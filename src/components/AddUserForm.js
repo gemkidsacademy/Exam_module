@@ -11,24 +11,28 @@ function AddUserForm({ onClose, onUserAdded }) {
 
   // ----------------- Fetch next user ID on component mount -----------------
   useEffect(() => {
-    const fetchNextId = async () => {
-      try {
-        const response = await fetch(
-          "https://web-production-481a5.up.railway.app/get_next_user_id_exam_module"
-        );
-  
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-  
-        const id = await response.json();
-        console.log("[DEBUG] Received next user ID:", id); // log the ID
-        setNextId(id);
-      } catch (err) {
-        console.error("[ERROR] Failed to fetch next user ID:", err);
-        alert("Unable to fetch next user ID");
+  const fetchNextId = async () => {
+    try {
+      const response = await fetch(
+        "https://web-production-481a5.up.railway.app/get_next_user_id_exam_module"
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
+
+      const id = await response.json();
+      console.log("[DEBUG] Received next user ID:", id);
+      setNextId(id);
+    } catch (err) {
+      console.error("[ERROR] Failed to fetch next user ID:", err);
+      alert("Unable to fetch next user ID");
+    }
+  };
+
+  fetchNextId(); // <-- Call async function
+}, []); // <-- Properly close useEffect
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
