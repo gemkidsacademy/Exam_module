@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 
 // --- Components ---
-import AdminDashboard from "./components/AdminDashboard";
+import AdminPanel from "./components/AdminPage";
 import AddDoctor from "./components/AddDoctorPage";
 import EditDoctor from "./components/EditDoctorPage";
 import ViewDoctors from "./components/ViewDoctors";
@@ -122,7 +122,7 @@ function App() {
           path="/AdminPanel"
           element={
             <PrivateRoute isLoggedIn={isLoggedIn}>
-              <AdminDashboard />
+              <AdminPanel />
             </PrivateRoute>
           }
         />
