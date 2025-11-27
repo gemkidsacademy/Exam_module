@@ -1,4 +1,5 @@
-.dashboard-container {
+/* Container spans full height */
+.selective-dashboard {
   display: flex;
   height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -7,12 +8,12 @@
 /* Sidebar */
 .sidebar {
   width: 220px;
-  background-color: #1f2937; /* dark gray-blue instead of black */
-  color: #e5e7eb; /* light gray text for readability */
+  background-color: #1f2937; /* dark gray-blue */
+  color: #e5e7eb; /* light gray text */
   display: flex;
   flex-direction: column;
   padding-top: 20px;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1); /* subtle shadow on the right */
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
 }
 
 /* Tabs */
@@ -20,24 +21,25 @@
   padding: 15px 20px;
   cursor: pointer;
   transition: all 0.3s ease;
-  border-left: 4px solid transparent; /* for active tab indicator */
+  border-left: 4px solid transparent;
 }
 
 .tab-item:hover {
-  background-color: #374151; /* hover slightly lighter */
+  background-color: #374151; /* lighter hover */
 }
 
 .tab-item.active {
-  background-color: #2563eb; /* bright blue for active tab */
+  background-color: #2563eb; /* bright blue active */
   color: #ffffff;
   font-weight: 600;
-  border-left: 4px solid #3b82f6; /* left accent line */
+  border-left: 4px solid #3b82f6;
 }
 
-/* Main content */
-.main-content {
+/* Content area */
+.content-area {
   flex: 1;
   padding: 40px;
-  background-color: #f3f4f6; /* light gray for contrast */
+  background-color: #f3f4f6; /* light gray */
   overflow-y: auto;
+  color: #111827; /* dark text for readability */
 }
