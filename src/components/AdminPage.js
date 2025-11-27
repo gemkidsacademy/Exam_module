@@ -15,7 +15,7 @@ const AdminPanel = () => {
   const [showDeleteUser, setShowDeleteUser] = useState(false);
 
   const tabs = [
-    { id: "database", label: "Chatbot User Management" },
+    { id: "database", label: "Exam Module User Management" },
   ];
 
   const handleUserUpdated = () => {
