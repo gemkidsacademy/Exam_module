@@ -1,69 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
 
-function SimpleLogin({ onLogin }) {
+// --- Components ---
+import AdminDashboard from "./components/AdminDashboard";
+import AddDoctor from "./components/AddDoctorPage";
+import EditDoctor from "./components/EditDoctorPage";
+import ViewDoctors from "./components/ViewDoctors";
+import DeleteDoctor from "./components/DeleteDoctor";
+import Chatbot_gamified_quiz from "./components/Chatbot_gamified_quiz";
+import UsageDashboard from "./components/UsageDashboard";
+
+// --- Login Page ---
+function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const server = "https://web-production-481a5.up.railway.app";
 
   const handleLogin = async () => {
+    setError(null);
+
+    if (!username || !password) {
+      setError("Please enter username and password");
+      return;
+    }
+
     try {
-      setError(null);
-  
-      if (!username || !password) {
-        setError("Please enter both username and password");
-        return;
-      }
-  
-      console.log("[INFO] Attempting exam-module login:", username);
-  
-      const response = await fetch("https://web-production-481a5.up.railway.app/login-exam-module", {
+      const response = await fetch(`${server}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        credentials: "include",
+        body: JSON.stringify({ name: username, password }),
       });
-  
+
       const data = await response.json();
-      console.log("[DEBUG] Login response:", data);
-  
+
       if (response.ok) {
-        console.log("[SUCCESS] Login successful");
-  
-        // Save login state
         setIsLoggedIn(true);
-        setUserData(data);
-  
-        // Role-based navigation
-        if (data?.name === "Admin") {
-          navigate("/admin");
-        } else {
-          navigate("/Quiz");
-        }
-  
+        setDoctorData(data);
+        setSessionToken(data.session_token || null);
+
+        if (data?.name === "Admin") navigate("/AdminPanel");
+        else navigate("/Quiz");
       } else {
         setError(data.detail || "Invalid credentials");
       }
     } catch (err) {
-      console.error("[ERROR] Network error:", err);
-      setError("Login failed. Try again.");
+      console.error("[ERROR] Login failed:", err);
+      setError("Login failed. Please try again.");
     }
   };
 
   return (
     <div style={styles.container}>
-      <div style={styles.box}>
+      <div style={styles.loginBox}>
         <h2>Login</h2>
 
         <input
           type="text"
-          placeholder="Enter username"
+          placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           style={styles.input}
         />
-
         <input
           type="password"
-          placeholder="Enter password"
+          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           style={styles.input}
@@ -79,21 +88,112 @@ function SimpleLogin({ onLogin }) {
   );
 }
 
+// --- Private Route Wrapper ---
+const PrivateRoute = ({ isLoggedIn, children }) => {
+  return isLoggedIn ? children : <Navigate to="/" />;
+};
+
+// --- Main App ---
+function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [doctorData, setDoctorData] = useState(null);
+  const [sessionToken, setSessionToken] = useState(null);
+
+  useEffect(() => {
+    document.title = "Class Management System";
+  }, []);
+
+  return (
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <LoginPage
+              setIsLoggedIn={setIsLoggedIn}
+              setDoctorData={setDoctorData}
+              setSessionToken={setSessionToken}
+            />
+          }
+        />
+
+        {/* Admin Routes */}
+        <Route
+          path="/AdminPanel"
+          element={
+            <PrivateRoute isLoggedIn={isLoggedIn}>
+              <AdminDashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/add-doctor"
+          element={
+            <PrivateRoute isLoggedIn={isLoggedIn}>
+              <AddDoctor />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/edit-doctor"
+          element={
+            <PrivateRoute isLoggedIn={isLoggedIn}>
+              <EditDoctor />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/view-doctors"
+          element={
+            <PrivateRoute isLoggedIn={isLoggedIn}>
+              <ViewDoctors />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/delete-doctor"
+          element={
+            <PrivateRoute isLoggedIn={isLoggedIn}>
+              <DeleteDoctor />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/usage-dashboard"
+          element={
+            <PrivateRoute isLoggedIn={isLoggedIn}>
+              <UsageDashboard />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Quiz Route */}
+        <Route
+          path="/Quiz"
+          element={<Chatbot_gamified_quiz doctorData={doctorData} />}
+        />
+      </Routes>
+    </Router>
+  );
+}
+
+// --- Styles ---
 const styles = {
   container: {
-    height: "100vh",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    height: "100vh",
     background: "#f0f2f5",
   },
-  box: {
-    width: "320px",
+  loginBox: {
     padding: "30px",
-    background: "white",
     borderRadius: "8px",
-    boxShadow: "0px 2px 10px rgba(0,0,0,0.1)",
+    background: "#fff",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
     textAlign: "center",
+    minWidth: "300px",
   },
   input: {
     width: "100%",
@@ -106,10 +206,11 @@ const styles = {
   button: {
     width: "100%",
     padding: "10px",
-    background: "#007bff",
-    color: "white",
-    border: "none",
+    marginTop: "10px",
     borderRadius: "4px",
+    border: "none",
+    background: "#007bff",
+    color: "#fff",
     cursor: "pointer",
     fontSize: "16px",
   },
@@ -119,4 +220,4 @@ const styles = {
   },
 };
 
-export default SimpleLogin;
+export default App;
