@@ -1,0 +1,86 @@
+/* --- Tailwind base imports --- */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- Global defaults --- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Root / reset — make sure the app root is truly edge-to-edge */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;        /* vertical scroll only when needed */
+  overflow-x: hidden;      /* prevent horizontal scroll */
+  font-family: 'Poppins', sans-serif;
+  background: #f0f4f8;
+}
+
+/* Shrink global font size (your previous tweak) */
+html {
+  scroll-behavior: smooth;
+  font-size: 13px;
+}
+
+/* Improve text rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-y: auto; /* ensure vertical scrollbar only when needed */
+}
+
+/* Ensure images, videos, iframes are responsive */
+img, video, iframe {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Default "container" kept but not forced — use .centered when you want margins */
+.container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---- HELPERS ---- */
+
+/* Use this class on the outermost component wrapper to guarantee full-bleed content
+   Works even if the page has a centered parent. */
+.edge-to-edge {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin-left: 50% !important;
+  transform: translateX(-50%) !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  box-sizing: border-box;
+}
+
+/* Use this for a centered, limited-width layout */
+.centered {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+/* Small visual debug helper (temporary use only) */
+/* .debug-outline * { outline: 1px solid rgba(0,128,255,0.12); } */
+
+ul, ol {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}

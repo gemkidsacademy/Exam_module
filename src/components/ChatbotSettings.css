@@ -1,0 +1,91 @@
+/* -------------------- Chatbot Settings Container -------------------- */
+.settings-container {
+  width: 90%;                /* responsive width */
+  max-width: 800px;          /* reasonable max width */
+  margin: 20px auto;         /* smaller top/bottom margin */
+  padding: 20px;             /* reduce padding to save space */
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  font-family: "Poppins", sans-serif;
+
+  display: flex;
+  flex-direction: column;
+  max-height: 70vh;          /* fit in viewport */
+  overflow-y: auto;          /* scroll if content is taller */
+}
+
+/* Title */
+.settings-title {
+  font-size: 1.8rem;
+  color: #333;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Description */
+.settings-description {
+  text-align: center;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+/* Knowledge base textarea */
+.knowledge-textarea {
+  width: 100%;
+  min-height: 180px;         /* minimum height */
+  max-height: 50vh;          /* prevent from being too tall */
+  resize: vertical;
+  overflow-y: auto;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  padding: 15px;
+  font-size: 1rem;
+  font-family: "Roboto", sans-serif;
+  margin-bottom: 20px;
+}
+
+/* Update button */
+.save-button {
+  display: block;
+  margin: 0 auto 15px auto;
+  background-color: #4f46e5; /* match dashboard color */
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+}
+
+.save-button:hover {
+  background-color: #4338ca;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+}
+
+/* Status message */
+.status-message {
+  text-align: center;
+  margin-top: 10px;
+  font-weight: 500;
+  color: #333;
+  word-break: break-word; /* prevents overflow for long messages */
+}
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  .settings-container {
+    padding: 15px;
+  }
+
+  .settings-title {
+    font-size: 1.5rem;
+  }
+
+  .knowledge-textarea {
+    min-height: 150px;
+  }
+}
