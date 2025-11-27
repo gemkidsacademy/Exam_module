@@ -1,19 +1,20 @@
-/* Container spans full height */
+/* Entire dashboard */
 .selective-dashboard {
   display: flex;
   height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #ffffff; /* White background for the whole dashboard */
 }
 
 /* Sidebar */
 .sidebar {
   width: 220px;
-  background-color: #d8b4fe; /* light purple background */
+  background-color: #ffffff; /* White sidebar */
   color: #000000; /* black text */
   display: flex;
   flex-direction: column;
   padding-top: 20px;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  border-right: 1px solid #e5e7eb; /* subtle border for separation */
 }
 
 /* Tabs */
@@ -22,18 +23,17 @@
   cursor: pointer;
   transition: all 0.3s ease;
   border-left: 4px solid transparent;
-  color: #000000; /* ensure text is black */
+  color: #000000; /* black text */
 }
 
 .tab-item:hover {
-  background-color: #c084fc; /* slightly darker light purple on hover */
+  background-color: #f3f4f6; /* light grey hover for feedback */
 }
 
 .tab-item.active {
-  background-color: #a78bfa; /* darker purple for active tab */
-  color: #000000;
+  background-color: #e0e7ff; /* very light blue/purple for active tab */
   font-weight: 600;
-  border-left: 4px solid #7c3aed; /* deep purple border for active */
+  border-left: 4px solid #6366f1; /* deeper purple border for active */
 }
 
 /* Content area */
