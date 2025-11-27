@@ -14,6 +14,8 @@ import EditDoctor from "./components/EditDoctorPage";
 import ViewDoctors from "./components/ViewDoctors";
 import DeleteDoctor from "./components/DeleteDoctor";
 import UsageDashboard from "./components/UsageDashboard";
+import SelectiveDashboard from "./components/SelectiveDashboard";
+
 
 // --- Login Page ---
 function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
@@ -128,6 +130,14 @@ function App() {
           element={
             <PrivateRoute isLoggedIn={isLoggedIn}>
               <AdminPanel />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/SelectiveDashboard"
+          element={
+            <PrivateRoute isLoggedIn={isLoggedIn}>
+              <SelectiveDashboard />
             </PrivateRoute>
           }
         />
