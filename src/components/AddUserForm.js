@@ -3,10 +3,10 @@ import "./AddUserForm.css";
 
 function AddUserForm({ onClose, onUserAdded }) {
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [className, setClassName] = useState("");
+  const [parentEmail, setParentEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [className, setClassName] = useState("");
+  const [classDay, setClassDay] = useState("Monday");
   const [nextId, setNextId] = useState(null); // New state for next user ID
 
   // ----------------- Fetch next user ID on component mount -----------------
@@ -31,13 +31,13 @@ function AddUserForm({ onClose, onUserAdded }) {
 
     // ----------------- Trim fields -----------------
     const trimmedName = name.trim();
-    const trimmedEmail = email.trim();
-    const trimmedPhone = phoneNumber.trim();
-    const trimmedClass = className.trim();
+    const trimmedEmail = parentEmail.trim();
     const trimmedPassword = password.trim();
+    const trimmedClass = className.trim();
+    const trimmedDay = classDay.trim();
 
     // ----------------- Validation -----------------
-    if (!trimmedName || !trimmedEmail || !trimmedPhone || !trimmedClass || !trimmedPassword) {
+    if (!trimmedName || !trimmedEmail || !trimmedPassword || !trimmedClass || !trimmedDay) {
       alert("All fields are required");
       return;
     }
@@ -48,12 +48,6 @@ function AddUserForm({ onClose, onUserAdded }) {
       return;
     }
 
-    const phoneRegex = /^04\d{8}$/;
-    if (!phoneRegex.test(trimmedPhone)) {
-      alert("Please enter a valid Australian phone number (e.g. 0412345678)");
-      return;
-    }
-
     if (!nextId) {
       alert("Next user ID not ready. Please try again.");
       return;
@@ -61,12 +55,12 @@ function AddUserForm({ onClose, onUserAdded }) {
 
     // ----------------- Prepare payload -----------------
     const payload = {
-      id: nextId, // include the fetched ID
-      name: trimmedName,
-      email: trimmedEmail,
-      phone_number: trimmedPhone,
-      class_name: trimmedClass,
+      id: nextId,            // fetched ID
       password: trimmedPassword,
+      name: trimmedName,
+      parent_email: trimmedEmail,
+      class_name: trimmedClass,
+      class_day: trimmedDay,
     };
 
     console.log("[DEBUG] Sending payload to backend:", JSON.stringify(payload));
@@ -94,10 +88,10 @@ function AddUserForm({ onClose, onUserAdded }) {
 
       // ----------------- Reset form -----------------
       setName("");
-      setEmail("");
-      setPhoneNumber("");
-      setClassName("");
+      setParentEmail("");
       setPassword("");
+      setClassName("");
+      setClassDay("Monday");
 
       // ----------------- Fetch next ID again -----------------
       const newId = await fetch(
@@ -124,23 +118,9 @@ function AddUserForm({ onClose, onUserAdded }) {
           />
           <input
             type="email"
-            placeholder="User email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Phone number (e.g. 0412345678)"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Class name"
-            value={className}
-            onChange={(e) => setClassName(e.target.value)}
+            placeholder="Parent Email"
+            value={parentEmail}
+            onChange={(e) => setParentEmail(e.target.value)}
             required
           />
           <input
@@ -150,6 +130,24 @@ function AddUserForm({ onClose, onUserAdded }) {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          <input
+            type="text"
+            placeholder="Class Name"
+            value={className}
+            onChange={(e) => setClassName(e.target.value)}
+            required
+          />
+          <select
+            value={classDay}
+            onChange={(e) => setClassDay(e.target.value)}
+          >
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+          </select>
+
           <div className="modal-actions">
             <button type="submit">Add User</button>
             <button type="button" onClick={onClose}>
