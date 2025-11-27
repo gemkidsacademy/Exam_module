@@ -9,7 +9,7 @@ const SelectiveDashboard = () => {
   return (
     <div className="selective-dashboard">
       {/* Sidebar */}
-      <div className="sidebar">
+      <aside className="sidebar">
         {tabs.map((tab) => (
           <div
             key={tab}
@@ -19,13 +19,15 @@ const SelectiveDashboard = () => {
             {tab}
           </div>
         ))}
-      </div>
+      </aside>
 
       {/* Content area */}
-      <div className="content-area">
+      <main className="content-area">
         <h2>{activeTab}</h2>
-        <p>Here you can add all components or actions related to <strong>{activeTab}</strong>.</p>
-      </div>
+        <p>
+          Here you can add all components or actions related to <strong>{activeTab}</strong>.
+        </p>
+      </main>
     </div>
   );
 };
