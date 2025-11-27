@@ -8,7 +8,7 @@
 /* Sidebar */
 .sidebar {
   width: 220px;
-  background-color: #8b5cf6; /* purple background */
+  background-color: #d8b4fe; /* light purple background */
   color: #000000; /* black text */
   display: flex;
   flex-direction: column;
@@ -26,14 +26,14 @@
 }
 
 .tab-item:hover {
-  background-color: #a78bfa; /* lighter purple on hover */
+  background-color: #c084fc; /* slightly darker light purple on hover */
 }
 
 .tab-item.active {
-  background-color: #7c3aed; /* darker purple for active tab */
+  background-color: #a78bfa; /* darker purple for active tab */
   color: #000000;
   font-weight: 600;
-  border-left: 4px solid #5b21b6; /* deep purple border for active */
+  border-left: 4px solid #7c3aed; /* deep purple border for active */
 }
 
 /* Content area */
