@@ -13,7 +13,6 @@ import AddDoctor from "./components/AddDoctorPage";
 import EditDoctor from "./components/EditDoctorPage";
 import ViewDoctors from "./components/ViewDoctors";
 import DeleteDoctor from "./components/DeleteDoctor";
-
 import UsageDashboard from "./components/UsageDashboard";
 
 // --- Login Page ---
@@ -25,19 +24,20 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
   const server = "https://web-production-481a5.up.railway.app";
 
   const handleLogin = async () => {
-    setError(null);
+    try {
+      setError(null);
 
-    if (!username || !password) {
-      setError("Please enter username and password");
-      return;
-    }
+      if (!username || !password) {
+        setError("Please enter username and password");
+        return;
+      }
 
-    const response = await fetch(`${server}/login-exam-module`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ student_id: username, password }), // use student_id
-    });
+      const response = await fetch(`${server}/login-exam-module`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ student_id: username, password }), // use student_id
+      });
 
       const data = await response.json();
 
@@ -166,8 +166,6 @@ function App() {
             </PrivateRoute>
           }
         />
-
-        
       </Routes>
     </Router>
   );
