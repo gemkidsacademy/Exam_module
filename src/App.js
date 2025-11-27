@@ -12,7 +12,7 @@ function SimpleLogin({ onLogin }) {
     }
 
     // Send login request to backend
-    fetch("https://your-backend-url.com/login", {
+    fetch("https://web-production-481a5.up.railway.app/login-exam-module", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
