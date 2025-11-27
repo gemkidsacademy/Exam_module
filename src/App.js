@@ -42,12 +42,13 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
       const data = await response.json();
 
       if (response.ok) {
+        console.log("[DEBUG] Login response data:", data); // Log the response
         setIsLoggedIn(true);
         setDoctorData(data);
         setSessionToken(data.session_token || null);
 
         if (data?.name === "Admin") navigate("/AdminPanel");
-        else navigate("/Quiz");
+        else navigate("/ExamModule");
       } else {
         setError(data.detail || "Invalid credentials");
       }
