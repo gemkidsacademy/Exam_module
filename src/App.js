@@ -5,27 +5,47 @@ function SimpleLogin({ onLogin }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
 
-  const handleLogin = () => {
-    if (!username || !password) {
-      setError("Please enter both username and password");
-      return;
-    }
-
-    // Send login request to backend
-    fetch("https://web-production-481a5.up.railway.app/login-exam-module", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    })
-      .then(async (res) => {
-        const data = await res.json();
-        if (res.ok) {
-          onLogin(data);
+  const handleLogin = async () => {
+    try {
+      setError(null);
+  
+      if (!username || !password) {
+        setError("Please enter both username and password");
+        return;
+      }
+  
+      console.log("[INFO] Attempting exam-module login:", username);
+  
+      const response = await fetch("https://web-production-481a5.up.railway.app/login-exam-module", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+  
+      const data = await response.json();
+      console.log("[DEBUG] Login response:", data);
+  
+      if (response.ok) {
+        console.log("[SUCCESS] Login successful");
+  
+        // Save login state
+        setIsLoggedIn(true);
+        setUserData(data);
+  
+        // Role-based navigation
+        if (data?.name === "Admin") {
+          navigate("/admin");
         } else {
-          setError(data.detail || "Invalid credentials");
+          navigate("/Quiz");
         }
-      })
-      .catch(() => setError("Login failed. Try again."));
+  
+      } else {
+        setError(data.detail || "Invalid credentials");
+      }
+    } catch (err) {
+      console.error("[ERROR] Network error:", err);
+      setError("Login failed. Try again.");
+    }
   };
 
   return (
