@@ -32,13 +32,12 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
       return;
     }
 
-    try {
-      const response = await fetch(`${server}/login-exam-module`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ name: username, password }),
-      });
+    const response = await fetch(`${server}/login-exam-module`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ student_id: username, password }), // use student_id
+    });
 
       const data = await response.json();
 
