@@ -14,17 +14,21 @@ function AddUserForm({ onClose, onUserAdded }) {
     const fetchNextId = async () => {
       try {
         const response = await fetch(
-          "https://krishbackend-production.up.railway.app/get_next_user_id"
+          "https://web-production-481a5.up.railway.app/get_next_user_id_exam_module"
         );
+  
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+  
         const id = await response.json();
+        console.log("[DEBUG] Received next user ID:", id); // log the ID
         setNextId(id);
       } catch (err) {
         console.error("[ERROR] Failed to fetch next user ID:", err);
         alert("Unable to fetch next user ID");
       }
     };
-    fetchNextId();
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
