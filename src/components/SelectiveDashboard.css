@@ -8,8 +8,8 @@
 /* Sidebar */
 .sidebar {
   width: 220px;
-  background-color: #1f2937; /* dark gray-blue */
-  color: #e5e7eb; /* light gray text */
+  background-color: #1f2937; /* dark gray instead of pure black */
+  color: #f3f4f6; /* light text for contrast */
   display: flex;
   flex-direction: column;
   padding-top: 20px;
@@ -22,14 +22,15 @@
   cursor: pointer;
   transition: all 0.3s ease;
   border-left: 4px solid transparent;
+  color: #f3f4f6; /* ensure text is visible */
 }
 
 .tab-item:hover {
-  background-color: #374151; /* lighter hover */
+  background-color: #374151; /* slightly lighter hover */
 }
 
 .tab-item.active {
-  background-color: #2563eb; /* bright blue active */
+  background-color: #2563eb; /* bright blue for active */
   color: #ffffff;
   font-weight: 600;
   border-left: 4px solid #3b82f6;
@@ -39,7 +40,7 @@
 .content-area {
   flex: 1;
   padding: 40px;
-  background-color: #f3f4f6; /* light gray */
+  background-color: #f3f4f6; /* light gray for readability */
   overflow-y: auto;
-  color: #111827; /* dark text for readability */
+  color: #111827; /* dark text for good contrast */
 }
