@@ -13,7 +13,7 @@ import AddDoctor from "./components/AddDoctorPage";
 import EditDoctor from "./components/EditDoctorPage";
 import ViewDoctors from "./components/ViewDoctors";
 import DeleteDoctor from "./components/DeleteDoctor";
-import Chatbot_gamified_quiz from "./components/Chatbot_gamified_quiz";
+
 import UsageDashboard from "./components/UsageDashboard";
 
 // --- Login Page ---
@@ -168,11 +168,7 @@ function App() {
           }
         />
 
-        {/* Quiz Route */}
-        <Route
-          path="/Quiz"
-          element={<Chatbot_gamified_quiz doctorData={doctorData} />}
-        />
+        
       </Routes>
     </Router>
   );
