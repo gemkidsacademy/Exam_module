@@ -33,7 +33,7 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
     }
 
     try {
-      const response = await fetch(`${server}/login`, {
+      const response = await fetch(`${server}/login-exam-module`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
