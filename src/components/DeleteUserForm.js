@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./AddUserForm.css"; // reuse the same modal styling
+import "./AddStudentForm.css"; // reuse the same modal styling
 
 function DeleteUserForm({ onClose, onUserUpdated }) {
   const [userIds, setUserIds] = useState([]); // list of user IDs
