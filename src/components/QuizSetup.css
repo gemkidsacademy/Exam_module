@@ -1,0 +1,116 @@
+/* Container */
+.quiz-setup-container {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 30px 25px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Heading */
+.quiz-setup-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333333;
+  font-weight: 700;
+}
+
+/* Form labels */
+.quiz-setup-container label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #555555;
+  font-size: 14px;
+}
+
+/* Input & Select fields */
+.quiz-setup-container input,
+.quiz-setup-container select {
+  width: 100%;
+  padding: 12px 10px;
+  margin-bottom: 18px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease-in-out;
+}
+
+.quiz-setup-container input:focus,
+.quiz-setup-container select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+  outline: none;
+}
+
+.quiz-setup-container input[readonly] {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  color: #777777;
+}
+
+/* Buttons */
+.quiz-setup-container button {
+  width: 100%;
+  padding: 14px;
+  background-color: #007bff;
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+}
+
+.quiz-setup-container button:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+.quiz-setup-container button:active {
+  transform: translateY(0);
+}
+
+/* Topic Card */
+.topics-container {
+  margin-top: 20px;
+}
+
+.topic {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 15px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+}
+
+.topic h4 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+/* Warning message */
+.warning {
+  color: red;
+  font-weight: bold;
+  margin-top: 5px;
+  font-size: 13px;
+}
+
+/* Note */
+.quiz-setup-container .note {
+  margin-top: 15px;
+  font-size: 0.9em;
+  color: #555;
+}
+
+/* Responsive */
+@media (max-width: 650px) {
+  .quiz-setup-container {
+    padding: 20px;
+    margin: 20px;
+  }
+}
