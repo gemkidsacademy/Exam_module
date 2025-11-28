@@ -5,7 +5,7 @@ import AddUserForm from "./AddUserForm";
 import EditUserForm from "./EditUserForm";
 import ViewUserModal from "./ViewUserModal";
 import DeleteUserForm from "./DeleteUserForm";
-import AddQuizForm from "./AddQuizForm";
+import QuizSetup from "./QuizSetup";
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("database");
@@ -121,7 +121,7 @@ const AdminPanel = () => {
                 Add Quiz
               </button>
               {showAddQuiz && (
-                <AddQuizForm
+                <QuizSetup
                   onClose={() => setShowAddQuiz(false)}
                   onQuizAdded={handleQuizAdded}
                 />
