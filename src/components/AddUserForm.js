@@ -6,6 +6,7 @@ export default function AddStudentForm() {
   const [className, setClassName] = useState("");
   const [classDay, setClassDay] = useState("");
   const [parentEmail, setParentEmail] = useState("");
+  import "./AddStudentForm.css";
 
   // -----------------------------
   // Fetch previous user ID
