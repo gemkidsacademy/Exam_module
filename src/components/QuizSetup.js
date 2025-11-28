@@ -86,7 +86,7 @@ export default function QuizSetup() {
 
   return (
     <div className="quiz-setup-container">
-      <h2>Quiz Setup</h2>
+      
       <form onSubmit={handleSubmit}>
         <label>Class:</label>
         <select
