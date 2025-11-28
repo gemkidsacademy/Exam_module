@@ -1,150 +1,131 @@
-import React, { useState, useEffect } from "react";
-import "./AddUserForm.css"; // reuse the same modal styling
+import { useState, useEffect } from "react";
+import "./AddStudentForm.css";
 
-function EditUserForm({ onClose, onUserUpdated }) {
-  const [userIds, setUserIds] = useState([]); // list of user IDs
-  const [selectedUserId, setSelectedUserId] = useState("");
+export default function EditUserForm() {
+  const [studentOptions, setStudentOptions] = useState([]); // Dropdown options from backend
+  const [selectedStudentId, setSelectedStudentId] = useState(""); // Admin selects which student to edit
+  const [id, setId] = useState(""); // Non-editable backend ID of selected student
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
   const [className, setClassName] = useState("");
-  const [password, setPassword] = useState("");
+  const [classDay, setClassDay] = useState("");
+  const [parentEmail, setParentEmail] = useState("");
 
-  // Fetch user IDs on mount
+  // Fetch all students for dropdown
   useEffect(() => {
-    const fetchUserIds = async () => {
+    const fetchStudents = async () => {
       try {
-        const res = await fetch("https://krishbackend-production.up.railway.app/user_ids");
-        if (!res.ok) throw new Error("Failed to fetch user IDs");
-        const data = await res.json(); // should return array like [{id:1}, {id:2}, ...]
-        setUserIds(data);
+        const response = await fetch(
+          "https://web-production-481a5.up.railway.app/get_all_students_exam_module"
+        );
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        setStudentOptions(data.students || []); // assuming backend returns { students: [{id, student_id, name, ...}] }
       } catch (err) {
         console.error(err);
-        alert("Error fetching user IDs");
+        alert("Unable to fetch students");
       }
     };
-
-    fetchUserIds();
+    fetchStudents();
   }, []);
 
-  // Fetch user details when a user ID is selected
+  // When a student is selected from dropdown, populate the form
   useEffect(() => {
-    if (!selectedUserId) return;
-
-    const fetchUserDetails = async () => {
-      try {
-        const res = await fetch(`https://krishbackend-production.up.railway.app/users/info/${selectedUserId}`);
-        if (!res.ok) throw new Error("Failed to fetch user details");
-        const user = await res.json();
-        setName(user.name || "");
-        setEmail(user.email || "");
-        setPhoneNumber(user.phone_number || "");
-        setClassName(user.class_name || "");
-        setPassword(""); // leave empty unless admin wants to reset
-      } catch (err) {
-        console.error(err);
-        alert("Error fetching user details");
-      }
-    };
-
-    fetchUserDetails();
-  }, [selectedUserId]);
+    if (!selectedStudentId) return;
+    const student = studentOptions.find(s => s.student_id === selectedStudentId);
+    if (student) {
+      setId(student.id);
+      setName(student.name);
+      setClassName(student.class_name);
+      setClassDay(student.class_day);
+      setParentEmail(student.parent_email);
+    }
+  }, [selectedStudentId, studentOptions]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedUserId) {
-      alert("Please select a user to edit");
-      return;
-    }
+    const payload = {
+      id,               // Backend ID, non-editable
+      student_id: selectedStudentId, // Admin-selected student_id
+      name,
+      class_name: className,
+      class_day: classDay,
+      parent_email: parentEmail,
+    };
 
     try {
-      const res = await fetch(
-        `https://krishbackend-production.up.railway.app/edit-user/${selectedUserId}`,
+      const response = await fetch(
+        "https://web-production-481a5.up.railway.app/edit_student_exam_module",
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name,
-            email,
-            phone_number: phoneNumber,
-            class_name: className,
-            password, // send only if admin wants to update
-          }),
+          body: JSON.stringify(payload),
         }
       );
-
-      if (!res.ok) throw new Error("Failed to update user");
-      await res.json();
-      onUserUpdated();
+      if (!response.ok) throw new Error("Failed to update student");
+      alert("Student updated successfully!");
     } catch (err) {
       console.error(err);
-      alert("Error updating user");
+      alert("Error updating student");
     }
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal">
-        <h3>Edit User</h3>
+    <div className="add-student-container">
+      <h2>Edit Student</h2>
+      <form onSubmit={handleSubmit}>
+        {/* Dropdown to select student by student_id */}
+        <label>Select Student ID</label>
+        <select
+          value={selectedStudentId}
+          onChange={(e) => setSelectedStudentId(e.target.value)}
+          required
+        >
+          <option value="">-- Select Student --</option>
+          {studentOptions.map((s) => (
+            <option key={s.id} value={s.student_id}>
+              {s.student_id} - {s.name}
+            </option>
+          ))}
+        </select>
 
-        <form onSubmit={handleSubmit}>
-          {/* User selection dropdown */}
-          <select
-            value={selectedUserId}
-            onChange={(e) => setSelectedUserId(e.target.value)}
-            required
-          >
-            <option value="">Select a user</option>
-            {userIds.map((u) => (
-              <option key={u.id} value={u.id}>
-                User ID: {u.id}
-              </option>
-            ))}
-          </select>
+        {/* Non-editable ID from backend */}
+        <label>ID</label>
+        <input type="text" value={id} readOnly />
 
-          <input
-            type="text"
-            placeholder="User name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <input
-            type="email"
-            placeholder="User email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Phone number (optional)"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Class name (optional)"
-            value={className}
-            onChange={(e) => setClassName(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Password (leave blank to keep unchanged)"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+        <label>Name</label>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
 
-          <div className="modal-actions">
-            <button type="submit">Update User</button>
-            <button type="button" onClick={onClose}>
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
+        <label>Class Name</label>
+        <input
+          type="text"
+          value={className}
+          onChange={(e) => setClassName(e.target.value)}
+          required
+        />
+
+        <label>Class Day</label>
+        <input
+          type="text"
+          value={classDay}
+          onChange={(e) => setClassDay(e.target.value)}
+          required
+        />
+
+        <label>Parent Email</label>
+        <input
+          type="email"
+          value={parentEmail}
+          onChange={(e) => setParentEmail(e.target.value)}
+          required
+        />
+
+        <button type="submit">Update Student</button>
+      </form>
     </div>
   );
 }
-
-export default EditUserForm;
