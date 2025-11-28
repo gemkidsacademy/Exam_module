@@ -1,34 +1,33 @@
-import React, { useState, useEffect } from "react";
-import "./AddStudentForm.css"; // reuse the same modal styling
+import { useState, useEffect } from "react";
+import "./AddStudentForm.css"; // Reuse AddStudentForm styling
 
-function DeleteUserForm({ onClose, onUserUpdated }) {
-  const [userIds, setUserIds] = useState([]); // list of user IDs
+export default function DeleteUserForm({ onUserDeleted }) {
+  const [users, setUsers] = useState([]); // List of users from backend
   const [selectedUserId, setSelectedUserId] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [className, setClassName] = useState("");
 
-  // Fetch user IDs on mount
+  // Fetch users for dropdown
   useEffect(() => {
-    const fetchUserIds = async () => {
+    const fetchUsers = async () => {
       try {
         const res = await fetch(
           "https://krishbackend-production.up.railway.app/user_ids"
         );
-        if (!res.ok) throw new Error("Failed to fetch user IDs");
+        if (!res.ok) throw new Error("Failed to fetch users");
         const data = await res.json();
-        setUserIds(data);
+        setUsers(data);
       } catch (err) {
         console.error(err);
-        alert("Error fetching user IDs");
+        alert("Error fetching users");
       }
     };
-
-    fetchUserIds();
+    fetchUsers();
   }, []);
 
-  // Fetch user details when a user ID is selected
+  // Fetch user details when selected
   useEffect(() => {
     if (!selectedUserId) return;
 
@@ -48,35 +47,33 @@ function DeleteUserForm({ onClose, onUserUpdated }) {
         alert("Error fetching user details");
       }
     };
-
     fetchUserDetails();
   }, [selectedUserId]);
 
-  const handleSubmit = async (e) => {
+  const handleDelete = async (e) => {
     e.preventDefault();
-
-    if (!selectedUserId) {
-      alert("Please select a user to delete");
-      return;
-    }
+    if (!selectedUserId) return alert("Please select a user to delete");
 
     try {
       const res = await fetch(
         `https://krishbackend-production.up.railway.app/delete-user/${selectedUserId}`,
-        {
-          method: "DELETE",
-        }
+        { method: "DELETE" }
       );
-
       if (!res.ok) throw new Error("Failed to delete user");
 
       const data = await res.json();
       alert(data.message || "User deleted successfully!");
 
-      // Notify parent component if provided
-      if (onUserUpdated && typeof onUserUpdated === "function") {
-        onUserUpdated();
-      }
+      // Notify parent if needed
+      if (onUserDeleted) onUserDeleted();
+
+      // Reset form
+      setSelectedUserId("");
+      setName("");
+      setEmail("");
+      setPhoneNumber("");
+      setClassName("");
+      setUsers(users.filter((u) => u.id !== selectedUserId));
     } catch (err) {
       console.error(err);
       alert("Error deleting user");
@@ -84,62 +81,39 @@ function DeleteUserForm({ onClose, onUserUpdated }) {
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal">
-        <h3>Delete User</h3>
+    <div className="add-student-container">
+      <h2>Delete User</h2>
+      <form onSubmit={handleDelete}>
+        {/* User selection */}
+        <label>User ID</label>
+        <select
+          value={selectedUserId}
+          onChange={(e) => setSelectedUserId(e.target.value)}
+          required
+        >
+          <option value="">-- Select User --</option>
+          {users.map((u) => (
+            <option key={u.id} value={u.id}>
+              {u.id} - {u.name}
+            </option>
+          ))}
+        </select>
 
-        <form onSubmit={handleSubmit}>
-          {/* User selection dropdown */}
-          <select
-            value={selectedUserId}
-            onChange={(e) => setSelectedUserId(e.target.value)}
-            required
-          >
-            <option value="">Select a user</option>
-            {userIds.map((u) => (
-              <option key={u.id} value={u.id}>
-                User ID: {u.id}
-              </option>
-            ))}
-          </select>
+        {/* Read-only details */}
+        <label>Name</label>
+        <input type="text" value={name} readOnly />
 
-          <input
-            type="text"
-            placeholder="User name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <input
-            type="email"
-            placeholder="User email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Phone number (optional)"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Class name (optional)"
-            value={className}
-            onChange={(e) => setClassName(e.target.value)}
-          />
+        <label>Email</label>
+        <input type="email" value={email} readOnly />
 
-          <div className="modal-actions">
-            <button type="submit">Delete User</button>
-            <button type="button" onClick={onClose}>
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
+        <label>Phone Number</label>
+        <input type="text" value={phoneNumber} readOnly />
+
+        <label>Class Name</label>
+        <input type="text" value={className} readOnly />
+
+        <button type="submit">Delete User</button>
+      </form>
     </div>
   );
 }
-
-export default DeleteUserForm;
