@@ -1,0 +1,36 @@
+.add-student-container {
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.add-student-container h2 {
+  text-align: center;
+}
+
+.add-student-container form label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.add-student-container form input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  box-sizing: border-box;
+}
+
+.add-student-container form button {
+  margin-top: 15px;
+  width: 100%;
+  padding: 10px;
+  background-color: #0077ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
