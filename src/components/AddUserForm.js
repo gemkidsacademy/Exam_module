@@ -1,81 +1,55 @@
-import React, { useState, useEffect } from "react";
-import "./AddUserForm.css";
+import { useState, useEffect } from "react";
 
-function AddUserForm({ onClose, onUserAdded }) {
+export default function AddStudentForm() {
+  const [nextId, setNextId] = useState("");     // Auto-filled student_id
   const [name, setName] = useState("");
-  const [parentEmail, setParentEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [className, setClassName] = useState("");
-  const [classDay, setClassDay] = useState("Monday");
-  const [nextId, setNextId] = useState(null); // New state for next user ID
+  const [classDay, setClassDay] = useState("");
+  const [parentEmail, setParentEmail] = useState("");
 
-  // ----------------- Fetch next user ID on component mount -----------------
+  // -----------------------------
+  // Fetch previous user ID
+  // -----------------------------
   useEffect(() => {
-  const fetchNextId = async () => {
-    try {
-      const response = await fetch(
-        "https://web-production-481a5.up.railway.app/get_next_user_id_exam_module"
-      );
+    const fetchNextId = async () => {
+      try {
+        const response = await fetch(
+          "https://web-production-481a5.up.railway.app/get_next_user_id_exam_module"
+        );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const id = await response.json();
+        console.log("[DEBUG] Received next user ID:", id);
+        setNextId(id);
+      } catch (err) {
+        console.error("[ERROR] Failed to fetch next user ID:", err);
+        alert("Unable to fetch next user ID");
       }
+    };
 
-      const id = await response.json();
-      console.log("[DEBUG] Received next user ID:", id);
-      setNextId(id);
-    } catch (err) {
-      console.error("[ERROR] Failed to fetch next user ID:", err);
-      alert("Unable to fetch next user ID");
-    }
-  };
+    fetchNextId();
+  }, []); // <-- properly closed useEffect
 
-  fetchNextId(); // <-- Call async function
-}, []); // <-- Properly close useEffect
-  
-
+  // -----------------------------
+  // Submit Student
+  // -----------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ----------------- Trim fields -----------------
-    const trimmedName = name.trim();
-    const trimmedEmail = parentEmail.trim();
-    const trimmedPassword = password.trim();
-    const trimmedClass = className.trim();
-    const trimmedDay = classDay.trim();
-
-    // ----------------- Validation -----------------
-    if (!trimmedName || !trimmedEmail || !trimmedPassword || !trimmedClass || !trimmedDay) {
-      alert("All fields are required");
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(trimmedEmail)) {
-      alert("Please enter a valid email address");
-      return;
-    }
-
-    if (!nextId) {
-      alert("Next user ID not ready. Please try again.");
-      return;
-    }
-
-    // ----------------- Prepare payload -----------------
     const payload = {
-      id: nextId,            // fetched ID
-      password: trimmedPassword,
-      name: trimmedName,
-      parent_email: trimmedEmail,
-      class_name: trimmedClass,
-      class_day: trimmedDay,
+      student_id: nextId,
+      name,
+      class_name: className,
+      class_day: classDay,
+      parent_email: parentEmail,
     };
-
-    console.log("[DEBUG] Sending payload to backend:", JSON.stringify(payload));
 
     try {
       const response = await fetch(
-        "https://krishbackend-production.up.railway.app/add_user",
+        "https://web-production-481a5.up.railway.app/add_student_exam_module",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -83,89 +57,69 @@ function AddUserForm({ onClose, onUserAdded }) {
         }
       );
 
-      const responseData = await response.json();
-      console.log("[DEBUG] Add user response:", responseData);
-
       if (!response.ok) {
-        alert(responseData.detail || "Failed to add user");
-        return;
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      alert("User added successfully");
-      onUserAdded();
-
-      // ----------------- Reset form -----------------
-      setName("");
-      setParentEmail("");
-      setPassword("");
-      setClassName("");
-      setClassDay("Monday");
-
-      // ----------------- Fetch next ID again -----------------
-      const newId = await fetch(
-        "https://krishbackend-production.up.railway.app/get_next_user_id"
-      ).then((res) => res.json());
-      setNextId(newId);
+      alert("Student added successfully!");
     } catch (err) {
-      console.error("[ERROR] Failed to add user:", err);
-      alert("An unexpected error occurred while adding the user");
+      console.error("[ERROR] Failed to add student:", err);
+      alert("Error adding student");
     }
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal">
-        <h3>Add New User</h3>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="User name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <input
-            type="email"
-            placeholder="Parent Email"
-            value={parentEmail}
-            onChange={(e) => setParentEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Class Name"
-            value={className}
-            onChange={(e) => setClassName(e.target.value)}
-            required
-          />
-          <select
-            value={classDay}
-            onChange={(e) => setClassDay(e.target.value)}
-          >
-            <option value="Monday">Monday</option>
-            <option value="Tuesday">Tuesday</option>
-            <option value="Wednesday">Wednesday</option>
-            <option value="Thursday">Thursday</option>
-            <option value="Friday">Friday</option>
-          </select>
+    <div style={{ padding: "20px", maxWidth: "400px" }}>
+      <h2>Add New Student</h2>
+      <form onSubmit={handleSubmit}>
+        
+        {/* student_id (auto-filled) */}
+        <label>Student ID</label>
+        <input
+          type="text"
+          value={nextId}
+          readOnly
+          style={{ width: "100%", marginBottom: "10px" }}
+        />
 
-          <div className="modal-actions">
-            <button type="submit">Add User</button>
-            <button type="button" onClick={onClose}>
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
+        <label>Name</label>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          style={{ width: "100%", marginBottom: "10px" }}
+        />
+
+        <label>Class Name</label>
+        <input
+          type="text"
+          value={className}
+          onChange={(e) => setClassName(e.target.value)}
+          required
+          style={{ width: "100%", marginBottom: "10px" }}
+        />
+
+        <label>Class Day</label>
+        <input
+          type="text"
+          value={classDay}
+          onChange={(e) => setClassDay(e.target.value)}
+          required
+          style={{ width: "100%", marginBottom: "10px" }}
+        />
+
+        <label>Parent Email</label>
+        <input
+          type="email"
+          value={parentEmail}
+          onChange={(e) => setParentEmail(e.target.value)}
+          required
+          style={{ width: "100%", marginBottom: "10px" }}
+        />
+
+        <button type="submit">Add Student</button>
+      </form>
     </div>
   );
 }
-
-export default AddUserForm;
