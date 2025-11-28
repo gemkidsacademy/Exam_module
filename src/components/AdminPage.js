@@ -5,17 +5,21 @@ import AddUserForm from "./AddUserForm";
 import EditUserForm from "./EditUserForm";
 import ViewUserModal from "./ViewUserModal";
 import DeleteUserForm from "./DeleteUserForm";
+import AddQuizForm from "./AddQuizForm";
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("database");
   const navigate = useNavigate();
+
   const [showAddUser, setShowAddUser] = useState(false);
   const [showEditUser, setShowEditUser] = useState(false);
   const [showViewUser, setShowViewUser] = useState(false);
   const [showDeleteUser, setShowDeleteUser] = useState(false);
+  const [showAddQuiz, setShowAddQuiz] = useState(false);
 
   const tabs = [
     { id: "database", label: "Exam Module User Management" },
+    { id: "add-quiz", label: "Add Quiz" },
   ];
 
   const handleUserUpdated = () => {
@@ -31,6 +35,18 @@ const AdminPanel = () => {
   const handleUserDeleted = () => {
     console.log("User deleted successfully");
   };
+
+  const handleQuizAdded = () => {
+    setShowAddQuiz(false);
+    alert("Quiz added successfully!");
+  };
+
+  // Toggle functions
+  const toggleAddUser = () => setShowAddUser((prev) => !prev);
+  const toggleEditUser = () => setShowEditUser((prev) => !prev);
+  const toggleViewUser = () => setShowViewUser((prev) => !prev);
+  const toggleDeleteUser = () => setShowDeleteUser((prev) => !prev);
+  const toggleAddQuiz = () => setShowAddQuiz((prev) => !prev);
 
   return (
     <div className="dashboard-container">
@@ -54,7 +70,7 @@ const AdminPanel = () => {
         {activeTab === "database" && (
           <div className="tab-panel">
             <div>
-              <button className="dashboard-button" onClick={() => setShowAddUser(true)}>
+              <button className="dashboard-button" onClick={toggleAddUser}>
                 Add User
               </button>
               {showAddUser && (
@@ -66,7 +82,7 @@ const AdminPanel = () => {
             </div>
 
             <div>
-              <button className="dashboard-button" onClick={() => setShowEditUser(true)}>
+              <button className="dashboard-button" onClick={toggleEditUser}>
                 Edit User
               </button>
               {showEditUser && (
@@ -78,24 +94,36 @@ const AdminPanel = () => {
             </div>
 
             <div>
-              <button className="dashboard-button" onClick={() => setShowViewUser(true)}>
+              <button className="dashboard-button" onClick={toggleViewUser}>
                 View User
               </button>
-              {showViewUser && (
-                <ViewUserModal
-                  onClose={() => setShowViewUser(false)}
-                />
-              )}
+              {showViewUser && <ViewUserModal onClose={() => setShowViewUser(false)} />}
             </div>
 
             <div>
-              <button className="dashboard-button" onClick={() => setShowDeleteUser(true)}>
+              <button className="dashboard-button" onClick={toggleDeleteUser}>
                 Delete User
               </button>
               {showDeleteUser && (
                 <DeleteUserForm
                   onClose={() => setShowDeleteUser(false)}
                   onUserDeleted={handleUserDeleted}
+                />
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === "add-quiz" && (
+          <div className="tab-panel">
+            <div>
+              <button className="dashboard-button" onClick={toggleAddQuiz}>
+                Add Quiz
+              </button>
+              {showAddQuiz && (
+                <AddQuizForm
+                  onClose={() => setShowAddQuiz(false)}
+                  onQuizAdded={handleQuizAdded}
                 />
               )}
             </div>
