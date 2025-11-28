@@ -1,0 +1,67 @@
+/* Container */
+.upload-pdf-container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 30px 25px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Heading */
+.upload-pdf-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333333;
+  font-weight: 700;
+}
+
+/* File input */
+.upload-pdf-container input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 18px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* Button */
+.upload-pdf-container button {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+}
+
+.upload-pdf-container button:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+.upload-pdf-container button:disabled {
+  background-color: #a0c4ff;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Note text */
+.upload-pdf-container .note {
+  margin-top: 15px;
+  font-size: 0.9em;
+  color: #555;
+}
+
+/* Selected file info */
+.upload-pdf-container p {
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #333;
+}
