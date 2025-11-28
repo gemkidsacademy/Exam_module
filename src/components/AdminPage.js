@@ -6,6 +6,7 @@ import EditUserForm from "./EditUserForm";
 import ViewUserModal from "./ViewUserModal";
 import DeleteUserForm from "./DeleteUserForm";
 import QuizSetup from "./QuizSetup";
+import UploadPDF from "./UploadPDF"; // Create this component for uploading PDFs
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("database");
@@ -15,11 +16,11 @@ const AdminPanel = () => {
   const [showEditUser, setShowEditUser] = useState(false);
   const [showViewUser, setShowViewUser] = useState(false);
   const [showDeleteUser, setShowDeleteUser] = useState(false);
-  const [showAddQuiz, setShowAddQuiz] = useState(false);
 
   const tabs = [
     { id: "database", label: "Exam Module User Management" },
     { id: "add-quiz", label: "Add Quiz" },
+    { id: "upload-pdf", label: "Upload PDF" }, // New tab
   ];
 
   const handleUserUpdated = () => {
@@ -36,17 +37,11 @@ const AdminPanel = () => {
     console.log("User deleted successfully");
   };
 
-  const handleQuizAdded = () => {
-    setShowAddQuiz(false);
-    alert("Quiz added successfully!");
-  };
-
   // Toggle functions
   const toggleAddUser = () => setShowAddUser((prev) => !prev);
   const toggleEditUser = () => setShowEditUser((prev) => !prev);
   const toggleViewUser = () => setShowViewUser((prev) => !prev);
   const toggleDeleteUser = () => setShowDeleteUser((prev) => !prev);
-  const toggleAddQuiz = () => setShowAddQuiz((prev) => !prev);
 
   return (
     <div className="dashboard-container">
@@ -120,6 +115,11 @@ const AdminPanel = () => {
           </div>
         )}
 
+        {activeTab === "upload-pdf" && (
+          <div className="tab-panel">
+            <UploadPDF />
+          </div>
+        )}
       </div>
     </div>
   );
