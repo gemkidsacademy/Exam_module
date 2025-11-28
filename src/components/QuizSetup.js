@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./QuizSetup.css"; // You can adapt your CSS from HTML version
+import "./QuizSetup.css"; // reuse your QuizSetup styling
 
 export default function QuizSetup() {
   const [quiz, setQuiz] = useState({
@@ -35,7 +35,6 @@ export default function QuizSetup() {
       const topics = [...prev.topics];
       topics[index][field] = parseInt(value) || 0;
 
-      // Update total and warning
       const total = topics[index].ai + topics[index].db;
       topics[index].total = total > 35 ? 35 : total;
       topics[index].warning = total > 35;
@@ -64,6 +63,7 @@ export default function QuizSetup() {
     alert("Check console for quiz setup object.");
   };
 
+  // Directly render the form — no extra button needed
   return (
     <div className="quiz-setup-container">
       <h2>Quiz Setup</h2>
@@ -122,6 +122,7 @@ export default function QuizSetup() {
           onChange={handleInputChange}
         />
 
+        {/* Generate topics immediately when number changes */}
         <button type="button" onClick={generateTopics}>
           Generate Topics
         </button>
@@ -130,6 +131,7 @@ export default function QuizSetup() {
           {quiz.topics.map((topic, index) => (
             <div className="topic" key={index}>
               <h4>Topic {index + 1}</h4>
+
               <label>Topic Name:</label>
               <input
                 type="text"
@@ -158,7 +160,9 @@ export default function QuizSetup() {
 
               <label>Total Questions:</label>
               <input type="number" value={topic.total} readOnly />
-              {topic.warning && <div className="warning">Total cannot exceed 35!</div>}
+              {topic.warning && (
+                <div className="warning">Total cannot exceed 35!</div>
+              )}
             </div>
           ))}
         </div>
@@ -166,7 +170,9 @@ export default function QuizSetup() {
         <button type="submit">Submit Quiz Setup</button>
 
         <p className="note">
-          Note: The number of questions generated—either by AI or from your database—will be configured in the backend based on your preferences. Total questions per topic cannot exceed 35.
+          Note: The number of questions generated—either by AI or from your
+          database—will be configured in the backend based on your preferences.
+          Total questions per topic cannot exceed 35.
         </p>
       </form>
     </div>
