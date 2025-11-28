@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "./AddStudentForm.css";
 
 export default function AddStudentForm() {
-  const [nextId, setNextId] = useState("");
+  const [studentId, setStudentId] = useState(""); // Editable ID field
   const [name, setName] = useState("");
   const [className, setClassName] = useState("");
   const [classDay, setClassDay] = useState("");
@@ -16,7 +16,7 @@ export default function AddStudentForm() {
         );
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const id = await response.json();
-        setNextId(id);
+        setStudentId(id); // Pre-fill editable ID
       } catch (err) {
         console.error(err);
         alert("Unable to fetch next user ID");
@@ -27,16 +27,30 @@ export default function AddStudentForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = { student_id: nextId, name, class_name: className, class_day: classDay, parent_email: parentEmail };
+    const payload = { 
+      student_id: studentId, 
+      name, 
+      class_name: className, 
+      class_day: classDay, 
+      parent_email: parentEmail 
+    };
     try {
       const response = await fetch(
         "https://web-production-481a5.up.railway.app/add_student_exam_module",
-        { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }
+        { 
+          method: "POST", 
+          headers: { "Content-Type": "application/json" }, 
+          body: JSON.stringify(payload) 
+        }
       );
       if (!response.ok) throw new Error("Failed to add student");
       alert("Student added successfully!");
       // Reset form
-      setName(""); setClassName(""); setClassDay(""); setParentEmail("");
+      setStudentId(""); 
+      setName(""); 
+      setClassName(""); 
+      setClassDay(""); 
+      setParentEmail("");
     } catch (err) {
       console.error(err);
       alert("Error adding student");
@@ -48,19 +62,44 @@ export default function AddStudentForm() {
       <h2>Add New Student</h2>
       <form onSubmit={handleSubmit}>
         <label>Student ID</label>
-        <input type="text" value={nextId} readOnly />
+        <input 
+          type="text" 
+          value={studentId} 
+          onChange={(e) => setStudentId(e.target.value)} 
+          required 
+        />
 
         <label>Name</label>
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
+        <input 
+          type="text" 
+          value={name} 
+          onChange={(e) => setName(e.target.value)} 
+          required 
+        />
 
         <label>Class Name</label>
-        <input type="text" value={className} onChange={(e) => setClassName(e.target.value)} required />
+        <input 
+          type="text" 
+          value={className} 
+          onChange={(e) => setClassName(e.target.value)} 
+          required 
+        />
 
         <label>Class Day</label>
-        <input type="text" value={classDay} onChange={(e) => setClassDay(e.target.value)} required />
+        <input 
+          type="text" 
+          value={classDay} 
+          onChange={(e) => setClassDay(e.target.value)} 
+          required 
+        />
 
         <label>Parent Email</label>
-        <input type="email" value={parentEmail} onChange={(e) => setParentEmail(e.target.value)} required />
+        <input 
+          type="email" 
+          value={parentEmail} 
+          onChange={(e) => setParentEmail(e.target.value)} 
+          required 
+        />
 
         <button type="submit">Add Student</button>
       </form>
