@@ -116,19 +116,10 @@ const AdminPanel = () => {
 
         {activeTab === "add-quiz" && (
           <div className="tab-panel">
-            <div>
-              <button className="dashboard-button" onClick={toggleAddQuiz}>
-                Add Quiz
-              </button>
-              {showAddQuiz && (
-                <QuizSetup
-                  onClose={() => setShowAddQuiz(false)}
-                  onQuizAdded={handleQuizAdded}
-                />
-              )}
-            </div>
+            <QuizSetup />
           </div>
         )}
+
       </div>
     </div>
   );
