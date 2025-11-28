@@ -4,6 +4,7 @@ import "./AddStudentForm.css"; // Reuse AddStudentForm styling
 export default function DeleteUserForm({ onUserDeleted }) {
   const [users, setUsers] = useState([]); // List of users from backend
   const [selectedUserId, setSelectedUserId] = useState("");
+  const [studentId, setStudentId] = useState(""); // Editable student ID
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -38,6 +39,7 @@ export default function DeleteUserForm({ onUserDeleted }) {
         );
         if (!res.ok) throw new Error("Failed to fetch user details");
         const user = await res.json();
+        setStudentId(user.student_id || ""); // Pre-fill student ID if available
         setName(user.name || "");
         setEmail(user.email || "");
         setPhoneNumber(user.phone_number || "");
@@ -69,6 +71,7 @@ export default function DeleteUserForm({ onUserDeleted }) {
 
       // Reset form
       setSelectedUserId("");
+      setStudentId("");
       setName("");
       setEmail("");
       setPhoneNumber("");
@@ -85,7 +88,7 @@ export default function DeleteUserForm({ onUserDeleted }) {
       <h2>Delete User</h2>
       <form onSubmit={handleDelete}>
         {/* User selection */}
-        <label>User ID</label>
+        <label>ID</label>
         <select
           value={selectedUserId}
           onChange={(e) => setSelectedUserId(e.target.value)}
@@ -98,6 +101,15 @@ export default function DeleteUserForm({ onUserDeleted }) {
             </option>
           ))}
         </select>
+
+        {/* Editable Student ID */}
+        <label>Student ID</label>
+        <input
+          type="text"
+          value={studentId}
+          onChange={(e) => setStudentId(e.target.value)}
+          placeholder="Enter Student ID"
+        />
 
         {/* Read-only details */}
         <label>Name</label>
