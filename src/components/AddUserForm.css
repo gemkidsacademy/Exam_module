@@ -1,89 +1,127 @@
-/* AddUserForm.css */
+import { useState, useEffect } from "react";
+import "./AddStudentForm.css";
 
-/* Modal overlay covers the whole screen */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* semi-transparent dark background */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
+export default function AddStudentForm() {
+  const [id, setId] = useState("");           // DB primary key, fetched from backend
+  const [studentId, setStudentId] = useState(""); // Optional secondary student ID
+  const [name, setName] = useState("");
+  const [className, setClassName] = useState("");
+  const [classDay, setClassDay] = useState("");
+  const [parentEmail, setParentEmail] = useState("");
 
-/* Modal container */
-.modal {
-  background-color: #fff;
-  padding: 30px;
-  border-radius: 12px;
-  width: 400px;
-  max-width: 90%;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  animation: fadeIn 0.2s ease-in-out;
-}
+  // -----------------------------
+  // Fetch next DB ID from backend
+  // -----------------------------
+  useEffect(() => {
+    const fetchNextId = async () => {
+      try {
+        const response = await fetch(
+          "https://web-production-481a5.up.railway.app/get_next_user_id_exam_module"
+        );
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const nextDbId = await response.json();
+        console.log("[DEBUG] Received next DB ID:", nextDbId);
+        setId(nextDbId);
+      } catch (err) {
+        console.error(err);
+        alert("Unable to fetch next user ID");
+      }
+    };
+    fetchNextId();
+  }, []);
 
-/* Smooth fade-in animation */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+  // -----------------------------
+  // Submit Student
+  // -----------------------------
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-/* Form inputs (include password) */
-.modal input[type="text"],
-.modal input[type="email"],
-.modal input[type="password"] {
-  width: 100%;
-  padding: 10px 12px;
-  margin: 10px 0;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  box-sizing: border-box;
-  transition: border 0.2s;
-}
+    const payload = {
+      id,             // primary key from backend
+      student_id: studentId,
+      name,
+      class_name: className,
+      class_day: classDay,
+      parent_email: parentEmail,
+    };
 
-.modal input[type="text"]:focus,
-.modal input[type="email"]:focus,
-.modal input[type="password"]:focus {
-  outline: none;
-  border-color: #4a90e2; /* highlight on focus */
-}
+    try {
+      const response = await fetch(
+        "https://web-production-481a5.up.railway.app/add_student_exam_module",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
 
-/* Button container */
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
-}
+      if (!response.ok) throw new Error("Failed to add student");
 
-/* Buttons */
-.modal-actions button {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
+      alert("Student added successfully!");
 
-.modal-actions button[type="submit"] {
-  background-color: #4a90e2;
-  color: #fff;
-}
+      // Reset form (except id)
+      setStudentId("");
+      setName("");
+      setClassName("");
+      setClassDay("");
+      setParentEmail("");
+    } catch (err) {
+      console.error(err);
+      alert("Error adding student");
+    }
+  };
 
-.modal-actions button[type="submit"]:hover {
-  background-color: #357ab8;
-}
+  return (
+    <div className="add-student-container">
+      <h2>Add New Student</h2>
+      <form onSubmit={handleSubmit}>
+        
+        {/* DB primary key id (readonly) */}
+        <label>ID (from backend)</label>
+        <input type="text" value={id} readOnly />
 
-.modal-actions button[type="button"] {
-  background-color: #e0e0e0;
-  color: #333;
-}
+        {/* Secondary student_id */}
+        <label>Student ID</label>
+        <input
+          type="text"
+          value={studentId}
+          onChange={(e) => setStudentId(e.target.value)}
+        />
 
-.modal-actions button[type="button"]:hover {
-  background-color: #ccc;
+        <label>Name</label>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+
+        <label>Class Name</label>
+        <input
+          type="text"
+          value={className}
+          onChange={(e) => setClassName(e.target.value)}
+          required
+        />
+
+        <label>Class Day</label>
+        <input
+          type="text"
+          value={classDay}
+          onChange={(e) => setClassDay(e.target.value)}
+          required
+        />
+
+        <label>Parent Email</label>
+        <input
+          type="email"
+          value={parentEmail}
+          onChange={(e) => setParentEmail(e.target.value)}
+          required
+        />
+
+        <button type="submit">Add Student</button>
+      </form>
+    </div>
+  );
 }
