@@ -25,7 +25,7 @@ const SelectiveDashboard = () => {
       <main className="content-area">
         <h2>{activeTab}</h2>
         <p>
-          Here you can add all components or actions related to <strong>{activeTab}</strong>.
+          Quiz will be available here once generated 
         </p>
       </main>
     </div>
