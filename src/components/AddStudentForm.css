@@ -1,33 +1,44 @@
-/* Container */
+/* =======================
+   Container
+======================= */
 .add-student-container {
   max-width: 450px;
   margin: 50px auto;
   padding: 30px 25px;
-  background: #ffffff;
+  background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
 }
 
-/* Heading */
+/* =======================
+   Headings
+======================= */
 .add-student-container h2 {
   text-align: center;
   margin-bottom: 25px;
-  color: #333333;
+  color: #333;
   font-weight: 700;
+  font-size: 1.8rem;
 }
 
-/* Form labels */
+/* =======================
+   Form Labels
+======================= */
 .add-student-container label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
   font-weight: 600;
-  color: #555555;
+  color: #555;
   font-size: 14px;
 }
 
-/* Input fields */
-.add-student-container input {
+/* =======================
+   Inputs & Selects
+======================= */
+.add-student-container input,
+.add-student-container select {
   width: 100%;
   padding: 12px 10px;
   margin-bottom: 18px;
@@ -35,9 +46,11 @@
   border-radius: 8px;
   font-size: 14px;
   transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
 }
 
-.add-student-container input:focus {
+.add-student-container input:focus,
+.add-student-container select:focus {
   border-color: #007bff;
   box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
   outline: none;
@@ -46,15 +59,17 @@
 .add-student-container input[readonly] {
   background-color: #f5f5f5;
   cursor: not-allowed;
-  color: #777777;
+  color: #777;
 }
 
-/* Submit button */
+/* =======================
+   Buttons
+======================= */
 .add-student-container button {
   width: 100%;
   padding: 14px;
   background-color: #007bff;
-  color: white;
+  color: #fff;
   font-weight: 600;
   font-size: 15px;
   border: none;
@@ -72,10 +87,42 @@
   transform: translateY(0);
 }
 
-/* Responsive spacing */
+/* =======================
+   Table Styling
+======================= */
+.add-student-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.add-student-container th,
+.add-student-container td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.add-student-container th {
+  background-color: #f0f0f0;
+  font-weight: 600;
+}
+
+.add-student-container tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* =======================
+   Responsive
+======================= */
 @media (max-width: 500px) {
   .add-student-container {
     padding: 20px;
     margin: 20px;
+  }
+
+  .add-student-container h2 {
+    font-size: 1.5rem;
   }
 }
