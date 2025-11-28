@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-
+import "./AddStudentForm.css";
 export default function AddStudentForm() {
   const [nextId, setNextId] = useState("");     // Auto-filled student_id
   const [name, setName] = useState("");
   const [className, setClassName] = useState("");
   const [classDay, setClassDay] = useState("");
   const [parentEmail, setParentEmail] = useState("");
-  import "./AddStudentForm.css";
+  
 
   // -----------------------------
   // Fetch previous user ID
