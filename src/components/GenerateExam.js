@@ -9,6 +9,40 @@ export default function GenerateExam() {
 
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
+  const formatClassName = (cls) => {
+  switch (cls) {
+    case "year1": return "Year 1";
+    case "year2": return "Year 2";
+    case "year3": return "Year 3";
+    case "year4": return "Year 4";
+    case "year5": return "Year 5";
+    case "year6": return "Year 6";
+    case "selective": return "Selective";
+    case "kindergarten": return "Kindergarten";
+    default: return cls;
+  }
+};
+
+const formatSubject = (subj) => {
+  switch (subj) {
+    case "thinking_skills": return "Thinking Skills";
+    case "mathematical_reasoning": return "Math Reasoning";
+    case "reading": return "Reading";
+    case "writing": return "Writing";
+    default: return subj;
+  }
+};
+
+const formatDifficulty = (lvl) => {
+  switch (lvl) {
+    case "easy": return "Easy";
+    case "medium": return "Medium";
+    case "hard": return "Hard";
+    default: return lvl;
+  }
+};
+
+
   // Fetch quiz setups from backend
   useEffect(() => {
     const fetchQuizzes = async () => {
@@ -72,11 +106,13 @@ export default function GenerateExam() {
         <select
           value={selectedQuiz}
           onChange={(e) => setSelectedQuiz(e.target.value)}
+          style={{ padding: "6px", minWidth: "280px" }}
         >
-          <option value="">-- Choose a Quiz --</option>
+          <option value="">-- Select Quiz Requirement --</option>
+        
           {quizzes.map((q) => (
             <option key={q.id} value={q.id}>
-              {q.class_name} — {q.subject} — {q.difficulty}
+              {`${formatClassName(q.class_name)} | ${formatSubject(q.subject)} | ${formatDifficulty(q.difficulty)}`}
             </option>
           ))}
         </select>
