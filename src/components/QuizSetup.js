@@ -62,40 +62,54 @@ export default function QuizSetup() {
   const handleSubmit = async (e) => {
   e.preventDefault();
 
+  if (!quiz.className || !quiz.subject || !quiz.difficulty) {
+    alert("Please select class, subject, and difficulty.");
+    return;
+  }
+
+  if (quiz.topics.length === 0) {
+    alert("Please generate at least one topic.");
+    return;
+  }
+
   if (totalQuestions > 40) {
     alert("Total questions across all topics cannot exceed 40.");
     return;
   }
 
-  // Prepare payload for backend
+  // Prepare clean payload
   const payload = {
-    class_name: quiz.className,
-    subject: quiz.subject,
-    difficulty: quiz.difficulty,
+    class_name: quiz.className.trim(),
+    subject: quiz.subject.trim(),
+    difficulty: quiz.difficulty.trim(),
     num_topics: quiz.topics.length,
     topics: quiz.topics.map((t) => ({
-      name: t.name,
-      ai: t.ai,
-      db: t.db,
-      total: t.total,
+      name: t.name.trim(),
+      ai: Number(t.ai),
+      db: Number(t.db),
+      total: Number(t.total),
     })),
   };
 
   try {
-    const res = await fetch("https://web-production-481a5.up.railway.app/api/quizzes", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    const res = await fetch(
+      "https://web-production-481a5.up.railway.app/api/quizzes",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
 
-    if (!res.ok) throw new Error("Failed to save quiz setup");
+    if (!res.ok) {
+      const err = await res.json();
+      console.error("Backend returned:", err);
+      throw new Error("Failed to save quiz setup");
+    }
 
     const data = await res.json();
     console.log("Quiz saved:", data);
     alert("Quiz setup saved successfully!");
-
   } catch (error) {
     console.error(error);
     alert("Error saving quiz setup. Please try again.");
