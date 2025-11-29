@@ -59,17 +59,48 @@ export default function QuizSetup() {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (totalQuestions > 40) {
-      alert("Total questions across all topics cannot exceed 40.");
-      return;
-    }
+  if (totalQuestions > 40) {
+    alert("Total questions across all topics cannot exceed 40.");
+    return;
+  }
 
-    console.log("Quiz Setup Submitted:", quiz);
-    alert("Quiz setup submitted. Check console for the object.");
+  // Prepare payload for backend
+  const payload = {
+    class_name: quiz.className,
+    subject: quiz.subject,
+    difficulty: quiz.difficulty,
+    num_topics: quiz.topics.length,
+    topics: quiz.topics.map((t) => ({
+      name: t.name,
+      ai: t.ai,
+      db: t.db,
+      total: t.total,
+    })),
   };
+
+  try {
+    const res = await fetch("https://your-backend-url.com/api/quizzes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) throw new Error("Failed to save quiz setup");
+
+    const data = await res.json();
+    console.log("Quiz saved:", data);
+    alert("Quiz setup saved successfully!");
+
+  } catch (error) {
+    console.error(error);
+    alert("Error saving quiz setup. Please try again.");
+  }
+};
 
   return (
     <div className="quiz-setup-container">
