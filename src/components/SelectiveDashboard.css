@@ -79,3 +79,95 @@
   color: #374151;
   margin-top: 8px;
 }
+
+/* ============================================
+   QUIZ CARD
+============================================ */
+.quiz-card {
+  width: 380px;
+  background: #e8fbe8; /* light green */
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* header */
+.quiz-header {
+  background: #d8f5d8;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.quiz-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+/* difficulty + attempts row */
+.quiz-meta-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.difficulty-pill {
+  background: #fde7e7;
+  color: #b91c1c;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.attempts-pill {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+}
+
+/* question row */
+.questions-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.questions-text {
+  color: #374151;
+  font-weight: 500;
+}
+
+/* buttons */
+.quiz-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.results-btn,
+.start-btn,
+.resume-btn {
+  width: 48%;
+  padding: 10px 0;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.results-btn {
+  background: #f1f5f9;
+  color: #111827;
+}
+
+.start-btn,
+.resume-btn {
+  background: #1e90ff;
+  color: white;
+}
