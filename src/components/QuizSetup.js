@@ -19,42 +19,48 @@ export default function QuizSetup() {
 
   const generateTopics = () => {
     const num = parseInt(quiz.numTopics) || 1;
-    const topicsArray = [];
 
-    for (let i = 0; i < num; i++) {
-      topicsArray.push({
-        name: "",
-        ai: 0,
-        db: 0,
-        warning: false,
-      });
-    }
+    const topicsArray = Array.from({ length: num }, () => ({
+      name: "",
+      ai: 0,
+      db: 0,
+      total: 0,
+      warning: false,
+    }));
 
     setQuiz((prev) => ({ ...prev, topics: topicsArray }));
     setTotalQuestions(0);
   };
 
   const handleTopicChange = (index, field, value) => {
-  setQuiz((prev) => {
-    const topics = [...prev.topics];
+    setQuiz((prev) => {
+      const topics = [...prev.topics];
 
-    // Convert value safely
-    const numValue = value === "" ? 0 : Number(value);
-    topics[index][field] = isNaN(numValue) ? 0 : numValue;
+      // Convert input to number safely
+      const numValue = Number(value) || 0;
 
-    // Always convert safely
-    const ai = Number(topics[index].ai) || 0;
-    const db = Number(topics[index].db) || 0;
+      // Update the ai/db field
+      topics[index][field] = numValue;
 
-    const total = ai + db;
+      // Recalculate per-topic total
+      const total =
+        Number(topics[index].ai || 0) +
+        Number(topics[index].db || 0);
 
-    topics[index].total = total;
-    topics[index].warning = total > 35;
+      topics[index].total = total;
+      topics[index].warning = total > 35;
 
-    return { ...prev, topics };
-  });
-};
+      // After updating topics, recalc global total
+      const globalTotal = topics.reduce(
+        (sum, t) => sum + (Number(t.total) || 0),
+        0
+      );
 
+      setTotalQuestions(globalTotal);
+
+      return { ...prev, topics };
+    });
+  };
 
   const handleTopicNameChange = (index, value) => {
     setQuiz((prev) => {
@@ -65,66 +71,64 @@ export default function QuizSetup() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!quiz.className || !quiz.subject || !quiz.difficulty) {
-    alert("Please select class, subject, and difficulty.");
-    return;
-  }
-
-  if (quiz.topics.length === 0) {
-    alert("Please generate at least one topic.");
-    return;
-  }
-
-  if (totalQuestions > 40) {
-    alert("Total questions across all topics cannot exceed 40.");
-    return;
-  }
-
-  // Prepare clean payload
-  const payload = {
-    class_name: quiz.className.trim(),
-    subject: quiz.subject.trim(),
-    difficulty: quiz.difficulty.trim(),
-    num_topics: quiz.topics.length,
-    topics: quiz.topics.map((t) => ({
-      name: t.name.trim(),
-      ai: Number(t.ai),
-      db: Number(t.db),
-      total: Number(t.total),
-    })),
-  };
-
-  try {
-    const res = await fetch(
-      "https://web-production-481a5.up.railway.app/api/quizzes",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      }
-    );
-
-    if (!res.ok) {
-      const err = await res.json();
-      console.error("Backend returned:", err);
-      throw new Error("Failed to save quiz setup");
+    if (!quiz.className || !quiz.subject || !quiz.difficulty) {
+      alert("Please select class, subject, and difficulty.");
+      return;
     }
 
-    const data = await res.json();
-    console.log("Quiz saved:", data);
-    alert("Quiz setup saved successfully!");
-  } catch (error) {
-    console.error(error);
-    alert("Error saving quiz setup. Please try again.");
-  }
-};
+    if (quiz.topics.length === 0) {
+      alert("Please generate at least one topic.");
+      return;
+    }
+
+    if (totalQuestions > 40) {
+      alert("Total questions across all topics cannot exceed 40.");
+      return;
+    }
+
+    const payload = {
+      class_name: quiz.className.trim(),
+      subject: quiz.subject.trim(),
+      difficulty: quiz.difficulty.trim(),
+      num_topics: quiz.topics.length,
+      topics: quiz.topics.map((t) => ({
+        name: t.name.trim(),
+        ai: Number(t.ai),
+        db: Number(t.db),
+        total: Number(t.total),
+      })),
+    };
+
+    try {
+      const res = await fetch(
+        "https://web-production-481a5.up.railway.app/api/quizzes",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!res.ok) {
+        const err = await res.json();
+        console.error("Backend returned:", err);
+        throw new Error("Failed to save quiz setup");
+      }
+
+      const data = await res.json();
+      console.log("Quiz saved:", data);
+      alert("Quiz setup saved successfully!");
+    } catch (error) {
+      console.error(error);
+      alert("Error saving quiz setup. Please try again.");
+    }
+  };
 
   return (
     <div className="quiz-setup-container">
       <form onSubmit={handleSubmit}>
-
         <label>Class:</label>
         <select
           name="className"
@@ -192,7 +196,9 @@ export default function QuizSetup() {
               <input
                 type="text"
                 value={topic.name}
-                onChange={(e) => handleTopicNameChange(index, e.target.value)}
+                onChange={(e) =>
+                  handleTopicNameChange(index, e.target.value)
+                }
                 required
               />
 
@@ -201,7 +207,9 @@ export default function QuizSetup() {
                 type="number"
                 min="0"
                 value={topic.ai}
-                onChange={(e) => handleTopicChange(index, "ai", e.target.value)}
+                onChange={(e) =>
+                  handleTopicChange(index, "ai", e.target.value)
+                }
                 required
               />
 
@@ -210,14 +218,15 @@ export default function QuizSetup() {
                 type="number"
                 min="0"
                 value={topic.db}
-                onChange={(e) => handleTopicChange(index, "db", e.target.value)}
+                onChange={(e) =>
+                  handleTopicChange(index, "db", e.target.value)
+                }
                 required
               />
             </div>
           ))}
         </div>
 
-        {/* Global Total Questions Below All Topics */}
         <div className="total-section">
           <h3>Total Questions: {totalQuestions}</h3>
           {totalQuestions > 40 && (
@@ -228,7 +237,6 @@ export default function QuizSetup() {
         <button type="submit" disabled={totalQuestions > 40}>
           Submit
         </button>
-
       </form>
     </div>
   );
