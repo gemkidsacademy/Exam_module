@@ -24,45 +24,55 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const server = "https://web-production-481a5.up.railway.app";
+  
   const handleLogin = async () => {
-    try {
-      setError(null);
-  
-      if (!username || !password) {
-        setError("Please enter username and password");
-        return;
-      }
-  
-      const response = await fetch(`${server}/login-exam-module`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ student_id: username, password }), // use student_id
-      });
-  
-      const data = await response.json();
-      console.log("[DEBUG] Login response data:", data); // Log the response
-  
-      if (response.ok) {
-        setIsLoggedIn(true);
-        setDoctorData(data);
-        setSessionToken(data.session_token || null);
-  
-        if (data?.name === "Admin") {
-          navigate("/AdminPanel");
-        } else if (data?.class_name === "Selective") {
-          navigate("/SelectiveDashboard");
-        } else {
-          navigate("/ExamModule");
-        }
-      } else {
-        setError(data.detail || "Invalid credentials");
-      }
-    } catch (err) {
-      console.error("[ERROR] Login failed:", err);
-      setError("Login failed. Please try again.");
+  try {
+    setError(null);
+
+    if (!username || !password) {
+      setError("Please enter username and password");
+      return;
     }
-  };
+
+    const response = await fetch(`${server}/login-exam-module`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ student_id: username, password }),
+    });
+
+    const data = await response.json();
+    console.log("[DEBUG] Login response data:", data);
+
+    if (!response.ok) {
+      setError(data.detail || "Invalid credentials");
+      return;
+    }
+
+    // ===== SUCCESSFUL LOGIN =====
+    setIsLoggedIn(true);
+    setDoctorData(data);
+    setSessionToken(data.session_token || null);
+
+    // 🔥 FIX — SAVE STUDENT INFO FOR DASHBOARD
+    sessionStorage.setItem("student_id", data.student_id);
+    sessionStorage.setItem("student_class", data.class_name);
+    sessionStorage.setItem("student_name", data.name);
+
+    // Route the user based on role/class
+    if (data?.name === "Admin") {
+      navigate("/AdminPanel");
+    } else if (data?.class_name === "Selective") {
+      navigate("/SelectiveDashboard");
+    } else {
+      navigate("/ExamModule");
+    }
+
+  } catch (err) {
+    console.error("[ERROR] Login failed:", err);
+    setError("Login failed. Please try again.");
+  }
+};
 
   
   return (
