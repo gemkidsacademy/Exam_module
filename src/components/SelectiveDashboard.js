@@ -64,31 +64,31 @@ const SelectiveDashboard = () => {
           <p>Loading exam information...</p>
         ) : (
           <div className="quiz-card">
-            <h3>NSW Selective {activeTab} Test</h3>
-
-            <div className="quiz-details">
-              <span className="level-badge">Advanced Level</span>
-              <span className="attempts">
-                Attempts: {examData.attempts_used}/{examData.attempts_allowed}
-              </span>
+            <div className="quiz-header">
+              <h3 className="quiz-title">NSW Selective {activeTab} Test - Free Trial 1</h3>
             </div>
-
-            <div className="question-count">
-              📘 {examData.total_questions} Questions
+          
+            <div className="quiz-meta-row">
+              <span className="difficulty-pill">Advanced Level</span>
+              <span className="attempts-pill">Attempts: {examData.attempts_used} / {examData.attempts_allowed}</span>
             </div>
-
-            <div className="actions">
+          
+            <div className="questions-row">
+              <span className="questions-icon">📘</span>
+              <span className="questions-text">{examData.total_questions} Questions</span>
+            </div>
+          
+            <div className="quiz-buttons">
+              <button className="results-btn">Results</button>
+          
               {examData.started && !examData.completed ? (
                 <button className="resume-btn">Resume</button>
               ) : (
                 <button className="start-btn">Start Quiz</button>
               )}
-
-              {examData.completed && (
-                <button className="results-btn">Results</button>
-              )}
             </div>
           </div>
+
         )}
       </main>
     </div>
