@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AdminPanel.css";
+
 import AddUserForm from "./AddUserForm";
 import EditUserForm from "./EditUserForm";
 import ViewUserModal from "./ViewUserModal";
 import DeleteUserForm from "./DeleteUserForm";
 import QuizSetup from "./QuizSetup";
-import UploadPDF from "./UploadPDF"; // Create this component for uploading PDFs
+import UploadPDF from "./UploadPDF";
+import GenerateExam from "./GenerateExam";   // ⬅️ NEW COMPONENT IMPORT
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("database");
@@ -20,7 +22,8 @@ const AdminPanel = () => {
   const tabs = [
     { id: "database", label: "Exam Module User Management" },
     { id: "add-quiz", label: "Add Exam" },
-    { id: "upload-pdf", label: "Upload Questions PDF" }, // New tab
+    { id: "upload-pdf", label: "Upload Questions PDF" },
+    { id: "generate-exam", label: "Generate Exam" }, // ⬅️ NEW TAB
   ];
 
   const handleUserUpdated = () => {
@@ -92,7 +95,9 @@ const AdminPanel = () => {
               <button className="dashboard-button" onClick={toggleViewUser}>
                 View User
               </button>
-              {showViewUser && <ViewUserModal onClose={() => setShowViewUser(false)} />}
+              {showViewUser && (
+                <ViewUserModal onClose={() => setShowViewUser(false)} />
+              )}
             </div>
 
             <div>
@@ -118,6 +123,12 @@ const AdminPanel = () => {
         {activeTab === "upload-pdf" && (
           <div className="tab-panel">
             <UploadPDF />
+          </div>
+        )}
+
+        {activeTab === "generate-exam" && (
+          <div className="tab-panel">
+            <GenerateExam />   {/* ⬅️ NEW COMPONENT RENDERED HERE */}
           </div>
         )}
       </div>
