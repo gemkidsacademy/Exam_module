@@ -1,10 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./SelectiveDashboard.css";
 
 const SelectiveDashboard = () => {
   const [activeTab, setActiveTab] = useState("Thinking skills");
+  const [examData, setExamData] = useState(null);
+  const studentId = sessionStorage.getItem("student_id"); // or however you store it
 
   const tabs = ["Thinking skills", "Mathematical reasoning", "Reading", "Writing"];
+
+  useEffect(() => {
+    const fetchExamStatus = async () => {
+      const subjectKey = SUBJECT_KEY_MAP[activeTab];
+
+      try {
+        const res = await fetch(
+          `https://web-production-481a5.up.railway.app/api/student/exam-status?student_id=${studentId}&subject=${subjectKey}`
+        );
+
+        if (!res.ok) {
+          setExamData(null);
+          return;
+        }
+
+        const data = await res.json();
+        setExamData(data);
+
+      } catch (err) {
+        console.error(err);
+        setExamData(null);
+      }
+    };
+
+    fetchExamStatus();
+  }, [activeTab]);
 
   return (
     <div className="selective-dashboard">
@@ -24,9 +52,37 @@ const SelectiveDashboard = () => {
       {/* Content area */}
       <main className="content-area">
         <h2>{activeTab}</h2>
-        <p>
-          Quiz will be available here once generated 
-        </p>
+
+        {!examData ? (
+          <p>Loading exam information...</p>
+        ) : (
+          <div className="quiz-card">
+            <h3>NSW Selective {activeTab} Test</h3>
+
+            <div className="quiz-details">
+              <span className="level-badge">Advanced Level</span>
+              <span className="attempts">
+                Attempts: {examData.attempts_used}/{examData.attempts_allowed}
+              </span>
+            </div>
+
+            <div className="question-count">
+              📘 {examData.total_questions} Questions
+            </div>
+
+            <div className="actions">
+              {examData.started && !examData.completed ? (
+                <button className="resume-btn">Resume</button>
+              ) : (
+                <button className="start-btn">Start Quiz</button>
+              )}
+
+              {examData.completed && (
+                <button className="results-btn">Results</button>
+              )}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
