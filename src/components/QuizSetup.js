@@ -38,12 +38,15 @@ export default function QuizSetup() {
   setQuiz((prev) => {
     const topics = [...prev.topics];
 
-    const num = Number(value);
-    topics[index][field] = isNaN(num) ? 0 : num;
+    // Convert value safely
+    const numValue = value === "" ? 0 : Number(value);
+    topics[index][field] = isNaN(numValue) ? 0 : numValue;
 
-    const total = 
-      Number(topics[index].ai || 0) + 
-      Number(topics[index].db || 0);
+    // Always convert safely
+    const ai = Number(topics[index].ai) || 0;
+    const db = Number(topics[index].db) || 0;
+
+    const total = ai + db;
 
     topics[index].total = total;
     topics[index].warning = total > 35;
