@@ -10,8 +10,7 @@ export default function QuizSetup() {
     topics: [],
   });
 
-  const [totalCount, setTotalCount] = useState(0);
-  const [totalWarning, setTotalWarning] = useState(false);
+  const [totalQuestions, setTotalQuestions] = useState(0);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -27,29 +26,26 @@ export default function QuizSetup() {
         name: "",
         ai: 0,
         db: 0,
+        warning: false,
       });
     }
 
     setQuiz((prev) => ({ ...prev, topics: topicsArray }));
-    setTotalCount(0);
-    setTotalWarning(false);
+    setTotalQuestions(0);
   };
 
   const handleTopicChange = (index, field, value) => {
-    const newValue = parseInt(value) || 0;
-
     setQuiz((prev) => {
       const topics = [...prev.topics];
-      topics[index][field] = newValue;
+      topics[index][field] = parseInt(value) || 0;
 
-      // Recalculate cumulative total
+      // Recalculate total for ALL topics
       const newTotal = topics.reduce(
-        (sum, t) => sum + (parseInt(t.ai) || 0) + (parseInt(t.db) || 0),
+        (acc, t) => acc + (parseInt(t.ai) || 0) + (parseInt(t.db) || 0),
         0
       );
 
-      setTotalCount(newTotal);
-      setTotalWarning(newTotal > 40);
+      setTotalQuestions(newTotal);
 
       return { ...prev, topics };
     });
@@ -63,28 +59,16 @@ export default function QuizSetup() {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (totalCount > 40) {
-      alert("The total number of questions across all topics cannot exceed 40.");
+    if (totalQuestions > 40) {
+      alert("Total questions across all topics cannot exceed 40.");
       return;
     }
 
-    try {
-      const res = await fetch("https://your-backend-url.com/api/save-quiz", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(quiz),
-      });
-
-      if (!res.ok) throw new Error("Failed to save quiz.");
-
-      alert("Quiz saved successfully!");
-    } catch (error) {
-      console.error(error);
-      alert("Failed to submit quiz.");
-    }
+    console.log("Quiz Setup Submitted:", quiz);
+    alert("Quiz setup submitted. Check console for the object.");
   };
 
   return (
@@ -123,7 +107,7 @@ export default function QuizSetup() {
           <option value="writing">Writing</option>
         </select>
 
-        <label>Difficulty:</label>
+        <label>Difficulty Level:</label>
         <select
           name="difficulty"
           value={quiz.difficulty}
@@ -158,9 +142,7 @@ export default function QuizSetup() {
               <input
                 type="text"
                 value={topic.name}
-                onChange={(e) =>
-                  handleTopicNameChange(index, e.target.value)
-                }
+                onChange={(e) => handleTopicNameChange(index, e.target.value)}
                 required
               />
 
@@ -169,9 +151,7 @@ export default function QuizSetup() {
                 type="number"
                 min="0"
                 value={topic.ai}
-                onChange={(e) =>
-                  handleTopicChange(index, "ai", e.target.value)
-                }
+                onChange={(e) => handleTopicChange(index, "ai", e.target.value)}
                 required
               />
 
@@ -180,26 +160,25 @@ export default function QuizSetup() {
                 type="number"
                 min="0"
                 value={topic.db}
-                onChange={(e) =>
-                  handleTopicChange(index, "db", e.target.value)
-                }
+                onChange={(e) => handleTopicChange(index, "db", e.target.value)}
                 required
               />
             </div>
           ))}
         </div>
 
-        {/* SINGLE cumulative total */}
-        <h3>Total Questions Across All Topics: {totalCount}</h3>
-        {totalWarning && (
-          <p className="warning">Total cannot exceed 40 questions!</p>
-        )}
+        {/* Global Total Questions Below All Topics */}
+        <div className="total-section">
+          <h3>Total Questions: {totalQuestions}</h3>
+          {totalQuestions > 40 && (
+            <div className="warning">Total cannot exceed 40!</div>
+          )}
+        </div>
 
-        <button type="submit">Submit Quiz Setup</button>
+        <button type="submit" disabled={totalQuestions > 40}>
+          Submit Quiz Setup
+        </button>
 
-        <p className="note">
-          Total questions (AI + DB combined across all topics) cannot exceed 40.
-        </p>
       </form>
     </div>
   );
