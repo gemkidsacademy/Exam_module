@@ -24,9 +24,9 @@ export default function QuizSetup() {
       name: "",
       ai: 0,
       db: 0,
-      total: 0,
-      warning: false,
+      total: 0
     }));
+
 
     setQuiz((prev) => ({ ...prev, topics: topicsArray }));
     setTotalQuestions(0);
