@@ -35,21 +35,23 @@ export default function QuizSetup() {
   };
 
   const handleTopicChange = (index, field, value) => {
-    setQuiz((prev) => {
-      const topics = [...prev.topics];
-      topics[index][field] = parseInt(value) || 0;
+  setQuiz((prev) => {
+    const topics = [...prev.topics];
 
-      // Recalculate total for ALL topics
-      const newTotal = topics.reduce(
-        (acc, t) => acc + (parseInt(t.ai) || 0) + (parseInt(t.db) || 0),
-        0
-      );
+    const num = Number(value);
+    topics[index][field] = isNaN(num) ? 0 : num;
 
-      setTotalQuestions(newTotal);
+    const total = 
+      Number(topics[index].ai || 0) + 
+      Number(topics[index].db || 0);
 
-      return { ...prev, topics };
-    });
-  };
+    topics[index].total = total;
+    topics[index].warning = total > 35;
+
+    return { ...prev, topics };
+  });
+};
+
 
   const handleTopicNameChange = (index, value) => {
     setQuiz((prev) => {
