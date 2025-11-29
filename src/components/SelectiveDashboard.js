@@ -5,15 +5,21 @@ const SUBJECT_KEY_MAP = {
   "Thinking skills": "thinking_skills",
   "Mathematical reasoning": "mathematical_reasoning",
   "Reading": "reading",
-  "Writing": "writing"
+  "Writing": "writing",
 };
 
 const SelectiveDashboard = () => {
   const [activeTab, setActiveTab] = useState("Thinking skills");
   const [examData, setExamData] = useState(null);
-  const studentId = sessionStorage.getItem("student_id"); // or however you store it
 
-  const tabs = ["Thinking skills", "Mathematical reasoning", "Reading", "Writing"];
+  const studentId = sessionStorage.getItem("student_id");
+
+  const tabs = [
+    "Thinking skills",
+    "Mathematical reasoning",
+    "Reading",
+    "Writing",
+  ];
 
   useEffect(() => {
     const fetchExamStatus = async () => {
@@ -31,7 +37,6 @@ const SelectiveDashboard = () => {
 
         const data = await res.json();
         setExamData(data);
-
       } catch (err) {
         console.error(err);
         setExamData(null);
@@ -64,23 +69,33 @@ const SelectiveDashboard = () => {
           <p>Loading exam information...</p>
         ) : (
           <div className="quiz-card">
+            {/* Top green header */}
             <div className="quiz-header">
-              <h3 className="quiz-title">NSW Selective {activeTab} Test - Free Trial 1</h3>
+              <h3 className="quiz-title">
+                NSW Selective {activeTab} Skills Test – Free Trial 1
+              </h3>
             </div>
-          
+
+            {/* Difficulty + Attempts Row */}
             <div className="quiz-meta-row">
               <span className="difficulty-pill">Advanced Level</span>
-              <span className="attempts-pill">Attempts: {examData.attempts_used} / {examData.attempts_allowed}</span>
+              <span className="attempts-pill">
+                Attempts: {examData.attempts_used} / {examData.attempts_allowed}
+              </span>
             </div>
-          
+
+            {/* Question count */}
             <div className="questions-row">
               <span className="questions-icon">📘</span>
-              <span className="questions-text">{examData.total_questions} Questions</span>
+              <span className="questions-text">
+                {examData.total_questions} Questions
+              </span>
             </div>
-          
+
+            {/* Buttons */}
             <div className="quiz-buttons">
               <button className="results-btn">Results</button>
-          
+
               {examData.started && !examData.completed ? (
                 <button className="resume-btn">Resume</button>
               ) : (
@@ -88,7 +103,6 @@ const SelectiveDashboard = () => {
               )}
             </div>
           </div>
-
         )}
       </main>
     </div>
