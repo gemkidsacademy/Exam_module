@@ -82,7 +82,7 @@ export default function QuizSetup() {
   };
 
   try {
-    const res = await fetch("https://your-backend-url.com/api/quizzes", {
+    const res = await fetch("https://web-production-481a5.up.railway.app/api/quizzes", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
