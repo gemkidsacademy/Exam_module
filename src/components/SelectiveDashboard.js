@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./SelectiveDashboard.css";
 
+const SUBJECT_KEY_MAP = {
+  "Thinking skills": "thinking_skills",
+  "Mathematical reasoning": "mathematical_reasoning",
+  "Reading": "reading",
+  "Writing": "writing"
+};
+
 const SelectiveDashboard = () => {
   const [activeTab, setActiveTab] = useState("Thinking skills");
   const [examData, setExamData] = useState(null);
