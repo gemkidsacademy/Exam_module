@@ -17,7 +17,8 @@ export default function UploadWord() {
     }
 
     const formData = new FormData();
-    formData.append("word", wordFile);
+    formData.append("file", wordFile);
+
 
     setUploading(true);
 
