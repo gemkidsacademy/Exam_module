@@ -23,8 +23,10 @@ const AdminPanel = () => {
     { id: "database", label: "Exam Module User Management" },
     { id: "add-quiz", label: "Add Exam" },
     { id: "upload-word", label: "Upload Questions Word Document" },
-    { id: "generate-exam", label: "Generate Exam" }, // ⬅️ NEW TAB
+    { id: "upload-image-folder", label: "Upload Exam Image Folder" }, // NEW TAB
+    { id: "generate-exam", label: "Generate Exam" },
   ];
+
 
   const handleUserUpdated = () => {
     setShowEditUser(false);
@@ -120,9 +122,9 @@ const AdminPanel = () => {
           </div>
         )}
 
-        {activeTab === "upload-word" && (
+        {activeTab === "upload-image-folder" && (
           <div className="tab-panel">
-            <UploadWord />
+            <UploadImageFolder />
           </div>
         )}
 
