@@ -158,8 +158,10 @@ const formatDifficulty = (lvl) => {
                 >
                   <strong>Q{q.q_id}.</strong> {q.question}
                   <ul>
-                    {q.options.map((opt, idx) => (
-                      <li key={idx}>{opt}</li>
+                    {Object.entries(q.options).map(([key, value]) => (
+                      <li key={key}>
+                        <strong>{key}.</strong> {value}
+                      </li>
                     ))}
                   </ul>
                   <p>
