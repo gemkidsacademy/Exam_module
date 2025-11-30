@@ -7,7 +7,7 @@ import EditUserForm from "./EditUserForm";
 import ViewUserModal from "./ViewUserModal";
 import DeleteUserForm from "./DeleteUserForm";
 import QuizSetup from "./QuizSetup";
-import UploadPDF from "./UploadPDF";
+import UploadWord from "./UploadWord";
 import GenerateExam from "./GenerateExam";   // ⬅️ NEW COMPONENT IMPORT
 
 const AdminPanel = () => {
@@ -22,7 +22,7 @@ const AdminPanel = () => {
   const tabs = [
     { id: "database", label: "Exam Module User Management" },
     { id: "add-quiz", label: "Add Exam" },
-    { id: "upload-pdf", label: "Upload Questions PDF" },
+    { id: "upload-word", label: "Upload Questions Word Document" },
     { id: "generate-exam", label: "Generate Exam" }, // ⬅️ NEW TAB
   ];
 
@@ -120,9 +120,9 @@ const AdminPanel = () => {
           </div>
         )}
 
-        {activeTab === "upload-pdf" && (
+        {activeTab === "upload-word" && (
           <div className="tab-panel">
-            <UploadPDF />
+            <UploadWord />
           </div>
         )}
 
