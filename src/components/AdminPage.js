@@ -9,6 +9,8 @@ import DeleteUserForm from "./DeleteUserForm";
 import QuizSetup from "./QuizSetup";
 import UploadWord from "./UploadWord";
 import GenerateExam from "./GenerateExam";   // ⬅️ NEW COMPONENT IMPORT
+import UploadImageFolder from "./UploadImageFolder";
+
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("database");
