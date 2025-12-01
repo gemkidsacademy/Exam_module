@@ -1,0 +1,92 @@
+.upload-folder-container {
+  padding: 25px;
+  background: #ffffff;
+  border-radius: 10px;
+  max-width: 600px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.upload-folder-container h3 {
+  margin-bottom: 15px;
+  color: #1f2937;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* Folder input */
+.folder-input {
+  margin-top: 10px;
+  padding: 8px;
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  width: 100%;
+  cursor: pointer;
+}
+
+/* Selected file count */
+.file-count {
+  margin-top: 12px;
+  font-weight: 600;
+  color: #4b5563;
+  font-size: 15px;
+}
+
+/* File list */
+.file-list {
+  margin-top: 10px;
+  max-height: 220px;
+  overflow-y: auto;
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+.file-list li {
+  padding: 5px 0;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+  font-size: 14px;
+  word-break: break-all;
+}
+
+.file-list li:last-child {
+  border-bottom: none;
+}
+
+/* Upload button */
+.upload-btn {
+  margin-top: 20px;
+  padding: 10px 18px;
+  border: none;
+  background-color: #4caf50;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background 0.25s ease, transform 0.15s ease;
+}
+
+.upload-btn:hover {
+  background-color: #43a047;
+  transform: translateY(-2px);
+}
+
+.upload-btn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Scrollbar styling */
+.file-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.file-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
