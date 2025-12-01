@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./UploadImageFolder.css";
 
 export default function UploadImageFolder() {
   const [files, setFiles] = useState([]);
