@@ -23,7 +23,7 @@ const AdminPanel = () => {
 
   const tabs = [
     { id: "database", label: "Exam Module User Management" },
-    { id: "add-quiz", label: "Add Exam" },
+    { id: "add-quiz", label: "Add Exam Questions" },
     { id: "upload-word", label: "Upload Questions Word Document" },
     { id: "upload-image-folder", label: "Upload Exam Image Folder" }, // NEW TAB
     { id: "generate-exam", label: "Generate Exam" },
