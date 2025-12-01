@@ -129,6 +129,11 @@ const AdminPanel = () => {
             <UploadImageFolder />
           </div>
         )}
+        {activeTab === "upload-word" && (
+          <div className="tab-panel">
+            <UploadWord />
+          </div>
+        )}
 
         {activeTab === "generate-exam" && (
           <div className="tab-panel">
