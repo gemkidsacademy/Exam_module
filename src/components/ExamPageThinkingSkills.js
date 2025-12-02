@@ -18,49 +18,70 @@ export default function ExamPageThinkingSkills() {
      STEP 1 — Start Exam Session if not already started
   ----------------------------------------------------------- */
   useEffect(() => {
-    console.log("StudentId (from login) →", studentId);
+  console.log("StudentId (from login) →", studentId);
 
-    const startExam = async () => {
-      if (!studentId) {
-        console.error("❌ No student_id found in sessionStorage");
-        return;
-      }
+  const startExam = async () => {
+    if (!studentId) {
+      console.error("❌ No student_id found in sessionStorage");
+      return;
+    }
 
-      if (sessionId) {
-        console.log("✔ Existing session detected:", sessionId);
-        return;
-      }
+    // If session already exists in localStorage → do nothing
+    if (sessionId) {
+      console.log("✔ Existing session detected:", sessionId);
+      return;
+    }
 
-      console.log("📡 Starting new exam session...");
+    console.log("📡 Starting / resuming exam session...");
 
-      try {
-        const res = await fetch(
-          "https://web-production-481a5.up.railway.app/api/student/start-exam",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              student_id: studentId,
-            }),
-          }
-        );
-
-        const data = await res.json();
-        console.log("📦 start-exam response:", data);
-
-        if (res.ok) {
-          localStorage.setItem("session_id", data.session_id);
-          setSessionId(data.session_id);
-        } else {
-          console.error("❌ Backend error:", data);
+    try {
+      const res = await fetch(
+        "https://web-production-481a5.up.railway.app/api/student/start-exam",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ student_id: studentId }),
         }
-      } catch (err) {
-        console.error("❌ Could not start exam:", err);
-      }
-    };
+      );
 
-    startExam();
-  }, [sessionId, studentId]);
+      const data = await res.json();
+      console.log("📦 start-exam response:", data);
+
+      if (!res.ok) {
+        console.error("❌ Backend error:", data);
+        return;
+      }
+
+      // 🛑 CASE 1 — Student already completed the exam
+      if (data.status === "already_completed") {
+        console.log("🛑 Exam already completed for this student.");
+        setCompleted(true);
+        return;
+      }
+
+      // 🔄 CASE 2 — Resume unfinished exam session
+      if (data.status === "resuming") {
+        console.log("🔄 Resuming unfinished exam session:", data.session_id);
+        localStorage.setItem("session_id", data.session_id);
+        setSessionId(data.session_id);
+        return;
+      }
+
+      // 🆕 CASE 3 — Start new exam session
+      if (data.status === "started") {
+        console.log("🎉 New session started:", data.session_id);
+        localStorage.setItem("session_id", data.session_id);
+        setSessionId(data.session_id);
+        return;
+      }
+
+    } catch (err) {
+      console.error("❌ Could not start exam:", err);
+    }
+  };
+
+  startExam();
+}, [sessionId, studentId]);
 
   /* -----------------------------------------------------------
      STEP 2 — Load Exam Details after session_id is known
