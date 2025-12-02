@@ -20,44 +20,54 @@ export default function ExamPageThinkingSkills() {
      STEP 1 — Start Exam Session (ONLY IF NO session_id EXISTS)
   ------------------------------------------------------------------- */
   useEffect(() => {
-    const startExam = async () => {
-      if (sessionId) {
-        console.log("✔ Existing session detected:", sessionId);
-        return;
-      }
+  console.log("StudentId →", studentId, typeof studentId);
 
-      console.log("📡 Starting new exam session...");
+  const startExam = async () => {
 
-      try {
-        const res = await fetch(
-          "https://web-production-481a5.up.railway.app/api/student/start-exam",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              student_id: studentId,
-              subject,
-              difficulty
-            })
-          }
-        );
+    if (!studentId) {
+      console.error("❌ No student_id found in sessionStorage");
+      return;
+    }
 
-        const data = await res.json();
-        console.log("📦 start-exam response:", data);
+    if (sessionId) {
+      console.log("✔ Existing session detected:", sessionId);
+      return;
+    }
 
-        if (res.ok) {
-          localStorage.setItem("session_id", data.session_id);
-          setSessionId(data.session_id);
-        } else {
-          console.error("❌ Error from backend:", data);
+    console.log("📡 Starting new exam session...");
+
+    try {
+      const res = await fetch(
+        "https://web-production-481a5.up.railway.app/api/student/start-exam",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            student_id: Number(studentId),   // <-- FIXED
+            subject,
+            difficulty
+          })
         }
-      } catch (err) {
-        console.error("❌ Could not start exam:", err);
-      }
-    };
+      );
 
-    startExam();
-  }, [sessionId, studentId]);
+      const data = await res.json();
+      console.log("📦 start-exam response:", data);
+
+      if (res.ok) {
+        localStorage.setItem("session_id", data.session_id);
+        setSessionId(data.session_id);
+      } else {
+        console.error("❌ Backend reported error:", data);
+      }
+
+    } catch (err) {
+      console.error("❌ Could not start exam:", err);
+    }
+  };
+
+  startExam();
+}, [sessionId, studentId]);
+
 
   /* -------------------------------------------------------------------
      STEP 2 — Load Exam (after session_id is ready)
