@@ -49,7 +49,7 @@ const SelectiveDashboard = () => {
 
       {/* Content */}
       <main className="content-area">
-        <h2 className="subject-title">{activeTab}</h2>
+        
 
         <ActiveComponent
           studentId={studentId}
