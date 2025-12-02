@@ -53,6 +53,7 @@ export default function ExamPageThinkingSkills() {
       if (data.status === "already_completed") {
         console.log("🛑 This student already completed the exam.");
         setCompleted(true);
+        setLoading(false);
         return;
       }
 
@@ -85,7 +86,10 @@ export default function ExamPageThinkingSkills() {
      STEP 2 — Load Exam Details after session_id is known
   ----------------------------------------------------------- */
   useEffect(() => {
-    if (!sessionId) return;
+    if (!sessionId) {
+        setLoading(false);
+        return;
+    }
 
     const loadExam = async () => {
       console.log("📡 Loading exam for session:", sessionId);
@@ -100,6 +104,7 @@ export default function ExamPageThinkingSkills() {
 
         if (data.completed) {
           setCompleted(true);
+          setLoading(false);   // ← ADD THIS
           return;
         }
 
