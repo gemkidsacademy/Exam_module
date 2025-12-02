@@ -44,10 +44,9 @@ export default function ExamPageThinkingSkills() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            student_id: studentId,  // <-- send "Gem002" directly
-            subject,
-            difficulty
+            student_id: studentId
           })
+
         }
       );
 
