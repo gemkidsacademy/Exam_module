@@ -224,6 +224,18 @@ export default function ExamPageThinkingSkills() {
   
   // 3️⃣ Now it is SAFE to access currentQ
   const currentQ = questions[currentIndex];
+
+  // 🛑 Safety check — prevents crashes
+  if (!currentQ) {
+    return (
+      <div className="completed-screen">
+        <h1>🎉 Exam Finished</h1>
+        <p>You have already completed this exam.</p>
+      </div>
+    );
+  }
+
+  
   return (
     <div className="exam-container">
       {/* Header */}
