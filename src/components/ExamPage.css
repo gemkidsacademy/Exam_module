@@ -1,15 +1,23 @@
+/* ============================================
+   FULL WIDTH EXAM CONTAINER
+============================================ */
 .exam-container {
-  max-width: 900px;
-  margin: auto;
-  padding: 24px;
+  width: 100%;
+  max-width: 100%;
+  padding: 24px 60px; /* more side spacing */
   font-family: "Inter", sans-serif;
+  box-sizing: border-box;
 }
 
+
+/* ============================================
+   HEADER
+============================================ */
 .exam-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 16px;
-  font-size: 18px;
+  margin-bottom: 18px;
+  font-size: 20px;
   font-weight: 600;
 }
 
@@ -21,17 +29,21 @@
   color: #1e3a8a;
 }
 
+
+/* ============================================
+   QUESTION NUMBER SCROLLER
+============================================ */
 .index-row {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   overflow-x: auto;
   padding: 12px 0;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .index-circle {
-  width: 36px;
-  height: 36px;
+  min-width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -39,6 +51,7 @@
   cursor: pointer;
   font-weight: 600;
   border: 1px solid #cbd5e1;
+  background: white;
 }
 
 .index-visited {
@@ -51,30 +64,42 @@
   color: #065f46;
 }
 
+
+/* ============================================
+   QUESTION BLOCK — FULL WIDTH
+============================================ */
 .question-card {
-  background: #f8fafc;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 24px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  background: #ffffff;
+  padding: 28px 32px;
+  border-radius: 14px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  width: 100%;        /* ✔ makes card full width */
+  box-sizing: border-box;
 }
 
 .question-text {
-  font-size: 20px;
-  margin-bottom: 16px;
+  font-size: 22px;
+  margin-bottom: 20px;
+  line-height: 1.5;
 }
 
+
+/* ============================================
+   OPTIONS — BIG, WIDE, LEFT ALIGNED
+============================================ */
 .option-btn {
   display: block;
   width: 100%;
   text-align: left;
-  padding: 12px;
-  margin: 8px 0;
-  border-radius: 10px;
+  padding: 14px 18px;
+  margin: 10px 0;
+  border-radius: 12px;
   border: 2px solid transparent;
   background: #f1f5f9;
   cursor: pointer;
   transition: 0.2s;
+  font-size: 17px;
 }
 
 .option-btn:hover {
@@ -86,18 +111,23 @@
   border-color: #3b82f6;
 }
 
+
+/* ============================================
+   NAV BUTTONS
+============================================ */
 .nav-buttons {
   display: flex;
   justify-content: space-between;
-  margin-top: 16px;
+  margin-top: 20px;
 }
 
 .nav-btn {
-  padding: 10px 24px;
+  padding: 12px 28px;
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
   border: none;
+  font-size: 16px;
 }
 
 .nav-btn.prev {
@@ -114,13 +144,18 @@
   color: white;
 }
 
+
+/* ============================================
+   LOADING + COMPLETED
+============================================ */
 .loading {
   text-align: center;
   margin-top: 100px;
-  font-size: 20px;
+  font-size: 22px;
 }
 
 .completed-screen {
   text-align: center;
   margin-top: 100px;
+  font-size: 20px;
 }
