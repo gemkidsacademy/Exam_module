@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./ExamPage.css";
 
 export default function ExamPageThinkingSkills() {
-  const studentId = sessionStorage.getItem("student_id"); // already stored earlier
+  const rawStudentId = sessionStorage.getItem("student_id");
+  const studentId = rawStudentId ? parseInt(rawStudentId.replace(/\D/g, ""), 10) : null; // already stored earlier
   const subject = "thinking_skills";
   const difficulty = "advanced";
 
@@ -20,12 +21,13 @@ export default function ExamPageThinkingSkills() {
      STEP 1 — Start Exam Session (ONLY IF NO session_id EXISTS)
   ------------------------------------------------------------------- */
   useEffect(() => {
-  console.log("StudentId →", studentId, typeof studentId);
+  console.log("Raw studentId:", rawStudentId);
+  console.log("Converted numeric studentId:", studentId, typeof studentId);
 
   const startExam = async () => {
 
-    if (!studentId) {
-      console.error("❌ No student_id found in sessionStorage");
+    if (studentId === null || isNaN(studentId)) {
+      console.error("❌ Invalid or missing numeric student_id");
       return;
     }
 
@@ -43,7 +45,7 @@ export default function ExamPageThinkingSkills() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            student_id: Number(studentId),   // <-- FIXED
+            student_id: studentId,   // already a number, no need to wrap in Number()
             subject,
             difficulty
           })
@@ -66,7 +68,8 @@ export default function ExamPageThinkingSkills() {
   };
 
   startExam();
-}, [sessionId, studentId]);
+}, [sessionId, studentId, rawStudentId]);
+
 
 
   /* -------------------------------------------------------------------
