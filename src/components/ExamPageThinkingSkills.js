@@ -4,7 +4,10 @@ import "./ExamPage.css";
 export default function ExamPageThinkingSkills() {
   const studentId = sessionStorage.getItem("student_id"); // e.g., "Gem002"
 
-  const [sessionId, setSessionId] = useState(localStorage.getItem("session_id"));
+  const [sessionId, setSessionId] = useState(
+    localStorage.getItem(`session_${studentId}`)
+  );
+
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState([]);
   const [totalQuestions, setTotalQuestions] = useState(0);
@@ -26,13 +29,7 @@ export default function ExamPageThinkingSkills() {
       return;
     }
 
-    // If session already exists in localStorage → do nothing
-    if (sessionId) {
-      console.log("✔ Existing session detected:", sessionId);
-      return;
-    }
-
-    console.log("📡 Starting / resuming exam session...");
+    console.log("📡 Checking exam session with backend...");
 
     try {
       const res = await fetch(
@@ -52,25 +49,25 @@ export default function ExamPageThinkingSkills() {
         return;
       }
 
-      // 🛑 CASE 1 — Student already completed the exam
+      // 🛑 Attempt already completed
       if (data.status === "already_completed") {
-        console.log("🛑 Exam already completed for this student.");
+        console.log("🛑 This student already completed the exam.");
         setCompleted(true);
         return;
       }
 
-      // 🔄 CASE 2 — Resume unfinished exam session
+      // 🔄 Resume previous session
       if (data.status === "resuming") {
-        console.log("🔄 Resuming unfinished exam session:", data.session_id);
-        localStorage.setItem("session_id", data.session_id);
+        console.log("🔄 Resuming previous exam:", data.session_id);
+        localStorage.setItem(`session_${studentId}`, data.session_id);
         setSessionId(data.session_id);
         return;
       }
 
-      // 🆕 CASE 3 — Start new exam session
+      // 🆕 Start fresh session
       if (data.status === "started") {
-        console.log("🎉 New session started:", data.session_id);
-        localStorage.setItem("session_id", data.session_id);
+        console.log("🎉 New exam session:", data.session_id);
+        localStorage.setItem(`session_${studentId}`, data.session_id);
         setSessionId(data.session_id);
         return;
       }
@@ -81,7 +78,8 @@ export default function ExamPageThinkingSkills() {
   };
 
   startExam();
-}, [sessionId, studentId]);
+}, [studentId]);
+
 
   /* -----------------------------------------------------------
      STEP 2 — Load Exam Details after session_id is known
