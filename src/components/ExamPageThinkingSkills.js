@@ -30,7 +30,7 @@ export default function ExamPageThinkingSkills() {
 
       try {
         const res = await fetch(
-          "https://your-backend.com/api/student/start-exam",
+          "https://web-production-481a5.up.railway.app/api/student/start-exam",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -70,7 +70,7 @@ export default function ExamPageThinkingSkills() {
 
       try {
         const res = await fetch(
-          `https://your-backend.com/api/student/get-exam?session_id=${sessionId}`
+          `https://web-production-481a5.up.railway.app/api/student/get-exam?session_id=${sessionId}`
         );
 
         const data = await res.json();
@@ -117,7 +117,7 @@ export default function ExamPageThinkingSkills() {
   const finishExam = async () => {
     console.log("🏁 Finishing exam...");
     try {
-      await fetch("https://your-backend.com/api/student/finish-exam", {
+      await fetch("https://web-production-481a5.up.railway.app/api/student/finish-exam", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ session_id: sessionId })
