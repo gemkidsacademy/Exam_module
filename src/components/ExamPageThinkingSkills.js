@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./ExamPage.css";
 
-export default function ExamPage() {
+export default function ExamPageThinkingSkills() {
   const sessionId = localStorage.getItem("session_id");
 
   const [loading, setLoading] = useState(true);
