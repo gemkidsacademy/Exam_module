@@ -213,16 +213,17 @@ export default function ExamPageThinkingSkills() {
 
   if (loading) return <p className="loading">Loading exam…</p>;
 
+  // 2️⃣ If completed → stop immediately BEFORE touching questions
   if (completed)
     return (
       <div className="completed-screen">
         <h1>🎉 Exam Finished</h1>
-        <p>Your time is over or you already submitted.</p>
+        <p>You have already completed this exam.</p>
       </div>
     );
-
+  
+  // 3️⃣ Now it is SAFE to access currentQ
   const currentQ = questions[currentIndex];
-
   return (
     <div className="exam-container">
       {/* Header */}
