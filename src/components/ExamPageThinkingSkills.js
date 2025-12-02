@@ -2,10 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./ExamPage.css";
 
 export default function ExamPageThinkingSkills() {
-  const studentId = sessionStorage.getItem("student_id");  // e.g., "Gem002"
-
-  const subject = "thinking_skills";
-  const difficulty = "advanced";
+  const studentId = sessionStorage.getItem("student_id"); // e.g., "Gem002"
 
   const [sessionId, setSessionId] = useState(localStorage.getItem("session_id"));
   const [loading, setLoading] = useState(true);
@@ -17,62 +14,57 @@ export default function ExamPageThinkingSkills() {
   const [timeLeft, setTimeLeft] = useState(null);
   const [completed, setCompleted] = useState(false);
 
-  /* -------------------------------------------------------------------
-     STEP 1 — Start Exam Session (ONLY IF NO session_id EXISTS)
-  ------------------------------------------------------------------- */
+  /* -----------------------------------------------------------
+     STEP 1 — Start Exam Session if not already started
+  ----------------------------------------------------------- */
   useEffect(() => {
-  console.log("StudentId (string from login) →", studentId);
+    console.log("StudentId (from login) →", studentId);
 
-  const startExam = async () => {
-
-    if (!studentId) {
-      console.error("❌ No student_id found in sessionStorage");
-      return;
-    }
-
-    if (sessionId) {
-      console.log("✔ Existing session detected:", sessionId);
-      return;
-    }
-
-    console.log("📡 Starting new exam session...");
-
-    try {
-      const res = await fetch(
-        "https://web-production-481a5.up.railway.app/api/student/start-exam",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            student_id: studentId
-          })
-
-        }
-      );
-
-      const data = await res.json();
-      console.log("📦 start-exam response:", data);
-
-      if (res.ok) {
-        localStorage.setItem("session_id", data.session_id);
-        setSessionId(data.session_id);
-      } else {
-        console.error("❌ Backend reported error:", data);
+    const startExam = async () => {
+      if (!studentId) {
+        console.error("❌ No student_id found in sessionStorage");
+        return;
       }
 
-    } catch (err) {
-      console.error("❌ Could not start exam:", err);
-    }
-  };
+      if (sessionId) {
+        console.log("✔ Existing session detected:", sessionId);
+        return;
+      }
 
-  startExam();
-}, [sessionId, studentId]);
+      console.log("📡 Starting new exam session...");
 
+      try {
+        const res = await fetch(
+          "https://web-production-481a5.up.railway.app/api/student/start-exam",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              student_id: studentId,
+            }),
+          }
+        );
 
+        const data = await res.json();
+        console.log("📦 start-exam response:", data);
 
-  /* -------------------------------------------------------------------
-     STEP 2 — Load Exam (after session_id is ready)
-  ------------------------------------------------------------------- */
+        if (res.ok) {
+          localStorage.setItem("session_id", data.session_id);
+          setSessionId(data.session_id);
+        } else {
+          console.error("❌ Backend error:", data);
+        }
+      } catch (err) {
+        console.error("❌ Could not start exam:", err);
+      }
+    };
+
+    startExam();
+  }, [sessionId, studentId]);
+
+  /* -----------------------------------------------------------
+     STEP 2 — Load Exam Details after session_id is known
+  ----------------------------------------------------------- */
   useEffect(() => {
     if (!sessionId) return;
 
@@ -83,20 +75,31 @@ export default function ExamPageThinkingSkills() {
         const res = await fetch(
           `https://web-production-481a5.up.railway.app/api/student/get-exam?session_id=${sessionId}`
         );
-
         const data = await res.json();
-        console.log("📦 Exam data:", data);
+
+        console.log("📦 Raw Exam data:", data);
 
         if (data.completed) {
           setCompleted(true);
           return;
         }
 
+        // 🔍 LOG EVERY QUESTION
+        console.log("🔍 Checking each question structure…");
+        data.questions.forEach((q, i) => {
+          console.log(
+            `Question ${i}:`,
+            "q_id=", q.q_id,
+            "question=", q.question,
+            "options=", q.options,
+            "Array?", Array.isArray(q.options)
+          );
+        });
+
         setQuestions(data.questions);
         setTotalQuestions(data.total_questions);
         setTimeLeft(data.remaining_time);
         setLoading(false);
-
       } catch (err) {
         console.error("❌ Exam load failure:", err);
       }
@@ -105,33 +108,35 @@ export default function ExamPageThinkingSkills() {
     loadExam();
   }, [sessionId]);
 
-  /* -------------------------------------------------------------------
-     TIMER HANDLING (Backend is REAL source of truth)
-  ------------------------------------------------------------------- */
+  /* -----------------------------------------------------------
+     TIMER HANDLING
+  ----------------------------------------------------------- */
   useEffect(() => {
     if (timeLeft === null || completed) return;
 
     if (timeLeft <= 0) {
-      console.log("⏰ Time over → finishing exam");
+      console.log("⏳ Time ended → auto finishing");
       finishExam();
       return;
     }
 
-    const timer = setInterval(() => setTimeLeft(t => t - 1), 1000);
+    const interval = setInterval(() => {
+      setTimeLeft((t) => t - 1);
+    }, 1000);
 
-    return () => clearInterval(timer);
+    return () => clearInterval(interval);
   }, [timeLeft, completed]);
 
-  /* -------------------------------------------------------------------
+  /* -----------------------------------------------------------
      FINISH EXAM
-  ------------------------------------------------------------------- */
+  ----------------------------------------------------------- */
   const finishExam = async () => {
-    console.log("🏁 Finishing exam...");
+    console.log("🏁 Finishing exam…");
     try {
       await fetch("https://web-production-481a5.up.railway.app/api/student/finish-exam", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId })
+        body: JSON.stringify({ session_id: sessionId }),
       });
     } catch (err) {
       console.error("❌ Finish exam error:", err);
@@ -139,11 +144,11 @@ export default function ExamPageThinkingSkills() {
     setCompleted(true);
   };
 
-  /* -------------------------------------------------------------------
-     QUESTION NAVIGATION
-  ------------------------------------------------------------------- */
-  const goToQuestion = idx => {
-    setVisited(prev => ({ ...prev, [idx]: true }));
+  /* -----------------------------------------------------------
+     NAVIGATION
+  ----------------------------------------------------------- */
+  const goToQuestion = (idx) => {
+    setVisited((prev) => ({ ...prev, [idx]: true }));
     setCurrentIndex(idx);
   };
 
@@ -153,36 +158,36 @@ export default function ExamPageThinkingSkills() {
   const prevQuestion = () =>
     currentIndex > 0 && goToQuestion(currentIndex - 1);
 
-  /* -------------------------------------------------------------------
+  /* -----------------------------------------------------------
      ANSWER SELECTION
-  ------------------------------------------------------------------- */
-  const handleAnswer = option => {
-    setAnswers(prev => ({ ...prev, [currentIndex]: option }));
+  ----------------------------------------------------------- */
+  const handleAnswer = (option) => {
+    setAnswers((prev) => ({ ...prev, [currentIndex]: option }));
   };
 
-  /* -------------------------------------------------------------------
-     COLOR CODING
-  ------------------------------------------------------------------- */
-  const getIndexClass = i => {
+  /* -----------------------------------------------------------
+     COLOR CODING FOR INDEX CIRCLES
+  ----------------------------------------------------------- */
+  const getIndexClass = (i) => {
     if (answers[i]) return "index-answered";
     if (visited[i]) return "index-visited";
     return "index-not-visited";
   };
 
-  /* -------------------------------------------------------------------
-     TIME FORMATTER
-  ------------------------------------------------------------------- */
-  const formatTime = seconds => {
+  /* -----------------------------------------------------------
+     HELPER → Format time
+  ----------------------------------------------------------- */
+  const formatTime = (seconds) => {
     const m = String(Math.floor(seconds / 60)).padStart(2, "0");
     const s = String(seconds % 60).padStart(2, "0");
     return `${m}:${s}`;
   };
 
-  /* -------------------------------------------------------------------
-     RENDER
-  ------------------------------------------------------------------- */
+  /* -----------------------------------------------------------
+     RENDER LOGIC
+  ----------------------------------------------------------- */
 
-  if (loading) return <p className="loading">Loading exam...</p>;
+  if (loading) return <p className="loading">Loading exam…</p>;
 
   if (completed)
     return (
@@ -196,7 +201,6 @@ export default function ExamPageThinkingSkills() {
 
   return (
     <div className="exam-container">
-
       {/* Header */}
       <div className="exam-header">
         <div className="timer">⏳ {formatTime(timeLeft)}</div>
@@ -205,7 +209,7 @@ export default function ExamPageThinkingSkills() {
         </div>
       </div>
 
-      {/* Question Index */}
+      {/* Question Index Buttons */}
       <div className="index-row">
         {questions.map((_, i) => (
           <div
@@ -222,17 +226,24 @@ export default function ExamPageThinkingSkills() {
       <div className="question-card">
         <p className="question-text">{currentQ.question}</p>
 
-        {currentQ.options.map((opt, i) => (
-          <button
-            key={i}
-            onClick={() => handleAnswer(opt)}
-            className={`option-btn ${
-              answers[currentIndex] === opt ? "selected" : ""
-            }`}
-          >
-            {opt}
-          </button>
-        ))}
+        {/* SAFE OPTIONS RENDERING */}
+        {Array.isArray(currentQ.options) ? (
+          currentQ.options.map((opt, i) => (
+            <button
+              key={i}
+              onClick={() => handleAnswer(opt)}
+              className={`option-btn ${
+                answers[currentIndex] === opt ? "selected" : ""
+              }`}
+            >
+              {opt}
+            </button>
+          ))
+        ) : (
+          <p style={{ color: "red", fontWeight: "bold" }}>
+            ⚠️ Invalid options format for this question. Check backend.
+          </p>
+        )}
       </div>
 
       {/* Navigation */}
