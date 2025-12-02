@@ -117,7 +117,7 @@ function App() {
   const [sessionToken, setSessionToken] = useState(null);
 
   useEffect(() => {
-    document.title = "Class Management System";
+    document.title = "Gem AI - Exam";
   }, []);
 
   return (
