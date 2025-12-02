@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./SelectiveDashboard.css";
 
-// IMPORT THE TAB COMPONENTS HERE
+// IMPORT TAB COMPONENTS
 import ThinkingSkills from "./ThinkingSkills";
 import MathematicalReasoning from "./MathematicalReasoning";
 import ReadingComponent from "./ReadingComponent";
@@ -27,9 +27,9 @@ const SelectiveDashboard = () => {
   const [examData, setExamData] = useState(null);
 
   const studentId = sessionStorage.getItem("student_id");
-
   const tabs = Object.keys(SUBJECT_KEY_MAP);
 
+  // Fetch exam status on tab change
   useEffect(() => {
     const fetchExamStatus = async () => {
       const subjectKey = SUBJECT_KEY_MAP[activeTab];
@@ -55,34 +55,33 @@ const SelectiveDashboard = () => {
     fetchExamStatus();
   }, [activeTab]);
 
-  // Choose the correct component dynamically
+  // Active Component
   const ActiveComponent = COMPONENT_MAP[activeTab];
 
   return (
     <div className="selective-dashboard">
-      
-      {/* Sidebar */}
-      <aside className="sidebar">
+
+      {/* Horizontal Top Menu */}
+      <nav className="horizontal-menu">
         {tabs.map((tab) => (
           <div
             key={tab}
-            className={`tab-item ${activeTab === tab ? "active" : ""}`}
+            className={`menu-item ${activeTab === tab ? "active" : ""}`}
             onClick={() => setActiveTab(tab)}
           >
             {tab}
           </div>
         ))}
-      </aside>
+      </nav>
 
-      {/* Content area */}
+      {/* Content */}
       <main className="content-area">
-        <h2>{activeTab}</h2>
+        <h2 className="subject-title">{activeTab}</h2>
 
         {!examData ? (
           <p>Loading exam information...</p>
         ) : (
           <>
-            {/* Top green header */}
             <div className="quiz-card">
               <div className="quiz-header">
                 <h3 className="quiz-title">
@@ -90,7 +89,7 @@ const SelectiveDashboard = () => {
                 </h3>
               </div>
 
-              {/* Difficulty + Attempts Row */}
+              {/* Difficulty + Attempts */}
               <div className="quiz-meta-row">
                 <span className="difficulty-pill">Advanced Level</span>
                 <span className="attempts-pill">
@@ -118,7 +117,7 @@ const SelectiveDashboard = () => {
               </div>
             </div>
 
-            {/* Render the tab-specific component */}
+            {/* Dynamic component */}
             <ActiveComponent examData={examData} studentId={studentId} />
           </>
         )}
