@@ -39,7 +39,6 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
       sessionStorage.setItem("student_class", data.class_name);
       sessionStorage.setItem("student_name", data.name);
 
-      // Route based on role/class
       if (data?.name === "Admin") {
         navigate("/AdminPanel");
       } else if (data?.class_name === "Selective") {
@@ -54,16 +53,16 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
   };
 
   return (
-    <div style={styles.container}>
+    <div className="login-container">
 
-      {/* LOGO ABOVE CARD */}
+      {/* LOGO ABOVE LOGIN CARD */}
       <img
         src="https://gemkidsacademy.com.au/wp-content/uploads/2024/10/cropped-logo-4-1.png"
         alt="Gem Kids Academy"
-        style={styles.logo}
+        className="login-logo"
       />
 
-      <div style={styles.loginBox}>
+      <div className="login-box">
         <h2>Login</h2>
 
         <input
@@ -71,7 +70,7 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          style={styles.input}
+          className="login-input"
         />
 
         <input
@@ -79,14 +78,14 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={styles.input}
+          className="login-input"
         />
 
-        <button onClick={handleLogin} style={styles.button}>
+        <button onClick={handleLogin} className="login-button">
           Login
         </button>
 
-        {error && <p style={styles.error}>{error}</p>}
+        {error && <p className="login-error">{error}</p>}
       </div>
     </div>
   );
