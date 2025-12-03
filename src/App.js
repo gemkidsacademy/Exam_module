@@ -236,7 +236,7 @@ const styles = {
     marginTop: "10px",
     borderRadius: "4px",
     border: "none",
-    background: "#007bff",
+    backgroundColor: "rgb(0, 140, 200)", // ⭐ Brand Login color (E-color)
     color: "#fff",
     cursor: "pointer",
     fontSize: "16px",
