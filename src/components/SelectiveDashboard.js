@@ -6,6 +6,7 @@ import ExamPageThinkingSkills from "./ExamPageThinkingSkills";
 import MathematicalReasoning from "./MathematicalReasoning";
 import ReadingComponent from "./ReadingComponent";
 import WritingComponent from "./WritingComponent";
+import WelcomeScreen from "./WelcomeScreen";
 
 const SUBJECT_KEY_MAP = {
   "Thinking skills": "thinking_skills",
@@ -23,7 +24,7 @@ const COMPONENT_MAP = {
 };
 
 const SelectiveDashboard = () => {
-  const [activeTab, setActiveTab] = useState("Thinking skills");
+  const [activeTab, setActiveTab] = useState(null);
 
   const studentId = sessionStorage.getItem("student_id");
   const tabs = Object.keys(SUBJECT_KEY_MAP);
@@ -49,14 +50,17 @@ const SelectiveDashboard = () => {
 
       {/* Content */}
       <main className="content-area">
-        
-
-        <ActiveComponent
-          studentId={studentId}
-          subject={subjectKey}
-          difficulty="advanced"
-        />
+        {ActiveComponent ? (
+          <ActiveComponent
+            studentId={studentId}
+            subject={subjectKey}
+            difficulty="advanced"
+          />
+        ) : (
+          <WelcomeScreen />
+        )}
       </main>
+
     </div>
   );
 };
