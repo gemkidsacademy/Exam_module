@@ -7,6 +7,7 @@ import MathematicalReasoning from "./MathematicalReasoning";
 import ReadingComponent from "./ReadingComponent";
 import WritingComponent from "./WritingComponent";
 import WelcomeScreen from "./WelcomeScreen";
+import QuizSetup from "./QuizSetup";
 
 const SUBJECT_KEY_MAP = {
   "Thinking skills": "thinking_skills",
@@ -57,7 +58,7 @@ const SelectiveDashboard = () => {
             difficulty="advanced"
           />
         ) : (
-          <WelcomeScreen />
+          <QuizSetup />
         )}
       </main>
 
