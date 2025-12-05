@@ -123,31 +123,28 @@ const AdminPanel = () => {
         {activeTab === "add-quiz" && (
           <div className="tab-panel" style={{ textAlign: "center", padding: "20px" }}>
             
-            {/* If examType is NOT selected → show 4 exam buttons */}
+            {/* STEP 1 — Show the exam buttons BEFORE user selects anything */}
             {!examType && (
               <>
                 <h3 style={{ marginBottom: "20px" }}>Select Exam Type</h3>
         
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px", maxWidth: "250px", margin: "0 auto" }}>
-                  <button className="exam-btn" onClick={() => setExamType("selective")}>
-                    Selective Exam
-                  </button>
-        
-                  <button className="exam-btn" onClick={() => setExamType("foundational")}>
-                    Foundational Exam
-                  </button>
-        
-                  <button className="exam-btn" onClick={() => setExamType("reading")}>
-                    Reading Exam
-                  </button>
-        
-                  <button className="exam-btn" onClick={() => setExamType("writing")}>
-                    Writing Exam
-                  </button>
+                  <button onClick={() => setExamType("selective")}>Selective Exam</button>
+                  <button onClick={() => setExamType("foundational")}>Foundational Exam</button>
+                  <button onClick={() => setExamType("reading")}>Reading Exam</button>
+                  <button onClick={() => setExamType("writing")}>Writing Exam</button>
                 </div>
               </>
             )}
         
+            {/* STEP 2 — When user presses Selective Exam → show QuizSetup here */}
+            {examType === "selective" && (
+              <QuizSetup />
+            )}
+        
+          </div>
+        )}
+
             {/* If Selective Exam chosen → show QuizSetup component */}
             {examType === "selective" && <QuizSetup />}
           </div>
