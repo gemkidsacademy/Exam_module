@@ -22,6 +22,14 @@ const AdminPanel = () => {
   const [showDeleteUser, setShowDeleteUser] = useState(false);
   const [examType, setExamType] = useState(null);
 
+  // Reset exam selection whenever user switches away from Add Quiz tab
+  React.useEffect(() => {
+    if (activeTab !== "add-quiz") {
+      setExamType(null);
+    }
+  }, [activeTab]);
+
+
 
   const tabs = [
     { id: "database", label: "Exam Module User Management" },
@@ -72,6 +80,7 @@ const AdminPanel = () => {
       {/* Tab Content */}
       <div className="tab-content">
         {activeTab === "database" && (
+          
           <div className="tab-panel">
             <div>
               <button className="dashboard-button" onClick={toggleAddUser}>
