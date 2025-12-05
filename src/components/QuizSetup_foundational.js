@@ -40,12 +40,12 @@ export default function QuizSetup_foundational() {
 
     sections[index][field] = numeric;
 
-    // Recompute per-section total
+    // Recompute section total
     const ai = Number(sections[index].ai) || 0;
     const db = Number(sections[index].db) || 0;
     sections[index].total = ai + db;
 
-    // Recompute entire quiz total
+    // Recompute quiz total
     const globalTotal = sections.reduce(
       (sum, sec) => sum + (Number(sec.total) || 0),
       0
@@ -55,7 +55,7 @@ export default function QuizSetup_foundational() {
     setQuiz((prev) => ({ ...prev, sections }));
   };
 
-  /** Submit handler */
+  /** Handle submit */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -65,7 +65,7 @@ export default function QuizSetup_foundational() {
     }
 
     if (!quiz.sections[0].name.trim() || !quiz.sections[1].name.trim()) {
-      alert("Section 1 and 2 must have names.");
+      alert("Section 1 and Section 2 must have names.");
       return;
     }
 
@@ -79,7 +79,7 @@ export default function QuizSetup_foundational() {
         quiz.sections[2].time === "")
     ) {
       alert(
-        "Section 3 is optional, but if you fill ANY field then ALL fields must be filled."
+        "Section 3 is optional, but if any field is filled, ALL fields must be filled."
       );
       return;
     }
@@ -89,9 +89,9 @@ export default function QuizSetup_foundational() {
       return;
     }
 
-    // Filter out optional section if empty
-    const finalSections = quiz.sections.filter((sec, idx) => {
-      if (idx === 2 && section3Empty) return false;
+    // Remove section 3 if empty
+    const finalSections = quiz.sections.filter((sec, i) => {
+      if (i === 2 && section3Empty) return false;
       return true;
     });
 
@@ -125,8 +125,8 @@ export default function QuizSetup_foundational() {
       }
 
       alert("Quiz setup saved successfully!");
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       alert("Error saving quiz setup. Please try again.");
     }
   };
@@ -135,7 +135,7 @@ export default function QuizSetup_foundational() {
     <div className="quiz-setup-container">
       <form onSubmit={handleSubmit}>
 
-        {/* ---------------- TOP ROW: CLASS / SUBJECT / DIFFICULTY ---------------- */}
+        {/* ---------- TOP ROW: Class + Subject + Difficulty ---------- */}
         <div className="top-row-grid">
 
           <div className="top-row-item">
@@ -145,7 +145,6 @@ export default function QuizSetup_foundational() {
               onChange={(e) =>
                 setQuiz((prev) => ({ ...prev, className: e.target.value }))
               }
-              required
             >
               <option value="">Select Class</option>
               <option value="selective">Selective</option>
@@ -163,7 +162,6 @@ export default function QuizSetup_foundational() {
               onChange={(e) =>
                 setQuiz((prev) => ({ ...prev, subject: e.target.value }))
               }
-              required
             >
               <option value="">Select Subject</option>
               <option value="thinking_skills">Thinking Skills</option>
@@ -180,7 +178,6 @@ export default function QuizSetup_foundational() {
               onChange={(e) =>
                 setQuiz((prev) => ({ ...prev, difficulty: e.target.value }))
               }
-              required
             >
               <option value="">Select Difficulty</option>
               <option value="easy">Easy</option>
@@ -188,10 +185,9 @@ export default function QuizSetup_foundational() {
               <option value="hard">Hard</option>
             </select>
           </div>
-
         </div>
 
-        {/* ---------------- SECTIONS GRID ---------------- */}
+        {/* ---------- SECTIONS GRID ---------- */}
         <div className="sections-grid">
           {quiz.sections.map((sec, index) => (
             <div className="section" key={index}>
@@ -203,7 +199,9 @@ export default function QuizSetup_foundational() {
               <input
                 type="text"
                 value={sec.name}
-                onChange={(e) => handleSectionNameChange(index, e.target.value)}
+                onChange={(e) =>
+                  handleSectionNameChange(index, e.target.value)
+                }
                 required={index !== 2}
               />
 
@@ -246,7 +244,7 @@ export default function QuizSetup_foundational() {
           ))}
         </div>
 
-        {/* ---------------- TOTAL SUMMARY ---------------- */}
+        {/* ---------- TOTAL SUMMARY ---------- */}
         <div className="total-section">
           <h3>Total Questions: {totalQuestions}</h3>
           {totalQuestions > 40 && (
