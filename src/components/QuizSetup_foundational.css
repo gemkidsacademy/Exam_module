@@ -1,15 +1,53 @@
-/* --- Container --- */
+/* ==========================================================
+   QUIZ SETUP CONTAINER
+   ========================================================== */
 .quiz-setup-container {
   max-width: 1100px;
   margin: 20px auto;
-  padding: 20px 20px 40px;
+  padding: 25px 25px 40px;
   background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* --- Form Labels --- */
+/* ==========================================================
+   TOP ROW — CLASS / SUBJECT / DIFFICULTY (3 COLUMNS)
+   ========================================================== */
+.top-row-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.top-row-item label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #444;
+  text-align: left;
+}
+
+.top-row-item select {
+  width: 100%;
+  padding: 11px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fafafa;
+  font-size: 14px;
+  transition: 0.2s ease-in-out;
+}
+
+.top-row-item select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+  outline: none;
+}
+
+/* ==========================================================
+   FORM LABELS
+   ========================================================== */
 .quiz-setup-container label {
   display: block;
   margin-bottom: 5px;
@@ -18,17 +56,19 @@
   font-size: 14px;
 }
 
-/* --- Inputs & Selects --- */
+/* ==========================================================
+   INPUTS & SELECTS
+   ========================================================== */
 .quiz-setup-container input,
 .quiz-setup-container select {
   width: 100%;
   padding: 10px 10px;
-  margin-bottom: 15px;
+  margin-bottom: 14px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 14px;
   background: #fdfdfd;
-  transition: 0.2s;
+  transition: 0.2s ease-in-out;
 }
 
 .quiz-setup-container input:focus,
@@ -40,46 +80,53 @@
 
 .quiz-setup-container input[readonly] {
   background: #f3f3f3;
+  cursor: not-allowed;
 }
 
-/* --- Grid for 3 Sections --- */
+/* ==========================================================
+   SECTIONS GRID (3 COLUMNS)
+   ========================================================== */
 .sections-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin-top: 20px;
+  gap: 22px;
+  margin-top: 15px;
 }
 
-/* --- Section Card --- */
+/* ==========================================================
+   SECTION CARD
+   ========================================================== */
 .section {
-  background: #f9f9f9;
-  border-radius: 10px;
+  background: #fafafa;
+  border-radius: 12px;
   border: 1px solid #ddd;
-  padding: 15px 18px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  padding: 18px 18px 22px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
 .section h3 {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   font-size: 17px;
   font-weight: 600;
   color: #333;
   text-align: center;
 }
 
-/* --- Summary Section --- */
+/* ==========================================================
+   TOTAL SUMMARY
+   ========================================================== */
 .total-section {
-  margin-top: 25px;
+  margin-top: 28px;
   text-align: center;
 }
 
 .total-section h3 {
-  font-size: 18px;
+  font-size: 19px;
   color: #333;
   font-weight: 700;
 }
 
-/* --- Warning Message --- */
+/* WARNING MESSAGE */
 .warning {
   color: red;
   font-weight: 700;
@@ -87,11 +134,13 @@
   font-size: 14px;
 }
 
-/* --- Submit Button --- */
+/* ==========================================================
+   SUBMIT BUTTON
+   ========================================================== */
 .quiz-setup-container button {
   width: 100%;
-  padding: 13px;
-  margin-top: 20px;
+  padding: 14px;
+  margin-top: 25px;
   background-color: #007bff;
   color: white;
   font-size: 15px;
@@ -104,21 +153,32 @@
 
 .quiz-setup-container button:hover {
   background: #0056b3;
+  transform: translateY(-1px);
 }
 
-/* --- Responsive (mobile/tablet) --- */
+/* ==========================================================
+   RESPONSIVE BEHAVIOR
+   ========================================================== */
+
+/* Sections → 2 columns */
 @media (max-width: 950px) {
   .sections-grid {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-@media (max-width: 650px) {
+/* Sections → 1 column, Top Row → 1 column */
+@media (max-width: 700px) {
   .sections-grid {
     grid-template-columns: 1fr;
   }
 
+  .top-row-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
   .quiz-setup-container {
-    padding: 15px;
+    padding: 18px;
   }
 }
