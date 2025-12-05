@@ -20,6 +20,8 @@ const AdminPanel = () => {
   const [showEditUser, setShowEditUser] = useState(false);
   const [showViewUser, setShowViewUser] = useState(false);
   const [showDeleteUser, setShowDeleteUser] = useState(false);
+  const [examType, setExamType] = useState(null);
+
 
   const tabs = [
     { id: "database", label: "Exam Module User Management" },
@@ -119,10 +121,38 @@ const AdminPanel = () => {
         )}
 
         {activeTab === "add-quiz" && (
-          <div className="tab-panel">
-            <QuizSetup />
+          <div className="tab-panel" style={{ textAlign: "center", padding: "20px" }}>
+            
+            {/* If examType is NOT selected → show 4 exam buttons */}
+            {!examType && (
+              <>
+                <h3 style={{ marginBottom: "20px" }}>Select Exam Type</h3>
+        
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", maxWidth: "250px", margin: "0 auto" }}>
+                  <button className="exam-btn" onClick={() => setExamType("selective")}>
+                    Selective Exam
+                  </button>
+        
+                  <button className="exam-btn" onClick={() => setExamType("foundational")}>
+                    Foundational Exam
+                  </button>
+        
+                  <button className="exam-btn" onClick={() => setExamType("reading")}>
+                    Reading Exam
+                  </button>
+        
+                  <button className="exam-btn" onClick={() => setExamType("writing")}>
+                    Writing Exam
+                  </button>
+                </div>
+              </>
+            )}
+        
+            {/* If Selective Exam chosen → show QuizSetup component */}
+            {examType === "selective" && <QuizSetup />}
           </div>
         )}
+
 
         {activeTab === "upload-image-folder" && (
           <div className="tab-panel">
