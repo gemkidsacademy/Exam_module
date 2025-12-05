@@ -121,34 +121,57 @@ const AdminPanel = () => {
         )}
 
         {activeTab === "add-quiz" && (
-          <div className="tab-panel" style={{ textAlign: "center", padding: "20px" }}>
-            
-            {/* STEP 1 — Show the exam buttons BEFORE user selects anything */}
-            {!examType && (
-              <>
-                <h3 style={{ marginBottom: "20px" }}>Select Exam Type</h3>
-        
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px", maxWidth: "250px", margin: "0 auto" }}>
-                  <button onClick={() => setExamType("selective")}>Selective Exam</button>
-                  <button onClick={() => setExamType("foundational")}>Foundational Exam</button>
-                  <button onClick={() => setExamType("reading")}>Reading Exam</button>
-                  <button onClick={() => setExamType("writing")}>Writing Exam</button>
-                </div>
-              </>
-            )}
-        
-            {/* STEP 2 — When user presses Selective Exam → show QuizSetup here */}
-            {examType === "selective" && (
-              <QuizSetup />
-            )}
-        
-          </div>
-        )}
+            <div className="tab-panel" style={{ textAlign: "center", padding: "30px" }}>
+          
+              {/* STEP 1 — Show exam selection buttons */}
+              {!examType && (
+                <>
+                  <h2 style={{ marginBottom: "25px", fontWeight: "600" }}>Select Exam Type</h2>
+          
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "15px",
+                      maxWidth: "320px",
+                      margin: "0 auto",
+                      width: "100%",
+                    }}
+                  >
+                    {[
+                      { label: "Selective Exam", value: "selective" },
+                      { label: "Foundational Exam", value: "foundational" },
+                      { label: "Reading Exam", value: "reading" },
+                      { label: "Writing Exam", value: "writing" },
+                    ].map((item) => (
+                      <button
+                        key={item.value}
+                        onClick={() => setExamType(item.value)}
+                        style={{
+                          padding: "12px 18px",
+                          borderRadius: "8px",
+                          border: "1px solid #ccc",
+                          fontSize: "16px",
+                          background: "#f8f9fa",
+                          cursor: "pointer",
+                          fontWeight: "500",
+                          transition: "0.2s",
+                        }}
+                        onMouseOver={(e) => (e.target.style.background = "#e6e6e6")}
+                        onMouseOut={(e) => (e.target.style.background = "#f8f9fa")}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+          
+              {/* STEP 2 — Render QuizSetup when Selective chosen */}
+              {examType === "selective" && <QuizSetup />}
+            </div>
+          )}
 
-            {/* If Selective Exam chosen → show QuizSetup component */}
-            {examType === "selective" && <QuizSetup />}
-          </div>
-        )}
 
 
         {activeTab === "upload-image-folder" && (
