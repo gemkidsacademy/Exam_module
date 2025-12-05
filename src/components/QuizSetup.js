@@ -235,7 +235,7 @@ export default function QuizSetup() {
         </div>
 
         <button type="submit" disabled={totalQuestions > 40}>
-          Submit
+          Create Exam
         </button>
       </form>
     </div>
