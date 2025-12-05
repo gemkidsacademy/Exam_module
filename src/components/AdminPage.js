@@ -10,6 +10,8 @@ import QuizSetup from "./QuizSetup";
 import UploadWord from "./UploadWord";
 import GenerateExam from "./GenerateExam";   // ⬅️ NEW COMPONENT IMPORT
 import UploadImageFolder from "./UploadImageFolder";
+import QuizSetup_foundationa from "./QuizSetup_foundationa";
+
 
 
 const AdminPanel = () => {
@@ -178,6 +180,7 @@ const AdminPanel = () => {
           
               {/* STEP 2 — Render QuizSetup when Selective chosen */}
               {examType === "selective" && <QuizSetup />}
+              {examType === "foundational" && <QuizSetup_foundational />}
             </div>
           )}
 
