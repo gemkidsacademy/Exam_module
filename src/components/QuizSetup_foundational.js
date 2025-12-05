@@ -7,15 +7,15 @@ export default function QuizSetup_foundational() {
     subject: "",
     difficulty: "",
     sections: [
-      { name: "", ai: 0, db: 0, total: 0, time: 0 }, // Section 1 (required)
-      { name: "", ai: 0, db: 0, total: 0, time: 0 }, // Section 2 (required)
-      { name: "", ai: "", db: "", total: 0, time: "" }, // Section 3 (optional)
+      { name: "", ai: 0, db: 0, total: 0, time: 0 }, // Required section
+      { name: "", ai: 0, db: 0, total: 0, time: 0 }, // Required section
+      { name: "", ai: "", db: "", total: 0, time: "" }, // Optional section
     ],
   });
 
   const [totalQuestions, setTotalQuestions] = useState(0);
 
-  /** Detect whether Section 3 is completely empty */
+  /** Check if optional Section 3 is completely empty */
   const isSection3Empty = () => {
     const s = quiz.sections[2];
     return (
@@ -40,32 +40,30 @@ export default function QuizSetup_foundational() {
 
     sections[index][field] = numValue;
 
-    // Auto compute totals (only if numeric)
+    // Calculate totals
     const ai = Number(sections[index].ai) || 0;
     const db = Number(sections[index].db) || 0;
     sections[index].total = ai + db;
 
-    // Recompute global total
-    const globalTotal = sections.reduce(
+    // Recalculate entire quiz total
+    const finalTotal = sections.reduce(
       (sum, sec) => sum + (Number(sec.total) || 0),
       0
     );
 
-    setTotalQuestions(globalTotal);
+    setTotalQuestions(finalTotal);
     setQuiz((prev) => ({ ...prev, sections }));
   };
 
-  /** Submit handler */
+  /** Handle submit */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate required fields
     if (!quiz.className || !quiz.subject || !quiz.difficulty) {
       alert("Please select class, subject, and difficulty.");
       return;
     }
 
-    // Validate Section 1 & 2 names
     if (!quiz.sections[0].name.trim() || !quiz.sections[1].name.trim()) {
       alert("Section 1 and Section 2 must have names.");
       return;
@@ -73,7 +71,6 @@ export default function QuizSetup_foundational() {
 
     const section3Empty = isSection3Empty();
 
-    // If Section 3 is partially filled, validate it
     if (
       !section3Empty &&
       (!quiz.sections[2].name.trim() ||
@@ -82,29 +79,28 @@ export default function QuizSetup_foundational() {
         quiz.sections[2].time === "")
     ) {
       alert(
-        "Section 3 is optional, but if you fill any field, all fields must be completed."
+        "Section 3 is optional, but if you fill any field then ALL fields in Section 3 must be completed."
       );
       return;
     }
 
-    // Total question limit
     if (totalQuestions > 40) {
-      alert("Total questions across all sections cannot exceed 40.");
+      alert("Total questions cannot exceed 40.");
       return;
     }
 
-    // Build payload, excluding empty Section 3
+    // Automatically remove Section 3 if empty
     const filteredSections = quiz.sections.filter((sec, i) => {
       if (i === 2 && section3Empty) return false;
       return true;
     });
 
     const payload = {
-      class_name: quiz.className.trim(),
-      subject: quiz.subject.trim(),
-      difficulty: quiz.difficulty.trim(),
+      class_name: quiz.className,
+      subject: quiz.subject,
+      difficulty: quiz.difficulty,
       sections: filteredSections.map((s) => ({
-        name: s.name.trim(),
+        name: s.name,
         ai: Number(s.ai) || 0,
         db: Number(s.db) || 0,
         total: Number(s.total) || 0,
@@ -138,6 +134,7 @@ export default function QuizSetup_foundational() {
   return (
     <div className="quiz-setup-container">
       <form onSubmit={handleSubmit}>
+
         <label>Class:</label>
         <select
           value={quiz.className}
@@ -183,13 +180,12 @@ export default function QuizSetup_foundational() {
           <option value="hard">Hard</option>
         </select>
 
-        {/* Sections UI */}
-        <div className="sections-container">
+        {/* NEW 3-COLUMN LAYOUT */}
+        <div className="sections-grid">
           {quiz.sections.map((sec, index) => (
             <div className="section" key={index}>
               <h3>
-                Section {index + 1}
-                {index === 2 && " (Optional)"}
+                Section {index + 1} {index === 2 && "(Optional)"}
               </h3>
 
               <label>Section Name:</label>
@@ -241,7 +237,6 @@ export default function QuizSetup_foundational() {
           ))}
         </div>
 
-        {/* Summary */}
         <div className="total-section">
           <h3>Total Questions: {totalQuestions}</h3>
           {totalQuestions > 40 && (
