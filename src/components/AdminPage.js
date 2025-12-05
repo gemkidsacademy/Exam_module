@@ -10,7 +10,7 @@ import QuizSetup from "./QuizSetup";
 import UploadWord from "./UploadWord";
 import GenerateExam from "./GenerateExam";   // ⬅️ NEW COMPONENT IMPORT
 import UploadImageFolder from "./UploadImageFolder";
-import QuizSetup_foundationa from "./QuizSetup_foundationa";
+import QuizSetup_foundational from "./QuizSetup_foundational";
 
 
 
