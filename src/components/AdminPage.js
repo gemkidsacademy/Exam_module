@@ -135,7 +135,7 @@ const AdminPanel = () => {
               {/* STEP 1 — Show exam selection buttons */}
               {!examType && (
                 <>
-                  <h2 style={{ marginBottom: "25px", fontWeight: "600" }}>Select Exam Type</h2>
+                  
           
                   <div
                     style={{
