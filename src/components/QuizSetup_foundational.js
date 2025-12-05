@@ -253,7 +253,7 @@ export default function QuizSetup_foundational() {
         </div>
 
         <button type="submit" disabled={totalQuestions > 40}>
-          Submit Quiz Setup
+          Create Exam
         </button>
       </form>
     </div>
