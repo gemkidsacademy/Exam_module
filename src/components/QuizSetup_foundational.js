@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./QuizSetup.css";
+import "./QuizSetup_foundational.css";
 
 export default function QuizSetup_foundational() {
   const [quiz, setQuiz] = useState({
