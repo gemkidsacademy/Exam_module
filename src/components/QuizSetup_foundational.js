@@ -7,9 +7,9 @@ export default function QuizSetup_foundational() {
     subject: "",
     difficulty: "",
     sections: [
-      { name: "", ai: 0, db: 0, total: 0, time: 0 }, // Required section
-      { name: "", ai: 0, db: 0, total: 0, time: 0 }, // Required section
-      { name: "", ai: "", db: "", total: 0, time: "" }, // Optional section
+      { name: "", ai: 0, db: 0, total: 0, time: 0 }, // Section 1 (required)
+      { name: "", ai: 0, db: 0, total: 0, time: 0 }, // Section 2 (required)
+      { name: "", ai: "", db: "", total: 0, time: "" }, // Section 3 (optional)
     ],
   });
 
@@ -36,26 +36,26 @@ export default function QuizSetup_foundational() {
   /** Update AI/DB/Time fields */
   const handleSectionChange = (index, field, value) => {
     const sections = [...quiz.sections];
-    const numValue = value === "" ? "" : Number(value);
+    const numeric = value === "" ? "" : Number(value);
 
-    sections[index][field] = numValue;
+    sections[index][field] = numeric;
 
-    // Calculate totals
+    // Recompute per-section total
     const ai = Number(sections[index].ai) || 0;
     const db = Number(sections[index].db) || 0;
     sections[index].total = ai + db;
 
-    // Recalculate entire quiz total
-    const finalTotal = sections.reduce(
+    // Recompute entire quiz total
+    const globalTotal = sections.reduce(
       (sum, sec) => sum + (Number(sec.total) || 0),
       0
     );
 
-    setTotalQuestions(finalTotal);
+    setTotalQuestions(globalTotal);
     setQuiz((prev) => ({ ...prev, sections }));
   };
 
-  /** Handle submit */
+  /** Submit handler */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -65,7 +65,7 @@ export default function QuizSetup_foundational() {
     }
 
     if (!quiz.sections[0].name.trim() || !quiz.sections[1].name.trim()) {
-      alert("Section 1 and Section 2 must have names.");
+      alert("Section 1 and 2 must have names.");
       return;
     }
 
@@ -79,7 +79,7 @@ export default function QuizSetup_foundational() {
         quiz.sections[2].time === "")
     ) {
       alert(
-        "Section 3 is optional, but if you fill any field then ALL fields in Section 3 must be completed."
+        "Section 3 is optional, but if you fill ANY field then ALL fields must be filled."
       );
       return;
     }
@@ -89,9 +89,9 @@ export default function QuizSetup_foundational() {
       return;
     }
 
-    // Automatically remove Section 3 if empty
-    const filteredSections = quiz.sections.filter((sec, i) => {
-      if (i === 2 && section3Empty) return false;
+    // Filter out optional section if empty
+    const finalSections = quiz.sections.filter((sec, idx) => {
+      if (idx === 2 && section3Empty) return false;
       return true;
     });
 
@@ -99,8 +99,8 @@ export default function QuizSetup_foundational() {
       class_name: quiz.className,
       subject: quiz.subject,
       difficulty: quiz.difficulty,
-      sections: filteredSections.map((s) => ({
-        name: s.name,
+      sections: finalSections.map((s) => ({
+        name: s.name.trim(),
         ai: Number(s.ai) || 0,
         db: Number(s.db) || 0,
         total: Number(s.total) || 0,
@@ -135,52 +135,63 @@ export default function QuizSetup_foundational() {
     <div className="quiz-setup-container">
       <form onSubmit={handleSubmit}>
 
-        <label>Class:</label>
-        <select
-          value={quiz.className}
-          onChange={(e) =>
-            setQuiz((prev) => ({ ...prev, className: e.target.value }))
-          }
-          required
-        >
-          <option value="">Select Class</option>
-          <option value="selective">Selective</option>
-          <option value="year3">Year 3</option>
-          <option value="year4">Year 4</option>
-          <option value="year5">Year 5</option>
-          <option value="year6">Year 6</option>
-        </select>
+        {/* ---------------- TOP ROW: CLASS / SUBJECT / DIFFICULTY ---------------- */}
+        <div className="top-row-grid">
 
-        <label>Subject:</label>
-        <select
-          value={quiz.subject}
-          onChange={(e) =>
-            setQuiz((prev) => ({ ...prev, subject: e.target.value }))
-          }
-          required
-        >
-          <option value="">Select Subject</option>
-          <option value="thinking_skills">Thinking Skills</option>
-          <option value="maths">Mathematical Reasoning</option>
-          <option value="reading">Reading</option>
-          <option value="writing">Writing</option>
-        </select>
+          <div className="top-row-item">
+            <label>Class:</label>
+            <select
+              value={quiz.className}
+              onChange={(e) =>
+                setQuiz((prev) => ({ ...prev, className: e.target.value }))
+              }
+              required
+            >
+              <option value="">Select Class</option>
+              <option value="selective">Selective</option>
+              <option value="year3">Year 3</option>
+              <option value="year4">Year 4</option>
+              <option value="year5">Year 5</option>
+              <option value="year6">Year 6</option>
+            </select>
+          </div>
 
-        <label>Difficulty:</label>
-        <select
-          value={quiz.difficulty}
-          onChange={(e) =>
-            setQuiz((prev) => ({ ...prev, difficulty: e.target.value }))
-          }
-          required
-        >
-          <option value="">Select Difficulty</option>
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-        </select>
+          <div className="top-row-item">
+            <label>Subject:</label>
+            <select
+              value={quiz.subject}
+              onChange={(e) =>
+                setQuiz((prev) => ({ ...prev, subject: e.target.value }))
+              }
+              required
+            >
+              <option value="">Select Subject</option>
+              <option value="thinking_skills">Thinking Skills</option>
+              <option value="maths">Mathematical Reasoning</option>
+              <option value="reading">Reading</option>
+              <option value="writing">Writing</option>
+            </select>
+          </div>
 
-        {/* NEW 3-COLUMN LAYOUT */}
+          <div className="top-row-item">
+            <label>Difficulty:</label>
+            <select
+              value={quiz.difficulty}
+              onChange={(e) =>
+                setQuiz((prev) => ({ ...prev, difficulty: e.target.value }))
+              }
+              required
+            >
+              <option value="">Select Difficulty</option>
+              <option value="easy">Easy</option>
+              <option value="medium">Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </div>
+
+        </div>
+
+        {/* ---------------- SECTIONS GRID ---------------- */}
         <div className="sections-grid">
           {quiz.sections.map((sec, index) => (
             <div className="section" key={index}>
@@ -192,9 +203,7 @@ export default function QuizSetup_foundational() {
               <input
                 type="text"
                 value={sec.name}
-                onChange={(e) =>
-                  handleSectionNameChange(index, e.target.value)
-                }
+                onChange={(e) => handleSectionNameChange(index, e.target.value)}
                 required={index !== 2}
               />
 
@@ -237,6 +246,7 @@ export default function QuizSetup_foundational() {
           ))}
         </div>
 
+        {/* ---------------- TOTAL SUMMARY ---------------- */}
         <div className="total-section">
           <h3>Total Questions: {totalQuestions}</h3>
           {totalQuestions > 40 && (
