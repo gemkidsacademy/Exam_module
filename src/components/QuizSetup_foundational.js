@@ -28,7 +28,6 @@ export default function QuizSetup_foundational() {
   const isSection3Empty = () => {
     const s = quiz.sections[2];
     return (
-      s.name.trim() === "" &&
       (s.ai === "" || s.ai === 0) &&
       (s.db === "" || s.db === 0) &&
       (s.time === "" || s.time === 0)
