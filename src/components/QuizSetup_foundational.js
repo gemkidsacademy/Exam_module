@@ -5,17 +5,26 @@ export default function QuizSetup_foundational() {
   const [quiz, setQuiz] = useState({
     className: "",
     subject: "",
-    difficulty: "",
     sections: [
-      { name: "", ai: 0, db: 0, total: 0, time: 0 }, // Section 1 (required)
-      { name: "", ai: 0, db: 0, total: 0, time: 0 }, // Section 2 (required)
-      { name: "", ai: "", db: "", total: 0, time: "" }, // Section 3 (optional)
+      { name: "", ai: 0, db: 0, total: 0, time: 0 },
+      { name: "", ai: 0, db: 0, total: 0, time: 0 },
+      { name: "", ai: "", db: "", total: 0, time: "" },
     ],
   });
+  React.useEffect(() => {
+    setQuiz((prev) => ({
+      ...prev,
+      sections: prev.sections.map((sec, i) => ({
+        ...sec,
+        name: i === 0 ? "Easy" : i === 1 ? "Medium" : "Hard",
+      })),
+    }));
+  }, []);
+
+  
 
   const [totalQuestions, setTotalQuestions] = useState(0);
 
-  /** Check if optional Section 3 is completely empty */
   const isSection3Empty = () => {
     const s = quiz.sections[2];
     return (
@@ -26,26 +35,22 @@ export default function QuizSetup_foundational() {
     );
   };
 
-  /** Update section name */
   const handleSectionNameChange = (index, value) => {
     const sections = [...quiz.sections];
     sections[index].name = value;
     setQuiz((prev) => ({ ...prev, sections }));
   };
 
-  /** Update AI/DB/Time fields */
   const handleSectionChange = (index, field, value) => {
     const sections = [...quiz.sections];
     const numeric = value === "" ? "" : Number(value);
 
     sections[index][field] = numeric;
 
-    // Recompute section total
     const ai = Number(sections[index].ai) || 0;
     const db = Number(sections[index].db) || 0;
     sections[index].total = ai + db;
 
-    // Recompute quiz total
     const globalTotal = sections.reduce(
       (sum, sec) => sum + (Number(sec.total) || 0),
       0
@@ -55,12 +60,11 @@ export default function QuizSetup_foundational() {
     setQuiz((prev) => ({ ...prev, sections }));
   };
 
-  /** Handle submit */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!quiz.className || !quiz.subject || !quiz.difficulty) {
-      alert("Please select class, subject, and difficulty.");
+    if (!quiz.className || !quiz.subject) {
+      alert("Please select class and subject.");
       return;
     }
 
@@ -84,12 +88,16 @@ export default function QuizSetup_foundational() {
       return;
     }
 
-    if (totalQuestions > 40) {
-      alert("Total questions cannot exceed 40.");
+    if (section3Empty && totalQuestions > 40) {
+      alert("Total questions cannot exceed 40 when only 2 sections are used.");
+      return;
+    }
+    
+    if (!section3Empty && totalQuestions > 50) {
+      alert("Total questions cannot exceed 50 when all 3 sections are used.");
       return;
     }
 
-    // Remove section 3 if empty
     const finalSections = quiz.sections.filter((sec, i) => {
       if (i === 2 && section3Empty) return false;
       return true;
@@ -98,7 +106,6 @@ export default function QuizSetup_foundational() {
     const payload = {
       class_name: quiz.className,
       subject: quiz.subject,
-      difficulty: quiz.difficulty,
       sections: finalSections.map((s) => ({
         name: s.name.trim(),
         ai: Number(s.ai) || 0,
@@ -135,7 +142,7 @@ export default function QuizSetup_foundational() {
     <div className="quiz-setup-container">
       <form onSubmit={handleSubmit}>
 
-        {/* ---------- TOP ROW: Class + Subject + Difficulty ---------- */}
+        {/* ---------- TOP ROW: Class + Subject (Difficulty removed) ---------- */}
         <div className="top-row-grid">
 
           <div className="top-row-item">
@@ -170,21 +177,6 @@ export default function QuizSetup_foundational() {
               <option value="writing">Writing</option>
             </select>
           </div>
-
-          <div className="top-row-item">
-            <label>Difficulty:</label>
-            <select
-              value={quiz.difficulty}
-              onChange={(e) =>
-                setQuiz((prev) => ({ ...prev, difficulty: e.target.value }))
-              }
-            >
-              <option value="">Select Difficulty</option>
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
-          </div>
         </div>
 
         {/* ---------- SECTIONS GRID ---------- */}
@@ -195,14 +187,12 @@ export default function QuizSetup_foundational() {
                 Section {index + 1} {index === 2 && "(Optional)"}
               </h3>
 
-              <label>Section Name:</label>
+              <label>Difficulty Level:</label>
               <input
                 type="text"
-                value={sec.name}
-                onChange={(e) =>
-                  handleSectionNameChange(index, e.target.value)
-                }
-                required={index !== 2}
+                value={index === 0 ? "Easy" : index === 1 ? "Medium" : "Hard"}
+                readOnly
+                style={{ backgroundColor: "#f3f3f3", cursor: "not-allowed" }}
               />
 
               <label>AI Questions:</label>
@@ -247,9 +237,14 @@ export default function QuizSetup_foundational() {
         {/* ---------- TOTAL SUMMARY ---------- */}
         <div className="total-section">
           <h3>Total Questions: {totalQuestions}</h3>
-          {totalQuestions > 40 && (
-            <div className="warning">Total cannot exceed 40!</div>
+          {isSection3Empty() && totalQuestions > 40 && (
+            <div className="warning">Total cannot exceed 40 when only 2 sections are used.</div>
           )}
+          
+          {!isSection3Empty() && totalQuestions > 50 && (
+            <div className="warning">Total cannot exceed 50 when all 3 sections are used.</div>
+          )}
+
         </div>
 
         <button type="submit" disabled={totalQuestions > 40}>
