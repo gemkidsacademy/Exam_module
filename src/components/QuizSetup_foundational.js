@@ -247,7 +247,13 @@ export default function QuizSetup_foundational() {
 
         </div>
 
-        <button type="submit" disabled={totalQuestions > 40}>
+        <button
+          type="submit"
+          disabled={
+            (isSection3Empty() && totalQuestions > 40) ||
+            (!isSection3Empty() && totalQuestions > 50)
+          }
+        >
           Create Exam
         </button>
       </form>
