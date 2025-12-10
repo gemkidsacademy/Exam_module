@@ -59,7 +59,7 @@ export default function WritingComponent({ studentId, subject, difficulty }) {
     <div className="writing-container">
       {/* HEADER */}
       <div className="writing-header">
-        <h2>Writing Exam</h2>
+        
         <div className="timer">Time Left: {formatTime(timeLeft)}</div>
       </div>
 
