@@ -3,7 +3,7 @@ import "./SelectiveDashboard.css";
 
 // IMPORT COMPONENTS
 import ExamPageThinkingSkills from "./ExamPageThinkingSkills";
-import ExamPageFoundational. from "./ExamPageFoundational.";
+import ExamPageFoundational from "./ExamPageFoundational";
 import ReadingComponent from "./ReadingComponent";
 import WritingComponent from "./WritingComponent";
 import WelcomeScreen from "./WelcomeScreen";
@@ -19,7 +19,7 @@ const SUBJECT_KEY_MAP = {
 // Tab → Component mapping
 const COMPONENT_MAP = {
   "Thinking skills": ExamPageThinkingSkills,
-  "Exam Page Foundational.": ExamPageFoundational.,
+  "Exam Page Foundational.": ExamPageFoundational,
   "Reading": ReadingComponent,
   "Writing": WritingComponent,
 };
