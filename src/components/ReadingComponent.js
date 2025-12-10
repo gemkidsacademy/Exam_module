@@ -77,11 +77,15 @@ const readingSets = [
     questionEnd: 9,
     type: "extracts",
     extracts: {
-      A: `Sometimes you run across a grimy, tattered dollar bill that seems like it's been around since the beginning of time... (Extract A about very early use of currency and bartering, archaeological record, and far-flung groups).`,
-      B: `There are many theories about the origin of money, in part because money has many functions... (Extract B about shells, metals, rare objects as currency, political control, taxes, and money as a stabilising force).`,
-      C: `Money has been part of human history for at least the last 3,000 years... (Extract C comparing bartering with early currency such as skins, salt, weapons, and explaining how money sped up trade).`,
-      D: `The first Australian banknotes were only produced a century ago but currency existed in Australia well before then... (Extract D about gold discovery, bank-issued notes, the Australian Notes Act 1910 and federal control of banknotes).`
-    }
+     A: "Sometimes you come across a grimy, tattered dollar bill that looks as if it has existed forever. In reality, the idea of money reaches far back into human civilisation. Archaeological findings show that long before coins appeared, communities relied on bartering systems. People exchanged goods such as grain, tools, or livestock, and even far-flung groups used barter to trade what they had in abundance for what they lacked. These early exchanges helped shape the foundations of organised economies."
+   
+     B: "There are many theories about how money first emerged, largely because money performs several different functions. Across history, societies have used shells, metals, beads, rare stones, and other precious or symbolic materials as forms of currency. These objects held value either because they were scarce or because rulers and political authorities declared them valuable. In many regions, taxation systems and the need to manage resources pushed governments to standardise forms of money. Over time, money also became a stabilising force, helping regulate trade, settle debts, and support structured economic systems."
+   
+     C: "Money has been part of human history for at least 3,000 years, long replacing pure bartering. Barter required both sides to want what the other offered, which often made exchanges slow and impractical. Early forms of money such as animal skins, salt, weapons, and small metal pieces solved this issue by providing a common medium of exchange. As soon as people began using agreed-upon items as currency, trade became faster, more flexible, and more extensive. This change laid the groundwork for more complex markets and long-distance commerce."
+   
+     D: "The first official Australian banknotes were produced only about a century ago, yet forms of currency were used in Australia long before that. After the discovery of gold in the mid-1800s, banks began issuing their own notes to support booming trade and mining activity. As the economy expanded, the need for a consistent national currency grew. This led to the Australian Notes Act of 1910, which gave the federal government exclusive authority to produce banknotes. From that point on, Australia moved toward a unified and regulated monetary system."
+   }
+
   },
   {
     id: "birds",
