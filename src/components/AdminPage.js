@@ -11,6 +11,9 @@ import UploadWord from "./UploadWord";
 import GenerateExam from "./GenerateExam";   // ⬅️ NEW COMPONENT IMPORT
 import UploadImageFolder from "./UploadImageFolder";
 import QuizSetup_foundational from "./QuizSetup_foundational";
+import ExamPageReading from "./ExamPageReading";
+
+
 
 
 
@@ -181,6 +184,7 @@ const AdminPanel = () => {
               {/* STEP 2 — Render QuizSetup when Selective chosen */}
               {examType === "selective" && <QuizSetup />}
               {examType === "foundational" && <QuizSetup_foundational />}
+              {examType === "reading" && <ExamPageReading />}
             </div>
           )}
 
