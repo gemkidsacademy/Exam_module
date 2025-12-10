@@ -180,7 +180,7 @@ export default function QuizSetup_foundational() {
                 style={{ backgroundColor: "#f3f3f3", cursor: "not-allowed" }}
               />
 
-              <label>Intro Text (Displayed Before Questions):</label>
+              <label>Intro Text (Displayed Before Sections):</label>
               <textarea
                 value={sec.intro}
                 onChange={(e) =>
