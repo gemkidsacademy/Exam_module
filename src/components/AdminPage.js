@@ -17,11 +17,6 @@ import QuizSetup_writing from "./QuizSetup_writing";
 
 
 
-
-
-
-
-
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("database");
   const navigate = useNavigate();
