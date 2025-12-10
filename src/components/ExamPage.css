@@ -198,3 +198,10 @@
   line-height: 1.5;
   white-space: pre-wrap;
 }
+
+.index-seen {
+  background: #e5e7eb !important; /* light grey */
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
