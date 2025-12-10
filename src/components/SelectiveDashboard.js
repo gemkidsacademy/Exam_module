@@ -5,7 +5,7 @@ import "./SelectiveDashboard.css";
 import ExamPageThinkingSkills from "./ExamPageThinkingSkills";
 import ExamPageFoundational from "./ExamPageFoundational";
 import ReadingComponent from "./ReadingComponent";
-import WritingComponent from "./WritingComponent";
+import ExamPageWriting from "./ExamPageWriting";
 import WelcomeScreen from "./WelcomeScreen";
 import QuizSetup from "./QuizSetup";
 
@@ -20,7 +20,7 @@ const COMPONENT_MAP = {
   "Thinking skills": ExamPageThinkingSkills,
   "Foundational": ExamPageFoundational,
   "Reading": ReadingComponent,
-  "Writing": WritingComponent,
+  "Writing": ExamPageWriting,
 };
 
 const SelectiveDashboard = () => {
