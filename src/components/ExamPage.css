@@ -223,5 +223,104 @@
   background: #ffffff;
   box-shadow: 0 0 4px rgba(59, 130, 246, 0.3);
 }
+.writing-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.writing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.timer {
+  font-size: 18px;
+  font-weight: bold;
+  color: #444;
+}
+
+.writing-meta p {
+  margin: 4px 0;
+  font-size: 16px;
+}
+
+.writing-question-box {
+  background: #f7f7f7;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.writing-text {
+  white-space: pre-wrap;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+/* COLLAPSIBLE INSTRUCTIONS */
+.instructions-container {
+  margin-bottom: 20px;
+}
+
+.toggle-btn {
+  width: 100%;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.toggle-btn:hover {
+  background: #3a78c5;
+}
+
+.instructions-content {
+  background: #eef4ff;
+  border-left: 4px solid #4a90e2;
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 6px;
+}
+
+.instruction-text {
+  white-space: pre-wrap;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.writing-answer-box {
+  width: 100%;
+  height: 300px;
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  resize: vertical;
+}
+
+.submit-writing-btn {
+  margin-top: 20px;
+  width: 100%;
+  background: #28a745;
+  color: white;
+  padding: 14px;
+  font-size: 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.submit-writing-btn:hover {
+  background: #218838;
+}
+
 
 
