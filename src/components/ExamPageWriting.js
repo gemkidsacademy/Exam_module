@@ -63,11 +63,8 @@ export default function WritingComponent({ studentId, subject, difficulty }) {
         <div className="timer">Time Left: {formatTime(timeLeft)}</div>
       </div>
 
-      {/* TOPIC INFO */}
-      <div className="writing-meta">
-        <p><strong>Topic:</strong> {writingQuestion.topic}</p>
-        <p><strong>Difficulty:</strong> {writingQuestion.difficulty}</p>
-      </div>
+     
+      
 
       {/* QUESTION TEXT */}
       <div className="writing-question-box">
