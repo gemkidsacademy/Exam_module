@@ -159,3 +159,42 @@
   margin-top: 100px;
   font-size: 20px;
 }
+/* ============================================================
+   READING MODE — TWO COLUMN LAYOUT
+============================================================= */
+.reading-mode .exam-body {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+/* LEFT PANE — Extracts / Passage */
+.reading-mode .passage-pane {
+  flex: 1;
+  max-width: 50%;
+}
+
+/* RIGHT PANE — Question Area */
+.reading-mode .question-pane {
+  flex: 1;
+}
+
+/* Extract blocks */
+.reading-mode .extract-block {
+  background: #f9fafb;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.reading-mode .passage-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.reading-mode .passage-text {
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
