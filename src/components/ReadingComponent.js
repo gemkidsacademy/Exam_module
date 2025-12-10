@@ -1,9 +1,5 @@
 import React, { useState } from "react";
-
-/* -------------------------------------------------------
-   FULL 40-QUESTION QUIZ (parsed from your Word document)
----------------------------------------------------------*/
-
+import "./ExamPage.css";
 const quiz40 = [
   // Set 1 — Money (1–10)
   { question: "Which extract claims that a positive outcome of the development of ‘money’ was that trade could be done much more quickly?", correct: "C" },
@@ -64,10 +60,6 @@ const quiz40 = [
   { question: "Which extract says this concept is omnipresent in psychology?", correct: "A" }
 ];
 
-/* -------------------------------------------------------
-   QUIZ COMPONENT
----------------------------------------------------------*/
-
 export default function ReadingComponent() {
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -79,85 +71,91 @@ export default function ReadingComponent() {
     setAnswers({ ...answers, [index]: choice });
   };
 
-  const calculateScore = () => {
-    let score = 0;
-    quiz40.forEach((q, i) => {
-      if (answers[i] === q.correct) score++;
-    });
-    return score;
-  };
+  const score = Object.keys(answers).reduce((acc, i) => {
+    return acc + (answers[i] === quiz40[i].correct ? 1 : 0);
+  }, 0);
 
   if (finished) {
-    const score = calculateScore();
     return (
-      <div style={{ maxWidth: 600, margin: "0 auto", padding: 20 }}>
+      <div className="completed-screen">
         <h1>Quiz Completed</h1>
         <h2>Your Score: {score} / {quiz40.length}</h2>
-
-        <h3>Review:</h3>
-        <ul>
-          {quiz40.map((q, i) => (
-            <li key={i} style={{ marginBottom: 10 }}>
-              <strong>Q{i + 1}:</strong> {q.question}
-              <br />
-              Your answer: {answers[i] || "None"}
-              <br />
-              Correct answer: {q.correct}
-            </li>
-          ))}
-        </ul>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: 700, margin: "0 auto", padding: 20 }}>
-      <h2>Reading Comprehension – 40 Question Quiz</h2>
+    <div className="exam-container">
 
-      <h3>Question {index + 1} / {quiz40.length}</h3>
-      <p style={{ fontSize: "1.2rem" }}>{current.question}</p>
+      {/* HEADER */}
+      <div className="exam-header">
+        <div>Reading Exam</div>
+        <div className="counter">
+          Question {index + 1} / {quiz40.length}
+        </div>
+      </div>
 
-      {/* Options A–D */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      {/* QUESTION NUMBER CIRCLES */}
+      <div className="index-row">
+        {quiz40.map((_, i) => (
+          <div
+            key={i}
+            className={
+              "index-circle " +
+              (answers[i] ? "index-answered" : index === i ? "index-visited" : "")
+            }
+            onClick={() => setIndex(i)}
+          >
+            {i + 1}
+          </div>
+        ))}
+      </div>
+
+      {/* QUESTION CARD */}
+      <div className="question-card">
+        <p className="question-text">{current.question}</p>
+
         {["A", "B", "C", "D"].map((opt) => (
           <button
             key={opt}
+            className={
+              "option-btn " +
+              (answers[index] === opt ? "selected" : "")
+            }
             onClick={() => handleSelect(opt)}
-            style={{
-              padding: "12px 15px",
-              borderRadius: 8,
-              border: "1px solid #ccc",
-              background: answers[index] === opt ? "#4caf50" : "white",
-              color: answers[index] === opt ? "white" : "black",
-              textAlign: "left",
-              cursor: "pointer",
-              fontSize: "1rem"
-            }}
           >
             {opt}
           </button>
         ))}
       </div>
 
-      {/* Navigation Buttons */}
-      <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
+      {/* NAVIGATION */}
+      <div className="nav-buttons">
         <button
-          onClick={() => setIndex((i) => i - 1)}
+          className="nav-btn prev"
           disabled={index === 0}
+          onClick={() => setIndex(index - 1)}
         >
           Previous
         </button>
 
         {index < quiz40.length - 1 ? (
-          <button onClick={() => setIndex((i) => i + 1)}>
+          <button
+            className="nav-btn next"
+            onClick={() => setIndex(index + 1)}
+          >
             Next
           </button>
         ) : (
-          <button onClick={() => setFinished(true)}>
-            Finish Quiz
+          <button
+            className="nav-btn finish"
+            onClick={() => setFinished(true)}
+          >
+            Finish
           </button>
         )}
       </div>
+
     </div>
   );
 }
