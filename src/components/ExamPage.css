@@ -4,7 +4,7 @@
 .exam-container {
   width: 100%;
   max-width: 100%;
-  padding: 24px 60px; /* more side spacing */
+  padding: 24px 60px;
   font-family: "Inter", sans-serif;
   box-sizing: border-box;
 }
@@ -66,7 +66,7 @@
 
 
 /* ============================================
-   QUESTION BLOCK — FULL WIDTH
+   QUESTION CARD
 ============================================ */
 .question-card {
   background: #ffffff;
@@ -74,7 +74,7 @@
   border-radius: 14px;
   margin-bottom: 30px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-  width: 100%;        /* ✔ makes card full width */
+  width: 100%;
   box-sizing: border-box;
 }
 
@@ -86,7 +86,7 @@
 
 
 /* ============================================
-   OPTIONS — BIG, WIDE, LEFT ALIGNED
+   OPTIONS
 ============================================ */
 .option-btn {
   display: block;
@@ -146,7 +146,7 @@
 
 
 /* ============================================
-   LOADING + COMPLETED
+   LOADING / COMPLETED
 ============================================ */
 .loading {
   text-align: center;
@@ -159,105 +159,67 @@
   margin-top: 100px;
   font-size: 20px;
 }
-/* ============================================================
-   READING MODE — TWO COLUMN LAYOUT
-============================================================= */
+
+
+/* ============================================
+   READING MODE (unchanged)
+============================================ */
 .reading-mode .exam-body {
   display: flex;
   gap: 24px;
   align-items: flex-start;
 }
 
-/* LEFT PANE — Extracts / Passage */
 .reading-mode .passage-pane {
   flex: 1;
   max-width: 50%;
 }
 
-/* RIGHT PANE — Question Area */
 .reading-mode .question-pane {
   flex: 1;
 }
 
-/* Extract blocks */
-.reading-mode .extract-block {
-  background: #f9fafb;
-  padding: 12px 14px;
-  border-radius: 10px;
-  margin-bottom: 16px;
-}
-
-.reading-mode .passage-title {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.reading-mode .passage-text {
-  font-size: 14px;
-  line-height: 1.5;
-  white-space: pre-wrap;
-}
-
 .index-seen {
-  background: #e5e7eb !important; /* light grey */
+  background: #e5e7eb !important;
   border-color: #cbd5e1;
   color: #475569;
 }
-.writing-box {
-  width: 100%;
-  height: 350px;
-  padding: 14px;
-  font-size: 17px;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  resize: vertical;
-  line-height: 1.5;
-  font-family: "Inter", sans-serif;
-  background: #f8fafc;
-}
 
-.writing-box:focus {
-  outline: none;
-  border-color: #3b82f6;
-  background: #ffffff;
-  box-shadow: 0 0 4px rgba(59, 130, 246, 0.3);
-}
+
+/* ============================================
+   WRITING EXAM — FIXED FULL WIDTH
+============================================ */
 .writing-container {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
+  width: 100%;
+  max-width: 100%;      /* ✅ FIX: now full width */
+  padding: 20px 40px;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .writing-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
-}
-
-.timer {
-  font-size: 18px;
-  font-weight: bold;
-  color: #444;
+  margin-bottom: 20px;
 }
 
 .writing-meta p {
   margin: 4px 0;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .writing-question-box {
   background: #f7f7f7;
-  padding: 15px;
-  border-radius: 8px;
+  padding: 18px;
+  border-radius: 10px;
   margin-bottom: 20px;
 }
 
 .writing-text {
   white-space: pre-wrap;
-  font-size: 16px;
-  line-height: 1.4;
+  font-size: 17px;
+  line-height: 1.5;
 }
 
 /* COLLAPSIBLE INSTRUCTIONS */
@@ -270,50 +232,48 @@
   background: #4a90e2;
   color: white;
   border: none;
-  padding: 12px;
+  padding: 14px;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 17px;
   cursor: pointer;
   text-align: left;
-}
-
-.toggle-btn:hover {
-  background: #3a78c5;
 }
 
 .instructions-content {
   background: #eef4ff;
   border-left: 4px solid #4a90e2;
-  padding: 15px;
-  margin-top: 10px;
+  padding: 18px;
+  margin-top: 12px;
   border-radius: 6px;
 }
 
 .instruction-text {
   white-space: pre-wrap;
-  font-size: 15px;
-  line-height: 1.5;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
+/* ✨ BIG FULL-WIDTH WRITING TEXTAREA */
 .writing-answer-box {
   width: 100%;
-  height: 300px;
-  padding: 12px;
-  margin-top: 10px;
-  font-size: 16px;
-  border-radius: 8px;
+  height: 450px;        /* ✅ Increased */
+  padding: 16px;
+  font-size: 18px;
+  border-radius: 10px;
   border: 1px solid #aaa;
   resize: vertical;
+  background: #fff;
+  line-height: 1.6;
 }
 
 .submit-writing-btn {
-  margin-top: 20px;
+  margin-top: 25px;
   width: 100%;
   background: #28a745;
   color: white;
-  padding: 14px;
-  font-size: 18px;
-  border-radius: 8px;
+  padding: 16px;
+  font-size: 20px;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
 }
@@ -321,6 +281,3 @@
 .submit-writing-btn:hover {
   background: #218838;
 }
-
-
-
