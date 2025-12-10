@@ -6,8 +6,8 @@ import ExamPageThinkingSkills from "./ExamPageThinkingSkills";
 import ExamPageFoundational from "./ExamPageFoundational";
 import ReadingComponent from "./ReadingComponent";
 import ExamPageWriting from "./ExamPageWriting";
+
 import WelcomeScreen from "./WelcomeScreen";
-import QuizSetup from "./QuizSetup";
 
 const SUBJECT_KEY_MAP = {
   "Thinking skills": "thinking_skills",
@@ -70,7 +70,7 @@ const SelectiveDashboard = () => {
             />
           )
         ) : (
-          <QuizSetup />
+          <WelcomeScreen />
         )}
 
       </main>
