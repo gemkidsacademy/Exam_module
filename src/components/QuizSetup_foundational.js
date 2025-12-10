@@ -182,6 +182,7 @@ export default function QuizSetup_foundational() {
 
               <label>Intro Text (Displayed Before Sections):</label>
               <textarea
+                className="intro-textarea"
                 value={sec.intro}
                 onChange={(e) =>
                   handleSectionChange(index, "intro", e.target.value)
@@ -189,6 +190,7 @@ export default function QuizSetup_foundational() {
                 placeholder="Enter intro/instructions for this section"
                 rows={4}
               />
+
 
               <label>AI Questions:</label>
               <input
