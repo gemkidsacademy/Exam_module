@@ -11,7 +11,7 @@ import QuizSetup from "./QuizSetup";
 
 const SUBJECT_KEY_MAP = {
   "Thinking skills": "thinking_skills",
-  "Exam Page Foundational.": "mathematical_reasoning",
+  "Foundational": "mathematical_reasoning",
   "Reading": "reading",
   "Writing": "writing",
 };
@@ -19,7 +19,7 @@ const SUBJECT_KEY_MAP = {
 // Tab → Component mapping
 const COMPONENT_MAP = {
   "Thinking skills": ExamPageThinkingSkills,
-  "Exam Page Foundational.": ExamPageFoundational,
+  "Foundational": ExamPageFoundational,
   "Reading": ReadingComponent,
   "Writing": WritingComponent,
 };
