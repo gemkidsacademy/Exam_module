@@ -149,3 +149,28 @@
   margin: 0 auto;
   box-sizing: border-box;
 }
+
+/* ==============================================
+   INTRO TEXT (Inside Sections)
+================================================= */
+.section textarea.intro-textarea {
+  width: 100%;
+  min-height: 90px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 14.5px;
+  line-height: 1.5;
+  resize: vertical;
+  box-sizing: border-box;
+  background: #f8fafc;
+  transition: 0.2s ease-in-out;
+}
+
+/* Focus effect */
+.section textarea.intro-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: #ffffff;
+  box-shadow: 0 0 4px rgba(59, 130, 246, 0.3);
+}
