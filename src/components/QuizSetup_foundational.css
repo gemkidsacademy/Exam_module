@@ -3,10 +3,11 @@
 ================================================= */
 .foundational-setup {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1200px;       /* centered full-width container */
   margin: 0 auto;
   padding: 20px;
   font-family: "Inter", sans-serif;
+  box-sizing: border-box;
 }
 
 
@@ -21,6 +22,12 @@
 
 .top-row-item {
   flex: 1;
+}
+
+.top-row-item label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
 }
 
 .top-row-item select {
@@ -49,6 +56,7 @@
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.07);
   text-align: center;
+  box-sizing: border-box;
 }
 
 .section h3 {
@@ -59,7 +67,7 @@
 
 
 /* ==============================================
-   INPUTS INSIDE SECTIONS
+   INPUTS INSIDE EACH SECTION
 ================================================= */
 .section label {
   display: block;
@@ -77,6 +85,12 @@
   border: 1px solid #ccc;
   font-size: 15px;
   margin-bottom: 6px;
+  box-sizing: border-box;
+}
+
+.section input[readonly] {
+  background: #f3f3f3;
+  cursor: not-allowed;
 }
 
 
@@ -111,8 +125,20 @@
   border-radius: 10px;
   margin-top: 25px;
   cursor: pointer;
+  transition: 0.2s;
 }
 
 .foundational-setup button[type="submit"]:hover {
   background: #1e4fcc;
+}
+
+
+/* ==============================================
+   RESPONSIVE FIXES
+================================================= */
+@media (max-width: 900px) {
+  .sections-grid {
+    flex-direction: column;
+    gap: 20px;
+  }
 }
