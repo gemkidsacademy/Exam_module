@@ -3,7 +3,7 @@ import "./SelectiveDashboard.css";
 
 // IMPORT COMPONENTS
 import ExamPageThinkingSkills from "./ExamPageThinkingSkills";
-import MathematicalReasoning from "./MathematicalReasoning";
+import ExamPageFoundational. from "./ExamPageFoundational.";
 import ReadingComponent from "./ReadingComponent";
 import WritingComponent from "./WritingComponent";
 import WelcomeScreen from "./WelcomeScreen";
@@ -11,7 +11,7 @@ import QuizSetup from "./QuizSetup";
 
 const SUBJECT_KEY_MAP = {
   "Thinking skills": "thinking_skills",
-  "Mathematical reasoning": "mathematical_reasoning",
+  "Exam Page Foundational.": "mathematical_reasoning",
   "Reading": "reading",
   "Writing": "writing",
 };
@@ -19,7 +19,7 @@ const SUBJECT_KEY_MAP = {
 // Tab → Component mapping
 const COMPONENT_MAP = {
   "Thinking skills": ExamPageThinkingSkills,
-  "Mathematical reasoning": MathematicalReasoning,
+  "Exam Page Foundational.": ExamPageFoundational.,
   "Reading": ReadingComponent,
   "Writing": WritingComponent,
 };
