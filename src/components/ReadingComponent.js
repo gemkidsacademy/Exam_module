@@ -40,6 +40,8 @@ const quiz40 = [
   // Gift Wrapping (27–31)
   { question: "Paragraph 1 – Which option summarises the paragraph?", correct: "E" },
   { question: "Paragraph 2 – Which option summarises the paragraph?", correct: "A" },
+
+   
   { question: "Paragraph 3 – Which option summarises the paragraph?", correct: "G" },
   { question: "Paragraph 4 – Which option summarises the paragraph?", correct: "C" },
   { question: "Paragraph 5 – Which option summarises the paragraph?", correct: "D" },
@@ -71,18 +73,114 @@ const readingSets = [
   {
     id: "money",
     title: "Money as Currency",
-    instruction: "Read the four extracts on the topic of Money as Currency. For each question, choose A, B, C, or D.",
+    instruction:
+      "Read the four extracts on the topic of Money as Currency. For each question, choose A, B, C, or D.",
     questionStart: 0,
     questionEnd: 9,
     type: "extracts",
     extracts: {
-      A: "Sometimes you come across a grimy, tattered dollar bill ... (full text)",
-      B: "There are many theories about how money emerged ... (full text)",
-      C: "Money has been part of human history for at least 3,000 years ... (full text)",
-      D: "The first official Australian banknotes were produced ... (full text)"
+      A: "Sometimes you come across a grimy, tattered dollar bill ... FULL TEXT HERE",
+      B: "There are many theories about how money emerged ... FULL TEXT HERE",
+      C: "Money has been part of human history for at least 3,000 years ... FULL TEXT HERE",
+      D: "The first official Australian banknotes were produced ... FULL TEXT HERE"
     }
   },
-  // ... other sets unchanged
+
+  {
+    id: "birds",
+    title: "Birds – Paragraph Summaries",
+    instruction:
+      "Read the text about birds. For each paragraph, choose the option (A–G) which best summarises it.",
+    questionStart: 10,
+    questionEnd: 15,
+    type: "passage",
+    passage: `
+Paragraph 1:
+Birds live in almost every part of the world. Many species migrate long distances each year...
+
+Paragraph 2:
+Scientists believe that modern birds evolved from reptiles millions of years ago...
+
+Paragraph 3:
+Young birds have feathers that differ in colour and pattern, helping protect them...
+
+Paragraph 4:
+Some birds fly exceptionally well while others cannot fly at all...
+
+Paragraph 5:
+Birds have extraordinary eyesight, much sharper than humans...
+
+Paragraph 6:
+Bird species follow breeding cycles that involve nesting, egg-laying, and caring for young...
+`
+  },
+
+  {
+    id: "lotf",
+    title: "Lord of the Flies – Comparative Analysis",
+    instruction:
+      "Read the four extracts related to Lord of the Flies. For each question, choose A, B, C, or D.",
+    questionStart: 16,
+    questionEnd: 25,
+    type: "extracts",
+    extracts: {
+      A: "FULL TEXT FOR Extract A",
+      B: "FULL TEXT FOR Extract B",
+      C: "FULL TEXT FOR Extract C",
+      D: "FULL TEXT FOR Extract D"
+    }
+  },
+
+  {
+    id: "gift",
+    title: "Does Gift Wrapping Matter?",
+    instruction:
+      "Read the text about gift wrapping. For each paragraph question, choose the option (A–G) which best summarises it.",
+    questionStart: 26,
+    questionEnd: 30,
+    type: "passage",
+    passage: `
+Paragraph 1 ... FULL TEXT
+Paragraph 2 ... FULL TEXT
+Paragraph 3 ... FULL TEXT
+Paragraph 4 ... FULL TEXT
+Paragraph 5 ... FULL TEXT
+`
+  },
+
+  {
+    id: "antarctica",
+    title: "Antarctica – Paragraph Summaries",
+    instruction:
+      "Read the text about Antarctica. For each paragraph, choose the option (A–G) which best summarises it.",
+    questionStart: 31,
+    questionEnd: 36,
+    type: "passage",
+    passage: `
+Paragraph 1 ... FULL TEXT
+Paragraph 2 ... FULL TEXT
+Paragraph 3 ... FULL TEXT
+Paragraph 4 ... FULL TEXT
+Paragraph 5 ... FULL TEXT
+Paragraph 6 ... FULL TEXT
+`
+  },
+
+  {
+    id: "memory",
+    title: "Memory – Different Types and Theories",
+    instruction:
+      "Read the four extracts on the topic of memory. For each question, choose A, B, C, or D.",
+    questionStart: 37,
+    questionEnd: 45,
+    type: "extracts",
+    extracts: {
+      A: "FULL TEXT MEMORY A",
+      B: "FULL TEXT MEMORY B",
+      C: "FULL TEXT MEMORY C",
+      D: "FULL TEXT MEMORY D"
+    }
+  }
 ];
 
 /* Helper to find extract group */
