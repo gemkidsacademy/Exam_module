@@ -142,3 +142,10 @@
     gap: 20px;
   }
 }
+.quiz-setup-container {
+  width: 100%;
+  max-width: 100% !important;
+  padding: 20px 40px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
