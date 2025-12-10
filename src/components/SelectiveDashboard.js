@@ -16,7 +16,6 @@ const SUBJECT_KEY_MAP = {
   "Writing": "writing",
 };
 
-// Tab → Component mapping
 const COMPONENT_MAP = {
   "Thinking skills": ExamPageThinkingSkills,
   "Foundational": ExamPageFoundational,
@@ -51,15 +50,29 @@ const SelectiveDashboard = () => {
 
       {/* Content */}
       <main className="content-area">
+
         {ActiveComponent ? (
-          <ActiveComponent
-            studentId={studentId}
-            subject={subjectKey}
-            difficulty="advanced"
-          />
+          activeTab === "Reading" ? (
+            // 👇 ONLY Reading gets two-column mode
+            <div className="reading-mode">
+              <ActiveComponent
+                studentId={studentId}
+                subject={subjectKey}
+                difficulty="advanced"
+              />
+            </div>
+          ) : (
+            // other subjects render normally
+            <ActiveComponent
+              studentId={studentId}
+              subject={subjectKey}
+              difficulty="advanced"
+            />
+          )
         ) : (
           <QuizSetup />
         )}
+
       </main>
 
     </div>
