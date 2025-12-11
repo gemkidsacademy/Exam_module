@@ -1,100 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./ExamPage_reading.css";
 
-
-/* -------------------------------------------------------
-   QUIZ QUESTIONS (same as before)
----------------------------------------------------------*/
-const quiz40 = [
-  // Money (1–10)
-  { question: "Which extract claims that a positive outcome of the development of ‘money’ was that trade could be done much more quickly?", correct: "C" },
-  { question: "Which extract best describes the transition from bartering to currency?", correct: "C" },
-  { question: "Which extract uses examples of trade from a prehistoric setting?", correct: "A" },
-  { question: "Which extract uses a colloquial term which means distant or remote communities?", correct: "A" },
-  { question: "Which extract describes in detail why coins became so popular as a form of currency?", correct: "B" },
-  { question: "Which extract lists several definitions of what humans call ‘currency’?", correct: "A" },
-  { question: "Which extract explains that an historical event led to the creation of new coins?", correct: "D" },
-  { question: "Which extract says that money fosters mutual exchange yet also encourages social ranking?", correct: "B" },
-  { question: "Which extract explains that money printed by state banks became illegal and federalised?", correct: "D" },
-  { question: "Which extract mentions that rare natural objects were likely used as currency?", correct: "B" },
-
-  // Birds (11–16)
-  { question: "Paragraph 1 – Which option summarises the paragraph?", correct: "F" },
-  { question: "Paragraph 2 – Which option summarises the paragraph?", correct: "B" },
-  { question: "Paragraph 3 – Which option summarises the paragraph?", correct: "D" },
-  { question: "Paragraph 4 – Which option summarises the paragraph?", correct: "A" },
-  { question: "Paragraph 5 – Which option summarises the paragraph?", correct: "E" },
-  { question: "Paragraph 6 – Which option summarises the paragraph?", correct: "G" },
-
-  // Lord of the Flies (17–26)
-  { question: "Which extract describes how characterisation drives plot movement?", correct: "B" },
-  { question: "Which extract includes commentary from a secondary source close to the author?", correct: "D" },
-  { question: "Which extract employs a third-person omniscient narrator?", correct: "A" },
-  { question: "Which extract suggests that a prop brings civilisation?", correct: "C" },
-  { question: "Which extract mentions the arrival of an unexpected character?", correct: "A" },
-  { question: "Which extract suggests that Golding did not jump to conclusions?", correct: "D" },
-  { question: "Which extract comments on the psychology of the adversary?", correct: "B" },
-  { question: "Which extract gives examples of how a motif is used?", correct: "C" },
-  { question: "Which extract suggests one’s birth position dictates fate?", correct: "B" },
-  { question: "Which extract discusses a character returning to primitive cruelty?", correct: "B" },
-
-  // Gift Wrapping (27–31)
-  { question: "Paragraph 1 – Which option summarises the paragraph?", correct: "E" },
-  { question: "Paragraph 2 – Which option summarises the paragraph?", correct: "A" },
-  { question: "Paragraph 3 – Which option summarises the paragraph?", correct: "G" },
-  { question: "Paragraph 4 – Which option summarises the paragraph?", correct: "C" },
-  { question: "Paragraph 5 – Which option summarises the paragraph?", correct: "D" },
-
-  // Antarctica (32–37)
-  { question: "Paragraph 1 – Which option summarises the paragraph?", correct: "E" },
-  { question: "Paragraph 2 – Which option summarises the paragraph?", correct: "G" },
-  { question: "Paragraph 3 – Which option summarises the paragraph?", correct: "A" },
-  { question: "Paragraph 4 – Which option summarises the paragraph?", correct: "B" },
-  { question: "Paragraph 5 – Which option summarises the paragraph?", correct: "F" },
-  { question: "Paragraph 6 – Which option summarises the paragraph?", correct: "D" },
-
-  // Memory (38–46)
-  { question: "Which extract reports that timing of an auditory stimulus affects short-term memory?", correct: "B" },
-  { question: "Which extract compares a type of memory with digital technology?", correct: "C" },
-  { question: "Which extract introduces deeper analysis linking learning and memory?", correct: "A" },
-  { question: "Which extract references the founding father of psychoanalysis?", correct: "D" },
-  { question: "Which extract suggests that this memory fades without reaffirming?", correct: "B" },
-  { question: "Which extract states that dreaming is common to all humans?", correct: "D" },
-  { question: "Which extract explains memory used for procedural actions?", correct: "C" },
-  { question: "Which extract claims this memory is limited by accessibility?", correct: "C" },
-  { question: "Which extract says this concept is omnipresent in psychology?", correct: "A" }
-];
-
-/* -------------------------------------------------------
-   PASSAGES + EXTRACTS WITH QUESTION RANGES
----------------------------------------------------------*/
-const readingSets = [
-  { id: "money", title: "Money as Currency", instruction: "Read the four extracts...", questionStart: 0, questionEnd: 9, type: "extracts" },
-  { id: "birds", title: "Birds – Paragraph Summaries", instruction: "Read the text about birds...", questionStart: 10, questionEnd: 15, type: "passage" },
-  { id: "lotf", title: "Lord of the Flies – Comparative Analysis", instruction: "Read the extracts...", questionStart: 16, questionEnd: 25, type: "extracts" },
-  { id: "gift", title: "Does Gift Wrapping Matter?", instruction: "Read the text...", questionStart: 26, questionEnd: 30, type: "passage" },
-  { id: "antarctica", title: "Antarctica – Paragraph Summaries", instruction: "Read the text...", questionStart: 31, questionEnd: 36, type: "passage" },
-  { id: "memory", title: "Memory – Types and Theories", instruction: "Read the extracts...", questionStart: 37, questionEnd: 45, type: "extracts" }
-];
-
-/* Helper to find which reading block a question belongs to */
-function getReadingSetForQuestion(qIndex) {
-  return readingSets.find(
-    (set) => qIndex >= set.questionStart && qIndex <= set.questionEnd
-  );
-}
-
-/* -------------------------------------------------------
-   COMPONENT
----------------------------------------------------------*/
-export default function ReadingComponent() {
+export default function ReadingExam() {
+  const [exam, setExam] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [passages, setPassages] = useState({});
   const [index, setIndex] = useState(0);
+
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
+
   const [finished, setFinished] = useState(false);
 
-  const currentSet = getReadingSetForQuestion(index);
-  const currentQuestion = quiz40[index];
+  // Timer
+  const [timeLeft, setTimeLeft] = useState(null);
+  const [duration, setDuration] = useState(null);
+
+  const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+
+  /* -------------------------------------------------------
+     LOAD THE LATEST EXAM FROM BACKEND
+  ---------------------------------------------------------*/
+  useEffect(() => {
+    const loadExam = async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/exams/latest-reading`);
+        const data = await res.json();
+
+        console.log("🔥 Loaded exam:", data);
+
+        setExam(data.exam_json);
+        setQuestions(data.exam_json.questions);
+        setPassages(data.exam_json.reading_material);
+
+        const seconds = data.duration_minutes * 60;
+        setDuration(seconds);
+        setTimeLeft(seconds);
+
+      } catch (err) {
+        console.error("❌ Failed to load exam", err);
+      }
+    };
+
+    loadExam();
+  }, []);
+
+  /* -------------------------------------------------------
+     TIMER COUNTDOWN (Backend-Controlled Duration)
+  ---------------------------------------------------------*/
+  useEffect(() => {
+    if (timeLeft === null) return;
+
+    if (timeLeft <= 0) {
+      setFinished(true);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setTimeLeft((t) => t - 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timeLeft]);
+
+  const formatTime = (sec) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
+  /* -------------------------------------------------------
+     HANDLERS
+  ---------------------------------------------------------*/
+  const currentQuestion = questions[index];
 
   const handleSelect = (choice) => {
     setAnswers((prev) => ({ ...prev, [index]: choice }));
@@ -105,94 +83,101 @@ export default function ReadingComponent() {
     setIndex(i);
   };
 
-  const score = quiz40.reduce(
-    (acc, q, i) => acc + (answers[i] === q.correct ? 1 : 0),
+  const score = questions.reduce(
+    (total, q, i) => total + (answers[i] === q.correct_answer ? 1 : 0),
     0
   );
 
+  /* -------------------------------------------------------
+     FINISHED SCREEN
+  ---------------------------------------------------------*/
   if (finished) {
     return (
       <div className="completed-screen">
-        <h1>Quiz Completed</h1>
-        <h2>Your Score: {score} / {quiz40.length}</h2>
+        <h1>Quiz Finished</h1>
+        <h2>Your Score: {score} / {questions.length}</h2>
+        <h3>Time Ended</h3>
       </div>
     );
   }
 
+  if (!exam) {
+    return <div>Loading Exam...</div>;
+  }
+
   /* -------------------------------------------------------
-     GROUPED QUESTION INDEX
+     RENDER QUESTION INDEX
   ---------------------------------------------------------*/
-  const renderGroupedIndex = () => {
-    return (
-      <div className="index-groups">
-        {readingSets.map((set, sIndex) => (
-          <div key={set.id} className="index-group">
-            <div className="index-group-title">{set.title}</div>
+  const renderIndex = () => (
+    <div className="index-wrapper">
+      {questions.map((q, i) => {
+        const cls =
+          answers[i] ? "index-answered"
+          : visited[i] ? "index-seen"
+          : "";
 
-            <div className="index-group-questions">
-              {Array.from(
-                { length: set.questionEnd - set.questionStart + 1 },
-                (_, i) => {
-                  const qIndex = set.questionStart + i;
-                  const cls =
-                    answers[qIndex] ? "index-answered"
-                    : visited[qIndex] ? "index-seen"
-                    : "";
-
-                  return (
-                    <div
-                      key={qIndex}
-                      className={`index-circle ${cls}`}
-                      onClick={() => goTo(qIndex)}
-                    >
-                      {qIndex + 1}
-                    </div>
-                  );
-                }
-              )}
-            </div>
+        return (
+          <div
+            key={i}
+            className={`index-circle ${cls}`}
+            onClick={() => goTo(i)}
+          >
+            {i + 1}
           </div>
-        ))}
-      </div>
-    );
-  };
+        );
+      })}
+    </div>
+  );
 
   /* -------------------------------------------------------
-     MAIN COMPONENT LAYOUT
+     MAIN RENDER
   ---------------------------------------------------------*/
   return (
     <div className="exam-container">
 
       {/* HEADER */}
       <div className="exam-header">
-        <div>{currentSet?.title || "Reading Exam"}</div>
+        <div>Reading Comprehension Exam</div>
+
+        <div className="timer-box">
+          Time Left: {formatTime(timeLeft)}
+        </div>
+
         <div className="counter">
-          Question {index + 1} / {quiz40.length}
+          Question {index + 1} / {questions.length}
         </div>
       </div>
 
-      {/* GROUPED QUESTION INDEX */}
-      {renderGroupedIndex()}
+      {/* INDEX */}
+      {renderIndex()}
 
-      {/* TWO-PANE LAYOUT */}
       <div className="exam-body">
 
-        {/* LEFT PANE – Reading Material */}
+        {/* LEFT: PASSAGE MATERIAL */}
         <div className="passage-pane">
-          <h3>{currentSet.title}</h3>
-          <p className="passage-instruction">{currentSet.instruction}</p>
-          <p className="passage-text">[INSERT READING MATERIAL HERE]</p>
+          <h3>Reading Materials</h3>
+
+          {Object.entries(passages).map(([label, text]) => (
+            <div key={label} className="passage-block">
+              <h4>{label}</h4>
+              <p>{text}</p>
+            </div>
+          ))}
         </div>
 
-        {/* RIGHT PANE – Question */}
+        {/* RIGHT: CURRENT QUESTION */}
         <div className="question-pane">
           <div className="question-card">
-            <p className="question-text">{currentQuestion.question}</p>
+            <p className="question-text">
+              Q{currentQuestion.question_number}. {currentQuestion.question_text}
+            </p>
 
-            {["A", "B", "C", "D"].map((opt) => (
+            {["A", "B", "C", "D", "E", "F", "G"].map((opt) => (
               <button
                 key={opt}
-                className={`option-btn ${answers[index] === opt ? "selected" : ""}`}
+                className={`option-btn ${
+                  answers[index] === opt ? "selected" : ""
+                }`}
                 onClick={() => handleSelect(opt)}
               >
                 {opt}
@@ -210,7 +195,7 @@ export default function ReadingComponent() {
               Previous
             </button>
 
-            {index < quiz40.length - 1 ? (
+            {index < questions.length - 1 ? (
               <button className="nav-btn next" onClick={() => goTo(index + 1)}>
                 Next
               </button>
