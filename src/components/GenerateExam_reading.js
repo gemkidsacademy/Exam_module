@@ -47,7 +47,7 @@ const formatDifficulty = (lvl) => {
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/quizzes`);
+        const res = await fetch(`${BACKEND_URL}/api/quizzes-reading`);
         if (!res.ok) throw new Error("Failed to load quizzes");
         const data = await res.json();
         setQuizzes(data);
