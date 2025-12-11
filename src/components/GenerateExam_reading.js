@@ -105,7 +105,7 @@ const formatDifficulty = (lvl) => {
         <label style={{ marginRight: "10px" }}>Select Quiz:</label>
         <select
           value={selectedQuiz}
-          onChange={(e) => setSelectedQuiz(e.target.value)}
+          onChange={(e) => setSelectedQuiz(Number(e.target.value))}
           style={{ padding: "6px", minWidth: "280px" }}
         >
           <option value="">-- Select Quiz Requirement --</option>
