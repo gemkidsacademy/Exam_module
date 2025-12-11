@@ -17,7 +17,7 @@ export default function ExamTypeSelector_generate_exam({ examType, onSelect }) {
 
   // → If Reading selected → render UploadWord_reading
   if (examType === "reading") {
-    return <GenerateExam />;
+    return <GenerateExam_reading />;
   }
 
   return (
