@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 export default function GenerateExam_reading() {
   const [quizzes, setQuizzes] = useState([]);
-  const [selectedConfigId, setSelectedConfigId] = useState(""); // renamed for clarity
+  const [selectedQuiz, setSelectedQuiz] = useState(null); // will store class_name + difficulty
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
@@ -33,10 +33,10 @@ export default function GenerateExam_reading() {
   };
 
   // ---------------------------
-  // LOAD QUIZZES
+  // LOAD QUIZ CONFIGS
   // ---------------------------
   useEffect(() => {
-    const fetchQuizzes = async () => {
+    const load = async () => {
       try {
         const res = await fetch(`${BACKEND_URL}/api/quizzes-reading`);
         if (!res.ok) throw new Error("Failed to load quizzes");
@@ -47,45 +47,45 @@ export default function GenerateExam_reading() {
 
       } catch (err) {
         console.error("❌ Error loading quizzes:", err);
-        setError("Error loading quizzes from backend.");
+        setError("Failed to load quizzes.");
       }
     };
 
-    fetchQuizzes();
+    load();
   }, []);
 
   // ---------------------------
-  // GENERATE EXAM
+  // GENERATE EXAM (NO CONFIG ID)
   // ---------------------------
   const handleGenerateExam = async () => {
-    if (!selectedConfigId) {
-      alert("Please select a quiz configuration.");
+    if (!selectedQuiz) {
+      alert("Please select a quiz.");
       return;
     }
 
-    const url = `${BACKEND_URL}/api/exams/generate/${selectedConfigId}`;
-    console.log("🌍 POST →", url);
-
-    setLoading(true);
-    setError("");
-    setGeneratedExam(null);
+    console.log("🚀 Generating exam with:", selectedQuiz);
 
     try {
-      const res = await fetch(url, { method: "POST" });
+      setLoading(true);
+      setGeneratedExam(null);
+
+      const res = await fetch(`${BACKEND_URL}/api/exams/generate-reading`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(selectedQuiz),
+      });
 
       const data = await res.json();
-      console.log("📦 Response JSON:", data);
+      console.log("📨 Response received:", data);
 
-      if (!res.ok) {
-        throw new Error(data?.detail || "Exam generation failed");
-      }
+      if (!res.ok) throw new Error(data.detail || "Generation failed");
 
       setGeneratedExam(data);
       alert("Exam generated successfully!");
 
     } catch (err) {
-      console.error("❌ Error generating exam:", err);
-      setError("Failed to generate exam. Check console for details.");
+      console.error("❌ Exam generation error:", err);
+      setError("Failed to generate exam.");
     }
 
     setLoading(false);
@@ -93,22 +93,31 @@ export default function GenerateExam_reading() {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Generate Exam</h2>
+      <h2>Generate Reading Exam</h2>
 
-      {error && <div style={{ color: "red" }}>{error}</div>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <div style={{ margin: "10px 0" }}>
-        <label style={{ marginRight: "10px" }}>Select Quiz:</label>
+      <div style={{ marginBottom: "20px" }}>
+        <label>Select Quiz:</label>
 
         <select
-          value={selectedConfigId}
-          onChange={(e) => setSelectedConfigId(e.target.value)}
-          style={{ padding: "6px", minWidth: "280px" }}
+          value={selectedQuiz ? JSON.stringify(selectedQuiz) : ""}
+          onChange={(e) => {
+            const parsed = JSON.parse(e.target.value);
+            setSelectedQuiz(parsed);
+          }}
+          style={{ padding: "8px", minWidth: "260px", display: "block", marginTop: "10px" }}
         >
           <option value="">-- Select Quiz Requirement --</option>
 
           {quizzes.map((q) => (
-            <option key={q.id} value={q.id}>
+            <option
+              key={`${q.class_name}-${q.difficulty}`}
+              value={JSON.stringify({
+                class_name: q.class_name,
+                difficulty: q.difficulty,
+              })}
+            >
               {`${formatClassName(q.class_name)} | ${formatDifficulty(q.difficulty)}`}
             </option>
           ))}
@@ -119,7 +128,7 @@ export default function GenerateExam_reading() {
         onClick={handleGenerateExam}
         disabled={loading}
         style={{
-          padding: "8px 15px",
+          padding: "10px 18px",
           backgroundColor: "#4caf50",
           color: "white",
           border: "none",
@@ -131,31 +140,19 @@ export default function GenerateExam_reading() {
 
       {generatedExam && (
         <div style={{ marginTop: "30px" }}>
-          <h3>Generated Exam Preview</h3>
+          <h3>Generated Exam</h3>
 
-          <p><strong>Generated Exam ID:</strong> {generatedExam.generated_exam_id}</p>
-          <p><strong>Config ID:</strong> {generatedExam.config_id}</p>
           <p><strong>Total Questions:</strong> {generatedExam.total_questions}</p>
 
-          {generatedExam.exam_json?.questions?.length > 0 ? (
-            <div style={{ marginTop: "20px" }}>
-              {generatedExam.exam_json.questions.map((q) => (
-                <div
-                  key={q.question_number}
-                  style={{
-                    marginBottom: "20px",
-                    padding: "10px",
-                    border: "1px solid #ddd",
-                    borderRadius: "5px",
-                  }}
-                >
-                  <strong>Q{q.question_number}.</strong> {q.question_text}
-                  <p><strong>Correct Answer:</strong> {q.correct_answer}</p>
-                </div>
-              ))}
-            </div>
+          {generatedExam.questions?.length > 0 ? (
+            generatedExam.questions.map((q, idx) => (
+              <div key={idx} style={{ marginBottom: "20px", padding: "10px", border: "1px solid #ccc" }}>
+                <strong>Q{idx + 1}:</strong> {q.question}
+                <p><strong>Correct:</strong> {q.correct}</p>
+              </div>
+            ))
           ) : (
-            <p>No questions found.</p>
+            <p>No questions generated.</p>
           )}
         </div>
       )}
