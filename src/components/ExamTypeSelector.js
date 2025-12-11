@@ -9,13 +9,9 @@ export default function ExamTypeSelector({ examType, onSelect }) {
     { label: "Writing Exam", value: "writing" },
   ];
 
-  // If Thinking Skills Exam is selected → render UploadWord component
+  // → If thinking skills selected → render UploadWord component
   if (examType === "thinkingskills") {
-    return (
-      <div style={{ paddingTop: "20px" }}>
-        <UploadWord />
-      </div>
-    );
+    return <UploadWord />;
   }
 
   return (
@@ -43,8 +39,6 @@ export default function ExamTypeSelector({ examType, onSelect }) {
             cursor: "pointer",
             transition: "0.2s",
           }}
-          onMouseOver={(e) => (e.target.style.background = "#e8e8e8")}
-          onMouseOut={(e) => (e.target.style.background = "#f8f9fa")}
         >
           {item.label}
         </button>
