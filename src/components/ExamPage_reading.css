@@ -1,0 +1,198 @@
+/* -------------------------------------------------------
+   GLOBAL LAYOUT
+---------------------------------------------------------*/
+
+.exam-container {
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.exam-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.counter {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+/* -------------------------------------------------------
+   QUESTION GROUP INDEX (THE PART THAT WAS BROKEN)
+---------------------------------------------------------*/
+
+.index-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.index-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 180px;
+}
+
+.index-group-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.index-group-questions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* FIXED CIRCLE BUTTONS */
+.index-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: white;
+  border: 1px solid #d0d6e0;
+  cursor: pointer;
+
+  user-select: none;
+  font-size: 14px;
+
+  transition: 0.15s ease;
+}
+
+/* Hover effect */
+.index-circle:hover {
+  background: #eef4ff;
+}
+
+/* Seen but not answered */
+.index-seen {
+  background: #f5f8ff;
+  border-color: #b8c7e0;
+}
+
+/* Answered */
+.index-answered {
+  background: #0b6cf0;
+  color: white;
+  border-color: #0b6cf0;
+}
+
+/* Current active question (optional highlight) */
+.index-circle.current {
+  outline: 2px solid rgba(11, 108, 240, 0.3);
+  transform: scale(1.06);
+}
+
+/* -------------------------------------------------------
+   BODY LAYOUT
+---------------------------------------------------------*/
+
+.exam-body {
+  display: flex;
+  gap: 20px;
+}
+
+.passage-pane {
+  flex: 1;
+  padding: 20px;
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+
+.question-pane {
+  width: 350px;
+}
+
+.question-card {
+  background: white;
+  border: 1px solid #eee;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.question-text {
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+/* Answer Option Buttons */
+.option-btn {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.option-btn:hover {
+  background: #f0f4ff;
+}
+
+.option-btn.selected {
+  background: #0b6cf0;
+  color: white;
+  border-color: #0b6cf0;
+}
+
+/* Navigation buttons */
+.nav-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.nav-btn {
+  padding: 10px 18px;
+  border-radius: 6px;
+  background: #e7ecf5;
+  border: none;
+  cursor: pointer;
+}
+
+.nav-btn:hover {
+  background: #d9e3f3;
+}
+
+.nav-btn.finish {
+  background: #0b6cf0;
+  color: white;
+}
+
+.nav-btn.finish:hover {
+  background: #085ac4;
+}
+
+/* -------------------------------------------------------
+   COMPLETED SCREEN
+---------------------------------------------------------*/
+
+.completed-screen {
+  padding: 40px;
+  text-align: center;
+}
+
+.completed-screen h1 {
+  font-size: 28px;
+}
+
+.completed-screen h2 {
+  font-size: 22px;
+  margin-top: 10px;
+}
