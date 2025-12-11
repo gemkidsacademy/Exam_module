@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 export default function GenerateExam_reading() {
   const [quizzes, setQuizzes] = useState([]);
-  const [selectedQuiz, setSelectedQuiz] = useState("");   // ✅ FIXED
+  const [selectedQuiz, setSelectedQuiz] = useState("");
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
@@ -32,7 +32,7 @@ export default function GenerateExam_reading() {
     }
   };
 
-  // 🚀 Load quizzes on mount
+  // ✅ FIXED — Correct API endpoint for loading quizzes
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
@@ -60,8 +60,9 @@ export default function GenerateExam_reading() {
     setGeneratedExam(null);
 
     try {
+      // ✅ selectedQuiz is string → convert properly
       const res = await fetch(
-        `${BACKEND_URL}/api/exams/generate/${Number(selectedQuiz)}`,  // ✅ FIX: convert to number
+        `${BACKEND_URL}/api/exams/generate/${Number(selectedQuiz)}`,
         { method: "POST" }
       );
 
@@ -93,10 +94,10 @@ export default function GenerateExam_reading() {
 
         <select
           value={selectedQuiz}
-          onChange={(e) => setSelectedQuiz(e.target.value)}   // ✅ FIXED
+          onChange={(e) => setSelectedQuiz(e.target.value)}
           style={{ padding: "6px", minWidth: "280px" }}
         >
-          <option value="">-- Select Quiz Requirement --</option>  {/* ✅ FIXED */}
+          <option value="">-- Select Quiz Requirement --</option>
 
           {quizzes.map((q) => (
             <option key={q.id} value={q.id}>
