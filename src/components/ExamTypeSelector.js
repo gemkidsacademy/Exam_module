@@ -1,5 +1,6 @@
 import React from "react";
 import UploadWord from "./UploadWord";
+import UploadWord_reading from "./UploadWord_reading";
 
 export default function ExamTypeSelector({ examType, onSelect }) {
   const examOptions = [
@@ -9,9 +10,14 @@ export default function ExamTypeSelector({ examType, onSelect }) {
     { label: "Writing Exam", value: "writing" },
   ];
 
-  // → If thinking skills selected → render UploadWord component
+  // → If Thinking Skills selected → render UploadWord
   if (examType === "thinkingskills") {
     return <UploadWord />;
+  }
+
+  // → If Reading selected → render UploadWord_reading
+  if (examType === "reading") {
+    return <UploadWord_reading />;
   }
 
   return (
