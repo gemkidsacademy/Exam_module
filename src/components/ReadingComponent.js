@@ -48,6 +48,7 @@ export default function ReadingExam() {
   ---------------------------------------------------------*/
   useEffect(() => {
     if (timeLeft === null) return;
+
     if (timeLeft <= 0) {
       setFinished(true);
       return;
@@ -83,6 +84,9 @@ export default function ReadingExam() {
     0
   );
 
+  /* -------------------------------------------------------
+     FINISHED SCREEN
+  ---------------------------------------------------------*/
   if (finished) {
     return (
       <div className="completed-screen">
@@ -101,12 +105,8 @@ export default function ReadingExam() {
   const topicPassageMap = {
     "Comparative analysis": ["Extract A", "Extract B", "Extract C", "Extract D"],
     "Main Idea and Summary": [
-      "Paragraph 1",
-      "Paragraph 2",
-      "Paragraph 3",
-      "Paragraph 4",
-      "Paragraph 5",
-      "Paragraph 6",
+      "Paragraph 1", "Paragraph 2", "Paragraph 3",
+      "Paragraph 4", "Paragraph 5", "Paragraph 6",
     ],
   };
 
@@ -114,7 +114,7 @@ export default function ReadingExam() {
   const visiblePassages = topicPassageMap[currentTopic] || [];
 
   /* -------------------------------------------------------
-     GROUP QUESTIONS FOR INDEX
+     GROUP QUESTIONS FOR INDEX PANEL
   ---------------------------------------------------------*/
   const grouped = questions.reduce((acc, q, idx) => {
     if (!acc[q.topic]) acc[q.topic] = [];
@@ -195,11 +195,13 @@ export default function ReadingExam() {
               Q{currentQuestion.question_number}. {currentQuestion.question_text}
             </p>
 
-            {/* DYNAMIC ANSWER OPTIONS */}
+            {/* DYNAMIC ANSWER OPTIONS (NOW FULLY FIXED) */}
             {Object.entries(answerOptions).map(([letter, text]) => (
               <button
                 key={letter}
-                className={`option-btn ${answers[index] === letter ? "selected" : ""}`}
+                className={`option-btn ${
+                  answers[index] === letter ? "selected" : ""
+                }`}
                 onClick={() => handleSelect(letter)}
               >
                 {letter}. {text}
@@ -208,7 +210,7 @@ export default function ReadingExam() {
 
           </div>
 
-          {/* NAV */}
+          {/* NAVIGATION */}
           <div className="nav-buttons">
             <button
               className="nav-btn prev"
