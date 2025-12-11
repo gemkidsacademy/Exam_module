@@ -36,28 +36,21 @@ export default function GenerateExam_reading() {
   // LOAD QUIZZES (DEBUG LOGS)
   // ---------------------------
   useEffect(() => {
-    const fetchQuizzes = async () => {
-      console.log("📥 Fetching quizzes from:", `${BACKEND_URL}/api/quizzes-reading`);
+  const fetchQuizzes = async () => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/quizzes-reading`);
+      if (!res.ok) throw new Error("Failed to load quizzes");
+      const data = await res.json();
+      console.log("📦 Loaded quizzes:", data);
+      setQuizzes(data);
+    } catch (err) {
+      console.error("❌ Error loading quizzes:", err);
+      setError("Error loading quizzes from backend.");
+    }
+  };
 
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/quizzes-reading`);
-        console.log("📡 Response status:", res.status);
-
-        if (!res.ok) throw new Error("Failed to load quizzes");
-
-        const data = await res.json();
-        console.log("📦 Loaded quizzes:", data);
-
-        setQuizzes(data);
-      } catch (err) {
-        console.error("❌ Error loading quizzes:", err);
-        setError("Error loading quizzes from backend.");
-      }
-    };
-
-    fetchQuizzes();
-  }, []);
-
+  fetchQuizzes();
+}, []);
   // ---------------------------
   // GENERATE EXAM (DEBUG LOGS)
   // ---------------------------
