@@ -4,7 +4,7 @@ import "./QuizSetup.css";
 export default function QuizSetup_reading() {
   const [quiz, setQuiz] = useState({
     className: "",
-    subject: "reading_comprehension",
+    subject: "Reading Comprehension",  // MUST MATCH DATABASE EXACTLY
     difficulty: "",
     numTopics: 1,
     topics: [],
