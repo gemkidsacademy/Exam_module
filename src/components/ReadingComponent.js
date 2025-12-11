@@ -188,19 +188,17 @@ export default function ReadingExam() {
             </p>
 
             {Object.keys(passages)
-                .map(label => label.replace("Extract ", "")) // Extract A → A
-                .sort() // Ensure A, B, C, D order
-                .map(opt => (
-                  <button
-                    key={opt}
-                    className={`option-btn ${
-                      answers[index] === opt ? "selected" : ""
-                    }`}
-                    onClick={() => handleSelect(opt)}
-                  >
-                    {opt}
-                  </button>
-                ))
+              .map(label => label.replace("Extract ", "")) // Extract A → A
+              .sort() // Ensure A, B, C, D order
+              .map((opt) => (
+                <button
+                  key={opt}
+                  className={`option-btn ${answers[index] === opt ? "selected" : ""}`}
+                  onClick={() => handleSelect(opt)}
+                >
+                  {opt}
+                </button>
+              ))
             }
 
               <button
