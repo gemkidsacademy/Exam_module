@@ -11,13 +11,12 @@ export default function ReadingExam() {
   const [visited, setVisited] = useState({});
   const [finished, setFinished] = useState(false);
 
-  // Timer
   const [timeLeft, setTimeLeft] = useState(null);
 
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
   /* -------------------------------------------------------
-     LOAD LATEST EXAM FROM BACKEND
+     LOAD LATEST EXAM
   ---------------------------------------------------------*/
   useEffect(() => {
     const loadExam = async () => {
@@ -52,9 +51,8 @@ export default function ReadingExam() {
       return;
     }
 
-    const interval = setInterval(() => setTimeLeft(t => t - 1), 1000);
+    const interval = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearInterval(interval);
-
   }, [timeLeft]);
 
   const formatTime = (sec) => {
@@ -64,16 +62,16 @@ export default function ReadingExam() {
   };
 
   /* -------------------------------------------------------
-     QUESTION NAVIGATION + ANSWER HANDLER
+     QUESTION HANDLERS
   ---------------------------------------------------------*/
   const currentQuestion = questions[index];
 
   const handleSelect = (choice) => {
-    setAnswers(prev => ({ ...prev, [index]: choice }));
+    setAnswers((prev) => ({ ...prev, [index]: choice }));
   };
 
   const goTo = (i) => {
-    setVisited(prev => ({ ...prev, [i]: true }));
+    setVisited((prev) => ({ ...prev, [i]: true }));
     setIndex(i);
   };
 
@@ -82,9 +80,6 @@ export default function ReadingExam() {
     0
   );
 
-  /* -------------------------------------------------------
-     FINISHED SCREEN
-  ---------------------------------------------------------*/
   if (finished) {
     return (
       <div className="completed-screen">
@@ -98,7 +93,21 @@ export default function ReadingExam() {
   if (!exam) return <div>Loading Exam...</div>;
 
   /* -------------------------------------------------------
-     GROUP QUESTIONS BY TOPIC (for nice UI)
+     PASSAGE FILTERING BASED ON TOPIC
+  ---------------------------------------------------------*/
+  const topicPassageMap = {
+    "Comparative analysis": ["Extract A", "Extract B", "Extract C", "Extract D"],
+    "Main Idea and Summary": [
+      "Paragraph 1", "Paragraph 2", "Paragraph 3",
+      "Paragraph 4", "Paragraph 5", "Paragraph 6",
+    ],
+  };
+
+  const currentTopic = currentQuestion.topic;
+  const visiblePassages = topicPassageMap[currentTopic] || [];
+
+  /* -------------------------------------------------------
+     GROUP QUESTIONS FOR INDEX
   ---------------------------------------------------------*/
   const grouped = questions.reduce((acc, q, idx) => {
     if (!acc[q.topic]) acc[q.topic] = [];
@@ -106,9 +115,6 @@ export default function ReadingExam() {
     return acc;
   }, {});
 
-  /* -------------------------------------------------------
-     RENDER NEW HORIZONTAL GROUPED INDEX
-  ---------------------------------------------------------*/
   const renderIndex = () => (
     <div className="topic-index-row">
       {Object.entries(grouped).map(([topic, qList]) => (
@@ -162,26 +168,26 @@ export default function ReadingExam() {
 
       <div className="exam-body">
 
-        {/* LEFT: PASSAGES */}
+        {/* LEFT: FILTERED PASSAGES */}
         <div className="passage-pane">
           <h3>Reading Materials</h3>
 
-          {Object.entries(passages).map(([label, text]) => (
+          {visiblePassages.map((label) => (
             <div key={label} className="passage-block">
               <h4>{label}</h4>
-              <p>{text}</p>
+              <p>{passages[label]}</p>
             </div>
           ))}
         </div>
 
-        {/* RIGHT: QUESTION PANE */}
+        {/* RIGHT: QUESTION */}
         <div className="question-pane">
           <div className="question-card">
             <p className="question-text">
               Q{currentQuestion.question_number}. {currentQuestion.question_text}
             </p>
 
-            {["A","B","C","D","E","F","G"].map(opt => (
+            {["A","B","C","D","E","F","G"].map((opt) => (
               <button
                 key={opt}
                 className={`option-btn ${
