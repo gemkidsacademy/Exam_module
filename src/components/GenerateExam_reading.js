@@ -112,7 +112,7 @@ const formatDifficulty = (lvl) => {
         
           {quizzes.map((q) => (
             <option key={q.id} value={q.id}>
-              {`${formatClassName(q.class_name)} | ${formatSubject(q.subject)} | ${formatDifficulty(q.difficulty)}`}
+              {`${formatClassName(q.class_name)} | ${formatDifficulty(q.difficulty)}`}
             </option>
           ))}
         </select>
