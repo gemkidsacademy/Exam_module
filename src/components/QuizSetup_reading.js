@@ -4,14 +4,18 @@ import "./QuizSetup.css";
 export default function QuizSetup_reading() {
   const [quiz, setQuiz] = useState({
     className: "",
-    subject: "reading",
+    subject: "reading_comprehension",
     difficulty: "",
     numTopics: 1,
     topics: [],
   });
 
   const [totalQuestions, setTotalQuestions] = useState(0);
+  const [loading, setLoading] = useState(false);
 
+  // ---------------------------------------
+  // HANDLE FORM INPUTS
+  // ---------------------------------------
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setQuiz((prev) => ({ ...prev, [name]: value }));
@@ -21,8 +25,9 @@ export default function QuizSetup_reading() {
     const num = parseInt(quiz.numTopics) || 1;
 
     const topicsArray = Array.from({ length: num }, () => ({
+      topic_id: "",     // Admin will select from dropdown later
       name: "",
-      total: 0,
+      num_questions: 0,
     }));
 
     setQuiz((prev) => ({ ...prev, topics: topicsArray }));
@@ -42,10 +47,10 @@ export default function QuizSetup_reading() {
 
     setQuiz((prev) => {
       const topics = [...prev.topics];
-      topics[index].total = numValue;
+      topics[index].num_questions = numValue;
 
       const globalTotal = topics.reduce(
-        (sum, t) => sum + (Number(t.total) || 0),
+        (sum, t) => sum + (Number(t.num_questions) || 0),
         0
       );
 
@@ -55,7 +60,10 @@ export default function QuizSetup_reading() {
     });
   };
 
-  const handleSubmit = (e) => {
+  // ---------------------------------------
+  // SUBMIT TO BACKEND
+  // ---------------------------------------
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!quiz.className || !quiz.subject || !quiz.difficulty) {
@@ -75,20 +83,48 @@ export default function QuizSetup_reading() {
 
     const payload = {
       class_name: quiz.className.trim(),
-      subject: "reading",
+      subject: quiz.subject,
       difficulty: quiz.difficulty,
-      num_topics: quiz.topics.length,
       topics: quiz.topics.map((t) => ({
+        topic_id: Number(t.topic_id) || null, // if you add dropdown later
         name: t.name.trim(),
-        total: Number(t.total),
+        num_questions: Number(t.num_questions),
       })),
-      total_questions: totalQuestions,
     };
 
-    console.log("Reading Exam Setup:", payload);
-    alert("Reading Exam Setup Saved (frontend only). Backend pending.");
+    try {
+      setLoading(true);
+
+      const response = await fetch("/api/admin/create-reading-config", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      setLoading(false);
+
+      if (!response.ok) {
+        alert("Error: " + data.detail);
+        return;
+      }
+
+      alert(
+        `Reading Exam Created!\nConfig ID: ${data.config_id}\nCreated At: ${data.created_at}`
+      );
+
+    } catch (err) {
+      setLoading(false);
+      console.error(err);
+      alert("Failed to create exam. Check console for details.");
+    }
   };
 
+  // ---------------------------------------
+  // RENDER
+  // ---------------------------------------
   return (
     <div className="quiz-setup-container">
       <form onSubmit={handleSubmit}>
@@ -113,7 +149,7 @@ export default function QuizSetup_reading() {
         <label>Subject:</label>
         <input
           type="text"
-          value="Reading"
+          value="Reading Comprehension"
           readOnly
           style={{ backgroundColor: "#f3f3f3", cursor: "not-allowed" }}
         />
@@ -142,7 +178,6 @@ export default function QuizSetup_reading() {
           onChange={handleInputChange}
         />
 
-        {/* GENERATE BUTTON */}
         <button type="button" onClick={generateTopics}>
           Generate Topics
         </button>
@@ -167,7 +202,7 @@ export default function QuizSetup_reading() {
               <input
                 type="number"
                 min="0"
-                value={topic.total}
+                value={topic.num_questions}
                 onChange={(e) =>
                   handleTopicTotalChange(index, e.target.value)
                 }
@@ -177,7 +212,7 @@ export default function QuizSetup_reading() {
           ))}
         </div>
 
-        {/* TOTAL SECTION */}
+        {/* TOTAL */}
         <div className="total-section">
           <h3>Total Questions: {totalQuestions}</h3>
           {totalQuestions > 40 && (
@@ -185,8 +220,8 @@ export default function QuizSetup_reading() {
           )}
         </div>
 
-        <button type="submit" disabled={totalQuestions > 40}>
-          Create Reading Exam
+        <button type="submit" disabled={loading || totalQuestions > 40}>
+          {loading ? "Saving..." : "Create Reading Exam"}
         </button>
       </form>
     </div>
