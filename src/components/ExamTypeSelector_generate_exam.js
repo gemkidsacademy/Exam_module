@@ -1,5 +1,6 @@
 import React from "react";
 import GenerateExam from "./GenerateExam"; 
+import GenerateExam_reading from "./GenerateExam_reading"; 
 
 
 export default function ExamTypeSelector_generate_exam({ examType, onSelect }) {
