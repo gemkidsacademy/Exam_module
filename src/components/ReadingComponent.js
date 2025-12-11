@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import "./ExamPage.css";
+import "./ExamPage_reading.css";
+
 
 /* -------------------------------------------------------
    QUIZ QUESTIONS (same as before)
