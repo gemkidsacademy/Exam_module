@@ -80,6 +80,7 @@ export default function ReadingExam() {
     0
   );
 
+  /* FINISHED SCREEN */
   if (finished) {
     return (
       <div className="completed-screen">
@@ -145,6 +146,18 @@ export default function ReadingExam() {
   );
 
   /* -------------------------------------------------------
+     DYNAMIC ANSWER OPTIONS
+     - If current question deals with Extract A–D → use A–D
+     - If Paragraphs → use A–G
+  ---------------------------------------------------------*/
+
+  let answerOptions = ["A", "B", "C", "D"]; // default for extracts
+
+  if (currentTopic === "Main Idea and Summary") {
+    answerOptions = ["A", "B", "C", "D", "E", "F", "G"];
+  }
+
+  /* -------------------------------------------------------
      MAIN UI
   ---------------------------------------------------------*/
   return (
@@ -187,32 +200,21 @@ export default function ReadingExam() {
               Q{currentQuestion.question_number}. {currentQuestion.question_text}
             </p>
 
-            {Object.keys(passages)
-              .map(label => label.replace("Extract ", "")) // Extract A → A
-              .sort() // Ensure A, B, C, D order
-              .map((opt) => (
-                <button
-                  key={opt}
-                  className={`option-btn ${answers[index] === opt ? "selected" : ""}`}
-                  onClick={() => handleSelect(opt)}
-                >
-                  {opt}
-                </button>
-              ))
-            }
-
+            {/* DYNAMIC ANSWER BUTTONS (NO eslint errors) */}
+            {answerOptions.map((letter) => (
               <button
-                key={opt}
+                key={letter}
                 className={`option-btn ${
-                  answers[index] === opt ? "selected" : ""
+                  answers[index] === letter ? "selected" : ""
                 }`}
-                onClick={() => handleSelect(opt)}
+                onClick={() => handleSelect(letter)}
               >
-                {opt}
+                {letter}
               </button>
             ))}
           </div>
 
+          {/* NAV */}
           <div className="nav-buttons">
             <button
               className="nav-btn prev"
