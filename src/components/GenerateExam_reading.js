@@ -96,16 +96,22 @@ export default function GenerateExam_reading() {
       <div style={{ marginBottom: "20px" }}>
         <label>Select Quiz:</label>
 
-        <select
+       <select
           value={selectedQuiz ? JSON.stringify(selectedQuiz) : ""}
           onChange={(e) => {
             const parsed = JSON.parse(e.target.value);
+        
+            console.log("📘 Class selected:", parsed.class_name);
+            console.log("📙 Difficulty selected:", parsed.difficulty);
+        
             setSelectedQuiz(parsed);
+            setSelectedClass(parsed.class_name);          // ✅ ADD THIS
+            setSelectedDifficulty(parsed.difficulty);     // ✅ ADD THIS
           }}
           style={{ padding: "8px", minWidth: "260px", display: "block", marginTop: "10px" }}
         >
           <option value="">-- Select Quiz Requirement --</option>
-
+        
           {quizzes.map((q) => (
             <option
               key={`${q.class_name}-${q.difficulty}`}
@@ -118,6 +124,7 @@ export default function GenerateExam_reading() {
             </option>
           ))}
         </select>
+
       </div>
 
       <button
