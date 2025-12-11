@@ -2,16 +2,18 @@ import React, { useState, useEffect } from "react";
 
 export default function GenerateExam_reading() {
   const [quizzes, setQuizzes] = useState([]);
-  const [selectedQuiz, setSelectedQuiz] = useState(null); // will store class_name + difficulty
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
+  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedDifficulty, setSelectedDifficulty] = useState("");
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
-  const [selectedClass, setSelectedClass] = useState("");
-  const [selectedDifficulty, setSelectedDifficulty] = useState("");
-
 
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
+  // ---------------------------
+  // Formatting Helpers
+  // ---------------------------
   const formatClassName = (cls) => {
     switch (cls) {
       case "year1": return "Year 1";
@@ -47,7 +49,6 @@ export default function GenerateExam_reading() {
         const data = await res.json();
         console.log("📦 Loaded quizzes:", data);
         setQuizzes(data);
-
       } catch (err) {
         console.error("❌ Error loading quizzes:", err);
         setError("Failed to load quizzes.");
@@ -58,35 +59,56 @@ export default function GenerateExam_reading() {
   }, []);
 
   // ---------------------------
-  // GENERATE EXAM (NO CONFIG ID)
+  // GENERATE EXAM
   // ---------------------------
   const handleGenerateExam = async () => {
-  if (!selectedClass || !selectedDifficulty) {
-    alert("Please select class and difficulty");
-    return;
-  }
+    if (!selectedClass || !selectedDifficulty) {
+      alert("Please select class and difficulty");
+      return;
+    }
 
-  const payload = {
-    class_name: selectedClass,
-    difficulty: selectedDifficulty
+    const payload = {
+      class_name: selectedClass,
+      difficulty: selectedDifficulty
+    };
+
+    console.log("📤 Sending payload:", payload);
+
+    setLoading(true);
+    setError("");
+    setGeneratedExam(null);
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/exams/generate-reading`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      console.log("📥 Response JSON:", data);
+
+      if (!res.ok) {
+        setError(data.detail || "Failed to generate exam.");
+        alert("❌ Error: " + (data.detail || "Failed to generate exam."));
+        setLoading(false);
+        return;
+      }
+
+      setGeneratedExam(data);
+      alert("✅ Exam generated successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("❌ Network error while generating exam.");
+      setError("Network error");
+    }
+
+    setLoading(false);
   };
 
-  console.log("📤 Sending payload:", payload);
-
-  const res = await fetch(`${BACKEND_URL}/api/exams/generate-reading`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(payload)
-  });
-
-  console.log("📡 Status:", res.status);
-
-  const data = await res.json();
-  console.log("📥 Response JSON:", data);
-};
-
+  // ---------------------------
+  // UI
+  // ---------------------------
   return (
     <div style={{ padding: "20px" }}>
       <h2>Generate Reading Exam</h2>
@@ -96,37 +118,42 @@ export default function GenerateExam_reading() {
       <div style={{ marginBottom: "20px" }}>
         <label>Select Quiz:</label>
 
-       <select
+        <select
           value={selectedQuiz ? JSON.stringify(selectedQuiz) : ""}
           onChange={(e) => {
             const parsed = JSON.parse(e.target.value);
-        
+
             console.log("📘 Class selected:", parsed.class_name);
             console.log("📙 Difficulty selected:", parsed.difficulty);
-        
+
             setSelectedQuiz(parsed);
-            setSelectedClass(parsed.class_name);          // ✅ ADD THIS
-            setSelectedDifficulty(parsed.difficulty);     // ✅ ADD THIS
+            setSelectedClass(parsed.class_name);
+            setSelectedDifficulty(parsed.difficulty);
           }}
-          style={{ padding: "8px", minWidth: "260px", display: "block", marginTop: "10px" }}
+          style={{
+            padding: "8px",
+            minWidth: "260px",
+            display: "block",
+            marginTop: "10px"
+          }}
         >
           <option value="">-- Select Quiz Requirement --</option>
-        
+
           {quizzes.map((q) => (
             <option
               key={`${q.class_name}-${q.difficulty}`}
               value={JSON.stringify({
                 class_name: q.class_name,
-                difficulty: q.difficulty,
+                difficulty: q.difficulty
               })}
             >
               {`${formatClassName(q.class_name)} | ${formatDifficulty(q.difficulty)}`}
             </option>
           ))}
         </select>
-
       </div>
 
+      {/* ------------ Generate Button ------------ */}
       <button
         onClick={handleGenerateExam}
         disabled={loading}
@@ -135,23 +162,35 @@ export default function GenerateExam_reading() {
           backgroundColor: "#4caf50",
           color: "white",
           border: "none",
-          cursor: "pointer",
+          cursor: loading ? "not-allowed" : "pointer"
         }}
       >
         {loading ? "Generating..." : "Generate Exam"}
       </button>
 
+      {/* ------------ Display Generated Exam ------------ */}
       {generatedExam && (
         <div style={{ marginTop: "30px" }}>
           <h3>Generated Exam</h3>
 
-          <p><strong>Total Questions:</strong> {generatedExam.total_questions}</p>
+          <p>
+            <strong>Total Questions:</strong> {generatedExam.total_questions}
+          </p>
 
           {generatedExam.questions?.length > 0 ? (
             generatedExam.questions.map((q, idx) => (
-              <div key={idx} style={{ marginBottom: "20px", padding: "10px", border: "1px solid #ccc" }}>
+              <div
+                key={idx}
+                style={{
+                  marginBottom: "20px",
+                  padding: "10px",
+                  border: "1px solid #ccc"
+                }}
+              >
                 <strong>Q{idx + 1}:</strong> {q.question}
-                <p><strong>Correct:</strong> {q.correct}</p>
+                <p>
+                  <strong>Correct:</strong> {q.correct}
+                </p>
               </div>
             ))
           ) : (
