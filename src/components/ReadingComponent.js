@@ -9,17 +9,15 @@ export default function ReadingExam() {
 
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
-
   const [finished, setFinished] = useState(false);
 
   // Timer
   const [timeLeft, setTimeLeft] = useState(null);
-  const [duration, setDuration] = useState(null);
 
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
   /* -------------------------------------------------------
-     LOAD THE LATEST EXAM FROM BACKEND
+     LOAD LATEST EXAM FROM BACKEND
   ---------------------------------------------------------*/
   useEffect(() => {
     const loadExam = async () => {
@@ -33,9 +31,8 @@ export default function ReadingExam() {
         setQuestions(data.exam_json.questions);
         setPassages(data.exam_json.reading_material);
 
-        const seconds = data.duration_minutes * 60;
-        setDuration(seconds);
-        setTimeLeft(seconds);
+        const timerSeconds = (data.duration_minutes || 40) * 60;
+        setTimeLeft(timerSeconds);
 
       } catch (err) {
         console.error("❌ Failed to load exam", err);
@@ -46,21 +43,18 @@ export default function ReadingExam() {
   }, []);
 
   /* -------------------------------------------------------
-     TIMER COUNTDOWN (Backend-Controlled Duration)
+     TIMER
   ---------------------------------------------------------*/
   useEffect(() => {
     if (timeLeft === null) return;
-
     if (timeLeft <= 0) {
       setFinished(true);
       return;
     }
 
-    const interval = setInterval(() => {
-      setTimeLeft((t) => t - 1);
-    }, 1000);
-
+    const interval = setInterval(() => setTimeLeft(t => t - 1), 1000);
     return () => clearInterval(interval);
+
   }, [timeLeft]);
 
   const formatTime = (sec) => {
@@ -70,16 +64,16 @@ export default function ReadingExam() {
   };
 
   /* -------------------------------------------------------
-     HANDLERS
+     QUESTION NAVIGATION + ANSWER HANDLER
   ---------------------------------------------------------*/
   const currentQuestion = questions[index];
 
   const handleSelect = (choice) => {
-    setAnswers((prev) => ({ ...prev, [index]: choice }));
+    setAnswers(prev => ({ ...prev, [index]: choice }));
   };
 
   const goTo = (i) => {
-    setVisited((prev) => ({ ...prev, [i]: true }));
+    setVisited(prev => ({ ...prev, [i]: true }));
     setIndex(i);
   };
 
@@ -96,41 +90,56 @@ export default function ReadingExam() {
       <div className="completed-screen">
         <h1>Quiz Finished</h1>
         <h2>Your Score: {score} / {questions.length}</h2>
-        <h3>Time Ended</h3>
+        <h3>Time Is Up!</h3>
       </div>
     );
   }
 
-  if (!exam) {
-    return <div>Loading Exam...</div>;
-  }
+  if (!exam) return <div>Loading Exam...</div>;
 
   /* -------------------------------------------------------
-     RENDER QUESTION INDEX
+     GROUP QUESTIONS BY TOPIC (for nice UI)
+  ---------------------------------------------------------*/
+  const grouped = questions.reduce((acc, q, idx) => {
+    if (!acc[q.topic]) acc[q.topic] = [];
+    acc[q.topic].push({ idx, number: q.question_number });
+    return acc;
+  }, {});
+
+  /* -------------------------------------------------------
+     RENDER NEW HORIZONTAL GROUPED INDEX
   ---------------------------------------------------------*/
   const renderIndex = () => (
-    <div className="index-wrapper">
-      {questions.map((q, i) => {
-        const cls =
-          answers[i] ? "index-answered"
-          : visited[i] ? "index-seen"
-          : "";
+    <div className="topic-index-row">
+      {Object.entries(grouped).map(([topic, qList]) => (
+        <div key={topic} className="topic-group-box">
+          <div className="topic-title">{topic}</div>
 
-        return (
-          <div
-            key={i}
-            className={`index-circle ${cls}`}
-            onClick={() => goTo(i)}
-          >
-            {i + 1}
+          <div className="topic-question-row">
+            {qList.map(({ idx, number }) => {
+              const cls =
+                answers[idx] ? "index-answered"
+                : visited[idx] ? "index-seen"
+                : "";
+
+              return (
+                <div
+                  key={idx}
+                  className={`index-circle ${cls}`}
+                  onClick={() => goTo(idx)}
+                >
+                  {number}
+                </div>
+              );
+            })}
           </div>
-        );
-      })}
+        </div>
+      ))}
     </div>
   );
 
   /* -------------------------------------------------------
-     MAIN RENDER
+     MAIN UI
   ---------------------------------------------------------*/
   return (
     <div className="exam-container">
@@ -148,12 +157,12 @@ export default function ReadingExam() {
         </div>
       </div>
 
-      {/* INDEX */}
+      {/* INDEX BAR */}
       {renderIndex()}
 
       <div className="exam-body">
 
-        {/* LEFT: PASSAGE MATERIAL */}
+        {/* LEFT: PASSAGES */}
         <div className="passage-pane">
           <h3>Reading Materials</h3>
 
@@ -165,14 +174,14 @@ export default function ReadingExam() {
           ))}
         </div>
 
-        {/* RIGHT: CURRENT QUESTION */}
+        {/* RIGHT: QUESTION PANE */}
         <div className="question-pane">
           <div className="question-card">
             <p className="question-text">
               Q{currentQuestion.question_number}. {currentQuestion.question_text}
             </p>
 
-            {["A", "B", "C", "D", "E", "F", "G"].map((opt) => (
+            {["A","B","C","D","E","F","G"].map(opt => (
               <button
                 key={opt}
                 className={`option-btn ${
@@ -185,7 +194,6 @@ export default function ReadingExam() {
             ))}
           </div>
 
-          {/* NAVIGATION */}
           <div className="nav-buttons">
             <button
               className="nav-btn prev"
