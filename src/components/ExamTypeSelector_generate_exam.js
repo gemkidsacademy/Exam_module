@@ -1,6 +1,6 @@
 import React from "react";
-import UploadWord from "./UploadWord";
-import UploadWord_reading from "./UploadWord_reading";
+import GenerateExam from "./GenerateExam"; 
+
 
 export default function ExamTypeSelector_generate_exam({ examType, onSelect }) {
   const examOptions = [
@@ -12,12 +12,12 @@ export default function ExamTypeSelector_generate_exam({ examType, onSelect }) {
 
   // → If Thinking Skills selected → render UploadWord
   if (examType === "thinkingskills") {
-    return <UploadWord />;
+    return <GenerateExam />;
   }
 
   // → If Reading selected → render UploadWord_reading
   if (examType === "reading") {
-    return <UploadWord_reading />;
+    return <GenerateExam />;
   }
 
   return (
