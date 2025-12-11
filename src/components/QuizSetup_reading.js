@@ -86,7 +86,6 @@ export default function QuizSetup_reading() {
       subject: quiz.subject,
       difficulty: quiz.difficulty,
       topics: quiz.topics.map((t) => ({
-        topic_id: Number(t.topic_id) || null, // if you add dropdown later
         name: t.name.trim(),
         num_questions: Number(t.num_questions),
       })),
