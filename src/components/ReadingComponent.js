@@ -187,7 +187,22 @@ export default function ReadingExam() {
               Q{currentQuestion.question_number}. {currentQuestion.question_text}
             </p>
 
-            {["A","B","C","D","E","F","G"].map((opt) => (
+            {Object.keys(passages)
+                .map(label => label.replace("Extract ", "")) // Extract A → A
+                .sort() // Ensure A, B, C, D order
+                .map(opt => (
+                  <button
+                    key={opt}
+                    className={`option-btn ${
+                      answers[index] === opt ? "selected" : ""
+                    }`}
+                    onClick={() => handleSelect(opt)}
+                  >
+                    {opt}
+                  </button>
+                ))
+            }
+
               <button
                 key={opt}
                 className={`option-btn ${
