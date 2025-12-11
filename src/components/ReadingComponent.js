@@ -5,13 +5,12 @@ export default function ReadingExam() {
   const [exam, setExam] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [passages, setPassages] = useState({});
+  const [answerOptions, setAnswerOptions] = useState({});
   const [index, setIndex] = useState(0);
 
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
   const [finished, setFinished] = useState(false);
-  const [answerOptions, setAnswerOptions] = useState({});
-
 
   const [timeLeft, setTimeLeft] = useState(null);
 
@@ -31,7 +30,7 @@ export default function ReadingExam() {
         setExam(data.exam_json);
         setQuestions(data.exam_json.questions);
         setPassages(data.exam_json.reading_material);
-        setAnswerOptions(data.exam_json.answer_options || {});  // ← NEW
+        setAnswerOptions(data.exam_json.answer_options || {});
 
         const timerSeconds = (data.duration_minutes || 40) * 60;
         setTimeLeft(timerSeconds);
@@ -56,6 +55,7 @@ export default function ReadingExam() {
 
     const interval = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearInterval(interval);
+
   }, [timeLeft]);
 
   const formatTime = (sec) => {
@@ -83,7 +83,6 @@ export default function ReadingExam() {
     0
   );
 
-  /* FINISHED SCREEN */
   if (finished) {
     return (
       <div className="completed-screen">
@@ -102,8 +101,12 @@ export default function ReadingExam() {
   const topicPassageMap = {
     "Comparative analysis": ["Extract A", "Extract B", "Extract C", "Extract D"],
     "Main Idea and Summary": [
-      "Paragraph 1", "Paragraph 2", "Paragraph 3",
-      "Paragraph 4", "Paragraph 5", "Paragraph 6",
+      "Paragraph 1",
+      "Paragraph 2",
+      "Paragraph 3",
+      "Paragraph 4",
+      "Paragraph 5",
+      "Paragraph 6",
     ],
   };
 
@@ -149,14 +152,6 @@ export default function ReadingExam() {
   );
 
   /* -------------------------------------------------------
-     DYNAMIC ANSWER OPTIONS
-     - If current question deals with Extract A–D → use A–D
-     - If Paragraphs → use A–G
-  ---------------------------------------------------------*/
-
-  
-
-  /* -------------------------------------------------------
      MAIN UI
   ---------------------------------------------------------*/
   return (
@@ -180,7 +175,7 @@ export default function ReadingExam() {
 
       <div className="exam-body">
 
-        {/* LEFT: FILTERED PASSAGES */}
+        {/* LEFT: PASSAGES */}
         <div className="passage-pane">
           <h3>Reading Materials</h3>
 
@@ -195,11 +190,12 @@ export default function ReadingExam() {
         {/* RIGHT: QUESTION */}
         <div className="question-pane">
           <div className="question-card">
+
             <p className="question-text">
               Q{currentQuestion.question_number}. {currentQuestion.question_text}
             </p>
 
-            {/* DYNAMIC ANSWER BUTTONS (NO eslint errors) */}
+            {/* DYNAMIC ANSWER OPTIONS */}
             {Object.entries(answerOptions).map(([letter, text]) => (
               <button
                 key={letter}
