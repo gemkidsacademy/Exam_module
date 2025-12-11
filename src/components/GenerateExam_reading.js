@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 export default function GenerateExam_reading() {
   const [quizzes, setQuizzes] = useState([]);
-  const [selectedQuiz, setSelectedQuiz] = useState("");
+  const [selectedQuiz, setSelectedQuiz] = useState(0);
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
@@ -108,8 +108,8 @@ const formatDifficulty = (lvl) => {
           onChange={(e) => setSelectedQuiz(Number(e.target.value))}
           style={{ padding: "6px", minWidth: "280px" }}
         >
-          <option value="">-- Select Quiz Requirement --</option>
-        
+          <option value={0}>-- Select Quiz Requirement --</option>   {/* ✅ Same type (number) */}
+          
           {quizzes.map((q) => (
             <option key={q.id} value={q.id}>
               {`${formatClassName(q.class_name)} | ${formatDifficulty(q.difficulty)}`}
