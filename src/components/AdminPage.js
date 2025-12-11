@@ -13,6 +13,8 @@ import UploadImageFolder from "./UploadImageFolder";
 import QuizSetup_foundational from "./QuizSetup_foundational";
 import QuizSetup_reading from "./QuizSetup_reading";
 import QuizSetup_writing from "./QuizSetup_writing";
+import ExamTypeSelector from "./ExamTypeSelector";
+
 
 
 
@@ -38,7 +40,7 @@ const AdminPanel = () => {
 
   const tabs = [
     { id: "database", label: "Exam Module User Management" },
-    { id: "upload-word", label: "Upload Questions Word Document" },
+    { id: "exam-type-selector", label: "Upload Questions Word Document" },
     { id: "upload-image-folder", label: "Upload Exam Image Folder" }, 
     { id: "add-quiz", label: "Create Exam" },
     { id: "generate-exam", label: "Generate Exam" },
@@ -197,9 +199,9 @@ const AdminPanel = () => {
             <UploadImageFolder />
           </div>
         )}
-        {activeTab === "upload-word" && (
+        {activeTab === "exam-type-selector" && (
           <div className="tab-panel">
-            <UploadWord />
+            <ExamTypeSelector />
           </div>
         )}
 
