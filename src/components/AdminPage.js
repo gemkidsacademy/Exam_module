@@ -210,7 +210,7 @@ const AdminPanel = () => {
 
         {activeTab === "generate-exam" && (
           <div className="tab-panel">
-            <GenerateExam />   {/* ⬅️ NEW COMPONENT RENDERED HERE */}
+            <ExamTypeSelector_generate_exam />   {/* ⬅️ NEW COMPONENT RENDERED HERE */}
           </div>
         )}
       </div>
