@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 export default function GenerateExam_reading() {
   const [quizzes, setQuizzes] = useState([]);
-  const [selectedQuiz, setSelectedQuiz] = useState("");
+  const [selectedConfigId, setSelectedConfigId] = useState(""); // renamed for clarity
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
@@ -33,54 +33,38 @@ export default function GenerateExam_reading() {
   };
 
   // ---------------------------
-  // LOAD QUIZZES (DEBUG LOGS)
+  // LOAD QUIZZES
   // ---------------------------
   useEffect(() => {
-  const fetchQuizzes = async () => {
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/quizzes-reading`);
-      if (!res.ok) throw new Error("Failed to load quizzes");
-      const data = await res.json();
-      console.log("📦 Loaded quizzes:", data);
-      setQuizzes(data);
-    } catch (err) {
-      console.error("❌ Error loading quizzes:", err);
-      setError("Error loading quizzes from backend.");
-    }
-  };
+    const fetchQuizzes = async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/quizzes-reading`);
+        if (!res.ok) throw new Error("Failed to load quizzes");
 
-  fetchQuizzes();
-}, []);
+        const data = await res.json();
+        console.log("📦 Loaded quizzes:", data);
+        setQuizzes(data);
+
+      } catch (err) {
+        console.error("❌ Error loading quizzes:", err);
+        setError("Error loading quizzes from backend.");
+      }
+    };
+
+    fetchQuizzes();
+  }, []);
+
   // ---------------------------
-  // GENERATE EXAM (DEBUG LOGS)
+  // GENERATE EXAM
   // ---------------------------
   const handleGenerateExam = async () => {
-    console.log("\n==========================");
-    console.log("▶️ GENERATE EXAM CLICKED");
-    console.log("==========================");
-
-    console.log("🔍 selectedQuiz Raw:", selectedQuiz);
-    console.log("🔍 typeof selectedQuiz:", typeof selectedQuiz);
-
-    if (!selectedQuiz || selectedQuiz === "0") {
-      alert("Please select a quiz before generating the exam.");
-      console.log("⚠️ BLOCKED: selectedQuiz is invalid");
+    if (!selectedConfigId) {
+      alert("Please select a quiz configuration.");
       return;
     }
 
-    const quizId = Number(selectedQuiz);
-
-    console.log("🔢 Converted quizId (Number):", quizId);
-    console.log("🔍 typeof quizId:", typeof quizId);
-
-    if (isNaN(quizId)) {
-      console.error("❌ quizId is NaN! Aborting.");
-      alert("Internal error: quizId is NaN");
-      return;
-    }
-
-    const url = `${BACKEND_URL}/api/exams/generate/${quizId}`;
-    console.log("🌍 FINAL REQUEST URL:", url);
+    const url = `${BACKEND_URL}/api/exams/generate/${selectedConfigId}`;
+    console.log("🌍 POST →", url);
 
     setLoading(true);
     setError("");
@@ -89,23 +73,15 @@ export default function GenerateExam_reading() {
     try {
       const res = await fetch(url, { method: "POST" });
 
-      console.log("📡 Backend response status:", res.status);
-
-      let data;
-      try {
-        data = await res.json();
-        console.log("📦 Response JSON:", data);
-      } catch (parseErr) {
-        console.error("❌ Failed to parse JSON:", parseErr);
-      }
+      const data = await res.json();
+      console.log("📦 Response JSON:", data);
 
       if (!res.ok) {
-        console.error("❌ Backend returned error:", data);
         throw new Error(data?.detail || "Exam generation failed");
       }
 
-      console.log("✅ Exam generated successfully:", data);
       setGeneratedExam(data);
+      alert("Exam generated successfully!");
 
     } catch (err) {
       console.error("❌ Error generating exam:", err);
@@ -125,11 +101,8 @@ export default function GenerateExam_reading() {
         <label style={{ marginRight: "10px" }}>Select Quiz:</label>
 
         <select
-          value={selectedQuiz}
-          onChange={(e) => {
-            console.log("🟦 onChange → new value:", e.target.value);
-            setSelectedQuiz(e.target.value);
-          }}
+          value={selectedConfigId}
+          onChange={(e) => setSelectedConfigId(e.target.value)}
           style={{ padding: "6px", minWidth: "280px" }}
         >
           <option value="">-- Select Quiz Requirement --</option>
@@ -160,12 +133,13 @@ export default function GenerateExam_reading() {
         <div style={{ marginTop: "30px" }}>
           <h3>Generated Exam Preview</h3>
 
-          <p><strong>Exam ID:</strong> {generatedExam.exam_id}</p>
-          <p><strong>Quiz ID:</strong> {generatedExam.quiz_id}</p>
+          <p><strong>Generated Exam ID:</strong> {generatedExam.generated_exam_id}</p>
+          <p><strong>Config ID:</strong> {generatedExam.config_id}</p>
+          <p><strong>Total Questions:</strong> {generatedExam.total_questions}</p>
 
-          {generatedExam.questions?.length > 0 ? (
+          {generatedExam.exam_json?.questions?.length > 0 ? (
             <div style={{ marginTop: "20px" }}>
-              {generatedExam.questions.map((q) => (
+              {generatedExam.exam_json.questions.map((q) => (
                 <div
                   key={q.question_number}
                   style={{
