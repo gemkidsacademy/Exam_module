@@ -14,7 +14,7 @@ import QuizSetup_foundational from "./QuizSetup_foundational";
 import QuizSetup_reading from "./QuizSetup_reading";
 import QuizSetup_writing from "./QuizSetup_writing";
 import ExamTypeSelector from "./ExamTypeSelector";
-
+import ExamTypeSelector_generate_exam from "./ExamTypeSelector_generate_exam";
 
 
 
