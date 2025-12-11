@@ -6,6 +6,9 @@ export default function GenerateExam_reading() {
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
+  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedDifficulty, setSelectedDifficulty] = useState("");
+
 
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
