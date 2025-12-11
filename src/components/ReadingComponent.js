@@ -28,20 +28,18 @@ const quiz40 = [
   // Lord of the Flies (17–26)
   { question: "Which extract describes how characterisation drives plot movement?", correct: "B" },
   { question: "Which extract includes commentary from a secondary source close to the author?", correct: "D" },
-  { question: "Which extract employs a third-person omniscient narrator to portray the character’s experience?", correct: "A" },
-  { question: "Which extract suggests that a prop in the story brings people to a more advanced stage of civilisation?", correct: "C" },
+  { question: "Which extract employs a third-person omniscient narrator?", correct: "A" },
+  { question: "Which extract suggests that a prop brings civilisation?", correct: "C" },
   { question: "Which extract mentions the arrival of an unexpected character?", correct: "A" },
-  { question: "Which extract suggests that William Golding did not jump to conclusions?", correct: "D" },
-  { question: "Which extract comments on the psychology of the narrative’s stereotyped adversary?", correct: "B" },
-  { question: "Which extract gives key examples of how a motif is used in a narrative?", correct: "C" },
-  { question: "Which extract suggests that one’s birth position dictates fate?", correct: "B" },
+  { question: "Which extract suggests that Golding did not jump to conclusions?", correct: "D" },
+  { question: "Which extract comments on the psychology of the adversary?", correct: "B" },
+  { question: "Which extract gives examples of how a motif is used?", correct: "C" },
+  { question: "Which extract suggests one’s birth position dictates fate?", correct: "B" },
   { question: "Which extract discusses a character returning to primitive cruelty?", correct: "B" },
 
   // Gift Wrapping (27–31)
   { question: "Paragraph 1 – Which option summarises the paragraph?", correct: "E" },
   { question: "Paragraph 2 – Which option summarises the paragraph?", correct: "A" },
-
-   
   { question: "Paragraph 3 – Which option summarises the paragraph?", correct: "G" },
   { question: "Paragraph 4 – Which option summarises the paragraph?", correct: "C" },
   { question: "Paragraph 5 – Which option summarises the paragraph?", correct: "D" },
@@ -67,123 +65,18 @@ const quiz40 = [
 ];
 
 /* -------------------------------------------------------
-   PASSAGES + EXTRACTS
+   PASSAGES + EXTRACTS WITH QUESTION RANGES
 ---------------------------------------------------------*/
 const readingSets = [
-  {
-    id: "money",
-    title: "Money as Currency",
-    instruction:
-      "Read the four extracts on the topic of Money as Currency. For each question, choose A, B, C, or D.",
-    questionStart: 0,
-    questionEnd: 9,
-    type: "extracts",
-    extracts: {
-      A: "Sometimes you come across a grimy, tattered dollar bill ... FULL TEXT HERE",
-      B: "There are many theories about how money emerged ... FULL TEXT HERE",
-      C: "Money has been part of human history for at least 3,000 years ... FULL TEXT HERE",
-      D: "The first official Australian banknotes were produced ... FULL TEXT HERE"
-    }
-  },
-
-  {
-    id: "birds",
-    title: "Birds – Paragraph Summaries",
-    instruction:
-      "Read the text about birds. For each paragraph, choose the option (A–G) which best summarises it.",
-    questionStart: 10,
-    questionEnd: 15,
-    type: "passage",
-    passage: `
-Paragraph 1:
-Birds live in almost every part of the world. Many species migrate long distances each year...
-
-Paragraph 2:
-Scientists believe that modern birds evolved from reptiles millions of years ago...
-
-Paragraph 3:
-Young birds have feathers that differ in colour and pattern, helping protect them...
-
-Paragraph 4:
-Some birds fly exceptionally well while others cannot fly at all...
-
-Paragraph 5:
-Birds have extraordinary eyesight, much sharper than humans...
-
-Paragraph 6:
-Bird species follow breeding cycles that involve nesting, egg-laying, and caring for young...
-`
-  },
-
-  {
-    id: "lotf",
-    title: "Lord of the Flies – Comparative Analysis",
-    instruction:
-      "Read the four extracts related to Lord of the Flies. For each question, choose A, B, C, or D.",
-    questionStart: 16,
-    questionEnd: 25,
-    type: "extracts",
-    extracts: {
-      A: "FULL TEXT FOR Extract A",
-      B: "FULL TEXT FOR Extract B",
-      C: "FULL TEXT FOR Extract C",
-      D: "FULL TEXT FOR Extract D"
-    }
-  },
-
-  {
-    id: "gift",
-    title: "Does Gift Wrapping Matter?",
-    instruction:
-      "Read the text about gift wrapping. For each paragraph question, choose the option (A–G) which best summarises it.",
-    questionStart: 26,
-    questionEnd: 30,
-    type: "passage",
-    passage: `
-Paragraph 1 ... FULL TEXT
-Paragraph 2 ... FULL TEXT
-Paragraph 3 ... FULL TEXT
-Paragraph 4 ... FULL TEXT
-Paragraph 5 ... FULL TEXT
-`
-  },
-
-  {
-    id: "antarctica",
-    title: "Antarctica – Paragraph Summaries",
-    instruction:
-      "Read the text about Antarctica. For each paragraph, choose the option (A–G) which best summarises it.",
-    questionStart: 31,
-    questionEnd: 36,
-    type: "passage",
-    passage: `
-Paragraph 1 ... FULL TEXT
-Paragraph 2 ... FULL TEXT
-Paragraph 3 ... FULL TEXT
-Paragraph 4 ... FULL TEXT
-Paragraph 5 ... FULL TEXT
-Paragraph 6 ... FULL TEXT
-`
-  },
-
-  {
-    id: "memory",
-    title: "Memory – Different Types and Theories",
-    instruction:
-      "Read the four extracts on the topic of memory. For each question, choose A, B, C, or D.",
-    questionStart: 37,
-    questionEnd: 45,
-    type: "extracts",
-    extracts: {
-      A: "FULL TEXT MEMORY A",
-      B: "FULL TEXT MEMORY B",
-      C: "FULL TEXT MEMORY C",
-      D: "FULL TEXT MEMORY D"
-    }
-  }
+  { id: "money", title: "Money as Currency", instruction: "Read the four extracts...", questionStart: 0, questionEnd: 9, type: "extracts" },
+  { id: "birds", title: "Birds – Paragraph Summaries", instruction: "Read the text about birds...", questionStart: 10, questionEnd: 15, type: "passage" },
+  { id: "lotf", title: "Lord of the Flies – Comparative Analysis", instruction: "Read the extracts...", questionStart: 16, questionEnd: 25, type: "extracts" },
+  { id: "gift", title: "Does Gift Wrapping Matter?", instruction: "Read the text...", questionStart: 26, questionEnd: 30, type: "passage" },
+  { id: "antarctica", title: "Antarctica – Paragraph Summaries", instruction: "Read the text...", questionStart: 31, questionEnd: 36, type: "passage" },
+  { id: "memory", title: "Memory – Types and Theories", instruction: "Read the extracts...", questionStart: 37, questionEnd: 45, type: "extracts" }
 ];
 
-/* Helper to find extract group */
+/* Helper to find which reading block a question belongs to */
 function getReadingSetForQuestion(qIndex) {
   return readingSets.find(
     (set) => qIndex >= set.questionStart && qIndex <= set.questionEnd
@@ -196,7 +89,7 @@ function getReadingSetForQuestion(qIndex) {
 export default function ReadingComponent() {
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [visited, setVisited] = useState({});       // ✅ NEW
+  const [visited, setVisited] = useState({});
   const [finished, setFinished] = useState(false);
 
   const currentSet = getReadingSetForQuestion(index);
@@ -206,18 +99,15 @@ export default function ReadingComponent() {
     setAnswers((prev) => ({ ...prev, [index]: choice }));
   };
 
+  const goTo = (i) => {
+    setVisited((prev) => ({ ...prev, [i]: true }));
+    setIndex(i);
+  };
+
   const score = quiz40.reduce(
     (acc, q, i) => acc + (answers[i] === q.correct ? 1 : 0),
     0
   );
-
-  // ---------------------------------------------------
-  // When the student navigates, mark the question visited
-  // ---------------------------------------------------
-  const goToQuestion = (i) => {
-    setVisited((prev) => ({ ...prev, [i]: true }));
-    setIndex(i);
-  };
 
   if (finished) {
     return (
@@ -228,63 +118,72 @@ export default function ReadingComponent() {
     );
   }
 
+  /* -------------------------------------------------------
+     GROUPED QUESTION INDEX
+  ---------------------------------------------------------*/
+  const renderGroupedIndex = () => {
+    return (
+      <div className="index-groups">
+        {readingSets.map((set, sIndex) => (
+          <div key={set.id} className="index-group">
+            <div className="index-group-title">{set.title}</div>
+
+            <div className="index-group-questions">
+              {Array.from(
+                { length: set.questionEnd - set.questionStart + 1 },
+                (_, i) => {
+                  const qIndex = set.questionStart + i;
+                  const cls =
+                    answers[qIndex] ? "index-answered"
+                    : visited[qIndex] ? "index-seen"
+                    : "";
+
+                  return (
+                    <div
+                      key={qIndex}
+                      className={`index-circle ${cls}`}
+                      onClick={() => goTo(qIndex)}
+                    >
+                      {qIndex + 1}
+                    </div>
+                  );
+                }
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  /* -------------------------------------------------------
+     MAIN COMPONENT LAYOUT
+  ---------------------------------------------------------*/
   return (
     <div className="exam-container">
-      
+
       {/* HEADER */}
       <div className="exam-header">
         <div>{currentSet?.title || "Reading Exam"}</div>
-        <div className="counter">Question {index + 1} / {quiz40.length}</div>
+        <div className="counter">
+          Question {index + 1} / {quiz40.length}
+        </div>
       </div>
 
-      {/* INDEX BAR */}
-      <div className="index-row">
-        {quiz40.map((_, i) => {
-          const cls =
-            answers[i] ? "index-answered"
-            : visited[i] ? "index-seen"
-            : "";
-
-          return (
-            <div
-              key={i}
-              className={`index-circle ${cls}`}
-              onClick={() => goToQuestion(i)}
-            >
-              {i + 1}
-            </div>
-          );
-        })}
-      </div>
+      {/* GROUPED QUESTION INDEX */}
+      {renderGroupedIndex()}
 
       {/* TWO-PANE LAYOUT */}
       <div className="exam-body">
 
-        {/* LEFT: PASSAGES */}
+        {/* LEFT PANE – Reading Material */}
         <div className="passage-pane">
-          {currentSet && (
-            <>
-              <h3 className="passage-title">{currentSet.title}</h3>
-              <p className="passage-instruction">{currentSet.instruction}</p>
-
-              {currentSet.type === "extracts" &&
-                Object.entries(currentSet.extracts).map(([label, text]) => (
-                  <div className="extract-block" key={label}>
-                    <h4>Extract {label}</h4>
-                    <p className="passage-text">{text}</p>
-                  </div>
-                ))}
-
-              {currentSet.type === "passage" && (
-                <div className="extract-block">
-                  <p className="passage-text">{currentSet.passage}</p>
-                </div>
-              )}
-            </>
-          )}
+          <h3>{currentSet.title}</h3>
+          <p className="passage-instruction">{currentSet.instruction}</p>
+          <p className="passage-text">[INSERT READING MATERIAL HERE]</p>
         </div>
 
-        {/* RIGHT: QUESTION */}
+        {/* RIGHT PANE – Question */}
         <div className="question-pane">
           <div className="question-card">
             <p className="question-text">{currentQuestion.question}</p>
@@ -292,9 +191,7 @@ export default function ReadingComponent() {
             {["A", "B", "C", "D"].map((opt) => (
               <button
                 key={opt}
-                className={`option-btn ${
-                  answers[index] === opt ? "selected" : ""
-                }`}
+                className={`option-btn ${answers[index] === opt ? "selected" : ""}`}
                 onClick={() => handleSelect(opt)}
               >
                 {opt}
@@ -302,21 +199,18 @@ export default function ReadingComponent() {
             ))}
           </div>
 
-          {/* NAV */}
+          {/* NAVIGATION */}
           <div className="nav-buttons">
             <button
               className="nav-btn prev"
               disabled={index === 0}
-              onClick={() => goToQuestion(index - 1)}
+              onClick={() => goTo(index - 1)}
             >
               Previous
             </button>
 
             {index < quiz40.length - 1 ? (
-              <button
-                className="nav-btn next"
-                onClick={() => goToQuestion(index + 1)}
-              >
+              <button className="nav-btn next" onClick={() => goTo(index + 1)}>
                 Next
               </button>
             ) : (
