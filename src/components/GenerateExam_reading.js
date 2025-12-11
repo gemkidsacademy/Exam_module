@@ -58,38 +58,31 @@ export default function GenerateExam_reading() {
   // GENERATE EXAM (NO CONFIG ID)
   // ---------------------------
   const handleGenerateExam = async () => {
-    if (!selectedQuiz) {
-      alert("Please select a quiz.");
-      return;
-    }
+  if (!selectedClass || !selectedDifficulty) {
+    alert("Please select class and difficulty");
+    return;
+  }
 
-    console.log("🚀 Generating exam with:", selectedQuiz);
-
-    try {
-      setLoading(true);
-      setGeneratedExam(null);
-
-      const res = await fetch(`${BACKEND_URL}/api/exams/generate-reading`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(selectedQuiz),
-      });
-
-      const data = await res.json();
-      console.log("📨 Response received:", data);
-
-      if (!res.ok) throw new Error(data.detail || "Generation failed");
-
-      setGeneratedExam(data);
-      alert("Exam generated successfully!");
-
-    } catch (err) {
-      console.error("❌ Exam generation error:", err);
-      setError("Failed to generate exam.");
-    }
-
-    setLoading(false);
+  const payload = {
+    class_name: selectedClass,
+    difficulty: selectedDifficulty
   };
+
+  console.log("📤 Sending payload:", payload);
+
+  const res = await fetch(`${BACKEND_URL}/api/exams/generate-reading`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  console.log("📡 Status:", res.status);
+
+  const data = await res.json();
+  console.log("📥 Response JSON:", data);
+};
 
   return (
     <div style={{ padding: "20px" }}>
