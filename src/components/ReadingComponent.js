@@ -10,6 +10,8 @@ export default function ReadingExam() {
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
   const [finished, setFinished] = useState(false);
+  const [answerOptions, setAnswerOptions] = useState({});
+
 
   const [timeLeft, setTimeLeft] = useState(null);
 
@@ -29,6 +31,7 @@ export default function ReadingExam() {
         setExam(data.exam_json);
         setQuestions(data.exam_json.questions);
         setPassages(data.exam_json.reading_material);
+        setAnswerOptions(data.exam_json.answer_options || {});  // ← NEW
 
         const timerSeconds = (data.duration_minutes || 40) * 60;
         setTimeLeft(timerSeconds);
@@ -151,11 +154,7 @@ export default function ReadingExam() {
      - If Paragraphs → use A–G
   ---------------------------------------------------------*/
 
-  let answerOptions = ["A", "B", "C", "D"]; // default for extracts
-
-  if (currentTopic === "Main Idea and Summary") {
-    answerOptions = ["A", "B", "C", "D", "E", "F", "G"];
-  }
+  
 
   /* -------------------------------------------------------
      MAIN UI
@@ -201,17 +200,16 @@ export default function ReadingExam() {
             </p>
 
             {/* DYNAMIC ANSWER BUTTONS (NO eslint errors) */}
-            {answerOptions.map((letter) => (
+            {Object.entries(answerOptions).map(([letter, text]) => (
               <button
                 key={letter}
-                className={`option-btn ${
-                  answers[index] === letter ? "selected" : ""
-                }`}
+                className={`option-btn ${answers[index] === letter ? "selected" : ""}`}
                 onClick={() => handleSelect(letter)}
               >
-                {letter}
+                {letter}. {text}
               </button>
             ))}
+
           </div>
 
           {/* NAV */}
