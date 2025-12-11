@@ -32,16 +32,25 @@ export default function GenerateExam_reading() {
     }
   };
 
-  // ✅ FIXED — Correct API endpoint for loading quizzes
+  // ---------------------------
+  // LOAD QUIZZES (DEBUG LOGS)
+  // ---------------------------
   useEffect(() => {
     const fetchQuizzes = async () => {
+      console.log("📥 Fetching quizzes from:", `${BACKEND_URL}/api/quizzes-reading`);
+
       try {
         const res = await fetch(`${BACKEND_URL}/api/quizzes-reading`);
+        console.log("📡 Response status:", res.status);
+
         if (!res.ok) throw new Error("Failed to load quizzes");
+
         const data = await res.json();
+        console.log("📦 Loaded quizzes:", data);
+
         setQuizzes(data);
       } catch (err) {
-        console.error(err);
+        console.error("❌ Error loading quizzes:", err);
         setError("Error loading quizzes from backend.");
       }
     };
@@ -49,34 +58,64 @@ export default function GenerateExam_reading() {
     fetchQuizzes();
   }, []);
 
+  // ---------------------------
+  // GENERATE EXAM (DEBUG LOGS)
+  // ---------------------------
   const handleGenerateExam = async () => {
-    if (!selectedQuiz) {
+    console.log("\n==========================");
+    console.log("▶️ GENERATE EXAM CLICKED");
+    console.log("==========================");
+
+    console.log("🔍 selectedQuiz Raw:", selectedQuiz);
+    console.log("🔍 typeof selectedQuiz:", typeof selectedQuiz);
+
+    if (!selectedQuiz || selectedQuiz === "0") {
       alert("Please select a quiz before generating the exam.");
+      console.log("⚠️ BLOCKED: selectedQuiz is invalid");
       return;
     }
+
+    const quizId = Number(selectedQuiz);
+
+    console.log("🔢 Converted quizId (Number):", quizId);
+    console.log("🔍 typeof quizId:", typeof quizId);
+
+    if (isNaN(quizId)) {
+      console.error("❌ quizId is NaN! Aborting.");
+      alert("Internal error: quizId is NaN");
+      return;
+    }
+
+    const url = `${BACKEND_URL}/api/exams/generate/${quizId}`;
+    console.log("🌍 FINAL REQUEST URL:", url);
 
     setLoading(true);
     setError("");
     setGeneratedExam(null);
 
     try {
-      // ✅ selectedQuiz is string → convert properly
-      const res = await fetch(
-        `${BACKEND_URL}/api/exams/generate/${Number(selectedQuiz)}`,
-        { method: "POST" }
-      );
+      const res = await fetch(url, { method: "POST" });
 
-      const data = await res.json();
+      console.log("📡 Backend response status:", res.status);
 
-      if (!res.ok) {
-        throw new Error(data.detail || "Exam generation failed");
+      let data;
+      try {
+        data = await res.json();
+        console.log("📦 Response JSON:", data);
+      } catch (parseErr) {
+        console.error("❌ Failed to parse JSON:", parseErr);
       }
 
+      if (!res.ok) {
+        console.error("❌ Backend returned error:", data);
+        throw new Error(data?.detail || "Exam generation failed");
+      }
+
+      console.log("✅ Exam generated successfully:", data);
       setGeneratedExam(data);
-      alert("Exam generated successfully!");
 
     } catch (err) {
-      console.error(err);
+      console.error("❌ Error generating exam:", err);
       setError("Failed to generate exam. Check console for details.");
     }
 
@@ -94,7 +133,10 @@ export default function GenerateExam_reading() {
 
         <select
           value={selectedQuiz}
-          onChange={(e) => setSelectedQuiz(e.target.value)}
+          onChange={(e) => {
+            console.log("🟦 onChange → new value:", e.target.value);
+            setSelectedQuiz(e.target.value);
+          }}
           style={{ padding: "6px", minWidth: "280px" }}
         >
           <option value="">-- Select Quiz Requirement --</option>
