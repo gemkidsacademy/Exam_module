@@ -210,9 +210,13 @@ const AdminPanel = () => {
 
         {activeTab === "generate-exam" && (
           <div className="tab-panel">
-            <ExamTypeSelector_generate_exam />   {/* ⬅️ NEW COMPONENT RENDERED HERE */}
+            <ExamTypeSelector_generate_exam
+              examType={examType}
+              onSelect={(value) => setExamType(value)}
+            />
           </div>
         )}
+
       </div>
     </div>
   );
