@@ -95,7 +95,7 @@ export default function QuizSetup_reading() {
     try {
       setLoading(true);
 
-      const response = await fetch("/api/admin/create-reading-config", {
+      const response = await fetch("https://web-production-481a5.up.railway.app/api/admin/create-reading-config", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
