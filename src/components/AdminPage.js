@@ -153,7 +153,7 @@ const AdminPanel = () => {
                     }}
                   >
                     {[
-                      { label: "Selective Exam", value: "selective" },
+                      { label: "Thinking Skills Exam", value: "selective" },
                       { label: "Foundational Exam", value: "foundational" },
                       { label: "Reading Exam", value: "reading" },
                       { label: "Writing Exam", value: "writing" },
