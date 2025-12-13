@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "./QuizSetup_writing.css";
 
+const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+
 export default function QuizSetup_writing() {
   const [form, setForm] = useState({
     className: "",
@@ -9,12 +11,14 @@ export default function QuizSetup_writing() {
     difficulty: ""
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!form.className || !form.topic || !form.difficulty) {
@@ -24,13 +28,43 @@ export default function QuizSetup_writing() {
 
     const payload = {
       class_name: form.className,
-      subject: "writing",
-      topic: form.topic,
+      subject: "Writing",
+      topic: form.topic.trim(),
       difficulty: form.difficulty
     };
 
-    console.log("Writing exam setup:", payload);
-    alert("Writing exam metadata saved (mock). Backend integration coming later.");
+    try {
+      setLoading(true);
+
+      const res = await fetch(
+        `${BACKEND_URL}/api/quizzes-writing`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.detail || "Failed to save writing exam");
+      }
+
+      alert("✅ Writing exam setup saved successfully!");
+
+      setForm({
+        className: "",
+        subject: "writing",
+        topic: "",
+        difficulty: ""
+      });
+    } catch (err) {
+      console.error(err);
+      alert("❌ Error saving writing exam setup.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -86,7 +120,9 @@ export default function QuizSetup_writing() {
         </select>
 
         {/* SUBMIT */}
-        <button type="submit">Save Writing Exam</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Saving..." : "Save Writing Exam"}
+        </button>
       </form>
     </div>
   );
