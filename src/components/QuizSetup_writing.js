@@ -6,7 +6,6 @@ const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 export default function QuizSetup_writing() {
   const [form, setForm] = useState({
     className: "",
-    subject: "writing",
     topic: "",
     difficulty: ""
   });
@@ -15,13 +14,16 @@ export default function QuizSetup_writing() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.className || !form.topic || !form.difficulty) {
+    if (!form.className || !form.topic.trim() || !form.difficulty) {
       alert("Please fill in all required fields.");
       return;
     }
@@ -29,7 +31,7 @@ export default function QuizSetup_writing() {
     const payload = {
       class_name: form.className,
       subject: "Writing",
-      topic: form.topic.trim(),
+      topic: form.topic.trim(),   // fully editable text
       difficulty: form.difficulty
     };
 
@@ -55,7 +57,6 @@ export default function QuizSetup_writing() {
 
       setForm({
         className: "",
-        subject: "writing",
         topic: "",
         difficulty: ""
       });
@@ -85,23 +86,23 @@ export default function QuizSetup_writing() {
           <option value="year6">Year 6</option>
         </select>
 
-        {/* SUBJECT */}
+        {/* SUBJECT (LOCKED) */}
         <label>Subject:</label>
         <input
           type="text"
           value="Writing"
           readOnly
-          style={{ background: "#eee" }}
+          style={{ backgroundColor: "#f0f0f0" }}
         />
 
-        {/* TOPIC */}
+        {/* TOPIC (FULLY EDITABLE) */}
         <label>Topic:</label>
         <input
           type="text"
           name="topic"
           value={form.topic}
           onChange={handleChange}
-          placeholder="Narrative / Persuasive / Descriptive"
+          placeholder="e.g. Narrative, Persuasive, Descriptive, Argumentative"
           required
         />
 
