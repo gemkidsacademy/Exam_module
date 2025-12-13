@@ -1,6 +1,8 @@
 import React from "react";
 import GenerateExam from "./GenerateExam"; 
 import GenerateExam_reading from "./GenerateExam_reading"; 
+import GenerateExam_foundational from "./GenerateExam_foundational"; 
+
 
 
 export default function ExamTypeSelector_generate_exam({ examType, onSelect }) {
@@ -14,6 +16,9 @@ export default function ExamTypeSelector_generate_exam({ examType, onSelect }) {
   // → If Thinking Skills selected → render UploadWord
   if (examType === "thinkingskills") {
     return <GenerateExam />;
+  }
+   if (examType === "foundational") {
+    return <GenerateExam_foundational />;
   }
 
   // → If Reading selected → render UploadWord_reading
