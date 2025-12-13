@@ -55,8 +55,8 @@ export default function ReadingComponent({ studentId }) {
 
         // Backend timer calculation
         const duration = (data.duration_minutes || 40) * 60;
-        const start = new Date(data.start_time).getTime();
-        const serverNow = new Date(data.server_now).getTime();
+        const start = new Date(data.start_time + "Z").getTime();
+        const serverNow = new Date(data.server_now + "Z").getTime();
         const elapsed = Math.floor((serverNow - start) / 1000);
 
         const remaining = duration - elapsed;
