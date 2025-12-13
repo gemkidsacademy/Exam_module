@@ -1,52 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AdminPanel.css";
 
+// User management
 import AddUserForm from "./AddUserForm";
 import EditUserForm from "./EditUserForm";
 import ViewUserModal from "./ViewUserModal";
 import DeleteUserForm from "./DeleteUserForm";
+
+// Quiz creation
 import QuizSetup from "./QuizSetup";
-import UploadWord from "./UploadWord";
-import GenerateExam from "./GenerateExam";   // ⬅️ NEW COMPONENT IMPORT
-import UploadImageFolder from "./UploadImageFolder";
 import QuizSetup_foundational from "./QuizSetup_foundational";
 import QuizSetup_reading from "./QuizSetup_reading";
 import QuizSetup_writing from "./QuizSetup_writing";
+
+// Uploads
+import UploadWord from "./UploadWord";
+import UploadImageFolder from "./UploadImageFolder";
+
+// Generate exams
+import GenerateExam from "./GenerateExam";
+import GenerateExam_reading from "./GenerateExam_reading";
+import GenerateExam_foundational from "./GenerateExam_foundational";
 import ExamTypeSelector from "./ExamTypeSelector";
 import ExamTypeSelector_generate_exam from "./ExamTypeSelector_generate_exam";
 
-
-
-
 const AdminPanel = () => {
-  const [activeTab, setActiveTab] = useState("database");
   const navigate = useNavigate();
 
+  // ---------------------------
+  // Tabs
+  // ---------------------------
+  const [activeTab, setActiveTab] = useState("database");
+
+  // ---------------------------
+  // Modal States
+  // ---------------------------
   const [showAddUser, setShowAddUser] = useState(false);
   const [showEditUser, setShowEditUser] = useState(false);
   const [showViewUser, setShowViewUser] = useState(false);
   const [showDeleteUser, setShowDeleteUser] = useState(false);
-  const [examType, setExamType] = useState(null);
 
-  // Reset exam selection whenever user switches away from Add Quiz tab
-  React.useEffect(() => {
+  // ---------------------------
+  // Exam Type States (IMPORTANT FIX)
+  // ---------------------------
+  const [createExamType, setCreateExamType] = useState(null);
+  const [generateExamType, setGenerateExamType] = useState(null);
+
+  // ---------------------------
+  // Reset states on tab switch
+  // ---------------------------
+  useEffect(() => {
     if (activeTab !== "add-quiz") {
-      setExamType(null);
+      setCreateExamType(null);
+    }
+    if (activeTab !== "generate-exam") {
+      setGenerateExamType(null);
     }
   }, [activeTab]);
 
-
-
+  // ---------------------------
+  // Tabs Config
+  // ---------------------------
   const tabs = [
     { id: "database", label: "Exam Module User Management" },
     { id: "exam-type-selector", label: "Upload Questions Word Document" },
-    { id: "upload-image-folder", label: "Upload Exam Image Folder" }, 
+    { id: "upload-image-folder", label: "Upload Exam Image Folder" },
     { id: "add-quiz", label: "Create Exam" },
     { id: "generate-exam", label: "Generate Exam" },
   ];
 
-
+  // ---------------------------
+  // User Callbacks
+  // ---------------------------
   const handleUserUpdated = () => {
     setShowEditUser(false);
     alert("User updated successfully!");
@@ -61,17 +87,14 @@ const AdminPanel = () => {
     console.log("User deleted successfully");
   };
 
-  // Toggle functions
-  const toggleAddUser = () => setShowAddUser((prev) => !prev);
-  const toggleEditUser = () => setShowEditUser((prev) => !prev);
-  const toggleViewUser = () => setShowViewUser((prev) => !prev);
-  const toggleDeleteUser = () => setShowDeleteUser((prev) => !prev);
-
+  // ---------------------------
+  // UI
+  // ---------------------------
   return (
     <div className="dashboard-container">
       <h1 className="dashboard-title">Admin Dashboard</h1>
 
-      {/* Tab Navigation */}
+      {/* ---------- Tabs ---------- */}
       <div className="tab-nav">
         {tabs.map((tab) => (
           <div
@@ -84,135 +107,112 @@ const AdminPanel = () => {
         ))}
       </div>
 
-      {/* Tab Content */}
+      {/* ---------- Tab Content ---------- */}
       <div className="tab-content">
+
+        {/* ===== USER MANAGEMENT ===== */}
         {activeTab === "database" && (
-          
           <div className="tab-panel">
-            <div>
-              <button className="dashboard-button" onClick={toggleAddUser}>
-                Add User
-              </button>
-              {showAddUser && (
-                <AddUserForm
-                  onClose={() => setShowAddUser(false)}
-                  onUserAdded={handleUserAdded}
-                />
-              )}
-            </div>
+            <button className="dashboard-button" onClick={() => setShowAddUser(true)}>
+              Add User
+            </button>
+            {showAddUser && (
+              <AddUserForm
+                onClose={() => setShowAddUser(false)}
+                onUserAdded={handleUserAdded}
+              />
+            )}
 
-            <div>
-              <button className="dashboard-button" onClick={toggleEditUser}>
-                Edit User
-              </button>
-              {showEditUser && (
-                <EditUserForm
-                  onClose={() => setShowEditUser(false)}
-                  onUserUpdated={handleUserUpdated}
-                />
-              )}
-            </div>
+            <button className="dashboard-button" onClick={() => setShowEditUser(true)}>
+              Edit User
+            </button>
+            {showEditUser && (
+              <EditUserForm
+                onClose={() => setShowEditUser(false)}
+                onUserUpdated={handleUserUpdated}
+              />
+            )}
 
-            <div>
-              <button className="dashboard-button" onClick={toggleViewUser}>
-                View User
-              </button>
-              {showViewUser && (
-                <ViewUserModal onClose={() => setShowViewUser(false)} />
-              )}
-            </div>
+            <button className="dashboard-button" onClick={() => setShowViewUser(true)}>
+              View User
+            </button>
+            {showViewUser && (
+              <ViewUserModal onClose={() => setShowViewUser(false)} />
+            )}
 
-            <div>
-              <button className="dashboard-button" onClick={toggleDeleteUser}>
-                Delete User
-              </button>
-              {showDeleteUser && (
-                <DeleteUserForm
-                  onClose={() => setShowDeleteUser(false)}
-                  onUserDeleted={handleUserDeleted}
-                />
-              )}
-            </div>
+            <button className="dashboard-button" onClick={() => setShowDeleteUser(true)}>
+              Delete User
+            </button>
+            {showDeleteUser && (
+              <DeleteUserForm
+                onClose={() => setShowDeleteUser(false)}
+                onUserDeleted={handleUserDeleted}
+              />
+            )}
           </div>
         )}
 
-        {activeTab === "add-quiz" && (
-            <div className="tab-panel" style={{ textAlign: "center", padding: "30px" }}>
-          
-              {/* STEP 1 — Show exam selection buttons */}
-              {!examType && (
-                <>
-                  
-          
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "15px",
-                      maxWidth: "320px",
-                      margin: "0 auto",
-                      width: "100%",
-                    }}
-                  >
-                    {[
-                      { label: "Thinking Skills Exam", value: "selective" },
-                      { label: "Foundational Exam", value: "foundational" },
-                      { label: "Reading Exam", value: "reading" },
-                      { label: "Writing Exam", value: "writing" },
-                    ].map((item) => (
-                      <button
-                        key={item.value}
-                        onClick={() => setExamType(item.value)}
-                        style={{
-                          padding: "12px 18px",
-                          borderRadius: "8px",
-                          border: "1px solid #ccc",
-                          fontSize: "16px",
-                          background: "#f8f9fa",
-                          cursor: "pointer",
-                          fontWeight: "500",
-                          transition: "0.2s",
-                        }}
-                        onMouseOver={(e) => (e.target.style.background = "#e6e6e6")}
-                        onMouseOut={(e) => (e.target.style.background = "#f8f9fa")}
-                      >
-                        {item.label}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-          
-              {/* STEP 2 — Render QuizSetup when Selective chosen */}
-              {examType === "selective" && <QuizSetup />}
-              {examType === "foundational" && <QuizSetup_foundational />}
-              {examType === "reading" && <QuizSetup_reading />}
-              {examType === "writing" && <QuizSetup_writing />}
+        {/* ===== UPLOAD WORD QUESTIONS ===== */}
+        {activeTab === "exam-type-selector" && (
+          <div className="tab-panel">
+            <ExamTypeSelector
+              examType={createExamType}
+              onSelect={setCreateExamType}
+            />
+          </div>
+        )}
 
-            </div>
-          )}
-
-
-
+        {/* ===== UPLOAD IMAGE FOLDER ===== */}
         {activeTab === "upload-image-folder" && (
           <div className="tab-panel">
             <UploadImageFolder />
           </div>
         )}
-        {activeTab === "exam-type-selector" && (
-          <div className="tab-panel">
-            <ExamTypeSelector 
-              examType={examType}
-              onSelect={(value) => setExamType(value)}
-            />
+
+        {/* ===== CREATE EXAM ===== */}
+        {activeTab === "add-quiz" && (
+          <div className="tab-panel" style={{ textAlign: "center", padding: "30px" }}>
+
+            {!createExamType && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "15px",
+                  maxWidth: "320px",
+                  margin: "0 auto",
+                }}
+              >
+                {[
+                  { label: "Thinking Skills Exam", value: "thinking_skills" },
+                  { label: "Foundational Exam", value: "foundational" },
+                  { label: "Reading Exam", value: "reading" },
+                  { label: "Writing Exam", value: "writing" },
+                ].map((item) => (
+                  <button
+                    key={item.value}
+                    onClick={() => setCreateExamType(item.value)}
+                    className="dashboard-button"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {createExamType === "thinking_skills" && <QuizSetup />}
+            {createExamType === "foundational" && <QuizSetup_foundational />}
+            {createExamType === "reading" && <QuizSetup_reading />}
+            {createExamType === "writing" && <QuizSetup_writing />}
           </div>
         )}
 
+        {/* ===== GENERATE EXAM ===== */}
         {activeTab === "generate-exam" && (
           <div className="tab-panel">
             <ExamTypeSelector_generate_exam
-              examType={examType}
-              onSelect={(value) => setExamType(value)}
+              examType={generateExamType}
+              onSelect={setGenerateExamType}
             />
           </div>
         )}
