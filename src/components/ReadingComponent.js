@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./ExamPage_reading.css";
 
-// 👇 Accept studentId as a prop
+// Accept studentId as a prop
 export default function ReadingComponent({ studentId }) {
   console.log("💥 USING NEW ReadingComponent");
 
@@ -21,12 +21,12 @@ export default function ReadingComponent({ studentId }) {
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
   /* -------------------------------------------------------
-     LOAD EXAM USING BACKEND CONTROLLED TIMER
+     LOAD EXAM (Backend-controlled timer)
   ---------------------------------------------------------*/
   useEffect(() => {
     const loadExam = async () => {
       if (!studentId) {
-        console.error("❌ No studentId provided to ReadingExam component");
+        console.error("❌ No studentId provided to ReadingComponent");
         return;
       }
 
@@ -39,22 +39,21 @@ export default function ReadingComponent({ studentId }) {
         const data = await res.json();
         console.log("🔥 Loaded reading exam:", data);
 
-        // Backend may return an error (403) for second attempt
+        // Handle second-attempt restriction
         if (data.detail) {
           alert(data.detail);
           setFinished(true);
           return;
         }
 
+        // Set exam data
         setSessionId(data.session_id);
         setExam(data.exam_json);
         setQuestions(data.exam_json.questions);
         setPassages(data.exam_json.reading_material);
         setAnswerOptions(data.exam_json.answer_options || {});
 
-        // -------------------------------
-        // Compute backend-controlled timer
-        // -------------------------------
+        // Backend timer calculation
         const duration = (data.duration_minutes || 40) * 60;
         const start = new Date(data.start_time).getTime();
         const serverNow = new Date(data.server_now).getTime();
@@ -72,7 +71,7 @@ export default function ReadingComponent({ studentId }) {
   }, [studentId]);
 
   /* -------------------------------------------------------
-     AUTO-SUBMIT WHEN TIME EXPIRES
+     AUTO-SUBMIT WHEN TIME ENDS
   ---------------------------------------------------------*/
   const autoSubmit = async () => {
     if (finished) return;
@@ -96,7 +95,7 @@ export default function ReadingComponent({ studentId }) {
   };
 
   /* -------------------------------------------------------
-     TIMER LOGIC
+     TIMER
   ---------------------------------------------------------*/
   useEffect(() => {
     if (timeLeft === null) return;
@@ -106,9 +105,11 @@ export default function ReadingComponent({ studentId }) {
       return;
     }
 
-    const interval = setInterval(() => setTimeLeft((t) => t - 1), 1000);
-    return () => clearInterval(interval);
+    const interval = setInterval(() => {
+      setTimeLeft((t) => t - 1);
+    }, 1000);
 
+    return () => clearInterval(interval);
   }, [timeLeft]);
 
   const formatTime = (sec) => {
@@ -118,7 +119,7 @@ export default function ReadingComponent({ studentId }) {
   };
 
   /* -------------------------------------------------------
-     QUESTION HANDLERS
+     QUESTION INTERACTION
   ---------------------------------------------------------*/
   const currentQuestion = questions[index];
 
@@ -170,7 +171,7 @@ export default function ReadingComponent({ studentId }) {
   const visiblePassages = topicPassageMap[currentTopic] || [];
 
   /* -------------------------------------------------------
-     INDEX PANEL
+     QUESTION INDEX PANEL
   ---------------------------------------------------------*/
   const grouped = questions.reduce((acc, q, idx) => {
     if (!acc[q.topic]) acc[q.topic] = [];
@@ -183,6 +184,7 @@ export default function ReadingComponent({ studentId }) {
       {Object.entries(grouped).map(([topic, qList]) => (
         <div key={topic} className="topic-group-box">
           <div className="topic-title">{topic}</div>
+
           <div className="topic-question-row">
             {qList.map(({ idx, number }) => {
               const cls =
@@ -231,6 +233,7 @@ export default function ReadingComponent({ studentId }) {
         {/* LEFT: PASSAGES */}
         <div className="passage-pane">
           <h3>Reading Materials</h3>
+
           {visiblePassages.map((label) => (
             <div key={label} className="passage-block">
               <h4>{label}</h4>
@@ -285,3 +288,4 @@ export default function ReadingComponent({ studentId }) {
     </div>
   );
 }
+
