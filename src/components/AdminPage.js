@@ -15,53 +15,55 @@ import QuizSetup_reading from "./QuizSetup_reading";
 import QuizSetup_writing from "./QuizSetup_writing";
 
 // Uploads
-import UploadWord from "./UploadWord";
 import UploadImageFolder from "./UploadImageFolder";
+import ExamTypeSelector from "./ExamTypeSelector";
 
 // Generate exams
-import GenerateExam from "./GenerateExam";
-import GenerateExam_reading from "./GenerateExam_reading";
-import GenerateExam_foundational from "./GenerateExam_foundational";
-import ExamTypeSelector from "./ExamTypeSelector";
 import ExamTypeSelector_generate_exam from "./ExamTypeSelector_generate_exam";
 
 const AdminPanel = () => {
   const navigate = useNavigate();
 
-  // ---------------------------
-  // Tabs
-  // ---------------------------
+  /* ---------------------------
+     Tabs
+  --------------------------- */
   const [activeTab, setActiveTab] = useState("database");
 
-  // ---------------------------
-  // Modal States
-  // ---------------------------
+  /* ---------------------------
+     Modal States
+  --------------------------- */
   const [showAddUser, setShowAddUser] = useState(false);
   const [showEditUser, setShowEditUser] = useState(false);
   const [showViewUser, setShowViewUser] = useState(false);
   const [showDeleteUser, setShowDeleteUser] = useState(false);
 
-  // ---------------------------
-  // Exam Type States (IMPORTANT FIX)
-  // ---------------------------
+  /* ---------------------------
+     Exam Type States
+  --------------------------- */
   const [createExamType, setCreateExamType] = useState(null);
   const [generateExamType, setGenerateExamType] = useState(null);
 
-  // ---------------------------
-  // Reset states on tab switch
-  // ---------------------------
+  /* ---------------------------
+     Reset states on tab switch
+     🔥 FIX IS HERE
+  --------------------------- */
   useEffect(() => {
-    if (activeTab !== "add-quiz") {
+    // createExamType is used in TWO tabs
+    if (
+      activeTab !== "add-quiz" &&
+      activeTab !== "exam-type-selector"
+    ) {
       setCreateExamType(null);
     }
+
     if (activeTab !== "generate-exam") {
       setGenerateExamType(null);
     }
   }, [activeTab]);
 
-  // ---------------------------
-  // Tabs Config
-  // ---------------------------
+  /* ---------------------------
+     Tabs Config
+  --------------------------- */
   const tabs = [
     { id: "database", label: "Exam Module User Management" },
     { id: "exam-type-selector", label: "Upload Questions Word Document" },
@@ -70,9 +72,9 @@ const AdminPanel = () => {
     { id: "generate-exam", label: "Generate Exam" },
   ];
 
-  // ---------------------------
-  // User Callbacks
-  // ---------------------------
+  /* ---------------------------
+     User Callbacks
+  --------------------------- */
   const handleUserUpdated = () => {
     setShowEditUser(false);
     alert("User updated successfully!");
@@ -87,9 +89,6 @@ const AdminPanel = () => {
     console.log("User deleted successfully");
   };
 
-  // ---------------------------
-  // UI
-  // ---------------------------
   return (
     <div className="dashboard-container">
       <h1 className="dashboard-title">Admin Dashboard</h1>
@@ -136,9 +135,7 @@ const AdminPanel = () => {
             <button className="dashboard-button" onClick={() => setShowViewUser(true)}>
               View User
             </button>
-            {showViewUser && (
-              <ViewUserModal onClose={() => setShowViewUser(false)} />
-            )}
+            {showViewUser && <ViewUserModal onClose={() => setShowViewUser(false)} />}
 
             <button className="dashboard-button" onClick={() => setShowDeleteUser(true)}>
               Delete User
