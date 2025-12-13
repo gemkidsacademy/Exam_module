@@ -113,7 +113,7 @@ export default function QuizSetup_foundational() {
 
     try {
       const res = await fetch(
-        "https://web-production-481a5.up.railway.app/api/quizzes",
+        "https://web-production-481a5.up.railway.app/api/quizzes-foundational",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
