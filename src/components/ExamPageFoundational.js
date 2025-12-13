@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./ExamPage.css";
 
 const BACKEND_URL = "https://web-production-481a5.up.railway.app";
@@ -17,6 +17,8 @@ export default function ExamPageFoundational() {
   const [completed, setCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const prevSectionRef = useRef(null);
+
   /* -----------------------------------------------------------
      LOAD EXAM STATE (AUTHORITATIVE)
   ----------------------------------------------------------- */
@@ -30,19 +32,38 @@ export default function ExamPageFoundational() {
     const data = await res.json();
 
     setExam(data.exam);
-    setCurrentSectionIndex(data.current_section_index);
     setTimeLeft(data.remaining_seconds);
-    setCurrentIndex(0);
-    setVisited({});
+
+    if (prevSectionRef.current !== data.current_section_index) {
+      setCurrentIndex(0);
+      setVisited({});
+    }
+
+    setCurrentSectionIndex(data.current_section_index);
+    prevSectionRef.current = data.current_section_index;
   };
 
+  /* -----------------------------------------------------------
+     INIT EXAM (START OR RESUME)
+  ----------------------------------------------------------- */
   useEffect(() => {
     const init = async () => {
       try {
+        const stateRes = await fetch(
+          `${BACKEND_URL}/api/exams/foundational/state?student_id=${STUDENT_ID}`
+        );
+
+        if (!stateRes.ok) {
+          await fetch(
+            `${BACKEND_URL}/api/exams/foundational/start?student_id=${STUDENT_ID}`,
+            { method: "POST" }
+          );
+        }
+
         await loadState();
       } catch (err) {
         console.error(err);
-        alert("Unable to load exam.");
+        alert("Unable to start or load exam.");
       } finally {
         setLoading(false);
       }
@@ -123,7 +144,7 @@ export default function ExamPageFoundational() {
     currentIndex > 0 && goToQuestion(currentIndex - 1);
 
   /* -----------------------------------------------------------
-     ANSWERS
+     ANSWERS (LOCAL FOR NOW)
   ----------------------------------------------------------- */
   const handleAnswer = (opt) => {
     setAnswers((a) => ({
@@ -165,8 +186,6 @@ export default function ExamPageFoundational() {
   ----------------------------------------------------------- */
   return (
     <div className="exam-container">
-
-      {/* HEADER */}
       <div className="exam-header">
         <h2>{section.name}</h2>
         <div className="timer">⏳ {formatTime(timeLeft)}</div>
@@ -175,7 +194,6 @@ export default function ExamPageFoundational() {
         </div>
       </div>
 
-      {/* INDEX */}
       <div className="index-row">
         {sectionQuestions.map((_, i) => (
           <div
@@ -188,7 +206,6 @@ export default function ExamPageFoundational() {
         ))}
       </div>
 
-      {/* QUESTION */}
       <div className="question-card">
         <p className="question-text">{currentQ.question_text}</p>
 
@@ -207,7 +224,6 @@ export default function ExamPageFoundational() {
         ))}
       </div>
 
-      {/* NAVIGATION */}
       <div className="nav-buttons">
         <button
           onClick={prevQuestion}
