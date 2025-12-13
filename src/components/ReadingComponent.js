@@ -13,28 +13,39 @@ export default function ReadingExam() {
   const [finished, setFinished] = useState(false);
 
   const [timeLeft, setTimeLeft] = useState(null);
+  const [sessionId, setSessionId] = useState(null);
 
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
   /* -------------------------------------------------------
-     LOAD LATEST EXAM
+     LOAD EXAM + BACKEND CONTROLLED TIMER
   ---------------------------------------------------------*/
   useEffect(() => {
     const loadExam = async () => {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/exams/latest-reading`);
+        const res = await fetch(
+          `${BACKEND_URL}/api/exams/start-reading?student_id=1`,
+          { method: "POST" }
+        );
         const data = await res.json();
 
-        console.log("🔥 Loaded exam:", data);
+        console.log("🔥 Loaded reading exam:", data);
 
+        // Main exam data
         setExam(data.exam_json);
         setQuestions(data.exam_json.questions);
         setPassages(data.exam_json.reading_material);
         setAnswerOptions(data.exam_json.answer_options || {});
+        setSessionId(data.session_id);
 
-        const timerSeconds = (data.duration_minutes || 40) * 60;
-        setTimeLeft(timerSeconds);
+        // Calculate backend timer
+        const duration = (data.duration_minutes || 40) * 60;
+        const start = new Date(data.start_time).getTime();
+        const serverNow = new Date(data.server_now).getTime();
+        const elapsed = Math.floor((serverNow - start) / 1000);
 
+        const remaining = duration - elapsed;
+        setTimeLeft(remaining > 0 ? remaining : 0);
       } catch (err) {
         console.error("❌ Failed to load exam", err);
       }
@@ -44,19 +55,42 @@ export default function ReadingExam() {
   }, []);
 
   /* -------------------------------------------------------
+     AUTO-SUBMIT WHEN TIME ENDS
+  ---------------------------------------------------------*/
+  const autoSubmit = async () => {
+    if (finished) return;
+
+    try {
+      await fetch(`${BACKEND_URL}/api/exams/submit-reading`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session_id: sessionId,
+          answers: answers,
+        }),
+      });
+
+      console.log("🔔 Auto-submitted exam to backend");
+    } catch (err) {
+      console.error("❌ Auto-submit failed", err);
+    }
+
+    setFinished(true);
+  };
+
+  /* -------------------------------------------------------
      TIMER
   ---------------------------------------------------------*/
   useEffect(() => {
     if (timeLeft === null) return;
 
     if (timeLeft <= 0) {
-      setFinished(true);
+      autoSubmit();
       return;
     }
 
     const interval = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearInterval(interval);
-
   }, [timeLeft]);
 
   const formatTime = (sec) => {
@@ -100,13 +134,17 @@ export default function ReadingExam() {
   if (!exam) return <div>Loading Exam...</div>;
 
   /* -------------------------------------------------------
-     PASSAGE FILTERING BASED ON TOPIC
+     PASSAGE FILTERING
   ---------------------------------------------------------*/
   const topicPassageMap = {
     "Comparative analysis": ["Extract A", "Extract B", "Extract C", "Extract D"],
     "Main Idea and Summary": [
-      "Paragraph 1", "Paragraph 2", "Paragraph 3",
-      "Paragraph 4", "Paragraph 5", "Paragraph 6",
+      "Paragraph 1",
+      "Paragraph 2",
+      "Paragraph 3",
+      "Paragraph 4",
+      "Paragraph 5",
+      "Paragraph 6",
     ],
   };
 
@@ -114,7 +152,7 @@ export default function ReadingExam() {
   const visiblePassages = topicPassageMap[currentTopic] || [];
 
   /* -------------------------------------------------------
-     GROUP QUESTIONS FOR INDEX PANEL
+     INDEX PANEL
   ---------------------------------------------------------*/
   const grouped = questions.reduce((acc, q, idx) => {
     if (!acc[q.topic]) acc[q.topic] = [];
@@ -131,9 +169,8 @@ export default function ReadingExam() {
           <div className="topic-question-row">
             {qList.map(({ idx, number }) => {
               const cls =
-                answers[idx] ? "index-answered"
-                : visited[idx] ? "index-seen"
-                : "";
+                answers[idx] ? "index-answered" :
+                visited[idx] ? "index-seen" : "";
 
               return (
                 <div
@@ -195,7 +232,6 @@ export default function ReadingExam() {
               Q{currentQuestion.question_number}. {currentQuestion.question_text}
             </p>
 
-            {/* DYNAMIC ANSWER OPTIONS (NOW FULLY FIXED) */}
             {Object.entries(answerOptions).map(([letter, text]) => (
               <button
                 key={letter}
@@ -225,7 +261,7 @@ export default function ReadingExam() {
                 Next
               </button>
             ) : (
-              <button className="nav-btn finish" onClick={() => setFinished(true)}>
+              <button className="nav-btn finish" onClick={autoSubmit}>
                 Finish
               </button>
             )}
