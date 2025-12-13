@@ -5,7 +5,6 @@ export default function GenerateExam_writing() {
   const [selectedQuiz, setSelectedQuiz] = useState(null);
 
   const [selectedClass, setSelectedClass] = useState("");
-  const [selectedTopic, setSelectedTopic] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState("");
 
   const [loading, setLoading] = useState(false);
@@ -46,7 +45,14 @@ export default function GenerateExam_writing() {
 
         const data = await res.json();
         console.log("📦 Loaded writing quizzes:", data);
-        setQuizzes(data);
+
+        // We only keep class + difficulty here
+        const filtered = data.map((q) => ({
+          class_name: q.class_name,
+          difficulty: q.difficulty
+        }));
+
+        setQuizzes(filtered);
       } catch (err) {
         console.error("❌ Error loading writing quizzes:", err);
         setError("Failed to load writing quizzes.");
@@ -60,14 +66,13 @@ export default function GenerateExam_writing() {
      GENERATE WRITING EXAM
   --------------------------- */
   const handleGenerateExam = async () => {
-    if (!selectedClass || !selectedTopic || !selectedDifficulty) {
-      alert("Please select class, topic, and difficulty");
+    if (!selectedClass || !selectedDifficulty) {
+      alert("Please select class and difficulty");
       return;
     }
 
     const payload = {
       class_name: selectedClass,
-      topic: selectedTopic,
       difficulty: selectedDifficulty
     };
 
@@ -126,12 +131,10 @@ export default function GenerateExam_writing() {
             const parsed = JSON.parse(e.target.value);
 
             console.log("📘 Class:", parsed.class_name);
-            console.log("📝 Topic:", parsed.topic);
             console.log("📙 Difficulty:", parsed.difficulty);
 
             setSelectedQuiz(parsed);
             setSelectedClass(parsed.class_name);
-            setSelectedTopic(parsed.topic);
             setSelectedDifficulty(parsed.difficulty);
           }}
           style={{
@@ -145,14 +148,13 @@ export default function GenerateExam_writing() {
 
           {quizzes.map((q) => (
             <option
-              key={`${q.class_name}-${q.topic}-${q.difficulty}`}
+              key={`${q.class_name}-${q.difficulty}`}
               value={JSON.stringify({
                 class_name: q.class_name,
-                topic: q.topic,
                 difficulty: q.difficulty
               })}
             >
-              {`${formatClassName(q.class_name)} | ${q.topic} | ${formatDifficulty(q.difficulty)}`}
+              {`${formatClassName(q.class_name)} | ${formatDifficulty(q.difficulty)}`}
             </option>
           ))}
         </select>
@@ -181,9 +183,7 @@ export default function GenerateExam_writing() {
           <p>
             <strong>Class:</strong> {generatedExam.class_name}
           </p>
-          <p>
-            <strong>Topic:</strong> {generatedExam.topic}
-          </p>
+
           <p>
             <strong>Difficulty:</strong> {generatedExam.difficulty}
           </p>
