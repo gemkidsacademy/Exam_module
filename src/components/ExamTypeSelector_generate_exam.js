@@ -1,7 +1,9 @@
 import React from "react";
 import GenerateExam from "./GenerateExam"; 
 import GenerateExam_reading from "./GenerateExam_reading"; 
-import GenerateExam_foundational from "./GenerateExam_foundational"; 
+import GenerateExam_foundational from "./GenerateExam_foundational";
+import GenerateExam_writing from "./GenerateExam_writing";
+
 
 
 
@@ -25,6 +27,10 @@ export default function ExamTypeSelector_generate_exam({ examType, onSelect }) {
   if (examType === "reading") {
     return <GenerateExam_reading />;
   }
+  if (examType === "writing") {
+    return <GenerateExam_writing />;
+  }
+  
 
   return (
     <div
