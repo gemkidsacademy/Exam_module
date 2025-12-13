@@ -53,13 +53,32 @@ export default function ReadingComponent({ studentId }) {
         setPassages(data.exam_json.reading_material);
         setAnswerOptions(data.exam_json.answer_options || {});
 
-        // Backend timer calculation
+        /* -------------------------------
+           FIXED TIMESTAMP PARSING
+        -------------------------------*/
         const duration = (data.duration_minutes || 40) * 60;
-        const start = new Date(data.start_time + "Z").getTime();
-        const serverNow = new Date(data.server_now + "Z").getTime();
-        const elapsed = Math.floor((serverNow - start) / 1000);
 
+        console.log("⏳ RAW start_time:", data.start_time);
+        console.log("⏳ RAW server_now:", data.server_now);
+
+        const start = new Date(data.start_time).getTime();
+        const serverNow = new Date(data.server_now).getTime();
+
+        console.log("⏳ Parsed start(ms):", start);
+        console.log("⏳ Parsed serverNow(ms):", serverNow);
+
+        if (isNaN(start) || isNaN(serverNow)) {
+          console.error("⛔ Timestamp parsing failed.");
+          setTimeLeft(duration); // fail-safe fallback
+          return;
+        }
+
+        const elapsed = Math.floor((serverNow - start) / 1000);
         const remaining = duration - elapsed;
+
+        console.log("⏳ elapsed seconds:", elapsed);
+        console.log("⏳ remaining seconds:", remaining);
+
         setTimeLeft(remaining > 0 ? remaining : 0);
 
       } catch (err) {
@@ -288,4 +307,3 @@ export default function ReadingComponent({ studentId }) {
     </div>
   );
 }
-
