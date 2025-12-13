@@ -2,57 +2,64 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AdminPanel.css";
 
-// User management
+/* ============================
+   User Management
+============================ */
 import AddUserForm from "./AddUserForm";
 import EditUserForm from "./EditUserForm";
 import ViewUserModal from "./ViewUserModal";
 import DeleteUserForm from "./DeleteUserForm";
 
-// Quiz creation
+/* ============================
+   Quiz Setup
+============================ */
 import QuizSetup from "./QuizSetup";
 import QuizSetup_foundational from "./QuizSetup_foundational";
 import QuizSetup_reading from "./QuizSetup_reading";
 import QuizSetup_writing from "./QuizSetup_writing";
 
-// Uploads
+/* ============================
+   Uploads
+============================ */
 import UploadImageFolder from "./UploadImageFolder";
 import ExamTypeSelector from "./ExamTypeSelector";
 
-// Generate exams
+/* ============================
+   Generate Exam
+============================ */
 import ExamTypeSelector_generate_exam from "./ExamTypeSelector_generate_exam";
 
 const AdminPanel = () => {
   const navigate = useNavigate();
 
-  /* ---------------------------
+  /* ============================
      Tabs
-  --------------------------- */
+  ============================ */
   const [activeTab, setActiveTab] = useState("database");
 
-  /* ---------------------------
-     Modal States
-  --------------------------- */
+  /* ============================
+     User Modals
+  ============================ */
   const [showAddUser, setShowAddUser] = useState(false);
   const [showEditUser, setShowEditUser] = useState(false);
   const [showViewUser, setShowViewUser] = useState(false);
   const [showDeleteUser, setShowDeleteUser] = useState(false);
 
-  /* ---------------------------
-     Exam Type States
-  --------------------------- */
+  /* ============================
+     Exam Flow State
+  ============================ */
   const [createExamType, setCreateExamType] = useState(null);
   const [generateExamType, setGenerateExamType] = useState(null);
 
-  /* ---------------------------
-     Reset states on tab switch
-     🔥 FIX IS HERE
-  --------------------------- */
+  /* ============================
+     State Reset Logic (FIXED)
+  ============================ */
   useEffect(() => {
-    // createExamType is used in TWO tabs
-    if (
-      activeTab !== "add-quiz" &&
-      activeTab !== "exam-type-selector"
-    ) {
+    const isCreateFlow =
+      activeTab === "add-quiz" ||
+      activeTab === "exam-type-selector";
+
+    if (!isCreateFlow) {
       setCreateExamType(null);
     }
 
@@ -61,9 +68,9 @@ const AdminPanel = () => {
     }
   }, [activeTab]);
 
-  /* ---------------------------
+  /* ============================
      Tabs Config
-  --------------------------- */
+  ============================ */
   const tabs = [
     { id: "database", label: "Exam Module User Management" },
     { id: "exam-type-selector", label: "Upload Questions Word Document" },
@@ -72,23 +79,27 @@ const AdminPanel = () => {
     { id: "generate-exam", label: "Generate Exam" },
   ];
 
-  /* ---------------------------
+  /* ============================
      User Callbacks
-  --------------------------- */
-  const handleUserUpdated = () => {
-    setShowEditUser(false);
-    alert("User updated successfully!");
-  };
-
+  ============================ */
   const handleUserAdded = () => {
     setShowAddUser(false);
     alert("User added successfully!");
   };
 
-  const handleUserDeleted = () => {
-    console.log("User deleted successfully");
+  const handleUserUpdated = () => {
+    setShowEditUser(false);
+    alert("User updated successfully!");
   };
 
+  const handleUserDeleted = () => {
+    setShowDeleteUser(false);
+    alert("User deleted successfully!");
+  };
+
+  /* ============================
+     Render
+  ============================ */
   return (
     <div className="dashboard-container">
       <h1 className="dashboard-title">Admin Dashboard</h1>
@@ -106,7 +117,7 @@ const AdminPanel = () => {
         ))}
       </div>
 
-      {/* ---------- Tab Content ---------- */}
+      {/* ---------- Content ---------- */}
       <div className="tab-content">
 
         {/* ===== USER MANAGEMENT ===== */}
@@ -135,7 +146,9 @@ const AdminPanel = () => {
             <button className="dashboard-button" onClick={() => setShowViewUser(true)}>
               View User
             </button>
-            {showViewUser && <ViewUserModal onClose={() => setShowViewUser(false)} />}
+            {showViewUser && (
+              <ViewUserModal onClose={() => setShowViewUser(false)} />
+            )}
 
             <button className="dashboard-button" onClick={() => setShowDeleteUser(true)}>
               Delete User
