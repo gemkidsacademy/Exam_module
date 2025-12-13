@@ -159,7 +159,7 @@ export default function QuizSetup_foundational() {
             >
               <option value="">Select Subject</option>
               <option value="thinking_skills">Thinking Skills</option>
-              <option value="maths">Mathematical Reasoning</option>
+              <option value="maths">Foundational</option>
               <option value="reading">Reading</option>
               <option value="writing">Writing</option>
             </select>
