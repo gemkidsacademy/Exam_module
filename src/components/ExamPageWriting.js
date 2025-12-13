@@ -1,40 +1,93 @@
 import React, { useState, useEffect } from "react";
 import "./ExamPage.css";
 
-export default function WritingComponent({ studentId, subject, difficulty }) {
-  const [timeLeft, setTimeLeft] = useState(40 * 60); // 40 minutes
-  const [completed, setCompleted] = useState(false);
+const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
-  // 🆕 Collapsible prompt
+export default function WritingComponent({ studentId }) {
+  /* -----------------------------------------------------------
+     STATE
+  ----------------------------------------------------------- */
+  const [exam, setExam] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [answerText, setAnswerText] = useState("");
+  const [completed, setCompleted] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Collapsible prompt
   const [showPrompt, setShowPrompt] = useState(true);
 
-  // TEMP sample data until backend wiring
-  const writingQuestion = {
-    topic: "Narrative",
-    difficulty: "Medium",
-    question_text:
-      "The Locked Door\n\nWrite a narrative beginning with:\n“The key to the attic door had been lost for a generation, but today...”"
-  };
-
   /* -----------------------------------------------------------
-     TIMER
+     LOAD WRITING EXAM FROM BACKEND
   ----------------------------------------------------------- */
   useEffect(() => {
-    if (completed) return;
+    const loadExam = async () => {
+      try {
+        const res = await fetch(
+          `${BACKEND_URL}/api/exams/writing/current?student_id=${studentId}`
+        );
+
+        if (!res.ok) {
+          throw new Error("Failed to load writing exam");
+        }
+
+        const data = await res.json();
+
+        setExam(data.exam);
+        setTimeLeft(data.remaining_seconds); // backend-authoritative
+      } catch (err) {
+        console.error(err);
+        alert("Unable to load writing exam.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadExam();
+  }, [studentId]);
+
+  /* -----------------------------------------------------------
+     TIMER (DISPLAY ONLY)
+  ----------------------------------------------------------- */
+  useEffect(() => {
+    if (loading || completed) return;
 
     if (timeLeft <= 0) {
       finishExam();
       return;
     }
 
-    const timer = setInterval(() => setTimeLeft((t) => t - 1), 1000);
-    return () => clearInterval(timer);
-  }, [timeLeft, completed]);
+    const timer = setInterval(() => {
+      setTimeLeft((t) => Math.max(0, t - 1));
+    }, 1000);
 
-  const finishExam = () => {
-    setCompleted(true);
+    return () => clearInterval(timer);
+  }, [timeLeft, completed, loading]);
+
+  /* -----------------------------------------------------------
+     SUBMIT
+  ----------------------------------------------------------- */
+  const finishExam = async () => {
+    try {
+      await fetch(
+        `${BACKEND_URL}/api/exams/writing/submit?student_id=${studentId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            answer_text: answerText
+          })
+        }
+      );
+    } catch (err) {
+      console.error("Submission failed", err);
+    } finally {
+      setCompleted(true);
+    }
   };
 
+  /* -----------------------------------------------------------
+     HELPERS
+  ----------------------------------------------------------- */
   const formatTime = (sec) => {
     const m = String(Math.floor(sec / 60)).padStart(2, "0");
     const s = String(sec % 60).padStart(2, "0");
@@ -42,7 +95,16 @@ export default function WritingComponent({ studentId, subject, difficulty }) {
   };
 
   /* -----------------------------------------------------------
-     END SCREEN
+     LOADING
+  ----------------------------------------------------------- */
+  if (loading) {
+    return <div className="loading-screen">Loading writing exam…</div>;
+  }
+
+  if (!exam) return null;
+
+  /* -----------------------------------------------------------
+     COMPLETED
   ----------------------------------------------------------- */
   if (completed) {
     return (
@@ -61,7 +123,9 @@ export default function WritingComponent({ studentId, subject, difficulty }) {
 
       {/* HEADER */}
       <div className="writing-header">
-        <div className="timer">Time Left: {formatTime(timeLeft)}</div>
+        <div className="timer">
+          Time Left: {formatTime(timeLeft)}
+        </div>
       </div>
 
       {/* COLLAPSIBLE PROMPT */}
@@ -70,34 +134,32 @@ export default function WritingComponent({ studentId, subject, difficulty }) {
         <div
           className="prompt-header"
           onClick={() => setShowPrompt((p) => !p)}
-          style={{
-            cursor: "pointer",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            fontWeight: "600"
-          }}
         >
           <span>Writing Prompt</span>
           <span>{showPrompt ? "▼ Hide" : "▶ Show"}</span>
         </div>
 
         {showPrompt && (
-          <p className="writing-text" style={{ marginTop: "12px" }}>
-            {writingQuestion.question_text}
+          <p className="writing-text">
+            {exam.question_text}
           </p>
         )}
 
       </div>
 
-      {/* ANSWER TEXTAREA */}
+      {/* ANSWER */}
       <textarea
         className="writing-answer-box"
         placeholder="Start writing your response here..."
-      ></textarea>
+        value={answerText}
+        onChange={(e) => setAnswerText(e.target.value)}
+      />
 
       {/* SUBMIT */}
-      <button className="submit-writing-btn" onClick={finishExam}>
+      <button
+        className="submit-writing-btn"
+        onClick={finishExam}
+      >
         Submit Writing
       </button>
 
