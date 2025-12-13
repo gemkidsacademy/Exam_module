@@ -1,61 +1,57 @@
 import React, { useState, useEffect } from "react";
 import "./ExamPage.css";
 
-export default function ExamPageFoundational() {
-  /* -----------------------------------------------------------
-     FRONTEND EXAM DATA: 3 SECTIONS WITH CUSTOM TIMERS
-  ----------------------------------------------------------- */
-  const examSections = [
-    {
-      name: "Section A",
-      duration_seconds: 900, // 15 min
-      questions: Array.from({ length: 25 }).map((_, i) => ({
-        q_id: i + 1,
-        question: `Section A: Question ${i + 1}?`,
-        options: ["Option 1", "Option 2", "Option 3", "Option 4"]
-      }))
-    },
-    {
-      name: "Section B",
-      duration_seconds: 600, // 10 min
-      questions: Array.from({ length: 15 }).map((_, i) => ({
-        q_id: i + 1,
-        question: `Section B: Question ${i + 1}?`,
-        options: ["Option 1", "Option 2", "Option 3", "Option 4"]
-      }))
-    },
-    {
-      name: "Section C",
-      duration_seconds: 600, // 10 min
-      questions: Array.from({ length: 10 }).map((_, i) => ({
-        q_id: i + 1,
-        question: `Section C: Question ${i + 1}?`,
-        options: ["Option 1", "Option 2", "Option 3", "Option 4"]
-      }))
-    }
-  ];
+const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
+export default function ExamPageFoundational() {
   /* -----------------------------------------------------------
      STATE
   ----------------------------------------------------------- */
-  const [currentSection, setCurrentSection] = useState(0);
+  const [exam, setExam] = useState(null);
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
-  const [timeLeft, setTimeLeft] = useState(
-    examSections[0].duration_seconds
-  );
+  const [timeLeft, setTimeLeft] = useState(0);
   const [completed, setCompleted] = useState(false);
-
-  const section = examSections[currentSection];
-  const questions = section.questions;
-  const totalQuestions = questions.length;
+  const [loading, setLoading] = useState(true);
 
   /* -----------------------------------------------------------
-     TIMER PER SECTION
+     LOAD EXAM FROM BACKEND
   ----------------------------------------------------------- */
   useEffect(() => {
-    if (completed) return;
+    const loadExam = async () => {
+      try {
+        const res = await fetch(
+          `${BACKEND_URL}/api/exams/foundational/current`
+        );
+
+        if (!res.ok) throw new Error("Failed to load exam");
+
+        const data = await res.json();
+
+        // If backend wraps response
+        const examData = data.exam || data;
+
+        setExam(examData);
+        setCurrentSectionIndex(data.current_section_index || 0);
+        setTimeLeft(data.remaining_seconds || examData.sections[0].time * 60);
+      } catch (err) {
+        console.error(err);
+        alert("Unable to load exam.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadExam();
+  }, []);
+
+  /* -----------------------------------------------------------
+     TIMER (BACKEND-SYNCED)
+  ----------------------------------------------------------- */
+  useEffect(() => {
+    if (loading || completed) return;
 
     if (timeLeft <= 0) {
       goToNextSection();
@@ -64,36 +60,28 @@ export default function ExamPageFoundational() {
 
     const t = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearInterval(t);
-  }, [timeLeft, completed]);
+  }, [timeLeft, completed, loading]);
 
   /* -----------------------------------------------------------
-     MOVE TO NEXT SECTION
+     DERIVED DATA
   ----------------------------------------------------------- */
-  const goToNextSection = () => {
-    if (currentSection < examSections.length - 1) {
-      setCurrentSection((s) => s + 1);
-      setCurrentIndex(0);
-      setVisited({});
-      setAnswers({});
-      setTimeLeft(examSections[currentSection + 1].duration_seconds);
-    } else {
-      finishExam();
-    }
-  };
+  if (loading) return <div>Loading exam...</div>;
+  if (!exam) return null;
 
-  /* -----------------------------------------------------------
-     FINISH EXAM
-  ----------------------------------------------------------- */
-  const finishExam = () => {
-    console.log("Exam completed");
-    setCompleted(true);
-  };
+  const section = exam.sections[currentSectionIndex];
+
+  const sectionQuestions = exam.questions.filter(
+    (q) => q.section === section.name
+  );
+
+  const totalQuestions = sectionQuestions.length;
+  const currentQ = sectionQuestions[currentIndex];
 
   /* -----------------------------------------------------------
      NAVIGATION
   ----------------------------------------------------------- */
   const goToQuestion = (i) => {
-    setVisited((prev) => ({ ...prev, [i]: true }));
+    setVisited((v) => ({ ...v, [i]: true }));
     setCurrentIndex(i);
   };
 
@@ -104,24 +92,41 @@ export default function ExamPageFoundational() {
     currentIndex > 0 && goToQuestion(currentIndex - 1);
 
   /* -----------------------------------------------------------
-     ANSWER
+     SECTION TRANSITION
   ----------------------------------------------------------- */
-  const handleAnswer = (opt) => {
-    setAnswers((prev) => ({ ...prev, [currentIndex]: opt }));
+  const goToNextSection = () => {
+    if (currentSectionIndex < exam.sections.length - 1) {
+      const nextSection = currentSectionIndex + 1;
+
+      setCurrentSectionIndex(nextSection);
+      setCurrentIndex(0);
+      setVisited({});
+      setTimeLeft(exam.sections[nextSection].time * 60);
+    } else {
+      setCompleted(true);
+    }
   };
 
   /* -----------------------------------------------------------
-     COLOR LOGIC
+     ANSWER HANDLING
+  ----------------------------------------------------------- */
+  const handleAnswer = (opt) => {
+    setAnswers((a) => ({
+      ...a,
+      [`${section.name}-${currentIndex}`]: opt
+    }));
+  };
+
+  /* -----------------------------------------------------------
+     UI HELPERS
   ----------------------------------------------------------- */
   const getIndexClass = (i) => {
-    if (answers[i]) return "index-answered";
+    const key = `${section.name}-${i}`;
+    if (answers[key]) return "index-answered";
     if (visited[i]) return "index-visited";
     return "index-not-visited";
   };
 
-  /* -----------------------------------------------------------
-     TIME FORMAT
-  ----------------------------------------------------------- */
   const formatTime = (seconds) => {
     const m = String(Math.floor(seconds / 60)).padStart(2, "0");
     const s = String(seconds % 60).padStart(2, "0");
@@ -131,19 +136,18 @@ export default function ExamPageFoundational() {
   /* -----------------------------------------------------------
      END SCREEN
   ----------------------------------------------------------- */
-  if (completed)
+  if (completed) {
     return (
       <div className="completed-screen">
         <h1>🎉 Exam Finished</h1>
-        <p>All three sections are completed.</p>
+        <p>You have completed the Foundational Exam.</p>
       </div>
     );
+  }
 
   /* -----------------------------------------------------------
-     CURRENT QUESTION
+     RENDER
   ----------------------------------------------------------- */
-  const currentQ = questions[currentIndex];
-
   return (
     <div className="exam-container">
 
@@ -158,7 +162,7 @@ export default function ExamPageFoundational() {
 
       {/* INDEX ROW */}
       <div className="index-row">
-        {questions.map((_, i) => (
+        {sectionQuestions.map((_, i) => (
           <div
             key={i}
             className={`index-circle ${getIndexClass(i)}`}
@@ -171,17 +175,19 @@ export default function ExamPageFoundational() {
 
       {/* QUESTION CARD */}
       <div className="question-card">
-        <p className="question-text">{currentQ.question}</p>
+        <p className="question-text">{currentQ.question_text}</p>
 
-        {currentQ.options.map((opt, i) => (
+        {Object.entries(currentQ.options).map(([key, text]) => (
           <button
-            key={i}
-            onClick={() => handleAnswer(opt)}
+            key={key}
+            onClick={() => handleAnswer(key)}
             className={`option-btn ${
-              answers[currentIndex] === opt ? "selected" : ""
+              answers[`${section.name}-${currentIndex}`] === key
+                ? "selected"
+                : ""
             }`}
           >
-            {opt}
+            {key}. {text}
           </button>
         ))}
       </div>
@@ -202,7 +208,9 @@ export default function ExamPageFoundational() {
           </button>
         ) : (
           <button onClick={goToNextSection} className="nav-btn finish">
-            {currentSection < 2 ? "Finish Section" : "Finish Exam"}
+            {currentSectionIndex < exam.sections.length - 1
+              ? "Finish Section"
+              : "Finish Exam"}
           </button>
         )}
       </div>
