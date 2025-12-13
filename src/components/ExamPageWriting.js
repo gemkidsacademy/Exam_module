@@ -12,37 +12,56 @@ export default function WritingComponent({ studentId }) {
   const [answerText, setAnswerText] = useState("");
   const [completed, setCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
-
-  // Collapsible prompt
   const [showPrompt, setShowPrompt] = useState(true);
 
   /* -----------------------------------------------------------
-     LOAD WRITING EXAM FROM BACKEND
+     STEP 1 — Start writing exam session
+  ----------------------------------------------------------- */
+  const startExam = async () => {
+    try {
+      await fetch(
+        `${BACKEND_URL}/api/student/start-writing-exam?student_id=${studentId}`,
+        { method: "POST" }
+      );
+    } catch (err) {
+      console.error("Failed to start writing exam:", err);
+      alert("Unable to start writing exam.");
+    }
+  };
+
+  /* -----------------------------------------------------------
+     STEP 2 — Load current writing exam session
+  ----------------------------------------------------------- */
+  const loadExam = async () => {
+    try {
+      const res = await fetch(
+        `${BACKEND_URL}/api/exams/writing/current?student_id=${studentId}`
+      );
+
+      if (!res.ok) throw new Error("Failed to load writing exam");
+
+      const data = await res.json();
+
+      setExam(data.exam);
+      setTimeLeft(data.remaining_seconds);
+    } catch (err) {
+      console.error(err);
+      alert("Unable to load writing exam.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* -----------------------------------------------------------
+     ON MOUNT: Start exam → Load exam
   ----------------------------------------------------------- */
   useEffect(() => {
-    const loadExam = async () => {
-      try {
-        const res = await fetch(
-          `${BACKEND_URL}/api/exams/writing/current?student_id=${studentId}`
-        );
-
-        if (!res.ok) {
-          throw new Error("Failed to load writing exam");
-        }
-
-        const data = await res.json();
-
-        setExam(data.exam);
-        setTimeLeft(data.remaining_seconds); // backend-authoritative
-      } catch (err) {
-        console.error(err);
-        alert("Unable to load writing exam.");
-      } finally {
-        setLoading(false);
-      }
+    const init = async () => {
+      await startExam();  // ensures StudentExamWriting row exists
+      await loadExam();   // now backend will not return 404
     };
 
-    loadExam();
+    init();
   }, [studentId]);
 
   /* -----------------------------------------------------------
@@ -50,21 +69,17 @@ export default function WritingComponent({ studentId }) {
   ----------------------------------------------------------- */
   useEffect(() => {
     if (loading || completed) return;
-
-    if (timeLeft <= 0) {
-      finishExam();
-      return;
-    }
+    if (timeLeft <= 0) return finishExam();
 
     const timer = setInterval(() => {
       setTimeLeft((t) => Math.max(0, t - 1));
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft, completed, loading]);
+  }, [timeLeft, loading, completed]);
 
   /* -----------------------------------------------------------
-     SUBMIT
+     SUBMIT WRITING ANSWER
   ----------------------------------------------------------- */
   const finishExam = async () => {
     try {
@@ -73,13 +88,11 @@ export default function WritingComponent({ studentId }) {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            answer_text: answerText
-          })
+          body: JSON.stringify({ answer_text: answerText })
         }
       );
     } catch (err) {
-      console.error("Submission failed", err);
+      console.error("Submission failed:", err);
     } finally {
       setCompleted(true);
     }
@@ -95,7 +108,7 @@ export default function WritingComponent({ studentId }) {
   };
 
   /* -----------------------------------------------------------
-     LOADING
+     LOADING STATE
   ----------------------------------------------------------- */
   if (loading) {
     return <div className="loading-screen">Loading writing exam…</div>;
@@ -104,7 +117,7 @@ export default function WritingComponent({ studentId }) {
   if (!exam) return null;
 
   /* -----------------------------------------------------------
-     COMPLETED
+     COMPLETED VIEW
   ----------------------------------------------------------- */
   if (completed) {
     return (
@@ -116,38 +129,26 @@ export default function WritingComponent({ studentId }) {
   }
 
   /* -----------------------------------------------------------
-     RENDER
+     MAIN RENDER
   ----------------------------------------------------------- */
   return (
     <div className="writing-container">
-
       {/* HEADER */}
       <div className="writing-header">
-        <div className="timer">
-          Time Left: {formatTime(timeLeft)}
-        </div>
+        <div className="timer">Time Left: {formatTime(timeLeft)}</div>
       </div>
 
       {/* COLLAPSIBLE PROMPT */}
       <div className="writing-question-box">
-
-        <div
-          className="prompt-header"
-          onClick={() => setShowPrompt((p) => !p)}
-        >
+        <div className="prompt-header" onClick={() => setShowPrompt(!showPrompt)}>
           <span>Writing Prompt</span>
           <span>{showPrompt ? "▼ Hide" : "▶ Show"}</span>
         </div>
 
-        {showPrompt && (
-          <p className="writing-text">
-            {exam.question_text}
-          </p>
-        )}
-
+        {showPrompt && <p className="writing-text">{exam.question_text}</p>}
       </div>
 
-      {/* ANSWER */}
+      {/* ANSWER AREA */}
       <textarea
         className="writing-answer-box"
         placeholder="Start writing your response here..."
@@ -156,13 +157,9 @@ export default function WritingComponent({ studentId }) {
       />
 
       {/* SUBMIT */}
-      <button
-        className="submit-writing-btn"
-        onClick={finishExam}
-      >
+      <button className="submit-writing-btn" onClick={finishExam}>
         Submit Writing
       </button>
-
     </div>
   );
 }
