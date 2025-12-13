@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./ExamPage_reading.css";
 
-export default function ReadingExam() {
+// 👇 Accept studentId as a prop
+export default function ReadingExam({ studentId }) {
   const [exam, setExam] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [passages, setPassages] = useState({});
@@ -18,27 +19,40 @@ export default function ReadingExam() {
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
   /* -------------------------------------------------------
-     LOAD EXAM + BACKEND CONTROLLED TIMER
+     LOAD EXAM USING BACKEND CONTROLLED TIMER
   ---------------------------------------------------------*/
   useEffect(() => {
     const loadExam = async () => {
+      if (!studentId) {
+        console.error("❌ No studentId provided to ReadingExam component");
+        return;
+      }
+
       try {
         const res = await fetch(
-          `${BACKEND_URL}/api/exams/start-reading?student_id=1`,
+          `${BACKEND_URL}/api/exams/start-reading?student_id=${studentId}`,
           { method: "POST" }
         );
-        const data = await res.json();
 
+        const data = await res.json();
         console.log("🔥 Loaded reading exam:", data);
 
-        // Main exam data
+        // Backend may return an error (403) for second attempt
+        if (data.detail) {
+          alert(data.detail);
+          setFinished(true);
+          return;
+        }
+
+        setSessionId(data.session_id);
         setExam(data.exam_json);
         setQuestions(data.exam_json.questions);
         setPassages(data.exam_json.reading_material);
         setAnswerOptions(data.exam_json.answer_options || {});
-        setSessionId(data.session_id);
 
-        // Calculate backend timer
+        // -------------------------------
+        // Compute backend-controlled timer
+        // -------------------------------
         const duration = (data.duration_minutes || 40) * 60;
         const start = new Date(data.start_time).getTime();
         const serverNow = new Date(data.server_now).getTime();
@@ -46,16 +60,17 @@ export default function ReadingExam() {
 
         const remaining = duration - elapsed;
         setTimeLeft(remaining > 0 ? remaining : 0);
+
       } catch (err) {
         console.error("❌ Failed to load exam", err);
       }
     };
 
     loadExam();
-  }, []);
+  }, [studentId]);
 
   /* -------------------------------------------------------
-     AUTO-SUBMIT WHEN TIME ENDS
+     AUTO-SUBMIT WHEN TIME EXPIRES
   ---------------------------------------------------------*/
   const autoSubmit = async () => {
     if (finished) return;
@@ -79,7 +94,7 @@ export default function ReadingExam() {
   };
 
   /* -------------------------------------------------------
-     TIMER
+     TIMER LOGIC
   ---------------------------------------------------------*/
   useEffect(() => {
     if (timeLeft === null) return;
@@ -91,6 +106,7 @@ export default function ReadingExam() {
 
     const interval = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearInterval(interval);
+
   }, [timeLeft]);
 
   const formatTime = (sec) => {
@@ -165,7 +181,6 @@ export default function ReadingExam() {
       {Object.entries(grouped).map(([topic, qList]) => (
         <div key={topic} className="topic-group-box">
           <div className="topic-title">{topic}</div>
-
           <div className="topic-question-row">
             {qList.map(({ idx, number }) => {
               const cls =
@@ -207,7 +222,6 @@ export default function ReadingExam() {
         </div>
       </div>
 
-      {/* INDEX BAR */}
       {renderIndex()}
 
       <div className="exam-body">
@@ -215,7 +229,6 @@ export default function ReadingExam() {
         {/* LEFT: PASSAGES */}
         <div className="passage-pane">
           <h3>Reading Materials</h3>
-
           {visiblePassages.map((label) => (
             <div key={label} className="passage-block">
               <h4>{label}</h4>
@@ -227,7 +240,6 @@ export default function ReadingExam() {
         {/* RIGHT: QUESTION */}
         <div className="question-pane">
           <div className="question-card">
-
             <p className="question-text">
               Q{currentQuestion.question_number}. {currentQuestion.question_text}
             </p>
@@ -243,7 +255,6 @@ export default function ReadingExam() {
                 {letter}. {text}
               </button>
             ))}
-
           </div>
 
           {/* NAVIGATION */}
