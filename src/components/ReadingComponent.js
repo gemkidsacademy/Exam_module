@@ -20,6 +20,17 @@ export default function ReadingComponent({ studentId }) {
 
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
+
+  /* -------------------------------------------------------
+     Helper: Normalize timestamps (ADD "Z" only if missing)
+  ---------------------------------------------------------*/
+  const normalizeTimestamp = (ts) => {
+    if (!ts) return null;
+    if (ts.includes("+") || ts.endsWith("Z")) return ts; // already timezone-aware
+    return ts + "Z"; // force UTC
+  };
+
+
   /* -------------------------------------------------------
      LOAD EXAM (Backend-controlled timer)
   ---------------------------------------------------------*/
@@ -39,14 +50,13 @@ export default function ReadingComponent({ studentId }) {
         const data = await res.json();
         console.log("🔥 Loaded reading exam:", data);
 
-        // Handle second-attempt restriction
         if (data.detail) {
           alert(data.detail);
           setFinished(true);
           return;
         }
 
-        // Set exam data
+        // Set exam details
         setSessionId(data.session_id);
         setExam(data.exam_json);
         setQuestions(data.exam_json.questions);
@@ -58,18 +68,18 @@ export default function ReadingComponent({ studentId }) {
         -------------------------------*/
         const duration = (data.duration_minutes || 40) * 60;
 
-        console.log("⏳ RAW start_time:", data.start_time);
+        console.log("⏳ RAW start:", data.start_time);
         console.log("⏳ RAW server_now:", data.server_now);
 
-        const start = new Date(data.start_time).getTime();
-        const serverNow = new Date(data.server_now).getTime();
+        const start = new Date(normalizeTimestamp(data.start_time)).getTime();
+        const serverNow = new Date(normalizeTimestamp(data.server_now)).getTime();
 
         console.log("⏳ Parsed start(ms):", start);
         console.log("⏳ Parsed serverNow(ms):", serverNow);
 
         if (isNaN(start) || isNaN(serverNow)) {
           console.error("⛔ Timestamp parsing failed.");
-          setTimeLeft(duration); // fail-safe fallback
+          setTimeLeft(duration);
           return;
         }
 
@@ -89,8 +99,9 @@ export default function ReadingComponent({ studentId }) {
     loadExam();
   }, [studentId]);
 
+
   /* -------------------------------------------------------
-     AUTO-SUBMIT WHEN TIME ENDS
+     AUTO-SUBMIT WHEN TIME EXPIRES
   ---------------------------------------------------------*/
   const autoSubmit = async () => {
     if (finished) return;
@@ -105,13 +116,14 @@ export default function ReadingComponent({ studentId }) {
         }),
       });
 
-      console.log("🔔 Auto-submitted exam to backend");
+      console.log("🔔 Auto-submitted exam");
     } catch (err) {
       console.error("❌ Auto-submit failed", err);
     }
 
     setFinished(true);
   };
+
 
   /* -------------------------------------------------------
      TIMER
@@ -124,18 +136,23 @@ export default function ReadingComponent({ studentId }) {
       return;
     }
 
-    const interval = setInterval(() => {
+    const timer = setInterval(() => {
       setTimeLeft((t) => t - 1);
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(timer);
   }, [timeLeft]);
 
+
+  /* -------------------------------------------------------
+     FORMATTING
+  ---------------------------------------------------------*/
   const formatTime = (sec) => {
     const m = Math.floor(sec / 60);
     const s = sec % 60;
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
+
 
   /* -------------------------------------------------------
      QUESTION INTERACTION
@@ -151,10 +168,12 @@ export default function ReadingComponent({ studentId }) {
     setIndex(i);
   };
 
+
   const score = questions.reduce(
-    (total, q, i) => total + (answers[i] === q.correct_answer ? 1 : 0),
+    (t, q, i) => t + (answers[i] === q.correct_answer ? 1 : 0),
     0
   );
+
 
   /* -------------------------------------------------------
      FINISHED SCREEN
@@ -171,23 +190,21 @@ export default function ReadingComponent({ studentId }) {
 
   if (!exam) return <div>Loading Exam...</div>;
 
+
   /* -------------------------------------------------------
      PASSAGE FILTERING
   ---------------------------------------------------------*/
   const topicPassageMap = {
     "Comparative analysis": ["Extract A", "Extract B", "Extract C", "Extract D"],
     "Main Idea and Summary": [
-      "Paragraph 1",
-      "Paragraph 2",
-      "Paragraph 3",
-      "Paragraph 4",
-      "Paragraph 5",
-      "Paragraph 6",
+      "Paragraph 1", "Paragraph 2", "Paragraph 3",
+      "Paragraph 4", "Paragraph 5", "Paragraph 6",
     ],
   };
 
-  const currentTopic = currentQuestion.topic;
-  const visiblePassages = topicPassageMap[currentTopic] || [];
+  const visiblePassages =
+    topicPassageMap[currentQuestion.topic] || [];
+
 
   /* -------------------------------------------------------
      QUESTION INDEX PANEL
@@ -207,8 +224,9 @@ export default function ReadingComponent({ studentId }) {
           <div className="topic-question-row">
             {qList.map(({ idx, number }) => {
               const cls =
-                answers[idx] ? "index-answered" :
-                visited[idx] ? "index-seen" : "";
+                answers[idx] ? "index-answered"
+                  : visited[idx] ? "index-seen"
+                  : "";
 
               return (
                 <div
@@ -226,13 +244,13 @@ export default function ReadingComponent({ studentId }) {
     </div>
   );
 
+
   /* -------------------------------------------------------
      MAIN UI
   ---------------------------------------------------------*/
   return (
     <div className="exam-container">
 
-      {/* HEADER */}
       <div className="exam-header">
         <div>Reading Comprehension Exam</div>
 
@@ -249,10 +267,9 @@ export default function ReadingComponent({ studentId }) {
 
       <div className="exam-body">
 
-        {/* LEFT: PASSAGES */}
+        {/* LEFT PASSAGES */}
         <div className="passage-pane">
           <h3>Reading Materials</h3>
-
           {visiblePassages.map((label) => (
             <div key={label} className="passage-block">
               <h4>{label}</h4>
@@ -261,9 +278,10 @@ export default function ReadingComponent({ studentId }) {
           ))}
         </div>
 
-        {/* RIGHT: QUESTION */}
+        {/* RIGHT QUESTION */}
         <div className="question-pane">
           <div className="question-card">
+
             <p className="question-text">
               Q{currentQuestion.question_number}. {currentQuestion.question_text}
             </p>
@@ -271,9 +289,7 @@ export default function ReadingComponent({ studentId }) {
             {Object.entries(answerOptions).map(([letter, text]) => (
               <button
                 key={letter}
-                className={`option-btn ${
-                  answers[index] === letter ? "selected" : ""
-                }`}
+                className={`option-btn ${answers[index] === letter ? "selected" : ""}`}
                 onClick={() => handleSelect(letter)}
               >
                 {letter}. {text}
@@ -281,7 +297,6 @@ export default function ReadingComponent({ studentId }) {
             ))}
           </div>
 
-          {/* NAVIGATION */}
           <div className="nav-buttons">
             <button
               className="nav-btn prev"
