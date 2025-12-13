@@ -41,7 +41,7 @@ export default function GenerateExam_writing() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/quizzes-writing`);
+        const res = await fetch(`${BACKEND_URL}/api/get-quizzes-writing`);
         if (!res.ok) throw new Error("Failed to load writing quizzes");
 
         const data = await res.json();
