@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./ExamPage_reading.css";
 
 // 👇 Accept studentId as a prop
-export default function ReadingExam({ studentId }) {
+export default function ReadingComponent({ studentId }) {
+
   const [exam, setExam] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [passages, setPassages] = useState({});
