@@ -5,25 +5,20 @@ export default function WritingComponent({ studentId, subject, difficulty }) {
   const [timeLeft, setTimeLeft] = useState(40 * 60); // 40 minutes
   const [completed, setCompleted] = useState(false);
 
-  // 🆕 Collapsible state
-  const [showInstructions, setShowInstructions] = useState(false);
+  // 🆕 Collapsible prompt
+  const [showPrompt, setShowPrompt] = useState(true);
 
   // TEMP sample data until backend wiring
   const writingQuestion = {
     topic: "Narrative",
     difficulty: "Medium",
     question_text:
-      "The Locked Door\nWrite a narrative beginning with:\n“​The key to the attic door had been lost for a generation, but today...”",
-    question_instructions: `
-• Establish who finds the key or why the door matters  
-• Build a complication or discovery  
-• Use sensory details  
-• Control pacing for suspense  
-• End with a meaningful resolution  
-`
+      "The Locked Door\n\nWrite a narrative beginning with:\n“The key to the attic door had been lost for a generation, but today...”"
   };
 
-  // TIMER
+  /* -----------------------------------------------------------
+     TIMER
+  ----------------------------------------------------------- */
   useEffect(() => {
     if (completed) return;
 
@@ -46,48 +41,51 @@ export default function WritingComponent({ studentId, subject, difficulty }) {
     return `${m}:${s}`;
   };
 
+  /* -----------------------------------------------------------
+     END SCREEN
+  ----------------------------------------------------------- */
   if (completed) {
     return (
       <div className="completed-screen">
         <h1>Writing Exam Completed</h1>
-        <p>⏳ Time ended or submitted.</p>
+        <p>⏳ Time ended or submission received.</p>
       </div>
     );
   }
 
+  /* -----------------------------------------------------------
+     RENDER
+  ----------------------------------------------------------- */
   return (
     <div className="writing-container">
+
       {/* HEADER */}
       <div className="writing-header">
-        
         <div className="timer">Time Left: {formatTime(timeLeft)}</div>
       </div>
 
-     
-      
-
-      {/* QUESTION TEXT */}
+      {/* COLLAPSIBLE PROMPT */}
       <div className="writing-question-box">
-        <h3>Prompt</h3>
-        <p className="writing-text">{writingQuestion.question_text}</p>
-      </div>
 
-      {/* COLLAPSIBLE INSTRUCTIONS */}
-      <div className="instructions-container">
-        
-        <button
-          className="toggle-btn"
-          onClick={() => setShowInstructions((prev) => !prev)}
+        <div
+          className="prompt-header"
+          onClick={() => setShowPrompt((p) => !p)}
+          style={{
+            cursor: "pointer",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            fontWeight: "600"
+          }}
         >
-          {showInstructions ? "Hide Instructions ▲" : "Show Instructions ▼"}
-        </button>
+          <span>Writing Prompt</span>
+          <span>{showPrompt ? "▼ Hide" : "▶ Show"}</span>
+        </div>
 
-        {showInstructions && (
-          <div className="instructions-content">
-            <pre className="instruction-text">
-{writingQuestion.question_instructions}
-            </pre>
-          </div>
+        {showPrompt && (
+          <p className="writing-text" style={{ marginTop: "12px" }}>
+            {writingQuestion.question_text}
+          </p>
         )}
 
       </div>
@@ -98,9 +96,11 @@ export default function WritingComponent({ studentId, subject, difficulty }) {
         placeholder="Start writing your response here..."
       ></textarea>
 
+      {/* SUBMIT */}
       <button className="submit-writing-btn" onClick={finishExam}>
         Submit Writing
       </button>
+
     </div>
   );
 }
