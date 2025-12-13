@@ -3,6 +3,7 @@ import "./ExamPage_reading.css";
 
 // 👇 Accept studentId as a prop
 export default function ReadingComponent({ studentId }) {
+  console.log("💥 USING NEW ReadingComponent");
 
   const [exam, setExam] = useState(null);
   const [questions, setQuestions] = useState([]);
