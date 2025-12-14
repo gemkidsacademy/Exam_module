@@ -17,7 +17,7 @@ export default function ExamTypeSelector({ examType, onSelect }) {
 
   return (
     <div className="exam-selector-container">
-      <h2 className="exam-selector-title">Select Exam Type</h2>
+      
 
       <div className="exam-selector-grid">
         {examOptions.map((item) => (
