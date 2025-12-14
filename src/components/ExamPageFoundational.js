@@ -2,9 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import "./ExamPage.css";
 
 const BACKEND_URL = "https://web-production-481a5.up.railway.app";
-const STUDENT_ID = 123; // replace later with auth-based ID
 
-export default function ExamPageFoundational() {
+export default function ExamPageFoundational({ studentId }) {
   /* -----------------------------------------------------------
      STATE
   ----------------------------------------------------------- */
@@ -24,7 +23,7 @@ export default function ExamPageFoundational() {
   ----------------------------------------------------------- */
   const loadState = async () => {
     const res = await fetch(
-      `${BACKEND_URL}/api/exams/foundational/state?student_id=${STUDENT_ID}`
+      `${BACKEND_URL}/api/exams/foundational/state?student_id=${studentId}`
     );
 
     if (!res.ok) throw new Error("Failed to load exam state");
@@ -50,12 +49,12 @@ export default function ExamPageFoundational() {
     const init = async () => {
       try {
         const stateRes = await fetch(
-          `${BACKEND_URL}/api/exams/foundational/state?student_id=${STUDENT_ID}`
+          `${BACKEND_URL}/api/exams/foundational/state?student_id=${studentId}`
         );
 
         if (!stateRes.ok) {
           await fetch(
-            `${BACKEND_URL}/api/exams/foundational/start?student_id=${STUDENT_ID}`,
+            `${BACKEND_URL}/api/exams/foundational/start?student_id=${studentId}`,
             { method: "POST" }
           );
         }
@@ -69,8 +68,8 @@ export default function ExamPageFoundational() {
       }
     };
 
-    init();
-  }, []);
+    if (studentId) init();
+  }, [studentId]);
 
   /* -----------------------------------------------------------
      TIMER (DISPLAY ONLY)
@@ -96,7 +95,7 @@ export default function ExamPageFoundational() {
   const handleNextSection = async () => {
     try {
       const res = await fetch(
-        `${BACKEND_URL}/api/exams/foundational/next-section?student_id=${STUDENT_ID}`,
+        `${BACKEND_URL}/api/exams/foundational/next-section?student_id=${studentId}`,
         { method: "POST" }
       );
 
@@ -144,7 +143,7 @@ export default function ExamPageFoundational() {
     currentIndex > 0 && goToQuestion(currentIndex - 1);
 
   /* -----------------------------------------------------------
-     ANSWERS (LOCAL FOR NOW)
+     ANSWERS (LOCAL)
   ----------------------------------------------------------- */
   const handleAnswer = (opt) => {
     setAnswers((a) => ({
