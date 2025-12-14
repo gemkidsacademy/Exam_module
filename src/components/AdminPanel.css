@@ -1,145 +1,181 @@
-/* -------------------- Dashboard container -------------------- */
+/* ============================
+   Dashboard Container
+============================ */
 .dashboard-container {
-  width: 90%;                 /* responsive width */
-  max-width: 1200px;          /* allow larger screens */
-  margin: 20px auto;
-  padding: 20px;
+  width: 92%;
+  max-width: 1280px;
+  margin: 24px auto;
+  padding: 24px;
+
   background: #ffffff;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 
   display: flex;
   flex-direction: column;
-  min-height: 80vh;           /* makes container fill most of the viewport */
+  min-height: 85vh;
 }
 
-/* Dashboard title */
+/* ============================
+   Dashboard Title
+============================ */
 .dashboard-title {
   text-align: center;
   font-size: 2rem;
-  color: #333;
-  margin-bottom: 30px;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 28px;
 }
 
-/* Tabs navigation */
+/* ============================
+   Tabs Navigation
+============================ */
 .tab-nav {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #eee;
+  gap: 18px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #eaeaea;
 }
 
 .tab-item {
-  padding: 10px 20px;
-  cursor: pointer;
+  padding: 10px 18px;
+  font-size: 14px;
   font-weight: 500;
   color: #555;
-  transition: all 0.3s ease;
+  cursor: pointer;
+
   border-radius: 10px 10px 0 0;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.tab-item:hover {
+  color: #4f46e5;
 }
 
 .tab-item.active {
-  color: #fff;
   background: #4f46e5;
-  box-shadow: 0 -2px 10px rgba(79, 70, 229, 0.3);
+  color: #ffffff;
+  box-shadow: 0 -3px 12px rgba(79, 70, 229, 0.35);
 }
 
-/* Tab content */
+/* ============================
+   Tab Content Area
+============================ */
 .tab-content {
-  flex: 1;                   /* fill remaining vertical space */
+  flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;          /* prevent dashboard overflow */
-  padding: 10px;
+  padding: 12px;
+  overflow: hidden;
 }
 
-/* Tab panel */
+/* ============================
+   Tab Panel
+============================ */
 .tab-panel {
+  flex: 1;
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
-  justify-content: flex-start;
+  gap: 20px;
 
-  flex: 1;                   /* fill remaining space */
-  max-height: 100%;           /* stay within tab-content */
-  overflow-y: auto;           /* scroll if too tall */
-  overflow-x: hidden;         /* hide horizontal overflow */
-  padding-right: 10px;        /* prevent scrollbar cutting off content */
+  align-items: flex-start;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding-right: 8px;
 }
 
-/* -------------------- Buttons -------------------- */
+/* ============================
+   Buttons
+============================ */
 .dashboard-button {
-  padding: 12px 20px;
-  border: none;
-  border-radius: 10px;
+  padding: 12px 22px;
+  font-size: 15px;
+  font-weight: 500;
+
   background: #4f46e5;
-  color: #fff;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+
   cursor: pointer;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-shadow: 0 6px 18px rgba(79, 70, 229, 0.3);
 }
 
 .dashboard-button:hover {
   background: #4338ca;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+  box-shadow: 0 10px 26px rgba(79, 70, 229, 0.4);
 }
 
 .dashboard-button:active {
   transform: translateY(0);
-  box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 6px 18px rgba(79, 70, 229, 0.3);
 }
 
-/* -------------------- PDF Uploader Styles -------------------- */
+/* ============================
+   PDF / Document Uploader
+============================ */
 .uploader-container {
   display: flex;
   justify-content: center;
-  margin-top: 30px;
+  margin-top: 32px;
 }
 
 .uploader-card {
-  background: #f9f9f9;
-  padding: 30px;
-  border-radius: 15px;
   width: 100%;
-  max-width: 500px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  max-width: 520px;
+  padding: 32px;
+
+  background: #fafafa;
+  border-radius: 16px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
 }
 
 .uploader-title {
   text-align: center;
-  font-size: 1.8rem;
-  margin-bottom: 25px;
-  color: #333;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 24px;
 }
 
+/* ============================
+   Form Labels
+============================ */
 .file-label,
 .page-range-label,
 .class-label,
 .term-label,
 .chapter-label {
   display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
   font-weight: 500;
-  margin-bottom: 8px;
   color: #555;
 }
 
+/* ============================
+   Form Inputs
+============================ */
 .file-input,
 .page-range-input,
 .class-input,
 .term-input,
 .chapter-input {
-  display: block;
   width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 15px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+
+  font-size: 14px;
   border-radius: 10px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-  transition: all 0.3s ease;
+  border: 1px solid #d1d5db;
+
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .file-input:hover,
@@ -148,33 +184,48 @@
 .term-input:hover,
 .chapter-input:hover {
   border-color: #4f46e5;
-  box-shadow: 0 0 8px rgba(79, 70, 229, 0.2);
+}
+
+.file-input:focus,
+.page-range-input:focus,
+.class-input:focus,
+.term-input:focus,
+.chapter-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
 }
 
 .file-name {
-  font-size: 0.9rem;
-  color: #333;
-  margin-bottom: 15px;
+  font-size: 13px;
+  color: #444;
+  margin-bottom: 14px;
 }
 
+/* ============================
+   Upload Button
+============================ */
 .upload-button {
   width: 100%;
   padding: 12px;
+
   background: #4f46e5;
-  color: #fff;
-  font-size: 1rem;
+  color: #ffffff;
+  font-size: 15px;
   font-weight: 500;
+
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 6px 18px rgba(79, 70, 229, 0.3);
 }
 
 .upload-button:hover {
   background: #4338ca;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+  box-shadow: 0 10px 26px rgba(79, 70, 229, 0.4);
 }
 
 .upload-button:disabled {
@@ -183,9 +234,13 @@
   box-shadow: none;
 }
 
+/* ============================
+   Upload Message
+============================ */
 .upload-message {
-  margin-top: 15px;
-  font-weight: 500;
+  margin-top: 16px;
   text-align: center;
+  font-size: 14px;
+  font-weight: 500;
   color: #333;
 }
