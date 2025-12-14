@@ -1,0 +1,48 @@
+/* ============================
+   Exam Type Selector
+============================ */
+
+.exam-selector-container {
+  max-width: 500px;
+  margin: 40px auto;
+  text-align: center;
+}
+
+.exam-selector-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 25px;
+  color: #222;
+}
+
+.exam-selector-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+.exam-selector-card {
+  padding: 18px 22px;
+  font-size: 18px;
+  font-weight: 600;
+
+  background: #4f46e5;
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.3);
+}
+
+.exam-selector-card:hover {
+  background: #4338ca;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(79, 70, 229, 0.4);
+}
+
+.exam-selector-card:active {
+  transform: translateY(0);
+  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.3);
+}
