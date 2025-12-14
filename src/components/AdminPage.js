@@ -122,45 +122,80 @@ const AdminPanel = () => {
 
         {/* ===== USER MANAGEMENT ===== */}
         {activeTab === "database" && (
-          <div className="tab-panel">
-            <button className="dashboard-button" onClick={() => setShowAddUser(true)}>
-              Add User
-            </button>
-            {showAddUser && (
-              <AddUserForm
-                onClose={() => setShowAddUser(false)}
-                onUserAdded={handleUserAdded}
-              />
-            )}
+  <div className="tab-panel">
 
-            <button className="dashboard-button" onClick={() => setShowEditUser(true)}>
-              Edit User
-            </button>
-            {showEditUser && (
-              <EditUserForm
-                onClose={() => setShowEditUser(false)}
-                onUserUpdated={handleUserUpdated}
-              />
-            )}
+    {/* Header */}
+    <div className="user-management-header">
+      <h2>Exam Module Users</h2>
+      <p>Manage student accounts for the exam system.</p>
+    </div>
 
-            <button className="dashboard-button" onClick={() => setShowViewUser(true)}>
-              View User
-            </button>
-            {showViewUser && (
-              <ViewUserModal onClose={() => setShowViewUser(false)} />
-            )}
+    {/* Action Cards */}
+    <div className="user-actions-grid">
 
-            <button className="dashboard-button" onClick={() => setShowDeleteUser(true)}>
-              Delete User
-            </button>
-            {showDeleteUser && (
-              <DeleteUserForm
-                onClose={() => setShowDeleteUser(false)}
-                onUserDeleted={handleUserDeleted}
-              />
-            )}
-          </div>
-        )}
+      <div
+        className="action-card"
+        onClick={() => setShowAddUser(true)}
+      >
+        <h3>Add User</h3>
+        <p>Create a new student account</p>
+      </div>
+
+      <div
+        className="action-card"
+        onClick={() => setShowEditUser(true)}
+      >
+        <h3>Edit User</h3>
+        <p>Update student details</p>
+      </div>
+
+      <div
+        className="action-card"
+        onClick={() => setShowViewUser(true)}
+      >
+        <h3>View Users</h3>
+        <p>Browse existing students</p>
+      </div>
+
+      <div
+        className="action-card danger"
+        onClick={() => setShowDeleteUser(true)}
+      >
+        <h3>Delete User</h3>
+        <p>Remove a student account</p>
+      </div>
+
+    </div>
+
+    {/* Modals (UNCHANGED LOGIC) */}
+    {showAddUser && (
+      <AddUserForm
+        onClose={() => setShowAddUser(false)}
+        onUserAdded={handleUserAdded}
+      />
+    )}
+
+    {showEditUser && (
+      <EditUserForm
+        onClose={() => setShowEditUser(false)}
+        onUserUpdated={handleUserUpdated}
+      />
+    )}
+
+    {showViewUser && (
+      <ViewUserModal onClose={() => setShowViewUser(false)} />
+    )}
+
+    {showDeleteUser && (
+      <DeleteUserForm
+        onClose={() => setShowDeleteUser(false)}
+        onUserDeleted={handleUserDeleted}
+      />
+    )}
+
+  </div>
+)}
+
 
         {/* ===== UPLOAD WORD QUESTIONS ===== */}
         {activeTab === "exam-type-selector" && (
