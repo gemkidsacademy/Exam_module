@@ -59,18 +59,16 @@
 
 /* Answered */
 .index-circle.index-answered {
-  background: #bbf7d0;
+  background-color: #bbf7d0 !important;
   border-color: #16a34a;
   color: #065f46;
 }
-
 /* Current question */
 .index-circle.index-current {
-  background: #2563eb;
+  background-color: #2563eb !important;
   border-color: #2563eb;
   color: #ffffff;
 }
-
 
 /* ============================================
    QUESTION CARD
@@ -289,8 +287,3 @@
   background: #218838;
 }
 
-.index-unanswered {
-  background: #e5e7eb;   /* grey */
-  border-color: #cbd5e1;
-  color: #475569;
-}
