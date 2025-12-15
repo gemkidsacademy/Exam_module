@@ -15,17 +15,37 @@ export default function ExamPageThinkingSkills() {
   const hasSubmittedRef = useRef(false);
   const prevIndexRef = useRef(null);
 
+  // mode control
+  const [mode, setMode] = useState("loading"); // loading | exam | report
+
   // exam state
-  const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
   const [timeLeft, setTimeLeft] = useState(null);
 
-  // post-exam state
-  const [submitted, setSubmitted] = useState(false);
+  // report
   const [report, setReport] = useState(null);
+
+  /* ============================================================
+     LOAD REPORT (reusable)
+  ============================================================ */
+  const loadReport = useCallback(async () => {
+    try {
+      const res = await fetch(
+        `https://web-production-481a5.up.railway.app/api/student/exam-report/thinking-skills?student_id=${studentId}`
+      );
+
+      const data = await res.json();
+      console.log("📊 report loaded:", data);
+
+      setReport(data);
+      setMode("report");
+    } catch (err) {
+      console.error("❌ loadReport error:", err);
+    }
+  }, [studentId]);
 
   /* ============================================================
      START / RESUME EXAM
@@ -47,21 +67,23 @@ export default function ExamPageThinkingSkills() {
         const data = await res.json();
         console.log("📥 start-exam:", data);
 
-        if (!res.ok) {
-          setLoading(false);
+        // returning student → show report
+        if (data.completed) {
+          await loadReport();
           return;
         }
 
+        // new / in-progress exam
         setQuestions(data.questions || []);
         setTimeLeft(data.remaining_time);
-        setLoading(false);
+        setMode("exam");
       } catch (err) {
         console.error("❌ start-exam error:", err);
       }
     };
 
     startExam();
-  }, [studentId]);
+  }, [studentId, loadReport]);
 
   /* ============================================================
      MARK VISITED QUESTIONS
@@ -89,7 +111,7 @@ export default function ExamPageThinkingSkills() {
 
       const payload = {
         student_id: studentId,
-        answers: answers
+        answers
       };
 
       console.log("📤 finish-exam payload:", payload);
@@ -104,28 +126,19 @@ export default function ExamPageThinkingSkills() {
           }
         );
 
-        // fetch report AFTER successful submission
-        const reportRes = await fetch(
-          `https://web-production-481a5.up.railway.app/api/student/exam-report/thinking-skills?student_id=${studentId}`
-        );
-
-        const reportData = await reportRes.json();
-        console.log("📊 report:", reportData);
-
-        setReport(reportData);
-        setSubmitted(true);
+        await loadReport();
       } catch (err) {
         console.error("❌ finish-exam error:", err);
       }
     },
-    [studentId, answers]
+    [studentId, answers, loadReport]
   );
 
   /* ============================================================
      TIMER (AUTO SUBMIT)
   ============================================================ */
   useEffect(() => {
-    if (timeLeft === null || submitted) return;
+    if (mode !== "exam" || timeLeft === null) return;
 
     if (timeLeft <= 0) {
       finishExam("time_expired");
@@ -137,7 +150,7 @@ export default function ExamPageThinkingSkills() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timeLeft, submitted, finishExam]);
+  }, [timeLeft, mode, finishExam]);
 
   /* ============================================================
      ANSWER HANDLING
@@ -158,22 +171,21 @@ export default function ExamPageThinkingSkills() {
   };
 
   /* ============================================================
-     RENDER STATES
+     RENDER
   ============================================================ */
-  if (loading) {
-    return <p className="loading">Loading exam…</p>;
+  if (mode === "loading") {
+    return <p className="loading">Loading…</p>;
   }
 
-  if (submitted && report) {
+  if (mode === "report") {
     return <ThinkingSkillsReport report={report} />;
   }
+
+  // ------------------ EXAM UI ------------------
 
   const currentQ = questions[currentIndex];
   if (!currentQ) return null;
 
-  /* ============================================================
-     EXAM UI
-  ============================================================ */
   return (
     <div className="exam-container">
       <div className="exam-header">
@@ -243,45 +255,28 @@ export default function ExamPageThinkingSkills() {
    REPORT COMPONENT
 ============================================================ */
 function ThinkingSkillsReport({ report }) {
-  // 🔒 Absolute guards
-  if (!report) {
+  if (!report?.summary) {
     return <p>Generating your report…</p>;
   }
 
-  if (!report.summary) {
-    console.error("❌ Missing summary in report:", report);
-    return <p>Report data incomplete. Please refresh.</p>;
-  }
-
-  const {
-    total_questions = 0,
-    correct_answers = 0,
-    wrong_answers = 0,
-    accuracy_percent = 0
-  } = report.summary;
-
-  const topic_breakdown = report.topic_breakdown || [];
+  const { summary, topic_breakdown } = report;
 
   return (
     <div className="report-container">
       <h2>
-        You scored {correct_answers} out of {total_questions}
-        {" "}in NSW Selective Thinking Skills Test – Free Trial
+        You scored {summary.correct_answers} out of{" "}
+        {summary.total_questions} in NSW Selective Thinking Skills Test – Free Trial
       </h2>
 
       <div className="accuracy-panel">
         <h3>Accuracy</h3>
-        <p>{accuracy_percent}%</p>
-        <p>Correct: {correct_answers}</p>
-        <p>Wrong: {wrong_answers}</p>
+        <p>{summary.accuracy_percent}%</p>
+        <p>Correct: {summary.correct_answers}</p>
+        <p>Wrong: {summary.wrong_answers}</p>
       </div>
 
       <div className="improvements-panel">
         <h3>Improvements</h3>
-
-        {topic_breakdown.length === 0 && (
-          <p>No topic data available.</p>
-        )}
 
         {topic_breakdown.map(t => (
           <div key={t.topic} className="topic-row">
