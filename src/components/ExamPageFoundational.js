@@ -69,21 +69,29 @@ export default function ExamPageThinkingSkills() {
      FINISH EXAM
   ----------------------------------------------------------- */
   const finishExam = async () => {
+    const payload = {
+      student_id: studentId,
+      answers: answers
+    };
+  
+    console.log("📤 finish-exam payload:", payload);
+  
     try {
-      await fetch("/api/student/finish-exam", {
+      const res = await fetch("/api/student/finish-exam", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          student_id: studentId,
-          answers: answers
-        }),
+        body: JSON.stringify(payload),
       });
+  
+      const data = await res.json();
+      console.log("📥 finish-exam response:", data);
     } catch (err) {
       console.error("❌ finish-exam error:", err);
     }
   
     setCompleted(true);
   };
+
 
   /* -----------------------------------------------------------
      ANSWER HANDLING
