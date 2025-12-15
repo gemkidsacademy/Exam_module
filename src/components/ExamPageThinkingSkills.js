@@ -38,18 +38,21 @@ export default function ExamPageThinkingSkills() {
         );
 
         const data = await res.json();
+        console.log("📥 start-exam response:", data);
 
-        if (!res.ok || data.completed) {
+        if (!res.ok) {
           setCompleted(true);
           setLoading(false);
           return;
         }
 
+        // ❗ DO NOT auto-complete here
         setQuestions(data.questions || []);
         setTimeLeft(data.remaining_time);
         setLoading(false);
+
       } catch (err) {
-        console.error("start-exam error:", err);
+        console.error("❌ start-exam error:", err);
       }
     };
 
@@ -57,7 +60,7 @@ export default function ExamPageThinkingSkills() {
   }, [studentId]);
 
   /* -----------------------------------------------------------
-     MARK PREVIOUS QUESTION AS VISITED (ONLY IF UNANSWERED)
+     MARK VISITED QUESTIONS
   ----------------------------------------------------------- */
   useEffect(() => {
     if (prevIndexRef.current !== null) {
@@ -65,7 +68,7 @@ export default function ExamPageThinkingSkills() {
       const prevQid = questions[prevIdx]?.q_id;
 
       if (prevQid && !answers[prevQid]) {
-        setVisited((prev) => ({
+        setVisited(prev => ({
           ...prev,
           [prevIdx]: true
         }));
@@ -76,65 +79,66 @@ export default function ExamPageThinkingSkills() {
   }, [currentIndex, questions, answers]);
 
   /* -----------------------------------------------------------
-     FINISH EXAM (SAFE + GUARDED)
+     FINISH EXAM (GUARDED, SINGLE SOURCE)
   ----------------------------------------------------------- */
   const finishExam = useCallback(
-      async (reason = "submitted") => {
-        if (hasSubmittedRef.current) return;
-        hasSubmittedRef.current = true;
-    
-        const totalQuestions = questions.length;                 // ✅ 40
-        const attemptedQuestions = Object.keys(answers).length;
-        const skippedQuestions = totalQuestions - attemptedQuestions;
-    
-        const payload = {
-          student_id: studentId,
-    
-          // raw answers (for per-question storage)
-          answers: answers,
-    
-          // exam truth (IMPORTANT)
-          total_questions: totalQuestions,
-          attempted_questions: attemptedQuestions,
-          skipped_questions: skippedQuestions,
-    
-          completed_reason: reason
-        };
-    
-        console.log("📤 finish-exam payload:", payload);
-    
-        try {
-          await fetch(
-            "https://web-production-481a5.up.railway.app/api/student/finish-exam",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload)
-            }
-          );
-        } catch (err) {
-          console.error("❌ finish-exam error:", err);
-        }
-    
-        setCompleted(true);
-      },
-      [studentId, answers, questions.length]
-    );
+    async (reason = "submitted") => {
+      if (hasSubmittedRef.current) return;
+      hasSubmittedRef.current = true;
 
+      const totalQuestions = questions.length;
+      const attemptedQuestions = Object.keys(answers).length;
+      const skippedQuestions = totalQuestions - attemptedQuestions;
+
+      const payload = {
+        student_id: studentId,
+        answers: answers,
+
+        // exam truth
+        total_questions: totalQuestions,
+        attempted_questions: attemptedQuestions,
+        skipped_questions: skippedQuestions,
+
+        completed_reason: reason
+      };
+
+      console.log("📤 finish-exam payload:", payload);
+
+      try {
+        const res = await fetch(
+          "https://web-production-481a5.up.railway.app/api/student/finish-exam",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          }
+        );
+
+        const data = await res.json();
+        console.log("📥 finish-exam response:", data);
+
+      } catch (err) {
+        console.error("❌ finish-exam error:", err);
+      }
+
+      setCompleted(true);
+    },
+    [studentId, answers, questions.length]
+  );
 
   /* -----------------------------------------------------------
-     TIMER (AUTO-SUBMIT WHEN TIME EXPIRES)
+     TIMER (AUTO SUBMIT)
   ----------------------------------------------------------- */
   useEffect(() => {
     if (timeLeft === null || completed) return;
 
     if (timeLeft <= 0) {
-      finishExam();
+      finishExam("time_expired");
       return;
     }
 
     const interval = setInterval(() => {
-      setTimeLeft((t) => t - 1);
+      setTimeLeft(t => t - 1);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -147,15 +151,12 @@ export default function ExamPageThinkingSkills() {
     const qid = questions[currentIndex]?.q_id;
     if (!qid) return;
 
-    setAnswers((prev) => ({
+    setAnswers(prev => ({
       ...prev,
       [qid]: option
     }));
   };
 
-  /* -----------------------------------------------------------
-     NAVIGATION
-  ----------------------------------------------------------- */
   const goToQuestion = (idx) => {
     setCurrentIndex(idx);
   };
@@ -177,7 +178,7 @@ export default function ExamPageThinkingSkills() {
     return (
       <div className="completed-screen">
         <h1>🎉 Exam Finished</h1>
-        <p>You have already completed this exam.</p>
+        <p>Your exam has been submitted successfully.</p>
       </div>
     );
   }
@@ -187,7 +188,6 @@ export default function ExamPageThinkingSkills() {
 
   return (
     <div className="exam-container">
-      {/* Header */}
       <div className="exam-header">
         <div className="timer">⏳ {formatTime(timeLeft)}</div>
         <div className="counter">
@@ -195,7 +195,6 @@ export default function ExamPageThinkingSkills() {
         </div>
       </div>
 
-      {/* Question Index Bar */}
       <div className="index-row">
         {questions.map((q, i) => (
           <div
@@ -214,25 +213,22 @@ export default function ExamPageThinkingSkills() {
         ))}
       </div>
 
-      {/* Question Card */}
       <div className="question-card">
         <p className="question-text">{currentQ.question}</p>
 
-        {Array.isArray(currentQ.options) &&
-          currentQ.options.map((opt, i) => (
-            <button
-              key={i}
-              onClick={() => handleAnswer(opt)}
-              className={`option-btn ${
-                answers[currentQ.q_id] === opt ? "selected" : ""
-              }`}
-            >
-              {opt}
-            </button>
-          ))}
+        {currentQ.options?.map((opt, i) => (
+          <button
+            key={i}
+            onClick={() => handleAnswer(opt)}
+            className={`option-btn ${
+              answers[currentQ.q_id] === opt ? "selected" : ""
+            }`}
+          >
+            {opt}
+          </button>
+        ))}
       </div>
 
-      {/* Navigation */}
       <div className="nav-buttons">
         <button
           onClick={() => goToQuestion(currentIndex - 1)}
@@ -246,7 +242,7 @@ export default function ExamPageThinkingSkills() {
             Next
           </button>
         ) : (
-          <button onClick={finishExam}>
+          <button onClick={() => finishExam("manual_submit")}>
             Finish Exam
           </button>
         )}
