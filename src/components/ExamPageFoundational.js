@@ -142,12 +142,17 @@ export default function ExamPageThinkingSkills() {
       <div className="index-row">
         {questions.map((q, i) => {
           const isAnswered = Boolean(answers[q.q_id]);
-
+          const isCurrent = i === currentIndex;
+      
           return (
             <div
               key={q.q_id}
               className={`index-circle ${
-                isAnswered ? "index-answered" : ""
+                isCurrent
+                  ? "index-current"
+                  : isAnswered
+                  ? "index-answered"
+                  : "index-unanswered"
               }`}
               onClick={() => goToQuestion(i)}
             >
