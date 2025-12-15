@@ -15,27 +15,37 @@ export default function ExamPageThinkingSkills() {
   const hasSubmittedRef = useRef(false);
   const prevIndexRef = useRef(null);
 
-  // mode control
-  const [mode, setMode] = useState("loading"); // loading | exam | report
+  /**
+   * mode:
+   * - loading → deciding what to show
+   * - exam    → active attempt
+   * - report  → completed attempt
+   */
+  const [mode, setMode] = useState("loading");
 
-  // exam state
+  // ---------------- EXAM STATE ----------------
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
   const [timeLeft, setTimeLeft] = useState(null);
 
-  // report
+  // ---------------- REPORT ----------------
   const [report, setReport] = useState(null);
 
   /* ============================================================
-     LOAD REPORT (reusable)
+     LOAD REPORT (ONLY WHEN EXAM IS COMPLETED)
   ============================================================ */
   const loadReport = useCallback(async () => {
     try {
       const res = await fetch(
         `https://web-production-481a5.up.railway.app/api/student/exam-report/thinking-skills?student_id=${studentId}`
       );
+
+      if (!res.ok) {
+        console.warn("⚠️ Report not available yet");
+        return;
+      }
 
       const data = await res.json();
       console.log("📊 report loaded:", data);
@@ -48,7 +58,7 @@ export default function ExamPageThinkingSkills() {
   }, [studentId]);
 
   /* ============================================================
-     START / RESUME EXAM
+     START / RESUME EXAM (SINGLE SOURCE OF TRUTH)
   ============================================================ */
   useEffect(() => {
     if (!studentId) return;
@@ -67,23 +77,17 @@ export default function ExamPageThinkingSkills() {
         const data = await res.json();
         console.log("📥 start-exam:", data);
 
-        // returning student → show report
-        if (data.status === "completed") {
+        // ✅ COMPLETED → SHOW REPORT
+        if (data.completed === true) {
           await loadReport();
           return;
         }
-        
-        if (data.status === "new" || data.status === "in_progress") {
-          setQuestions(data.questions || []);
-          setTimeLeft(data.remaining_time);
-          setMode("exam");
-          return;
-        }
 
-        // new / in-progress exam
+        // ✅ NEW / IN-PROGRESS → SHOW EXAM
         setQuestions(data.questions || []);
         setTimeLeft(data.remaining_time);
         setMode("exam");
+
       } catch (err) {
         console.error("❌ start-exam error:", err);
       }
@@ -109,7 +113,7 @@ export default function ExamPageThinkingSkills() {
   }, [currentIndex, questions, answers]);
 
   /* ============================================================
-     FINISH EXAM (SINGLE SOURCE OF TRUTH)
+     FINISH EXAM (SUBMIT ONLY — NO UI DECISIONS)
   ============================================================ */
   const finishExam = useCallback(
     async (reason = "submitted") => {
@@ -133,7 +137,9 @@ export default function ExamPageThinkingSkills() {
           }
         );
 
+        // ⬅️ ONLY NOW load report
         await loadReport();
+
       } catch (err) {
         console.error("❌ finish-exam error:", err);
       }
@@ -188,8 +194,7 @@ export default function ExamPageThinkingSkills() {
     return <ThinkingSkillsReport report={report} />;
   }
 
-  // ------------------ EXAM UI ------------------
-
+  // ---------------- EXAM UI ----------------
   const currentQ = questions[currentIndex];
   if (!currentQ) return null;
 
@@ -263,7 +268,7 @@ export default function ExamPageThinkingSkills() {
 ============================================================ */
 function ThinkingSkillsReport({ report }) {
   if (!report?.summary) {
-    return <p>Generating your report…</p>;
+    return <p>Loading report…</p>;
   }
 
   const { summary, topic_breakdown } = report;
