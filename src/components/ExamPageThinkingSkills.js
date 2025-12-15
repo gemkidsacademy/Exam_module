@@ -243,28 +243,45 @@ export default function ExamPageThinkingSkills() {
    REPORT COMPONENT
 ============================================================ */
 function ThinkingSkillsReport({ report }) {
+  // 🔒 Absolute guards
   if (!report) {
     return <p>Generating your report…</p>;
   }
 
-  const { summary, topic_breakdown } = report;
+  if (!report.summary) {
+    console.error("❌ Missing summary in report:", report);
+    return <p>Report data incomplete. Please refresh.</p>;
+  }
+
+  const {
+    total_questions = 0,
+    correct_answers = 0,
+    wrong_answers = 0,
+    accuracy_percent = 0
+  } = report.summary;
+
+  const topic_breakdown = report.topic_breakdown || [];
 
   return (
     <div className="report-container">
       <h2>
-        You scored {summary.correct_answers} out of {summary.total_questions}
+        You scored {correct_answers} out of {total_questions}
         {" "}in NSW Selective Thinking Skills Test – Free Trial
       </h2>
 
       <div className="accuracy-panel">
         <h3>Accuracy</h3>
-        <p>{summary.accuracy_percent}%</p>
-        <p>Correct: {summary.correct_answers}</p>
-        <p>Wrong: {summary.wrong_answers}</p>
+        <p>{accuracy_percent}%</p>
+        <p>Correct: {correct_answers}</p>
+        <p>Wrong: {wrong_answers}</p>
       </div>
 
       <div className="improvements-panel">
         <h3>Improvements</h3>
+
+        {topic_breakdown.length === 0 && (
+          <p>No topic data available.</p>
+        )}
 
         {topic_breakdown.map(t => (
           <div key={t.topic} className="topic-row">
