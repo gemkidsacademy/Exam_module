@@ -243,22 +243,30 @@ export default function ExamPageThinkingSkills() {
 
       <div className="nav-buttons">
         <button
+          className="nav-btn prev"
           onClick={() => goToQuestion(currentIndex - 1)}
           disabled={currentIndex === 0}
         >
           Previous
         </button>
-
+      
         {currentIndex < questions.length - 1 ? (
-          <button onClick={() => goToQuestion(currentIndex + 1)}>
+          <button
+            className="nav-btn next"
+            onClick={() => goToQuestion(currentIndex + 1)}
+          >
             Next
           </button>
         ) : (
-          <button onClick={() => finishExam("manual_submit")}>
+          <button
+            className="nav-btn finish"
+            onClick={() => finishExam("manual_submit")}
+          >
             Finish Exam
           </button>
         )}
       </div>
+
     </div>
   );
 }
