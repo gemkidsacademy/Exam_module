@@ -13,7 +13,7 @@ export default function ExamPageThinkingSkills() {
   const [completed, setCompleted] = useState(false);
 
   /* -----------------------------------------------------------
-     STEP 1 — Start or Resume Exam (NO session_id)
+     START / RESUME EXAM (backend authoritative)
   ----------------------------------------------------------- */
   useEffect(() => {
     if (!studentId) {
@@ -34,14 +34,7 @@ export default function ExamPageThinkingSkills() {
 
         const data = await res.json();
 
-        if (!res.ok) {
-          console.error("❌ start-exam failed:", data);
-          setCompleted(true);
-          setLoading(false);
-          return;
-        }
-
-        if (data.completed) {
+        if (!res.ok || data.completed) {
           setCompleted(true);
           setLoading(false);
           return;
@@ -50,7 +43,6 @@ export default function ExamPageThinkingSkills() {
         setQuestions(data.questions || []);
         setTimeLeft(data.remaining_time);
         setLoading(false);
-
       } catch (err) {
         console.error("❌ start-exam error:", err);
       }
@@ -60,7 +52,7 @@ export default function ExamPageThinkingSkills() {
   }, [studentId]);
 
   /* -----------------------------------------------------------
-     TIMER (backend-controlled start, frontend countdown)
+     TIMER
   ----------------------------------------------------------- */
   useEffect(() => {
     if (timeLeft === null || completed) return;
@@ -78,13 +70,17 @@ export default function ExamPageThinkingSkills() {
   }, [timeLeft, completed]);
 
   /* -----------------------------------------------------------
-     FINISH EXAM (NO session_id)
+     FINISH EXAM
   ----------------------------------------------------------- */
   const finishExam = async () => {
     try {
       await fetch(
         "https://web-production-481a5.up.railway.app/api/student/finish-exam",
-        { method: "POST" }
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ student_id: studentId }),
+        }
       );
     } catch (err) {
       console.error("❌ finish-exam error:", err);
@@ -94,7 +90,7 @@ export default function ExamPageThinkingSkills() {
   };
 
   /* -----------------------------------------------------------
-     ANSWERS
+     ANSWER HANDLING
   ----------------------------------------------------------- */
   const handleAnswer = (option) => {
     const qid = questions[currentIndex]?.q_id;
@@ -138,6 +134,7 @@ export default function ExamPageThinkingSkills() {
 
   return (
     <div className="exam-container">
+      {/* Header */}
       <div className="exam-header">
         <div className="timer">⏳ {formatTime(timeLeft)}</div>
         <div className="counter">
@@ -145,6 +142,28 @@ export default function ExamPageThinkingSkills() {
         </div>
       </div>
 
+      {/* Question Index Bar */}
+      <div className="index-row">
+        {questions.map((q, i) => (
+          <div
+            key={i}
+            className={`index-circle ${
+              answers[q.q_id]
+                ? "index-answered"
+                : i === currentIndex
+                ? "index-active"
+                : visited[i]
+                ? "index-visited"
+                : "index-not-visited"
+            }`}
+            onClick={() => goToQuestion(i)}
+          >
+            {i + 1}
+          </div>
+        ))}
+      </div>
+
+      {/* Question Card */}
       <div className="question-card">
         <p className="question-text">{currentQ.question}</p>
 
@@ -162,6 +181,7 @@ export default function ExamPageThinkingSkills() {
           ))}
       </div>
 
+      {/* Navigation */}
       <div className="nav-buttons">
         <button
           onClick={() => goToQuestion(currentIndex - 1)}
