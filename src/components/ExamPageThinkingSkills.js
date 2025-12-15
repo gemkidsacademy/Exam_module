@@ -68,8 +68,15 @@ export default function ExamPageThinkingSkills() {
         console.log("📥 start-exam:", data);
 
         // returning student → show report
-        if (data.completed) {
+        if (data.status === "completed") {
           await loadReport();
+          return;
+        }
+        
+        if (data.status === "new" || data.status === "in_progress") {
+          setQuestions(data.questions || []);
+          setTimeLeft(data.remaining_time);
+          setMode("exam");
           return;
         }
 
