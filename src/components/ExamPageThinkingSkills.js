@@ -160,7 +160,7 @@ export default function ExamPageThinkingSkills() {
       try {
         // 1️⃣ SAVE FULL EXAM RESULTS
         await fetch(
-          "https://web-production-481a5.up.railway.app/api/student/save-exam-results",
+          "https://web-production-481a5.up.railway.app/api/student/save-exam-results-thinkingskills",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
