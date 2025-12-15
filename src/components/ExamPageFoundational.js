@@ -1,165 +1,108 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import "./ExamPage.css";
 
-const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+export default function ExamPageThinkingSkills() {
+  const studentId = sessionStorage.getItem("student_id");
 
-export default function ExamPageFoundational({ studentId }) {
-  /* -----------------------------------------------------------
-     STATE
-  ----------------------------------------------------------- */
-  const [exam, setExam] = useState(null);
-  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [visited, setVisited] = useState({});
-  const [timeLeft, setTimeLeft] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(null);
   const [completed, setCompleted] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  const prevSectionRef = useRef(null);
 
   /* -----------------------------------------------------------
-     LOAD EXAM STATE (AUTHORITATIVE)
-  ----------------------------------------------------------- */
-  const loadState = async () => {
-    const res = await fetch(
-      `${BACKEND_URL}/api/exams/foundational/state?student_id=${studentId}`
-    );
-
-    if (!res.ok) throw new Error("Failed to load exam state");
-
-    const data = await res.json();
-
-    setExam(data.exam);
-    setTimeLeft(data.remaining_seconds);
-
-    if (prevSectionRef.current !== data.current_section_index) {
-      setCurrentIndex(0);
-      setVisited({});
-    }
-
-    setCurrentSectionIndex(data.current_section_index);
-    prevSectionRef.current = data.current_section_index;
-  };
-
-  /* -----------------------------------------------------------
-     INIT EXAM (START OR RESUME)
+     START / RESUME EXAM
   ----------------------------------------------------------- */
   useEffect(() => {
-    const init = async () => {
+    if (!studentId) return;
+
+    const startExam = async () => {
       try {
-        const stateRes = await fetch(
-          `${BACKEND_URL}/api/exams/foundational/state?student_id=${studentId}`
+        const res = await fetch(
+          "https://web-production-481a5.up.railway.app/api/student/start-exam",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ student_id: studentId }),
+          }
         );
 
-        if (!stateRes.ok) {
-          await fetch(
-            `${BACKEND_URL}/api/exams/foundational/start?student_id=${studentId}`,
-            { method: "POST" }
-          );
+        const data = await res.json();
+
+        if (!res.ok || data.completed) {
+          setCompleted(true);
+          setLoading(false);
+          return;
         }
 
-        await loadState();
-      } catch (err) {
-        console.error(err);
-        alert("Unable to start or load exam.");
-      } finally {
+        setQuestions(data.questions || []);
+        setTimeLeft(data.remaining_time);
         setLoading(false);
+      } catch (err) {
+        console.error("❌ start-exam error:", err);
       }
     };
 
-    if (studentId) init();
+    startExam();
   }, [studentId]);
 
   /* -----------------------------------------------------------
-     TIMER (DISPLAY ONLY)
+     TIMER
   ----------------------------------------------------------- */
   useEffect(() => {
-    if (loading || completed) return;
+    if (timeLeft === null || completed) return;
 
     if (timeLeft <= 0) {
-      handleNextSection();
+      finishExam();
       return;
     }
 
-    const t = setInterval(() => {
-      setTimeLeft((t) => Math.max(0, t - 1));
+    const interval = setInterval(() => {
+      setTimeLeft((t) => t - 1);
     }, 1000);
 
-    return () => clearInterval(t);
-  }, [timeLeft, loading, completed]);
+    return () => clearInterval(interval);
+  }, [timeLeft, completed]);
 
   /* -----------------------------------------------------------
-     SECTION ADVANCE (BACKEND CONTROLLED)
+     FINISH EXAM
   ----------------------------------------------------------- */
-  const handleNextSection = async () => {
+  const finishExam = async () => {
     try {
-      const res = await fetch(
-        `${BACKEND_URL}/api/exams/foundational/next-section?student_id=${studentId}`,
-        { method: "POST" }
+      await fetch(
+        "https://web-production-481a5.up.railway.app/api/student/finish-exam",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ student_id: studentId }),
+        }
       );
-
-      const data = await res.json();
-
-      if (data.completed) {
-        setCompleted(true);
-        return;
-      }
-
-      await loadState();
     } catch (err) {
-      console.error(err);
-      alert("Failed to advance section.");
+      console.error("❌ finish-exam error:", err);
     }
+
+    setCompleted(true);
   };
 
   /* -----------------------------------------------------------
-     DERIVED DATA
+     ANSWER HANDLING
   ----------------------------------------------------------- */
-  if (loading) return <div>Loading exam...</div>;
-  if (!exam) return null;
+  const handleAnswer = (option) => {
+    const qid = questions[currentIndex]?.q_id;
+    if (!qid) return;
 
-  const section = exam.sections[currentSectionIndex];
-
-  const sectionQuestions = exam.questions.filter(
-    (q) => q.section === section.name
-  );
-
-  const totalQuestions = sectionQuestions.length;
-  const currentQ = sectionQuestions[currentIndex];
-
-  /* -----------------------------------------------------------
-     NAVIGATION
-  ----------------------------------------------------------- */
-  const goToQuestion = (i) => {
-    setVisited((v) => ({ ...v, [i]: true }));
-    setCurrentIndex(i);
-  };
-
-  const nextQuestion = () =>
-    currentIndex < totalQuestions - 1 && goToQuestion(currentIndex + 1);
-
-  const prevQuestion = () =>
-    currentIndex > 0 && goToQuestion(currentIndex - 1);
-
-  /* -----------------------------------------------------------
-     ANSWERS (LOCAL)
-  ----------------------------------------------------------- */
-  const handleAnswer = (opt) => {
-    setAnswers((a) => ({
-      ...a,
-      [`${section.name}-${currentIndex}`]: opt
+    setAnswers((prev) => ({
+      ...prev,
+      [qid]: option,
     }));
   };
 
   /* -----------------------------------------------------------
-     UI HELPERS
+     NAVIGATION
   ----------------------------------------------------------- */
-  const getIndexClass = (i) => {
-    const key = `${section.name}-${i}`;
-    if (answers[key]) return "index-answered";
-    if (visited[i]) return "index-visited";
-    return "index-not-visited";
+  const goToQuestion = (idx) => {
+    setCurrentIndex(idx);
   };
 
   const formatTime = (seconds) => {
@@ -169,77 +112,84 @@ export default function ExamPageFoundational({ studentId }) {
   };
 
   /* -----------------------------------------------------------
-     END SCREEN
+     RENDER
   ----------------------------------------------------------- */
+  if (loading) return <p className="loading">Loading exam…</p>;
+
   if (completed) {
     return (
       <div className="completed-screen">
         <h1>🎉 Exam Finished</h1>
-        <p>You have completed the Foundational Exam.</p>
+        <p>You have already completed this exam.</p>
       </div>
     );
   }
 
-  /* -----------------------------------------------------------
-     RENDER
-  ----------------------------------------------------------- */
+  const currentQ = questions[currentIndex];
+  if (!currentQ) return null;
+
   return (
     <div className="exam-container">
+      {/* Header */}
       <div className="exam-header">
-        <h2>{section.name}</h2>
         <div className="timer">⏳ {formatTime(timeLeft)}</div>
         <div className="counter">
-          Question {currentIndex + 1} / {totalQuestions}
+          Question {currentIndex + 1} / {questions.length}
         </div>
       </div>
 
+      {/* Question Index Bar */}
       <div className="index-row">
-        {sectionQuestions.map((_, i) => (
-          <div
-            key={i}
-            className={`index-circle ${getIndexClass(i)}`}
-            onClick={() => goToQuestion(i)}
-          >
-            {i + 1}
-          </div>
-        ))}
+        {questions.map((q, i) => {
+          const isAnswered = Boolean(answers[q.q_id]);
+
+          return (
+            <div
+              key={q.q_id}
+              className={`index-circle ${
+                isAnswered ? "index-answered" : ""
+              }`}
+              onClick={() => goToQuestion(i)}
+            >
+              {i + 1}
+            </div>
+          );
+        })}
       </div>
 
+      {/* Question Card */}
       <div className="question-card">
-        <p className="question-text">{currentQ.question_text}</p>
+        <p className="question-text">{currentQ.question}</p>
 
-        {Object.entries(currentQ.options).map(([key, text]) => (
-          <button
-            key={key}
-            onClick={() => handleAnswer(key)}
-            className={`option-btn ${
-              answers[`${section.name}-${currentIndex}`] === key
-                ? "selected"
-                : ""
-            }`}
-          >
-            {key}. {text}
-          </button>
-        ))}
+        {Array.isArray(currentQ.options) &&
+          currentQ.options.map((opt, i) => (
+            <button
+              key={i}
+              onClick={() => handleAnswer(opt)}
+              className={`option-btn ${
+                answers[currentQ.q_id] === opt ? "selected" : ""
+              }`}
+            >
+              {opt}
+            </button>
+          ))}
       </div>
 
+      {/* Navigation */}
       <div className="nav-buttons">
         <button
-          onClick={prevQuestion}
+          onClick={() => goToQuestion(currentIndex - 1)}
           disabled={currentIndex === 0}
-          className="nav-btn prev"
         >
           Previous
         </button>
 
-        {currentIndex < totalQuestions - 1 ? (
-          <button onClick={nextQuestion} className="nav-btn next">
+        {currentIndex < questions.length - 1 ? (
+          <button onClick={() => goToQuestion(currentIndex + 1)}>
             Next
           </button>
         ) : (
-          <button onClick={handleNextSection} className="nav-btn finish">
-            Finish Section
-          </button>
+          <button onClick={finishExam}>Finish Exam</button>
         )}
       </div>
     </div>
