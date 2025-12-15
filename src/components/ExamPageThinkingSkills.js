@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./ExamPage.css";
 
 export default function ExamPageThinkingSkills() {
@@ -11,6 +11,9 @@ export default function ExamPageThinkingSkills() {
   const [visited, setVisited] = useState({});
   const [timeLeft, setTimeLeft] = useState(null);
   const [completed, setCompleted] = useState(false);
+
+  // Track previously viewed question index
+  const prevIndexRef = useRef(null);
 
   /* -----------------------------------------------------------
      START / RESUME EXAM
@@ -49,16 +52,23 @@ export default function ExamPageThinkingSkills() {
   }, [studentId]);
 
   /* -----------------------------------------------------------
-     MARK QUESTION AS SEEN WHEN IT IS SHOWN
+     MARK PREVIOUS QUESTION AS VISITED (ONLY IF UNANSWERED)
   ----------------------------------------------------------- */
   useEffect(() => {
-    if (!questions.length) return;
+    if (prevIndexRef.current !== null) {
+      const prevIdx = prevIndexRef.current;
+      const prevQid = questions[prevIdx]?.q_id;
 
-    setVisited((prev) => ({
-      ...prev,
-      [currentIndex]: true,
-    }));
-  }, [currentIndex, questions.length]);
+      if (prevQid && !answers[prevQid]) {
+        setVisited((prev) => ({
+          ...prev,
+          [prevIdx]: true,
+        }));
+      }
+    }
+
+    prevIndexRef.current = currentIndex;
+  }, [currentIndex, questions, answers]);
 
   /* -----------------------------------------------------------
      TIMER
@@ -157,10 +167,10 @@ export default function ExamPageThinkingSkills() {
             key={i}
             className={`index-circle ${
               answers[q.q_id]
-                ? "index-answered"        // 🟢 answered
+                ? "index-answered"   // 🟢 answered
                 : visited[i]
-                ? "index-visited"         // ⚪ seen but not answered
-                : "index-not-visited"     // ⚪ not seen
+                ? "index-visited"    // ⚪ seen but unanswered
+                : "index-not-visited"
             }`}
             onClick={() => goToQuestion(i)}
           >
