@@ -78,32 +78,49 @@ export default function ExamPageThinkingSkills() {
   /* -----------------------------------------------------------
      FINISH EXAM (SAFE + GUARDED)
   ----------------------------------------------------------- */
-  const finishExam = useCallback(async () => {
-    if (hasSubmittedRef.current) return;
-    hasSubmittedRef.current = true;
-
-    const payload = {
-      student_id: studentId,
-      answers: answers
-    };
-
-    console.log("finish-exam payload:", payload);
-
-    try {
-      await fetch(
-        "https://web-production-481a5.up.railway.app/api/student/finish-exam",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+  const finishExam = useCallback(
+      async (reason = "submitted") => {
+        if (hasSubmittedRef.current) return;
+        hasSubmittedRef.current = true;
+    
+        const totalQuestions = questions.length;                 // ✅ 40
+        const attemptedQuestions = Object.keys(answers).length;
+        const skippedQuestions = totalQuestions - attemptedQuestions;
+    
+        const payload = {
+          student_id: studentId,
+    
+          // raw answers (for per-question storage)
+          answers: answers,
+    
+          // exam truth (IMPORTANT)
+          total_questions: totalQuestions,
+          attempted_questions: attemptedQuestions,
+          skipped_questions: skippedQuestions,
+    
+          completed_reason: reason
+        };
+    
+        console.log("📤 finish-exam payload:", payload);
+    
+        try {
+          await fetch(
+            "https://web-production-481a5.up.railway.app/api/student/finish-exam",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload)
+            }
+          );
+        } catch (err) {
+          console.error("❌ finish-exam error:", err);
         }
-      );
-    } catch (err) {
-      console.error("finish-exam error:", err);
-    }
+    
+        setCompleted(true);
+      },
+      [studentId, answers, questions.length]
+    );
 
-    setCompleted(true);
-  }, [studentId, answers]);
 
   /* -----------------------------------------------------------
      TIMER (AUTO-SUBMIT WHEN TIME EXPIRES)
