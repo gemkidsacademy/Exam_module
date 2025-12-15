@@ -243,6 +243,10 @@ export default function ExamPageThinkingSkills() {
    REPORT COMPONENT
 ============================================================ */
 function ThinkingSkillsReport({ report }) {
+  if (!report) {
+    return <p>Generating your report…</p>;
+  }
+
   const { summary, topic_breakdown } = report;
 
   return (
