@@ -70,18 +70,18 @@ export default function ExamPageThinkingSkills() {
   ----------------------------------------------------------- */
   const finishExam = async () => {
     try {
-      await fetch(
-        "https://web-production-481a5.up.railway.app/api/student/finish-exam",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ student_id: studentId }),
-        }
-      );
+      await fetch("/api/student/finish-exam", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          student_id: studentId,
+          answers: answers
+        }),
+      });
     } catch (err) {
       console.error("❌ finish-exam error:", err);
     }
-
+  
     setCompleted(true);
   };
 
