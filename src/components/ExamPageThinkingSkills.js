@@ -200,7 +200,11 @@ export default function ExamPageThinkingSkills() {
   // ---------------- EXAM UI ----------------
   const currentQ = questions[currentIndex];
   if (!currentQ) return null;
-
+  const normalizedOptions = Array.isArray(currentQ.options)
+    ? currentQ.options
+    : Object.entries(currentQ.options || {}).map(
+        ([k, v]) => `${k}) ${v}`
+      );
   return (
     <div className="exam-container">
       <div className="exam-header">
@@ -230,24 +234,22 @@ export default function ExamPageThinkingSkills() {
 
       <div className="question-card">
         <p className="question-text">{currentQ.question}</p>
-
-        {currentQ.options?.map((opt, i) => {
-          const optionKey = opt.split(")")[0]; // ✅ "B"
-          const optionText = opt;              // "B) 12:22 pm"
-        
+      
+        {normalizedOptions.map((opt, i) => {
+          const optionKey = opt.split(")")[0];
+      
           return (
             <button
               key={i}
-              onClick={() => handleAnswer(optionKey)}  // ✅ send only key
+              onClick={() => handleAnswer(optionKey)}
               className={`option-btn ${
                 answers[currentQ.q_id] === optionKey ? "selected" : ""
               }`}
             >
-              {optionText}
+              {opt}
             </button>
           );
         })}
-
       </div>
 
       <div className="nav-buttons">
