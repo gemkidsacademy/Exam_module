@@ -268,35 +268,67 @@ export default function ExamPageThinkingSkills() {
 ============================================================ */
 function ThinkingSkillsReport({ report }) {
   if (!report?.summary) {
-    return <p>Loading report…</p>;
+    return <p className="loading">Generating your report…</p>;
   }
 
   const { summary, topic_breakdown } = report;
 
   return (
-    <div className="report-container">
-      <h2>
+    <div className="report-page">
+      {/* Header */}
+      <h2 className="report-title">
         You scored {summary.correct_answers} out of{" "}
         {summary.total_questions} in NSW Selective Thinking Skills Test – Free Trial
       </h2>
 
-      <div className="accuracy-panel">
-        <h3>Accuracy</h3>
-        <p>{summary.accuracy_percent}%</p>
-        <p>Correct: {summary.correct_answers}</p>
-        <p>Wrong: {summary.wrong_answers}</p>
-      </div>
+      <div className="report-grid">
+        {/* Accuracy Card */}
+        <div className="report-card">
+          <h3>Accuracy</h3>
 
-      <div className="improvements-panel">
-        <h3>Improvements</h3>
-
-        {topic_breakdown.map(t => (
-          <div key={t.topic} className="topic-row">
-            <span>{t.topic}</span>
-            <span>{t.accuracy_percent}%</span>
+          {/* Donut placeholder */}
+          <div className="donut">
+            <span>{summary.accuracy_percent}%</span>
           </div>
-        ))}
+
+          <div className="legend">
+            <div>
+              <span className="dot green" /> Correct Answer
+            </div>
+            <div>
+              <span className="dot red" /> Wrong Answer
+            </div>
+          </div>
+
+          <div className="stats">
+            <p>Correct: {summary.correct_answers}</p>
+            <p>Wrong: {summary.wrong_answers}</p>
+          </div>
+        </div>
+
+        {/* Improvements */}
+        <div className="report-card">
+          <h3>Improvements</h3>
+
+          {topic_breakdown.map(topic => (
+            <div key={topic.topic} className="topic-bar">
+              <span className="topic-name">{topic.topic}</span>
+
+              <div className="bar">
+                <div
+                  className="bar-fill"
+                  style={{ width: `${topic.accuracy_percent}%` }}
+                />
+              </div>
+
+              <span className="percent">
+                {topic.accuracy_percent}%
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
+
