@@ -6,23 +6,30 @@ import React, {
 } from "react";
 import "./ExamPage.css";
 
+/* ============================================================
+   MAIN COMPONENT
+============================================================ */
 export default function ExamPageThinkingSkills() {
   const studentId = sessionStorage.getItem("student_id");
 
   const hasSubmittedRef = useRef(false);
   const prevIndexRef = useRef(null);
 
+  // exam state
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
   const [timeLeft, setTimeLeft] = useState(null);
-  const [completed, setCompleted] = useState(false);
 
-  /* -----------------------------------------------------------
+  // post-exam state
+  const [submitted, setSubmitted] = useState(false);
+  const [report, setReport] = useState(null);
+
+  /* ============================================================
      START / RESUME EXAM
-  ----------------------------------------------------------- */
+  ============================================================ */
   useEffect(() => {
     if (!studentId) return;
 
@@ -38,19 +45,16 @@ export default function ExamPageThinkingSkills() {
         );
 
         const data = await res.json();
-        console.log("📥 start-exam response:", data);
+        console.log("📥 start-exam:", data);
 
         if (!res.ok) {
-          setCompleted(true);
           setLoading(false);
           return;
         }
 
-        // ❗ DO NOT auto-complete here
         setQuestions(data.questions || []);
         setTimeLeft(data.remaining_time);
         setLoading(false);
-
       } catch (err) {
         console.error("❌ start-exam error:", err);
       }
@@ -59,53 +63,39 @@ export default function ExamPageThinkingSkills() {
     startExam();
   }, [studentId]);
 
-  /* -----------------------------------------------------------
+  /* ============================================================
      MARK VISITED QUESTIONS
-  ----------------------------------------------------------- */
+  ============================================================ */
   useEffect(() => {
     if (prevIndexRef.current !== null) {
       const prevIdx = prevIndexRef.current;
       const prevQid = questions[prevIdx]?.q_id;
 
       if (prevQid && !answers[prevQid]) {
-        setVisited(prev => ({
-          ...prev,
-          [prevIdx]: true
-        }));
+        setVisited(prev => ({ ...prev, [prevIdx]: true }));
       }
     }
 
     prevIndexRef.current = currentIndex;
   }, [currentIndex, questions, answers]);
 
-  /* -----------------------------------------------------------
-     FINISH EXAM (GUARDED, SINGLE SOURCE)
-  ----------------------------------------------------------- */
+  /* ============================================================
+     FINISH EXAM (SINGLE SOURCE OF TRUTH)
+  ============================================================ */
   const finishExam = useCallback(
     async (reason = "submitted") => {
       if (hasSubmittedRef.current) return;
       hasSubmittedRef.current = true;
 
-      const totalQuestions = questions.length;
-      const attemptedQuestions = Object.keys(answers).length;
-      const skippedQuestions = totalQuestions - attemptedQuestions;
-
       const payload = {
         student_id: studentId,
-        answers: answers,
-
-        // exam truth
-        total_questions: totalQuestions,
-        attempted_questions: attemptedQuestions,
-        skipped_questions: skippedQuestions,
-
-        completed_reason: reason
+        answers: answers
       };
 
       console.log("📤 finish-exam payload:", payload);
 
       try {
-        const res = await fetch(
+        await fetch(
           "https://web-production-481a5.up.railway.app/api/student/finish-exam",
           {
             method: "POST",
@@ -114,23 +104,28 @@ export default function ExamPageThinkingSkills() {
           }
         );
 
-        const data = await res.json();
-        console.log("📥 finish-exam response:", data);
+        // fetch report AFTER successful submission
+        const reportRes = await fetch(
+          `https://web-production-481a5.up.railway.app/api/student/exam-report/thinking-skills?student_id=${studentId}`
+        );
 
+        const reportData = await reportRes.json();
+        console.log("📊 report:", reportData);
+
+        setReport(reportData);
+        setSubmitted(true);
       } catch (err) {
         console.error("❌ finish-exam error:", err);
       }
-
-      setCompleted(true);
     },
-    [studentId, answers, questions.length]
+    [studentId, answers]
   );
 
-  /* -----------------------------------------------------------
+  /* ============================================================
      TIMER (AUTO SUBMIT)
-  ----------------------------------------------------------- */
+  ============================================================ */
   useEffect(() => {
-    if (timeLeft === null || completed) return;
+    if (timeLeft === null || submitted) return;
 
     if (timeLeft <= 0) {
       finishExam("time_expired");
@@ -142,24 +137,19 @@ export default function ExamPageThinkingSkills() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timeLeft, completed, finishExam]);
+  }, [timeLeft, submitted, finishExam]);
 
-  /* -----------------------------------------------------------
+  /* ============================================================
      ANSWER HANDLING
-  ----------------------------------------------------------- */
+  ============================================================ */
   const handleAnswer = (option) => {
     const qid = questions[currentIndex]?.q_id;
     if (!qid) return;
 
-    setAnswers(prev => ({
-      ...prev,
-      [qid]: option
-    }));
+    setAnswers(prev => ({ ...prev, [qid]: option }));
   };
 
-  const goToQuestion = (idx) => {
-    setCurrentIndex(idx);
-  };
+  const goToQuestion = (idx) => setCurrentIndex(idx);
 
   const formatTime = (seconds) => {
     const m = String(Math.floor(seconds / 60)).padStart(2, "0");
@@ -167,25 +157,23 @@ export default function ExamPageThinkingSkills() {
     return `${m}:${s}`;
   };
 
-  /* -----------------------------------------------------------
-     RENDER
-  ----------------------------------------------------------- */
+  /* ============================================================
+     RENDER STATES
+  ============================================================ */
   if (loading) {
     return <p className="loading">Loading exam…</p>;
   }
 
-  if (completed) {
-    return (
-      <div className="completed-screen">
-        <h1>🎉 Exam Finished</h1>
-        <p>Your exam has been submitted successfully.</p>
-      </div>
-    );
+  if (submitted && report) {
+    return <ThinkingSkillsReport report={report} />;
   }
 
   const currentQ = questions[currentIndex];
   if (!currentQ) return null;
 
+  /* ============================================================
+     EXAM UI
+  ============================================================ */
   return (
     <div className="exam-container">
       <div className="exam-header">
@@ -246,6 +234,40 @@ export default function ExamPageThinkingSkills() {
             Finish Exam
           </button>
         )}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   REPORT COMPONENT
+============================================================ */
+function ThinkingSkillsReport({ report }) {
+  const { summary, topic_breakdown } = report;
+
+  return (
+    <div className="report-container">
+      <h2>
+        You scored {summary.correct_answers} out of {summary.total_questions}
+        {" "}in NSW Selective Thinking Skills Test – Free Trial
+      </h2>
+
+      <div className="accuracy-panel">
+        <h3>Accuracy</h3>
+        <p>{summary.accuracy_percent}%</p>
+        <p>Correct: {summary.correct_answers}</p>
+        <p>Wrong: {summary.wrong_answers}</p>
+      </div>
+
+      <div className="improvements-panel">
+        <h3>Improvements</h3>
+
+        {topic_breakdown.map(t => (
+          <div key={t.topic} className="topic-row">
+            <span>{t.topic}</span>
+            <span>{t.accuracy_percent}%</span>
+          </div>
+        ))}
       </div>
     </div>
   );
