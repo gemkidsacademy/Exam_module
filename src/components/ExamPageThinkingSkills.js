@@ -13,15 +13,12 @@ export default function ExamPageThinkingSkills() {
   const [completed, setCompleted] = useState(false);
 
   /* -----------------------------------------------------------
-     START / RESUME EXAM (backend authoritative)
+     START / RESUME EXAM
   ----------------------------------------------------------- */
   useEffect(() => {
-    if (!studentId) {
-      console.error("❌ No student_id found");
-      return;
-    }
+    if (!studentId) return;
 
-    const startOrResumeExam = async () => {
+    const startExam = async () => {
       try {
         const res = await fetch(
           "https://web-production-481a5.up.railway.app/api/student/start-exam",
@@ -48,8 +45,20 @@ export default function ExamPageThinkingSkills() {
       }
     };
 
-    startOrResumeExam();
+    startExam();
   }, [studentId]);
+
+  /* -----------------------------------------------------------
+     MARK QUESTION AS SEEN WHEN IT IS SHOWN
+  ----------------------------------------------------------- */
+  useEffect(() => {
+    if (!questions.length) return;
+
+    setVisited((prev) => ({
+      ...prev,
+      [currentIndex]: true,
+    }));
+  }, [currentIndex, questions.length]);
 
   /* -----------------------------------------------------------
      TIMER
@@ -106,7 +115,6 @@ export default function ExamPageThinkingSkills() {
      NAVIGATION
   ----------------------------------------------------------- */
   const goToQuestion = (idx) => {
-    setVisited((prev) => ({ ...prev, [idx]: true }));
     setCurrentIndex(idx);
   };
 
@@ -149,12 +157,10 @@ export default function ExamPageThinkingSkills() {
             key={i}
             className={`index-circle ${
               answers[q.q_id]
-                ? "index-answered"
-                : i === currentIndex
-                ? "index-active"
+                ? "index-answered"        // 🟢 answered
                 : visited[i]
-                ? "index-visited"
-                : "index-not-visited"
+                ? "index-visited"         // ⚪ seen but not answered
+                : "index-not-visited"     // ⚪ not seen
             }`}
             onClick={() => goToQuestion(i)}
           >
