@@ -2,15 +2,10 @@ import React, { useState, useEffect } from "react";
 import "./ExamPage.css";
 
 export default function ExamPageThinkingSkills() {
-  const studentId = sessionStorage.getItem("student_id"); // e.g., "Gem002"
-
-  const [sessionId, setSessionId] = useState(
-    localStorage.getItem(`session_${studentId}`)
-  );
+  const studentId = sessionStorage.getItem("student_id");
 
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState([]);
-  const [totalQuestions, setTotalQuestions] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
@@ -18,128 +13,59 @@ export default function ExamPageThinkingSkills() {
   const [completed, setCompleted] = useState(false);
 
   /* -----------------------------------------------------------
-     STEP 1 — Start Exam Session if not already started
+     STEP 1 — Start or Resume Exam (NO session_id)
   ----------------------------------------------------------- */
   useEffect(() => {
-  console.log("StudentId (from login) →", studentId);
-
-  const startExam = async () => {
     if (!studentId) {
-      console.error("❌ No student_id found in sessionStorage");
+      console.error("❌ No student_id found");
       return;
     }
 
-    console.log("📡 Checking exam session with backend...");
-
-    try {
-      const res = await fetch(
-        "https://web-production-481a5.up.railway.app/api/student/start-exam",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ student_id: studentId }),
-        }
-      );
-
-      const data = await res.json();
-      console.log("📦 start-exam response:", data);
-
-      if (!res.ok) {
-        console.error("❌ Backend error:", data);
-        return;
-      }
-
-      // 🛑 Attempt already completed
-      if (data.status === "already_completed") {
-        console.log("🛑 This student already completed the exam.");
-        setCompleted(true);
-        setLoading(false);
-        return;
-      }
-
-      // 🔄 Resume previous session
-      if (data.status === "resuming") {
-        console.log("🔄 Resuming previous exam:", data.session_id);
-        localStorage.setItem(`session_${studentId}`, data.session_id);
-        setSessionId(data.session_id);
-        return;
-      }
-
-      // 🆕 Start fresh session
-      if (data.status === "started") {
-        console.log("🎉 New exam session:", data.session_id);
-        localStorage.setItem(`session_${studentId}`, data.session_id);
-        setSessionId(data.session_id);
-        return;
-      }
-
-    } catch (err) {
-      console.error("❌ Could not start exam:", err);
-    }
-  };
-
-  startExam();
-}, [studentId]);
-
-
-  /* -----------------------------------------------------------
-     STEP 2 — Load Exam Details after session_id is known
-  ----------------------------------------------------------- */
-  useEffect(() => {
-    if (!sessionId) {
-        setLoading(false);
-        return;
-    }
-
-    const loadExam = async () => {
-      console.log("📡 Loading exam for session:", sessionId);
-
+    const startOrResumeExam = async () => {
       try {
         const res = await fetch(
-          `https://web-production-481a5.up.railway.app/api/student/get-exam?session_id=${sessionId}`
+          "https://web-production-481a5.up.railway.app/api/student/start-exam",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ student_id: studentId }),
+          }
         );
+
         const data = await res.json();
 
-        console.log("📦 Raw Exam data:", data);
-
-        if (data.completed) {
+        if (!res.ok) {
+          console.error("❌ start-exam failed:", data);
           setCompleted(true);
-          setLoading(false);   // ← ADD THIS
+          setLoading(false);
           return;
         }
 
-        // 🔍 LOG EVERY QUESTION
-        console.log("🔍 Checking each question structure…");
-        data.questions.forEach((q, i) => {
-          console.log(
-            `Question ${i}:`,
-            "q_id=", q.q_id,
-            "question=", q.question,
-            "options=", q.options,
-            "Array?", Array.isArray(q.options)
-          );
-        });
+        if (data.completed) {
+          setCompleted(true);
+          setLoading(false);
+          return;
+        }
 
-        setQuestions(data.questions);
-        setTotalQuestions(data.total_questions);
+        setQuestions(data.questions || []);
         setTimeLeft(data.remaining_time);
         setLoading(false);
+
       } catch (err) {
-        console.error("❌ Exam load failure:", err);
+        console.error("❌ start-exam error:", err);
       }
     };
 
-    loadExam();
-  }, [sessionId]);
+    startOrResumeExam();
+  }, [studentId]);
 
   /* -----------------------------------------------------------
-     TIMER HANDLING
+     TIMER (backend-controlled start, frontend countdown)
   ----------------------------------------------------------- */
   useEffect(() => {
     if (timeLeft === null || completed) return;
 
     if (timeLeft <= 0) {
-      console.log("⏳ Time ended → auto finishing");
       finishExam();
       return;
     }
@@ -152,45 +78,33 @@ export default function ExamPageThinkingSkills() {
   }, [timeLeft, completed]);
 
   /* -----------------------------------------------------------
-     FINISH EXAM
+     FINISH EXAM (NO session_id)
   ----------------------------------------------------------- */
   const finishExam = async () => {
-      console.log("🏁 Submitting student exam results…");
-    
-      try {
-        // 1️⃣ SAVE FULL EXAM RESULTS
-        await fetch(
-          "https://web-production-481a5.up.railway.app/api/student/save-exam-results-thinkingskills",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              session_id: sessionId,
-              answers: answers, // { question_id: selected_option }
-            }),
-          }
-        );
-    
-        console.log("✅ Exam results saved successfully");
-    
-        // 2️⃣ MARK EXAM AS FINISHED (LOCK ATTEMPT)
-        await fetch(
-          "https://web-production-481a5.up.railway.app/api/student/finish-exam",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ session_id: sessionId }),
-          }
-        );
-    
-        console.log("🔒 Exam marked as completed");
-    
-      } catch (err) {
-        console.error("❌ Exam submission error:", err);
-      }
-    
-      setCompleted(true);
-    };
+    try {
+      await fetch(
+        "https://web-production-481a5.up.railway.app/api/student/finish-exam",
+        { method: "POST" }
+      );
+    } catch (err) {
+      console.error("❌ finish-exam error:", err);
+    }
+
+    setCompleted(true);
+  };
+
+  /* -----------------------------------------------------------
+     ANSWERS
+  ----------------------------------------------------------- */
+  const handleAnswer = (option) => {
+    const qid = questions[currentIndex]?.q_id;
+    if (!qid) return;
+
+    setAnswers((prev) => ({
+      ...prev,
+      [qid]: option,
+    }));
+  };
 
   /* -----------------------------------------------------------
      NAVIGATION
@@ -200,35 +114,6 @@ export default function ExamPageThinkingSkills() {
     setCurrentIndex(idx);
   };
 
-  const nextQuestion = () =>
-    currentIndex < totalQuestions - 1 && goToQuestion(currentIndex + 1);
-
-  const prevQuestion = () =>
-    currentIndex > 0 && goToQuestion(currentIndex - 1);
-
-  /* -----------------------------------------------------------
-     ANSWER SELECTION
-  ----------------------------------------------------------- */
-  const handleAnswer = (option) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [currentQ.q_id]: option
-    }));
-
-  };
-
-  /* -----------------------------------------------------------
-     COLOR CODING FOR INDEX CIRCLES
-  ----------------------------------------------------------- */
-  const getIndexClass = (i) => {
-    if (answers[i]) return "index-answered";
-    if (visited[i]) return "index-visited";
-    return "index-not-visited";
-  };
-
-  /* -----------------------------------------------------------
-     HELPER → Format time
-  ----------------------------------------------------------- */
   const formatTime = (seconds) => {
     const m = String(Math.floor(seconds / 60)).padStart(2, "0");
     const s = String(seconds % 60).padStart(2, "0");
@@ -236,12 +121,10 @@ export default function ExamPageThinkingSkills() {
   };
 
   /* -----------------------------------------------------------
-     RENDER LOGIC
+     RENDER
   ----------------------------------------------------------- */
-
   if (loading) return <p className="loading">Loading exam…</p>;
 
-  // 2️⃣ If completed → stop immediately BEFORE touching questions
   if (completed)
     return (
       <div className="completed-screen">
@@ -249,86 +132,50 @@ export default function ExamPageThinkingSkills() {
         <p>You have already completed this exam.</p>
       </div>
     );
-  
-  // 3️⃣ Now it is SAFE to access currentQ
+
   const currentQ = questions[currentIndex];
+  if (!currentQ) return null;
 
-  // 🛑 Safety check — prevents crashes
-  if (!currentQ) {
-    return (
-      <div className="completed-screen">
-        <h1>🎉 Exam Finished</h1>
-        <p>You have already completed this exam.</p>
-      </div>
-    );
-  }
-
-  
   return (
     <div className="exam-container">
-      {/* Header */}
       <div className="exam-header">
         <div className="timer">⏳ {formatTime(timeLeft)}</div>
         <div className="counter">
-          Question {currentIndex + 1} / {totalQuestions}
+          Question {currentIndex + 1} / {questions.length}
         </div>
       </div>
 
-      {/* Question Index Buttons */}
-      <div className="index-row">
-        {questions.map((_, i) => (
-          <div
-            key={i}
-            className={`index-circle ${getIndexClass(i)}`}
-            onClick={() => goToQuestion(i)}
-          >
-            {i + 1}
-          </div>
-        ))}
-      </div>
-
-      {/* Question Card */}
       <div className="question-card">
         <p className="question-text">{currentQ.question}</p>
 
-        {/* SAFE OPTIONS RENDERING */}
-        {Array.isArray(currentQ.options) ? (
+        {Array.isArray(currentQ.options) &&
           currentQ.options.map((opt, i) => (
             <button
               key={i}
               onClick={() => handleAnswer(opt)}
               className={`option-btn ${
-                answers[currentIndex] === opt ? "selected" : ""
+                answers[currentQ.q_id] === opt ? "selected" : ""
               }`}
             >
               {opt}
             </button>
-          ))
-        ) : (
-          <p style={{ color: "red", fontWeight: "bold" }}>
-            ⚠️ Invalid options format for this question. Check backend.
-          </p>
-        )}
+          ))}
       </div>
 
-      {/* Navigation */}
       <div className="nav-buttons">
         <button
-          onClick={prevQuestion}
+          onClick={() => goToQuestion(currentIndex - 1)}
           disabled={currentIndex === 0}
-          className="nav-btn prev"
         >
           Previous
         </button>
 
-        {currentIndex < totalQuestions - 1 ? (
-          <button onClick={nextQuestion} className="nav-btn next">
+        {currentIndex < questions.length - 1 ? (
+          <button onClick={() => goToQuestion(currentIndex + 1)}>
             Next
           </button>
         ) : (
-          <button onClick={finishExam} className="nav-btn finish">
-            Finish Exam
-          </button>
+          <button onClick={finishExam}>Finish Exam</button>
         )}
       </div>
     </div>
