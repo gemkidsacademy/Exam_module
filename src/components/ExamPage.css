@@ -31,7 +31,7 @@
 
 
 /* ============================================
-   QUESTION NUMBER SCROLLER
+   QUESTION NUMBER SCROLLER (FIXED)
 ============================================ */
 .index-row {
   display: flex;
@@ -41,6 +41,7 @@
   margin-bottom: 28px;
 }
 
+/* Base circle (neutral / unanswered fallback) */
 .index-circle {
   min-width: 40px;
   height: 40px;
@@ -51,17 +52,22 @@
   cursor: pointer;
   font-weight: 600;
   border: 1px solid #cbd5e1;
-  background: white;
+  background: #e5e7eb;      /* ✅ GREY by default */
+  color: #475569;
 }
 
-.index-visited {
-  background: #e2e8f0;
-}
-
-.index-answered {
+/* Answered */
+.index-circle.index-answered {
   background: #bbf7d0;
   border-color: #16a34a;
   color: #065f46;
+}
+
+/* Current question */
+.index-circle.index-current {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
 }
 
 
