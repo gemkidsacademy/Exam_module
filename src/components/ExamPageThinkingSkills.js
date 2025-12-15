@@ -155,18 +155,42 @@ export default function ExamPageThinkingSkills() {
      FINISH EXAM
   ----------------------------------------------------------- */
   const finishExam = async () => {
-    console.log("🏁 Finishing exam…");
-    try {
-      await fetch("https://web-production-481a5.up.railway.app/api/student/finish-exam", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId }),
-      });
-    } catch (err) {
-      console.error("❌ Finish exam error:", err);
-    }
-    setCompleted(true);
-  };
+      console.log("🏁 Submitting student exam results…");
+    
+      try {
+        // 1️⃣ SAVE FULL EXAM RESULTS
+        await fetch(
+          "https://web-production-481a5.up.railway.app/api/student/save-exam-results",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              session_id: sessionId,
+              answers: answers, // { question_id: selected_option }
+            }),
+          }
+        );
+    
+        console.log("✅ Exam results saved successfully");
+    
+        // 2️⃣ MARK EXAM AS FINISHED (LOCK ATTEMPT)
+        await fetch(
+          "https://web-production-481a5.up.railway.app/api/student/finish-exam",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ session_id: sessionId }),
+          }
+        );
+    
+        console.log("🔒 Exam marked as completed");
+    
+      } catch (err) {
+        console.error("❌ Exam submission error:", err);
+      }
+    
+      setCompleted(true);
+    };
 
   /* -----------------------------------------------------------
      NAVIGATION
@@ -186,7 +210,11 @@ export default function ExamPageThinkingSkills() {
      ANSWER SELECTION
   ----------------------------------------------------------- */
   const handleAnswer = (option) => {
-    setAnswers((prev) => ({ ...prev, [currentIndex]: option }));
+    setAnswers((prev) => ({
+      ...prev,
+      [currentQ.q_id]: option
+    }));
+
   };
 
   /* -----------------------------------------------------------
