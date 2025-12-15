@@ -168,11 +168,14 @@ export default function ExamPageThinkingSkills() {
   /* ============================================================
      ANSWER HANDLING
   ============================================================ */
-  const handleAnswer = (option) => {
+  const handleAnswer = (optionKey) => {
     const qid = questions[currentIndex]?.q_id;
     if (!qid) return;
-
-    setAnswers(prev => ({ ...prev, [qid]: option }));
+  
+    setAnswers(prev => ({
+      ...prev,
+      [qid]: optionKey   // ✅ stores "B"
+    }));
   };
 
   const goToQuestion = (idx) => setCurrentIndex(idx);
@@ -228,17 +231,23 @@ export default function ExamPageThinkingSkills() {
       <div className="question-card">
         <p className="question-text">{currentQ.question}</p>
 
-        {currentQ.options?.map((opt, i) => (
-          <button
-            key={i}
-            onClick={() => handleAnswer(opt)}
-            className={`option-btn ${
-              answers[currentQ.q_id] === opt ? "selected" : ""
-            }`}
-          >
-            {opt}
-          </button>
-        ))}
+        {currentQ.options?.map((opt, i) => {
+          const optionKey = opt.split(")")[0]; // ✅ "B"
+          const optionText = opt;              // "B) 12:22 pm"
+        
+          return (
+            <button
+              key={i}
+              onClick={() => handleAnswer(optionKey)}  // ✅ send only key
+              className={`option-btn ${
+                answers[currentQ.q_id] === optionKey ? "selected" : ""
+              }`}
+            >
+              {optionText}
+            </button>
+          );
+        })}
+
       </div>
 
       <div className="nav-buttons">
