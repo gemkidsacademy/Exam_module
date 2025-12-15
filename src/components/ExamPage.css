@@ -281,3 +281,9 @@
 .submit-writing-btn:hover {
   background: #218838;
 }
+
+.index-unanswered {
+  background: #e5e7eb;   /* grey */
+  border-color: #cbd5e1;
+  color: #475569;
+}
