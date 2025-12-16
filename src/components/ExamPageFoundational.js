@@ -332,3 +332,53 @@ function formatTime(seconds) {
   const s = String(seconds % 60).padStart(2, "0");
   return `${m}:${s}`;
 }
+/* ============================================================
+   REPORT COMPONENT
+============================================================ */
+function FoundationalSkillsReport({ report }) {
+  if (!report?.summary) {
+    return <p className="loading">Generating your report…</p>;
+  }
+
+  const { summary, topic_breakdown } = report;
+
+  return (
+    <div className="report-page">
+      <h2 className="report-title">
+        You scored {summary.correct_answers} out of {summary.total_questions} in Foundational Skills Test
+      </h2>
+
+      <div className="report-grid">
+        <div className="report-card">
+          <h3>Accuracy</h3>
+          <div className="donut">
+            <span>{summary.accuracy_percent}%</span>
+          </div>
+          <div className="stats">
+            <p>Correct: {summary.correct_answers}</p>
+            <p>Wrong: {summary.wrong_answers}</p>
+          </div>
+        </div>
+
+        <div className="report-card">
+          <h3>Topic Breakdown</h3>
+
+          {topic_breakdown.map(topic => (
+            <div key={topic.topic} className="topic-bar">
+              <span className="topic-name">{topic.topic}</span>
+
+              <div className="bar">
+                <div
+                  className="bar-fill"
+                  style={{ width: `${topic.accuracy_percent}%` }}
+                />
+              </div>
+
+              <span className="percent">{topic.accuracy_percent}%</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
