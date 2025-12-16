@@ -9,7 +9,11 @@ export default function QuizSetup_reading() {
     numTopics: 1,
     topics: [],
   });
-
+  const READING_TOPIC_OPTIONS = [
+    "Comparative analysis",
+    "Gapped Text",
+    "Main Idea & Summary"
+  ];
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [loading, setLoading] = useState(false);
 
@@ -34,13 +38,14 @@ export default function QuizSetup_reading() {
     setTotalQuestions(0);
   };
 
-  const handleTopicNameChange = (index, value) => {
+  const handleTopicSelect = (index, value) => {
     setQuiz((prev) => {
       const topics = [...prev.topics];
       topics[index].name = value;
       return { ...prev, topics };
     });
   };
+
 
   const handleTopicTotalChange = (index, value) => {
     const numValue = Number(value) || 0;
@@ -188,14 +193,20 @@ export default function QuizSetup_reading() {
               <h4>Topic {index + 1}</h4>
 
               <label>Topic Name:</label>
-              <input
-                type="text"
+              <select
                 value={topic.name}
                 onChange={(e) =>
-                  handleTopicNameChange(index, e.target.value)
+                  handleTopicSelect(index, e.target.value)
                 }
                 required
-              />
+              >
+                <option value="">Select Topic</option>
+                {READING_TOPIC_OPTIONS.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
 
               <label>Total Questions for this Topic:</label>
               <input
