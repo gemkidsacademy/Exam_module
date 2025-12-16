@@ -1,8 +1,9 @@
 import "./ExamTypeSelector.css";
 import UploadWord from "./UploadWord";
-import UploadWord_reading from "./UploadWord_reading";
+import ReadingUploadPanel from "./ReadingUploadPanel";
 import UploadWord_writing from "./UploadWord_writing";
 import ReadingUploadPanel from "./ReadingUploadPanel";
+
 
 
 export default function ExamTypeSelector({ examType, onSelect }) {
