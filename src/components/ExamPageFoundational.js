@@ -321,6 +321,7 @@ export default function ExamPageFoundationalSkills() {
 
           return (
             <button
+              type="button"
               key={i}
               onClick={() => handleAnswer(optionKey)}
               className={`option-btn ${
@@ -335,6 +336,7 @@ export default function ExamPageFoundationalSkills() {
 
       <div className="nav-buttons">
         <button
+          type="button"
           className="nav-btn prev"
           onClick={() => goToQuestion(currentIndex - 1)}
           disabled={currentIndex === 0}
@@ -344,6 +346,7 @@ export default function ExamPageFoundationalSkills() {
 
         {currentIndex < questions.length - 1 ? (
           <button
+            type="button"
             className="nav-btn next"
             onClick={() => goToQuestion(currentIndex + 1)}
           >
@@ -351,6 +354,7 @@ export default function ExamPageFoundationalSkills() {
           </button>
         ) : (
           <button
+            type="button"
             className="nav-btn finish"
             onClick={goToNextSection}
           >
