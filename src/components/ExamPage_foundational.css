@@ -1,0 +1,321 @@
+/* ============================================================
+   GLOBAL RESET
+============================================================ */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+/* ============================================================
+   LOADING
+============================================================ */
+.loading {
+  text-align: center;
+  font-size: 18px;
+  padding: 60px 20px;
+  color: #475569;
+}
+
+/* ============================================================
+   EXAM CONTAINER
+============================================================ */
+.exam-container {
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 24px 32px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.foundational-exam {
+  border-top: 6px solid #2563eb;
+}
+
+/* ============================================================
+   HEADER
+============================================================ */
+.exam-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  font-weight: 600;
+}
+
+.timer {
+  color: #dc2626;
+  font-size: 18px;
+}
+
+.counter {
+  color: #1e3a8a;
+  font-size: 16px;
+}
+
+/* ============================================================
+   SECTION TITLE
+============================================================ */
+.section-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: #020617;
+}
+
+/* ============================================================
+   QUESTION INDEX ROW
+============================================================ */
+.index-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 10px 0 18px;
+  margin-bottom: 18px;
+}
+
+.index-circle {
+  min-width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 600;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+/* States */
+.index-not-visited {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.index-visited {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.index-answered {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.index-circle:hover {
+  transform: scale(1.05);
+}
+
+/* ============================================================
+   QUESTION CARD
+============================================================ */
+.question-card {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.question-text {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   OPTIONS
+============================================================ */
+.option-btn {
+  width: 100%;
+  text-align: left;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 2px solid #e5e7eb;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.option-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5f5;
+}
+
+.option-btn.selected {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+/* ============================================================
+   NAVIGATION BUTTONS
+============================================================ */
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nav-btn {
+  padding: 12px 22px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-btn.prev {
+  background: #e5e7eb;
+  color: #1f2937;
+}
+
+.nav-btn.next {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.nav-btn.finish {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nav-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   REPORT PAGE
+============================================================ */
+.report-page {
+  max-width: 1100px;
+  margin: 32px auto;
+  padding: 32px;
+}
+
+.report-title {
+  text-align: center;
+  font-size: 26px;
+  font-weight: 800;
+  margin-bottom: 32px;
+}
+
+/* ============================================================
+   REPORT GRID
+============================================================ */
+.report-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.report-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+}
+
+.report-card h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 20px;
+}
+
+/* ============================================================
+   DONUT (SIMPLIFIED)
+============================================================ */
+.donut {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  margin: 20px auto;
+  background: conic-gradient(
+    #2563eb calc(var(--percent, 75) * 1%),
+    #e5e7eb 0
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.donut span {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* ============================================================
+   STATS
+============================================================ */
+.stats {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 16px;
+  font-weight: 600;
+}
+
+/* ============================================================
+   TOPIC BREAKDOWN
+============================================================ */
+.topic-bar {
+  display: grid;
+  grid-template-columns: 1fr 4fr auto;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.topic-name {
+  font-weight: 600;
+}
+
+.bar {
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: #2563eb;
+  border-radius: 6px;
+}
+
+.percent {
+  font-weight: 600;
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 768px) {
+  .exam-container {
+    padding: 20px;
+  }
+
+  .report-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nav-buttons {
+    flex-direction: column;
+  }
+}
