@@ -119,6 +119,20 @@ export default function ReadingComponent({ studentId }) {
   /* -----------------------------
      UI
   ----------------------------- */
+  const examLevelOptions = exam?.answer_options || {};
+  const questionLevelOptions = currentQuestion.answer_options || {};
+              
+              // Detect placeholder options like { A: "A", B: "B", ... }
+  const isPlaceholderOptions =
+     Object.keys(questionLevelOptions).length > 0 &&
+     Object.entries(questionLevelOptions).every(
+     ([key, value]) => key === value
+     );
+              
+  const optionsToRender = isPlaceholderOptions
+      ? examLevelOptions
+      : questionLevelOptions;
+             
   return (
     <div className="exam-container">
       <div className="exam-header">
@@ -161,8 +175,9 @@ export default function ReadingComponent({ studentId }) {
             </p>
 
             <div className="options">
-              {Object.entries(currentQuestion.answer_options || {}).map(
-                ([letter, text]) => (
+               
+              <div className="options">
+                {Object.entries(optionsToRender).map(([letter, text]) => (
                   <button
                     key={letter}
                     className={`option-btn ${
@@ -172,8 +187,11 @@ export default function ReadingComponent({ studentId }) {
                   >
                     <strong>{letter}.</strong> {text}
                   </button>
-                )
-              )}
+                ))}
+              </div>
+
+              </div>
+
             </div>
           </div>
 
