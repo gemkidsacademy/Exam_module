@@ -45,7 +45,7 @@ export default function ExamPageFoundationalSkills() {
 
     try {
       const res = await fetch(
-        `/api/student/exam-report/foundational-skills?student_id=${studentId}`
+        `https://web-production-481a5.up.railway.app/api/student/exam-report/foundational-skills?student_id=${studentId}`
       );
 
       if (!res.ok) {
@@ -100,7 +100,7 @@ export default function ExamPageFoundationalSkills() {
 
       try {
         const res = await fetch(
-          "/api/student/start-exam/foundational-skills",
+          "https://web-production-481a5.up.railway.app/api/student/start-exam/foundational-skills",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -174,7 +174,7 @@ export default function ExamPageFoundationalSkills() {
 
       try {
         await fetch(
-          "/api/student/finish-exam/foundational-skills",
+          "https://web-production-481a5.up.railway.app/api/student/finish-exam/foundational-skills",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -202,7 +202,7 @@ export default function ExamPageFoundationalSkills() {
 
     try {
       const res = await fetch(
-        `/api/exams/foundational/next-section?student_id=${studentId}`,
+        `https://web-production-481a5.up.railway.app/api/exams/foundational/next-section?student_id=${studentId}`,
         { method: "POST" }
       );
 
