@@ -36,9 +36,14 @@ export default function ReadingComponent({ studentId }) {
      LOAD EXAM
   ----------------------------- */
   useEffect(() => {
-    if (!studentId) return;
+    if (!studentId) {
+      console.warn("⚠️ studentId missing");
+      return;
+    }
 
     const loadExam = async () => {
+      console.log("🚀 Loading reading exam for student:", studentId);
+
       const res = await fetch(
         `${BACKEND_URL}/api/exams/start-reading?student_id=${studentId}`,
         { method: "POST" }
@@ -46,17 +51,29 @@ export default function ReadingComponent({ studentId }) {
 
       const data = await res.json();
 
+      console.log("📦 RAW API RESPONSE:", data);
+
       if (data.detail) {
-        alert(data.detail);
+        console.error("❌ API error:", data.detail);
         setFinished(true);
         return;
       }
+
+      console.log("📘 exam_json:", data.exam_json);
+      console.log("📘 questions:", data.exam_json?.questions);
+      console.log("📘 reading_material:", data.exam_json?.reading_material);
+      console.log("📘 answer_options (raw):", data.exam_json?.answer_options);
 
       setSessionId(data.session_id);
       setExam(data.exam_json);
       setQuestions(data.exam_json.questions || []);
       setReadingMaterial(data.exam_json.reading_material || null);
       setAnswerOptions(data.exam_json.answer_options || {});
+
+      console.log(
+        "✅ answerOptions keys:",
+        Object.keys(data.exam_json.answer_options || {})
+      );
 
       const durationSeconds = (data.duration_minutes || 40) * 60;
       const start = new Date(normalizeTimestamp(data.start_time)).getTime();
@@ -89,7 +106,7 @@ export default function ReadingComponent({ studentId }) {
      SUBMIT
   ----------------------------- */
   const autoSubmit = async () => {
-    if (finished) return;
+    console.warn("⏱ Auto submitting exam");
 
     await fetch(`${BACKEND_URL}/api/exams/submit-reading`, {
       method: "POST",
@@ -104,59 +121,30 @@ export default function ReadingComponent({ studentId }) {
      INTERACTION
   ----------------------------- */
   const currentQuestion = questions[index];
-  if (!exam || !currentQuestion) return <div>Loading Exam…</div>;
+
+  if (!exam || !currentQuestion) {
+    console.warn("⌛ Exam or currentQuestion not ready");
+    return <div>Loading Exam…</div>;
+  }
 
   const handleSelect = (choice) => {
+    console.log(`🟢 Selected answer for Q${index + 1}:`, choice);
     setAnswers((prev) => ({ ...prev, [index]: choice }));
   };
 
   const goTo = (i) => {
+    console.log("➡️ Navigating to question index:", i);
     setVisited((v) => ({ ...v, [i]: true }));
     setIndex(i);
   };
 
   /* -----------------------------
-     FINISHED
+     RENDER DEBUG
   ----------------------------- */
-  if (finished) {
-    const score = questions.reduce(
-      (s, q, i) => s + (answers[i] === q.correct_answer ? 1 : 0),
-      0
-    );
-
-    return (
-      <div className="completed-screen">
-        <h1>Quiz Finished</h1>
-        <h2>
-          Your Score: {score} / {questions.length}
-        </h2>
-      </div>
-    );
-  }
-
-  /* -----------------------------
-     QUESTION INDEX ROW
-  ----------------------------- */
-  const renderQuestionIndex = () => (
-    <div className="question-index-row">
-      {questions.map((q, i) => {
-        let cls = "index-circle";
-        if (answers[i]) cls += " answered";
-        else if (visited[i]) cls += " visited";
-        if (i === index) cls += " active";
-
-        return (
-          <div
-            key={i}
-            className={cls}
-            onClick={() => goTo(i)}
-          >
-            {q.question_number}
-          </div>
-        );
-      })}
-    </div>
-  );
+  console.log("🧪 RENDER CHECK");
+  console.log("   → currentQuestion:", currentQuestion);
+  console.log("   → answerOptions:", answerOptions);
+  console.log("   → option count:", Object.keys(answerOptions).length);
 
   /* -----------------------------
      UI
@@ -171,11 +159,27 @@ export default function ReadingComponent({ studentId }) {
         </div>
       </div>
 
-      {/* QUESTION INDEX */}
-      {renderQuestionIndex()}
+      <div className="question-index-row">
+        {questions.map((q, i) => {
+          let cls = "index-circle";
+          if (answers[i]) cls += " answered";
+          else if (visited[i]) cls += " visited";
+          if (i === index) cls += " active";
+
+          return (
+            <div
+              key={i}
+              className={cls}
+              onClick={() => goTo(i)}
+            >
+              {q.question_number}
+            </div>
+          );
+        })}
+      </div>
 
       <div className="exam-body">
-        {/* LEFT: READING PASSAGE */}
+        {/* LEFT */}
         <div className="passage-pane">
           <h3>{readingMaterial?.title || "Reading Passage"}</h3>
           <p className="reading-text">
@@ -183,7 +187,7 @@ export default function ReadingComponent({ studentId }) {
           </p>
         </div>
 
-        {/* RIGHT: QUESTION + OPTIONS */}
+        {/* RIGHT */}
         <div className="question-pane">
           <div className="question-card">
             <p className="question-text">
@@ -192,17 +196,27 @@ export default function ReadingComponent({ studentId }) {
             </p>
 
             <div className="options">
-              {Object.entries(answerOptions).map(([letter, text]) => (
-                <button
-                  key={letter}
-                  className={`option-btn ${
-                    answers[index] === letter ? "selected" : ""
-                  }`}
-                  onClick={() => handleSelect(letter)}
-                >
-                  <strong>{letter}.</strong> {text}
-                </button>
-              ))}
+              {Object.keys(answerOptions).length === 0 && (
+                <p style={{ color: "red" }}>
+                  ❌ No answer options received
+                </p>
+              )}
+
+              {Object.entries(answerOptions).map(([letter, text]) => {
+                console.log("🔘 Rendering option:", letter, text);
+
+                return (
+                  <button
+                    key={letter}
+                    className={`option-btn ${
+                      answers[index] === letter ? "selected" : ""
+                    }`}
+                    onClick={() => handleSelect(letter)}
+                  >
+                    <strong>{letter}.</strong> {text}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
