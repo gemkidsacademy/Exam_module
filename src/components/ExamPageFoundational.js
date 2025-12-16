@@ -288,7 +288,7 @@ export default function ExamPageFoundationalSkills() {
       );
 
   return (
-    <div className="exam-container">
+    <div className="exam-container foundational-exam">
       <div className="exam-header">
         <div className="timer">⏳ {formatTime(timeLeft)}</div>
         <div className="counter">
