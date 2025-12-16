@@ -2,6 +2,8 @@ import "./ExamTypeSelector.css";
 import UploadWord from "./UploadWord";
 import UploadWord_reading from "./UploadWord_reading";
 import UploadWord_writing from "./UploadWord_writing";
+import ReadingUploadPanel from "./ReadingUploadPanel";
+
 
 export default function ExamTypeSelector({ examType, onSelect }) {
   const examOptions = [
@@ -12,7 +14,7 @@ export default function ExamTypeSelector({ examType, onSelect }) {
   ];
 
   if (examType === "thinkingskills") return <UploadWord />;
-  if (examType === "reading") return <UploadWord_reading />;
+  if (examType === "reading") return <ReadingUploadPanel />;
   if (examType === "writing") return <UploadWord_writing />;
 
   return (
