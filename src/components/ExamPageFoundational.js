@@ -234,7 +234,7 @@ export default function ExamPageFoundationalSkills() {
   const goToNextSection = async () => {
     try {
       const res = await fetch(
-        `/api/exams/foundational/next-section?student_id=${studentId}`,
+        `https://web-production-481a5.up.railway.app/api/exams/foundational/next-section?student_id=${studentId}`,
         { method: "POST" }
       );
 
