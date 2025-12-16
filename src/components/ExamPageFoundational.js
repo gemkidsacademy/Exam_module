@@ -8,6 +8,8 @@ import "./ExamPage_foundational.css";
 
 export default function ExamPageFoundationalSkills() {
   const studentId = sessionStorage.getItem("student_id");
+  const hasStartedRef = useRef(false);
+
 
   /* ============================================================
      REFS
@@ -107,36 +109,39 @@ export default function ExamPageFoundationalSkills() {
      START / RESUME EXAM
   ============================================================ */
   useEffect(() => {
-    if (!studentId) return;
+  if (!studentId) return;
+  if (hasStartedRef.current) return;
 
-    const startExam = async () => {
-      try {
-        const res = await fetch(
-          "https://web-production-481a5.up.railway.app/api/student/start-exam/foundational-skills",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ student_id: studentId })
-          }
-        );
+  hasStartedRef.current = true;
 
-        const data = await res.json();
-
-        if (data.completed === true) {
-          await loadReport();
-          return;
+  const startExam = async () => {
+    try {
+      const res = await fetch(
+        "https://web-production-481a5.up.railway.app/api/student/start-exam/foundational-skills",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ student_id: studentId })
         }
+      );
 
-        loadSection(data.section, data.current_section_index);
-        setTimeLeft(data.remaining_time);
-        setMode("exam");
-      } catch (err) {
-        console.error("❌ start-exam error:", err);
+      const data = await res.json();
+
+      if (data.completed === true) {
+        await loadReport();
+        return;
       }
-    };
 
-    startExam();
-  }, [studentId, loadReport]);
+      loadSection(data.section, data.current_section_index);
+      setTimeLeft(data.remaining_time);
+      setMode("exam");
+    } catch (err) {
+      console.error("❌ start-exam error:", err);
+    }
+  };
+
+  startExam();
+}, [studentId]); // 🔥 exactly like ThinkingSkills
 
   /* ============================================================
      TIMER
