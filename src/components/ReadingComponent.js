@@ -195,15 +195,26 @@ export default function ReadingComponent({ studentId }) {
      PASSAGE FILTERING
   ---------------------------------------------------------*/
   const topicPassageMap = {
-    "Comparative analysis": ["Extract A", "Extract B", "Extract C", "Extract D"],
-    "Main Idea and Summary": [
-      "Paragraph 1", "Paragraph 2", "Paragraph 3",
-      "Paragraph 4", "Paragraph 5", "Paragraph 6",
+    "Comparative analysis": [
+      "Extract A",
+      "Extract B",
+      "Extract C",
+      "Extract D",
+    ],
+    "Main Idea & Summary": [
+      "Paragraph 1",
+      "Paragraph 2",
+      "Paragraph 3",
+      "Paragraph 4",
+      "Paragraph 5",
+      "Paragraph 6",
     ],
   };
+  const isGappedText = currentQuestion.topic === "Gapped Text";
 
-  const visiblePassages =
-    topicPassageMap[currentQuestion.topic] || [];
+  const visiblePassages = isGappedText
+    ? []
+    : topicPassageMap[currentQuestion.topic] || [];
 
 
   /* -------------------------------------------------------
@@ -267,58 +278,60 @@ export default function ReadingComponent({ studentId }) {
 
       <div className="exam-body">
 
-        {/* LEFT PASSAGES */}
-        <div className="passage-pane">
-          <h3>Reading Materials</h3>
-          {visiblePassages.map((label) => (
-            <div key={label} className="passage-block">
-              <h4>{label}</h4>
-              <p>{passages[label]}</p>
-            </div>
-          ))}
+  {/* LEFT: PASSAGES (only if not Gapped Text) */}
+  {!isGappedText && (
+    <div className="passage-pane">
+      <h3>Reading Materials</h3>
+      {visiblePassages.map((label) => (
+        <div key={label} className="passage-block">
+          <h4>{label}</h4>
+          <p>{passages[label]}</p>
         </div>
-
-        {/* RIGHT QUESTION */}
-        <div className="question-pane">
-          <div className="question-card">
-
-            <p className="question-text">
-              Q{currentQuestion.question_number}. {currentQuestion.question_text}
-            </p>
-
-            {Object.entries(answerOptions).map(([letter, text]) => (
-              <button
-                key={letter}
-                className={`option-btn ${answers[index] === letter ? "selected" : ""}`}
-                onClick={() => handleSelect(letter)}
-              >
-                {letter}. {text}
-              </button>
-            ))}
-          </div>
-
-          <div className="nav-buttons">
-            <button
-              className="nav-btn prev"
-              disabled={index === 0}
-              onClick={() => goTo(index - 1)}
-            >
-              Previous
-            </button>
-
-            {index < questions.length - 1 ? (
-              <button className="nav-btn next" onClick={() => goTo(index + 1)}>
-                Next
-              </button>
-            ) : (
-              <button className="nav-btn finish" onClick={autoSubmit}>
-                Finish
-              </button>
-            )}
-          </div>
-
-        </div>
-      </div>
+      ))}
     </div>
+  )}
+
+  {/* RIGHT: QUESTION (always shown) */}
+  <div className="question-pane">
+    <div className="question-card">
+      <p className="question-text">
+        Q{currentQuestion.question_number}. {currentQuestion.question_text}
+      </p>
+
+      {Object.entries(answerOptions).map(([letter, text]) => (
+        <button
+          key={letter}
+          className={`option-btn ${
+            answers[index] === letter ? "selected" : ""
+          }`}
+          onClick={() => handleSelect(letter)}
+        >
+          {letter}. {text}
+        </button>
+      ))}
+    </div>
+
+    <div className="nav-buttons">
+      <button
+        className="nav-btn prev"
+        disabled={index === 0}
+        onClick={() => goTo(index - 1)}
+      >
+        Previous
+      </button>
+
+      {index < questions.length - 1 ? (
+        <button className="nav-btn next" onClick={() => goTo(index + 1)}>
+          Next
+        </button>
+      ) : (
+        <button className="nav-btn finish" onClick={autoSubmit}>
+          Finish
+        </button>
+      )}
+    </div>
+  </div>
+</div>
+
   );
 }
