@@ -36,6 +36,10 @@ export default function ExamPageFoundationalSkills() {
 
   // ---------------- REPORT ----------------
   const [report, setReport] = useState(null);
+  const jumpToQuestion = (idx) => {
+    if (idx < 0 || idx >= questions.length) return;
+    setCurrentIndex(idx);
+  };
 
   /* ============================================================
      LOAD REPORT
@@ -247,7 +251,14 @@ export default function ExamPageFoundationalSkills() {
       [currentIndex]: optionKey
     }));
   };
-  const goToQuestion = (idx) => setCurrentIndex(idx);
+  const goToQuestion = (delta) => {
+    setCurrentIndex(prev => {
+      const next = prev + delta;
+      if (next < 0 || next >= questions.length) return prev;
+      return next;
+    });
+  };
+
 
   const formatTime = (seconds) => {
     const m = String(Math.floor(seconds / 60)).padStart(2, "0");
@@ -305,7 +316,7 @@ export default function ExamPageFoundationalSkills() {
                 : "index-not-visited"
             }`}
 
-            onClick={() => goToQuestion(i)}
+            onClick={() => jumpToQuestion(i)}
           >
             {i + 1}
           </div>
@@ -337,20 +348,21 @@ export default function ExamPageFoundationalSkills() {
         <button
           type="button"
           className="nav-btn prev"
-          onClick={() => goToQuestion(currentIndex - 1)}
+          onClick={() => goToQuestion(-1)}
           disabled={currentIndex === 0}
         >
           Previous
         </button>
 
         {currentIndex < questions.length - 1 ? (
-          <button
-            type="button"
-            className="nav-btn next"
-            onClick={() => goToQuestion(currentIndex + 1)}
-          >
-            Next
-          </button>
+        <button
+          type="button"
+          className="nav-btn next"
+          onClick={() => goToQuestion(1)}
+        >
+          Next
+        </button>
+
         ) : (
           <button
             type="button"
