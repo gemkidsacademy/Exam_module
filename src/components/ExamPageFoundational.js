@@ -41,20 +41,21 @@ export default function ExamPageFoundationalSkills() {
      LOAD REPORT
   ============================================================ */
   const loadReport = useCallback(async () => {
+    console.log("📊 LOAD REPORT → student:", studentId);
+
     try {
       const res = await fetch(
         `/api/student/exam-report/foundational-skills?student_id=${studentId}`
       );
 
-      if (!res.ok) return;
-
       if (!res.ok) {
         const text = await res.text();
-        console.error("start-exam failed:", text);
+        console.warn("⚠️ report not ready:", text);
         return;
       }
-      
+
       const data = await res.json();
+      console.log("✅ REPORT DATA:", data);
 
       setReport(data);
       setMode("report");
@@ -64,10 +65,21 @@ export default function ExamPageFoundationalSkills() {
   }, [studentId]);
 
   /* ============================================================
-     LOAD SECTION
+     LOAD SECTION (AUTHORITATIVE)
   ============================================================ */
   const loadSection = (section, sectionIndex) => {
-    setQuestions(section.questions || []);
+    console.log("🧩 LOAD SECTION:", {
+      sectionIndex,
+      sectionName: section?.name,
+      questionsCount: section?.questions?.length
+    });
+
+    if (!section || !Array.isArray(section.questions)) {
+      console.error("❌ Invalid section payload:", section);
+      return;
+    }
+
+    setQuestions(section.questions);
     setSectionName(section.name || "");
     setCurrentSectionIndex(sectionIndex);
     setCurrentIndex(0);
@@ -78,12 +90,17 @@ export default function ExamPageFoundationalSkills() {
      START / RESUME EXAM
   ============================================================ */
   useEffect(() => {
-    if (!studentId) return;
+    if (!studentId) {
+      console.warn("⚠️ No student_id in sessionStorage");
+      return;
+    }
 
     const startExam = async () => {
+      console.log("🚀 START EXAM → student:", studentId);
+
       try {
         const res = await fetch(
-          "https://web-production-481a5.up.railway.app/api/student/start-exam/foundational-skills",
+          "/api/student/start-exam/foundational-skills",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -91,10 +108,29 @@ export default function ExamPageFoundationalSkills() {
           }
         );
 
-        const data = await res.json();
+        console.log("⬅️ start-exam status:", res.status);
+
+        const raw = await res.text();
+        console.log("⬅️ start-exam raw response:", raw);
+
+        let data;
+        try {
+          data = JSON.parse(raw);
+        } catch {
+          console.error("❌ start-exam invalid JSON");
+          return;
+        }
+
+        console.log("✅ START-EXAM DATA:", data);
 
         if (data.completed === true) {
+          console.log("ℹ️ Exam already completed → loading report");
           await loadReport();
+          return;
+        }
+
+        if (!data.section || !data.section.questions) {
+          console.error("❌ start-exam missing section data:", data);
           return;
         }
 
@@ -134,6 +170,8 @@ export default function ExamPageFoundationalSkills() {
       if (hasSubmittedRef.current) return;
       hasSubmittedRef.current = true;
 
+      console.log("🏁 FINISH EXAM:", { studentId, reason });
+
       try {
         await fetch(
           "/api/student/finish-exam/foundational-skills",
@@ -160,6 +198,8 @@ export default function ExamPageFoundationalSkills() {
      NEXT SECTION
   ============================================================ */
   const goToNextSection = async () => {
+    console.log("➡️ NEXT SECTION → student:", studentId);
+
     try {
       const res = await fetch(
         `/api/exams/foundational/next-section?student_id=${studentId}`,
@@ -167,6 +207,7 @@ export default function ExamPageFoundationalSkills() {
       );
 
       const data = await res.json();
+      console.log("⬅️ next-section response:", data);
 
       if (data.completed === true) {
         finishExam("manual_submit");
@@ -231,7 +272,14 @@ export default function ExamPageFoundationalSkills() {
   }
 
   const currentQ = questions[currentIndex];
-  if (!currentQ) return null;
+
+  if (!currentQ) {
+    console.warn("🟠 Render blocked – no current question", {
+      questionsLength: questions.length,
+      currentIndex
+    });
+    return <p className="loading">Preparing questions…</p>;
+  }
 
   const normalizedOptions = Array.isArray(currentQ.options)
     ? currentQ.options
@@ -248,9 +296,7 @@ export default function ExamPageFoundationalSkills() {
         </div>
       </div>
 
-      <div className="section-title">
-        {sectionName}
-      </div>
+      <div className="section-title">{sectionName}</div>
 
       <div className="index-row">
         {questions.map((q, i) => (
@@ -338,11 +384,9 @@ function FoundationalSkillsReport({ report }) {
       <div className="report-grid">
         <div className="report-card">
           <h3>Accuracy</h3>
-
           <div className="donut">
             <span>{summary.accuracy_percent}%</span>
           </div>
-
           <div className="stats">
             <p>Correct: {summary.correct_answers}</p>
             <p>Wrong: {summary.wrong_answers}</p>
@@ -363,9 +407,7 @@ function FoundationalSkillsReport({ report }) {
                 />
               </div>
 
-              <span className="percent">
-                {topic.accuracy_percent}%
-              </span>
+              <span className="percent">{topic.accuracy_percent}%</span>
             </div>
           ))}
         </div>
