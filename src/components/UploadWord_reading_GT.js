@@ -23,7 +23,7 @@ export default function UploadWord_reading_GT() {
     setUploading(true);
 
     try {
-      const res = await fetch("https://web-production-481a5.up.railway.app/upload-word-reading", {
+      const res = await fetch("https://web-production-481a5.up.railway.app/upload-word-reading-gapped"", {
         method: "POST",
         body: formData,
       });
