@@ -152,15 +152,14 @@ export default function ExamPageFoundationalSkills() {
   useEffect(() => {
     if (prevIndexRef.current !== null) {
       const prevIdx = prevIndexRef.current;
-      const prevQid = questions[prevIdx]?.q_id;
-
-      if (prevQid && !answers[prevQid]) {
+  
+      if (answers[prevIdx] === undefined) {
         setVisited(prev => ({ ...prev, [prevIdx]: true }));
       }
     }
-
+  
     prevIndexRef.current = currentIndex;
-  }, [currentIndex, questions, answers]);
+  }, [currentIndex, answers]);
 
   /* ============================================================
      FINISH EXAM
