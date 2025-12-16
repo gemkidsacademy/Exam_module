@@ -81,13 +81,22 @@ export default function ExamPageFoundationalSkills() {
   /* ============================================================
      LOAD SECTION (ATOMIC)
   ============================================================ */
+  const normalizeQuestions = (rawQuestions) => {
+    return rawQuestions.map((q, index) => ({
+      q_id: q.q_id || q.id || index,
+      question: q.question || q.question_text || q.text || q.prompt,
+      options: q.options || q.choices || q.answers
+    }));
+  };
   const loadSection = (section, sectionIndex) => {
     if (!section || !Array.isArray(section.questions)) {
       console.error("❌ Invalid section payload:", section);
       return;
     }
-
-    setQuestions(section.questions);
+  
+    const normalized = normalizeQuestions(section.questions);
+  
+    setQuestions(normalized);
     setSectionName(section.name || "");
     setCurrentSectionIndex(sectionIndex);
     setCurrentIndex(0);
