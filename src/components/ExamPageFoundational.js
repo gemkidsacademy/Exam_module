@@ -48,7 +48,14 @@ export default function ExamPageFoundationalSkills() {
 
       if (!res.ok) return;
 
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("start-exam failed:", text);
+        return;
+      }
+      
       const data = await res.json();
+
       setReport(data);
       setMode("report");
     } catch (err) {
