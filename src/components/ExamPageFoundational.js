@@ -93,11 +93,14 @@ export default function ExamPageFoundationalSkills() {
   ============================================================ */
   const normalizeQuestions = (rawQuestions) => {
     return rawQuestions.map((q, index) => ({
-      q_id: q.q_id || q.id || index,
+      question_number: q.question_number, // ✅ CRITICAL
+      q_id: q.question_number,             // optional alias
       question: q.question || q.question_text || q.text || q.prompt,
-      options: q.options || q.choices || q.answers
+      options: q.options || q.choices || q.answers,
+      topic: q.topic
     }));
   };
+
   const loadSection = (section, sectionIndex) => {
     if (!section || !Array.isArray(section.questions)) {
       console.error("❌ Invalid section payload:", section);
@@ -175,7 +178,7 @@ export default function ExamPageFoundationalSkills() {
   const handleAnswer = (optionKey) => {
     setAnswers(prev => ({
       ...prev,
-      [currentIndex]: optionKey
+      [currentQ.question_number]: optionKey
     }));
   };
 
@@ -273,6 +276,7 @@ export default function ExamPageFoundationalSkills() {
     : Object.entries(currentQ.options || {}).map(
         ([k, v]) => `${k}) ${v}`
       );
+  const qNum = currentQ.question_number;
 
   return (
     <div className="exam-container foundational-exam">
@@ -289,8 +293,9 @@ export default function ExamPageFoundationalSkills() {
         {questions.map((q, i) => (
           <div
             key={q.q_id}
+            
             className={`index-circle ${
-              answers[i]
+              answers[q.question_number]
                 ? "index-answered"
                 : visited[i]
                 ? "index-visited"
@@ -315,8 +320,9 @@ export default function ExamPageFoundationalSkills() {
               type="button"
               onClick={() => handleAnswer(optionKey)}
               className={`option-btn ${
-                answers[currentIndex] === optionKey ? "selected" : ""
+                answers[currentQ.question_number] === optionKey ? "selected" : ""
               }`}
+
             >
               {opt}
             </button>
