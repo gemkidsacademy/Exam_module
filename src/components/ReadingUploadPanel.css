@@ -1,0 +1,45 @@
+.reading-upload-panel {
+  max-width: 420px;
+  margin: 40px auto;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.reading-upload-panel h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.upload-btn {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.upload-btn.gapped {
+  background: #0b6cf0;
+  color: white;
+}
+
+.upload-btn.main-idea {
+  background: #059669;
+  color: white;
+}
+
+.upload-btn.comparative {
+  background: #7c3aed;
+  color: white;
+}
+
+.upload-btn:hover {
+  opacity: 0.9;
+}
