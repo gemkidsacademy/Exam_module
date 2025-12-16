@@ -3,8 +3,6 @@ import React, { useState, useEffect } from "react";
 export default function GenerateExam_reading() {
   const [quizzes, setQuizzes] = useState([]);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
-  const [selectedClass, setSelectedClass] = useState("");
-  const [selectedDifficulty, setSelectedDifficulty] = useState("");
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
@@ -15,33 +13,33 @@ export default function GenerateExam_reading() {
   // Formatting Helpers
   // ---------------------------
   const formatClassName = (cls) => {
-    switch (cls) {
-      case "year1": return "Year 1";
-      case "year2": return "Year 2";
-      case "year3": return "Year 3";
-      case "year4": return "Year 4";
-      case "year5": return "Year 5";
-      case "year6": return "Year 6";
-      case "selective": return "Selective";
-      case "kindergarten": return "Kindergarten";
-      default: return cls;
-    }
+    const map = {
+      year1: "Year 1",
+      year2: "Year 2",
+      year3: "Year 3",
+      year4: "Year 4",
+      year5: "Year 5",
+      year6: "Year 6",
+      selective: "Selective",
+      kindergarten: "Kindergarten"
+    };
+    return map[cls] || cls;
   };
 
   const formatDifficulty = (lvl) => {
-    switch (lvl) {
-      case "easy": return "Easy";
-      case "medium": return "Medium";
-      case "hard": return "Hard";
-      default: return lvl;
-    }
+    const map = {
+      easy: "Easy",
+      medium: "Medium",
+      hard: "Hard"
+    };
+    return map[lvl] || lvl;
   };
 
   // ---------------------------
   // LOAD QUIZ CONFIGS
   // ---------------------------
   useEffect(() => {
-    const load = async () => {
+    const loadQuizzes = async () => {
       try {
         const res = await fetch(`${BACKEND_URL}/api/quizzes-reading`);
         if (!res.ok) throw new Error("Failed to load quizzes");
@@ -55,21 +53,21 @@ export default function GenerateExam_reading() {
       }
     };
 
-    load();
+    loadQuizzes();
   }, []);
 
   // ---------------------------
   // GENERATE EXAM
   // ---------------------------
   const handleGenerateExam = async () => {
-    if (!selectedClass || !selectedDifficulty) {
-      alert("Please select class and difficulty");
+    if (!selectedQuiz) {
+      alert("Please select a quiz requirement.");
       return;
     }
 
     const payload = {
-      class_name: selectedClass,
-      difficulty: selectedDifficulty
+      class_name: selectedQuiz.class_name,
+      difficulty: selectedQuiz.difficulty
     };
 
     console.log("📤 Sending payload:", payload);
@@ -90,17 +88,14 @@ export default function GenerateExam_reading() {
 
       if (!res.ok) {
         setError(data.detail || "Failed to generate exam.");
-        alert("❌ Error: " + (data.detail || "Failed to generate exam."));
         setLoading(false);
         return;
       }
 
-      setGeneratedExam(data);
-      alert("✅ Exam generated successfully!");
+      setGeneratedExam(data.exam_json);
     } catch (err) {
-      console.error(err);
-      alert("❌ Network error while generating exam.");
-      setError("Network error");
+      console.error("❌ Network error:", err);
+      setError("Network error while generating exam.");
     }
 
     setLoading(false);
@@ -110,29 +105,24 @@ export default function GenerateExam_reading() {
   // UI
   // ---------------------------
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ padding: "20px", maxWidth: "900px" }}>
       <h2>Generate Reading Exam</h2>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
+      {/* ---------------- Quiz Selector ---------------- */}
       <div style={{ marginBottom: "20px" }}>
-        <label>Select Quiz:</label>
+        <label><strong>Select Quiz Requirement</strong></label>
 
         <select
-          value={selectedQuiz ? JSON.stringify(selectedQuiz) : ""}
+          value={selectedQuiz ? selectedQuiz.id : ""}
           onChange={(e) => {
-            const parsed = JSON.parse(e.target.value);
-
-            console.log("📘 Class selected:", parsed.class_name);
-            console.log("📙 Difficulty selected:", parsed.difficulty);
-
-            setSelectedQuiz(parsed);
-            setSelectedClass(parsed.class_name);
-            setSelectedDifficulty(parsed.difficulty);
+            const quiz = quizzes.find(q => String(q.id) === e.target.value);
+            setSelectedQuiz(quiz || null);
           }}
           style={{
             padding: "8px",
-            minWidth: "260px",
+            minWidth: "300px",
             display: "block",
             marginTop: "10px"
           }}
@@ -140,20 +130,35 @@ export default function GenerateExam_reading() {
           <option value="">-- Select Quiz Requirement --</option>
 
           {quizzes.map((q) => (
-            <option
-              key={`${q.class_name}-${q.difficulty}`}
-              value={JSON.stringify({
-                class_name: q.class_name,
-                difficulty: q.difficulty
-              })}
-            >
+            <option key={q.id} value={q.id}>
               {`${formatClassName(q.class_name)} | ${formatDifficulty(q.difficulty)}`}
             </option>
           ))}
         </select>
       </div>
 
-      {/* ------------ Generate Button ------------ */}
+      {/* ---------------- Read-only Topics ---------------- */}
+      {selectedQuiz?.topics && (
+        <div
+          style={{
+            marginBottom: "20px",
+            padding: "12px",
+            border: "1px solid #ddd",
+            backgroundColor: "#f9f9f9"
+          }}
+        >
+          <strong>Included Topics</strong>
+          <ul style={{ marginTop: "8px" }}>
+            {selectedQuiz.topics.map((t, idx) => (
+              <li key={idx}>
+                {t.name} ({t.num_questions} questions)
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* ---------------- Generate Button ---------------- */}
       <button
         onClick={handleGenerateExam}
         disabled={loading}
@@ -168,34 +173,31 @@ export default function GenerateExam_reading() {
         {loading ? "Generating..." : "Generate Exam"}
       </button>
 
-      {/* ------------ Display Generated Exam ------------ */}
+      {/* ---------------- Generated Exam Preview ---------------- */}
       {generatedExam && (
         <div style={{ marginTop: "30px" }}>
-          <h3>Generated Exam</h3>
+          <h3>Generated Exam Preview</h3>
 
           <p>
             <strong>Total Questions:</strong> {generatedExam.total_questions}
           </p>
 
-          {generatedExam.questions?.length > 0 ? (
-            generatedExam.questions.map((q, idx) => (
-              <div
-                key={idx}
-                style={{
-                  marginBottom: "20px",
-                  padding: "10px",
-                  border: "1px solid #ccc"
-                }}
-              >
-                <strong>Q{idx + 1}:</strong> {q.question}
-                <p>
-                  <strong>Correct:</strong> {q.correct}
-                </p>
-              </div>
-            ))
-          ) : (
-            <p>No questions generated.</p>
-          )}
+          {generatedExam.questions?.map((q, idx) => (
+            <div
+              key={idx}
+              style={{
+                marginBottom: "16px",
+                padding: "12px",
+                border: "1px solid #ccc",
+                background: "#fff"
+              }}
+            >
+              <strong>Q{idx + 1}:</strong> {q.question_text}
+              <p>
+                <strong>Correct Answer:</strong> {q.correct_answer}
+              </p>
+            </div>
+          ))}
         </div>
       )}
     </div>
