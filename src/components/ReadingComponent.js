@@ -5,8 +5,9 @@ export default function ReadingComponent({ studentId }) {
   console.log("💥 USING ReadingComponent");
 
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
-  const GAPPED_OPTIONS = ["A", "B", "C", "D", "E", "F", "G"];
-
+  
+  const FIXED_OPTIONS = ["A", "B", "C", "D", "E", "F", "G"];
+  
 
   // -----------------------------
   // STATE
@@ -131,6 +132,13 @@ export default function ReadingComponent({ studentId }) {
   // INTERACTION
   // -----------------------------
   const currentQuestion = questions[index];
+  if (!exam || !currentQuestion) {
+    return <div>Loading Exam...</div>;
+  }
+
+  const isGappedText = currentQuestion.topic === "Gapped Text";
+  const isMainIdea = currentQuestion.topic === "Main Idea & Summary";
+  const usesFixedOptions = isGappedText || isMainIdea;
 
   const handleSelect = (choice) => {
     setAnswers((prev) => ({ ...prev, [index]: choice }));
@@ -183,7 +191,7 @@ export default function ReadingComponent({ studentId }) {
     ],
   };
 
-  const isGappedText = currentQuestion.topic === "Gapped Text";
+  
 
   const visiblePassages = isGappedText
     ? []
@@ -268,9 +276,9 @@ export default function ReadingComponent({ studentId }) {
             </p>
 
             {/* ANSWER OPTIONS */}
-            {isGappedText ? (
-              <div className="gapped-options">
-                {GAPPED_OPTIONS.map((letter) => (
+            {usesFixedOptions ? (
+              <div className="fixed-options">
+                {FIXED_OPTIONS.map((letter) => (
                   <button
                     key={letter}
                     className={`option-btn ${
