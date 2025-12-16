@@ -371,21 +371,24 @@
   color: #475569;
 }
 
-/* ============================================================
-   FOUNDATIONAL EXAM — SAFE CLICK FIX (SCOPED)
-============================================================ */
+/* ============================================
+   FOUNDATIONAL EXAM — FINAL CLICK FIX (SCOPED)
+============================================ */
 
+/* Prevent index-row from blocking the UI */
 .foundational-exam .index-row {
-  position: relative;
-  z-index: 1;
+  pointer-events: none;
 }
 
-.foundational-exam .question-card {
-  position: relative;
-  z-index: 5;
+/* Re-enable clicks ONLY on circles */
+.foundational-exam .index-circle {
+  pointer-events: auto;
 }
 
-.foundational-exam .option-btn {
+/* Ensure exam content always receives clicks */
+.foundational-exam .question-card,
+.foundational-exam .option-btn,
+.foundational-exam .nav-buttons {
   position: relative;
-  z-index: 10;
+  z-index: 2;
 }
