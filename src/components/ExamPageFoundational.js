@@ -56,10 +56,18 @@ export default function ExamPageFoundationalSkills() {
   const questionsReady = Array.isArray(questions) && questions.length > 0;
 
   const safeSetQuestionIndex = (idx) => {
+    console.log("🧭 TRY SET INDEX", {
+      target: idx,
+      min: 0,
+      max: questions?.length - 1
+    });
+  
     if (!questionsReady) return;
     if (idx < 0 || idx >= questions.length) return;
+  
     setCurrentIndex(idx);
   };
+
 
   /* ============================================================
      LOAD REPORT
@@ -175,8 +183,13 @@ export default function ExamPageFoundationalSkills() {
      NAVIGATION
   ============================================================ */
   const nextQuestion = () => {
+    console.log("➡️ NEXT CLICKED", {
+      before: currentIndex,
+      questionsLength: questions?.length
+    });
+  
     if (!questionsReady) return;
-
+  
     setVisited(prev => ({ ...prev, [currentIndex]: true }));
     safeSetQuestionIndex(currentIndex + 1);
   };
@@ -247,6 +260,10 @@ export default function ExamPageFoundationalSkills() {
   if (!questionsReady) {
     return <p className="loading">Preparing questions…</p>;
   }
+  console.log("🎯 RENDER QUESTION", {
+    currentIndex,
+    questionText: currentQ?.question
+  });
 
   const currentQ = questions[currentIndex];
 
