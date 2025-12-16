@@ -243,15 +243,11 @@ export default function ExamPageFoundationalSkills() {
      ANSWER HANDLING
   ============================================================ */
   const handleAnswer = (optionKey) => {
-    const qid = questions[currentIndex]?.q_id;
-    if (!qid) return;
-
     setAnswers(prev => ({
       ...prev,
-      [qid]: optionKey
+      [currentIndex]: optionKey
     }));
   };
-
   const goToQuestion = (idx) => setCurrentIndex(idx);
 
   const formatTime = (seconds) => {
@@ -303,12 +299,13 @@ export default function ExamPageFoundationalSkills() {
           <div
             key={q.q_id}
             className={`index-circle ${
-              answers[q.q_id]
+              answers[i]
                 ? "index-answered"
                 : visited[i]
                 ? "index-visited"
                 : "index-not-visited"
             }`}
+
             onClick={() => goToQuestion(i)}
           >
             {i + 1}
@@ -327,7 +324,7 @@ export default function ExamPageFoundationalSkills() {
               key={i}
               onClick={() => handleAnswer(optionKey)}
               className={`option-btn ${
-                answers[currentQ.q_id] === optionKey ? "selected" : ""
+                answers[currentIndex] === optionKey ? "selected" : ""
               }`}
             >
               {opt}
