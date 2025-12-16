@@ -5,6 +5,8 @@ export default function ReadingComponent({ studentId }) {
   console.log("💥 USING ReadingComponent");
 
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+  const GAPPED_OPTIONS = ["A", "B", "C", "D", "E", "F", "G"];
+
 
   // -----------------------------
   // STATE
@@ -265,17 +267,35 @@ export default function ReadingComponent({ studentId }) {
               {currentQuestion.question_text}
             </p>
 
-            {Object.entries(answerOptions).map(([letter, text]) => (
-              <button
-                key={letter}
-                className={`option-btn ${
-                  answers[index] === letter ? "selected" : ""
-                }`}
-                onClick={() => handleSelect(letter)}
-              >
-                {letter}. {text}
-              </button>
-            ))}
+            {/* ANSWER OPTIONS */}
+            {isGappedText ? (
+              <div className="gapped-options">
+                {GAPPED_OPTIONS.map((letter) => (
+                  <button
+                    key={letter}
+                    className={`option-btn ${
+                      answers[index] === letter ? "selected" : ""
+                    }`}
+                    onClick={() => handleSelect(letter)}
+                  >
+                    {letter}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              Object.entries(answerOptions).map(([letter, text]) => (
+                <button
+                  key={letter}
+                  className={`option-btn ${
+                    answers[index] === letter ? "selected" : ""
+                  }`}
+                  onClick={() => handleSelect(letter)}
+                >
+                  {letter}. {text}
+                </button>
+              ))
+            )}
+
           </div>
 
           <div className="nav-buttons">
