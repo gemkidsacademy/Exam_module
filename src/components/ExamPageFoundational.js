@@ -83,7 +83,7 @@ export default function ExamPageFoundationalSkills() {
     const startExam = async () => {
       try {
         const res = await fetch(
-          "/api/student/start-exam/foundational-skills",
+          "https://web-production-481a5.up.railway.app/api/student/start-exam/foundational-skills",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
