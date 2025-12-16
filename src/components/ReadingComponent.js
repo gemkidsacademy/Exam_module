@@ -120,7 +120,8 @@ export default function ReadingComponent({ studentId }) {
      UI
   ----------------------------- */
   const examLevelOptions = exam?.answer_options || {};
-  const questionLevelOptions = currentQuestion.answer_options || {};
+  const questionLevelOptions = currentQuestion?.answer_options || {};
+
               
               // Detect placeholder options like { A: "A", B: "B", ... }
   const isPlaceholderOptions =
