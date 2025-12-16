@@ -94,61 +94,64 @@ export default function ExamPageFoundationalSkills() {
      START / RESUME EXAM
   ============================================================ */
   useEffect(() => {
-    if (!studentId) {
-      console.warn("⚠️ No student_id in sessionStorage");
-      return;
-    }
+  if (!studentId) return;
 
-    const startExam = async () => {
-      console.log("🚀 START EXAM → student:", studentId);
+  const startExam = async (retry = false) => {
+    console.log("🚀 START EXAM → student:", studentId);
 
-      try {
-        const res = await fetch(
-          "https://web-production-481a5.up.railway.app/api/student/start-exam/foundational-skills",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ student_id: studentId })
-          }
-        );
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, 15000); // 15s timeout (Railway-safe)
 
-        console.log("⬅️ start-exam status:", res.status);
-
-        const raw = await res.text();
-        console.log("⬅️ start-exam raw response:", raw);
-
-        let data;
-        try {
-          data = JSON.parse(raw);
-        } catch {
-          console.error("❌ start-exam invalid JSON");
-          return;
+    try {
+      const res = await fetch(
+        "https://web-production-481a5.up.railway.app/api/student/start-exam/foundational-skills",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ student_id: studentId }),
+          signal: controller.signal
         }
+      );
 
-        console.log("✅ START-EXAM DATA:", data);
+      clearTimeout(timeoutId);
 
-        if (data.completed === true) {
-          console.log("ℹ️ Exam already completed → loading report");
-          await loadReport();
-          return;
-        }
+      console.log("⬅️ start-exam status:", res.status);
 
-        if (!data.section || !data.section.questions) {
-          console.error("❌ start-exam missing section data:", data);
-          return;
-        }
+      const data = await res.json();
+      console.log("✅ START-EXAM DATA:", data);
 
-        loadSection(data.section, data.current_section_index);
-        setTimeLeft(data.remaining_time);
-        setMode("exam");
-
-      } catch (err) {
-        console.error("❌ start-exam error:", err);
+      if (data.completed === true) {
+        console.log("ℹ️ Exam already completed → loading report");
+        await loadReport();
+        return;
       }
-    };
 
-    startExam();
-  }, [studentId, loadReport]);
+      if (!data.section || !Array.isArray(data.section.questions)) {
+        console.error("❌ start-exam invalid payload:", data);
+        return;
+      }
+
+      loadSection(data.section, data.current_section_index);
+      setTimeLeft(data.remaining_time);
+      setMode("exam");
+
+    } catch (err) {
+      clearTimeout(timeoutId);
+
+      console.error("❌ start-exam failed:", err);
+
+      // Retry once (Railway DB waking up)
+      if (!retry) {
+        console.warn("🔁 Retrying start-exam once...");
+        setTimeout(() => startExam(true), 1000);
+      }
+    }
+  };
+
+  startExam();
+}, [studentId, loadReport]);
 
   /* ============================================================
      MARK VISITED QUESTIONS
