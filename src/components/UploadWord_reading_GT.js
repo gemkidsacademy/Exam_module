@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./UploadPDF.css"; // You can rename this if you want
 
-export default function UploadWord_reading() {
+export default function UploadWord_reading_GT() {
   const [wordFile, setWordFile] = useState(null);
   const [uploading, setUploading] = useState(false);
 
