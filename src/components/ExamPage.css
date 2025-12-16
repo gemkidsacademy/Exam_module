@@ -371,3 +371,21 @@
   color: #475569;
 }
 
+/* ============================================================
+   FOUNDATIONAL EXAM — SAFE CLICK FIX (SCOPED)
+============================================================ */
+
+.foundational-exam .index-row {
+  position: relative;
+  z-index: 1;
+}
+
+.foundational-exam .question-card {
+  position: relative;
+  z-index: 5;
+}
+
+.foundational-exam .option-btn {
+  position: relative;
+  z-index: 10;
+}
