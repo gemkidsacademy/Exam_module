@@ -7,7 +7,6 @@ export default function ReadingComponent({ studentId }) {
   const [exam, setExam] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [readingMaterial, setReadingMaterial] = useState(null);
-  const [answerOptions, setAnswerOptions] = useState({});
   const [index, setIndex] = useState(0);
 
   const [answers, setAnswers] = useState({});
@@ -18,32 +17,12 @@ export default function ReadingComponent({ studentId }) {
   const [sessionId, setSessionId] = useState(null);
 
   /* -----------------------------
-     HELPERS
-  ----------------------------- */
-  const normalizeTimestamp = (ts) => {
-    if (!ts) return null;
-    if (ts.includes("+") || ts.endsWith("Z")) return ts;
-    return ts + "Z";
-  };
-
-  const formatTime = (sec) => {
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${m}:${s.toString().padStart(2, "0")}`;
-  };
-
-  /* -----------------------------
      LOAD EXAM
   ----------------------------- */
   useEffect(() => {
-    if (!studentId) {
-      console.warn("⚠️ studentId missing");
-      return;
-    }
+    if (!studentId) return;
 
     const loadExam = async () => {
-      console.log("🚀 Loading reading exam for student:", studentId);
-
       const res = await fetch(
         `${BACKEND_URL}/api/exams/start-reading?student_id=${studentId}`,
         { method: "POST" }
@@ -51,41 +30,26 @@ export default function ReadingComponent({ studentId }) {
 
       const data = await res.json();
 
-      console.log("📦 RAW API RESPONSE:", data);
+      console.log("📦 FULL API RESPONSE:", data);
 
       if (data.detail) {
-        console.error("❌ API error:", data.detail);
+        alert(data.detail);
         setFinished(true);
         return;
       }
-
-      console.log("📘 exam_json:", data.exam_json);
-      console.log("📘 questions:", data.exam_json?.questions);
-      console.log("📘 reading_material:", data.exam_json?.reading_material);
-      console.log("📘 answer_options (raw):", data.exam_json?.answer_options);
 
       setSessionId(data.session_id);
       setExam(data.exam_json);
       setQuestions(data.exam_json.questions || []);
       setReadingMaterial(data.exam_json.reading_material || null);
-      setAnswerOptions(data.exam_json.answer_options || {});
-
-      console.log(
-        "✅ answerOptions keys:",
-        Object.keys(data.exam_json.answer_options || {})
-      );
 
       const durationSeconds = (data.duration_minutes || 40) * 60;
-      const start = new Date(normalizeTimestamp(data.start_time)).getTime();
-      const now = new Date(normalizeTimestamp(data.server_now)).getTime();
+      const start = new Date(data.start_time).getTime();
+      const now = new Date(data.server_now).getTime();
 
-      if (isNaN(start) || isNaN(now)) {
-        setTimeLeft(durationSeconds);
-      } else {
-        setTimeLeft(
-          Math.max(durationSeconds - Math.floor((now - start) / 1000), 0)
-        );
-      }
+      setTimeLeft(
+        Math.max(durationSeconds - Math.floor((now - start) / 1000), 0)
+      );
     };
 
     loadExam();
@@ -106,7 +70,7 @@ export default function ReadingComponent({ studentId }) {
      SUBMIT
   ----------------------------- */
   const autoSubmit = async () => {
-    console.warn("⏱ Auto submitting exam");
+    if (finished) return;
 
     await fetch(`${BACKEND_URL}/api/exams/submit-reading`, {
       method: "POST",
@@ -121,30 +85,36 @@ export default function ReadingComponent({ studentId }) {
      INTERACTION
   ----------------------------- */
   const currentQuestion = questions[index];
+  if (!exam || !currentQuestion) return <div>Loading Exam…</div>;
 
-  if (!exam || !currentQuestion) {
-    console.warn("⌛ Exam or currentQuestion not ready");
-    return <div>Loading Exam…</div>;
-  }
+  console.log("🧪 CURRENT QUESTION:", currentQuestion);
+  console.log("🧪 CURRENT OPTIONS:", currentQuestion.answer_options);
 
   const handleSelect = (choice) => {
-    console.log(`🟢 Selected answer for Q${index + 1}:`, choice);
     setAnswers((prev) => ({ ...prev, [index]: choice }));
   };
 
   const goTo = (i) => {
-    console.log("➡️ Navigating to question index:", i);
     setVisited((v) => ({ ...v, [i]: true }));
     setIndex(i);
   };
 
   /* -----------------------------
-     RENDER DEBUG
+     FINISHED
   ----------------------------- */
-  console.log("🧪 RENDER CHECK");
-  console.log("   → currentQuestion:", currentQuestion);
-  console.log("   → answerOptions:", answerOptions);
-  console.log("   → option count:", Object.keys(answerOptions).length);
+  if (finished) {
+    const score = questions.reduce(
+      (s, q, i) => s + (answers[i] === q.correct_answer ? 1 : 0),
+      0
+    );
+
+    return (
+      <div className="completed-screen">
+        <h1>Quiz Finished</h1>
+        <h2>Your Score: {score} / {questions.length}</h2>
+      </div>
+    );
+  }
 
   /* -----------------------------
      UI
@@ -153,12 +123,13 @@ export default function ReadingComponent({ studentId }) {
     <div className="exam-container">
       <div className="exam-header">
         <div>Reading Comprehension Exam</div>
-        <div className="timer-box">Time Left: {formatTime(timeLeft)}</div>
+        <div className="timer-box">Time Left: {timeLeft}s</div>
         <div className="counter">
           Question {index + 1} / {questions.length}
         </div>
       </div>
 
+      {/* QUESTION INDEX */}
       <div className="question-index-row">
         {questions.map((q, i) => {
           let cls = "index-circle";
@@ -167,11 +138,7 @@ export default function ReadingComponent({ studentId }) {
           if (i === index) cls += " active";
 
           return (
-            <div
-              key={i}
-              className={cls}
-              onClick={() => goTo(i)}
-            >
+            <div key={i} className={cls} onClick={() => goTo(i)}>
               {q.question_number}
             </div>
           );
@@ -181,10 +148,8 @@ export default function ReadingComponent({ studentId }) {
       <div className="exam-body">
         {/* LEFT */}
         <div className="passage-pane">
-          <h3>{readingMaterial?.title || "Reading Passage"}</h3>
-          <p className="reading-text">
-            {readingMaterial?.content}
-          </p>
+          <h3>{readingMaterial?.title}</h3>
+          <p className="reading-text">{readingMaterial?.content}</p>
         </div>
 
         {/* RIGHT */}
@@ -196,16 +161,8 @@ export default function ReadingComponent({ studentId }) {
             </p>
 
             <div className="options">
-              {Object.keys(answerOptions).length === 0 && (
-                <p style={{ color: "red" }}>
-                  ❌ No answer options received
-                </p>
-              )}
-
-              {Object.entries(answerOptions).map(([letter, text]) => {
-                console.log("🔘 Rendering option:", letter, text);
-
-                return (
+              {Object.entries(currentQuestion.answer_options || {}).map(
+                ([letter, text]) => (
                   <button
                     key={letter}
                     className={`option-btn ${
@@ -215,16 +172,13 @@ export default function ReadingComponent({ studentId }) {
                   >
                     <strong>{letter}.</strong> {text}
                   </button>
-                );
-              })}
+                )
+              )}
             </div>
           </div>
 
           <div className="nav-buttons">
-            <button
-              disabled={index === 0}
-              onClick={() => goTo(index - 1)}
-            >
+            <button disabled={index === 0} onClick={() => goTo(index - 1)}>
               Previous
             </button>
 
