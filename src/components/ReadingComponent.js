@@ -29,7 +29,6 @@ export default function ReadingComponent({ studentId }) {
       );
 
       const data = await res.json();
-
       console.log("📦 FULL API RESPONSE:", data);
 
       if (data.detail) {
@@ -88,7 +87,8 @@ export default function ReadingComponent({ studentId }) {
   if (!exam || !currentQuestion) return <div>Loading Exam…</div>;
 
   console.log("🧪 CURRENT QUESTION:", currentQuestion);
-  console.log("🧪 CURRENT OPTIONS:", currentQuestion.answer_options);
+  console.log("🧪 QUESTION OPTIONS:", currentQuestion.answer_options);
+  console.log("🧪 EXAM OPTIONS:", exam.answer_options);
 
   const handleSelect = (choice) => {
     setAnswers((prev) => ({ ...prev, [index]: choice }));
@@ -111,29 +111,34 @@ export default function ReadingComponent({ studentId }) {
     return (
       <div className="completed-screen">
         <h1>Quiz Finished</h1>
-        <h2>Your Score: {score} / {questions.length}</h2>
+        <h2>
+          Your Score: {score} / {questions.length}
+        </h2>
       </div>
     );
   }
 
   /* -----------------------------
-     UI
+     OPTION SELECTION LOGIC
   ----------------------------- */
   const examLevelOptions = exam?.answer_options || {};
   const questionLevelOptions = currentQuestion?.answer_options || {};
 
-              
-              // Detect placeholder options like { A: "A", B: "B", ... }
   const isPlaceholderOptions =
-     Object.keys(questionLevelOptions).length > 0 &&
-     Object.entries(questionLevelOptions).every(
-     ([key, value]) => key === value
-     );
-              
+    Object.keys(questionLevelOptions).length > 0 &&
+    Object.entries(questionLevelOptions).every(
+      ([key, value]) => key === value
+    );
+
   const optionsToRender = isPlaceholderOptions
-      ? examLevelOptions
-      : questionLevelOptions;
-             
+    ? examLevelOptions
+    : questionLevelOptions;
+
+  console.log("🧠 OPTIONS USED:", optionsToRender);
+
+  /* -----------------------------
+     UI
+  ----------------------------- */
   return (
     <div className="exam-container">
       <div className="exam-header">
@@ -176,23 +181,17 @@ export default function ReadingComponent({ studentId }) {
             </p>
 
             <div className="options">
-               
-              <div className="options">
-                {Object.entries(optionsToRender).map(([letter, text]) => (
-                  <button
-                    key={letter}
-                    className={`option-btn ${
-                      answers[index] === letter ? "selected" : ""
-                    }`}
-                    onClick={() => handleSelect(letter)}
-                  >
-                    <strong>{letter}.</strong> {text}
-                  </button>
-                ))}
-              </div>
-
-              </div>
-
+              {Object.entries(optionsToRender).map(([letter, text]) => (
+                <button
+                  key={letter}
+                  className={`option-btn ${
+                    answers[index] === letter ? "selected" : ""
+                  }`}
+                  onClick={() => handleSelect(letter)}
+                >
+                  <strong>{letter}.</strong> {text}
+                </button>
+              ))}
             </div>
           </div>
 
