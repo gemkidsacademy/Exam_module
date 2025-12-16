@@ -2,7 +2,7 @@ import "./ExamTypeSelector.css";
 import UploadWord from "./UploadWord";
 import ReadingUploadPanel from "./ReadingUploadPanel";
 import UploadWord_writing from "./UploadWord_writing";
-import ReadingUploadPanel from "./ReadingUploadPanel";
+
 
 
 
