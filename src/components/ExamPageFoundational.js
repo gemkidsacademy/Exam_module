@@ -1,117 +1,184 @@
-import React, { useState, useEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback
+} from "react";
 import "./ExamPage.css";
 
-export default function ExamPageThinkingSkills() {
+/* ============================================================
+   MAIN COMPONENT
+============================================================ */
+export default function ExamPageFoundationalSkills() {
   const studentId = sessionStorage.getItem("student_id");
 
-  const [loading, setLoading] = useState(true);
+  const hasSubmittedRef = useRef(false);
+  const prevIndexRef = useRef(null);
+
+  /**
+   * mode:
+   * - loading → deciding what to show
+   * - exam    → active attempt
+   * - report  → completed attempt
+   */
+  const [mode, setMode] = useState("loading");
+
+  // ---------------- EXAM STATE ----------------
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
+  const [visited, setVisited] = useState({});
   const [timeLeft, setTimeLeft] = useState(null);
-  const [completed, setCompleted] = useState(false);
 
-  /* -----------------------------------------------------------
+  // ---------------- REPORT ----------------
+  const [report, setReport] = useState(null);
+
+  /* ============================================================
+     LOAD REPORT (ONLY WHEN EXAM IS COMPLETED)
+  ============================================================ */
+  const loadReport = useCallback(async () => {
+    try {
+      const res = await fetch(
+        `/api/student/exam-report/foundational-skills?student_id=${studentId}`
+      );
+
+      if (!res.ok) {
+        console.warn("⚠️ Foundational report not available yet");
+        return;
+      }
+
+      const data = await res.json();
+      console.log("📊 Foundational report loaded:", data);
+
+      setReport(data);
+      setMode("report");
+    } catch (err) {
+      console.error("❌ loadReport error:", err);
+    }
+  }, [studentId]);
+
+  /* ============================================================
      START / RESUME EXAM
-  ----------------------------------------------------------- */
+  ============================================================ */
   useEffect(() => {
     if (!studentId) return;
 
     const startExam = async () => {
       try {
         const res = await fetch(
-          "https://web-production-481a5.up.railway.app/api/student/start-exam",
+          "/api/student/start-exam/foundational-skills",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ student_id: studentId }),
+            body: JSON.stringify({ student_id: studentId })
           }
         );
 
         const data = await res.json();
+        console.log("📥 start foundational exam:", data);
 
-        if (!res.ok || data.completed) {
-          setCompleted(true);
-          setLoading(false);
+        // ✅ COMPLETED → SHOW REPORT
+        if (data.completed === true) {
+          await loadReport();
           return;
         }
 
+        // ✅ NEW / IN-PROGRESS → SHOW EXAM
         setQuestions(data.questions || []);
         setTimeLeft(data.remaining_time);
-        setLoading(false);
+        setMode("exam");
+
       } catch (err) {
         console.error("❌ start-exam error:", err);
       }
     };
 
     startExam();
-  }, [studentId]);
+  }, [studentId, loadReport]);
 
-  /* -----------------------------------------------------------
-     TIMER
-  ----------------------------------------------------------- */
+  /* ============================================================
+     MARK VISITED QUESTIONS
+  ============================================================ */
   useEffect(() => {
-    if (timeLeft === null || completed) return;
+    if (prevIndexRef.current !== null) {
+      const prevIdx = prevIndexRef.current;
+      const prevQid = questions[prevIdx]?.q_id;
+
+      if (prevQid && !answers[prevQid]) {
+        setVisited(prev => ({ ...prev, [prevIdx]: true }));
+      }
+    }
+
+    prevIndexRef.current = currentIndex;
+  }, [currentIndex, questions, answers]);
+
+  /* ============================================================
+     FINISH EXAM (SUBMIT ONLY)
+  ============================================================ */
+  const finishExam = useCallback(
+    async (reason = "submitted") => {
+      if (hasSubmittedRef.current) return;
+      hasSubmittedRef.current = true;
+
+      const payload = {
+        student_id: studentId,
+        answers,
+        reason
+      };
+
+      console.log("📤 finish foundational exam:", payload);
+
+      try {
+        await fetch(
+          "/api/student/finish-exam/foundational-skills",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          }
+        );
+
+        await loadReport();
+
+      } catch (err) {
+        console.error("❌ finish-exam error:", err);
+      }
+    },
+    [studentId, answers, loadReport]
+  );
+
+  /* ============================================================
+     TIMER (AUTO SUBMIT)
+  ============================================================ */
+  useEffect(() => {
+    if (mode !== "exam" || timeLeft === null) return;
 
     if (timeLeft <= 0) {
-      finishExam();
+      finishExam("time_expired");
       return;
     }
 
     const interval = setInterval(() => {
-      setTimeLeft((t) => t - 1);
+      setTimeLeft(t => t - 1);
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timeLeft, completed]);
+  }, [timeLeft, mode, finishExam]);
 
-  /* -----------------------------------------------------------
-     FINISH EXAM
-  ----------------------------------------------------------- */
-  const finishExam = async () => {
-    const payload = {
-      student_id: studentId,
-      answers: answers
-    };
-  
-    console.log("📤 finish-exam payload:", payload);
-  
-    try {
-      const res = await fetch("/api/student/finish-exam", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-  
-      const data = await res.json();
-      console.log("📥 finish-exam response:", data);
-    } catch (err) {
-      console.error("❌ finish-exam error:", err);
-    }
-  
-    setCompleted(true);
-  };
-
-
-  /* -----------------------------------------------------------
+  /* ============================================================
      ANSWER HANDLING
-  ----------------------------------------------------------- */
-  const handleAnswer = (option) => {
+  ============================================================ */
+  const handleAnswer = (optionKey) => {
     const qid = questions[currentIndex]?.q_id;
     if (!qid) return;
 
-    setAnswers((prev) => ({
+    setAnswers(prev => ({
       ...prev,
-      [qid]: option,
+      [qid]: optionKey
     }));
   };
 
-  /* -----------------------------------------------------------
-     NAVIGATION
-  ----------------------------------------------------------- */
-  const goToQuestion = (idx) => {
-    setCurrentIndex(idx);
-  };
+  const goToQuestion = (idx) => setCurrentIndex(idx);
 
   const formatTime = (seconds) => {
     const m = String(Math.floor(seconds / 60)).padStart(2, "0");
@@ -119,26 +186,28 @@ export default function ExamPageThinkingSkills() {
     return `${m}:${s}`;
   };
 
-  /* -----------------------------------------------------------
+  /* ============================================================
      RENDER
-  ----------------------------------------------------------- */
-  if (loading) return <p className="loading">Loading exam…</p>;
+  ============================================================ */
+  if (mode === "loading") {
+    return <p className="loading">Loading…</p>;
+  }
 
-  if (completed) {
-    return (
-      <div className="completed-screen">
-        <h1>🎉 Exam Finished</h1>
-        <p>You have already completed this exam.</p>
-      </div>
-    );
+  if (mode === "report") {
+    return <FoundationalSkillsReport report={report} />;
   }
 
   const currentQ = questions[currentIndex];
   if (!currentQ) return null;
 
+  const normalizedOptions = Array.isArray(currentQ.options)
+    ? currentQ.options
+    : Object.entries(currentQ.options || {}).map(
+        ([k, v]) => `${k}) ${v}`
+      );
+
   return (
     <div className="exam-container">
-      {/* Header */}
       <div className="exam-header">
         <div className="timer">⏳ {formatTime(timeLeft)}</div>
         <div className="counter">
@@ -146,51 +215,47 @@ export default function ExamPageThinkingSkills() {
         </div>
       </div>
 
-      {/* Question Index Bar */}
       <div className="index-row">
-        {questions.map((q, i) => {
-          const isAnswered = Boolean(answers[q.q_id]);
-          const isCurrent = i === currentIndex;
-      
-          return (
-            <div
-              key={q.q_id}
-              className={`index-circle ${
-                isCurrent
-                  ? "index-current"
-                  : isAnswered
-                  ? "index-answered"
-                  : "index-unanswered"
-              }`}
-              onClick={() => goToQuestion(i)}
-            >
-              {i + 1}
-            </div>
-          );
-        })}
+        {questions.map((q, i) => (
+          <div
+            key={q.q_id}
+            className={`index-circle ${
+              answers[q.q_id]
+                ? "index-answered"
+                : visited[i]
+                ? "index-visited"
+                : "index-not-visited"
+            }`}
+            onClick={() => goToQuestion(i)}
+          >
+            {i + 1}
+          </div>
+        ))}
       </div>
 
-      {/* Question Card */}
       <div className="question-card">
         <p className="question-text">{currentQ.question}</p>
 
-        {Array.isArray(currentQ.options) &&
-          currentQ.options.map((opt, i) => (
+        {normalizedOptions.map((opt, i) => {
+          const optionKey = opt.split(")")[0];
+
+          return (
             <button
               key={i}
-              onClick={() => handleAnswer(opt)}
+              onClick={() => handleAnswer(optionKey)}
               className={`option-btn ${
-                answers[currentQ.q_id] === opt ? "selected" : ""
+                answers[currentQ.q_id] === optionKey ? "selected" : ""
               }`}
             >
               {opt}
             </button>
-          ))}
+          );
+        })}
       </div>
 
-      {/* Navigation */}
       <div className="nav-buttons">
         <button
+          className="nav-btn prev"
           onClick={() => goToQuestion(currentIndex - 1)}
           disabled={currentIndex === 0}
         >
@@ -198,12 +263,76 @@ export default function ExamPageThinkingSkills() {
         </button>
 
         {currentIndex < questions.length - 1 ? (
-          <button onClick={() => goToQuestion(currentIndex + 1)}>
+          <button
+            className="nav-btn next"
+            onClick={() => goToQuestion(currentIndex + 1)}
+          >
             Next
           </button>
         ) : (
-          <button onClick={finishExam}>Finish Exam</button>
+          <button
+            className="nav-btn finish"
+            onClick={() => finishExam("manual_submit")}
+          >
+            Finish Exam
+          </button>
         )}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   REPORT COMPONENT
+============================================================ */
+function FoundationalSkillsReport({ report }) {
+  if (!report?.summary) {
+    return <p className="loading">Generating your report…</p>;
+  }
+
+  const { summary, topic_breakdown } = report;
+
+  return (
+    <div className="report-page">
+      <h2 className="report-title">
+        You scored {summary.correct_answers} out of{" "}
+        {summary.total_questions} in Foundational Skills Test
+      </h2>
+
+      <div className="report-grid">
+        <div className="report-card">
+          <h3>Accuracy</h3>
+
+          <div className="donut">
+            <span>{summary.accuracy_percent}%</span>
+          </div>
+
+          <div className="stats">
+            <p>Correct: {summary.correct_answers}</p>
+            <p>Wrong: {summary.wrong_answers}</p>
+          </div>
+        </div>
+
+        <div className="report-card">
+          <h3>Topic Breakdown</h3>
+
+          {topic_breakdown.map(topic => (
+            <div key={topic.topic} className="topic-bar">
+              <span className="topic-name">{topic.topic}</span>
+
+              <div className="bar">
+                <div
+                  className="bar-fill"
+                  style={{ width: `${topic.accuracy_percent}%` }}
+                />
+              </div>
+
+              <span className="percent">
+                {topic.accuracy_percent}%
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
