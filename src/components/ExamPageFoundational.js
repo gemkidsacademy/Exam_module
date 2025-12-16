@@ -17,11 +17,15 @@ export default function ExamPageFoundationalSkills() {
 
   /**
    * mode:
-   * - loading → deciding what to show
-   * - exam    → active attempt
-   * - report  → completed attempt
+   * - loading
+   * - exam
+   * - report
    */
   const [mode, setMode] = useState("loading");
+
+  // ---------------- SECTION STATE ----------------
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+  const [sectionName, setSectionName] = useState("");
 
   // ---------------- EXAM STATE ----------------
   const [questions, setQuestions] = useState([]);
@@ -34,7 +38,7 @@ export default function ExamPageFoundationalSkills() {
   const [report, setReport] = useState(null);
 
   /* ============================================================
-     LOAD REPORT (ONLY WHEN EXAM IS COMPLETED)
+     LOAD REPORT
   ============================================================ */
   const loadReport = useCallback(async () => {
     try {
@@ -42,20 +46,26 @@ export default function ExamPageFoundationalSkills() {
         `/api/student/exam-report/foundational-skills?student_id=${studentId}`
       );
 
-      if (!res.ok) {
-        console.warn("⚠️ Foundational report not available yet");
-        return;
-      }
+      if (!res.ok) return;
 
       const data = await res.json();
-      console.log("📊 Foundational report loaded:", data);
-
       setReport(data);
       setMode("report");
     } catch (err) {
       console.error("❌ loadReport error:", err);
     }
   }, [studentId]);
+
+  /* ============================================================
+     LOAD SECTION
+  ============================================================ */
+  const loadSection = (section, sectionIndex) => {
+    setQuestions(section.questions || []);
+    setSectionName(section.name || "");
+    setCurrentSectionIndex(sectionIndex);
+    setCurrentIndex(0);
+    setVisited({});
+  };
 
   /* ============================================================
      START / RESUME EXAM
@@ -75,16 +85,13 @@ export default function ExamPageFoundationalSkills() {
         );
 
         const data = await res.json();
-        console.log("📥 start foundational exam:", data);
 
-        // ✅ COMPLETED → SHOW REPORT
         if (data.completed === true) {
           await loadReport();
           return;
         }
 
-        // ✅ NEW / IN-PROGRESS → SHOW EXAM
-        setQuestions(data.questions || []);
+        loadSection(data.section, data.current_section_index);
         setTimeLeft(data.remaining_time);
         setMode("exam");
 
@@ -113,20 +120,12 @@ export default function ExamPageFoundationalSkills() {
   }, [currentIndex, questions, answers]);
 
   /* ============================================================
-     FINISH EXAM (SUBMIT ONLY)
+     FINISH EXAM
   ============================================================ */
   const finishExam = useCallback(
     async (reason = "submitted") => {
       if (hasSubmittedRef.current) return;
       hasSubmittedRef.current = true;
-
-      const payload = {
-        student_id: studentId,
-        answers,
-        reason
-      };
-
-      console.log("📤 finish foundational exam:", payload);
 
       try {
         await fetch(
@@ -134,12 +133,15 @@ export default function ExamPageFoundationalSkills() {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+              student_id: studentId,
+              answers,
+              reason
+            })
           }
         );
 
         await loadReport();
-
       } catch (err) {
         console.error("❌ finish-exam error:", err);
       }
@@ -148,7 +150,31 @@ export default function ExamPageFoundationalSkills() {
   );
 
   /* ============================================================
-     TIMER (AUTO SUBMIT)
+     NEXT SECTION
+  ============================================================ */
+  const goToNextSection = async () => {
+    try {
+      const res = await fetch(
+        `/api/exams/foundational/next-section?student_id=${studentId}`,
+        { method: "POST" }
+      );
+
+      const data = await res.json();
+
+      if (data.completed === true) {
+        finishExam("manual_submit");
+        return;
+      }
+
+      loadSection(data.section, data.current_section_index);
+
+    } catch (err) {
+      console.error("❌ next-section error:", err);
+    }
+  };
+
+  /* ============================================================
+     TIMER
   ============================================================ */
   useEffect(() => {
     if (mode !== "exam" || timeLeft === null) return;
@@ -211,8 +237,12 @@ export default function ExamPageFoundationalSkills() {
       <div className="exam-header">
         <div className="timer">⏳ {formatTime(timeLeft)}</div>
         <div className="counter">
-          Question {currentIndex + 1} / {questions.length}
+          Section {currentSectionIndex + 1} | Question {currentIndex + 1} / {questions.length}
         </div>
+      </div>
+
+      <div className="section-title">
+        {sectionName}
       </div>
 
       <div className="index-row">
@@ -272,9 +302,9 @@ export default function ExamPageFoundationalSkills() {
         ) : (
           <button
             className="nav-btn finish"
-            onClick={() => finishExam("manual_submit")}
+            onClick={goToNextSection}
           >
-            Finish Exam
+            Next Section
           </button>
         )}
       </div>
@@ -295,8 +325,7 @@ function FoundationalSkillsReport({ report }) {
   return (
     <div className="report-page">
       <h2 className="report-title">
-        You scored {summary.correct_answers} out of{" "}
-        {summary.total_questions} in Foundational Skills Test
+        You scored {summary.correct_answers} out of {summary.total_questions} in Foundational Skills Test
       </h2>
 
       <div className="report-grid">
