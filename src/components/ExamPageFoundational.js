@@ -260,12 +260,13 @@ export default function ExamPageFoundationalSkills() {
   if (!questionsReady) {
     return <p className="loading">Preparing questions…</p>;
   }
+  const currentQ = questions[currentIndex];
   console.log("🎯 RENDER QUESTION", {
     currentIndex,
     questionText: currentQ?.question
   });
 
-  const currentQ = questions[currentIndex];
+  
 
   const normalizedOptions = Array.isArray(currentQ.options)
     ? currentQ.options
