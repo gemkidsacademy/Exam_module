@@ -6,37 +6,55 @@ import React, {
 } from "react";
 import "./ExamPage_foundational.css";
 
-/* ============================================================
-   MAIN COMPONENT
-============================================================ */
 export default function ExamPageFoundationalSkills() {
   const studentId = sessionStorage.getItem("student_id");
 
+  /* ============================================================
+     REFS
+  ============================================================ */
   const hasSubmittedRef = useRef(false);
-  const prevIndexRef = useRef(null);
 
-  /**
-   * mode:
-   * - loading
-   * - exam
-   * - report
-   */
+  /* ============================================================
+     MODE
+     loading | exam | report
+  ============================================================ */
   const [mode, setMode] = useState("loading");
 
-  // ---------------- SECTION STATE ----------------
-  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+  /* ============================================================
+     SECTION STATE
+  ============================================================ */
   const [sectionName, setSectionName] = useState("");
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
 
-  // ---------------- EXAM STATE ----------------
-  const [questions, setQuestions] = useState([]);
+  /* ============================================================
+     QUESTIONS
+  ============================================================ */
+  const [questions, setQuestions] = useState(null); // null = not ready
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  /* ============================================================
+     ANSWERS & VISITED
+  ============================================================ */
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
+
+  /* ============================================================
+     TIMER
+  ============================================================ */
   const [timeLeft, setTimeLeft] = useState(null);
 
-  // ---------------- REPORT ----------------
+  /* ============================================================
+     REPORT
+  ============================================================ */
   const [report, setReport] = useState(null);
-  const jumpToQuestion = (idx) => {
+
+  /* ============================================================
+     HELPERS
+  ============================================================ */
+  const questionsReady = Array.isArray(questions) && questions.length > 0;
+
+  const safeSetQuestionIndex = (idx) => {
+    if (!questionsReady) return;
     if (idx < 0 || idx >= questions.length) return;
     setCurrentIndex(idx);
   };
@@ -45,22 +63,14 @@ export default function ExamPageFoundationalSkills() {
      LOAD REPORT
   ============================================================ */
   const loadReport = useCallback(async () => {
-    console.log("📊 LOAD REPORT → student:", studentId);
-
     try {
       const res = await fetch(
         `https://web-production-481a5.up.railway.app/api/student/exam-report/foundational-skills?student_id=${studentId}`
       );
 
-      if (!res.ok) {
-        const text = await res.text();
-        console.warn("⚠️ report not ready:", text);
-        return;
-      }
+      if (!res.ok) return;
 
       const data = await res.json();
-      console.log("✅ REPORT DATA:", data);
-
       setReport(data);
       setMode("report");
     } catch (err) {
@@ -69,15 +79,9 @@ export default function ExamPageFoundationalSkills() {
   }, [studentId]);
 
   /* ============================================================
-     LOAD SECTION (AUTHORITATIVE)
+     LOAD SECTION (ATOMIC)
   ============================================================ */
   const loadSection = (section, sectionIndex) => {
-    console.log("🧩 LOAD SECTION:", {
-      sectionIndex,
-      sectionName: section?.name,
-      questionsCount: section?.questions?.length
-    });
-
     if (!section || !Array.isArray(section.questions)) {
       console.error("❌ Invalid section payload:", section);
       return;
@@ -94,138 +98,36 @@ export default function ExamPageFoundationalSkills() {
      START / RESUME EXAM
   ============================================================ */
   useEffect(() => {
-  if (!studentId) return;
+    if (!studentId) return;
 
-  const startExam = async (retry = false) => {
-    console.log("🚀 START EXAM → student:", studentId);
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => {
-      controller.abort();
-    }, 15000); // 15s timeout (Railway-safe)
-
-    try {
-      const res = await fetch(
-        "https://web-production-481a5.up.railway.app/api/student/start-exam/foundational-skills",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ student_id: studentId }),
-          signal: controller.signal
-        }
-      );
-
-      clearTimeout(timeoutId);
-
-      console.log("⬅️ start-exam status:", res.status);
-
-      const data = await res.json();
-      console.log("✅ START-EXAM DATA:", data);
-
-      if (data.completed === true) {
-        console.log("ℹ️ Exam already completed → loading report");
-        await loadReport();
-        return;
-      }
-
-      if (!data.section || !Array.isArray(data.section.questions)) {
-        console.error("❌ start-exam invalid payload:", data);
-        return;
-      }
-
-      loadSection(data.section, data.current_section_index);
-      setTimeLeft(data.remaining_time);
-      setMode("exam");
-
-    } catch (err) {
-      clearTimeout(timeoutId);
-
-      console.error("❌ start-exam failed:", err);
-
-      // Retry once (Railway DB waking up)
-      if (!retry) {
-        console.warn("🔁 Retrying start-exam once...");
-        setTimeout(() => startExam(true), 1000);
-      }
-    }
-  };
-
-  startExam();
-}, [studentId, loadReport]);
-
-  /* ============================================================
-     MARK VISITED QUESTIONS
-  ============================================================ */
-  useEffect(() => {
-    if (prevIndexRef.current !== null) {
-      const prevIdx = prevIndexRef.current;
-  
-      if (answers[prevIdx] === undefined) {
-        setVisited(prev => ({ ...prev, [prevIdx]: true }));
-      }
-    }
-  
-    prevIndexRef.current = currentIndex;
-  }, [currentIndex, answers]);
-
-  /* ============================================================
-     FINISH EXAM
-  ============================================================ */
-  const finishExam = useCallback(
-    async (reason = "submitted") => {
-      if (hasSubmittedRef.current) return;
-      hasSubmittedRef.current = true;
-
-      console.log("🏁 FINISH EXAM:", { studentId, reason });
-
+    const startExam = async () => {
       try {
-        await fetch(
-          "https://web-production-481a5.up.railway.app/api/student/finish-exam/foundational-skills",
+        const res = await fetch(
+          "https://web-production-481a5.up.railway.app/api/student/start-exam/foundational-skills",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              student_id: studentId,
-              answers,
-              reason
-            })
+            body: JSON.stringify({ student_id: studentId })
           }
         );
 
-        await loadReport();
+        const data = await res.json();
+
+        if (data.completed === true) {
+          await loadReport();
+          return;
+        }
+
+        loadSection(data.section, data.current_section_index);
+        setTimeLeft(data.remaining_time);
+        setMode("exam");
       } catch (err) {
-        console.error("❌ finish-exam error:", err);
+        console.error("❌ start-exam error:", err);
       }
-    },
-    [studentId, answers, loadReport]
-  );
+    };
 
-  /* ============================================================
-     NEXT SECTION
-  ============================================================ */
-  const goToNextSection = async () => {
-    console.log("➡️ NEXT SECTION → student:", studentId);
-
-    try {
-      const res = await fetch(
-        `https://web-production-481a5.up.railway.app/api/exams/foundational/next-section?student_id=${studentId}`,
-        { method: "POST" }
-      );
-
-      const data = await res.json();
-      console.log("⬅️ next-section response:", data);
-
-      if (data.completed === true) {
-        finishExam("manual_submit");
-        return;
-      }
-
-      loadSection(data.section, data.current_section_index);
-
-    } catch (err) {
-      console.error("❌ next-section error:", err);
-    }
-  };
+    startExam();
+  }, [studentId, loadReport]);
 
   /* ============================================================
      TIMER
@@ -243,10 +145,10 @@ export default function ExamPageFoundationalSkills() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timeLeft, mode, finishExam]);
+  }, [timeLeft, mode]);
 
   /* ============================================================
-     ANSWER HANDLING
+     ANSWERS
   ============================================================ */
   const handleAnswer = (optionKey) => {
     setAnswers(prev => ({
@@ -254,41 +156,85 @@ export default function ExamPageFoundationalSkills() {
       [currentIndex]: optionKey
     }));
   };
-  const goToQuestion = (delta) => {
-    setCurrentIndex(prev => {
-      const next = prev + delta;
-      if (next < 0 || next >= questions.length) return prev;
-      return next;
-    });
+
+  /* ============================================================
+     NAVIGATION
+  ============================================================ */
+  const nextQuestion = () => {
+    if (!questionsReady) return;
+
+    setVisited(prev => ({ ...prev, [currentIndex]: true }));
+    safeSetQuestionIndex(currentIndex + 1);
   };
 
+  const prevQuestion = () => {
+    if (!questionsReady) return;
+    safeSetQuestionIndex(currentIndex - 1);
+  };
 
-  const formatTime = (seconds) => {
-    const m = String(Math.floor(seconds / 60)).padStart(2, "0");
-    const s = String(seconds % 60).padStart(2, "0");
-    return `${m}:${s}`;
+  const jumpToQuestion = (idx) => {
+    if (!questionsReady) return;
+    setVisited(prev => ({ ...prev, [currentIndex]: true }));
+    safeSetQuestionIndex(idx);
+  };
+
+  /* ============================================================
+     FINISH EXAM
+  ============================================================ */
+  const finishExam = async (reason = "submitted") => {
+    if (hasSubmittedRef.current) return;
+    hasSubmittedRef.current = true;
+
+    try {
+      await fetch(
+        "https://web-production-481a5.up.railway.app/api/student/finish-exam/foundational-skills",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ student_id: studentId, answers, reason })
+        }
+      );
+
+      await loadReport();
+    } catch (err) {
+      console.error("❌ finish-exam error:", err);
+    }
+  };
+
+  /* ============================================================
+     NEXT SECTION
+  ============================================================ */
+  const goToNextSection = async () => {
+    try {
+      const res = await fetch(
+        `/api/exams/foundational/next-section?student_id=${studentId}`,
+        { method: "POST" }
+      );
+
+      const data = await res.json();
+
+      if (data.completed === true) {
+        finishExam("manual_submit");
+        return;
+      }
+
+      loadSection(data.section, data.current_section_index);
+    } catch (err) {
+      console.error("❌ next-section error:", err);
+    }
   };
 
   /* ============================================================
      RENDER
   ============================================================ */
-  if (mode === "loading") {
-    return <p className="loading">Loading…</p>;
-  }
+  if (mode === "loading") return <p className="loading">Loading…</p>;
+  if (mode === "report") return <FoundationalSkillsReport report={report} />;
 
-  if (mode === "report") {
-    return <FoundationalSkillsReport report={report} />;
+  if (!questionsReady) {
+    return <p className="loading">Preparing questions…</p>;
   }
 
   const currentQ = questions[currentIndex];
-
-  if (!currentQ) {
-    console.warn("🟠 Render blocked – no current question", {
-      questionsLength: questions.length,
-      currentIndex
-    });
-    return <p className="loading">Preparing questions…</p>;
-  }
 
   const normalizedOptions = Array.isArray(currentQ.options)
     ? currentQ.options
@@ -318,7 +264,6 @@ export default function ExamPageFoundationalSkills() {
                 ? "index-visited"
                 : "index-not-visited"
             }`}
-
             onClick={() => jumpToQuestion(i)}
           >
             {i + 1}
@@ -334,8 +279,8 @@ export default function ExamPageFoundationalSkills() {
 
           return (
             <button
-              type="button"
               key={i}
+              type="button"
               onClick={() => handleAnswer(optionKey)}
               className={`option-btn ${
                 answers[currentIndex] === optionKey ? "selected" : ""
@@ -351,21 +296,20 @@ export default function ExamPageFoundationalSkills() {
         <button
           type="button"
           className="nav-btn prev"
-          onClick={() => goToQuestion(-1)}
+          onClick={prevQuestion}
           disabled={currentIndex === 0}
         >
           Previous
         </button>
 
         {currentIndex < questions.length - 1 ? (
-        <button
-          type="button"
-          className="nav-btn next"
-          onClick={() => goToQuestion(1)}
-        >
-          Next
-        </button>
-
+          <button
+            type="button"
+            className="nav-btn next"
+            onClick={nextQuestion}
+          >
+            Next
+          </button>
         ) : (
           <button
             type="button"
@@ -381,52 +325,10 @@ export default function ExamPageFoundationalSkills() {
 }
 
 /* ============================================================
-   REPORT COMPONENT
+   UTIL
 ============================================================ */
-function FoundationalSkillsReport({ report }) {
-  if (!report?.summary) {
-    return <p className="loading">Generating your report…</p>;
-  }
-
-  const { summary, topic_breakdown } = report;
-
-  return (
-    <div className="report-page">
-      <h2 className="report-title">
-        You scored {summary.correct_answers} out of {summary.total_questions} in Foundational Skills Test
-      </h2>
-
-      <div className="report-grid">
-        <div className="report-card">
-          <h3>Accuracy</h3>
-          <div className="donut">
-            <span>{summary.accuracy_percent}%</span>
-          </div>
-          <div className="stats">
-            <p>Correct: {summary.correct_answers}</p>
-            <p>Wrong: {summary.wrong_answers}</p>
-          </div>
-        </div>
-
-        <div className="report-card">
-          <h3>Topic Breakdown</h3>
-
-          {topic_breakdown.map(topic => (
-            <div key={topic.topic} className="topic-bar">
-              <span className="topic-name">{topic.topic}</span>
-
-              <div className="bar">
-                <div
-                  className="bar-fill"
-                  style={{ width: `${topic.accuracy_percent}%` }}
-                />
-              </div>
-
-              <span className="percent">{topic.accuracy_percent}%</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+function formatTime(seconds) {
+  const m = String(Math.floor(seconds / 60)).padStart(2, "0");
+  const s = String(seconds % 60).padStart(2, "0");
+  return `${m}:${s}`;
 }
