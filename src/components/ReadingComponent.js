@@ -95,8 +95,18 @@ export default function ReadingComponent({ studentId }) {
   /* -----------------------------
      INTERACTION
   ----------------------------- */
-  const currentQuestion = questions[index];
+  const currentQuestion = questions[index];  
   if (!exam || !currentQuestion) return <div>Loading Exam…</div>;
+  
+  const groupedQuestions = useMemo(() => {
+    const groups = {};
+    questions.forEach((q, i) => {
+      const key = q.topic;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push({ index: i });
+    });
+    return groups;
+  }, [questions]);
 
   const topic = (currentQuestion.topic || "").toLowerCase();
   const rm = currentQuestion.reading_material || {};
