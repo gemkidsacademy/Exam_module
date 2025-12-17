@@ -23,7 +23,7 @@ export default function ReadingComponent({ studentId }) {
 
     const loadExam = async () => {
       const res = await fetch(
-        `${BACKEND_URL}/api/exams/start-reading?student_id=${studentId}`,
+        `${BACKEND_URL}/api/exams/start-reading-new?student_id=${studentId}`,
         { method: "POST" }
       );
 
