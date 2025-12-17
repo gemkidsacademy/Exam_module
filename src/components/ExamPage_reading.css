@@ -35,17 +35,42 @@
 }
 
 /* =======================================================
-   QUESTION INDEX ROW (TOP)
+   GROUPED QUESTION INDEX (HORIZONTAL + SCROLL)
 ======================================================= */
 
-.question-index-row {
+.question-index-grouped {
   display: flex;
-  gap: 10px;
-  padding: 12px 0 18px;
-  margin-bottom: 18px;
+  flex-direction: row;
+  gap: 28px;
   overflow-x: auto;
+  padding: 12px 0 18px;
+  margin-bottom: 20px;
   border-bottom: 1px solid #e5e9f0;
 }
+
+.topic-group {
+  display: flex;
+  flex-direction: column;
+  min-width: max-content;
+}
+
+.topic-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  white-space: nowrap;
+  color: #1f2937;
+}
+
+.topic-circles {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+/* =======================================================
+   QUESTION CIRCLES
+======================================================= */
 
 .index-circle {
   width: 38px;
@@ -62,6 +87,7 @@
   font-size: 14px;
   font-weight: 600;
   user-select: none;
+  flex-shrink: 0;
 
   transition: all 0.15s ease;
 }
@@ -122,6 +148,18 @@
   line-height: 1.65;
   white-space: pre-line;
   color: #1f2937;
+}
+
+.extract-block,
+.paragraph-block {
+  margin-bottom: 14px;
+}
+
+.extract-block strong,
+.paragraph-block strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
 }
 
 /* =======================================================
