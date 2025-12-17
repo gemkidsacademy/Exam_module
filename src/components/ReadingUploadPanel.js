@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import "./ReadingUploadPanel.css";
 import UploadWord_reading_GT from "./UploadWord_reading_GT";
 import UploadWord_reading_CA from "./UploadWord_reading_CA";
+import UploadWord_reading_MI from "./UploadWord_reading_MI";
+
 
 export default function ReadingUploadPanel() {
   const [activeUpload, setActiveUpload] = useState(null);
@@ -37,6 +39,7 @@ export default function ReadingUploadPanel() {
 
       {activeUpload === "gapped" && <UploadWord_reading_GT />}
       {activeUpload === "comparative" && <UploadWord_reading_CA />}
+      {activeUpload === "main-idea" && <UploadWord_reading_MI />}
     </div>
   );
 }
