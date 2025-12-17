@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import "./ExamPage_reading.css";
 
 export default function ReadingComponent({ studentId }) {
@@ -37,11 +37,11 @@ export default function ReadingComponent({ studentId }) {
       }
 
       const sections = data.exam_json.sections || [];
-      const flatQuestions = [];
+      const flat = [];
 
       sections.forEach((section) => {
         section.questions.forEach((q) => {
-          flatQuestions.push({
+          flat.push({
             ...q,
             topic: section.topic,
             reading_material: section.reading_material,
@@ -52,7 +52,7 @@ export default function ReadingComponent({ studentId }) {
 
       setSessionId(data.session_id);
       setExam(data.exam_json);
-      setQuestions(flatQuestions);
+      setQuestions(flat);
 
       const durationSeconds = (data.duration_minutes || 40) * 60;
       const start = new Date(data.start_time).getTime();
@@ -98,6 +98,10 @@ export default function ReadingComponent({ studentId }) {
   const currentQuestion = questions[index];
   if (!exam || !currentQuestion) return <div>Loading Exam…</div>;
 
+  const topic = (currentQuestion.topic || "").toLowerCase();
+  const rm = currentQuestion.reading_material || {};
+  const optionsToRender = currentQuestion.answer_options || {};
+
   const handleSelect = (choice) => {
     setAnswers((prev) => ({ ...prev, [index]: choice }));
   };
@@ -106,6 +110,19 @@ export default function ReadingComponent({ studentId }) {
     setVisited((v) => ({ ...v, [i]: true }));
     setIndex(i);
   };
+
+  /* -----------------------------
+     GROUP QUESTIONS BY TOPIC
+  ----------------------------- */
+  const groupedQuestions = useMemo(() => {
+    const groups = {};
+    questions.forEach((q, i) => {
+      const key = q.topic;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push({ index: i });
+    });
+    return groups;
+  }, [questions]);
 
   /* -----------------------------
      FINISHED
@@ -126,9 +143,6 @@ export default function ReadingComponent({ studentId }) {
     );
   }
 
-  const optionsToRender = currentQuestion.answer_options || {};
-  const rm = currentQuestion.reading_material || {};
-
   /* -----------------------------
      UI
   ----------------------------- */
@@ -142,33 +156,40 @@ export default function ReadingComponent({ studentId }) {
         </div>
       </div>
 
-      {/* QUESTION INDEX */}
-      <div className="question-index-row">
-        {questions.map((q, i) => {
-          let cls = "index-circle";
-          if (answers[i]) cls += " answered";
-          else if (visited[i]) cls += " visited";
-          if (i === index) cls += " active";
+      {/* GROUPED QUESTION INDEX */}
+      <div className="question-index-grouped">
+        {Object.entries(groupedQuestions).map(([topicName, qs]) => (
+          <div key={topicName} className="topic-group">
+            <div className="topic-title">{topicName}</div>
+            <div className="topic-circles">
+              {qs.map(({ index: i }) => {
+                let cls = "index-circle";
+                if (answers[i]) cls += " answered";
+                else if (visited[i]) cls += " visited";
+                if (i === index) cls += " active";
 
-          return (
-            <div key={i} className={cls} onClick={() => goTo(i)}>
-              {q.question_number}
+                return (
+                  <div key={i} className={cls} onClick={() => goTo(i)}>
+                    {questions[i].question_number}
+                  </div>
+                );
+              })}
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       <div className="exam-body">
-        {/* LEFT */}
+        {/* LEFT PANE */}
         <div className="passage-pane">
-          {currentQuestion.topic === "Gapped Text" && (
+          {topic.includes("gapped") && (
             <>
               <h3>{rm.title}</h3>
               <p className="reading-text">{rm.content}</p>
             </>
           )}
 
-          {currentQuestion.topic === "Comparative analysis" && (
+          {topic.includes("comparative") && (
             <>
               <h3>Extracts</h3>
               {Object.entries(rm.extracts || {}).map(([k, v]) => (
@@ -180,7 +201,7 @@ export default function ReadingComponent({ studentId }) {
             </>
           )}
 
-          {currentQuestion.topic === "Main Idea & Summary" && (
+          {topic.includes("main idea") && (
             <>
               <h3>Paragraphs</h3>
               {Object.entries(rm.paragraphs || {}).map(([k, v]) => (
@@ -193,12 +214,11 @@ export default function ReadingComponent({ studentId }) {
           )}
         </div>
 
-        {/* RIGHT */}
+        {/* RIGHT PANE */}
         <div className="question-pane">
           <div className="question-card">
             <p className="question-text">
-              Q{currentQuestion.question_number}.{" "}
-              {currentQuestion.question_text}
+              Q{currentQuestion.question_number}. {currentQuestion.question_text}
             </p>
 
             <div className="options">
