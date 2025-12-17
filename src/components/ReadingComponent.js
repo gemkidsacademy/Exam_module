@@ -168,9 +168,38 @@ export default function ReadingComponent({ studentId }) {
       <div className="exam-body">
         {/* LEFT */}
         <div className="passage-pane">
-          <h3>{readingMaterial?.title}</h3>
-          <p className="reading-text">{readingMaterial?.content}</p>
+          {currentQuestion.topic === "Gapped Text" && (
+            <>
+              <h3>{readingMaterial?.title}</h3>
+              <p className="reading-text">{readingMaterial?.content}</p>
+            </>
+          )}
+        
+          {currentQuestion.topic === "Comparative analysis" && (
+            <>
+              <h3>Extracts</h3>
+              {Object.entries(readingMaterial || {}).map(([label, text]) => (
+                <div key={label} className="extract-block">
+                  <strong>Extract {label}</strong>
+                  <p>{text}</p>
+                </div>
+              ))}
+            </>
+          )}
+        
+          {currentQuestion.topic === "Main Idea & Summary" && (
+            <>
+              <h3>Paragraphs</h3>
+              {Object.entries(readingMaterial || {}).map(([num, text]) => (
+                <div key={num} className="paragraph-block">
+                  <strong>Paragraph {num}</strong>
+                  <p>{text}</p>
+                </div>
+              ))}
+            </>
+          )}
         </div>
+
 
         {/* RIGHT */}
         <div className="question-pane">
