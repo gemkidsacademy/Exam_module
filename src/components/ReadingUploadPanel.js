@@ -1,34 +1,42 @@
 import React, { useState } from "react";
 import "./ReadingUploadPanel.css";
 import UploadWord_reading_GT from "./UploadWord_reading_GT";
+import UploadWord_reading_CA from "./UploadWord_reading_CA";
 
 export default function ReadingUploadPanel() {
-  const [showGappedUpload, setShowGappedUpload] = useState(false);
+  const [activeUpload, setActiveUpload] = useState(null);
 
   return (
     <div className="reading-upload-panel">
       <h2>Upload Reading Question Sets</h2>
 
-      {!showGappedUpload && (
+      {!activeUpload && (
         <>
           <button
             className="upload-btn gapped"
-            onClick={() => setShowGappedUpload(true)}
+            onClick={() => setActiveUpload("gapped")}
           >
             Upload Gapped Text Questions
           </button>
 
-          <button className="upload-btn main-idea">
+          <button
+            className="upload-btn main-idea"
+            onClick={() => setActiveUpload("main-idea")}
+          >
             Upload Main Idea & Summary Questions
           </button>
 
-          <button className="upload-btn comparative">
+          <button
+            className="upload-btn comparative"
+            onClick={() => setActiveUpload("comparative")}
+          >
             Upload Comparative Analysis Questions
           </button>
         </>
       )}
 
-      {showGappedUpload && <UploadWord_reading_GT />}
+      {activeUpload === "gapped" && <UploadWord_reading_GT />}
+      {activeUpload === "comparative" && <UploadWord_reading_CA />}
     </div>
   );
 }
