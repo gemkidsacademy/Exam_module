@@ -6,7 +6,6 @@ export default function ReadingComponent({ studentId }) {
 
   const [exam, setExam] = useState(null);
   const [questions, setQuestions] = useState([]);
-  const [readingMaterial, setReadingMaterial] = useState(null);
   const [index, setIndex] = useState(0);
 
   const [answers, setAnswers] = useState({});
@@ -37,10 +36,23 @@ export default function ReadingComponent({ studentId }) {
         return;
       }
 
+      const sections = data.exam_json.sections || [];
+      const flatQuestions = [];
+
+      sections.forEach((section) => {
+        section.questions.forEach((q) => {
+          flatQuestions.push({
+            ...q,
+            topic: section.topic,
+            reading_material: section.reading_material,
+            answer_options: section.answer_options,
+          });
+        });
+      });
+
       setSessionId(data.session_id);
       setExam(data.exam_json);
-      setQuestions(data.exam_json.questions || []);
-      setReadingMaterial(data.exam_json.reading_material || null);
+      setQuestions(flatQuestions);
 
       const durationSeconds = (data.duration_minutes || 40) * 60;
       const start = new Date(data.start_time).getTime();
@@ -86,10 +98,6 @@ export default function ReadingComponent({ studentId }) {
   const currentQuestion = questions[index];
   if (!exam || !currentQuestion) return <div>Loading Exam…</div>;
 
-  console.log("🧪 CURRENT QUESTION:", currentQuestion);
-  console.log("🧪 QUESTION OPTIONS:", currentQuestion.answer_options);
-  console.log("🧪 EXAM OPTIONS:", exam.answer_options);
-
   const handleSelect = (choice) => {
     setAnswers((prev) => ({ ...prev, [index]: choice }));
   };
@@ -118,23 +126,8 @@ export default function ReadingComponent({ studentId }) {
     );
   }
 
-  /* -----------------------------
-     OPTION SELECTION LOGIC
-  ----------------------------- */
-  const examLevelOptions = exam?.answer_options || {};
-  const questionLevelOptions = currentQuestion?.answer_options || {};
-
-  const isPlaceholderOptions =
-    Object.keys(questionLevelOptions).length > 0 &&
-    Object.entries(questionLevelOptions).every(
-      ([key, value]) => key === value
-    );
-
-  const optionsToRender = isPlaceholderOptions
-    ? examLevelOptions
-    : questionLevelOptions;
-
-  console.log("🧠 OPTIONS USED:", optionsToRender);
+  const optionsToRender = currentQuestion.answer_options || {};
+  const rm = currentQuestion.reading_material || {};
 
   /* -----------------------------
      UI
@@ -170,36 +163,35 @@ export default function ReadingComponent({ studentId }) {
         <div className="passage-pane">
           {currentQuestion.topic === "Gapped Text" && (
             <>
-              <h3>{readingMaterial?.title}</h3>
-              <p className="reading-text">{readingMaterial?.content}</p>
+              <h3>{rm.title}</h3>
+              <p className="reading-text">{rm.content}</p>
             </>
           )}
-        
+
           {currentQuestion.topic === "Comparative analysis" && (
             <>
               <h3>Extracts</h3>
-              {Object.entries(readingMaterial || {}).map(([label, text]) => (
-                <div key={label} className="extract-block">
-                  <strong>Extract {label}</strong>
-                  <p>{text}</p>
+              {Object.entries(rm.extracts || {}).map(([k, v]) => (
+                <div key={k} className="extract-block">
+                  <strong>Extract {k}</strong>
+                  <p>{v}</p>
                 </div>
               ))}
             </>
           )}
-        
+
           {currentQuestion.topic === "Main Idea & Summary" && (
             <>
               <h3>Paragraphs</h3>
-              {Object.entries(readingMaterial || {}).map(([num, text]) => (
-                <div key={num} className="paragraph-block">
-                  <strong>Paragraph {num}</strong>
-                  <p>{text}</p>
+              {Object.entries(rm.paragraphs || {}).map(([k, v]) => (
+                <div key={k} className="paragraph-block">
+                  <strong>Paragraph {k}</strong>
+                  <p>{v}</p>
                 </div>
               ))}
             </>
           )}
         </div>
-
 
         {/* RIGHT */}
         <div className="question-pane">
