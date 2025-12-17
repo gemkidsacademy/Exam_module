@@ -12,7 +12,7 @@ export default function QuizSetup_reading() {
   const READING_TOPIC_OPTIONS = [
     "Comparative analysis",
     "Gapped Text",
-    "Main Idea & Summary"
+    "Main Idea and Summary"
   ];
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [loading, setLoading] = useState(false);
