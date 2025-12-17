@@ -28,7 +28,6 @@ export default function ReadingComponent({ studentId }) {
       );
 
       const data = await res.json();
-      console.log("📦 FULL API RESPONSE:", data);
 
       if (data.detail) {
         alert(data.detail);
@@ -71,11 +70,25 @@ export default function ReadingComponent({ studentId }) {
   ----------------------------- */
   useEffect(() => {
     if (timeLeft === null) return;
-    if (timeLeft <= 0) return autoSubmit();
+    if (timeLeft <= 0) autoSubmit();
 
     const t = setInterval(() => setTimeLeft((v) => v - 1), 1000);
     return () => clearInterval(t);
   }, [timeLeft]);
+
+  /* -----------------------------
+     GROUP QUESTIONS BY TOPIC
+     (HOOK MUST BE ABOVE ANY RETURN)
+  ----------------------------- */
+  const groupedQuestions = useMemo(() => {
+    const groups = {};
+    questions.forEach((q, i) => {
+      const key = q.topic || "Other";
+      if (!groups[key]) groups[key] = [];
+      groups[key].push({ index: i });
+    });
+    return groups;
+  }, [questions]);
 
   /* -----------------------------
      SUBMIT
@@ -93,20 +106,10 @@ export default function ReadingComponent({ studentId }) {
   };
 
   /* -----------------------------
-     INTERACTION
+     SAFE EARLY RETURN (NO HOOKS BELOW)
   ----------------------------- */
-  const currentQuestion = questions[index];  
+  const currentQuestion = questions[index];
   if (!exam || !currentQuestion) return <div>Loading Exam…</div>;
-  
-  const groupedQuestions = useMemo(() => {
-    const groups = {};
-    questions.forEach((q, i) => {
-      const key = q.topic;
-      if (!groups[key]) groups[key] = [];
-      groups[key].push({ index: i });
-    });
-    return groups;
-  }, [questions]);
 
   const topic = (currentQuestion.topic || "").toLowerCase();
   const rm = currentQuestion.reading_material || {};
@@ -121,10 +124,6 @@ export default function ReadingComponent({ studentId }) {
     setIndex(i);
   };
 
-  /* -----------------------------
-     GROUP QUESTIONS BY TOPIC
-  ----------------------------- */
-  
   /* -----------------------------
      FINISHED
   ----------------------------- */
