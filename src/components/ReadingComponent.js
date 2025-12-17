@@ -124,16 +124,7 @@ export default function ReadingComponent({ studentId }) {
   /* -----------------------------
      GROUP QUESTIONS BY TOPIC
   ----------------------------- */
-  const groupedQuestions = useMemo(() => {
-    const groups = {};
-    questions.forEach((q, i) => {
-      const key = q.topic;
-      if (!groups[key]) groups[key] = [];
-      groups[key].push({ index: i });
-    });
-    return groups;
-  }, [questions]);
-
+  
   /* -----------------------------
      FINISHED
   ----------------------------- */
