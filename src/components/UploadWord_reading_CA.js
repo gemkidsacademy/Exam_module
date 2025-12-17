@@ -1,42 +1,67 @@
 import React, { useState } from "react";
-import "./ReadingUploadPanel.css";
-import UploadWord_reading_GT from "./UploadWord_reading_GT";
-import UploadWord_reading_CA from "./UploadWord_reading_CA";
+import "./UploadPDF.css"; // You can rename this if you want
 
-export default function ReadingUploadPanel() {
-  const [activeUpload, setActiveUpload] = useState(null);
+export default function UploadWord_reading_CA() {
+  const [wordFile, setWordFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileChange = (e) => {
+    setWordFile(e.target.files[0]);
+  };
+
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    if (!wordFile) {
+      alert("Please select a Word document first.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", wordFile);
+
+
+    setUploading(true);
+
+    try {
+      const res = await fetch("https://web-production-481a5.up.railway.app/upload-word-reading-gapped-multi-ai", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+
+      const data = await res.json();
+      alert(data.message || "Word document uploaded successfully!");
+      setWordFile(null);
+    } catch (err) {
+      console.error(err);
+      alert("Error uploading Word document.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
-    <div className="reading-upload-panel">
-      <h2>Upload Reading Question Sets</h2>
+    <div className="upload-pdf-container">
+      <h2>Upload Word Document for Quiz Questions</h2>
 
-      {!activeUpload && (
-        <>
-          <button
-            className="upload-btn gapped"
-            onClick={() => setActiveUpload("gapped")}
-          >
-            Upload Gapped Text Questions
-          </button>
+      <form onSubmit={handleUpload}>
+        <input
+          type="file"
+          accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          onChange={handleFileChange}
+        />
 
-          <button
-            className="upload-btn main-idea"
-            onClick={() => setActiveUpload("main-idea")}
-          >
-            Upload Main Idea & Summary Questions
-          </button>
+        <button type="submit" disabled={uploading}>
+          {uploading ? "Uploading..." : "Upload Word File"}
+        </button>
+      </form>
 
-          <button
-            className="upload-btn comparative"
-            onClick={() => setActiveUpload("comparative")}
-          >
-            Upload Comparative Analysis Questions
-          </button>
-        </>
-      )}
+      {wordFile && <p>Selected file: {wordFile.name}</p>}
 
-      {activeUpload === "gapped" && <UploadWord_reading_GT />}
-      {activeUpload === "comparative" && <UploadWord_reading_CA />}
+      <p className="note">
+        Upload a Word document to populate quiz questions in the database.
+      </p>
     </div>
   );
 }
