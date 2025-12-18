@@ -1,12 +1,17 @@
 
 /* ============================================
-   FULL-BLEED EXAM SHELL (THIS IS THE KEY)
+   EXAM SHELL — CORRECT FIX
 ============================================ */
 .exam-shell {
-  width: 100vw;
+  width: 100%;        /* ✅ respect parent */
+  max-width: none;
   min-height: 100vh;
+  margin: 0;
+  padding: 0;
   background: #f5f7fb;
+  box-sizing: border-box;
 }
+
 /* ============================================
    EXAM CONTENT (CARD)
 ============================================ */
