@@ -21,10 +21,11 @@
 ============================================ */
 .exam-container {
   width: 100%;
-  max-width: none;      /* ✅ remove constraint */
-  margin: 0;            /* ✅ stop centering */
-  padding: 24px 48px;   /* controlled side spacing */
+  max-width: none;      /* important */
+  margin: 0;            /* stop centering */
+  padding: 24px 48px;   /* horizontal breathing space */
   box-sizing: border-box;
+  font-family: "Inter", sans-serif;
 }
 
 
