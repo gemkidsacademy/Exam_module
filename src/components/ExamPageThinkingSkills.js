@@ -217,37 +217,42 @@ export default function ExamPageThinkingSkills() {
         ([k, v]) => `${k}) ${v}`
       );
   return (
-    <div className="exam-container">
-      <div className="exam-header">
-        <div className="timer">⏳ {formatTime(timeLeft)}</div>
-        <div className="counter">
-          Question {currentIndex + 1} / {questions.length}
-        </div>
-      </div>
+    <div className="exam-shell">
+  <div className="exam-container">
 
-      <div className="index-row">
-        {questions.map((q, i) => {
-          let cls = "index-circle index-not-visited"; // white
-      
-          if (visited[q.q_id]) {
-            cls = "index-circle index-visited"; // grey
-          }
-      
-          if (answers[q.q_id]) {
-            cls = "index-circle index-answered"; // green
-          }
-      
-          return (
-            <div
-              key={q.q_id}
-              className={cls}
-              onClick={() => goToQuestion(i)}
-            >
-              {i + 1}
-            </div>
-          );
-        })}
+    <div className="exam-header">
+      <div className="timer">⏳ {formatTime(timeLeft)}</div>
+      <div className="counter">
+        Question {currentIndex + 1} / {questions.length}
       </div>
+    </div>
+
+    <div className="index-row">
+      {questions.map((q, i) => {
+        let cls = "index-circle index-not-visited";
+
+        if (visited[q.q_id]) {
+          cls = "index-circle index-visited";
+        }
+
+        if (answers[q.q_id]) {
+          cls = "index-circle index-answered";
+        }
+
+        return (
+          <div
+            key={q.q_id}
+            className={cls}
+            onClick={() => goToQuestion(i)}
+          >
+            {i + 1}
+          </div>
+        );
+      })}
+    </div>
+
+  </div>
+</div>
 
       <div className="question-card">
         <p className="question-text">{currentQ.question}</p>
