@@ -8,6 +8,25 @@
   padding-left: clamp(12px, 2vw, 32px);
   padding-right: clamp(12px, 2vw, 32px);
 }
+/* ============================================
+   FULL-BLEED EXAM SHELL (THIS IS THE KEY)
+============================================ */
+.exam-shell {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  background: #f0f4f8; /* page background */
+  padding: 24px 0;
+}
+
+/* ============================================
+   EXAM CONTENT (CARD)
+============================================ */
+.exam-container {
+  width: 100%;
+  max-width: 1400px;   /* 👈 control content width */
+  margin: 0 auto;
+}
+
 
 
 /* ============================================
