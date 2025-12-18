@@ -14,6 +14,8 @@ export default function ReadingComponent({ studentId }) {
 
   const [timeLeft, setTimeLeft] = useState(null);
   const [sessionId, setSessionId] = useState(null);
+  const prettyTopic = (t) =>
+    t.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
   /* -----------------------------
      LOAD EXAM
@@ -119,18 +121,16 @@ export default function ReadingComponent({ studentId }) {
     ? Number(((correct / total) * 100).toFixed(1))
     : 0;
 
-  // Convert topic stats → UI-friendly improvements
-  const improvements = Object.entries(topicStats).map(
+  const topics = Object.entries(topicStats).map(
     ([topic, stats]) => {
       const topicAccuracy =
         stats.total > 0
-          ? (stats.correct / stats.total) * 100
+          ? Number(((stats.correct / stats.total) * 100).toFixed(1))
           : 0;
 
       return {
         topic,
-        accuracy: Number(topicAccuracy.toFixed(1)),
-        improvement: Math.round(100 - topicAccuracy),
+        accuracy: topicAccuracy,
       };
     }
   );
@@ -141,7 +141,7 @@ export default function ReadingComponent({ studentId }) {
     correct,
     wrong,
     accuracy,
-    improvements,
+    topics,
   };
 };
 
@@ -193,7 +193,7 @@ export default function ReadingComponent({ studentId }) {
       </h1>
 
       <div className="report-grid">
-        {/* ACCURACY */}
+        {/* LEFT: ACCURACY */}
         <div className="card">
           <h3>Accuracy</h3>
 
@@ -214,22 +214,23 @@ export default function ReadingComponent({ studentId }) {
           </div>
         </div>
 
-        {/* IMPROVEMENTS (DYNAMIC TOPICS) */}
+        {/* RIGHT: TOPIC BREAKDOWN (ACCURACY-BASED) */}
         <div className="card">
-          <h3>Improvements</h3>
+          <h3>Topic Breakdown</h3>
+          <p className="helper-text">Topic Name – Accuracy %</p>
 
-          {report.improvements.map((item) => (
+          {report.topics.map((item) => (
             <div key={item.topic} className="improve-row">
-              <label>{item.topic}</label>
+              <label>{prettyTopic(item.topic)}</label>
 
               <div className="bar">
                 <div
                   className="fill blue"
-                  style={{ width: `${item.improvement}%` }}
+                  style={{ width: `${item.accuracy}%` }}
                 />
               </div>
 
-              <span>{item.improvement}%</span>
+              <span>{item.accuracy}%</span>
             </div>
           ))}
         </div>
