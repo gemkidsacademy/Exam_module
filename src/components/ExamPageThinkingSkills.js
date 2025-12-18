@@ -105,7 +105,11 @@ export default function ExamPageThinkingSkills() {
       const prevQid = questions[prevIdx]?.q_id;
 
       if (prevQid && !answers[prevQid]) {
-        setVisited(prev => ({ ...prev, [prevIdx]: true }));
+        const prevQ = questions[prevIdx];
+        if (prevQ && !answers[prevQ.q_id]) {
+          setVisited(prev => ({ ...prev, [prevQ.q_id]: true }));
+        }
+
       }
     }
 
@@ -178,7 +182,14 @@ export default function ExamPageThinkingSkills() {
     }));
   };
 
-  const goToQuestion = (idx) => setCurrentIndex(idx);
+  const goToQuestion = (idx) => {
+    const qid = questions[idx]?.q_id;
+    if (qid) {
+      setVisited(prev => ({ ...prev, [qid]: true }));
+    }
+    setCurrentIndex(idx);
+  };
+
 
   const formatTime = (seconds) => {
     const m = String(Math.floor(seconds / 60)).padStart(2, "0");
@@ -215,21 +226,27 @@ export default function ExamPageThinkingSkills() {
       </div>
 
       <div className="index-row">
-        {questions.map((q, i) => (
-          <div
-            key={q.q_id}
-            className={`index-circle ${
-              answers[q.q_id]
-                ? "index-answered"
-                : visited[i]
-                ? "index-visited"
-                : "index-not-visited"
-            }`}
-            onClick={() => goToQuestion(i)}
-          >
-            {i + 1}
-          </div>
-        ))}
+        {questions.map((q, i) => {
+          let cls = "index-circle index-not-visited"; // white
+      
+          if (visited[q.q_id]) {
+            cls = "index-circle index-visited"; // grey
+          }
+      
+          if (answers[q.q_id]) {
+            cls = "index-circle index-answered"; // green
+          }
+      
+          return (
+            <div
+              key={q.q_id}
+              className={cls}
+              onClick={() => goToQuestion(i)}
+            >
+              {i + 1}
+            </div>
+          );
+        })}
       </div>
 
       <div className="question-card">
