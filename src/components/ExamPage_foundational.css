@@ -26,9 +26,10 @@ body {
    EXAM CONTAINER
 ============================================================ */
 .exam-container {
-  max-width: 1100px;
-  margin: 24px auto;
-  padding: 24px 32px;
+  width: 100%;
+  max-width: none;              /* 🔥 remove width cap */
+  margin: 24px 0;               /* 🔥 stop centering */
+  padding: 24px clamp(16px, 4vw, 48px);
   background: #ffffff;
   border-radius: 14px;
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
@@ -231,9 +232,10 @@ body {
    REPORT PAGE
 ============================================================ */
 .report-page {
-  max-width: 1100px;
-  margin: 32px auto;
-  padding: 32px;
+  width: 100%;
+  max-width: none;              /* 🔥 remove width cap */
+  margin: 32px 0;               /* 🔥 stop centering */
+  padding: 32px clamp(16px, 4vw, 48px);
 }
 
 .report-title {
