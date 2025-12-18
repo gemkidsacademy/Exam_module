@@ -167,3 +167,7 @@
 .resume-btn:hover {
   background: #1d4ed8;
 }
+.exam-shell {
+  width: 100%;
+  max-width: 100%;
+}
