@@ -13,18 +13,18 @@
 ============================================ */
 .exam-shell {
   width: 100vw;
-  margin-left: calc(50% - 50vw);
-  background: #f0f4f8; /* page background */
-  padding: 24px 0;
+  min-height: 100vh;
+  background: #f5f7fb;
 }
-
 /* ============================================
    EXAM CONTENT (CARD)
 ============================================ */
 .exam-container {
   width: 100%;
-  max-width: 1400px;   /* 👈 control content width */
-  margin: 0 auto;
+  max-width: none;      /* ✅ remove constraint */
+  margin: 0;            /* ✅ stop centering */
+  padding: 24px 48px;   /* controlled side spacing */
+  box-sizing: border-box;
 }
 
 
