@@ -9,6 +9,11 @@ export default function ReadingComponent({ studentId }) {
   const [index, setIndex] = useState(0);
   const [report, setReport] = useState(null);
   const [loadingReport, setLoadingReport] = useState(false);
+    const formatTime = (seconds) => {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}:${secs.toString().padStart(2, "0")}`;
+    };
 
 
   const [answers, setAnswers] = useState({});
@@ -286,7 +291,10 @@ export default function ReadingComponent({ studentId }) {
     <div className="exam-container">
       <div className="exam-header">
         <div>Reading Comprehension Exam</div>
-        <div className="timer-box">Time Left: {timeLeft}s</div>
+        <div className="timer-box">
+          Time Left: {formatTime(timeLeft)}
+        </div>
+
         <div className="counter">
           Question {index + 1} / {questions.length}
         </div>
