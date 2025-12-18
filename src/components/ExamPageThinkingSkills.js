@@ -327,7 +327,7 @@ function ThinkingSkillsReport({ report }) {
 
         {/* Improvements */}
         <div className="report-card">
-          <h3>Improvements</h3>
+          <h3>Topic Breakdown</h3>
 
           {topic_breakdown.map(topic => (
             <div key={topic.topic} className="topic-bar">
