@@ -116,11 +116,12 @@
 ============================================ */
 .question-card {
   background: #ffffff;
-  padding: 28px 32px;
+  width: 100%;
+  max-width: none; /* 🔥 ensure no visual cap */
+  padding: 32px clamp(32px, 8vw, 120px); /* 🔥 spread content horizontally */
   border-radius: 14px;
   margin-bottom: 30px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-  width: 100%;
   box-sizing: border-box;
 }
 
