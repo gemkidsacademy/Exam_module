@@ -15,11 +15,10 @@
 .exam-container {
   width: 100%;
   max-width: none;
-  padding: 24px 0;      /* ✅ vertical only */
-  font-family: "Inter", sans-serif;
+  margin: 0;              /* 🔥 important */
+  padding: 24px 0;
   box-sizing: border-box;
 }
-
 
 /* ============================================
    HEADER
@@ -185,13 +184,25 @@
 
 .reading-mode .passage-pane {
   flex: 1;
-  max-width: 50%;
+  max-width: 45%;
 }
 
 .reading-mode .question-pane {
   flex: 1;
+  max-width: 55%;
 }
+/* ============================================
+   READING MODE — ULTRA WIDE SCREENS
+============================================ */
+@media (min-width: 1400px) {
+  .reading-mode .passage-pane {
+    max-width: 40%;
+  }
 
+  .reading-mode .question-pane {
+    max-width: 60%;
+  }
+}
 
 
 /* ============================================
