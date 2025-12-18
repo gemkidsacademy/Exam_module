@@ -17,11 +17,10 @@
 ============================================ */
 .exam-container {
   width: 100%;
-  max-width: none;      /* important */
-  margin: 0;            /* stop centering */
-  padding: 24px 48px;   /* horizontal breathing space */
+  max-width: none;
+  margin: 0;
+  padding: 24px 0;     /* 🔥 REMOVE horizontal padding */
   box-sizing: border-box;
-  font-family: "Inter", sans-serif;
 }
 
 
