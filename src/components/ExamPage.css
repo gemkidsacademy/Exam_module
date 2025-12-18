@@ -1,4 +1,15 @@
 /* ============================================
+   EXAM ROOT — WIDTH UNLOCK
+============================================ */
+.exam-root {
+  width: 100%;
+  max-width: none;
+  min-width: 0;        /* 🔥 critical for flex layouts */
+  display: block;
+}
+
+
+/* ============================================
    FULL WIDTH EXAM CONTAINER
 ============================================ */
 .exam-container {
