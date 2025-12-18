@@ -1,12 +1,11 @@
 /* Overall App wrapper */
+/* Overall App wrapper */
 .App {
-  text-align: center;
   background-color: #f0f2f5;
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 100%;
 }
+
 
 /* Login page layout */
 .login-container {
