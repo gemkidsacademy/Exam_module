@@ -19,7 +19,7 @@
   width: 100%;
   max-width: none;
   margin: 0;
-  padding: 24px 0;     /* 🔥 REMOVE horizontal padding */
+  padding: 24px clamp(16px, 4vw, 48px);  /* 🔥 REMOVE horizontal padding */
   box-sizing: border-box;
 }
 
