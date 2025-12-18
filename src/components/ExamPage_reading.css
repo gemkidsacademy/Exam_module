@@ -3,12 +3,13 @@
 ======================================================= */
 
 .exam-container {
-  width: 100%;
+  width: 100vw;
   padding: 20px;
   box-sizing: border-box;
   font-family: "Inter", system-ui, sans-serif;
   background: #ffffff;
 }
+
 
 /* =======================================================
    HEADER
