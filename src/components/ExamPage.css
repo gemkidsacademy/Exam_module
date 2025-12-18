@@ -52,17 +52,14 @@
   cursor: pointer;
   font-weight: 600;
 
-  background-color: #e5e7eb !important;   /* 🔥 FORCE GREY */
+  background-color: #ffffff;   /* default = NOT VISITED */
   border: 1px solid #cbd5e1;
   color: #475569;
+
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 /* Answered */
-.index-circle.index-answered {
-  background-color: #bbf7d0 !important;
-  border-color: #16a34a;
-  color: #065f46;
-}
 /* Current question */
 .index-circle.index-current {
   background-color: #2563eb !important;
@@ -184,11 +181,6 @@
   flex: 1;
 }
 
-.index-seen {
-  background: #e5e7eb !important;
-  border-color: #cbd5e1;
-  color: #475569;
-}
 
 
 /* ============================================
@@ -357,18 +349,26 @@
   height: 100%;
   background: #6366f1;
 }
-/* Seen but unanswered */
-.index-circle.index-visited {
-  background-color: #fef3c7 !important;  /* amber */
-  border-color: #f59e0b;
-  color: #92400e;
-}
 
-/* Not visited */
+/* NOT VISITED — WHITE (initial state) */
 .index-circle.index-not-visited {
-  background-color: #e5e7eb !important;
+  background-color: #ffffff;
   border-color: #cbd5e1;
   color: #475569;
+}
+
+/* VISITED — GREY (seen, unanswered) */
+.index-circle.index-visited {
+  background-color: #e5e7eb;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+/* ANSWERED — GREEN */
+.index-circle.index-answered {
+  background-color: #bbf7d0;
+  border-color: #16a34a;
+  color: #065f46;
 }
 
 /* ============================================
