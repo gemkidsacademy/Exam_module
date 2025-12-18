@@ -50,30 +50,31 @@ const SelectiveDashboard = () => {
 
       {/* Content */}
       <main className="content-area">
-
         {ActiveComponent ? (
-          activeTab === "Reading" ? (
-            // 👇 ONLY Reading gets two-column mode
-            <div className="reading-mode">
+          <div className="exam-shell">
+            {activeTab === "Reading" ? (
+              // Reading keeps its special two-column layout
+              <div className="reading-mode">
+                <ActiveComponent
+                  studentId={studentId}
+                  subject={subjectKey}
+                  difficulty="advanced"
+                />
+              </div>
+            ) : (
+              // All other exams render full-width
               <ActiveComponent
                 studentId={studentId}
                 subject={subjectKey}
                 difficulty="advanced"
               />
-            </div>
-          ) : (
-            // other subjects render normally
-            <ActiveComponent
-              studentId={studentId}
-              subject={subjectKey}
-              difficulty="advanced"
-            />
-          )
+            )}
+          </div>
         ) : (
           <WelcomeScreen />
         )}
-
       </main>
+
 
     </div>
   );
