@@ -195,12 +195,7 @@ export default function ReadingComponent({ studentId }) {
   }
 };
 
-  /* -----------------------------
-     SAFE EARLY RETURN (NO HOOKS BELOW)
-  ----------------------------- */
-  const currentQuestion = questions[index];
-  if (!exam || !currentQuestion) return <div>Loading Exam…</div>;
-
+  
   const topic = (currentQuestion.topic || "").toLowerCase();
   const rm = currentQuestion.reading_material || {};
   const optionsToRender = currentQuestion.answer_options || {};
@@ -276,6 +271,11 @@ export default function ReadingComponent({ studentId }) {
 }
 
 
+  /* -----------------------------
+     SAFE EARLY RETURN (NO HOOKS BELOW)
+  ----------------------------- */
+  const currentQuestion = questions[index];
+    if (!exam || !currentQuestion) return <div>Loading Exam…</div>;
 
   /* -----------------------------
      UI
