@@ -217,49 +217,49 @@ export default function ExamPageThinkingSkills() {
         ([k, v]) => `${k}) ${v}`
       );
   return (
-    <div className="exam-shell">
-  <div className="exam-container">
+  <div className="exam-shell">
+    <div className="exam-container">
 
-    <div className="exam-header">
-      <div className="timer">⏳ {formatTime(timeLeft)}</div>
-      <div className="counter">
-        Question {currentIndex + 1} / {questions.length}
+      {/* HEADER */}
+      <div className="exam-header">
+        <div className="timer">⏳ {formatTime(timeLeft)}</div>
+        <div className="counter">
+          Question {currentIndex + 1} / {questions.length}
+        </div>
       </div>
-    </div>
 
-    <div className="index-row">
-      {questions.map((q, i) => {
-        let cls = "index-circle index-not-visited";
+      {/* QUESTION INDEX */}
+      <div className="index-row">
+        {questions.map((q, i) => {
+          let cls = "index-circle index-not-visited";
 
-        if (visited[q.q_id]) {
-          cls = "index-circle index-visited";
-        }
+          if (visited[q.q_id]) {
+            cls = "index-circle index-visited";
+          }
 
-        if (answers[q.q_id]) {
-          cls = "index-circle index-answered";
-        }
+          if (answers[q.q_id]) {
+            cls = "index-circle index-answered";
+          }
 
-        return (
-          <div
-            key={q.q_id}
-            className={cls}
-            onClick={() => goToQuestion(i)}
-          >
-            {i + 1}
-          </div>
-        );
-      })}
-    </div>
+          return (
+            <div
+              key={q.q_id}
+              className={cls}
+              onClick={() => goToQuestion(i)}
+            >
+              {i + 1}
+            </div>
+          );
+        })}
+      </div>
 
-  </div>
-</div>
-
+      {/* QUESTION CARD */}
       <div className="question-card">
         <p className="question-text">{currentQ.question}</p>
-      
+
         {normalizedOptions.map((opt, i) => {
           const optionKey = opt.split(")")[0];
-      
+
           return (
             <button
               key={i}
@@ -274,6 +274,7 @@ export default function ExamPageThinkingSkills() {
         })}
       </div>
 
+      {/* NAVIGATION */}
       <div className="nav-buttons">
         <button
           className="nav-btn prev"
@@ -282,7 +283,7 @@ export default function ExamPageThinkingSkills() {
         >
           Previous
         </button>
-      
+
         {currentIndex < questions.length - 1 ? (
           <button
             className="nav-btn next"
@@ -301,7 +302,9 @@ export default function ExamPageThinkingSkills() {
       </div>
 
     </div>
-  );
+  </div>
+);
+
 }
 
 /* ============================================================
