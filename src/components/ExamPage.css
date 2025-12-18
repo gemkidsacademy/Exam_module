@@ -3,11 +3,10 @@
 ============================================ */
 .exam-container {
   width: 100%;
-  max-width: 100%;
+  max-width: none;
+  padding: 24px 0;   /* ❌ REMOVE horizontal padding */
   box-sizing: border-box;
-  padding: 24px clamp(16px, 4vw, 48px);
 }
-
 
 
 /* ============================================
