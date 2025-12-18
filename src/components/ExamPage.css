@@ -4,7 +4,8 @@
 .exam-container {
   width: 100%;
   max-width: none;
-  padding: 24px 0;   /* ❌ REMOVE horizontal padding */
+  padding: 24px 0;      /* ✅ vertical only */
+  font-family: "Inter", sans-serif;
   box-sizing: border-box;
 }
 
@@ -390,4 +391,15 @@
 .foundational-exam .nav-buttons {
   position: relative;
   z-index: 2;
+}
+/* ============================================
+   EXAM INNER PADDING (FULL-WIDTH LAYOUT)
+============================================ */
+
+.exam-header,
+.index-row,
+.question-card,
+.nav-buttons {
+  padding-left: clamp(16px, 4vw, 48px);
+  padding-right: clamp(16px, 4vw, 48px);
 }
