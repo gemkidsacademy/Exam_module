@@ -1,4 +1,16 @@
 /* ============================================
+   THINKING SKILLS — EXTRA WIDE MODE
+============================================ */
+.exam-container .exam-header,
+.exam-container .index-row,
+.exam-container .question-card,
+.exam-container .nav-buttons {
+  padding-left: clamp(12px, 2vw, 32px);
+  padding-right: clamp(12px, 2vw, 32px);
+}
+
+
+/* ============================================
    EXAM ROOT — WIDTH UNLOCK
 ============================================ */
 .exam-root {
