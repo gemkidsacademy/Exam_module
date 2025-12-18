@@ -2,29 +2,6 @@
 /* Overall App wrapper */
 /* ===== HARD DEBUG: SHOW TRUE WIDTH ===== */
 
-.selective-dashboard {
-  outline: 5px solid red !important;
-}
-
-.content-area {
-  outline: 5px solid blue !important;
-}
-
-.exam-root {
-  outline: 5px solid green !important;
-}
-
-.exam-shell {
-  outline: 5px solid orange !important;
-}
-
-.exam-container {
-  outline: 5px solid purple !important;
-}
-
-.question-card {
-  outline: 5px solid black !important;
-}
 
 .App {
   background-color: #f0f2f5;
