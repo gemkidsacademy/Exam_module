@@ -1,9 +1,14 @@
+/* ============================================================
+   EXAM ROOT — FULL WIDTH GUARANTEE
+============================================================ */
 .exam-root {
   width: 100%;
-  min-width: 0;        /* 🔥 critical for flex children */
+  max-width: 100%;
   flex: 1;
+  min-width: 0;      /* 🔥 critical for flex layouts */
   display: block;
 }
+
 
 /* ============================================================
    GLOBAL LAYOUT
