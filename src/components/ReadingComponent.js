@@ -91,6 +91,61 @@ export default function ReadingComponent({ studentId }) {
   }, [questions]);
 
   /* -----------------------------
+     Front End Reporting
+  ----------------------------- */
+  const buildLocalReport = () => {
+  const total = questions.length;
+  let correct = 0;
+
+  const topicStats = {};
+
+  questions.forEach((q, i) => {
+    const topic = q.topic || "General";
+
+    if (!topicStats[topic]) {
+      topicStats[topic] = { total: 0, correct: 0 };
+    }
+
+    topicStats[topic].total += 1;
+
+    if (answers[i] === q.correct_answer) {
+      correct += 1;
+      topicStats[topic].correct += 1;
+    }
+  });
+
+  const wrong = total - correct;
+  const accuracy = total
+    ? Number(((correct / total) * 100).toFixed(1))
+    : 0;
+
+  // Convert topic stats → UI-friendly improvements
+  const improvements = Object.entries(topicStats).map(
+    ([topic, stats]) => {
+      const topicAccuracy =
+        stats.total > 0
+          ? (stats.correct / stats.total) * 100
+          : 0;
+
+      return {
+        topic,
+        accuracy: Number(topicAccuracy.toFixed(1)),
+        improvement: Math.round(100 - topicAccuracy),
+      };
+    }
+  );
+
+  return {
+    score: correct,
+    total,
+    correct,
+    wrong,
+    accuracy,
+    improvements,
+  };
+};
+
+  /* -----------------------------
      SUBMIT
   ----------------------------- */
   const autoSubmit = async () => {
@@ -128,20 +183,62 @@ export default function ReadingComponent({ studentId }) {
      FINISHED
   ----------------------------- */
   if (finished) {
-    const score = questions.reduce(
-      (s, q, i) => s + (answers[i] === q.correct_answer ? 1 : 0),
-      0
-    );
+  const report = buildLocalReport();
 
-    return (
-      <div className="completed-screen">
-        <h1>Quiz Finished</h1>
-        <h2>
-          Your Score: {score} / {questions.length}
-        </h2>
+  return (
+    <div className="report-container">
+      <h1>
+        You scored {report.score} out of {report.total} in NSW Selective
+        Reading Test – Free Trial
+      </h1>
+
+      <div className="report-grid">
+        {/* ACCURACY */}
+        <div className="card">
+          <h3>Accuracy</h3>
+
+          <div
+            className="accuracy-circle"
+            style={{ "--p": report.accuracy }}
+          >
+            <span>{report.accuracy}%</span>
+          </div>
+
+          <div className="legend">
+            <span className="correct-dot">
+              Correct: {report.correct}
+            </span>
+            <span className="wrong-dot">
+              Wrong: {report.wrong}
+            </span>
+          </div>
+        </div>
+
+        {/* IMPROVEMENTS (DYNAMIC TOPICS) */}
+        <div className="card">
+          <h3>Improvements</h3>
+
+          {report.improvements.map((item) => (
+            <div key={item.topic} className="improve-row">
+              <label>{item.topic}</label>
+
+              <div className="bar">
+                <div
+                  className="fill blue"
+                  style={{ width: `${item.improvement}%` }}
+                />
+              </div>
+
+              <span>{item.improvement}%</span>
+            </div>
+          ))}
+        </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
+
 
   /* -----------------------------
      UI
