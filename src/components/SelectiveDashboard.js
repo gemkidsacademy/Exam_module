@@ -50,28 +50,31 @@ const SelectiveDashboard = () => {
 
       {/* Content */}
       <main className="content-area">
-  {ActiveComponent ? (
-    <div className="exam-root">
-      {activeTab === "Reading" ? (
-        <div className="reading-mode">
-          <ActiveComponent
-            studentId={studentId}
-            subject={subjectKey}
-            difficulty="advanced"
-          />
-        </div>
-      ) : (
-        <ActiveComponent
-          studentId={studentId}
-          subject={subjectKey}
-          difficulty="advanced"
-        />
-      )}
-    </div>
-  ) : (
-    <WelcomeScreen />
-  )}
-</main>
+
+        {ActiveComponent ? (
+          <div className="exam-root">
+            {activeTab === "Reading" ? (
+              <div className="reading-mode">
+                <ActiveComponent
+                  studentId={studentId}
+                  subject={subjectKey}
+                  difficulty="advanced"
+                />
+              </div>
+            ) : (
+              <ActiveComponent
+                studentId={studentId}
+                subject={subjectKey}
+                difficulty="advanced"
+              />
+            )}
+          </div>
+        ) : (
+          <WelcomeScreen />
+        )}
+      
+      </main>
+
 
 
     </div>
