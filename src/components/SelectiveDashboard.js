@@ -33,7 +33,15 @@ const SelectiveDashboard = () => {
   const subjectKey = SUBJECT_KEY_MAP[activeTab];
 
   return (
-    <div className="selective-dashboard">
+    <div
+      className="selective-dashboard"
+      style={{
+        width: "100vw",
+        minHeight: "100vh",
+        background: "rgba(255,0,0,0.05)",
+        marginLeft: "calc(50% - 50vw)",
+      }}
+    >
 
       {/* Horizontal Menu */}
       <nav className="horizontal-menu">
