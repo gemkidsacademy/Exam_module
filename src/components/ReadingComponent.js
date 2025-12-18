@@ -7,6 +7,9 @@ export default function ReadingComponent({ studentId }) {
   const [exam, setExam] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
+  const [report, setReport] = useState(null);
+  const [loadingReport, setLoadingReport] = useState(false);
+
 
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
@@ -16,6 +19,51 @@ export default function ReadingComponent({ studentId }) {
   const [sessionId, setSessionId] = useState(null);
   const prettyTopic = (t) =>
     t.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const buildLocalReport = () => {
+  const total = questions.length;
+  let correct = 0;
+
+  const topicStats = {};
+
+  questions.forEach((q, i) => {
+    const topic = q.topic || "General";
+
+    if (!topicStats[topic]) {
+      topicStats[topic] = { total: 0, correct: 0 };
+    }
+
+    topicStats[topic].total += 1;
+
+    if (answers[i] === q.correct_answer) {
+      correct += 1;
+      topicStats[topic].correct += 1;
+    }
+  });
+
+  const wrong = total - correct;
+  const accuracy = total
+    ? Number(((correct / total) * 100).toFixed(1))
+    : 0;
+
+  const topics = Object.entries(topicStats).map(
+    ([topic, stats]) => ({
+      topic,
+      accuracy: stats.total
+        ? Number(((stats.correct / stats.total) * 100).toFixed(1))
+        : 0
+    })
+  );
+
+  return {
+    score: correct,
+    total,
+    correct,
+    wrong,
+    accuracy,
+    topics
+  };
+};
+
 
   /* -----------------------------
      LOAD EXAM
@@ -31,11 +79,12 @@ export default function ReadingComponent({ studentId }) {
 
       const data = await res.json();
 
-      if (data.detail) {
-        alert(data.detail);
+      if (data.finished === true) {
         setFinished(true);
+        loadReport();
         return;
       }
+
 
       const sections = data.exam_json.sections || [];
       const flat = [];
@@ -95,70 +144,56 @@ export default function ReadingComponent({ studentId }) {
   /* -----------------------------
      Front End Reporting
   ----------------------------- */
-  const buildLocalReport = () => {
-  const total = questions.length;
-  let correct = 0;
+  const loadReport = async () => {
+  setLoadingReport(true);
 
-  const topicStats = {};
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/api/exams/reading-report?student_id=${studentId}`
+    );
 
-  questions.forEach((q, i) => {
-    const topic = q.topic || "General";
-
-    if (!topicStats[topic]) {
-      topicStats[topic] = { total: 0, correct: 0 };
+    if (!res.ok) {
+      throw new Error("Failed to load report");
     }
 
-    topicStats[topic].total += 1;
-
-    if (answers[i] === q.correct_answer) {
-      correct += 1;
-      topicStats[topic].correct += 1;
-    }
-  });
-
-  const wrong = total - correct;
-  const accuracy = total
-    ? Number(((correct / total) * 100).toFixed(1))
-    : 0;
-
-  const topics = Object.entries(topicStats).map(
-    ([topic, stats]) => {
-      const topicAccuracy =
-        stats.total > 0
-          ? Number(((stats.correct / stats.total) * 100).toFixed(1))
-          : 0;
-
-      return {
-        topic,
-        accuracy: topicAccuracy,
-      };
-    }
-  );
-
-  return {
-    score: correct,
-    total,
-    correct,
-    wrong,
-    accuracy,
-    topics,
-  };
+    const data = await res.json();
+    setReport(data);
+  } catch (err) {
+    console.error("❌ report load error:", err);
+  } finally {
+    setLoadingReport(false);
+  }
 };
+
 
   /* -----------------------------
      SUBMIT
   ----------------------------- */
   const autoSubmit = async () => {
-    if (finished) return;
+  if (finished) return;
 
+  // 1️⃣ Build report on frontend
+  const report = buildLocalReport();
+
+  try {
+    // 2️⃣ Submit answers + report together
     await fetch(`${BACKEND_URL}/api/exams/submit-reading`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ session_id: sessionId, answers }),
+      body: JSON.stringify({
+        session_id: sessionId,
+        answers,
+        report   // 👈 this is the important addition
+      }),
     });
 
+    // 3️⃣ Switch to finished state
     setFinished(true);
-  };
+
+  } catch (err) {
+    console.error("❌ submit-reading error:", err);
+  }
+};
 
   /* -----------------------------
      SAFE EARLY RETURN (NO HOOKS BELOW)
@@ -183,7 +218,9 @@ export default function ReadingComponent({ studentId }) {
      FINISHED
   ----------------------------- */
   if (finished) {
-  const report = buildLocalReport();
+  if (loadingReport || !report) {
+    return <div>Loading your report…</div>;
+  }
 
   return (
     <div className="report-container">
@@ -214,10 +251,9 @@ export default function ReadingComponent({ studentId }) {
           </div>
         </div>
 
-        {/* RIGHT: TOPIC BREAKDOWN (ACCURACY-BASED) */}
+        {/* RIGHT: TOPIC BREAKDOWN */}
         <div className="card">
           <h3>Topic Breakdown</h3>
-          
 
           {report.topics.map((item) => (
             <div key={item.topic} className="improve-row">
