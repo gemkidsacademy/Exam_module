@@ -15,11 +15,12 @@
 /* ============================================
    EXAM CONTENT (CARD)
 ============================================ */
+/* === FINAL FULL-WIDTH FIX === */
 .exam-container {
-  width: 100%;
-  max-width: none;
-  margin: 0;
-  padding: 0;  /* 🔥 REMOVE horizontal padding */
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
   box-sizing: border-box;
 }
 
