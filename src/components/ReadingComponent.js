@@ -189,6 +189,8 @@ export default function ReadingComponent({ studentId }) {
 
     // 3️⃣ Switch to finished state
     setFinished(true);
+    await loadReport();
+
 
   } catch (err) {
     console.error("❌ submit-reading error:", err);
@@ -196,10 +198,7 @@ export default function ReadingComponent({ studentId }) {
 };
 
   
-  const topic = (currentQuestion.topic || "").toLowerCase();
-  const rm = currentQuestion.reading_material || {};
-  const optionsToRender = currentQuestion.answer_options || {};
-
+  
   const handleSelect = (choice) => {
     setAnswers((prev) => ({ ...prev, [index]: choice }));
   };
@@ -276,6 +275,9 @@ export default function ReadingComponent({ studentId }) {
   ----------------------------- */
   const currentQuestion = questions[index];
     if (!exam || !currentQuestion) return <div>Loading Exam…</div>;
+  const topic = (currentQuestion.topic || "").toLowerCase();
+  const rm = currentQuestion.reading_material || {};
+  const optionsToRender = currentQuestion.answer_options || {};
 
   /* -----------------------------
      UI
