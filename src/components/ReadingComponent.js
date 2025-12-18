@@ -217,7 +217,7 @@ export default function ReadingComponent({ studentId }) {
         {/* RIGHT: TOPIC BREAKDOWN (ACCURACY-BASED) */}
         <div className="card">
           <h3>Topic Breakdown</h3>
-          <p className="helper-text">Topic Name – Accuracy %</p>
+          
 
           {report.topics.map((item) => (
             <div key={item.topic} className="improve-row">
