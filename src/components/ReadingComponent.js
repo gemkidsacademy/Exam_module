@@ -104,7 +104,11 @@ export default function ReadingComponent({ studentId }) {
       );
 
       const data = await res.json();
-
+      console.log("📦 START-READING RESPONSE (RAW):", data);
+      console.log("📦 exam_json:", data.exam_json);
+      console.log("📦 questions:", data.exam_json?.questions);
+      console.log("📦 duration_minutes:", data.duration_minutes);
+      console.log("📦 finished:", data.finished);
       if (data.finished === true) {
         setFinished(true);
         loadReport();
