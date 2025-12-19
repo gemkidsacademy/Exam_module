@@ -19,6 +19,20 @@ export default function ReadingComponent({ studentId }) {
   const [timeLeft, setTimeLeft] = useState(null);
 
   const [report, setReport] = useState(null);
+  const normalizedReport = useMemo(() => {
+    if (!report) return null;
+  
+    return {
+      total: report.overall.total_questions,
+      attempted: report.overall.attempted,
+      correct: report.overall.correct,
+      incorrect: report.overall.incorrect,
+      not_attempted: report.overall.not_attempted,
+      accuracy: report.overall.accuracy,
+      topics: report.topics || [],
+      improvement_order: report.improvement_order || []
+    };
+  }, [report]);
   const [loadingReport, setLoadingReport] = useState(false);
 
   /* =============================
@@ -111,19 +125,29 @@ export default function ReadingComponent({ studentId }) {
      LOAD REPORT
   ============================= */
   const loadReport = async () => {
-    setLoadingReport(true);
-    try {
-      const res = await fetch(
-        `${BACKEND_URL}/api/exams/reading-report?student_id=${studentId}`
-      );
-      const data = await res.json();
-      setReport(data);
-    } catch (err) {
-      console.error("❌ report load error:", err);
-    } finally {
-      setLoadingReport(false);
+  if (!sessionId) return;
+
+  setLoadingReport(true);
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/api/exams/reading-report?session_id=${sessionId}`
+    );
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error("❌ report load failed:", errText);
+      return;
     }
-  };
+
+    const data = await res.json();
+    setReport(data);
+
+  } catch (err) {
+    console.error("❌ report load error:", err);
+  } finally {
+    setLoadingReport(false);
+  }
+};
 
   /* =============================
      SUBMIT
@@ -179,28 +203,33 @@ export default function ReadingComponent({ studentId }) {
      FINISHED VIEW
   ============================= */
   if (finished) {
-    if (loadingReport || !report) {
+    if (loadingReport || !normalizedReport) {
       return <div>Loading your report…</div>;
     }
 
     return (
       <div className="report-container">
         <h1>
-          You scored {report.correct} out of {report.total}
+          You scored {normalizedReport.correct} out of {normalizedReport.total}
         </h1>
+
 
         <div className="report-grid">
           <div className="card">
             <h3>Accuracy</h3>
-            <div className="accuracy-circle" style={{ "--p": report.accuracy }}>
-              <span>{report.accuracy}%</span>
+            <div
+              className="accuracy-circle"
+              style={{ "--p": normalizedReport.accuracy }}
+            >
+              <span>{normalizedReport.accuracy}%</span>
             </div>
+
           </div>
 
           <div className="card">
             <h3>Topic Breakdown</h3>
 
-            {report.topics.map((t) => (
+            {normalizedReport.topics.map((t) => (
               <div key={t.topic} className="improve-row">
                 <label>{prettyTopic(t.topic)}</label>
                 <div className="bar">
