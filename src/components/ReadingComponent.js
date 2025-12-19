@@ -219,6 +219,7 @@ export default function ReadingComponent({ studentId }) {
 
   const options = currentQuestion.answer_options || {};
   const rm = currentQuestion.reading_material || {};
+  const passageText = rm.content || rm.text || "";
 
   /* -----------------------------
      EXAM UI
@@ -257,7 +258,7 @@ export default function ReadingComponent({ studentId }) {
       <div className="exam-body">
         <div className="passage-pane">
           {rm.title && <h3>{rm.title}</h3>}
-          {rm.content && <p>{rm.content}</p>}
+          {passageText && <p>{passageText}</p>}
         </div>
 
         <div className="question-pane">
