@@ -311,68 +311,110 @@ export default function ExamPageThinkingSkills() {
    REPORT COMPONENT
 ============================================================ */
 function ThinkingSkillsReport({ report }) {
-  if (!report?.summary) {
+  if (!report?.overall) {
     return <p className="loading">Generating your report…</p>;
   }
 
-  const { summary, topic_breakdown } = report;
+  const {
+    overall,
+    topic_wise_performance,
+    topic_accuracy,
+    improvement_areas
+  } = report;
 
   return (
     <div className="report-page">
-      {/* Header */}
+
+      {/* ===============================
+         HEADER (Overall Result – B)
+      =============================== */}
       <h2 className="report-title">
-        You scored {summary.correct_answers} out of{" "}
-        {summary.total_questions} in NSW Selective Thinking Skills Test – Free Trial
+        You scored {overall.correct} out of {overall.total_questions} in NSW
+        Selective Thinking Skills Test – Free Trial
       </h2>
 
       <div className="report-grid">
-        {/* Accuracy Card */}
+
+        {/* ===============================
+           OVERALL ACCURACY (B)
+        =============================== */}
         <div className="report-card">
-          <h3>Accuracy</h3>
+          <h3>Overall Accuracy</h3>
 
-          {/* Donut placeholder */}
           <div className="donut">
-            <span>{summary.accuracy_percent}%</span>
-          </div>
-
-          <div className="legend">
-            <div>
-              <span className="dot green" /> Correct Answer
-            </div>
-            <div>
-              <span className="dot red" /> Wrong Answer
-            </div>
+            <span>{overall.accuracy_percent}%</span>
           </div>
 
           <div className="stats">
-            <p>Correct: {summary.correct_answers}</p>
-            <p>Wrong: {summary.wrong_answers}</p>
+            <p>Total Questions: {overall.total_questions}</p>
+            <p>Attempted: {overall.attempted}</p>
+            <p>Correct: {overall.correct}</p>
+            <p>Incorrect: {overall.incorrect}</p>
+            <p>Not Attempted: {overall.not_attempted}</p>
+            <p>Score: {overall.score_percent}%</p>
           </div>
         </div>
 
-        {/* Improvements */}
+        {/* ===============================
+           TOPIC-WISE PERFORMANCE (A)
+        =============================== */}
         <div className="report-card">
-          <h3>Topic Breakdown</h3>
+          <h3>Topic-wise Performance</h3>
 
-          {topic_breakdown.map(topic => (
-            <div key={topic.topic} className="topic-bar">
-              <span className="topic-name">{topic.topic}</span>
+          {topic_wise_performance.map(t => (
+            <div key={t.topic} className="topic-stack">
+              <strong>{t.topic}</strong>
+
+              <div className="stack-bar">
+                <div
+                  className="stack correct"
+                  style={{ width: `${(t.correct / t.total) * 100}%` }}
+                />
+                <div
+                  className="stack incorrect"
+                  style={{ width: `${(t.incorrect / t.total) * 100}%` }}
+                />
+                <div
+                  className="stack not-attempted"
+                  style={{ width: `${(t.not_attempted / t.total) * 100}%` }}
+                />
+              </div>
+
+              <small>
+                Attempted: {t.attempted} | Correct: {t.correct} | Incorrect:{" "}
+                {t.incorrect} | Not Attempted: {t.not_attempted}
+              </small>
+            </div>
+          ))}
+        </div>
+
+        {/* ===============================
+           IMPROVEMENT AREAS (D)
+        =============================== */}
+        <div className="report-card">
+          <h3>Improvement Areas</h3>
+
+          {improvement_areas.map(t => (
+            <div key={t.topic} className="topic-bar">
+              <span>{t.topic}</span>
 
               <div className="bar">
                 <div
                   className="bar-fill"
-                  style={{ width: `${topic.accuracy_percent}%` }}
+                  style={{ width: `${t.accuracy_percent}%` }}
                 />
               </div>
 
-              <span className="percent">
-                {topic.accuracy_percent}%
-              </span>
+              <span>{t.accuracy_percent}%</span>
+
+              {t.limited_data && (
+                <small className="warning">Limited data</small>
+              )}
             </div>
           ))}
         </div>
+
       </div>
     </div>
   );
 }
-
