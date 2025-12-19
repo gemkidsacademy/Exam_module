@@ -1,95 +1,37 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./ExamPage_reading.css";
 
 export default function ReadingComponent({ studentId }) {
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
+  /* -----------------------------
+     STATE
+  ----------------------------- */
   const [exam, setExam] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
-  const [report, setReport] = useState(null);
-  const [loadingReport, setLoadingReport] = useState(false);
-    const formatTime = (seconds) => {
-      const mins = Math.floor(seconds / 60);
-      const secs = seconds % 60;
-      return `${mins}:${secs.toString().padStart(2, "0")}`;
-    };
-
 
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
   const [finished, setFinished] = useState(false);
 
-  const [timeLeft, setTimeLeft] = useState(null);
   const [sessionId, setSessionId] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(null);
+
+  const [report, setReport] = useState(null);
+  const [loadingReport, setLoadingReport] = useState(false);
+
+  /* -----------------------------
+     HELPERS
+  ----------------------------- */
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
   const prettyTopic = (t) =>
     t.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  const buildLocalReport = () => {
-  const total = questions.length;
-
-  let correct = 0;
-  let attempted = 0;
-
-  const topicStats = {};
-
-  questions.forEach((q, index) => {
-    const topic = q.topic || "Unknown";
-
-    if (!topicStats[topic]) {
-      topicStats[topic] = {
-        total: 0,
-        attempted: 0,
-        correct: 0
-      };
-    }
-
-    topicStats[topic].total += 1;
-
-    const selected = answers[index];
-    if (selected != null) {
-      attempted += 1;
-      topicStats[topic].attempted += 1;
-
-      if (selected === q.correct_answer) {
-        correct += 1;
-        topicStats[topic].correct += 1;
-      }
-    }
-  });
-
-  const wrong = attempted - correct;
-  const accuracy = total
-    ? Number(((correct / total) * 100).toFixed(1))
-    : 0;
-
-  const topics = Object.entries(topicStats).map(([topic, s]) => {
-    const incorrect = s.attempted - s.correct;
-    const not_attempted = s.total - s.attempted;
-
-    return {
-      topic,
-      attempted: s.attempted,
-      correct: s.correct,
-      incorrect,
-      not_attempted,
-      accuracy: s.total
-        ? Number(((s.correct / s.total) * 100).toFixed(1))
-        : 0
-    };
-  });
-
-  return {
-    total,
-    correct,
-    wrong,
-    accuracy,
-    topics
-  };
-};
-
-  
-  
-
 
   /* -----------------------------
      LOAD EXAM
@@ -104,26 +46,28 @@ export default function ReadingComponent({ studentId }) {
       );
 
       const data = await res.json();
-      console.log("📦 START-READING RESPONSE (RAW):", data);
-      console.log("📦 exam_json:", data.exam_json);
-      console.log("📦 questions:", data.exam_json?.questions);
-      console.log("📦 duration_minutes:", data.duration_minutes);
-      console.log("📦 finished:", data.finished);
+
       if (data.finished === true) {
         setFinished(true);
         loadReport();
         return;
       }
 
+      const sections = data.exam_json?.sections || [];
 
-      const flat = data.exam_json.questions || [];
+      // 🔑 Flatten Reading sections into renderable questions
+      const flatQuestions = sections.flatMap((section) =>
+        section.questions.map((q) => ({
+          ...q,
+          topic: section.topic,
+          answer_options: section.answer_options,
+          reading_material: section.reading_material
+        }))
+      );
 
-      setQuestions(flat);
-
-
-      setSessionId(data.session_id);
+      setQuestions(flatQuestions);
       setExam(data.exam_json);
-      setQuestions(flat);
+      setSessionId(data.session_id);
 
       const durationSeconds = (data.duration_minutes || 40) * 60;
       const start = new Date(data.start_time).getTime();
@@ -150,78 +94,67 @@ export default function ReadingComponent({ studentId }) {
 
   /* -----------------------------
      GROUP QUESTIONS BY TOPIC
-     (HOOK MUST BE ABOVE ANY RETURN)
   ----------------------------- */
   const groupedQuestions = useMemo(() => {
-    const groups = {};
+    const g = {};
     questions.forEach((q, i) => {
       const key = q.topic || "Other";
-      if (!groups[key]) groups[key] = [];
-      groups[key].push({ index: i });
+      if (!g[key]) g[key] = [];
+      g[key].push(i);
     });
-    return groups;
+    return g;
   }, [questions]);
 
   /* -----------------------------
-     Front End Reporting
+     LOAD REPORT
   ----------------------------- */
   const loadReport = async () => {
-  setLoadingReport(true);
-
-  try {
-    const res = await fetch(
-      `${BACKEND_URL}/api/exams/reading-report?student_id=${studentId}`
-    );
-
-    if (!res.ok) {
-      throw new Error("Failed to load report");
+    setLoadingReport(true);
+    try {
+      const res = await fetch(
+        `${BACKEND_URL}/api/exams/reading-report?student_id=${studentId}`
+      );
+      const data = await res.json();
+      setReport(data);
+    } catch (err) {
+      console.error("❌ report load error:", err);
+    } finally {
+      setLoadingReport(false);
     }
-
-    const data = await res.json();
-    setReport(data);
-  } catch (err) {
-    console.error("❌ report load error:", err);
-  } finally {
-    setLoadingReport(false);
-  }
-};
-
+  };
 
   /* -----------------------------
      SUBMIT
   ----------------------------- */
   const autoSubmit = async () => {
-  if (finished) return;
+    if (finished) return;
 
-  // 1️⃣ Build report on frontend
-  const report = buildLocalReport();
+    try {
+      await fetch(`${BACKEND_URL}/api/exams/submit-reading`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session_id: sessionId,
+          answers
+        })
+      });
 
-  try {
-    // 2️⃣ Submit answers + report together
-    await fetch(`${BACKEND_URL}/api/exams/submit-reading`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        session_id: sessionId,
-        answers,
-        report   // 👈 this is the important addition
-      }),
-    });
+      setFinished(true);
+      await loadReport();
+    } catch (err) {
+      console.error("❌ submit-reading error:", err);
+    }
+  };
 
-    // 3️⃣ Switch to finished state
-    setFinished(true);
-    await loadReport();
-
-
-  } catch (err) {
-    console.error("❌ submit-reading error:", err);
-  }
-};
-
-  
-  
-  const handleSelect = (choice) => {
-    setAnswers((prev) => ({ ...prev, [index]: choice }));
+  /* -----------------------------
+     ANSWER HANDLING
+  ----------------------------- */
+  const handleSelect = (letter) => {
+    const q = questions[index];
+    setAnswers((prev) => ({
+      ...prev,
+      [q.question_id]: letter
+    }));
   };
 
   const goTo = (i) => {
@@ -230,185 +163,121 @@ export default function ReadingComponent({ studentId }) {
   };
 
   /* -----------------------------
-     FINISHED
+     FINISHED VIEW
   ----------------------------- */
   if (finished) {
-  if (loadingReport || !report) {
-    return <div>Loading your report…</div>;
-  }
+    if (loadingReport || !report) {
+      return <div>Loading your report…</div>;
+    }
 
-  return (
-    <div className="report-container">
-      <h1>
-        You scored {report.correct} out of {report.total}
-      </h1>
-          
-      <div className="report-grid">
-        {/* LEFT: ACCURACY */}
-        <div className="card">
-          <h3>Accuracy</h3>
+    return (
+      <div className="report-container">
+        <h1>
+          You scored {report.correct} out of {report.total}
+        </h1>
 
-          <div
-            className="accuracy-circle"
-            style={{ "--p": report.accuracy }}
-          >
-            <span>{report.accuracy}%</span>
+        <div className="report-grid">
+          <div className="card">
+            <h3>Accuracy</h3>
+            <div className="accuracy-circle" style={{ "--p": report.accuracy }}>
+              <span>{report.accuracy}%</span>
+            </div>
           </div>
 
-          <div className="legend">
-            <span className="correct-dot">
-              Correct: {report.correct}
-            </span>
-            <span className="wrong-dot">
-              Incorrect: {report.wrong}
-            </span>
-            <span className="not-attempted-dot">
-              Not Attempted: {report.total - (report.correct + report.wrong)}
-            </span>
-          </div>
+          <div className="card">
+            <h3>Topic Breakdown</h3>
 
-
-        </div>
-
-        {/* RIGHT: TOPIC BREAKDOWN */}
-        <div className="card">
-          <h3>Topic Breakdown</h3>
-
-          {report.topics.map((item) => (
-            <div key={item.topic} className="improve-row">
-              <label>{prettyTopic(item.topic)}</label>
-
-              <div className="bar">
-                <div
-                  className="fill blue"
-                  style={{ width: `${item.accuracy}%` }}
-                />
-              </div>
-
-              <span>{item.accuracy}%</span>
-
-              <div className="topic-meta">
+            {report.topics.map((t) => (
+              <div key={t.topic} className="improve-row">
+                <label>{prettyTopic(t.topic)}</label>
+                <div className="bar">
+                  <div
+                    className="fill blue"
+                    style={{ width: `${t.accuracy}%` }}
+                  />
+                </div>
+                <span>{t.accuracy}%</span>
                 <small>
-                  Attempted: {item.attempted} | 
-                  Correct: {item.correct} | 
-                  Incorrect: {item.incorrect} | 
-                  Not Attempted: {item.not_attempted}
+                  Attempted: {t.attempted} | Correct: {t.correct} | Incorrect:{" "}
+                  {t.incorrect} | Not Attempted: {t.not_attempted}
                 </small>
               </div>
-            </div>
-          ))
-          }
-
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
-
+    );
+  }
 
   /* -----------------------------
-     SAFE EARLY RETURN (NO HOOKS BELOW)
+     SAFE GUARD
   ----------------------------- */
   const currentQuestion = questions[index];
-    if (!exam || !currentQuestion) return <div>Loading Exam…</div>;
-  const topic = (currentQuestion.topic || "").toLowerCase();
+  if (!exam || !currentQuestion) {
+    return <div>Loading Exam…</div>;
+  }
+
+  const options = currentQuestion.answer_options || {};
   const rm = currentQuestion.reading_material || {};
-  const optionsToRender = currentQuestion.answer_options || {};
 
   /* -----------------------------
-     UI
+     EXAM UI
   ----------------------------- */
   return (
     <div className="exam-container">
       <div className="exam-header">
         <div>Reading Comprehension Exam</div>
-        <div className="timer-box">
-          Time Left: {formatTime(timeLeft)}
-        </div>
-
+        <div className="timer-box">Time Left: {formatTime(timeLeft)}</div>
         <div className="counter">
           Question {index + 1} / {questions.length}
         </div>
       </div>
 
-      {/* GROUPED QUESTION INDEX */}
       <div className="question-index-grouped">
-        {Object.entries(groupedQuestions).map(([topicName, qs]) => (
-          <div key={topicName} className="topic-group">
-            <div className="topic-title">{topicName}</div>
+        {Object.entries(groupedQuestions).map(([topic, idxs]) => (
+          <div key={topic} className="topic-group">
+            <div className="topic-title">{prettyTopic(topic)}</div>
             <div className="topic-circles">
-              {qs.map(({ index: i }) => {
-                let cls = "index-circle";
-                if (answers[i]) cls += " answered";
-                else if (visited[i]) cls += " visited";
-                if (i === index) cls += " active";
-
-                return (
-                  <div key={i} className={cls} onClick={() => goTo(i)}>
-                    {questions[i].question_number}
-                  </div>
-                );
-              })}
+              {idxs.map((i) => (
+                <div
+                  key={i}
+                  className={`index-circle ${
+                    i === index ? "active" : ""
+                  } ${answers[questions[i].question_id] ? "answered" : ""}`}
+                  onClick={() => goTo(i)}
+                >
+                  {questions[i].question_number}
+                </div>
+              ))}
             </div>
           </div>
         ))}
       </div>
 
       <div className="exam-body">
-        {/* LEFT PANE */}
         <div className="passage-pane">
-          {topic.includes("gapped") && (
-            <>
-              <h3>{rm.title}</h3>
-              <p className="reading-text">{rm.content}</p>
-            </>
-          )}
-
-          {topic.includes("comparative") && (
-            <>
-              <h3>Extracts</h3>
-              {Object.entries(rm.extracts || {}).map(([k, v]) => (
-                <div key={k} className="extract-block">
-                  <strong>Extract {k}</strong>
-                  <p>{v}</p>
-                </div>
-              ))}
-            </>
-          )}
-
-          {topic.includes("main idea") && (
-            <>
-              <h3>Paragraphs</h3>
-              {Object.entries(rm.paragraphs || {}).map(([k, v]) => (
-                <div key={k} className="paragraph-block">
-                  <strong>Paragraph {k}</strong>
-                  <p>{v}</p>
-                </div>
-              ))}
-            </>
-          )}
+          {rm.title && <h3>{rm.title}</h3>}
+          {rm.content && <p>{rm.content}</p>}
         </div>
 
-        {/* RIGHT PANE */}
         <div className="question-pane">
-          <div className="question-card">
-            <p className="question-text">
-              Q{currentQuestion.question_number}. {currentQuestion.question_text}
-            </p>
+          <p className="question-text">
+            Q{currentQuestion.question_number}.{" "}
+            {currentQuestion.question_text}
+          </p>
 
-            <div className="options">
-              {Object.entries(optionsToRender).map(([letter, text]) => (
-                <button
-                  key={letter}
-                  className={`option-btn ${
-                    answers[index] === letter ? "selected" : ""
-                  }`}
-                  onClick={() => handleSelect(letter)}
-                >
-                  <strong>{letter}.</strong> {text}
-                </button>
-              ))}
-            </div>
+          <div className="options">
+            {Object.entries(options).map(([k, v]) => (
+              <button
+                key={k}
+                className={`option-btn ${
+                  answers[currentQuestion.question_id] === k ? "selected" : ""
+                }`}
+                onClick={() => handleSelect(k)}
+              >
+                <strong>{k}.</strong> {v}
+              </button>
+            ))}
           </div>
 
           <div className="nav-buttons">
