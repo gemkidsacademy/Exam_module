@@ -57,12 +57,15 @@ export default function ReadingComponent({ studentId }) {
       }
 
       // 🔑 Reading exams come directly from exam_json.questions
-      const flatQuestions = (data.exam_json?.questions || []).map((q) => ({
-        ...q,
-        answer_options: q.options || {},
-        reading_material: q.reading_material || {},
-        topic: q.topic || "Other"
-      }));
+      const flatQuestions = (data.exam_json?.sections || []).flatMap(section =>
+        (section.questions || []).map(q => ({
+          ...q,
+          topic: section.topic,
+          answer_options: section.answer_options || {},
+          reading_material: section.reading_material || {}
+        }))
+      );
+      console.log("📘 Flattened questions count:", flatQuestions.length);
 
       setExam(data.exam_json);
       setQuestions(flatQuestions);
