@@ -156,7 +156,7 @@ export default function ReadingComponent({ studentId }) {
     const q = questions[index];
     setAnswers((prev) => ({
       ...prev,
-      [q.question_number]: letter
+      [q.question_id]: letter
     }));
   };
 
@@ -247,7 +247,7 @@ export default function ReadingComponent({ studentId }) {
                   key={i}
                   className={`index-circle ${
                     i === index ? "active" : ""
-                  } ${answers[questions[i].question_number] ? "answered" : ""}`}
+                  } ${answers[questions[i].question_id] ? "answered" : ""}`}
                   onClick={() => goTo(i)}
                 >
                   {questions[i].question_number}
@@ -298,7 +298,7 @@ export default function ReadingComponent({ studentId }) {
               <button
                 key={k}
                 className={`option-btn ${
-                  answers[currentQuestion.question_number] === k
+                  answers[currentQuestion.question_id] === k
                     ? "selected"
                     : ""
                 }`}
