@@ -374,45 +374,88 @@ function formatTime(seconds) {
    REPORT COMPONENT
 ============================================================ */
 function FoundationalSkillsReport({ report }) {
-  if (!report?.summary) {
+  if (!report?.overall) {
     return <p className="loading">Generating your report…</p>;
   }
 
-  const { summary, topic_breakdown } = report;
+  const { overall, topic_wise_performance, improvement_areas } = report;
 
   return (
     <div className="report-page">
       <h2 className="report-title">
-        You scored {summary.correct_answers} out of {summary.total_questions} in Foundational Skills Test
+        You scored {overall.correct} out of {overall.total_questions} in Foundational Skills Test
       </h2>
 
       <div className="report-grid">
+        {/* OVERALL ACCURACY */}
         <div className="report-card">
-          <h3>Accuracy</h3>
+          <h3>Overall Accuracy</h3>
           <div className="donut">
-            <span>{summary.accuracy_percent}%</span>
+            <span>{overall.accuracy_percent}%</span>
           </div>
           <div className="stats">
-            <p>Correct: {summary.correct_answers}</p>
-            <p>Wrong: {summary.wrong_answers}</p>
+            <p>Attempted: {overall.attempted}</p>
+            <p>Correct: {overall.correct}</p>
+            <p>Incorrect: {overall.incorrect}</p>
+            <p>Not Attempted: {overall.not_attempted}</p>
           </div>
         </div>
 
-        <div className="report-card">
-          <h3>Topic Breakdown</h3>
+        {/* TOPIC-WISE PERFORMANCE */}
+        <div className="topic-performance-card">
+          <h3>Topic-wise Performance</h3>
 
-          {topic_breakdown.map(topic => (
-            <div key={topic.topic} className="topic-bar">
-              <span className="topic-name">{topic.topic}</span>
+          {topic_wise_performance.map(t => (
+            <div key={t.topic} className="topic-row">
+              <div className="topic-title">{t.topic}</div>
+
+              <div className="stack-bar">
+                <div
+                  className="stack correct"
+                  style={{ width: `${(t.correct / t.total) * 100}%` }}
+                />
+                <div
+                  className="stack incorrect"
+                  style={{ width: `${(t.incorrect / t.total) * 100}%` }}
+                />
+                <div
+                  className="stack not-attempted"
+                  style={{ width: `${(t.not_attempted / t.total) * 100}%` }}
+                />
+              </div>
+
+              <div className="topic-metrics">
+                <span>Attempted: {t.attempted}</span>
+                <span className="correct">Correct: {t.correct}</span>
+                <span className="incorrect">Incorrect: {t.incorrect}</span>
+                <span className="not-attempted">
+                  Not Attempted: {t.not_attempted}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* IMPROVEMENT AREAS */}
+        <div className="report-card">
+          <h3>Improvement Areas</h3>
+
+          {improvement_areas.map(item => (
+            <div key={item.topic} className="topic-bar">
+              <span className="topic-name">{item.topic}</span>
 
               <div className="bar">
                 <div
                   className="bar-fill"
-                  style={{ width: `${topic.accuracy_percent}%` }}
+                  style={{ width: `${item.accuracy}%` }}
                 />
               </div>
 
-              <span className="percent">{topic.accuracy_percent}%</span>
+              <span className="percent">{item.accuracy}%</span>
+
+              {item.limited_data && (
+                <small className="muted">Limited data</small>
+              )}
             </div>
           ))}
         </div>
