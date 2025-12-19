@@ -9,12 +9,15 @@ import "./ExamPage_foundational.css";
 export default function ExamPageFoundationalSkills() {
   const studentId = sessionStorage.getItem("student_id");
   const hasStartedRef = useRef(false);
+  
 
 
   /* ============================================================
      REFS
   ============================================================ */
   const hasSubmittedRef = useRef(false);
+  // derived state
+  
 
   /* ============================================================
      MODE
@@ -27,6 +30,9 @@ export default function ExamPageFoundationalSkills() {
   ============================================================ */
   const [sectionName, setSectionName] = useState("");
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+  const totalSections = 2; // 🔴 adjust if sections become dynamic
+  const isLastSection = currentSectionIndex === totalSections - 1;
+
 
   /* ============================================================
      QUESTIONS
@@ -107,6 +113,7 @@ export default function ExamPageFoundationalSkills() {
       console.error("❌ Invalid section payload:", section);
       return;
     }
+    hasSubmittedRef.current = false;
   
     const normalized = normalizeQuestions(section.questions);
   
@@ -342,7 +349,7 @@ export default function ExamPageFoundationalSkills() {
         >
           Previous
         </button>
-
+      
         {currentIndex < questions.length - 1 ? (
           <button
             type="button"
@@ -350,6 +357,14 @@ export default function ExamPageFoundationalSkills() {
             onClick={nextQuestion}
           >
             Next
+          </button>
+        ) : isLastSection ? (
+          <button
+            type="button"
+            className="nav-btn finish"
+            onClick={() => finishExam("manual_submit")}
+          >
+            Submit Exam
           </button>
         ) : (
           <button
@@ -361,6 +376,7 @@ export default function ExamPageFoundationalSkills() {
           </button>
         )}
       </div>
+
     </div>
   );
 }
