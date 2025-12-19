@@ -24,50 +24,8 @@ export default function ReadingComponent({ studentId }) {
   const [sessionId, setSessionId] = useState(null);
   const prettyTopic = (t) =>
     t.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  const buildLocalReport = () => {
-  const total = questions.length;
-  let correct = 0;
-
-  const topicStats = {};
-
-  questions.forEach((q, i) => {
-    const topic = q.topic || "General";
-
-    if (!topicStats[topic]) {
-      topicStats[topic] = { total: 0, correct: 0 };
-    }
-
-    topicStats[topic].total += 1;
-
-    if (answers[i] === q.correct_answer) {
-      correct += 1;
-      topicStats[topic].correct += 1;
-    }
-  });
-
-  const wrong = total - correct;
-  const accuracy = total
-    ? Number(((correct / total) * 100).toFixed(1))
-    : 0;
-
-  const topics = Object.entries(topicStats).map(
-    ([topic, stats]) => ({
-      topic,
-      accuracy: stats.total
-        ? Number(((stats.correct / stats.total) * 100).toFixed(1))
-        : 0
-    })
-  );
-
-  return {
-    score: correct,
-    total,
-    correct,
-    wrong,
-    accuracy,
-    topics
-  };
-};
+  
+  
 
 
   /* -----------------------------
@@ -91,19 +49,10 @@ export default function ReadingComponent({ studentId }) {
       }
 
 
-      const sections = data.exam_json.sections || [];
-      const flat = [];
+      const flat = data.exam_json.questions || [];
 
-      sections.forEach((section) => {
-        section.questions.forEach((q) => {
-          flat.push({
-            ...q,
-            topic: section.topic,
-            reading_material: section.reading_material,
-            answer_options: section.answer_options,
-          });
-        });
-      });
+      setQuestions(flat);
+
 
       setSessionId(data.session_id);
       setExam(data.exam_json);
@@ -224,10 +173,9 @@ export default function ReadingComponent({ studentId }) {
   return (
     <div className="report-container">
       <h1>
-        You scored {report.score} out of {report.total} in NSW Selective
-        Reading Test – Free Trial
+        You scored {report.correct} out of {report.total}
       </h1>
-
+          
       <div className="report-grid">
         {/* LEFT: ACCURACY */}
         <div className="card">
@@ -245,9 +193,14 @@ export default function ReadingComponent({ studentId }) {
               Correct: {report.correct}
             </span>
             <span className="wrong-dot">
-              Wrong: {report.wrong}
+              Incorrect: {report.wrong}
+            </span>
+            <span className="not-attempted-dot">
+              Not Attempted: {report.total - (report.correct + report.wrong)}
             </span>
           </div>
+
+
         </div>
 
         {/* RIGHT: TOPIC BREAKDOWN */}
@@ -266,8 +219,19 @@ export default function ReadingComponent({ studentId }) {
               </div>
 
               <span>{item.accuracy}%</span>
+
+              <div className="topic-meta">
+                <small>
+                  Attempted: {item.attempted} | 
+                  Correct: {item.correct} | 
+                  Incorrect: {item.incorrect} | 
+                  Not Attempted: {item.not_attempted}
+                </small>
+              </div>
             </div>
-          ))}
+          ))
+          }
+
         </div>
       </div>
     </div>
