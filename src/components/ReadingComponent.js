@@ -129,25 +129,35 @@ export default function ReadingComponent({ studentId }) {
      SUBMIT
   ============================= */
   const autoSubmit = async () => {
-    if (finished) return;
+  if (finished) return;
 
-    try {
-      await fetch(`${BACKEND_URL}/api/exams/submit-reading`, {
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/api/exams/submit-reading`,
+      {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           session_id: sessionId,
-          answers,
-          report: {} // 🔑 backend-required placeholder
+          answers   // 🔑 raw answers only (keyed by question_id)
         })
-      });
+      }
+    );
 
-      setFinished(true);
-      await loadReport();
-    } catch (err) {
-      console.error("❌ submit-reading error:", err);
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error("❌ submit-reading failed:", errText);
+      return;
     }
-  };
+
+    setFinished(true);
+    await loadReport();
+
+  } catch (err) {
+    console.error("❌ submit-reading error:", err);
+  }
+};
+
 
   /* =============================
      ANSWER HANDLING
