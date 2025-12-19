@@ -1,3 +1,99 @@
+/* ============================================
+   TOPIC-WISE PERFORMANCE (MODERN)
+============================================ */
+
+.topic-performance-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.topic-performance-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 18px;
+  color: #111827;
+}
+
+/* Each topic row */
+.topic-row {
+  padding: 14px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.topic-row:last-child {
+  border-bottom: none;
+}
+
+/* Topic name */
+.topic-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1f2937;
+}
+
+/* Stacked bar container */
+.stack-bar {
+  display: flex;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #f3f4f6;
+  margin-bottom: 10px;
+}
+
+/* Individual segments */
+.stack {
+  height: 100%;
+}
+
+.stack.correct {
+  background-color: #10b981; /* green */
+}
+
+.stack.incorrect {
+  background-color: #ef4444; /* red */
+}
+
+.stack.not-attempted {
+  background-color: #d1d5db; /* gray */
+}
+
+/* Metrics row */
+.topic-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  font-size: 13px;
+  color: #374151;
+}
+
+.topic-metrics span {
+  background: #f9fafb;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+/* Semantic coloring */
+.topic-metrics .correct {
+  color: #065f46;
+  background: #ecfdf5;
+}
+
+.topic-metrics .incorrect {
+  color: #991b1b;
+  background: #fef2f2;
+}
+
+.topic-metrics .not-attempted {
+  color: #6b7280;
+  background: #f3f4f6;
+}
+
+
 
 /* ============================================
    EXAM SHELL — CORRECT FIX
