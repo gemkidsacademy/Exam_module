@@ -168,6 +168,15 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/adminpanel"
+            element={
+              <PrivateRoute isLoggedIn={isLoggedIn}>
+                <AdminPanel />
+              </PrivateRoute>
+            }
+          />
+
   
           {/* other routes unchanged */}
         </Routes>
