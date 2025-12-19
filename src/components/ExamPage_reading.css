@@ -264,22 +264,21 @@
 ======================================================= */
 
 .report-container {
-  max-width: 1100px;
-  margin: 40px auto;
-  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
 }
 
 .report-container h1 {
-  font-size: 26px;
-  font-weight: 600;
-  margin-bottom: 28px;
-  color: #111827;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 32px;
 }
 
-/* GRID */
 .report-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
   gap: 28px;
 }
 
@@ -331,24 +330,8 @@
   justify-content: center;
 }
 
-/* LEGEND */
-.legend {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 14px;
-  font-size: 14px;
-}
-
-.correct-dot {
-  color: #16a34a;
-}
-
-.wrong-dot {
-  color: #dc2626;
-}
-
 /* =======================================================
-   IMPROVEMENTS
+   IMPROVEMENTS & TOPIC BARS
 ======================================================= */
 
 .improve-row {
