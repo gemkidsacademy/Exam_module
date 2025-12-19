@@ -92,14 +92,15 @@ export default function ExamPageFoundationalSkills() {
      LOAD SECTION (ATOMIC)
   ============================================================ */
   const normalizeQuestions = (rawQuestions) => {
-    return rawQuestions.map((q, index) => ({
-      question_number: q.question_number, // ✅ CRITICAL
-      q_id: q.question_number,             // optional alias
+    return rawQuestions.map((q) => ({
+      question_number: q.question_number, // UI only
+      q_id: q.q_id,                       // ✅ REAL q_id from backend
       question: q.question || q.question_text || q.text || q.prompt,
       options: q.options || q.choices || q.answers,
       topic: q.topic
     }));
   };
+
 
   const loadSection = (section, sectionIndex) => {
     if (!section || !Array.isArray(section.questions)) {
@@ -179,9 +180,10 @@ export default function ExamPageFoundationalSkills() {
   const handleAnswer = (optionKey) => {
     setAnswers(prev => ({
       ...prev,
-      [currentQ.question_number]: optionKey
+      [currentQ.q_id]: optionKey // ✅ USE REAL q_id
     }));
   };
+
 
   /* ============================================================
      NAVIGATION
@@ -296,7 +298,7 @@ export default function ExamPageFoundationalSkills() {
             key={q.q_id}
             
             className={`index-circle ${
-              answers[q.question_number]
+              answers[q.q_id]
                 ? "index-answered"
                 : visited[i]
                 ? "index-visited"
@@ -321,7 +323,7 @@ export default function ExamPageFoundationalSkills() {
               type="button"
               onClick={() => handleAnswer(optionKey)}
               className={`option-btn ${
-                answers[currentQ.question_number] === optionKey ? "selected" : ""
+                answers[currentQ.q_id] === optionKey ? "selected" : ""
               }`}
 
             >
