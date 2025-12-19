@@ -358,13 +358,13 @@ function ThinkingSkillsReport({ report }) {
         {/* ===============================
            TOPIC-WISE PERFORMANCE (A)
         =============================== */}
-        <div className="report-card">
+        <div className="topic-performance-card">
           <h3>Topic-wise Performance</h3>
-
+        
           {topic_wise_performance.map(t => (
-            <div key={t.topic} className="topic-stack">
-              <strong>{t.topic}</strong>
-
+            <div key={t.topic} className="topic-row">
+              <div className="topic-title">{t.topic}</div>
+        
               <div className="stack-bar">
                 <div
                   className="stack correct"
@@ -379,11 +379,15 @@ function ThinkingSkillsReport({ report }) {
                   style={{ width: `${(t.not_attempted / t.total) * 100}%` }}
                 />
               </div>
-
-              <small>
-                Attempted: {t.attempted} | Correct: {t.correct} | Incorrect:{" "}
-                {t.incorrect} | Not Attempted: {t.not_attempted}
-              </small>
+        
+              <div className="topic-metrics">
+                <span>Attempted: {t.attempted}</span>
+                <span className="correct">Correct: {t.correct}</span>
+                <span className="incorrect">Incorrect: {t.incorrect}</span>
+                <span className="not-attempted">
+                  Not Attempted: {t.not_attempted}
+                </span>
+              </div>
             </div>
           ))}
         </div>
