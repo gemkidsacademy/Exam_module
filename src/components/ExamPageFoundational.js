@@ -142,6 +142,7 @@ export default function ExamPageFoundationalSkills() {
         await loadReport();
         return;
       }
+      console.log("START-EXAM RESPONSE →", data);
 
       loadSection(data.section, data.current_section_index);
       setTimeLeft(data.remaining_time);
