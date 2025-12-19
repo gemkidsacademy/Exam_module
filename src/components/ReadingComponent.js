@@ -47,6 +47,9 @@ export default function ReadingComponent({ studentId }) {
 
       const data = await res.json();
 
+      console.log("🧪 API RESPONSE DATA:", data);
+
+
       if (data.finished === true) {
         setFinished(true);
         loadReport();
