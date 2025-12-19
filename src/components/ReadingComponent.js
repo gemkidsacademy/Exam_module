@@ -24,6 +24,69 @@ export default function ReadingComponent({ studentId }) {
   const [sessionId, setSessionId] = useState(null);
   const prettyTopic = (t) =>
     t.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const buildLocalReport = () => {
+  const total = questions.length;
+
+  let correct = 0;
+  let attempted = 0;
+
+  const topicStats = {};
+
+  questions.forEach((q, index) => {
+    const topic = q.topic || "Unknown";
+
+    if (!topicStats[topic]) {
+      topicStats[topic] = {
+        total: 0,
+        attempted: 0,
+        correct: 0
+      };
+    }
+
+    topicStats[topic].total += 1;
+
+    const selected = answers[index];
+    if (selected != null) {
+      attempted += 1;
+      topicStats[topic].attempted += 1;
+
+      if (selected === q.correct_answer) {
+        correct += 1;
+        topicStats[topic].correct += 1;
+      }
+    }
+  });
+
+  const wrong = attempted - correct;
+  const accuracy = total
+    ? Number(((correct / total) * 100).toFixed(1))
+    : 0;
+
+  const topics = Object.entries(topicStats).map(([topic, s]) => {
+    const incorrect = s.attempted - s.correct;
+    const not_attempted = s.total - s.attempted;
+
+    return {
+      topic,
+      attempted: s.attempted,
+      correct: s.correct,
+      incorrect,
+      not_attempted,
+      accuracy: s.total
+        ? Number(((s.correct / s.total) * 100).toFixed(1))
+        : 0
+    };
+  });
+
+  return {
+    total,
+    correct,
+    wrong,
+    accuracy,
+    topics
+  };
+};
+
   
   
 
