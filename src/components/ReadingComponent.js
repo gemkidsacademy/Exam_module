@@ -222,7 +222,7 @@ export default function ReadingComponent({ studentId }) {
 
   const options = currentQuestion.answer_options;
   const rm = currentQuestion.reading_material || {};
-  const passageText = rm.content || rm.text || "";
+  
 
   /* =============================
      EXAM UI
@@ -261,7 +261,30 @@ export default function ReadingComponent({ studentId }) {
       <div className="exam-body">
         <div className="passage-pane">
           {rm.title && <h3>{rm.title}</h3>}
-          {passageText && <p>{passageText}</p>}
+        
+          {/* Comparative Analysis */}
+          {rm.extracts && (
+            <div className="extracts">
+              {Object.entries(rm.extracts).map(([key, text]) => (
+                <div key={key} className="extract">
+                  <strong>{key}.</strong> {text}
+                </div>
+              ))}
+            </div>
+          )}
+        
+          {/* Gapped Text */}
+          {rm.content && (
+            <p className="reading-content">{rm.content}</p>
+          )}
+        
+          {/* Main Idea / Paragraph-based */}
+          {rm.paragraphs &&
+            Object.entries(rm.paragraphs).map(([num, text]) => (
+              <p key={num} className="reading-paragraph">
+                <strong>{num}.</strong> {text}
+              </p>
+            ))}
         </div>
 
         <div className="question-pane">
