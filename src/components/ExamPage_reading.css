@@ -366,3 +366,12 @@
 .fill.blue {
   background: #2563eb;
 }
+.fill.red {
+  background: #dc2626;
+}
+.improve-row small {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #374151;
+}
