@@ -216,48 +216,100 @@ useEffect(() => {
     }
 
     return (
-      <div className="report-container">
-        <h1>
-          You scored {normalizedReport.correct} out of {normalizedReport.total}
-        </h1>
+  <div className="report-container">
+    <h1>
+      You scored {normalizedReport.correct} out of {normalizedReport.total}
+    </h1>
 
+    <div className="report-grid">
 
-        <div className="report-grid">
-          <div className="card">
-            <h3>Accuracy</h3>
-            <div
-              className="accuracy-circle"
-              style={{ "--p": normalizedReport.accuracy }}
-            >
-              <span>{normalizedReport.accuracy}%</span>
-            </div>
-
-          </div>
-
-          <div className="card">
-            <h3>Topic Breakdown</h3>
-
-            {normalizedReport.topics.map((t) => (
-              <div key={t.topic} className="improve-row">
-                <label>{prettyTopic(t.topic)}</label>
-                <div className="bar">
-                  <div
-                    className="fill blue"
-                    style={{ width: `${t.accuracy}%` }}
-                  />
-                </div>
-                <span>{t.accuracy}%</span>
-                <small>
-                  Attempted: {t.attempted} | Correct: {t.correct} | Incorrect:{" "}
-                  {t.incorrect} | Not Attempted: {t.not_attempted}
-                </small>
-              </div>
-            ))}
-          </div>
+      {/* =============================
+          OVERALL ACCURACY
+      ============================= */}
+      <div className="card">
+        <h3>Accuracy</h3>
+        <div
+          className="accuracy-circle"
+          style={{ "--p": normalizedReport.accuracy }}
+        >
+          <span>{normalizedReport.accuracy}%</span>
         </div>
       </div>
-    );
-  }
+
+      {/* =============================
+          TOPIC BREAKDOWN
+      ============================= */}
+      <div className="card">
+        <h3>Topic Breakdown</h3>
+
+        {normalizedReport.topics.map((t) => (
+          <div key={t.topic} className="improve-row">
+            <label>{prettyTopic(t.topic)}</label>
+
+            <div className="bar">
+              <div
+                className="fill blue"
+                style={{ width: `${t.accuracy}%` }}
+              />
+            </div>
+
+            <span>{t.accuracy}%</span>
+
+            <small>
+              Attempted: {t.attempted} | Correct: {t.correct} | Incorrect:{" "}
+              {t.incorrect} | Not Attempted: {t.not_attempted}
+            </small>
+          </div>
+        ))}
+      </div>
+
+      {/* =============================
+          IMPROVEMENT AREAS (NEW)
+      ============================= */}
+      <div className="card">
+        <h3>Improvement Areas</h3>
+        <p className="section-note">
+          Topics are ranked from weakest to strongest based on performance.
+        </p>
+
+        {normalizedReport.improvement_order.map((topic, idx) => {
+          const t = normalizedReport.topics.find(
+            (x) => x.topic === topic
+          );
+
+          if (!t) return null;
+
+          return (
+            <div key={topic} className="improve-row">
+              <strong>
+                {idx + 1}. {prettyTopic(topic)}
+              </strong>
+
+              <div className="bar">
+                <div
+                  className="fill red"
+                  style={{ width: `${t.accuracy}%` }}
+                />
+              </div>
+
+              <small>
+                Accuracy: {t.accuracy}% · Attempted: {t.attempted}/{t.total}
+              </small>
+
+              {t.total < 3 && (
+                <div className="low-data-warning">
+                  Limited data available for this topic
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+    </div>
+  </div>
+);
+
 
   /* =============================
      SAFE GUARD
