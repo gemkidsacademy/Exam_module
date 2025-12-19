@@ -65,8 +65,8 @@ export default function ReadingComponent({ studentId }) {
 
 
       if (data.finished === true) {
+        setSessionId(data.session_id);
         setFinished(true);
-        loadReport();
         return;
       }
 
@@ -128,6 +128,8 @@ export default function ReadingComponent({ studentId }) {
   if (!sessionId) return;
 
   setLoadingReport(true);
+  console.log("📊 Loading report for session:", sessionId);
+
   try {
     const res = await fetch(
       `${BACKEND_URL}/api/exams/reading-report?session_id=${sessionId}`
@@ -148,6 +150,12 @@ export default function ReadingComponent({ studentId }) {
     setLoadingReport(false);
   }
 };
+useEffect(() => {
+  if (finished && sessionId) {
+    loadReport();
+  }
+}, [finished, sessionId]);
+
 
   /* =============================
      SUBMIT
