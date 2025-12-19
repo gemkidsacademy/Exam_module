@@ -183,7 +183,7 @@ useEffect(() => {
     }
 
     setFinished(true);
-    await loadReport();
+    
 
   } catch (err) {
     console.error("❌ submit-reading error:", err);
