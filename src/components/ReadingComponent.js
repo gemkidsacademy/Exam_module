@@ -4,9 +4,9 @@ import "./ExamPage_reading.css";
 export default function ReadingComponent({ studentId }) {
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
-  /* -----------------------------
+  /* =============================
      STATE
-  ----------------------------- */
+  ============================= */
   const [exam, setExam] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
@@ -21,21 +21,21 @@ export default function ReadingComponent({ studentId }) {
   const [report, setReport] = useState(null);
   const [loadingReport, setLoadingReport] = useState(false);
 
-  /* -----------------------------
+  /* =============================
      HELPERS
-  ----------------------------- */
+  ============================= */
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
-  const prettyTopic = (t) =>
+  const prettyTopic = (t = "Other") =>
     t.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
-  /* -----------------------------
+  /* =============================
      LOAD EXAM
-  ----------------------------- */
+  ============================= */
   useEffect(() => {
     if (!studentId) return;
 
@@ -53,20 +53,16 @@ export default function ReadingComponent({ studentId }) {
         return;
       }
 
-      const sections = data.exam_json?.sections || [];
+      // 🔑 Reading exams come directly from exam_json.questions
+      const flatQuestions = (data.exam_json?.questions || []).map((q) => ({
+        ...q,
+        answer_options: q.options || {},
+        reading_material: q.reading_material || {},
+        topic: q.topic || "Other"
+      }));
 
-      // 🔑 Flatten Reading sections into renderable questions
-      const flatQuestions = sections.flatMap((section) =>
-        section.questions.map((q) => ({
-          ...q,
-          topic: section.topic,
-          answer_options: section.answer_options,
-          reading_material: section.reading_material
-        }))
-      );
-
-      setQuestions(flatQuestions);
       setExam(data.exam_json);
+      setQuestions(flatQuestions);
       setSessionId(data.session_id);
 
       const durationSeconds = (data.duration_minutes || 40) * 60;
@@ -81,9 +77,9 @@ export default function ReadingComponent({ studentId }) {
     loadExam();
   }, [studentId]);
 
-  /* -----------------------------
+  /* =============================
      TIMER
-  ----------------------------- */
+  ============================= */
   useEffect(() => {
     if (timeLeft === null) return;
     if (timeLeft <= 0) autoSubmit();
@@ -92,9 +88,9 @@ export default function ReadingComponent({ studentId }) {
     return () => clearInterval(t);
   }, [timeLeft]);
 
-  /* -----------------------------
+  /* =============================
      GROUP QUESTIONS BY TOPIC
-  ----------------------------- */
+  ============================= */
   const groupedQuestions = useMemo(() => {
     const g = {};
     questions.forEach((q, i) => {
@@ -105,9 +101,9 @@ export default function ReadingComponent({ studentId }) {
     return g;
   }, [questions]);
 
-  /* -----------------------------
+  /* =============================
      LOAD REPORT
-  ----------------------------- */
+  ============================= */
   const loadReport = async () => {
     setLoadingReport(true);
     try {
@@ -123,9 +119,9 @@ export default function ReadingComponent({ studentId }) {
     }
   };
 
-  /* -----------------------------
+  /* =============================
      SUBMIT
-  ----------------------------- */
+  ============================= */
   const autoSubmit = async () => {
     if (finished) return;
 
@@ -135,7 +131,8 @@ export default function ReadingComponent({ studentId }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           session_id: sessionId,
-          answers
+          answers,
+          report: {} // 🔑 backend-required placeholder
         })
       });
 
@@ -146,14 +143,14 @@ export default function ReadingComponent({ studentId }) {
     }
   };
 
-  /* -----------------------------
+  /* =============================
      ANSWER HANDLING
-  ----------------------------- */
+  ============================= */
   const handleSelect = (letter) => {
     const q = questions[index];
     setAnswers((prev) => ({
       ...prev,
-      [q.question_id]: letter
+      [q.question_number]: letter
     }));
   };
 
@@ -162,9 +159,9 @@ export default function ReadingComponent({ studentId }) {
     setIndex(i);
   };
 
-  /* -----------------------------
+  /* =============================
      FINISHED VIEW
-  ----------------------------- */
+  ============================= */
   if (finished) {
     if (loadingReport || !report) {
       return <div>Loading your report…</div>;
@@ -209,21 +206,21 @@ export default function ReadingComponent({ studentId }) {
     );
   }
 
-  /* -----------------------------
+  /* =============================
      SAFE GUARD
-  ----------------------------- */
+  ============================= */
   const currentQuestion = questions[index];
   if (!exam || !currentQuestion) {
     return <div>Loading Exam…</div>;
   }
 
-  const options = currentQuestion.answer_options || {};
+  const options = currentQuestion.answer_options;
   const rm = currentQuestion.reading_material || {};
   const passageText = rm.content || rm.text || "";
 
-  /* -----------------------------
+  /* =============================
      EXAM UI
-  ----------------------------- */
+  ============================= */
   return (
     <div className="exam-container">
       <div className="exam-header">
@@ -244,7 +241,7 @@ export default function ReadingComponent({ studentId }) {
                   key={i}
                   className={`index-circle ${
                     i === index ? "active" : ""
-                  } ${answers[questions[i].question_id] ? "answered" : ""}`}
+                  } ${answers[questions[i].question_number] ? "answered" : ""}`}
                   onClick={() => goTo(i)}
                 >
                   {questions[i].question_number}
@@ -272,7 +269,9 @@ export default function ReadingComponent({ studentId }) {
               <button
                 key={k}
                 className={`option-btn ${
-                  answers[currentQuestion.question_id] === k ? "selected" : ""
+                  answers[currentQuestion.question_number] === k
+                    ? "selected"
+                    : ""
                 }`}
                 onClick={() => handleSelect(k)}
               >
