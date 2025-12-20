@@ -253,31 +253,37 @@ const AdminPanel = () => {
                  STEP 2: SELECTIVE EXAM TYPES
              ============================ */}
              {examCategory === "selective" && !createExamType && (
-               <div
-                 style={{
-                   display: "flex",
-                   flexDirection: "column",
-                   gap: "15px",
-                   maxWidth: "320px",
-                   margin: "30px auto 0",
-                 }}
-               >
-                 {[
-                   { label: "Thinking Skills Exam", value: "thinking_skills" },
-                   { label: "Foundational Exam", value: "foundational" },
-                   { label: "Reading Exam", value: "reading" },
-                   { label: "Writing Exam", value: "writing" },
-                 ].map((item) => (
-                   <button
-                     key={item.value}
-                     onClick={() => setCreateExamType(item.value)}
-                     className="dashboard-button"
-                   >
-                     {item.label}
-                   </button>
-                 ))}
-               </div>
-             )}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "15px",
+                  maxWidth: "320px",
+                  margin: "30px auto 0",
+                }}
+              >
+                {[
+                  { label: "Thinking Skills Exam", value: "thinking_skills" },
+                  {
+                    label: examCategory === "selective"
+                      ? "Mathematical Reasoning"
+                      : "Foundational Exam",
+                    value: "foundational"
+                  },
+                  { label: "Reading Exam", value: "reading" },
+                  { label: "Writing Exam", value: "writing" },
+                ].map((item) => (
+                  <button
+                    key={item.value}
+                    onClick={() => setCreateExamType(item.value)}
+                    className="dashboard-button"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            )}
+
          
              {/* ============================
                  STEP 3: RENDER FORMS
