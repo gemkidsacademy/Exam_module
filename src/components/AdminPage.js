@@ -270,9 +270,13 @@ const AdminPanel = () => {
 
     {/* STEP 2B: FOUNDATIONAL */}
     {createExamCategory === "foundational" && !createExamType && (
-      <button onClick={() => setCreateExamType("foundational")}>
+      <button
+        className="dashboard-button"
+        onClick={() => setCreateExamType("foundational")}
+      >
         Foundational Exam
       </button>
+
     )}
 
     {/* STEP 3: FORMS */}
