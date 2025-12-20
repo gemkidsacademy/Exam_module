@@ -327,13 +327,114 @@ const AdminPanel = () => {
 
         {/* ===== GENERATE EXAM ===== */}
         {activeTab === "generate-exam" && (
-          <div className="tab-panel">
-            <ExamTypeSelector_generate_exam
-              examType={generateExamType}
-              onSelect={setGenerateExamType}
-            />
-          </div>
-        )}
+           <div className="tab-panel" style={{ textAlign: "center", padding: "30px" }}>
+         
+             {/* ============================
+                 STEP 1: SELECT EXAM CATEGORY
+             ============================ */}
+             {!examCategory && (
+               <div
+                 style={{
+                   display: "flex",
+                   flexDirection: "column",
+                   gap: "15px",
+                   maxWidth: "320px",
+                   margin: "0 auto",
+                 }}
+               >
+                 <button
+                   className="dashboard-button"
+                   onClick={() => setExamCategory("selective")}
+                 >
+                   Selective Exam
+                 </button>
+         
+                 <button
+                   className="dashboard-button"
+                   onClick={() => setExamCategory("foundational")}
+                 >
+                   Foundational Exam
+                 </button>
+               </div>
+             )}
+         
+             {/* ============================
+                 STEP 2: SELECTIVE EXAM TYPES
+             ============================ */}
+             {examCategory === "selective" && !generateExamType && (
+               <div
+                 style={{
+                   display: "flex",
+                   flexDirection: "column",
+                   gap: "15px",
+                   maxWidth: "320px",
+                   margin: "30px auto 0",
+                 }}
+               >
+                 <button
+                   className="dashboard-button"
+                   onClick={() => setGenerateExamType("thinking_skills")}
+                 >
+                   Thinking Skills
+                 </button>
+         
+                 <button
+                   className="dashboard-button"
+                   onClick={() => setGenerateExamType("mathematical_reasoning")}
+                 >
+                   Mathematical Reasoning
+                 </button>
+         
+                 <button
+                   className="dashboard-button"
+                   onClick={() => setGenerateExamType("reading")}
+                 >
+                   Reading
+                 </button>
+         
+                 <button
+                   className="dashboard-button"
+                   onClick={() => setGenerateExamType("writing")}
+                 >
+                   Writing
+                 </button>
+               </div>
+             )}
+         
+             {/* ============================
+                 STEP 2B: FOUNDATIONAL
+             ============================ */}
+             {examCategory === "foundational" && !generateExamType && (
+               <div
+                 style={{
+                   display: "flex",
+                   flexDirection: "column",
+                   gap: "15px",
+                   maxWidth: "320px",
+                   margin: "30px auto 0",
+                 }}
+               >
+                 <button
+                   className="dashboard-button"
+                   onClick={() => setGenerateExamType("foundational")}
+                 >
+                   Foundational Exam
+                 </button>
+               </div>
+             )}
+         
+             {/* ============================
+                 STEP 3: RENDER GENERATOR
+             ============================ */}
+             {generateExamType && (
+               <ExamTypeSelector_generate_exam
+                 examType={generateExamType}
+               />
+             )}
+         
+           </div>
+         )}
+
 
       </div>
     </div>
