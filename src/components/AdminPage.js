@@ -212,7 +212,7 @@ const AdminPanel = () => {
    
   <div className="tab-panel" style={{ textAlign: "center", padding: "30px" }}>
 
-    <h3>Create Exam</h3>
+    
 
     {/* STEP 1: CATEGORY */}
     {!createExamCategory && (
@@ -292,12 +292,20 @@ const AdminPanel = () => {
 
           {!generateExamCategory && (
             <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-              <button onClick={() => setGenerateExamCategory("selective")}>
-                Selective Exam
-              </button>
-              <button onClick={() => setGenerateExamCategory("foundational")}>
-                Foundational Exam
-              </button>
+              <button
+                 className="dashboard-button"
+                 onClick={() => setGenerateExamCategory("selective")}
+               >
+                 Selective Exam
+               </button>
+               
+               <button
+                 className="dashboard-button"
+                 onClick={() => setGenerateExamCategory("foundational")}
+               >
+                 Foundational Exam
+               </button>
+
             </div>
           )}
 
