@@ -74,7 +74,7 @@ export default function GenerateExam_math_reasoning() {
   ------------------------------------------- */
   return (
     <div style={{ padding: "20px", maxWidth: "500px" }}>
-      <h2>Generate Foundational Exam</h2>
+      <h2>Generate Mathematical Reasoning Exam</h2>
 
       {/* CLASS SELECTION */}
       <label style={{ display: "block", marginTop: "15px" }}>
