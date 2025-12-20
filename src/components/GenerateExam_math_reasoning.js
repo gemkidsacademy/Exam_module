@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
-export default function GenerateExam_foundational() {
+export default function GenerateExam_math_reasoning() {
   const [availableClasses, setAvailableClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState("");
   const [loading, setLoading] = useState(false);
