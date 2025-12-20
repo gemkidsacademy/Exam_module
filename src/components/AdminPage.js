@@ -217,30 +217,54 @@ const AdminPanel = () => {
     {/* STEP 1: CATEGORY */}
     {!createExamCategory && (
       <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-        <button onClick={() => setCreateExamCategory("selective")}>
-          Selective Exam
-        </button>
-        <button onClick={() => setCreateExamCategory("foundational")}>
-          Foundational Exam
-        </button>
+        <button
+           className="dashboard-button"
+           onClick={() => setCreateExamCategory("selective")}
+         >
+           Selective Exam
+         </button>
+         
+         <button
+           className="dashboard-button"
+           onClick={() => setCreateExamCategory("foundational")}
+         >
+           Foundational Exam
+         </button>
+
       </div>
     )}
 
     {/* STEP 2: SELECTIVE OPTIONS */}
     {createExamCategory === "selective" && !createExamType && (
       <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-        <button onClick={() => setCreateExamType("thinking_skills")}>
-          Thinking Skills
-        </button>
-        <button onClick={() => setCreateExamType("mathematical_reasoning")}>
-          Mathematical Reasoning
-        </button>
-        <button onClick={() => setCreateExamType("reading")}>
-          Reading
-        </button>
-        <button onClick={() => setCreateExamType("writing")}>
-          Writing
-        </button>
+        <button
+           className="dashboard-button"
+           onClick={() => setCreateExamType("thinking_skills")}
+         >
+           Thinking Skills
+         </button>
+         
+         <button
+           className="dashboard-button"
+           onClick={() => setCreateExamType("mathematical_reasoning")}
+         >
+           Mathematical Reasoning
+         </button>
+         
+         <button
+           className="dashboard-button"
+           onClick={() => setCreateExamType("reading")}
+         >
+           Reading
+         </button>
+         
+         <button
+           className="dashboard-button"
+           onClick={() => setCreateExamType("writing")}
+         >
+           Writing
+         </button>
+
       </div>
     )}
 
