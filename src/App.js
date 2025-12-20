@@ -15,7 +15,7 @@ import ViewDoctors from "./components/ViewDoctors";
 import DeleteDoctor from "./components/DeleteDoctor";
 import UsageDashboard from "./components/UsageDashboard";
 import SelectiveDashboard from "./components/SelectiveDashboard";
-import SelectiveFoundational from "./components/SelectiveFoundational";
+import Foundational_dashboard from "./components/Foundational_dashboard";
 
 
 // --- Login Page ---
