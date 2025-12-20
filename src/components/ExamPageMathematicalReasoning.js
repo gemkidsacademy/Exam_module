@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./ExamPageFoundational.css";
+import "./ExamPage_foundational.css";
 
 export default function ExamPageMathematicalReasoning({ studentId }) {
   /* ======================================================
