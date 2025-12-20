@@ -221,22 +221,23 @@ const AdminPanel = () => {
             </div>
           )}
 
-          {createExamCategory === "selective" && !createExamType && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-              <button onClick={() => setCreateExamType("thinking_skills")}>
-                Thinking Skills Exam
-              </button>
-              <button onClick={() => setCreateExamType("mathematical_reasoning")}>
-                Mathematical Reasoning
-              </button>
-              <button onClick={() => setCreateExamType("reading")}>
-                Reading Exam
-              </button>
-              <button onClick={() => setCreateExamType("writing")}>
-                Writing Exam
-              </button>
-            </div>
-          )}
+          {createExamCategory === "selective" && (
+           <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+             <button onClick={() => setCreateExamType("thinking_skills")}>
+               Thinking Skills Exam
+             </button>
+             <button onClick={() => setCreateExamType("mathematical_reasoning")}>
+               Mathematical Reasoning
+             </button>
+             <button onClick={() => setCreateExamType("reading")}>
+               Reading Exam
+             </button>
+             <button onClick={() => setCreateExamType("writing")}>
+               Writing Exam
+             </button>
+           </div>
+         )}
+
 
           {createExamCategory === "foundational" && !createExamType && (
             <button onClick={() => setCreateExamType("foundational")}>
