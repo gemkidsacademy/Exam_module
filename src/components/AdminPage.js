@@ -207,51 +207,59 @@ const AdminPanel = () => {
       )}
 
       {/* ===== CREATE EXAM ===== */}
-      {activeTab === "add-quiz" && (
-        <div className="tab-panel" style={{ textAlign: "center", padding: "30px" }}>
+      {/* ===== CREATE EXAM ===== */}
+{activeTab === "add-quiz" && (
+  <div className="tab-panel" style={{ textAlign: "center", padding: "30px" }}>
 
-          {!createExamCategory && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-              <button onClick={() => setCreateExamCategory("selective")}>
-                Selective Exam
-              </button>
-              <button onClick={() => setCreateExamCategory("foundational")}>
-                Foundational Exam
-              </button>
-            </div>
-          )}
+    <h3>Create Exam</h3>
 
-          {createExamCategory === "selective" && (
-           <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-             <button onClick={() => setCreateExamType("thinking_skills")}>
-               Thinking Skills Exam
-             </button>
-             <button onClick={() => setCreateExamType("mathematical_reasoning")}>
-               Mathematical Reasoning
-             </button>
-             <button onClick={() => setCreateExamType("reading")}>
-               Reading Exam
-             </button>
-             <button onClick={() => setCreateExamType("writing")}>
-               Writing Exam
-             </button>
-           </div>
-         )}
+    {/* STEP 1: CATEGORY */}
+    {!createExamCategory && (
+      <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+        <button onClick={() => setCreateExamCategory("selective")}>
+          Selective Exam
+        </button>
+        <button onClick={() => setCreateExamCategory("foundational")}>
+          Foundational Exam
+        </button>
+      </div>
+    )}
 
+    {/* STEP 2: SELECTIVE OPTIONS */}
+    {createExamCategory === "selective" && !createExamType && (
+      <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+        <button onClick={() => setCreateExamType("thinking_skills")}>
+          Thinking Skills
+        </button>
+        <button onClick={() => setCreateExamType("mathematical_reasoning")}>
+          Mathematical Reasoning
+        </button>
+        <button onClick={() => setCreateExamType("reading")}>
+          Reading
+        </button>
+        <button onClick={() => setCreateExamType("writing")}>
+          Writing
+        </button>
+      </div>
+    )}
 
-          {createExamCategory === "foundational" && !createExamType && (
-            <button onClick={() => setCreateExamType("foundational")}>
-              Foundational Exam
-            </button>
-          )}
+    {/* STEP 2B: FOUNDATIONAL */}
+    {createExamCategory === "foundational" && !createExamType && (
+      <button onClick={() => setCreateExamType("foundational")}>
+        Foundational Exam
+      </button>
+    )}
 
-          {createExamType === "thinking_skills" && <QuizSetup />}
-          {createExamType === "mathematical_reasoning" && <QuizSetup_MathematicalReasoning />}
-          {createExamType === "foundational" && <QuizSetup_foundational />}
-          {createExamType === "reading" && <QuizSetup_reading />}
-          {createExamType === "writing" && <QuizSetup_writing />}
-        </div>
-      )}
+    {/* STEP 3: FORMS */}
+    {createExamType === "thinking_skills" && <QuizSetup />}
+    {createExamType === "mathematical_reasoning" && <QuizSetup_MathematicalReasoning />}
+    {createExamType === "foundational" && <QuizSetup_foundational />}
+    {createExamType === "reading" && <QuizSetup_reading />}
+    {createExamType === "writing" && <QuizSetup_writing />}
+
+  </div>
+)}
+
 
       {/* ===== GENERATE EXAM ===== */}
       {activeTab === "generate-exam" && (
