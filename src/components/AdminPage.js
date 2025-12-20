@@ -17,6 +17,7 @@ import QuizSetup from "./QuizSetup";
 import QuizSetup_foundational from "./QuizSetup_foundational";
 import QuizSetup_reading from "./QuizSetup_reading";
 import QuizSetup_writing from "./QuizSetup_writing";
+import QuizSetup_MathematicalReasoning from "./QuizSetup_MathematicalReasoning";
 
 /* ============================
    Uploads
@@ -262,36 +263,64 @@ const AdminPanel = () => {
                   margin: "30px auto 0",
                 }}
               >
-                {[
-                  { label: "Thinking Skills Exam", value: "thinking_skills" },
-                  {
-                    label: examCategory === "selective"
-                      ? "Mathematical Reasoning"
-                      : "Foundational Exam",
-                    value: "foundational"
-                  },
-                  { label: "Reading Exam", value: "reading" },
-                  { label: "Writing Exam", value: "writing" },
-                ].map((item) => (
-                  <button
-                    key={item.value}
-                    onClick={() => setCreateExamType(item.value)}
-                    className="dashboard-button"
-                  >
-                    {item.label}
-                  </button>
-                ))}
+                <button
+                  className="dashboard-button"
+                  onClick={() => setCreateExamType("thinking_skills")}
+                >
+                  Thinking Skills Exam
+                </button>
+            
+                <button
+                  className="dashboard-button"
+                  onClick={() => setCreateExamType("mathematical_reasoning")}
+                >
+                  Mathematical Reasoning
+                </button>
+            
+                <button
+                  className="dashboard-button"
+                  onClick={() => setCreateExamType("reading")}
+                >
+                  Reading Exam
+                </button>
+            
+                <button
+                  className="dashboard-button"
+                  onClick={() => setCreateExamType("writing")}
+                >
+                  Writing Exam
+                </button>
               </div>
             )}
+            
 
-         
+             {examCategory === "foundational" && !createExamType && (
+                 <div
+                   style={{
+                     display: "flex",
+                     flexDirection: "column",
+                     gap: "15px",
+                     maxWidth: "320px",
+                     margin: "30px auto 0",
+                   }}
+                 >
+                   <button
+                     className="dashboard-button"
+                     onClick={() => setCreateExamType("foundational")}
+                   >
+                     Foundational Exam
+                   </button>
+                 </div>
+               )}
+
              {/* ============================
                  STEP 3: RENDER FORMS
              ============================ */}
-             {createExamType === "thinking_skills" && <QuizSetup />}
-             {createExamType === "foundational" && <QuizSetup_foundational />}
-             {createExamType === "reading" && <QuizSetup_reading />}
-             {createExamType === "writing" && <QuizSetup_writing />}
+            {createExamType === "thinking_skills" && <QuizSetup />}
+            {createExamType === "mathematical_reasoning" && <QuizSetup_MathematicalReasoning />}
+            {createExamType === "foundational" && <QuizSetup_foundational />}
+            {createExamType === "reading" && <QuizSetup_reading />}
+            {createExamType === "writing" && <QuizSetup_writing />}
          
            </div>
          )}
