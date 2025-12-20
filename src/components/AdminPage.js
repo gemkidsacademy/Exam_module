@@ -209,6 +209,7 @@ const AdminPanel = () => {
       {/* ===== CREATE EXAM ===== */}
       {/* ===== CREATE EXAM ===== */}
 {activeTab === "add-quiz" && (
+   {console.log("RENDER CREATE EXAM BLOCK")}
   <div className="tab-panel" style={{ textAlign: "center", padding: "30px" }}>
 
     <h3>Create Exam</h3>
