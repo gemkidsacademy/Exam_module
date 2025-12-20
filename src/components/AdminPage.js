@@ -62,12 +62,14 @@ const AdminPanel = () => {
      State Reset Logic (FIXED)
   ============================ */
   useEffect(() => {
-     if (activeTab !== "add-quiz") {
+     if (activeTab === "add-quiz") {
+       // entering Create Exam → start clean
        setCreateExamCategory(null);
        setCreateExamType(null);
      }
    
-     if (activeTab !== "generate-exam") {
+     if (activeTab === "generate-exam") {
+       // entering Generate Exam → start clean
        setGenerateExamCategory(null);
        setGenerateExamType(null);
      }
