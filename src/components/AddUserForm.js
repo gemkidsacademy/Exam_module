@@ -8,6 +8,24 @@ export default function AddStudentForm() {
   const [className, setClassName] = useState("");
   const [classDay, setClassDay] = useState("");
   const [parentEmail, setParentEmail] = useState("");
+  const CLASS_NAME_OPTIONS = [
+  "Kindergarten",
+  "Selective",
+  "Grade 1",
+  "Grade 2",
+  "Grade 3",
+  "Grade 4",
+  "Grade 5",
+  "Grade 6",
+];
+
+const CLASS_DAY_OPTIONS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+];
 
   useEffect(() => {
     const fetchNextId = async () => {
@@ -90,20 +108,33 @@ export default function AddStudentForm() {
         />
 
         <label>Class Name</label>
-        <input
-          type="text"
-          value={className}
-          onChange={(e) => setClassName(e.target.value)}
-          required
-        />
+          <select
+            value={className}
+            onChange={(e) => setClassName(e.target.value)}
+            required
+          >
+            <option value="">Select class</option>
+            {CLASS_NAME_OPTIONS.map((cls) => (
+              <option key={cls} value={cls}>
+                {cls}
+              </option>
+            ))}
+          </select>
+
 
         <label>Class Day</label>
-        <input
-          type="text"
-          value={classDay}
-          onChange={(e) => setClassDay(e.target.value)}
-          required
-        />
+          <select
+            value={classDay}
+            onChange={(e) => setClassDay(e.target.value)}
+            required
+          >
+            <option value="">Select day</option>
+            {CLASS_DAY_OPTIONS.map((day) => (
+              <option key={day} value={day}>
+                {day}
+              </option>
+            ))}
+          </select>
 
         <label>Parent Email</label>
         <input
