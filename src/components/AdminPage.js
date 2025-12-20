@@ -107,237 +107,200 @@ const AdminPanel = () => {
      Render
   ============================ */
   return (
-    <div className="dashboard-container">
-      <h1 className="dashboard-title">Admin Dashboard</h1>
+  <div className="dashboard-container">
+    <h1 className="dashboard-title">Admin Dashboard</h1>
 
-      {/* ---------- Tabs ---------- */}
-      <div className="tab-nav">
-        {tabs.map((tab) => (
-          <div
-            key={tab.id}
-            className={`tab-item ${activeTab === tab.id ? "active" : ""}`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {tab.label}
+    {/* ---------- Tabs ---------- */}
+    <div className="tab-nav">
+      {tabs.map((tab) => (
+        <div
+          key={tab.id}
+          className={`tab-item ${activeTab === tab.id ? "active" : ""}`}
+          onClick={() => setActiveTab(tab.id)}
+        >
+          {tab.label}
+        </div>
+      ))}
+    </div>
+
+    {/* ---------- Content ---------- */}
+    <div className="tab-content">
+
+      {/* ===== USER MANAGEMENT ===== */}
+      {activeTab === "database" && (
+        <div className="tab-panel">
+
+          <div className="user-management-header">
+            <h2>Exam Module Users</h2>
+            <p>Manage student accounts for the exam system.</p>
           </div>
-        ))}
-      </div>
 
-      {/* ---------- Content ---------- */}
-      <div className="tab-content">
+          <div className="user-actions-grid">
+            <div className="action-card" onClick={() => setShowAddUser(true)}>
+              <h3>Add User</h3>
+              <p>Create a new student account</p>
+            </div>
 
-        {/* ===== USER MANAGEMENT ===== */}
-        {activeTab === "database" && (
-  <div className="tab-panel">
+            <div className="action-card" onClick={() => setShowEditUser(true)}>
+              <h3>Edit User</h3>
+              <p>Update student details</p>
+            </div>
 
-    {/* Header */}
-    <div className="user-management-header">
-      <h2>Exam Module Users</h2>
-      <p>Manage student accounts for the exam system.</p>
-    </div>
+            <div className="action-card" onClick={() => setShowViewUser(true)}>
+              <h3>View Users</h3>
+              <p>Browse existing students</p>
+            </div>
 
-    {/* Action Cards */}
-    <div className="user-actions-grid">
+            <div
+              className="action-card danger"
+              onClick={() => setShowDeleteUser(true)}
+            >
+              <h3>Delete User</h3>
+              <p>Remove a student account</p>
+            </div>
+          </div>
 
-      <div
-        className="action-card"
-        onClick={() => setShowAddUser(true)}
-      >
-        <h3>Add User</h3>
-        <p>Create a new student account</p>
-      </div>
-
-      <div
-        className="action-card"
-        onClick={() => setShowEditUser(true)}
-      >
-        <h3>Edit User</h3>
-        <p>Update student details</p>
-      </div>
-
-      <div
-        className="action-card"
-        onClick={() => setShowViewUser(true)}
-      >
-        <h3>View Users</h3>
-        <p>Browse existing students</p>
-      </div>
-
-      <div
-        className="action-card danger"
-        onClick={() => setShowDeleteUser(true)}
-      >
-        <h3>Delete User</h3>
-        <p>Remove a student account</p>
-      </div>
-
-    </div>
-
-    {/* Modals (UNCHANGED LOGIC) */}
-    {showAddUser && (
-      <AddUserForm
-        onClose={() => setShowAddUser(false)}
-        onUserAdded={handleUserAdded}
-      />
-    )}
-
-    {showEditUser && (
-      <EditUserForm
-        onClose={() => setShowEditUser(false)}
-        onUserUpdated={handleUserUpdated}
-      />
-    )}
-
-    {showViewUser && (
-      <ViewUserModal onClose={() => setShowViewUser(false)} />
-    )}
-
-    {showDeleteUser && (
-      <DeleteUserForm
-        onClose={() => setShowDeleteUser(false)}
-        onUserDeleted={handleUserDeleted}
-      />
-    )}
-
-  </div>
-)}
-
-
-        {/* ===== UPLOAD WORD QUESTIONS ===== */}
-        {activeTab === "exam-type-selector" && (
-          <div className="tab-panel">
-            <ExamTypeSelector
-              examType={createExamType}
-              onSelect={setCreateExamType}
+          {showAddUser && (
+            <AddUserForm
+              onClose={() => setShowAddUser(false)}
+              onUserAdded={handleUserAdded}
             />
-          </div>
-        )}
+          )}
 
-        {/* ===== UPLOAD IMAGE FOLDER ===== */}
-        {activeTab === "upload-image-folder" && (
-          <div className="tab-panel">
-            <UploadImageFolder />
-          </div>
-        )}
+          {showEditUser && (
+            <EditUserForm
+              onClose={() => setShowEditUser(false)}
+              onUserUpdated={handleUserUpdated}
+            />
+          )}
 
-        {/* ===== CREATE EXAM ===== */}
-        {activeTab === "add-quiz" && (
-  <div className="tab-panel" style={{ textAlign: "center", padding: "30px" }}>
+          {showViewUser && (
+            <ViewUserModal onClose={() => setShowViewUser(false)} />
+          )}
 
-    {/* STEP 1: CATEGORY */}
-    {!createExamCategory && (
-      <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-        <button onClick={() => setCreateExamCategory("selective")}>
-          Selective Exam
-        </button>
-
-        <button onClick={() => setCreateExamCategory("foundational")}>
-          Foundational Exam
-        </button>
-      </div>
-    )}
-
-    {/* STEP 2: SELECTIVE TYPES */}
-    {createExamCategory === "selective" && !createExamType && (
-      <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-        <button onClick={() => setCreateExamType("thinking_skills")}>
-          Thinking Skills Exam
-        </button>
-
-        <button onClick={() => setCreateExamType("mathematical_reasoning")}>
-          Mathematical Reasoning
-        </button>
-
-        <button onClick={() => setCreateExamType("reading")}>
-          Reading Exam
-        </button>
-
-        <button onClick={() => setCreateExamType("writing")}>
-          Writing Exam
-        </button>
-      </div>
-    )}
-
-    {/* STEP 2B: FOUNDATIONAL */}
-    {createExamCategory === "foundational" && !createExamType && (
-      <button onClick={() => setCreateExamType("foundational")}>
-        Foundational Exam
-      </button>
-    )}
-
-    {/* STEP 3: FORMS */}
-    {createExamType === "thinking_skills" && <QuizSetup />}
-    {createExamType === "mathematical_reasoning" && <QuizSetup_MathematicalReasoning />}
-    {createExamType === "foundational" && <QuizSetup_foundational />}
-    {createExamType === "reading" && <QuizSetup_reading />}
-    {createExamType === "writing" && <QuizSetup_writing />}
-
-  </div>
-)}
-
-            
-         
-           </div>
-         )}
-
-        {/* ===== GENERATE EXAM ===== */}
-           {/* ===== GENERATE EXAM ===== */}
-            {activeTab === "generate-exam" && (
-  <div className="tab-panel" style={{ textAlign: "center", padding: "30px" }}>
-
-    {/* STEP 1: CATEGORY */}
-    {!generateExamCategory && (
-      <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-        <button onClick={() => setGenerateExamCategory("selective")}>
-          Selective Exam
-        </button>
-
-        <button onClick={() => setGenerateExamCategory("foundational")}>
-          Foundational Exam
-        </button>
-      </div>
-    )}
-
-    {/* STEP 2: SELECTIVE TYPES */}
-    {generateExamCategory === "selective" && !generateExamType && (
-      <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-        <button onClick={() => setGenerateExamType("thinking_skills")}>
-          Thinking Skills
-        </button>
-
-        <button onClick={() => setGenerateExamType("mathematical_reasoning")}>
-          Mathematical Reasoning
-        </button>
-
-        <button onClick={() => setGenerateExamType("reading")}>
-          Reading
-        </button>
-
-        <button onClick={() => setGenerateExamType("writing")}>
-          Writing
-        </button>
-      </div>
-    )}
-
-    {/* STEP 2B: FOUNDATIONAL */}
-    {generateExamCategory === "foundational" && !generateExamType && (
-      <button onClick={() => setGenerateExamType("foundational")}>
-        Foundational Exam
-      </button>
-    )}
-
-    {/* STEP 3: GENERATORS */}
-    {generateExamCategory === "selective" && generateExamType && (
-      <ExamTypeSelector_generate_exam examType={generateExamType} />
-    )}
-
-    {generateExamCategory === "foundational" &&
-      generateExamType === "foundational" && (
-        <GenerateExam_foundational />
+          {showDeleteUser && (
+            <DeleteUserForm
+              onClose={() => setShowDeleteUser(false)}
+              onUserDeleted={handleUserDeleted}
+            />
+          )}
+        </div>
       )}
 
+      {/* ===== UPLOAD WORD QUESTIONS ===== */}
+      {activeTab === "exam-type-selector" && (
+        <div className="tab-panel">
+          <ExamTypeSelector
+            examType={createExamType}
+            onSelect={setCreateExamType}
+          />
+        </div>
+      )}
+
+      {/* ===== UPLOAD IMAGE FOLDER ===== */}
+      {activeTab === "upload-image-folder" && (
+        <div className="tab-panel">
+          <UploadImageFolder />
+        </div>
+      )}
+
+      {/* ===== CREATE EXAM ===== */}
+      {activeTab === "add-quiz" && (
+        <div className="tab-panel" style={{ textAlign: "center", padding: "30px" }}>
+
+          {!createExamCategory && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+              <button onClick={() => setCreateExamCategory("selective")}>
+                Selective Exam
+              </button>
+              <button onClick={() => setCreateExamCategory("foundational")}>
+                Foundational Exam
+              </button>
+            </div>
+          )}
+
+          {createExamCategory === "selective" && !createExamType && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+              <button onClick={() => setCreateExamType("thinking_skills")}>
+                Thinking Skills Exam
+              </button>
+              <button onClick={() => setCreateExamType("mathematical_reasoning")}>
+                Mathematical Reasoning
+              </button>
+              <button onClick={() => setCreateExamType("reading")}>
+                Reading Exam
+              </button>
+              <button onClick={() => setCreateExamType("writing")}>
+                Writing Exam
+              </button>
+            </div>
+          )}
+
+          {createExamCategory === "foundational" && !createExamType && (
+            <button onClick={() => setCreateExamType("foundational")}>
+              Foundational Exam
+            </button>
+          )}
+
+          {createExamType === "thinking_skills" && <QuizSetup />}
+          {createExamType === "mathematical_reasoning" && <QuizSetup_MathematicalReasoning />}
+          {createExamType === "foundational" && <QuizSetup_foundational />}
+          {createExamType === "reading" && <QuizSetup_reading />}
+          {createExamType === "writing" && <QuizSetup_writing />}
+        </div>
+      )}
+
+      {/* ===== GENERATE EXAM ===== */}
+      {activeTab === "generate-exam" && (
+        <div className="tab-panel" style={{ textAlign: "center", padding: "30px" }}>
+
+          {!generateExamCategory && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+              <button onClick={() => setGenerateExamCategory("selective")}>
+                Selective Exam
+              </button>
+              <button onClick={() => setGenerateExamCategory("foundational")}>
+                Foundational Exam
+              </button>
+            </div>
+          )}
+
+          {generateExamCategory === "selective" && !generateExamType && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+              <button onClick={() => setGenerateExamType("thinking_skills")}>
+                Thinking Skills
+              </button>
+              <button onClick={() => setGenerateExamType("mathematical_reasoning")}>
+                Mathematical Reasoning
+              </button>
+              <button onClick={() => setGenerateExamType("reading")}>
+                Reading
+              </button>
+              <button onClick={() => setGenerateExamType("writing")}>
+                Writing
+              </button>
+            </div>
+          )}
+
+          {generateExamCategory === "foundational" && !generateExamType && (
+            <button onClick={() => setGenerateExamType("foundational")}>
+              Foundational Exam
+            </button>
+          )}
+
+          {generateExamCategory === "selective" && generateExamType && (
+            <ExamTypeSelector_generate_exam examType={generateExamType} />
+          )}
+
+          {generateExamCategory === "foundational" &&
+            generateExamType === "foundational" && (
+              <GenerateExam_foundational />
+            )}
+        </div>
+      )}
+
+    </div>
   </div>
-)}
-</div>
-)}
+);
+}
 export default AdminPanel;
