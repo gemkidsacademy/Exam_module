@@ -1,86 +1,51 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import "./SelectiveDashboard.css";
 
-export default function Foundational_dashboard() {
-  const navigate = useNavigate();
+// IMPORT COMPONENT
+import ExamPageFoundational from "./ExamPageFoundational";
+import WelcomeScreen from "./WelcomeScreen";
 
-  /* -----------------------------
-     STATE
-  ----------------------------- */
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [student, setStudent] = useState(null);
+const Foundational_dashboard = () => {
+  const [activeTab, setActiveTab] = useState(null);
 
-  /* -----------------------------
-     EFFECT
-  ----------------------------- */
-  useEffect(() => {
-    const studentId = sessionStorage.getItem("student_id");
+  const studentId = sessionStorage.getItem("student_id");
 
-    if (!studentId) {
-      setError("Student ID not found in session");
-      setLoading(false);
-      return;
-    }
+  // Only one allowed tab
+  const tabs = ["Foundational"];
 
-    const loadStudent = async () => {
-      try {
-        setLoading(true);
-
-        // Temporary placeholder (replace with real API call)
-        const data = {
-          student_id: studentId,
-          class_name: "Foundational",
-          exam_type: "Selective",
-        };
-
-        setStudent(data);
-      } catch (err) {
-        console.error(err);
-        setError("Failed to load student data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadStudent();
-  }, []);
-
-  /* -----------------------------
-     RENDER STATES
-  ----------------------------- */
-  if (loading) {
-    return <div>Loading Foundational Selective Dashboard...</div>;
-  }
-
-  if (error) {
-    return <div style={{ color: "red" }}>{error}</div>;
-  }
-
-  /* -----------------------------
-     MAIN UI
-  ----------------------------- */
   return (
-    <div className="dashboard-container">
-      <h2>Selective Foundational Dashboard</h2>
+    <div className="selective-dashboard">
 
-      <div className="dashboard-card">
-        <p>
-          <strong>Student ID:</strong> {student.student_id}
-        </p>
-        <p>
-          <strong>Class:</strong> {student.class_name}
-        </p>
-        <p>
-          <strong>Exam Type:</strong> {student.exam_type}
-        </p>
-      </div>
+      {/* Horizontal Menu */}
+      <nav className="horizontal-menu">
+        {tabs.map((tab) => (
+          <div
+            key={tab}
+            className={`menu-item ${activeTab === tab ? "active" : ""}`}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab}
+          </div>
+        ))}
+      </nav>
 
-      <div className="dashboard-actions">
-        <button onClick={() => navigate("/ExamModule")}>
-          Start Foundational Exam
-        </button>
-      </div>
+      {/* Content */}
+      <main className="content-area">
+        {activeTab === "Foundational" ? (
+          <div className="exam-root">
+            <ExamPageFoundational
+              studentId={studentId}
+              subject="mathematical_reasoning"
+              difficulty="foundational"
+            />
+          </div>
+        ) : (
+          <WelcomeScreen />
+        )}
+      </main>
+
     </div>
   );
-}
+};
+
+export default Foundational_dashboard;
