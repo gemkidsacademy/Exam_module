@@ -171,7 +171,11 @@ function App() {
           />
           <Route
             path="/selectiveFoundational"
-            element={<SelectiveFoundational studentId={studentId} />}
+            element={
+              <PrivateRoute isLoggedIn={isLoggedIn}>
+                <SelectiveFoundational />
+              </PrivateRoute>
+            }
           />
 
   
