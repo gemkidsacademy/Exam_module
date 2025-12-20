@@ -12,21 +12,30 @@ export default function EditUserForm() {
 
   // Fetch all students for dropdown
   useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        const response = await fetch(
-          "https://web-production-481a5.up.railway.app/get_all_students_exam_module"
-        );
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
-        setStudentOptions(data.students || []); // assuming backend returns { students: [{id, student_id, name, ...}] }
-      } catch (err) {
-        console.error(err);
-        alert("Unable to fetch students");
+  const fetchStudents = async () => {
+    try {
+      const response = await fetch(
+        "https://web-production-481a5.up.railway.app/get_all_students_exam_module"
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
-    fetchStudents();
-  }, []);
+
+      const data = await response.json();
+
+      // ✅ Backend returns array directly
+      setStudentOptions(data);
+
+    } catch (err) {
+      console.error(err);
+      alert("Unable to fetch students");
+    }
+  };
+
+  fetchStudents();
+}, []);
+
 
   // When a student is selected from dropdown, populate the form
   useEffect(() => {
