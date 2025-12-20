@@ -27,49 +27,56 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
   const server = "https://web-production-481a5.up.railway.app";
 
   const handleLogin = async () => {
-    try {
-      setError(null);
+  try {
+    setError(null);
 
-      if (!username || !password) {
-        setError("Please enter username and password");
-        return;
-      }
-
-      const response = await fetch(`${server}/login-exam-module`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ student_id: username, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.detail || "Invalid credentials");
-        return;
-      }
-
-      // Successful
-      setIsLoggedIn(true);
-      setDoctorData(data);
-      setSessionToken(data.session_token || null);
-
-      sessionStorage.setItem("student_id", data.student_id);
-      sessionStorage.setItem("student_class", data.class_name);
-      sessionStorage.setItem("student_name", data.name);
-
-      if (data?.name === "Admin") {
-        navigate("/AdminPanel");
-      } else if (data?.class_name === "Selective") {
-        navigate("/SelectiveDashboard");
-      } else if (data?.class_name === "Foundational") {
-        navigate("/selectiveFoundational");
-      } else {
-        navigate("/ExamModule");
-      } catch (err) {
-      setError("Login failed. Please try again.");
+    if (!username || !password) {
+      setError("Please enter username and password");
+      return;
     }
-  };
+
+    const response = await fetch(`${server}/login-exam-module`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        student_id: username,
+        password: password,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setError(data?.detail || "Invalid credentials");
+      return;
+    }
+
+    // ✅ Successful login
+    setIsLoggedIn(true);
+    setDoctorData(data);
+    setSessionToken(data.session_token || null);
+
+    sessionStorage.setItem("student_id", data.student_id);
+    sessionStorage.setItem("student_class", data.class_name);
+    sessionStorage.setItem("student_name", data.name);
+
+    if (data?.name === "Admin") {
+      navigate("/AdminPanel");
+    } else if (data?.class_name === "Selective") {
+      navigate("/SelectiveDashboard");
+    } else if (data?.class_name === "Foundational") {
+      navigate("/selectiveFoundational");
+    } else {
+      navigate("/ExamModule");
+    }
+
+  } catch (err) {
+    console.error("Login error:", err);
+    setError("Login failed. Please try again.");
+  }
+};
+
 
   return (
     <div style={styles.container}>
