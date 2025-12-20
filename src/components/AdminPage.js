@@ -44,6 +44,7 @@ const AdminPanel = () => {
   const [showEditUser, setShowEditUser] = useState(false);
   const [showViewUser, setShowViewUser] = useState(false);
   const [showDeleteUser, setShowDeleteUser] = useState(false);
+  const [examCategory, setExamCategory] = useState(null);
 
   /* ============================
      Exam Flow State
@@ -55,18 +56,19 @@ const AdminPanel = () => {
      State Reset Logic (FIXED)
   ============================ */
   useEffect(() => {
-    const isCreateFlow =
-      activeTab === "add-quiz" ||
-      activeTab === "exam-type-selector";
-
-    if (!isCreateFlow) {
-      setCreateExamType(null);
-    }
-
-    if (activeTab !== "generate-exam") {
-      setGenerateExamType(null);
-    }
-  }, [activeTab]);
+     const isCreateFlow =
+       activeTab === "add-quiz" ||
+       activeTab === "exam-type-selector";
+   
+     if (!isCreateFlow) {
+       setCreateExamType(null);
+       setExamCategory(null); // ✅ reset category
+     }
+   
+     if (activeTab !== "generate-exam") {
+       setGenerateExamType(null);
+     }
+   }, [activeTab]);
 
   /* ============================
      Tabs Config
@@ -216,41 +218,77 @@ const AdminPanel = () => {
 
         {/* ===== CREATE EXAM ===== */}
         {activeTab === "add-quiz" && (
-          <div className="tab-panel" style={{ textAlign: "center", padding: "30px" }}>
-
-            {!createExamType && (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "15px",
-                  maxWidth: "320px",
-                  margin: "0 auto",
-                }}
-              >
-                {[
-                  { label: "Thinking Skills Exam", value: "thinking_skills" },
-                  { label: "Foundational Exam", value: "foundational" },
-                  { label: "Reading Exam", value: "reading" },
-                  { label: "Writing Exam", value: "writing" },
-                ].map((item) => (
-                  <button
-                    key={item.value}
-                    onClick={() => setCreateExamType(item.value)}
-                    className="dashboard-button"
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {createExamType === "thinking_skills" && <QuizSetup />}
-            {createExamType === "foundational" && <QuizSetup_foundational />}
-            {createExamType === "reading" && <QuizSetup_reading />}
-            {createExamType === "writing" && <QuizSetup_writing />}
-          </div>
-        )}
+           <div className="tab-panel" style={{ textAlign: "center", padding: "30px" }}>
+         
+             {/* ============================
+                 STEP 1: SELECT EXAM CATEGORY
+             ============================ */}
+             {!examCategory && (
+               <div
+                 style={{
+                   display: "flex",
+                   flexDirection: "column",
+                   gap: "15px",
+                   maxWidth: "320px",
+                   margin: "0 auto",
+                 }}
+               >
+                 <button
+                   className="dashboard-button"
+                   onClick={() => setExamCategory("selective")}
+                 >
+                   Selective Exam
+                 </button>
+         
+                 <button
+                   className="dashboard-button"
+                   onClick={() => setExamCategory("foundational")}
+                 >
+                   Foundational Exam
+                 </button>
+               </div>
+             )}
+         
+             {/* ============================
+                 STEP 2: SELECTIVE EXAM TYPES
+             ============================ */}
+             {examCategory === "selective" && !createExamType && (
+               <div
+                 style={{
+                   display: "flex",
+                   flexDirection: "column",
+                   gap: "15px",
+                   maxWidth: "320px",
+                   margin: "30px auto 0",
+                 }}
+               >
+                 {[
+                   { label: "Thinking Skills Exam", value: "thinking_skills" },
+                   { label: "Foundational Exam", value: "foundational" },
+                   { label: "Reading Exam", value: "reading" },
+                   { label: "Writing Exam", value: "writing" },
+                 ].map((item) => (
+                   <button
+                     key={item.value}
+                     onClick={() => setCreateExamType(item.value)}
+                     className="dashboard-button"
+                   >
+                     {item.label}
+                   </button>
+                 ))}
+               </div>
+             )}
+         
+             {/* ============================
+                 STEP 3: RENDER FORMS
+             ============================ */}
+             {createExamType === "thinking_skills" && <QuizSetup />}
+             {createExamType === "foundational" && <QuizSetup_foundational />}
+             {createExamType === "reading" && <QuizSetup_reading />}
+             {createExamType === "writing" && <QuizSetup_writing />}
+         
+           </div>
+         )}
 
         {/* ===== GENERATE EXAM ===== */}
         {activeTab === "generate-exam" && (
