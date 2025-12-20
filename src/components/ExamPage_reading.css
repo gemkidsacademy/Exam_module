@@ -321,3 +321,17 @@
   font-size: 13px;
   color: #6b7280;
 }
+/* =======================================================
+   TOPIC GROUP LAYOUT (FIX)
+======================================================= */
+
+.topic-group {
+  flex: 0 0 auto;          /* ⛔ prevent shrinking */
+  min-width: 120px;        /* ensures horizontal stacking */
+}
+
+.topic-circles {
+  display: flex;
+  flex-direction: column;  /* numbers go top → bottom */
+  gap: 10px;
+}
