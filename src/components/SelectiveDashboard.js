@@ -3,22 +3,24 @@ import "./SelectiveDashboard.css";
 
 // IMPORT COMPONENTS
 import ExamPageThinkingSkills from "./ExamPageThinkingSkills";
-import ExamPageFoundational from "./ExamPageFoundational";
+import ExamPageMathematicalReasoning from "./ExamPageMathematicalReasoning";
 import ReadingComponent from "./ReadingComponent";
 import ExamPageWriting from "./ExamPageWriting";
+
+
 
 import WelcomeScreen from "./WelcomeScreen";
 
 const SUBJECT_KEY_MAP = {
   "Thinking skills": "thinking_skills",
-  "Foundational": "mathematical_reasoning",
+  "Mathematical Reasoning": "mathematical_reasoning",
   "Reading": "reading",
   "Writing": "writing",
 };
 
 const COMPONENT_MAP = {
   "Thinking skills": ExamPageThinkingSkills,
-  "Foundational": ExamPageFoundational,
+  "Mathematical Reasoning": ExamPageMathematicalReasoning,
   "Reading": ReadingComponent,
   "Writing": ExamPageWriting,
 };
