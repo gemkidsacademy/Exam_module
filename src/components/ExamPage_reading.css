@@ -330,8 +330,3 @@
   min-width: 120px;        /* ensures horizontal stacking */
 }
 
-.topic-circles {
-  display: flex;
-  flex-direction: column;  /* numbers go top → bottom */
-  gap: 10px;
-}
