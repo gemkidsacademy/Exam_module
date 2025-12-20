@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function SelectiveFoundational() {
+export default function Foundational_dashboard() {
   const navigate = useNavigate();
 
   /* -----------------------------
