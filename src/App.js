@@ -15,6 +15,8 @@ import ViewDoctors from "./components/ViewDoctors";
 import DeleteDoctor from "./components/DeleteDoctor";
 import UsageDashboard from "./components/UsageDashboard";
 import SelectiveDashboard from "./components/SelectiveDashboard";
+import SelectiveFoundational from "./components/SelectiveFoundational";
+
 
 // --- Login Page ---
 function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
@@ -60,10 +62,11 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
         navigate("/AdminPanel");
       } else if (data?.class_name === "Selective") {
         navigate("/SelectiveDashboard");
+      } else if (data?.class_name === "Foundational") {
+        navigate("/selectiveFoundational");
       } else {
         navigate("/ExamModule");
-      }
-    } catch (err) {
+      } catch (err) {
       setError("Login failed. Please try again.");
     }
   };
@@ -159,6 +162,11 @@ function App() {
               />
             }
           />
+          <Route
+            path="/selectiveFoundational"
+            element={<SelectiveFoundational studentId={studentId} />}
+          />
+
   
           <Route
             path="/SelectiveDashboard"
