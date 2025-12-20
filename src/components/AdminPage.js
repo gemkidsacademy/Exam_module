@@ -338,55 +338,6 @@ const AdminPanel = () => {
 
   </div>
 )}
-
-
-            
-                
-            
-                {/* ============================
-                    STEP 2B: FOUNDATIONAL
-                ============================ */}
-                {generateExamCategory === "foundational" && !generateExamType && (
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "15px",
-                      maxWidth: "320px",
-                      margin: "30px auto 0",
-                    }}
-                  >
-                    <button
-                      className="dashboard-button"
-                      onClick={() => setGenerateExamType("foundational")}
-                    >
-                      Foundational Exam
-                    </button>
-                  </div>
-                )}
-            
-                {/* ============================
-                    STEP 3: RENDER GENERATOR
-                ============================ */}
-            
-                {/* SELECTIVE exams */}
-                {generateExamCategory === "selective" && generateExamType && (
-                  <ExamTypeSelector_generate_exam examType={generateExamType} />
-                )}
-            
-                {/* FOUNDATIONAL exam */}
-                {generateExamCategory === "foundational" &&
-                  generateExamType === "foundational" && (
-                    <GenerateExam_foundational />
-                  )}
-            
-              </div>
-            )}
-   
-   
-         </div>
-       </div>
-     );
-   };
-   
-   export default AdminPanel;
+</div>
+)}
+export default AdminPanel;
