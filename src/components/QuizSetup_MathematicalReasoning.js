@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./QuizSetup.css";
 
-export default function QuizSetupMathematicalReasoning() {
+export default function QuizSetup_MathematicalReasoning() {
   const [quiz, setQuiz] = useState({
     className: "selective",
     subject: "mathematical_reasoning",
