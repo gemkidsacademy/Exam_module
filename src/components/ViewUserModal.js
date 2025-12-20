@@ -8,7 +8,7 @@ export default function ViewUserModal({ onClose }) {
     const fetchUsers = async () => {
       try {
         const res = await fetch(
-          "https://krishbackend-production.up.railway.app/api/users"
+          "https://krishbackend-production.up.railway.app/api/users-exam-module"
         );
         if (!res.ok) throw new Error("Failed to fetch users");
         const data = await res.json();
