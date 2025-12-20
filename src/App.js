@@ -173,7 +173,7 @@ function App() {
             path="/selectiveFoundational"
             element={
               <PrivateRoute isLoggedIn={isLoggedIn}>
-                <SelectiveFoundational />
+                <Foundational_dashboard />
               </PrivateRoute>
             }
           />
