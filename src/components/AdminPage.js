@@ -30,6 +30,8 @@ import ExamTypeSelector from "./ExamTypeSelector";
 ============================ */
 import ExamTypeSelector_generate_exam from "./ExamTypeSelector_generate_exam";
 
+import GenerateExam_foundational from "./GenerateExam_foundational";
+
 const AdminPanel = () => {
   const navigate = useNavigate();
 
@@ -426,11 +428,17 @@ const AdminPanel = () => {
              {/* ============================
                  STEP 3: RENDER GENERATOR
              ============================ */}
-             {generateExamType && (
-               <ExamTypeSelector_generate_exam
-                 examType={generateExamType}
-               />
-             )}
+             {/* SELECTIVE exams */}
+               {examCategory === "selective" && generateExamType && (
+                 <ExamTypeSelector_generate_exam
+                   examType={generateExamType}
+                 />
+               )}
+               
+               {/* FOUNDATIONAL exam */}
+               {examCategory === "foundational" && generateExamType === "foundational" && (
+                 <GenerateExam_foundational />
+               )}
          
            </div>
          )}
