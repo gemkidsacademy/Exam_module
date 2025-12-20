@@ -1,7 +1,7 @@
 import React from "react";
 import GenerateExam from "./GenerateExam";
 import GenerateExam_reading from "./GenerateExam_reading";
-import GenerateExam_math_reasoning from "./GenerateExam_math_reasoning";
+import GenerateExam_mathematical_reasoning from "./GenerateExam_mathematical_reasoning";
 import GenerateExam_writing from "./GenerateExam_writing";
 import "./ExamTypeSelectorGenerate.css";
 
@@ -14,7 +14,7 @@ export default function ExamTypeSelector_generate_exam({ examType, onSelect }) {
   ];
 
   if (examType === "thinkingskills") return <GenerateExam />;
-  if (examType === "math_reasoning") return <GenerateExam_math_reasoning />;
+  if (examType === "math_reasoning") return <GenerateExam_mathematical_reasoning />;
   if (examType === "reading") return <GenerateExam_reading />;
   if (examType === "writing") return <GenerateExam_writing />;
 
