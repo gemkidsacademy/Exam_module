@@ -39,22 +39,45 @@
 /* =======================================================
    QUESTION INDEX (UNCHANGED FUNCTIONALLY)
 ======================================================= */
-
 .question-index-grouped {
   display: flex;
-  gap: 28px;
-  overflow-x: auto;
+  flex-wrap: nowrap;          /* 🔑 force one row */
+  gap: 40px;                  /* space between topics */
+  overflow-x: auto;           /* horizontal scroll */
   padding: 12px 0 18px;
   margin-bottom: 24px;
   border-bottom: 1px solid #e5e7eb;
 }
 
+/* Each topic block */
+.topic-group {
+  flex: 0 0 auto;             /* prevent shrinking */
+}
+
+/* Topic title */
 .topic-title {
   font-size: 14px;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   color: #111827;
+  white-space: nowrap;
 }
+
+/* 🔑 ALL question numbers flow horizontally */
+.topic-circles {
+  display: flex;
+  flex-direction: row;        /* 🔥 THIS is the key fix */
+  gap: 10px;
+}
+.question-index-grouped::-webkit-scrollbar {
+  height: 6px;
+}
+
+.question-index-grouped::-webkit-scrollbar-thumb {
+  background: #c7d2fe;
+  border-radius: 999px;
+}
+
 
 /* =======================================================
    QUESTION CIRCLES
