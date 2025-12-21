@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 
 export default function GenerateExam_thinking_skills() {
-  const [quizzes, setQuizzes] = useState([]);
-  const [selectedQuiz, setSelectedQuiz] = useState(null);
+  const [difficulty, setDifficulty] = useState("");
+  
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState("");
   const [loading, setLoading] = useState(false);
@@ -47,13 +47,8 @@ export default function GenerateExam_thinking_skills() {
         if (!res.ok) throw new Error("Failed to load quizzes");
 
         const data = await res.json();
+        setDifficulty(data);
 
-        // ✅ normalize to array
-        const quizArray = Array.isArray(data)
-          ? data
-          : Object.values(data);
-        
-        setQuizzes(quizArray);
       } catch (err) {
         console.error("❌ Error loading quizzes:", err);
         setError("Failed to load quizzes.");
@@ -67,36 +62,41 @@ export default function GenerateExam_thinking_skills() {
      Generate Exam
   =========================== */
   const handleGenerateExam = async () => {
-    if (!selectedQuiz) {
-      alert("Please select a quiz before generating the exam.");
+    if (!selectedDifficulty) {
+      alert("Please select a difficulty before generating the exam.");
       return;
     }
-
+  
     setLoading(true);
     setError("");
     setGeneratedExam(null);
-
+  
     try {
       const res = await fetch(
-        `${BACKEND_URL}/api/exams/generate-thinking-skills/${selectedQuiz}`,
-        { method: "POST" }
+        `${BACKEND_URL}/api/exams/generate-thinking-skills`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            difficulty: selectedDifficulty
+          })
+        }
       );
-
+  
       const data = await res.json();
-
+  
       if (!res.ok) {
         throw new Error(data.detail || "Exam generation failed");
       }
-
+  
       setGeneratedExam(data);
       alert("Exam generated successfully!");
-
     } catch (err) {
-      console.error(err);
+      console.error("❌ Generate exam failed:", err);
       setError("Failed to generate exam. Check console for details.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   /* ===========================
@@ -113,49 +113,25 @@ export default function GenerateExam_thinking_skills() {
         <label>Select Quiz:</label>
 
         <select
-          value={selectedQuiz ? JSON.stringify(selectedQuiz) : ""}
+          value={selectedDifficulty}
           onChange={(e) => {
-            const parsed = JSON.parse(e.target.value);
-        
-            setSelectedQuiz(parsed);   // ✅ now includes topics[]
-            setSelectedClass(parsed.class_name);
-            setSelectedDifficulty(parsed.difficulty);
+            setSelectedDifficulty(e.target.value);
           }}
         >
-          <option value="">-- Select Quiz Requirement --</option>
+          <option value="">-- Select Difficulty --</option>
         
-          {quizzes.map((q) => (
-            <option
-              key={`${q.class_name}-${q.difficulty}`}
-              value={JSON.stringify(q)}   // ✅ full object
-            >
-              {formatClassName(q.class_name)} | {formatDifficulty(q.difficulty)}
+          {difficulty && (
+            <option value={difficulty}>
+              {formatDifficulty(difficulty)}
             </option>
-          ))}
+          )}
         </select>
+
 
       </div>
 
       {/* -------- Topics Preview -------- */}
-      {selectedQuiz && selectedQuiz.topics && (
-        <div
-          style={{
-            marginTop: "15px",
-            padding: "10px",
-            border: "1px solid #ddd",
-            background: "#f9f9f9"
-          }}
-        >
-          <strong>Included Topics:</strong>
-          <ul style={{ marginTop: "8px" }}>
-            {Object.values(selectedQuiz.topics).map((t, idx) => (
-              <li key={idx}>
-                {t.name} ({t.num_questions} questions)
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      
 
       {/* -------- Generate Button -------- */}
       <button
