@@ -143,7 +143,7 @@ export default function GenerateExam_thinking_skills() {
         >
           <strong>Included Topics:</strong>
           <ul style={{ marginTop: "8px" }}>
-            {selectedQuiz.topics.map((t, idx) => (
+            {Object.values(selectedQuiz.topics).map((t, idx) => (
               <li key={idx}>
                 {t.name} ({t.num_questions} questions)
               </li>
