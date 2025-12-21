@@ -43,7 +43,7 @@ export default function GenerateExam_thinking_skills() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/quizzes-thinking-skills`);
+        const res = await fetch(`${BACKEND_URL}/api/quizzes/thinking-skills/difficulty`);
         if (!res.ok) throw new Error("Failed to load quizzes");
 
         const data = await res.json();
