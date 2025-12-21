@@ -140,16 +140,25 @@ export default function QuizSetup_foundational() {
             <label>Class:</label>
             <select
               value={quiz.className}
-              onChange={(e) => setQuiz((prev) => ({ ...prev, className: e.target.value }))}
+              onChange={(e) =>
+                setQuiz((prev) => ({ ...prev, className: e.target.value }))
+              }
             >
               <option value="">Select Class</option>
-              <option value="selective">Selective</option>
+              <option value="kindergarten">Kindergarten</option>
+              <option value="year1">Year 1</option>
+              <option value="year2">Year 2</option>
               <option value="year3">Year 3</option>
               <option value="year4">Year 4</option>
               <option value="year5">Year 5</option>
               <option value="year6">Year 6</option>
+              <option value="year7">Year 7</option>
+              <option value="year8">Year 8</option>
+              <option value="year9">Year 9</option>
+              <option value="year10">Year 10</option>
             </select>
           </div>
+
 
           <div className="top-row-item">
             <label>Subject:</label>
