@@ -39,7 +39,7 @@ export default function ExamPageThinkingSkills() {
   const loadReport = useCallback(async () => {
     try {
       const res = await fetch(
-        `https://web-production-481a5.up.railway.app/api/student/exam-report/mathematical-reasoning?student_id=${studentId}`
+        `https://web-production-481a5.up.railway.app/api/student/exam-report/thinking-skills?student_id=${studentId}`
       );
 
       if (!res.ok) {
