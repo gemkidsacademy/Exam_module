@@ -1,0 +1,107 @@
+/* =========================
+   PAGE WRAPPER
+========================= */
+.generate-reading-container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px;
+  font-family: "Inter", system-ui, sans-serif;
+  background: #ffffff;
+}
+
+/* =========================
+   HEADINGS
+========================= */
+.generate-reading-container h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* =========================
+   FORM GROUPS
+========================= */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  font-size: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* =========================
+   TOPICS PREVIEW
+========================= */
+.topics-preview {
+  margin-top: 15px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  background: #f9f9f9;
+  border-radius: 6px;
+}
+
+.topics-preview strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.topics-preview ul {
+  padding-left: 18px;
+}
+
+/* =========================
+   BUTTON
+========================= */
+.primary-btn {
+  margin-top: 20px;
+  padding: 12px 20px;
+  background-color: #4caf50;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================
+   ERROR
+========================= */
+.error-text {
+  color: #d32f2f;
+  margin-bottom: 12px;
+}
+
+/* =========================
+   GENERATED EXAM
+========================= */
+.generated-exam {
+  margin-top: 30px;
+}
+
+.question-card {
+  margin-bottom: 20px;
+  padding: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.question-card strong {
+  display: block;
+  margin-bottom: 6px;
+}
