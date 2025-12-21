@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import "./QuizSetup.css";
 
+/* ============================
+     this is helping setup Mathematical Reasoning
+  ============================ */
+
+
 export default function QuizSetup() {
   const [quiz, setQuiz] = useState({
     className: "",
