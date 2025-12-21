@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./generate_exam.css";
+import "./generateexam_MR.css";
 export default function GenerateExam() {
   const [quizzes, setQuizzes] = useState([]);
   const [selectedQuiz, setSelectedQuiz] = useState("");
