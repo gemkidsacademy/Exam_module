@@ -12,6 +12,9 @@ import DeleteUserForm from "./DeleteUserForm";
 
 import GenerateExam from "./GenerateExam";
 import GenerateExam_reading from "./GenerateExam_reading";
+import GenerateExam_writing from "./GenerateExam_writing";
+import GenerateExam_thinking_skills from "./GenerateExam_thinking_skills";
+
 
 
 /* ============================
@@ -381,11 +384,22 @@ const AdminPanel = () => {
             )}
       
           {/* ===============================
-              STEP 3: GENERATE EXAM
-          =============================== */}
-          {/* ===============================
              STEP 3: GENERATE EXAM
          =============================== */}
+         
+         {/* SELECTIVE — THINKING SKILLS */}
+         {generateExamStep === "generate" &&
+           generateExamCategory === "selective" &&
+           generateExamType === "thinking_skills" && (
+             <GenerateExam_thinking_skills />
+         )}
+         
+         {/* SELECTIVE — MATHEMATICAL REASONING */}
+         {generateExamStep === "generate" &&
+           generateExamCategory === "selective" &&
+           generateExamType === "mathematical_reasoning" && (
+             <GenerateExam examType="mathematical_reasoning" />
+         )}
          
          {/* SELECTIVE — READING */}
          {generateExamStep === "generate" &&
@@ -394,11 +408,11 @@ const AdminPanel = () => {
              <GenerateExam_reading />
          )}
          
-         {/* SELECTIVE — ALL OTHER SUBJECTS */}
+         {/* SELECTIVE — WRITING */}
          {generateExamStep === "generate" &&
            generateExamCategory === "selective" &&
-           generateExamType !== "reading" && (
-             <GenerateExam examType={generateExamType} />
+           generateExamType === "writing" && (
+             <GenerateExam_writing />
          )}
          
          {/* FOUNDATIONAL */}
@@ -407,9 +421,6 @@ const AdminPanel = () => {
              <GenerateExam_foundational />
          )}
 
-      
-        </div>
-      )}
 
     </div>
   </div>
