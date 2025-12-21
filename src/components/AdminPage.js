@@ -335,7 +335,8 @@ const AdminPanel = () => {
                 <button
                  className="dashboard-button"
                  onClick={() => {
-                   setGenerateExamType("thinking_skills");
+                   // SWAPPED
+                   setGenerateExamType("mathematical_reasoning");
                    setGenerateExamStep("generate");
                  }}
                >
@@ -345,7 +346,8 @@ const AdminPanel = () => {
                <button
                  className="dashboard-button"
                  onClick={() => {
-                   setGenerateExamType("mathematical_reasoning");
+                   // SWAPPED
+                   setGenerateExamType("thinking_skills");
                    setGenerateExamStep("generate");
                  }}
                >
