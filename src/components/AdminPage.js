@@ -11,6 +11,8 @@ import ViewUserModal from "./ViewUserModal";
 import DeleteUserForm from "./DeleteUserForm";
 
 import GenerateExam from "./GenerateExam";
+import GenerateExam_reading from "./GenerateExam_reading";
+
 
 /* ============================
    Quiz Setup
@@ -20,6 +22,7 @@ import QuizSetup_foundational from "./QuizSetup_foundational";
 import QuizSetup_reading from "./QuizSetup_reading";
 import QuizSetup_writing from "./QuizSetup_writing";
 import QuizSetup_MathematicalReasoning from "./QuizSetup_MathematicalReasoning";
+
 
 /* ============================
    Uploads
@@ -380,15 +383,30 @@ const AdminPanel = () => {
           {/* ===============================
               STEP 3: GENERATE EXAM
           =============================== */}
-          {generateExamStep === "generate" &&
-            generateExamCategory === "selective" && (
-              <GenerateExam examType={generateExamType} />
-            )}
-      
-          {generateExamStep === "generate" &&
-            generateExamCategory === "foundational" && (
-              <GenerateExam_foundational />
-            )}
+          {/* ===============================
+             STEP 3: GENERATE EXAM
+         =============================== */}
+         
+         {/* SELECTIVE — READING */}
+         {generateExamStep === "generate" &&
+           generateExamCategory === "selective" &&
+           generateExamType === "reading" && (
+             <GenerateExam_reading />
+         )}
+         
+         {/* SELECTIVE — ALL OTHER SUBJECTS */}
+         {generateExamStep === "generate" &&
+           generateExamCategory === "selective" &&
+           generateExamType !== "reading" && (
+             <GenerateExam examType={generateExamType} />
+         )}
+         
+         {/* FOUNDATIONAL */}
+         {generateExamStep === "generate" &&
+           generateExamCategory === "foundational" && (
+             <GenerateExam_foundational />
+         )}
+
       
         </div>
       )}
