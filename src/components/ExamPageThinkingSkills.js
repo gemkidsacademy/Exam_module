@@ -133,7 +133,7 @@ export default function ExamPageThinkingSkills() {
 
       try {
         await fetch(
-          "https://web-production-481a5.up.railway.app/api/student/finish-exam",
+          "https://web-production-481a5.up.railway.app/api/student/finish-exam-thinkingskills",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
