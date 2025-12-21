@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "./generateexam_foundational.css";
 
 const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
@@ -9,8 +10,7 @@ export default function GenerateExam_foundational() {
   const [generatedExam, setGeneratedExam] = useState(null);
 
   /* -------------------------------------------
-     LOAD CLASS NAMES FROM BACKEND
-     These come from quiz_setup_foundational table
+     LOAD CLASS NAMES
   ------------------------------------------- */
   useEffect(() => {
     const loadClasses = async () => {
@@ -60,73 +60,58 @@ export default function GenerateExam_foundational() {
       }
 
       setGeneratedExam(data);
-      alert("✅ Foundational exam generated successfully!");
     } catch (err) {
       console.error(err);
       alert("Network error while generating exam.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   /* -------------------------------------------
      UI
   ------------------------------------------- */
   return (
-    <div style={{ padding: "20px", maxWidth: "500px" }}>
+    <div className="generate-foundational-container">
       <h2>Generate Foundational Exam</h2>
 
-      {/* CLASS SELECTION */}
-      <label style={{ display: "block", marginTop: "15px" }}>
-        Select Class:
-      </label>
+      <div className="form-group">
+        <label>Select Class</label>
+        <select
+          value={selectedClass}
+          onChange={(e) => setSelectedClass(e.target.value)}
+        >
+          <option value="">-- Select Class --</option>
+          {availableClasses.map((c) => (
+            <option key={c.class_name} value={c.class_name}>
+              {c.class_name}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      <select
-        value={selectedClass}
-        onChange={(e) => setSelectedClass(e.target.value)}
-        style={{ padding: "10px", width: "100%", marginTop: "5px" }}
-      >
-        <option value="">-- Select Class --</option>
-
-        {availableClasses.map((c) => (
-          <option key={c.class_name} value={c.class_name}>
-            {c.class_name}
-          </option>
-        ))}
-      </select>
-
-      {/* GENERATE BUTTON */}
       <button
+        className="primary-btn"
         onClick={handleGenerateExam}
         disabled={loading || !selectedClass}
-        style={{
-          marginTop: "20px",
-          padding: "12px 22px",
-          backgroundColor: "#2196f3",
-          color: "white",
-          border: "none",
-          borderRadius: "6px",
-          fontSize: "16px",
-          cursor: loading || !selectedClass ? "not-allowed" : "pointer"
-        }}
       >
         {loading ? "Generating..." : "Generate Exam"}
       </button>
 
-      {/* RESULT */}
       {generatedExam && (
-        <div style={{ marginTop: "30px" }}>
+        <div className="generated-output">
           <h3>Generated Exam</h3>
 
-          <p><strong>Total Questions:</strong> {generatedExam.total_questions}</p>
+          <p>
+            <strong>Total Questions:</strong>{" "}
+            {generatedExam.total_questions}
+          </p>
 
-          {/* Optional: Show per-section breakdown */}
           {generatedExam.sections && (
-            <div style={{ marginTop: "15px" }}>
-              <h4>Sections:</h4>
+            <div className="sections-list">
               {generatedExam.sections.map((sec, i) => (
-                <div key={i} style={{ marginBottom: "10px" }}>
-                  <strong>{sec.name}:</strong> {sec.total} questions  
+                <div key={i} className="section-item">
+                  {sec.name}: {sec.total} questions
                 </div>
               ))}
             </div>
