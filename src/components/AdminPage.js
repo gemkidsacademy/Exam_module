@@ -10,6 +10,8 @@ import EditUserForm from "./EditUserForm";
 import ViewUserModal from "./ViewUserModal";
 import DeleteUserForm from "./DeleteUserForm";
 
+import GenerateExam from "./GenerateExam";
+
 /* ============================
    Quiz Setup
 ============================ */
@@ -331,40 +333,45 @@ const AdminPanel = () => {
             generateExamCategory === "selective" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
                 <button
-                  onClick={() => {
-                    setGenerateExamType("thinking_skills");
-                    setGenerateExamStep("generate");
-                  }}
-                >
-                  Thinking Skills
-                </button>
-      
-                <button
-                  onClick={() => {
-                    setGenerateExamType("mathematical_reasoning");
-                    setGenerateExamStep("generate");
-                  }}
-                >
-                  Mathematical Reasoning
-                </button>
-      
-                <button
-                  onClick={() => {
-                    setGenerateExamType("reading");
-                    setGenerateExamStep("generate");
-                  }}
-                >
-                  Reading
-                </button>
-      
-                <button
-                  onClick={() => {
-                    setGenerateExamType("writing");
-                    setGenerateExamStep("generate");
-                  }}
-                >
-                  Writing
-                </button>
+                 className="dashboard-button"
+                 onClick={() => {
+                   setGenerateExamType("thinking_skills");
+                   setGenerateExamStep("generate");
+                 }}
+               >
+                 Thinking Skills
+               </button>
+               
+               <button
+                 className="dashboard-button"
+                 onClick={() => {
+                   setGenerateExamType("mathematical_reasoning");
+                   setGenerateExamStep("generate");
+                 }}
+               >
+                 Mathematical Reasoning
+               </button>
+               
+               <button
+                 className="dashboard-button"
+                 onClick={() => {
+                   setGenerateExamType("reading");
+                   setGenerateExamStep("generate");
+                 }}
+               >
+                 Reading
+               </button>
+               
+               <button
+                 className="dashboard-button"
+                 onClick={() => {
+                   setGenerateExamType("writing");
+                   setGenerateExamStep("generate");
+                 }}
+               >
+                 Writing
+               </button>
+
               </div>
             )}
       
