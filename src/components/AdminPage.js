@@ -299,44 +299,112 @@ const AdminPanel = () => {
          )}
          
          
-               {/* ===============================
-             STEP 3: GENERATE EXAM
-         =============================== */}
-         <>
-           {/* SELECTIVE — THINKING SKILLS */}
-           {generateExamStep === "generate" &&
-             generateExamCategory === "selective" &&
-             generateExamType === "thinking_skills" && (
-               <GenerateExam_thinking_skills />
-           )}
-         
-           {/* SELECTIVE — MATHEMATICAL REASONING */}
-           {generateExamStep === "generate" &&
-             generateExamCategory === "selective" &&
-             generateExamType === "mathematical_reasoning" && (
-               <GenerateExam examType="mathematical_reasoning" />
-           )}
-         
-           {/* SELECTIVE — READING */}
-           {generateExamStep === "generate" &&
-             generateExamCategory === "selective" &&
-             generateExamType === "reading" && (
-               <GenerateExam_reading />
-           )}
-         
-           {/* SELECTIVE — WRITING */}
-           {generateExamStep === "generate" &&
-             generateExamCategory === "selective" &&
-             generateExamType === "writing" && (
-               <GenerateExam_writing />
-           )}
-         
-           {/* FOUNDATIONAL */}
-           {generateExamStep === "generate" &&
-             generateExamCategory === "foundational" && (
-               <GenerateExam_foundational />
-           )}
-         </>
+              {/* ===== GENERATE EXAM ===== */}
+               {activeTab === "generate-exam" && (
+                 <div className="tab-panel" style={{ textAlign: "center", padding: "30px" }}>
+               
+                   {/* STEP 1: CATEGORY */}
+                   {generateExamStep === "category" && (
+                     <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+                       <button
+                         className="dashboard-button"
+                         onClick={() => {
+                           setGenerateExamCategory("selective");
+                           setGenerateExamStep("type");
+                         }}
+                       >
+                         Selective Exam
+                       </button>
+               
+                       <button
+                         className="dashboard-button"
+                         onClick={() => {
+                           setGenerateExamCategory("foundational");
+                           setGenerateExamStep("generate");
+                         }}
+                       >
+                         Foundational Exam
+                       </button>
+                     </div>
+                   )}
+               
+                   {/* STEP 2: SELECTIVE SUBJECT */}
+                   {generateExamStep === "type" &&
+                     generateExamCategory === "selective" && (
+                       <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+                         <button
+                           className="dashboard-button"
+                           onClick={() => {
+                             setGenerateExamType("thinking_skills");
+                             setGenerateExamStep("generate");
+                           }}
+                         >
+                           Thinking Skills
+                         </button>
+               
+                         <button
+                           className="dashboard-button"
+                           onClick={() => {
+                             setGenerateExamType("mathematical_reasoning");
+                             setGenerateExamStep("generate");
+                           }}
+                         >
+                           Mathematical Reasoning
+                         </button>
+               
+                         <button
+                           className="dashboard-button"
+                           onClick={() => {
+                             setGenerateExamType("reading");
+                             setGenerateExamStep("generate");
+                           }}
+                         >
+                           Reading
+                         </button>
+               
+                         <button
+                           className="dashboard-button"
+                           onClick={() => {
+                             setGenerateExamType("writing");
+                             setGenerateExamStep("generate");
+                           }}
+                         >
+                           Writing
+                         </button>
+                       </div>
+                     )}
+               
+                   {/* STEP 3: GENERATE */}
+                   {generateExamStep === "generate" && (
+                     <>
+                       {generateExamCategory === "selective" &&
+                         generateExamType === "thinking_skills" && (
+                           <GenerateExam_thinking_skills />
+                       )}
+               
+                       {generateExamCategory === "selective" &&
+                         generateExamType === "mathematical_reasoning" && (
+                           <GenerateExam examType="mathematical_reasoning" />
+                       )}
+               
+                       {generateExamCategory === "selective" &&
+                         generateExamType === "reading" && (
+                           <GenerateExam_reading />
+                       )}
+               
+                       {generateExamCategory === "selective" &&
+                         generateExamType === "writing" && (
+                           <GenerateExam_writing />
+                       )}
+               
+                       {generateExamCategory === "foundational" && (
+                         <GenerateExam_foundational />
+                       )}
+                     </>
+                   )}
+               
+                 </div>
+               )}
 
 
 
