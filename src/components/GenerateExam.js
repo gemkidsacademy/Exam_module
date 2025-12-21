@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./generateexam_MR.css";
+
 export default function GenerateExam() {
   const [quizzes, setQuizzes] = useState([]);
   const [selectedQuiz, setSelectedQuiz] = useState("");
@@ -10,40 +11,39 @@ export default function GenerateExam() {
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
   const formatClassName = (cls) => {
-  switch (cls) {
-    case "year1": return "Year 1";
-    case "year2": return "Year 2";
-    case "year3": return "Year 3";
-    case "year4": return "Year 4";
-    case "year5": return "Year 5";
-    case "year6": return "Year 6";
-    case "selective": return "Selective";
-    case "kindergarten": return "Kindergarten";
-    default: return cls;
-  }
-};
+    switch (cls) {
+      case "year1": return "Year 1";
+      case "year2": return "Year 2";
+      case "year3": return "Year 3";
+      case "year4": return "Year 4";
+      case "year5": return "Year 5";
+      case "year6": return "Year 6";
+      case "selective": return "Selective";
+      case "kindergarten": return "Kindergarten";
+      default: return cls;
+    }
+  };
 
-const formatSubject = (subj) => {
-  switch (subj) {
-    case "thinking_skills": return "Thinking Skills";
-    case "mathematical_reasoning": return "Math Reasoning";
-    case "reading": return "Reading";
-    case "writing": return "Writing";
-    default: return subj;
-  }
-};
+  const formatSubject = (subj) => {
+    switch (subj) {
+      case "thinking_skills": return "Thinking Skills";
+      case "mathematical_reasoning": return "Math Reasoning";
+      case "reading": return "Reading";
+      case "writing": return "Writing";
+      default: return subj;
+    }
+  };
 
-const formatDifficulty = (lvl) => {
-  switch (lvl) {
-    case "easy": return "Easy";
-    case "medium": return "Medium";
-    case "hard": return "Hard";
-    default: return lvl;
-  }
-};
+  const formatDifficulty = (lvl) => {
+    switch (lvl) {
+      case "easy": return "Easy";
+      case "medium": return "Medium";
+      case "hard": return "Hard";
+      default: return lvl;
+    }
+  };
 
-
-  // Fetch quiz setups from backend
+  /* ---------------- FETCH QUIZZES ---------------- */
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
@@ -60,6 +60,7 @@ const formatDifficulty = (lvl) => {
     fetchQuizzes();
   }, []);
 
+  /* ---------------- GENERATE EXAM ---------------- */
   const handleGenerateExam = async () => {
     if (!selectedQuiz) {
       alert("Please select a quiz before generating the exam.");
@@ -77,39 +78,31 @@ const formatDifficulty = (lvl) => {
       );
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.detail || "Exam generation failed");
-      }
+      if (!res.ok) throw new Error(data.detail || "Exam generation failed");
 
       setGeneratedExam(data);
-      alert("Exam generated successfully!");
-
     } catch (err) {
       console.error(err);
       setError("Failed to generate exam. Check console for details.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
+  /* ---------------- UI ---------------- */
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="generate-exam-container">
       <h2>Generate Mathematical Reasoning Exam</h2>
 
-      {/* Error message */}
-      {error && <div style={{ color: "red" }}>{error}</div>}
+      {error && <div className="error-text">{error}</div>}
 
-      {/* Quiz selection dropdown */}
-      <div style={{ margin: "10px 0" }}>
-        <label style={{ marginRight: "10px" }}>Select Quiz:</label>
+      <div className="form-group">
+        <label>Select Quiz</label>
         <select
           value={selectedQuiz}
           onChange={(e) => setSelectedQuiz(e.target.value)}
-          style={{ padding: "6px", minWidth: "280px" }}
         >
           <option value="">-- Select Quiz Requirement --</option>
-        
           {quizzes.map((q) => (
             <option key={q.id} value={q.id}>
               {`${formatClassName(q.class_name)} | ${formatSubject(q.subject)} | ${formatDifficulty(q.difficulty)}`}
@@ -118,44 +111,25 @@ const formatDifficulty = (lvl) => {
         </select>
       </div>
 
-      {/* Generate button */}
       <button
+        className="primary-btn"
         onClick={handleGenerateExam}
         disabled={loading}
-        style={{
-          padding: "8px 15px",
-          backgroundColor: "#4caf50",
-          color: "white",
-          border: "none",
-          cursor: "pointer",
-        }}
       >
         {loading ? "Generating..." : "Generate Exam"}
       </button>
 
-      {/* Show generated exam preview */}
       {generatedExam && (
-        <div style={{ marginTop: "30px" }}>
+        <div className="generated-output">
           <h3>Generated Exam Preview</h3>
-          <p>
-            <strong>Exam ID:</strong> {generatedExam.exam_id}
-          </p>
-          <p>
-            <strong>Quiz ID:</strong> {generatedExam.quiz_id}
-          </p>
 
-          {generatedExam.questions && generatedExam.questions.length > 0 ? (
-            <div style={{ marginTop: "20px" }}>
+          <p><strong>Exam ID:</strong> {generatedExam.exam_id}</p>
+          <p><strong>Quiz ID:</strong> {generatedExam.quiz_id}</p>
+
+          {generatedExam.questions?.length > 0 ? (
+            <div className="questions-preview">
               {generatedExam.questions.map((q) => (
-                <div
-                  key={q.q_id}
-                  style={{
-                    marginBottom: "20px",
-                    padding: "10px",
-                    border: "1px solid #ddd",
-                    borderRadius: "5px",
-                  }}
-                >
+                <div key={q.q_id} className="question-card">
                   <strong>Q{q.q_id}.</strong> {q.question}
                   <ul>
                     {Object.entries(q.options).map(([key, value]) => (
@@ -164,9 +138,9 @@ const formatDifficulty = (lvl) => {
                       </li>
                     ))}
                   </ul>
-                  <p>
-                    <strong>Correct Answer:</strong> {q.correct}
-                  </p>
+                  <div className="correct-answer">
+                    Correct Answer: {q.correct}
+                  </div>
                 </div>
               ))}
             </div>
