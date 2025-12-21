@@ -217,209 +217,127 @@ const AdminPanel = () => {
 
       {/* ===== CREATE EXAM ===== */}
       {/* ===== CREATE EXAM ===== */}
-{activeTab === "add-quiz" && (
-   
-  <div className="tab-panel" style={{ textAlign: "center", padding: "30px" }}>
-
-    
-
-    {/* STEP 1: CATEGORY */}
-    {!createExamCategory && (
-      <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-        <button
-           className="dashboard-button"
-           onClick={() => setCreateExamCategory("selective")}
-         >
-           Selective Exam
-         </button>
+         {activeTab === "add-quiz" && (
+            
+           <div className="tab-panel" style={{ textAlign: "center", padding: "30px" }}>
          
-         <button
-           className="dashboard-button"
-           onClick={() => setCreateExamCategory("foundational")}
-         >
-           Foundational Exam
-         </button>
-
-      </div>
-    )}
-
-    {/* STEP 2: SELECTIVE OPTIONS */}
-    {createExamCategory === "selective" && !createExamType && (
-      <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-        <button
-           className="dashboard-button"
-           onClick={() => setCreateExamType("thinking_skills")}
-         >
-           Thinking Skills
-         </button>
+             
          
-         <button
-           className="dashboard-button"
-           onClick={() => setCreateExamType("mathematical_reasoning")}
-         >
-           Mathematical Reasoning
-         </button>
+             {/* STEP 1: CATEGORY */}
+             {!createExamCategory && (
+               <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+                 <button
+                    className="dashboard-button"
+                    onClick={() => setCreateExamCategory("selective")}
+                  >
+                    Selective Exam
+                  </button>
+                  
+                  <button
+                    className="dashboard-button"
+                    onClick={() => setCreateExamCategory("foundational")}
+                  >
+                    Foundational Exam
+                  </button>
          
-         <button
-           className="dashboard-button"
-           onClick={() => setCreateExamType("reading")}
-         >
-           Reading
-         </button>
+               </div>
+             )}
          
-         <button
-           className="dashboard-button"
-           onClick={() => setCreateExamType("writing")}
-         >
-           Writing
-         </button>
-
-      </div>
-    )}
-
-    {/* STEP 2B: FOUNDATIONAL */}
-    {createExamCategory === "foundational" && !createExamType && (
-      <button
-        className="dashboard-button"
-        onClick={() => setCreateExamType("foundational")}
-      >
-        Foundational Exam
-      </button>
-
-    )}
-
-    {/* STEP 3: FORMS */}
-    {createExamType === "thinking_skills" && <QuizSetup />}
-    {createExamType === "mathematical_reasoning" && <QuizSetup_MathematicalReasoning />}
-    {createExamType === "foundational" && <QuizSetup_foundational />}
-    {createExamType === "reading" && <QuizSetup_reading />}
-    {createExamType === "writing" && <QuizSetup_writing />}
-
-  </div>
-)}
-
-
-      {/* ===== GENERATE EXAM ===== */}
-      {/* ===== GENERATE EXAM ===== */}
-      {activeTab === "generate-exam" && (
-        <div className="tab-panel" style={{ textAlign: "center", padding: "30px" }}>
-      
-          {/* ===============================
-              STEP 1: SELECT CATEGORY
-          =============================== */}
-          {generateExamStep === "category" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-              <button
-                className="dashboard-button"
-                onClick={() => {
-                  setGenerateExamCategory("selective");
-                  setGenerateExamStep("type");
-                }}
-              >
-                Selective Exam
-              </button>
-      
-              <button
-                className="dashboard-button"
-                onClick={() => {
-                  setGenerateExamCategory("foundational");
-                  setGenerateExamType("foundational");
-                  setGenerateExamStep("generate");
-                }}
-              >
-                Foundational Exam
-              </button>
-            </div>
-          )}
-      
-          {/* ===============================
-              STEP 2: SELECTIVE SUBJECT
-          =============================== */}
-          {generateExamStep === "type" &&
-            generateExamCategory === "selective" && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-                <button
-                 className="dashboard-button"
-                 onClick={() => {
-                   // SWAPPED
-                   setGenerateExamType("mathematical_reasoning");
-                   setGenerateExamStep("generate");
-                 }}
-               >
-                 Thinking Skills
-               </button>
-               
+             {/* STEP 2: SELECTIVE OPTIONS */}
+             {createExamCategory === "selective" && !createExamType && (
+               <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+                 <button
+                    className="dashboard-button"
+                    onClick={() => setCreateExamType("thinking_skills")}
+                  >
+                    Thinking Skills
+                  </button>
+                  
+                  <button
+                    className="dashboard-button"
+                    onClick={() => setCreateExamType("mathematical_reasoning")}
+                  >
+                    Mathematical Reasoning
+                  </button>
+                  
+                  <button
+                    className="dashboard-button"
+                    onClick={() => setCreateExamType("reading")}
+                  >
+                    Reading
+                  </button>
+                  
+                  <button
+                    className="dashboard-button"
+                    onClick={() => setCreateExamType("writing")}
+                  >
+                    Writing
+                  </button>
+         
+               </div>
+             )}
+         
+             {/* STEP 2B: FOUNDATIONAL */}
+             {createExamCategory === "foundational" && !createExamType && (
                <button
                  className="dashboard-button"
-                 onClick={() => {
-                   // SWAPPED
-                   setGenerateExamType("thinking_skills");
-                   setGenerateExamStep("generate");
-                 }}
+                 onClick={() => setCreateExamType("foundational")}
                >
-                 Mathematical Reasoning
+                 Foundational Exam
                </button>
-               
-               <button
-                 className="dashboard-button"
-                 onClick={() => {
-                   setGenerateExamType("reading");
-                   setGenerateExamStep("generate");
-                 }}
-               >
-                 Reading
-               </button>
-               
-               <button
-                 className="dashboard-button"
-                 onClick={() => {
-                   setGenerateExamType("writing");
-                   setGenerateExamStep("generate");
-                 }}
-               >
-                 Writing
-               </button>
-
-              </div>
-            )}
-      
-          {/* ===============================
+         
+             )}
+         
+             {/* STEP 3: FORMS */}
+             {createExamType === "thinking_skills" && <QuizSetup />}
+             {createExamType === "mathematical_reasoning" && <QuizSetup_MathematicalReasoning />}
+             {createExamType === "foundational" && <QuizSetup_foundational />}
+             {createExamType === "reading" && <QuizSetup_reading />}
+             {createExamType === "writing" && <QuizSetup_writing />}
+         
+           </div>
+         )}
+         
+         
+               {/* ===============================
              STEP 3: GENERATE EXAM
          =============================== */}
+         <>
+           {/* SELECTIVE — THINKING SKILLS */}
+           {generateExamStep === "generate" &&
+             generateExamCategory === "selective" &&
+             generateExamType === "thinking_skills" && (
+               <GenerateExam_thinking_skills />
+           )}
          
-         {/* SELECTIVE — THINKING SKILLS */}
-         {generateExamStep === "generate" &&
-           generateExamCategory === "selective" &&
-           generateExamType === "thinking_skills" && (
-             <GenerateExam_thinking_skills />
-         )}
+           {/* SELECTIVE — MATHEMATICAL REASONING */}
+           {generateExamStep === "generate" &&
+             generateExamCategory === "selective" &&
+             generateExamType === "mathematical_reasoning" && (
+               <GenerateExam examType="mathematical_reasoning" />
+           )}
          
-         {/* SELECTIVE — MATHEMATICAL REASONING */}
-         {generateExamStep === "generate" &&
-           generateExamCategory === "selective" &&
-           generateExamType === "mathematical_reasoning" && (
-             <GenerateExam examType="mathematical_reasoning" />
-         )}
+           {/* SELECTIVE — READING */}
+           {generateExamStep === "generate" &&
+             generateExamCategory === "selective" &&
+             generateExamType === "reading" && (
+               <GenerateExam_reading />
+           )}
          
-         {/* SELECTIVE — READING */}
-         {generateExamStep === "generate" &&
-           generateExamCategory === "selective" &&
-           generateExamType === "reading" && (
-             <GenerateExam_reading />
-         )}
+           {/* SELECTIVE — WRITING */}
+           {generateExamStep === "generate" &&
+             generateExamCategory === "selective" &&
+             generateExamType === "writing" && (
+               <GenerateExam_writing />
+           )}
          
-         {/* SELECTIVE — WRITING */}
-         {generateExamStep === "generate" &&
-           generateExamCategory === "selective" &&
-           generateExamType === "writing" && (
-             <GenerateExam_writing />
-         )}
-         
-         {/* FOUNDATIONAL */}
-         {generateExamStep === "generate" &&
-           generateExamCategory === "foundational" && (
-             <GenerateExam_foundational />
-         )}
+           {/* FOUNDATIONAL */}
+           {generateExamStep === "generate" &&
+             generateExamCategory === "foundational" && (
+               <GenerateExam_foundational />
+           )}
+         </>
+
 
 
     </div>
