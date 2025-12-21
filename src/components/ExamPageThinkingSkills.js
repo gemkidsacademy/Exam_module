@@ -66,7 +66,7 @@ export default function ExamPageThinkingSkills() {
     const startExam = async () => {
       try {
         const res = await fetch(
-          "https://web-production-481a5.up.railway.app/api/student/start-exam",
+          "https://web-production-481a5.up.railway.app//api/student/start-exam-thinkingskills",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
