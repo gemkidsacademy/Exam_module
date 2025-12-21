@@ -62,17 +62,10 @@ export default function GenerateExam_thinking_skills() {
      Generate Exam
   =========================== */
   const handleGenerateExam = async () => {
-    if (!selectedClass || !selectedDifficulty) {
-      alert("Please select class and difficulty");
+    if (!selectedQuiz) {
+      alert("Please select a quiz before generating the exam.");
       return;
     }
-
-    const payload = {
-      class_name: selectedClass,
-      difficulty: selectedDifficulty
-    };
-
-    console.log("📤 Sending payload:", payload);
 
     setLoading(true);
     setError("");
@@ -80,30 +73,22 @@ export default function GenerateExam_thinking_skills() {
 
     try {
       const res = await fetch(
-        `${BACKEND_URL}/api/exams/generate-thinking-skills`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        }
+        `${BACKEND_URL}/api/exams/generate-thinking-skills/${selectedQuiz}`,
+        { method: "POST" }
       );
 
       const data = await res.json();
-      console.log("📥 Response JSON:", data);
 
       if (!res.ok) {
-        setError(data.detail || "Failed to generate exam.");
-        alert("❌ Error: " + (data.detail || "Failed to generate exam."));
-        setLoading(false);
-        return;
+        throw new Error(data.detail || "Exam generation failed");
       }
 
       setGeneratedExam(data);
-      alert("✅ Exam generated successfully!");
+      alert("Exam generated successfully!");
+
     } catch (err) {
       console.error(err);
-      alert("❌ Network error while generating exam.");
-      setError("Network error");
+      setError("Failed to generate exam. Check console for details.");
     }
 
     setLoading(false);
@@ -126,35 +111,24 @@ export default function GenerateExam_thinking_skills() {
           value={selectedQuiz ? JSON.stringify(selectedQuiz) : ""}
           onChange={(e) => {
             const parsed = JSON.parse(e.target.value);
-
-            console.log("📘 Class selected:", parsed.class_name);
-            console.log("📙 Difficulty selected:", parsed.difficulty);
-
-            setSelectedQuiz(parsed);
+        
+            setSelectedQuiz(parsed);   // ✅ now includes topics[]
             setSelectedClass(parsed.class_name);
             setSelectedDifficulty(parsed.difficulty);
           }}
-          style={{
-            padding: "8px",
-            minWidth: "260px",
-            display: "block",
-            marginTop: "10px"
-          }}
         >
           <option value="">-- Select Quiz Requirement --</option>
-
+        
           {quizzes.map((q) => (
             <option
               key={`${q.class_name}-${q.difficulty}`}
-              value={JSON.stringify({
-                class_name: q.class_name,
-                difficulty: q.difficulty
-              })}
+              value={JSON.stringify(q)}   // ✅ full object
             >
-              {`${formatClassName(q.class_name)} | ${formatDifficulty(q.difficulty)}`}
+              {formatClassName(q.class_name)} | {formatDifficulty(q.difficulty)}
             </option>
           ))}
         </select>
+
       </div>
 
       {/* -------- Topics Preview -------- */}
