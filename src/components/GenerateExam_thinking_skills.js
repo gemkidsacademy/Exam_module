@@ -47,8 +47,13 @@ export default function GenerateExam_thinking_skills() {
         if (!res.ok) throw new Error("Failed to load quizzes");
 
         const data = await res.json();
-        console.log("📦 Loaded thinking skills quizzes:", data);
-        setQuizzes(data);
+
+        // ✅ normalize to array
+        const quizArray = Array.isArray(data)
+          ? data
+          : Object.values(data);
+        
+        setQuizzes(quizArray);
       } catch (err) {
         console.error("❌ Error loading quizzes:", err);
         setError("Failed to load quizzes.");
