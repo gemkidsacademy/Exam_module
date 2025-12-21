@@ -95,7 +95,7 @@ const formatDifficulty = (lvl) => {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Generate Exam</h2>
+      <h2>Generate Mathematical Reasoning Exam</h2>
 
       {/* Error message */}
       {error && <div style={{ color: "red" }}>{error}</div>}
