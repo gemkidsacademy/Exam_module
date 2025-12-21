@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import generateexam.css
 
 export default function GenerateExam_thinking_skills() {
   const [difficulty, setDifficulty] = useState("");
