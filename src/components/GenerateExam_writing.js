@@ -1,21 +1,18 @@
 import React, { useState, useEffect } from "react";
+import "./generateexam_writing.css";
 
 export default function GenerateExam_writing() {
   const [quizzes, setQuizzes] = useState([]);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
-
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
 
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
-  /* ---------------------------
-     Formatting Helpers
-  --------------------------- */
+  /* ---------------- Formatting Helpers ---------------- */
   const formatClassName = (cls) => {
     switch (cls) {
       case "year5": return "Year 5";
@@ -34,9 +31,7 @@ export default function GenerateExam_writing() {
     }
   };
 
-  /* ---------------------------
-     LOAD WRITING QUIZ CONFIGS
-  --------------------------- */
+  /* ---------------- Load Writing Quiz Configs ---------------- */
   useEffect(() => {
     const load = async () => {
       try {
@@ -44,9 +39,6 @@ export default function GenerateExam_writing() {
         if (!res.ok) throw new Error("Failed to load writing quizzes");
 
         const data = await res.json();
-        console.log("📦 Loaded writing quizzes:", data);
-
-        // We only keep class + difficulty here
         const filtered = data.map((q) => ({
           class_name: q.class_name,
           difficulty: q.difficulty
@@ -54,7 +46,7 @@ export default function GenerateExam_writing() {
 
         setQuizzes(filtered);
       } catch (err) {
-        console.error("❌ Error loading writing quizzes:", err);
+        console.error(err);
         setError("Failed to load writing quizzes.");
       }
     };
@@ -62,21 +54,12 @@ export default function GenerateExam_writing() {
     load();
   }, []);
 
-  /* ---------------------------
-     GENERATE WRITING EXAM
-  --------------------------- */
+  /* ---------------- Generate Writing Exam ---------------- */
   const handleGenerateExam = async () => {
     if (!selectedClass || !selectedDifficulty) {
       alert("Please select class and difficulty");
       return;
     }
-
-    const payload = {
-      class_name: selectedClass,
-      difficulty: selectedDifficulty
-    };
-
-    console.log("📤 Sending payload:", payload);
 
     setLoading(true);
     setError("");
@@ -88,71 +71,48 @@ export default function GenerateExam_writing() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({
+            class_name: selectedClass,
+            difficulty: selectedDifficulty
+          })
         }
       );
 
       const data = await res.json();
-      console.log("📥 Response JSON:", data);
-
-      if (!res.ok) {
-        setError(data.detail || "Failed to generate writing exam.");
-        alert("❌ Error: " + (data.detail || "Failed to generate writing exam."));
-        setLoading(false);
-        return;
-      }
+      if (!res.ok) throw new Error(data.detail || "Failed to generate exam");
 
       setGeneratedExam(data);
-      alert("✅ Writing exam generated successfully!");
     } catch (err) {
       console.error(err);
-      alert("❌ Network error while generating writing exam.");
-      setError("Network error");
+      setError("Network error while generating writing exam.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
-  /* ---------------------------
-     UI
-  --------------------------- */
+  /* ---------------- UI ---------------- */
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="generate-writing-container">
       <h2>Generate Writing Exam</h2>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <div className="error-text">{error}</div>}
 
-      <div style={{ marginBottom: "20px" }}>
-        <label>Select Writing Configuration:</label>
-
+      <div className="form-group">
+        <label>Select Writing Configuration</label>
         <select
           value={selectedQuiz ? JSON.stringify(selectedQuiz) : ""}
           onChange={(e) => {
             const parsed = JSON.parse(e.target.value);
-
-            console.log("📘 Class:", parsed.class_name);
-            console.log("📙 Difficulty:", parsed.difficulty);
-
             setSelectedQuiz(parsed);
             setSelectedClass(parsed.class_name);
             setSelectedDifficulty(parsed.difficulty);
           }}
-          style={{
-            padding: "8px",
-            minWidth: "300px",
-            display: "block",
-            marginTop: "10px"
-          }}
         >
           <option value="">-- Select Writing Quiz --</option>
-
           {quizzes.map((q) => (
             <option
               key={`${q.class_name}-${q.difficulty}`}
-              value={JSON.stringify({
-                class_name: q.class_name,
-                difficulty: q.difficulty
-              })}
+              value={JSON.stringify(q)}
             >
               {`${formatClassName(q.class_name)} | ${formatDifficulty(q.difficulty)}`}
             </option>
@@ -160,42 +120,22 @@ export default function GenerateExam_writing() {
         </select>
       </div>
 
-      {/* ------------ Generate Button ------------ */}
       <button
+        className="primary-btn"
         onClick={handleGenerateExam}
         disabled={loading}
-        style={{
-          padding: "10px 18px",
-          backgroundColor: "#673ab7",
-          color: "white",
-          border: "none",
-          cursor: loading ? "not-allowed" : "pointer"
-        }}
       >
         {loading ? "Generating..." : "Generate Writing Exam"}
       </button>
 
-      {/* ------------ Preview Generated Writing Exam ------------ */}
       {generatedExam && (
-        <div style={{ marginTop: "30px" }}>
+        <div className="generated-output">
           <h3>Generated Writing Prompt</h3>
 
-          <p>
-            <strong>Class:</strong> {generatedExam.class_name}
-          </p>
+          <p><strong>Class:</strong> {generatedExam.class_name}</p>
+          <p><strong>Difficulty:</strong> {generatedExam.difficulty}</p>
 
-          <p>
-            <strong>Difficulty:</strong> {generatedExam.difficulty}
-          </p>
-
-          <div
-            style={{
-              padding: "15px",
-              border: "1px solid #ccc",
-              background: "#fafafa",
-              whiteSpace: "pre-wrap"
-            }}
-          >
+          <div className="writing-prompt">
             {generatedExam.question_text}
           </div>
         </div>
