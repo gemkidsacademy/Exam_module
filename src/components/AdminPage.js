@@ -72,15 +72,14 @@ const AdminPanel = () => {
   ============================ */
   useEffect(() => {
      if (activeTab === "add-quiz") {
-       // entering Create Exam → start clean
        setCreateExamCategory(null);
        setCreateExamType(null);
      }
    
      if (activeTab === "generate-exam") {
-       // entering Generate Exam → start clean
        setGenerateExamCategory(null);
        setGenerateExamType(null);
+       setGenerateExamStep("category"); // ✅ FIX
      }
    }, [activeTab]);
 
