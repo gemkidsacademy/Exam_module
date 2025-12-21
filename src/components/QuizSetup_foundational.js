@@ -164,15 +164,16 @@ export default function QuizSetup_foundational() {
             <label>Subject:</label>
             <select
               value={quiz.subject}
-              onChange={(e) => setQuiz((prev) => ({ ...prev, subject: e.target.value }))}
+              onChange={(e) =>
+                setQuiz((prev) => ({ ...prev, subject: e.target.value }))
+              }
             >
               <option value="">Select Subject</option>
-              <option value="thinking_skills">Thinking Skills</option>
-              <option value="maths">Foundational</option>
-              <option value="reading">Reading</option>
-              <option value="writing">Writing</option>
+              <option value="english">English</option>
+              <option value="maths">Maths</option>
             </select>
           </div>
+
         </div>
 
         {/* ---------- SECTIONS GRID ---------- */}
