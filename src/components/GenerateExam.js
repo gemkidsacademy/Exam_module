@@ -44,51 +44,30 @@ export default function GenerateExam() {
   };
 
   /* ---------------- FETCH QUIZZES ---------------- */
-  useEffect(() => {
-    const fetchQuizzes = async () => {
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/quizzes`);
-        if (!res.ok) throw new Error("Failed to load quizzes");
-        const data = await res.json();
-        setQuizzes(data);
-      } catch (err) {
-        console.error(err);
-        setError("Error loading quizzes from backend.");
-      }
-    };
-
-    fetchQuizzes();
-  }, []);
-
+  
   /* ---------------- GENERATE EXAM ---------------- */
   const handleGenerateExam = async () => {
-    if (!selectedQuiz) {
-      alert("Please select a quiz before generating the exam.");
-      return;
-    }
+  setLoading(true);
+  setError("");
+  setGeneratedExam(null);
 
-    setLoading(true);
-    setError("");
-    setGeneratedExam(null);
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/api/exams/generate`,
+      { method: "POST" }
+    );
 
-    try {
-      const res = await fetch(
-        `${BACKEND_URL}/api/exams/generate/${selectedQuiz}`,
-        { method: "POST" }
-      );
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Exam generation failed");
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || "Exam generation failed");
-
-      setGeneratedExam(data);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to generate exam. Check console for details.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+    setGeneratedExam(data);
+  } catch (err) {
+    console.error(err);
+    setError("Failed to generate exam. Check console for details.");
+  } finally {
+    setLoading(false);
+  }
+};
   /* ---------------- UI ---------------- */
   return (
     <div className="generate-exam-container">
