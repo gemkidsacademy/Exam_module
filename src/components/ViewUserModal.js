@@ -30,7 +30,8 @@ export default function ViewUserModal({ onClose }) {
   }, []);
 
   return (
-    <div className="add-student-container">
+    <div className="add-student-container full-width">
+
       <h2>View Students</h2>
 
       {loading ? (
