@@ -153,3 +153,12 @@
 .students-table tr:nth-child(even) {
   background-color: #fafafa;
 }
+
+/* =======================
+   Wide container (View mode)
+======================= */
+.add-student-container.full-width {
+  max-width: 100%;
+  margin: 20px 0;
+  padding: 24px;
+}
