@@ -140,10 +140,7 @@ const AdminPanel = () => {
       {activeTab === "database" && (
         <div className="tab-panel">
 
-          <div className="user-management-header">
-            <h2>Exam Module Users</h2>
-            <p>Manage student accounts for the exam system.</p>
-          </div>
+          
 
           <div className="user-actions-grid">
             <div className="action-card" onClick={() => setShowAddUser(true)}>
