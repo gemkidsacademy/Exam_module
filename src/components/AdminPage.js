@@ -81,6 +81,11 @@ const AdminPanel = () => {
      }
    }, [activeTab]);
 
+   useEffect(() => {
+     if (activeTab !== "database") {
+       setUserMode("menu");
+     }
+   }, [activeTab]);
 
   /* ============================
      Tabs Config
