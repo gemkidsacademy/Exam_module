@@ -53,7 +53,7 @@ export default function GenerateExam() {
 
   try {
     const res = await fetch(
-      `${BACKEND_URL}/api/quizzes/generate`,
+      `${BACKEND_URL}/api/generate-exam-mathematical-reasoning`,
       { method: "POST" }
     );
 
