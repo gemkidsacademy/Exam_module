@@ -53,8 +53,16 @@ export default function GenerateExam() {
 
   try {
     const res = await fetch(
-      `${BACKEND_URL}/api/exams/generate-thinking-skills`,
-      { method: "POST" }
+      `${BACKEND_URL}/api/quizzes/generate`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          difficulty: "medium", // or selectedDifficulty from UI
+        }),
+      }
     );
 
     const data = await res.json();
@@ -68,6 +76,7 @@ export default function GenerateExam() {
     setLoading(false);
   }
 };
+
   /* ---------------- UI ---------------- */
   return (
     <div className="generate-exam-container">
