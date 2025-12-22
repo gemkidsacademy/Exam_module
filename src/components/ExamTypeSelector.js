@@ -15,6 +15,7 @@ export default function ExamTypeSelector({ examType, onSelect }) {
   ];
 
   if (examType === "thinkingskills") return <UploadWord />;
+  if (examType === "foundational") return <UploadWord />;
   if (examType === "reading") return <ReadingUploadPanel />;
   if (examType === "writing") return <UploadWord_writing />;
 
