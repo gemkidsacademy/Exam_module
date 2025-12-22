@@ -7,19 +7,14 @@ export default function UploadImageFolder() {
 
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
-  // Handle folder selection
   const handleFolderSelect = (e) => {
     const selectedFiles = Array.from(e.target.files);
-
-    // Filter only images
     const imageFiles = selectedFiles.filter((f) =>
       f.type.startsWith("image/")
     );
-
     setFiles(imageFiles);
   };
 
-  // Upload folder to backend
   const handleUpload = async () => {
     if (files.length === 0) {
       alert("Please select a folder containing images.");
@@ -40,28 +35,25 @@ export default function UploadImageFolder() {
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.detail || "Upload failed");
-      }
+      if (!res.ok) throw new Error(data.detail || "Upload failed");
 
       alert(data.message || "Images uploaded successfully!");
       setFiles([]);
-
     } catch (err) {
       console.error(err);
-      alert("Failed to upload image folder. Check console for details.");
+      alert("Failed to upload image folder.");
     } finally {
       setUploading(false);
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="upload-folder-container">
       <h3>Upload Exam Image Folder</h3>
 
-      {/* Folder Input */}
+      {/* Folder input */}
       <input
+        className="folder-input"
         type="file"
         webkitdirectory="true"
         directory="true"
@@ -69,34 +61,27 @@ export default function UploadImageFolder() {
         onChange={handleFolderSelect}
       />
 
-      <br />
-
-      {/* Show selected file count */}
-      <p style={{ marginTop: "10px", fontWeight: "bold" }}>
+      {/* File count */}
+      <div className="file-count">
         {files.length} image(s) selected
-      </p>
+      </div>
 
-      {/* List of selected files */}
+      {/* File list */}
       {files.length > 0 && (
-        <ul style={{ maxHeight: "200px", overflowY: "auto", padding: "5px" }}>
+        <ul className="file-list">
           {files.map((file, index) => (
-            <li key={index}>{file.webkitRelativePath || file.name}</li>
+            <li key={index}>
+              {file.webkitRelativePath || file.name}
+            </li>
           ))}
         </ul>
       )}
 
-      {/* Upload Button */}
+      {/* Upload button */}
       <button
+        className="upload-btn"
         onClick={handleUpload}
         disabled={uploading}
-        style={{
-          padding: "10px 18px",
-          backgroundColor: "#4caf50",
-          color: "white",
-          border: "none",
-          cursor: "pointer",
-          marginTop: "15px",
-        }}
       >
         {uploading ? "Uploading..." : "Upload Folder"}
       </button>
