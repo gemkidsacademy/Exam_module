@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./deleteuserform.css";
+import "./AddStudentForm.css";
 
 function DeleteUserModal({ onClose, onUserDeleted }) {
   const [studentOptions, setStudentOptions] = useState([]);
@@ -92,45 +92,54 @@ function DeleteUserModal({ onClose, onUserDeleted }) {
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal">
-        <h3>Delete Student</h3>
+  <div className="add-student-container">
+    <h2>Delete Student</h2>
 
-        {/* Dropdown */}
-        <label>Select Student</label>
-        <select
-          value={selectedStudentId}
-          onChange={(e) => setSelectedStudentId(e.target.value)}
-        >
-          <option value="">-- Select Student --</option>
-          {studentOptions.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.student_id} - {s.name}
-            </option>
-          ))}
-        </select>
+    {/* Dropdown */}
+    <label>Select Student</label>
+    <select
+      value={selectedStudentId}
+      onChange={(e) => setSelectedStudentId(e.target.value)}
+    >
+      <option value="">-- Select Student --</option>
+      {studentOptions.map((s) => (
+        <option key={s.id} value={s.id}>
+          {s.student_id} - {s.name}
+        </option>
+      ))}
+    </select>
 
-        {/* Read-only details */}
-        <input type="text" value={id} placeholder="ID" readOnly />
-        <input type="text" value={name} placeholder="Name" readOnly />
-        <input type="text" value={className} placeholder="Class" readOnly />
-        <input type="text" value={classDay} placeholder="Day" readOnly />
-        <input
-          type="email"
-          value={parentEmail}
-          placeholder="Parent Email"
-          readOnly
-        />
+    {/* Read-only details */}
+    <label>ID</label>
+    <input type="text" value={id} readOnly />
 
-        <div className="modal-actions">
-          <button className="danger-btn" onClick={handleDelete}>
-            Delete Student
-          </button>
-          <button onClick={onClose}>Cancel</button>
-        </div>
-      </div>
-    </div>
-  );
+    <label>Name</label>
+    <input type="text" value={name} readOnly />
+
+    <label>Class</label>
+    <input type="text" value={className} readOnly />
+
+    <label>Day</label>
+    <input type="text" value={classDay} readOnly />
+
+    <label>Parent Email</label>
+    <input type="email" value={parentEmail} readOnly />
+
+    <button
+      className="danger-btn"
+      type="button"
+      onClick={handleDelete}
+      disabled={!id}
+    >
+      Delete Student
+    </button>
+
+    <button type="button" onClick={onClose}>
+      ← Back to User Management
+    </button>
+  </div>
+);
+
 }
 
 export default DeleteUserModal;
