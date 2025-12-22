@@ -75,20 +75,7 @@ export default function GenerateExam() {
 
       {error && <div className="error-text">{error}</div>}
 
-      <div className="form-group">
-        <label>Select Quiz</label>
-        <select
-          value={selectedQuiz}
-          onChange={(e) => setSelectedQuiz(e.target.value)}
-        >
-          <option value="">-- Select Quiz Requirement --</option>
-          {quizzes.map((q) => (
-            <option key={q.id} value={q.id}>
-              {`${formatClassName(q.class_name)} | ${formatSubject(q.subject)} | ${formatDifficulty(q.difficulty)}`}
-            </option>
-          ))}
-        </select>
-      </div>
+      
 
       <button
         className="primary-btn"
