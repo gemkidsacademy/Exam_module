@@ -8,7 +8,7 @@ import "./AdminPanel.css";
 import AddUserForm from "./AddUserForm";
 import EditUserForm from "./EditUserForm";
 import ViewUserModal from "./ViewUserModal";
-import DeleteUserForm from "./DeleteUserForm";
+import DeleteUserForm from "./DeleteUserModal";
 
 import GenerateExam from "./GenerateExam";
 import GenerateExam_reading from "./GenerateExam_reading";
