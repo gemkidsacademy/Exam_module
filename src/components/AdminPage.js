@@ -87,6 +87,13 @@ const AdminPanel = () => {
      }
    }, [activeTab]);
 
+   useEffect(() => {
+     if (activeTab !== "exam-type-selector") {
+       setCreateExamType("");
+     }
+   }, [activeTab]);
+
+
   /* ============================
      Tabs Config
   ============================ */
