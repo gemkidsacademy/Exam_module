@@ -135,62 +135,58 @@ const AdminPanel = () => {
 
     {/* ---------- Content ---------- */}
     <div className="tab-content">
-
-      {/* ===== USER MANAGEMENT ===== */}
+      {/* ===== USER MANAGEMENT   ===== */}
       {activeTab === "database" && (
         <div className="tab-panel">
-
-          
-
-          <div className="user-actions-grid">
-            <div className="action-card" onClick={() => setShowAddUser(true)}>
-              <h3>Add User</h3>
-              <p>Create a new student account</p>
+      
+          {/* ================= MENU ================= */}
+          {userMode === "menu" && (
+            <div className="user-actions-grid">
+              <div className="action-card" onClick={() => setUserMode("add")}>
+                <h3>Add User</h3>
+                <p>Create a new student account</p>
+              </div>
+      
+              <div className="action-card" onClick={() => setUserMode("edit")}>
+                <h3>Edit User</h3>
+                <p>Update student details</p>
+              </div>
+      
+              <div className="action-card" onClick={() => setUserMode("view")}>
+                <h3>View Users</h3>
+                <p>Browse existing students</p>
+              </div>
+      
+              <div
+                className="action-card danger"
+                onClick={() => setUserMode("delete")}
+              >
+                <h3>Delete User</h3>
+                <p>Remove a student account</p>
+              </div>
             </div>
-
-            <div className="action-card" onClick={() => setShowEditUser(true)}>
-              <h3>Edit User</h3>
-              <p>Update student details</p>
-            </div>
-
-            <div className="action-card" onClick={() => setShowViewUser(true)}>
-              <h3>View Users</h3>
-              <p>Browse existing students</p>
-            </div>
-
-            <div
-              className="action-card danger"
-              onClick={() => setShowDeleteUser(true)}
-            >
-              <h3>Delete User</h3>
-              <p>Remove a student account</p>
-            </div>
-          </div>
-
-          {showAddUser && (
-            <AddUserForm
-              onClose={() => setShowAddUser(false)}
-              onUserAdded={handleUserAdded}
-            />
           )}
-
-          {showEditUser && (
-            <EditUserForm
-              onClose={() => setShowEditUser(false)}
-              onUserUpdated={handleUserUpdated}
-            />
+      
+          {/* ================= ADD ================= */}
+          {userMode === "add" && (
+            <AddUserForm onClose={() => setUserMode("menu")} />
           )}
-
-          {showViewUser && (
-            <ViewUserModal onClose={() => setShowViewUser(false)} />
+      
+          {/* ================= EDIT ================= */}
+          {userMode === "edit" && (
+            <EditUserForm onClose={() => setUserMode("menu")} />
           )}
-
-          {showDeleteUser && (
-            <DeleteUserModal
-              onClose={() => setShowDeleteUser(false)}
-              onUserDeleted={handleUserDeleted}
-            />
+      
+          {/* ================= VIEW ================= */}
+          {userMode === "view" && (
+            <ViewUserModal onClose={() => setUserMode("menu")} />
           )}
+      
+          {/* ================= DELETE ================= */}
+          {userMode === "delete" && (
+            <DeleteUserModal onClose={() => setUserMode("menu")} />
+          )}
+      
         </div>
       )}
 
