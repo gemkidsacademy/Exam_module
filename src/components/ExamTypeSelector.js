@@ -9,13 +9,13 @@ import UploadWord_writing from "./UploadWord_writing";
 export default function ExamTypeSelector({ examType, onSelect }) {
   const examOptions = [
     { label: "Thinking Skills Exam", value: "thinkingskills" },
-    { label: "Foundational Exam", value: "foundational" },
+    { label: "Mathematical Reasoning", value: "mathematical-reasoning" },
     { label: "Reading Exam", value: "reading" },
     { label: "Writing Exam", value: "writing" },
   ];
 
   if (examType === "thinkingskills") return <UploadWord />;
-  if (examType === "foundational") return <UploadWord />;
+  if (examType === "mathematical-reasoning") return <UploadWord />;
   if (examType === "reading") return <ReadingUploadPanel />;
   if (examType === "writing") return <UploadWord_writing />;
 
