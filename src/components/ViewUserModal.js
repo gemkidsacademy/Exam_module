@@ -1,65 +1,89 @@
-import { useState, useEffect } from "react";
-import "./AddStudentForm.css"; // reuse AddStudentForm styling
+import { useEffect, useState } from "react";
+import "./AddStudentForm.css"; // reuse same styling if you want
 
 export default function ViewUserModal({ onClose }) {
-  const [users, setUsers] = useState([]);
+  const [studentOptions, setStudentOptions] = useState([]);
+  const [selectedStudentId, setSelectedStudentId] = useState("");
+  const [student, setStudent] = useState(null);
 
+  // Fetch students
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchStudents = async () => {
       try {
         const res = await fetch(
-          "https://krishbackend-production.up.railway.app/users-exam-module/list"
+          "https://web-production-481a5.up.railway.app/get_all_students_exam_module"
         );
-        if (!res.ok) throw new Error("Failed to fetch users");
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch students");
+        }
+
         const data = await res.json();
-        setUsers(data);
+        setStudentOptions(data);
       } catch (err) {
         console.error(err);
-        alert("Error fetching users");
+        alert("Unable to load students");
       }
     };
 
-    fetchUsers();
+    fetchStudents();
   }, []);
+
+  // Load selected student
+  useEffect(() => {
+    if (!selectedStudentId) {
+      setStudent(null);
+      return;
+    }
+
+    const found = studentOptions.find(
+      (s) => s.student_id === selectedStudentId
+    );
+    setStudent(found || null);
+  }, [selectedStudentId, studentOptions]);
 
   return (
     <div className="add-student-container">
-      <h2>All Users</h2>
+      <h2>View Student</h2>
 
-      {users.length === 0 ? (
-        <p style={{ textAlign: "center", marginTop: "20px" }}>No users found.</p>
-      ) : (
-        <div style={{ overflowX: "auto", marginTop: "20px" }}>
-          <table className="user-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Class</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td>{user.id}</td>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>{user.phone_number || "-"}</td>
-                  <td>{user.class_name || "-"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <label>Select Student</label>
+      <select
+        value={selectedStudentId}
+        onChange={(e) => setSelectedStudentId(e.target.value)}
+      >
+        <option value="">-- Select Student --</option>
+        {studentOptions.map((s) => (
+          <option key={s.id} value={s.student_id}>
+            {s.student_id} - {s.name}
+          </option>
+        ))}
+      </select>
+
+      {student && (
+        <div className="student-view-box">
+          <label>ID</label>
+          <input value={student.id} readOnly />
+
+          <label>Student ID</label>
+          <input value={student.student_id} readOnly />
+
+          <label>Name</label>
+          <input value={student.name} readOnly />
+
+          <label>Class Name</label>
+          <input value={student.class_name} readOnly />
+
+          <label>Class Day</label>
+          <input value={student.class_day} readOnly />
+
+          <label>Parent Email</label>
+          <input value={student.parent_email} readOnly />
         </div>
       )}
 
-      <div style={{ textAlign: "center", marginTop: "20px" }}>
-        <button className="add-student-container-button" onClick={onClose}>
-          Close
-        </button>
-      </div>
+      <button type="button" onClick={onClose}>
+        Close
+      </button>
     </div>
   );
 }
