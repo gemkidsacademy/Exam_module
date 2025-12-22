@@ -126,3 +126,30 @@
     font-size: 1.5rem;
   }
 }
+
+.table-wrapper {
+  margin-top: 16px;
+  overflow-x: auto;
+}
+
+.students-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.students-table th,
+.students-table td {
+  border: 1px solid #e5e7eb;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.students-table th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+.students-table tr:nth-child(even) {
+  background-color: #fafafa;
+}
