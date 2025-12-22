@@ -23,7 +23,7 @@ export default function GenerateExam_thinking_skills() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          difficulty: selectedDifficulty   // ← REQUIRED
+          difficulty: "easy" // fixed difficulty for now
         })
       }
     );
