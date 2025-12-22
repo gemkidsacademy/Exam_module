@@ -51,10 +51,8 @@ const AdminPanel = () => {
   /* ============================
      User Modals
   ============================ */
-  const [showAddUser, setShowAddUser] = useState(false);
-  const [showEditUser, setShowEditUser] = useState(false);
-  const [showViewUser, setShowViewUser] = useState(false);
-  const [showDeleteUser, setShowDeleteUser] = useState(false);
+  const [userMode, setUserMode] = useState("menu");
+  
   const [generateExamStep, setGenerateExamStep] = useState("category"); 
 
   const [createExamCategory, setCreateExamCategory] = useState(null);
