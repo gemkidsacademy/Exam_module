@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import "./AddStudentForm.css"; // reuse same styling if you want
+import "./AddStudentForm.css";
 
 export default function ViewUserModal({ onClose }) {
-  const [studentOptions, setStudentOptions] = useState([]);
-  const [selectedStudentId, setSelectedStudentId] = useState("");
-  const [student, setStudent] = useState(null);
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch students
   useEffect(() => {
     const fetchStudents = async () => {
       try {
@@ -19,65 +17,52 @@ export default function ViewUserModal({ onClose }) {
         }
 
         const data = await res.json();
-        setStudentOptions(data);
+        setStudents(data);
       } catch (err) {
         console.error(err);
         alert("Unable to load students");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchStudents();
   }, []);
 
-  // Load selected student
-  useEffect(() => {
-    if (!selectedStudentId) {
-      setStudent(null);
-      return;
-    }
-
-    const found = studentOptions.find(
-      (s) => s.student_id === selectedStudentId
-    );
-    setStudent(found || null);
-  }, [selectedStudentId, studentOptions]);
-
   return (
     <div className="add-student-container">
-      <h2>View Student</h2>
+      <h2>View Students</h2>
 
-      <label>Select Student</label>
-      <select
-        value={selectedStudentId}
-        onChange={(e) => setSelectedStudentId(e.target.value)}
-      >
-        <option value="">-- Select Student --</option>
-        {studentOptions.map((s) => (
-          <option key={s.id} value={s.student_id}>
-            {s.student_id} - {s.name}
-          </option>
-        ))}
-      </select>
-
-      {student && (
-        <div className="student-view-box">
-          <label>ID</label>
-          <input value={student.id} readOnly />
-
-          <label>Student ID</label>
-          <input value={student.student_id} readOnly />
-
-          <label>Name</label>
-          <input value={student.name} readOnly />
-
-          <label>Class Name</label>
-          <input value={student.class_name} readOnly />
-
-          <label>Class Day</label>
-          <input value={student.class_day} readOnly />
-
-          <label>Parent Email</label>
-          <input value={student.parent_email} readOnly />
+      {loading ? (
+        <p>Loading students...</p>
+      ) : students.length === 0 ? (
+        <p>No students found.</p>
+      ) : (
+        <div className="table-wrapper">
+          <table className="students-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Student ID</th>
+                <th>Name</th>
+                <th>Class</th>
+                <th>Day</th>
+                <th>Parent Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              {students.map((s) => (
+                <tr key={s.id}>
+                  <td>{s.id}</td>
+                  <td>{s.student_id}</td>
+                  <td>{s.name}</td>
+                  <td>{s.class_name}</td>
+                  <td>{s.class_day}</td>
+                  <td>{s.parent_email}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
