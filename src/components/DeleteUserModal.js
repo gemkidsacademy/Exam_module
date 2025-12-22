@@ -1,127 +1,132 @@
 import React, { useState, useEffect } from "react";
-import "./AddUserForm.css"; // reuse modal styling
+import "./deleteuserform.css";
 
-function DeleteUserForm({ onClose, onUserDeleted }) {
-  const [userIds, setUserIds] = useState([]);
-  const [selectedUserId, setSelectedUserId] = useState("");
+function DeleteUserModal({ onClose, onUserDeleted }) {
+  const [studentOptions, setStudentOptions] = useState([]);
+  const [selectedStudentId, setSelectedStudentId] = useState("");
+
+  // Read-only fields
+  const [id, setId] = useState("");
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [parentEmail, setParentEmail] = useState("");
   const [className, setClassName] = useState("");
+  const [classDay, setClassDay] = useState("");
 
-  // Fetch user IDs on mount
+  // 1️⃣ Fetch all students once (same as Edit)
   useEffect(() => {
-    const fetchUserIds = async () => {
-      try {
-        const res = await fetch("https://your-backend-url.com/api/user-ids");
-        if (!res.ok) throw new Error("Failed to fetch user IDs");
-        const data = await res.json();
-        setUserIds(data); // [{id:1},{id:2},...]
-      } catch (err) {
-        console.error(err);
-        alert("Error fetching user IDs");
-      }
-    };
-    fetchUserIds();
-  }, []);
-
-  // Fetch user details when a user ID is selected
-  useEffect(() => {
-    if (!selectedUserId) {
-      setName("");
-      setEmail("");
-      setPhoneNumber("");
-      setClassName("");
-      return;
-    }
-
-    const fetchUserDetails = async () => {
+    const fetchStudents = async () => {
       try {
         const res = await fetch(
-          `https://your-backend-url.com/api/user/${selectedUserId}`
+          "https://web-production-481a5.up.railway.app/get_all_students_exam_module"
         );
-        if (!res.ok) throw new Error("Failed to fetch user details");
-        const user = await res.json();
-        setName(user.name || "");
-        setEmail(user.email || "");
-        setPhoneNumber(user.phone_number || "");
-        setClassName(user.class_name || "");
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch students");
+        }
+
+        const data = await res.json();
+        setStudentOptions(data);
       } catch (err) {
         console.error(err);
-        // Keep fields empty if backend fails
-        setName("");
-        setEmail("");
-        setPhoneNumber("");
-        setClassName("");
+        alert("Unable to load students");
       }
     };
 
-    fetchUserDetails();
-  }, [selectedUserId]);
+    fetchStudents();
+  }, []);
 
-  const handleDelete = async () => {
-    if (!selectedUserId) {
-      alert("Please select a user to delete");
+  // 2️⃣ Populate fields from local list (NO API CALL)
+  useEffect(() => {
+    if (!selectedStudentId) {
+      setId("");
+      setName("");
+      setParentEmail("");
+      setClassName("");
+      setClassDay("");
       return;
     }
+
+    const student = studentOptions.find(
+      (s) => String(s.id) === String(selectedStudentId)
+    );
+
+    if (student) {
+      setId(student.id);
+      setName(student.name);
+      setParentEmail(student.parent_email);
+      setClassName(student.class_name);
+      setClassDay(student.class_day);
+    }
+  }, [selectedStudentId, studentOptions]);
+
+  // 3️⃣ Delete handler
+  const handleDelete = async () => {
+    if (!id) {
+      alert("Please select a student to delete");
+      return;
+    }
+
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete:\n\n${name} (${id}) ?`
+    );
+
+    if (!confirmDelete) return;
 
     try {
       const res = await fetch(
-        `https://your-backend-url.com/api/delete-user/${selectedUserId}`,
+        `https://web-production-481a5.up.railway.app/delete_student_exam_module/${id}`,
         { method: "DELETE" }
       );
-      if (!res.ok) throw new Error("Failed to delete user");
-      await res.json();
-      onUserDeleted();
+
+      if (!res.ok) {
+        throw new Error("Failed to delete student");
+      }
+
+      alert("Student deleted successfully");
+      onUserDeleted?.();
       onClose();
     } catch (err) {
       console.error(err);
-      alert("Error deleting user");
+      alert("Error deleting student");
     }
   };
 
   return (
     <div className="modal-overlay">
       <div className="modal">
-        <h3>Delete User</h3>
+        <h3>Delete Student</h3>
 
-        {/* Dropdown to select user ID */}
+        {/* Dropdown */}
+        <label>Select Student</label>
         <select
-          value={selectedUserId}
-          onChange={(e) => setSelectedUserId(e.target.value)}
-          required
+          value={selectedStudentId}
+          onChange={(e) => setSelectedStudentId(e.target.value)}
         >
-          <option value="">Select a user</option>
-          {userIds.map((u) => (
-            <option key={u.id} value={u.id}>
-              User ID: {u.id}
+          <option value="">-- Select Student --</option>
+          {studentOptions.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.student_id} - {s.name}
             </option>
           ))}
         </select>
 
-        {/* Display user details read-only */}
-        <input type="text" placeholder="User name" value={name} readOnly />
-        <input type="email" placeholder="User email" value={email} readOnly />
+        {/* Read-only details */}
+        <input type="text" value={id} placeholder="ID" readOnly />
+        <input type="text" value={name} placeholder="Name" readOnly />
+        <input type="text" value={className} placeholder="Class" readOnly />
+        <input type="text" value={classDay} placeholder="Day" readOnly />
         <input
-          type="text"
-          placeholder="Phone number (optional)"
-          value={phoneNumber}
-          readOnly
-        />
-        <input
-          type="text"
-          placeholder="Class name (optional)"
-          value={className}
+          type="email"
+          value={parentEmail}
+          placeholder="Parent Email"
           readOnly
         />
 
         <div className="modal-actions">
-          <button type="button" onClick={handleDelete}>
-            Delete User
+          <button className="danger-btn" onClick={handleDelete}>
+            Delete Student
           </button>
-          <button type="button" onClick={onClose}>
-            Cancel
-          </button>
+          <button onClick={onClose}>Cancel</button>
         </div>
       </div>
     </div>
