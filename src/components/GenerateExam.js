@@ -53,7 +53,7 @@ export default function GenerateExam() {
 
   try {
     const res = await fetch(
-      `${BACKEND_URL}/api/exams/generate`,
+      `${BACKEND_URL}/api/quizzes/generate`,
       { method: "POST" }
     );
 
