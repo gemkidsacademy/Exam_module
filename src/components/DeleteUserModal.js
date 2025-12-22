@@ -134,9 +134,7 @@ function DeleteUserModal({ onClose, onUserDeleted }) {
       Delete Student
     </button>
 
-    <button type="button" onClick={onClose}>
-      ← Back to User Management
-    </button>
+    
   </div>
 );
 
