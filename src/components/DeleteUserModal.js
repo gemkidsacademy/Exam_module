@@ -133,4 +133,4 @@ function DeleteUserModal({ onClose, onUserDeleted }) {
   );
 }
 
-export default DeleteUserForm;
+export default DeleteUserModal;
