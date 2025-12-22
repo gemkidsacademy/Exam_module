@@ -97,19 +97,16 @@ const AdminPanel = () => {
      User Callbacks
   ============================ */
   const handleUserAdded = () => {
-    setShowAddUser(false);
-    alert("User added successfully!");
-  };
-
-  const handleUserUpdated = () => {
-    setShowEditUser(false);
-    alert("User updated successfully!");
-  };
-
-  const handleUserDeleted = () => {
-    setShowDeleteUser(false);
-    alert("User deleted successfully!");
-  };
+     setUserMode("menu");
+   };
+   
+   const handleUserUpdated = () => {
+     setUserMode("menu");
+   };
+   
+   const handleUserDeleted = () => {
+     setUserMode("menu");
+   };
 
   /* ============================
      Render
