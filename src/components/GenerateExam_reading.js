@@ -21,10 +21,10 @@ export default function GenerateExam_reading() {
       try {
         const res = await fetch(`${BACKEND_URL}/api/quizzes-reading`);
         if (!res.ok) throw new Error("Failed to load quizzes");
+
         const data = await res.json();
         setQuizzes(data);
 
-        // 🔑 Auto-select latest quiz (same data as dropdown before)
         if (data.length > 0) {
           const latest = data[data.length - 1];
           setSelectedQuiz(latest);
@@ -49,8 +49,10 @@ export default function GenerateExam_reading() {
       return;
     }
 
+    // 🔑 reset UI state before request
     setLoading(true);
     setError("");
+    setSuccessMessage("");
     setGeneratedExam(null);
 
     try {
@@ -69,9 +71,11 @@ export default function GenerateExam_reading() {
         setError(data.detail || "Failed to generate exam.");
         return;
       }
+
+      // ✅ success message AFTER backend confirms
       setSuccessMessage("Exam created successfully.");
-      
       setGeneratedExam(data);
+
     } catch (err) {
       console.error(err);
       setError("Network error");
@@ -81,7 +85,7 @@ export default function GenerateExam_reading() {
   };
 
   /* ---------------------------
-     UI (BUTTON ONLY)
+     UI
   --------------------------- */
   return (
     <div className="generate-reading-container">
@@ -93,7 +97,7 @@ export default function GenerateExam_reading() {
       <button
         className="primary-btn"
         onClick={handleGenerateExam}
-        disabled={loading}
+        disabled={loading || !selectedClass}
       >
         {loading ? "Generating..." : "Generate Exam"}
       </button>
