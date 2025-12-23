@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import StudentExamReports from "./StudentExamReports";
+
 import "./AdminPanel.css";
 
 /* ============================
@@ -103,6 +105,8 @@ const AdminPanel = () => {
     { id: "upload-image-folder", label: "Upload Exam Image Folder" },
     { id: "add-quiz", label: "Create Exam" },
     { id: "generate-exam", label: "Generate Exam" },
+    { id: "student-exam-reports", label: "Student Exam Reports" },
+
   ];
 
   /* ============================
@@ -404,6 +408,13 @@ const AdminPanel = () => {
                
                  </div>
                )}
+               {/* ===== STUDENT EXAM REPORTS ===== */}
+               {activeTab === "student-exam-reports" && (
+                 <div className="tab-panel">
+                   <StudentExamReports />
+                 </div>
+               )}
+
 
 
 
