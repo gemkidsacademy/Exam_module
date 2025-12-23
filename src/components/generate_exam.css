@@ -50,58 +50,49 @@
   background-color: #ffffff;
   color: #111827;
   cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .generate-exam-container select:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  border-color: #2196f3;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
 }
 
 /* ================================
-   GENERATE BUTTON
+   GENERATE BUTTON (PRIMARY)
 ================================ */
 .generate-btn {
   width: 100%;
   height: 48px;
+  margin-top: 20px;
   border: none;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border-radius: 8px;
+  background-color: #2196f3;
   color: #ffffff;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: background-color 0.2s ease, transform 0.1s ease,
+    box-shadow 0.1s ease;
 }
 
-.generate-btn:hover {
+/* Hover */
+.generate-btn:hover:not(:disabled) {
+  background-color: #1976d2;
   transform: translateY(-1px);
-  box-shadow: 0 8px 18px rgba(22, 163, 74, 0.35);
+  box-shadow: 0 6px 16px rgba(33, 150, 243, 0.35);
 }
 
-.generate-btn:active {
+/* Active */
+.generate-btn:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
+  box-shadow: 0 4px 10px rgba(33, 150, 243, 0.25);
 }
 
+/* Disabled */
 .generate-btn:disabled {
-  background: #9ca3af;
+  background-color: #90caf9;
   cursor: not-allowed;
   box-shadow: none;
-}
-.blue-btn {
-  margin-top: 20px;
-  padding: 12px 22px;
-  background-color: #2196f3;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.blue-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
