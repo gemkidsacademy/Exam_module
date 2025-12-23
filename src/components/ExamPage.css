@@ -445,12 +445,14 @@
   width: 160px;
   height: 160px;
   border-radius: 50%;
-  border: 18px solid #fecaca;
+  background: conic-gradient(
+    #d9d9d9 0 calc(var(--grey) * 1%),
+    #1e4fff calc(var(--grey) * 1%) 100%
+  );
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
-  margin: 16px auto;
+  font-weight: bold;
 }
 
 .legend {
