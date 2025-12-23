@@ -123,7 +123,7 @@ export default function QuizSetup_foundational() {
 
       if (!res.ok) throw new Error("Failed to save quiz setup");
 
-      alert("Quiz setup saved successfully!");
+      alert("Exam setup saved successfully!");
     } catch (err) {
       console.error(err);
       alert("Error saving quiz setup. Please try again.");
