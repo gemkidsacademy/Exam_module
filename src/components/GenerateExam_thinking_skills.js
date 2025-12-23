@@ -56,8 +56,9 @@ export default function GenerateExam_thinking_skills() {
       <button
         className="generate-btn blue-btn"
         onClick={handleGenerateExam}
-        disabled={loading || !selectedClass}
+        disabled={loading}
       >
+
         {loading ? "Generating..." : "Generate Exam"}
       </button>
 
