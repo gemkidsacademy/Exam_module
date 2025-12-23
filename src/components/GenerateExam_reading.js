@@ -96,7 +96,7 @@ export default function GenerateExam_reading() {
       <button
         className="primary-btn"
         onClick={handleGenerateExam}
-        disabled={loading}
+        disabled={loading || !selectedClass || !selectedDifficulty}
       >
         {loading ? "Generating..." : "Generate Exam"}
       </button>
