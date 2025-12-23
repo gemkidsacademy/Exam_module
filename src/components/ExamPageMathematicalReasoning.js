@@ -320,6 +320,7 @@ function ThinkingSkillsReport({ report }) {
   if (!report?.overall) {
     return <p className="loading">Generating your report…</p>;
   }
+  
 
   const {
     overall,
@@ -327,7 +328,8 @@ function ThinkingSkillsReport({ report }) {
     topic_accuracy,
     improvement_areas
   } = report;
-
+  const greyPercent =
+   (overall.correct / overall.total_questions) * 100;
   return (
     <div className="report-page">
 
@@ -347,9 +349,13 @@ function ThinkingSkillsReport({ report }) {
         <div className="report-card">
           <h3>Overall Accuracy</h3>
 
-          <div className="donut">
-            <span>{overall.accuracy_percent}%</span>
+          <div
+            className="donut"
+            style={{ "--grey": greyPercent }}
+          >
+            <span>{greyPercent}%</span>
           </div>
+
 
           <div className="stats">
             <p>Total Questions: {overall.total_questions}</p>
