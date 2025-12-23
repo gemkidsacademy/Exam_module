@@ -9,7 +9,10 @@ import "./ExamPage.css";
 /* ============================================================
    MAIN COMPONENT
 ============================================================ */
-export default function ExamPageMathematicalReasoning() {
+export default function ExamPageMathematicalReasoning({
+    onExamStart,
+    onExamFinish
+  }) {
   const studentId = sessionStorage.getItem("student_id");
 
   const hasSubmittedRef = useRef(false);
@@ -80,6 +83,7 @@ export default function ExamPageMathematicalReasoning() {
         // ✅ COMPLETED → SHOW REPORT
         if (data.completed === true) {
           await loadReport();
+          onExamFinish?.();
           return;
         }
 
@@ -87,6 +91,7 @@ export default function ExamPageMathematicalReasoning() {
         setQuestions(data.questions || []);
         setTimeLeft(data.remaining_time);
         setMode("exam");
+        onExamStart?.();
 
       } catch (err) {
         console.error("❌ start-exam error:", err);
@@ -143,6 +148,7 @@ export default function ExamPageMathematicalReasoning() {
 
         // ⬅️ ONLY NOW load report
         await loadReport();
+        onExamFinish?.();
 
       } catch (err) {
         console.error("❌ finish-exam error:", err);
