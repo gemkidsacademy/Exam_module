@@ -3,7 +3,12 @@ import "./ExamPage.css";
 
 const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
-export default function WritingComponent({ studentId }) {
+export default function WritingComponent({
+    studentId,
+    onExamStart,
+    onExamFinish
+  }) {
+
   /* -----------------------------------------------------------
      STATE
   ----------------------------------------------------------- */
@@ -33,24 +38,34 @@ export default function WritingComponent({ studentId }) {
      STEP 2 — Load current writing exam session
   ----------------------------------------------------------- */
   const loadExam = async () => {
-    try {
-      const res = await fetch(
-        `${BACKEND_URL}/api/exams/writing/current?student_id=${studentId}`
-      );
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/api/exams/writing/current?student_id=${studentId}`
+    );
 
-      if (!res.ok) throw new Error("Failed to load writing exam");
+    if (!res.ok) throw new Error("Failed to load writing exam");
 
-      const data = await res.json();
+    const data = await res.json();
 
-      setExam(data.exam);
-      setTimeLeft(data.remaining_seconds);
-    } catch (err) {
-      console.error(err);
-      alert("Unable to load writing exam.");
-    } finally {
-      setLoading(false);
+    // ✅ EXAM ALREADY COMPLETED (refresh / resume case)
+    if (data.completed === true) {
+      setCompleted(true);
+      onExamFinish?.();     // 🔓 unlock tabs
+      return;
     }
-  };
+
+    // ✅ ACTIVE EXAM
+    setExam(data.exam);
+    setTimeLeft(data.remaining_seconds);
+    onExamStart?.();        // 🔒 lock tabs
+
+  } catch (err) {
+    console.error(err);
+    alert("Unable to load writing exam.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   /* -----------------------------------------------------------
      ON MOUNT: Start exam → Load exam
@@ -95,6 +110,7 @@ export default function WritingComponent({ studentId }) {
       console.error("Submission failed:", err);
     } finally {
       setCompleted(true);
+      onExamFinish?.();
     }
   };
 
