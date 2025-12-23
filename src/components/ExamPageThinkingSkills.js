@@ -9,7 +9,10 @@ import "./ExamPage.css";
 /* ============================================================
    MAIN COMPONENT
 ============================================================ */
-export default function ExamPageThinkingSkills() {
+export default function ExamPageThinkingSkills({
+    onExamStart,
+    onExamFinish
+  }) {
   const studentId = sessionStorage.getItem("student_id");
 
   const hasSubmittedRef = useRef(false);
@@ -87,6 +90,7 @@ export default function ExamPageThinkingSkills() {
         setQuestions(data.questions || []);
         setTimeLeft(data.remaining_time);
         setMode("exam");
+        onExamStart?.();
 
       } catch (err) {
         console.error("❌ start-exam error:", err);
