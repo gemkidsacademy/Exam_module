@@ -11,12 +11,12 @@ export default function AddStudentForm() {
   const CLASS_NAME_OPTIONS = [
   "Kindergarten",
   "Selective",
-  "Grade 1",
-  "Grade 2",
-  "Grade 3",
-  "Grade 4",
-  "Grade 5",
-  "Grade 6",
+  "Year 1",
+  "Year 2",
+  "Year 3",
+  "Year 4",
+  "Year 5",
+  "Year 6",
 ];
 
 const CLASS_DAY_OPTIONS = [
