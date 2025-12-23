@@ -12,29 +12,6 @@ export default function GenerateExam_reading() {
 
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
-  const formatClassName = (cls) => {
-    switch (cls) {
-      case "year1": return "Year 1";
-      case "year2": return "Year 2";
-      case "year3": return "Year 3";
-      case "year4": return "Year 4";
-      case "year5": return "Year 5";
-      case "year6": return "Year 6";
-      case "selective": return "Selective";
-      case "kindergarten": return "Kindergarten";
-      default: return cls;
-    }
-  };
-
-  const formatDifficulty = (lvl) => {
-    switch (lvl) {
-      case "easy": return "Easy";
-      case "medium": return "Medium";
-      case "hard": return "Hard";
-      default: return lvl;
-    }
-  };
-
   /* ---------------------------
      LOAD QUIZ CONFIGS
   --------------------------- */
@@ -45,6 +22,14 @@ export default function GenerateExam_reading() {
         if (!res.ok) throw new Error("Failed to load quizzes");
         const data = await res.json();
         setQuizzes(data);
+
+        // 🔑 Auto-select latest quiz (same data as dropdown before)
+        if (data.length > 0) {
+          const latest = data[data.length - 1];
+          setSelectedQuiz(latest);
+          setSelectedClass(latest.class_name);
+          setSelectedDifficulty(latest.difficulty);
+        }
       } catch (err) {
         console.error(err);
         setError("Failed to load quizzes.");
@@ -59,7 +44,7 @@ export default function GenerateExam_reading() {
   --------------------------- */
   const handleGenerateExam = async () => {
     if (!selectedClass || !selectedDifficulty) {
-      alert("Please select class and difficulty");
+      alert("Quiz configuration not ready");
       return;
     }
 
@@ -94,52 +79,11 @@ export default function GenerateExam_reading() {
   };
 
   /* ---------------------------
-     UI
+     UI (BUTTON ONLY)
   --------------------------- */
   return (
     <div className="generate-reading-container">
-      <h2>Generate Reading Exam</h2>
-
       {error && <p className="error-text">{error}</p>}
-
-      <div className="form-group">
-        <label>Select Quiz</label>
-        <select
-          value={selectedQuiz ? JSON.stringify(selectedQuiz) : ""}
-          onChange={(e) => {
-            const parsed = JSON.parse(e.target.value);
-            setSelectedQuiz(parsed);
-            setSelectedClass(parsed.class_name);
-            setSelectedDifficulty(parsed.difficulty);
-          }}
-        >
-          <option value="">-- Select Quiz Requirement --</option>
-          {quizzes.map((q) => (
-            <option
-              key={`${q.class_name}-${q.difficulty}`}
-              value={JSON.stringify({
-                class_name: q.class_name,
-                difficulty: q.difficulty
-              })}
-            >
-              {`${formatClassName(q.class_name)} | ${formatDifficulty(q.difficulty)}`}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {selectedQuiz?.topics && (
-        <div className="topics-preview">
-          <strong>Included Topics:</strong>
-          <ul>
-            {selectedQuiz.topics.map((t, idx) => (
-              <li key={idx}>
-                {t.name} ({t.num_questions} questions)
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       <button
         className="primary-btn"
@@ -148,26 +92,6 @@ export default function GenerateExam_reading() {
       >
         {loading ? "Generating..." : "Generate Exam"}
       </button>
-
-      {generatedExam && (
-        <div className="generated-exam">
-          <h3>Generated Exam</h3>
-
-          <p>
-            <strong>Total Questions:</strong>{" "}
-            {generatedExam.total_questions}
-          </p>
-
-          {generatedExam.questions?.map((q, idx) => (
-            <div key={idx} className="question-card">
-              <strong>Q{idx + 1}:</strong> {q.question}
-              <p>
-                <strong>Correct:</strong> {q.correct}
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
