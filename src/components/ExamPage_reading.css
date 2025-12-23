@@ -275,8 +275,8 @@
 
   border-radius: 50%;
   background: conic-gradient(
-    #2563eb calc(var(--p) * 1%),
-    #fecaca 0
+    #22c55e calc(var(--p) * 1%),
+    #e5e7eb 0
   );
 
   display: flex;
@@ -327,7 +327,7 @@
 }
 
 .fill.blue {
-  background: #2563eb;
+  background: #22c55e;
 }
 
 .fill.green {
