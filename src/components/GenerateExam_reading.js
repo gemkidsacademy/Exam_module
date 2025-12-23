@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "./generateexam_reading.css";
- 
+
 export default function GenerateExam_reading() {
   const [quizzes, setQuizzes] = useState([]);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
@@ -49,36 +50,36 @@ export default function GenerateExam_reading() {
       return;
     }
 
-    // 🔑 reset UI state before request
+    // Reset UI before request (same pattern as MR)
     setLoading(true);
     setError("");
     setSuccessMessage("");
     setGeneratedExam(null);
 
     try {
-      const res = await fetch(`${BACKEND_URL}/api/exams/generate-reading`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          class_name: selectedClass,
-          difficulty: selectedDifficulty
-        })
-      });
+      const res = await fetch(
+        `${BACKEND_URL}/api/exams/generate-reading`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            class_name: selectedClass,
+            difficulty: selectedDifficulty
+          })
+        }
+      );
 
       const data = await res.json();
-
       if (!res.ok) {
-        setError(data.detail || "Failed to generate exam.");
-        return;
+        throw new Error(data.detail || "Exam generation failed");
       }
 
-      // ✅ success message AFTER backend confirms
-      setSuccessMessage("Exam created successfully.");
+      // ✅ success only AFTER backend response
       setGeneratedExam(data);
-
+      setSuccessMessage("Exam created successfully.");
     } catch (err) {
       console.error(err);
-      setError("Network error");
+      setError("Failed to generate exam. Check console for details.");
     } finally {
       setLoading(false);
     }
@@ -90,17 +91,22 @@ export default function GenerateExam_reading() {
   return (
     <div className="generate-reading-container">
       {error && <p className="error-text">{error}</p>}
-      {successMessage && (
-        <p className="success-text">{successMessage}</p>
-      )}
+      {successMessage && <p className="success-text">{successMessage}</p>}
 
       <button
         className="primary-btn"
         onClick={handleGenerateExam}
-        disabled={loading || !selectedClass}
+        disabled={loading}
       >
         {loading ? "Generating..." : "Generate Exam"}
       </button>
+
+      {/* Optional: keep preview logic if backend returns exam */}
+      {generatedExam && (
+        <div className="generated-output">
+          <p><strong>Exam ID:</strong> {generatedExam.exam_id}</p>
+        </div>
+      )}
     </div>
   );
 }
