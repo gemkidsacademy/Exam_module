@@ -1,7 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./ExamPage_reading.css";
 
-export default function ReadingComponent({ studentId }) {
+export default function ReadingComponent({
+    studentId,
+    onExamStart,
+    onExamFinish
+  }) {
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
   /* =============================
@@ -67,6 +71,7 @@ export default function ReadingComponent({ studentId }) {
       if (data.finished === true) {
         setSessionId(data.session_id);
         setFinished(true);
+        onExamFinish?.();  
         return;
       }
 
@@ -84,6 +89,7 @@ export default function ReadingComponent({ studentId }) {
       setExam(data.exam_json);
       setQuestions(flatQuestions);
       setSessionId(data.session_id);
+      onExamStart?.();  
 
       const durationSeconds = (data.duration_minutes || 40) * 60;
       const start = new Date(data.start_time).getTime();
@@ -183,7 +189,7 @@ useEffect(() => {
     }
 
     setFinished(true);
-    
+    onExamFinish?.();  
 
   } catch (err) {
     console.error("❌ submit-reading error:", err);
