@@ -9,6 +9,8 @@ export default function GenerateExam_writing() {
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
 
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
@@ -53,6 +55,7 @@ export default function GenerateExam_writing() {
     setLoading(true);
     setError("");
     setGeneratedExam(null);
+    setSuccessMessage("");
 
     try {
       const res = await fetch(
@@ -70,6 +73,7 @@ export default function GenerateExam_writing() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Failed to generate exam");
 
+      setSuccessMessage("Writing exam created successfully.");
       setGeneratedExam(data);
     } catch (err) {
       console.error(err);
@@ -83,6 +87,9 @@ export default function GenerateExam_writing() {
   return (
     <div className="generate-writing-container">
       {error && <div className="error-text">{error}</div>}
+      {successMessage && (
+        <div className="success-text">{successMessage}</div>
+      )}
 
       <button
         className="primary-btn"
