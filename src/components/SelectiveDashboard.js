@@ -27,6 +27,8 @@ const COMPONENT_MAP = {
 
 const SelectiveDashboard = () => {
   const [activeTab, setActiveTab] = useState(null);
+  const [examInProgress, setExamInProgress] = useState(false);
+
 
   const studentId = sessionStorage.getItem("student_id");
   const tabs = Object.keys(SUBJECT_KEY_MAP);
@@ -43,7 +45,14 @@ const SelectiveDashboard = () => {
           <div
             key={tab}
             className={`menu-item ${activeTab === tab ? "active" : ""}`}
-            onClick={() => setActiveTab(tab)}
+            onClick={() => {
+              if (examInProgress) {
+                alert("Please submit your current exam before switching subjects.");
+                return;
+              }
+              setActiveTab(tab);
+            }}
+
           >
             {tab}
           </div>
@@ -61,6 +70,8 @@ const SelectiveDashboard = () => {
                   studentId={studentId}
                   subject={subjectKey}
                   difficulty="advanced"
+                  onExamStart={() => setExamInProgress(true)}
+                  onExamFinish={() => setExamInProgress(false)}
                 />
               </div>
             ) : (
@@ -68,6 +79,8 @@ const SelectiveDashboard = () => {
                 studentId={studentId}
                 subject={subjectKey}
                 difficulty="advanced"
+                onExamStart={() => setExamInProgress(true)}
+                onExamFinish={() => setExamInProgress(false)}
               />
             )}
           </div>
