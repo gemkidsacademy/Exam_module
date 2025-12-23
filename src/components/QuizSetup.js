@@ -7,15 +7,16 @@ import "./QuizSetup.css";
 
 
 export default function QuizSetup() {
-  const [quiz, setQuiz] = useState({
-    className: "",
-    subject: "",
-    difficulty: "",
-    numTopics: 1,
-    topics: [],
-  });
+  
 
   const [totalQuestions, setTotalQuestions] = useState(0);
+  const [quiz, setQuiz] = useState({
+       className: "selective",
+       subject: "thinking_skills",
+       difficulty: "",
+       numTopics: 1,
+       topics: [],
+     });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -135,36 +136,18 @@ export default function QuizSetup() {
     <div className="quiz-setup-container">
       <form onSubmit={handleSubmit}>
         <label>Class:</label>
-        <select
-          name="className"
-          value={quiz.className}
-          onChange={handleInputChange}
-          required
-        >
-          <option value="">Select Class</option>
-          <option value="kindergarten">Kindergarten</option>
-          <option value="selective">Selective</option>
-          <option value="year1">Year 1</option>
-          <option value="year2">Year 2</option>
-          <option value="year3">Year 3</option>
-          <option value="year4">Year 4</option>
-          <option value="year5">Year 5</option>
-          <option value="year6">Year 6</option>
-        </select>
+          <input
+            type="text"
+            value="Selective"
+            readOnly
+          />
 
         <label>Subject:</label>
-        <select
-          name="subject"
-          value={quiz.subject}
-          onChange={handleInputChange}
-          required
-        >
-          <option value="">Select Subject</option>
-          <option value="thinking_skills">Thinking Skills</option>
-          <option value="mathematical_reasoning">Mathematical Reasoning</option>
-          <option value="reading">Reading</option>
-          <option value="writing">Writing</option>
-        </select>
+          <input
+            type="text"
+            value="Thinking Skills"
+            readOnly
+          />
 
         <label>Difficulty Level:</label>
         <select
