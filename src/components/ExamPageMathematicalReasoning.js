@@ -330,6 +330,7 @@ function ThinkingSkillsReport({ report }) {
   } = report;
   const greyPercent =
    (overall.correct / overall.total_questions) * 100;
+  const percentage = Math.round(greyPercent);
   return (
     <div className="report-page">
 
@@ -349,12 +350,45 @@ function ThinkingSkillsReport({ report }) {
         <div className="report-card">
           <h3>Overall Accuracy</h3>
 
-          <div
-            className="donut"
-            style={{ "--grey": greyPercent }}
-          >
-            <span>{greyPercent}%</span>
+          <div style={{ display: "flex", justifyContent: "center", margin: "24px 0" }}>
+            <svg width="160" height="160" viewBox="0 0 160 160">
+              {/* Background ring */}
+              <circle
+                cx="80"
+                cy="80"
+                r="70"
+                stroke="#e5e7eb"
+                strokeWidth="14"
+                fill="none"
+              />
+          
+              {/* Progress ring (GREEN = correct) */}
+              <circle
+                cx="80"
+                cy="80"
+                r="70"
+                stroke="#22c55e"
+                strokeWidth="14"
+                fill="none"
+                strokeDasharray={`${percentage * 4.4} 999`}
+                strokeLinecap="round"
+                transform="rotate(-90 80 80)"
+              />
+          
+              {/* Center percentage */}
+              <text
+                x="80"
+                y="88"
+                textAnchor="middle"
+                fontSize="24"
+                fontWeight="600"
+                fill="#111827"
+              >
+                {percentage}%
+              </text>
+            </svg>
           </div>
+
 
 
           <div className="stats">
