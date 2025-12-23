@@ -9,6 +9,7 @@ export default function GenerateExam_reading() {
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
@@ -68,7 +69,8 @@ export default function GenerateExam_reading() {
         setError(data.detail || "Failed to generate exam.");
         return;
       }
-
+      setSuccessMessage("Exam created successfully.");
+      
       setGeneratedExam(data);
     } catch (err) {
       console.error(err);
@@ -84,6 +86,9 @@ export default function GenerateExam_reading() {
   return (
     <div className="generate-reading-container">
       {error && <p className="error-text">{error}</p>}
+      {successMessage && (
+        <p className="success-text">{successMessage}</p>
+      )}
 
       <button
         className="primary-btn"
