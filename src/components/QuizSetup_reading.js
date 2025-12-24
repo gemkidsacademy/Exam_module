@@ -3,7 +3,7 @@ import "./QuizSetup.css";
 
 export default function QuizSetup_reading() {
   const [quiz, setQuiz] = useState({
-    className: "",
+    className: "selective",
     subject: "Reading Comprehension",  // MUST MATCH DATABASE EXACTLY
     difficulty: "",
     numTopics: 1,
@@ -135,20 +135,15 @@ export default function QuizSetup_reading() {
         
         {/* CLASS */}
         <label>Class:</label>
-        <select
-          name="className"
-          value={quiz.className}
-          onChange={handleInputChange}
-          required
-        >
-          <option value="">Select Class</option>
-          <option value="selective">Selective</option>
-          <option value="year3">Year 3</option>
-          <option value="year4">Year 4</option>
-          <option value="year5">Year 5</option>
-          <option value="year6">Year 6</option>
-        </select>
-
+        <input
+          type="text"
+          value="Selective"
+          readOnly
+          style={{
+            backgroundColor: "#f3f3f3",
+            cursor: "not-allowed"
+          }}
+        />
         {/* SUBJECT */}
         <label>Subject:</label>
         <input
