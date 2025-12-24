@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import "./StudentExamReports.css";
+
 
 export default function StudentExamReports() {
   const [students, setStudents] = useState([]);
@@ -37,7 +39,7 @@ export default function StudentExamReports() {
      UI
   ============================ */
   return (
-    <div>
+    <div className="student-exam-reports">
       <h2>Student Exam Reports</h2>
 
       {/* ============================
@@ -47,7 +49,8 @@ export default function StudentExamReports() {
         <>
           <h4>Select Student</h4>
           <ul>
-            {students.map((student) => (
+            {Array.isArray(students) && students.map((student) => (
+
               <li key={student.id}>
                 <button
                   className="dashboard-button"
@@ -75,11 +78,12 @@ export default function StudentExamReports() {
           </h4>
 
           {reports.length === 0 && (
-            <p>No Selective exam reports found.</p>
+            <p className="empty-state">No Selective exam reports found.</p>
           )}
 
           <ul>
-            {reports.map((report, index) => (
+            {Array.isArray(reports) && reports.map((report, index) => (
+
               <li key={report.id}>
                 <button
                   className="dashboard-button"
@@ -115,8 +119,10 @@ export default function StudentExamReports() {
           </p>
 
           <h4>Section Performance</h4>
-          <ul>
-            {selectedReport.sections.map((section) => (
+          <ul className="section-list">
+            {Array.isArray(selectedReport.sections) &&
+              selectedReport.sections.map((section) => (
+
               <li key={section.section_name}>
                 <strong>{section.section_name}</strong> –{" "}
                 {section.performance_band}
