@@ -16,10 +16,18 @@ export default function StudentExamReports() {
      Uses student_id as key
   ============================ */
   useEffect(() => {
+    console.log("📡 Fetching students list…");
+
     fetch(`${BACKEND_URL}/api/admin/students`)
       .then((res) => res.json())
-      .then(setStudents)
-      .catch(() => alert("Failed to load students"));
+      .then((data) => {
+        console.log("✅ Students received:", data);
+        setStudents(data);
+      })
+      .catch((err) => {
+        console.error("❌ Failed to load students", err);
+        alert("Failed to load students");
+      });
   }, []);
 
   /* ============================
@@ -29,29 +37,54 @@ export default function StudentExamReports() {
   useEffect(() => {
     if (!selectedStudentId) return;
 
+    console.log("👤 Selected student_id:", selectedStudentId);
+    console.log(
+      "➡️ Fetching student details:",
+      `${BACKEND_URL}/api/admin/students/${selectedStudentId}`
+    );
+
     fetch(`${BACKEND_URL}/api/admin/students/${selectedStudentId}`)
       .then((res) => res.json())
       .then((data) => {
+        console.log("✅ Student details received:", data);
         setStudentDetails(data);
         setReports([]);
         setSelectedReport(null);
       })
-      .catch(() => alert("Failed to load student details"));
+      .catch((err) => {
+        console.error("❌ Failed to load student details", err);
+        alert("Failed to load student details");
+      });
   }, [selectedStudentId]);
 
   /* ============================
      Load Selective Reports
-     Triggered by studentDetails
+     Triggered by student_id
   ============================ */
   useEffect(() => {
     if (!selectedStudentId) return;
-  
+
+    console.log(
+      "📄 Fetching reports for student_id:",
+      selectedStudentId
+    );
+    console.log(
+      "➡️ Reports URL:",
+      `${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-reports`
+    );
+
     fetch(
       `${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-reports`
     )
       .then((res) => res.json())
-      .then(setReports)
-      .catch(() => alert("Failed to load reports"));
+      .then((data) => {
+        console.log("✅ Reports received:", data);
+        setReports(data);
+      })
+      .catch((err) => {
+        console.error("❌ Failed to load reports", err);
+        alert("Failed to load reports");
+      });
   }, [selectedStudentId]);
 
   /* ============================
@@ -71,18 +104,25 @@ export default function StudentExamReports() {
           <div className="student-select-box">
             <select
               value={selectedStudentId}
-              onChange={(e) => setSelectedStudentId(e.target.value)}
+              onChange={(e) => {
+                console.log("🟡 Dropdown changed → value:", e.target.value);
+                setSelectedStudentId(e.target.value);
+              }}
             >
               <option value="">-- Select Student ID --</option>
+
               {Array.isArray(students) &&
-                students.map((student) => (
-                  <option
-                    key={student.student_id}
-                    value={student.student_id}
-                  >
-                    {student.student_id} – {student.name}
-                  </option>
-                ))}
+                students.map((student) => {
+                  console.log("🔹 Rendering option:", student);
+                  return (
+                    <option
+                      key={student.student_id}
+                      value={student.student_id}
+                    >
+                      {student.student_id} – {student.name}
+                    </option>
+                  );
+                })}
             </select>
           </div>
         </>
@@ -95,6 +135,7 @@ export default function StudentExamReports() {
         <>
           <button
             onClick={() => {
+              console.log("↩️ Resetting student selection");
               setSelectedStudentId("");
               setStudentDetails(null);
               setReports([]);
@@ -123,7 +164,10 @@ export default function StudentExamReports() {
                 <li key={report.id}>
                   <button
                     className="dashboard-button"
-                    onClick={() => setSelectedReport(report)}
+                    onClick={() => {
+                      console.log("📘 Opening report:", report);
+                      setSelectedReport(report);
+                    }}
                   >
                     Selective Exam – {report.exam_date} (Attempt {index + 1})
                   </button>
