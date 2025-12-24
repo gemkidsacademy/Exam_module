@@ -350,14 +350,16 @@ useEffect(() => {
             <div className="topic-circles">
               {idxs.map((i) => (
                 <div
-                  key={i}
-                  className={`index-circle ${
-                    i === index ? "active" : ""
-                  } ${answers[questions[i].question_id] ? "answered" : ""}`}
+                  className={`index-circle
+                    ${visited[i] ? "visited" : ""}
+                    ${answers[questions[i].question_id] ? "answered" : ""}
+                    ${i === index ? "active" : ""}
+                  `}
                   onClick={() => goTo(i)}
                 >
                   {questions[i].question_number}
                 </div>
+
               ))}
             </div>
           </div>
