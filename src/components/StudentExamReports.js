@@ -13,7 +13,7 @@ export default function StudentExamReports() {
      Load Students
   ============================ */
   useEffect(() => {
-    fetch(`${BACKEND_URL}/api/admin/students`)
+    fetch(`${BACKEND_URL}/students`)
       .then((res) => res.json())
       .then(setStudents)
       .catch(() => alert("Failed to load students"));
