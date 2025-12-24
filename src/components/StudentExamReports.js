@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "./StudentExamReports.css";
 
-
 export default function StudentExamReports() {
   const [students, setStudents] = useState([]);
+  const [selectedStudentId, setSelectedStudentId] = useState("");
   const [selectedStudent, setSelectedStudent] = useState(null);
 
   const [reports, setReports] = useState([]);
@@ -43,24 +43,41 @@ export default function StudentExamReports() {
       <h2>Student Exam Reports</h2>
 
       {/* ============================
-         STEP 1: SELECT STUDENT
+         STEP 1: SELECT STUDENT (DROPDOWN)
       ============================ */}
       {!selectedStudent && (
         <>
           <h4>Select Student</h4>
-          <ul>
-            {Array.isArray(students) && students.map((student) => (
 
-              <li key={student.id}>
-                <button
-                  className="dashboard-button"
-                  onClick={() => setSelectedStudent(student)}
-                >
-                  {student.name}
-                </button>
-              </li>
-            ))}
-          </ul>
+          <div className="student-select-box">
+            <select
+              value={selectedStudentId}
+              onChange={(e) => setSelectedStudentId(e.target.value)}
+            >
+              <option value="">-- Select Student --</option>
+              {Array.isArray(students) &&
+                students.map((student) => (
+                  <option key={student.id} value={student.id}>
+                    {student.name}
+                  </option>
+                ))}
+            </select>
+
+            <button
+              className="dashboard-button"
+              disabled={!selectedStudentId}
+              onClick={() => {
+                const student = students.find(
+                  (s) => s.id === selectedStudentId
+                );
+                setSelectedStudent(student);
+                setReports([]);
+                setSelectedReport(null);
+              }}
+            >
+              Load Reports
+            </button>
+          </div>
         </>
       )}
 
@@ -69,7 +86,11 @@ export default function StudentExamReports() {
       ============================ */}
       {selectedStudent && !selectedReport && (
         <>
-          <button onClick={() => setSelectedStudent(null)}>
+          <button onClick={() => {
+            setSelectedStudent(null);
+            setSelectedStudentId("");
+            setReports([]);
+          }}>
             ← Back to Students
           </button>
 
@@ -82,17 +103,17 @@ export default function StudentExamReports() {
           )}
 
           <ul>
-            {Array.isArray(reports) && reports.map((report, index) => (
-
-              <li key={report.id}>
-                <button
-                  className="dashboard-button"
-                  onClick={() => setSelectedReport(report)}
-                >
-                  Selective Exam – {report.exam_date} (Attempt {index + 1})
-                </button>
-              </li>
-            ))}
+            {Array.isArray(reports) &&
+              reports.map((report, index) => (
+                <li key={report.id}>
+                  <button
+                    className="dashboard-button"
+                    onClick={() => setSelectedReport(report)}
+                  >
+                    Selective Exam – {report.exam_date} (Attempt {index + 1})
+                  </button>
+                </li>
+              ))}
           </ul>
         </>
       )}
@@ -122,19 +143,18 @@ export default function StudentExamReports() {
           <ul className="section-list">
             {Array.isArray(selectedReport.sections) &&
               selectedReport.sections.map((section) => (
-
-              <li key={section.section_name}>
-                <strong>{section.section_name}</strong> –{" "}
-                {section.performance_band}
-                <br />
-                Strengths: {section.strengths_summary}
-                <br />
-                Improvement: {section.improvement_summary}
-              </li>
-            ))}
+                <li key={section.section_name}>
+                  <strong>{section.section_name}</strong> –{" "}
+                  {section.performance_band}
+                  <br />
+                  Strengths: {section.strengths_summary}
+                  <br />
+                  Improvement: {section.improvement_summary}
+                </li>
+              ))}
           </ul>
 
-          <p style={{ marginTop: "20px", fontStyle: "italic" }}>
+          <p className="report-disclaimer">
             {selectedReport.disclaimer}
           </p>
         </>
