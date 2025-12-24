@@ -346,13 +346,16 @@ function ThinkingSkillsReport({ report }) {
         <h3>Overall Accuracy</h3>
       
         {(() => {
-          const accuracy = overall.accuracy_percent;
+          const accuracy = Math.round(
+            (overall.correct / overall.total_questions) * 100
+          );
+
       
           const donutBackground =
             accuracy === 0
               ? "#e5e7eb" // full grey when no correct answers
               : `conic-gradient(
-                  #2563eb ${accuracy * 3.6}deg,
+                  #22c55e ${accuracy * 3.6}deg,
                   #e5e7eb 0deg
                 )`;
       
