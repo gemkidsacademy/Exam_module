@@ -4,7 +4,7 @@ import "./StudentExamReports.css";
 export default function StudentExamReports() {
   const [students, setStudents] = useState([]);
   const [selectedStudentId, setSelectedStudentId] = useState("");
-  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [studentDetails, setStudentDetails] = useState(null);
 
   const [reports, setReports] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
@@ -12,28 +12,47 @@ export default function StudentExamReports() {
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
   /* ============================
-     Load Students
+     Load Students (dropdown list)
+     Uses student_id as key
   ============================ */
   useEffect(() => {
-    fetch(`${BACKEND_URL}/students`)
+    fetch(`${BACKEND_URL}/api/admin/students`)
       .then((res) => res.json())
       .then(setStudents)
       .catch(() => alert("Failed to load students"));
   }, []);
 
   /* ============================
-     Load Selective Reports
+     Load Student Details
+     Triggered by student_id
   ============================ */
   useEffect(() => {
-    if (!selectedStudent) return;
+    if (!selectedStudentId) return;
+
+    fetch(`${BACKEND_URL}/api/admin/students/${selectedStudentId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setStudentDetails(data);
+        setReports([]);
+        setSelectedReport(null);
+      })
+      .catch(() => alert("Failed to load student details"));
+  }, [selectedStudentId]);
+
+  /* ============================
+     Load Selective Reports
+     Triggered by studentDetails
+  ============================ */
+  useEffect(() => {
+    if (!studentDetails) return;
 
     fetch(
-      `${BACKEND_URL}/api/admin/students/${selectedStudent.id}/selective-reports`
+      `${BACKEND_URL}/api/admin/students/${studentDetails.student_id}/selective-reports`
     )
       .then((res) => res.json())
       .then(setReports)
       .catch(() => alert("Failed to load reports"));
-  }, [selectedStudent]);
+  }, [studentDetails]);
 
   /* ============================
      UI
@@ -43,9 +62,9 @@ export default function StudentExamReports() {
       <h2>Student Exam Reports</h2>
 
       {/* ============================
-         STEP 1: SELECT STUDENT (DROPDOWN)
+         STEP 1: SELECT STUDENT ID
       ============================ */}
-      {!selectedStudent && (
+      {!studentDetails && (
         <>
           <h4>Select Student</h4>
 
@@ -54,49 +73,45 @@ export default function StudentExamReports() {
               value={selectedStudentId}
               onChange={(e) => setSelectedStudentId(e.target.value)}
             >
-              <option value="">-- Select Student --</option>
+              <option value="">-- Select Student ID --</option>
               {Array.isArray(students) &&
                 students.map((student) => (
-                  <option key={student.id} value={student.id}>
-                    {student.name}
+                  <option
+                    key={student.student_id}
+                    value={student.student_id}
+                  >
+                    {student.student_id} – {student.name}
                   </option>
                 ))}
             </select>
-
-            <button
-              className="dashboard-button"
-              disabled={!selectedStudentId}
-              onClick={() => {
-                const student = students.find(
-                  (s) => s.id === selectedStudentId
-                );
-                setSelectedStudent(student);
-                setReports([]);
-                setSelectedReport(null);
-              }}
-            >
-              Load Reports
-            </button>
           </div>
         </>
       )}
 
       {/* ============================
-         STEP 2: SELECT EXAM ATTEMPT
+         STEP 2: STUDENT CONTEXT
       ============================ */}
-      {selectedStudent && !selectedReport && (
+      {studentDetails && !selectedReport && (
         <>
-          <button onClick={() => {
-            setSelectedStudent(null);
-            setSelectedStudentId("");
-            setReports([]);
-          }}>
+          <button
+            onClick={() => {
+              setSelectedStudentId("");
+              setStudentDetails(null);
+              setReports([]);
+            }}
+          >
             ← Back to Students
           </button>
 
-          <h4>
-            Selective Exam Reports for {selectedStudent.name}
-          </h4>
+          <div className="student-info-box">
+            <p><strong>Student ID:</strong> {studentDetails.student_id}</p>
+            <p><strong>Name:</strong> {studentDetails.name}</p>
+            <p><strong>Class:</strong> {studentDetails.class_name}</p>
+            <p><strong>Class Day:</strong> {studentDetails.class_day}</p>
+            <p><strong>Parent Email:</strong> {studentDetails.parent_email}</p>
+          </div>
+
+          <h4>Selective Exam Reports</h4>
 
           {reports.length === 0 && (
             <p className="empty-state">No Selective exam reports found.</p>
@@ -119,7 +134,7 @@ export default function StudentExamReports() {
       )}
 
       {/* ============================
-         STEP 3: VIEW REPORT (READ ONLY)
+         STEP 3: VIEW REPORT
       ============================ */}
       {selectedReport && (
         <>
