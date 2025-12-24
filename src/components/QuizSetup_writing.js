@@ -5,7 +5,7 @@ const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
 export default function QuizSetup_writing() {
   const [form, setForm] = useState({
-    className: "",
+    className: "selective",
     topic: "",
     difficulty: ""
   });
@@ -74,18 +74,12 @@ export default function QuizSetup_writing() {
 
         {/* CLASS */}
         <label>Class:</label>
-        <select
-          name="className"
-          value={form.className}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Select Class</option>
-          <option value="selective">Selective</option>
-          <option value="year5">Year 5</option>
-          <option value="year6">Year 6</option>
-        </select>
-
+        <input
+          type="text"
+          value="Selective"
+          readOnly
+          style={{ backgroundColor: "#f0f0f0" }}
+        />
         {/* SUBJECT (LOCKED) */}
         <label>Subject:</label>
         <input
