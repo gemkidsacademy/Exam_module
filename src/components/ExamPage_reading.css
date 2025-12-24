@@ -103,11 +103,13 @@
 .index-circle:hover {
   background: #eef2ff;
 }
-
+.index-circle.visited:not(.answered) {
+  background: #e5e7eb;   /* grey */
+  color: #374151;
+}
 .index-circle.answered {
-  background: #2563eb;
-  border-color: #2563eb;
-  color: #ffffff;
+  background: #22c55e; /* green */
+  color: white;
 }
 
 .index-circle.active {
