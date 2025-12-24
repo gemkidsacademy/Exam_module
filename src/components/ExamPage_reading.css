@@ -99,6 +99,11 @@
   cursor: pointer;
   transition: all 0.15s ease;
 }
+.index-circle.visited {
+  background: #e5e7eb; /* GREY */
+  color: #111827;
+  border-color: #d1d5db;
+}
 
 .index-circle:hover {
   background: #eef2ff;
