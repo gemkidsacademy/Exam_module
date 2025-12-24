@@ -83,6 +83,7 @@ export default function ExamPageThinkingSkills({
         // ✅ COMPLETED → SHOW REPORT
         if (data.completed === true) {
           await loadReport();
+          onExamFinish?.();  
           return;
         }
 
@@ -124,36 +125,36 @@ export default function ExamPageThinkingSkills({
      FINISH EXAM (SUBMIT ONLY — NO UI DECISIONS)
   ============================================================ */
   const finishExam = useCallback(
-    async (reason = "submitted") => {
-      if (hasSubmittedRef.current) return;
-      hasSubmittedRef.current = true;
+  async (reason = "submitted") => {
+    if (hasSubmittedRef.current) return;
+    hasSubmittedRef.current = true;
 
-      const payload = {
-        student_id: studentId,
-        answers
-      };
+    const payload = {
+      student_id: studentId,
+      answers
+    };
 
-      console.log("📤 finish-exam payload:", payload);
+    try {
+      await fetch(
+        "https://web-production-481a5.up.railway.app/api/student/finish-exam/thinking-skills",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }
+      );
 
-      try {
-        await fetch(
-          "https://web-production-481a5.up.railway.app/api/student/finish-exam/thinking-skills",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          }
-        );
+      await loadReport();
 
-        // ⬅️ ONLY NOW load report
-        await loadReport();
+      // ✅ notify parent
+      onExamFinish?.();
 
-      } catch (err) {
-        console.error("❌ finish-exam error:", err);
-      }
-    },
-    [studentId, answers, loadReport]
-  );
+    } catch (err) {
+      console.error("❌ finish-exam error:", err);
+    }
+  },
+  [studentId, answers, loadReport, onExamFinish]
+);
 
   /* ============================================================
      TIMER (AUTO SUBMIT)
