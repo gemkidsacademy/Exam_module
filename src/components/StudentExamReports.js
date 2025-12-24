@@ -44,15 +44,15 @@ export default function StudentExamReports() {
      Triggered by studentDetails
   ============================ */
   useEffect(() => {
-    if (!studentDetails) return;
-
+    if (!selectedStudentId) return;
+  
     fetch(
-      `${BACKEND_URL}/api/admin/students/${studentDetails.student_id}/selective-reports`
+      `${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-reports`
     )
       .then((res) => res.json())
       .then(setReports)
       .catch(() => alert("Failed to load reports"));
-  }, [studentDetails]);
+  }, [selectedStudentId]);
 
   /* ============================
      UI
