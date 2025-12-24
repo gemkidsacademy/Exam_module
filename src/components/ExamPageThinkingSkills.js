@@ -17,7 +17,7 @@ export default function ExamPageThinkingSkills({
 
   const hasSubmittedRef = useRef(false);
   const prevIndexRef = useRef(null);
-
+  
   /**
    * mode:
    * - loading → deciding what to show
@@ -340,24 +340,46 @@ function ThinkingSkillsReport({ report }) {
       <div className="report-grid">
 
         {/* ===============================
-           OVERALL ACCURACY (B)
-        =============================== */}
-        <div className="report-card">
-          <h3>Overall Accuracy</h3>
-
-          <div className="donut">
-            <span>{overall.accuracy_percent}%</span>
-          </div>
-
-          <div className="stats">
-            <p>Total Questions: {overall.total_questions}</p>
-            <p>Attempted: {overall.attempted}</p>
-            <p>Correct: {overall.correct}</p>
-            <p>Incorrect: {overall.incorrect}</p>
-            <p>Not Attempted: {overall.not_attempted}</p>
-            <p>Score: {overall.score_percent}%</p>
-          </div>
+          OVERALL ACCURACY (B)
+      =============================== */}
+      <div className="report-card">
+        <h3>Overall Accuracy</h3>
+      
+        {(() => {
+          const accuracy = overall.accuracy_percent;
+      
+          const donutBackground =
+            accuracy === 0
+              ? "#e5e7eb" // full grey when no correct answers
+              : `conic-gradient(
+                  #2563eb ${accuracy * 3.6}deg,
+                  #e5e7eb 0deg
+                )`;
+      
+          return (
+            <div className="donut-wrapper">
+              <div
+                className="donut"
+                style={{ background: donutBackground }}
+              >
+                <span className="donut-text">
+                  {accuracy}%
+                </span>
+              </div>
+            </div>
+          );
+        })()}
+      
+        <div className="stats">
+          <p>Total Questions: {overall.total_questions}</p>
+          <p>Attempted: {overall.attempted}</p>
+          <p>Correct: {overall.correct}</p>
+          <p>Incorrect: {overall.incorrect}</p>
+          <p>Not Attempted: {overall.not_attempted}</p>
+          <p>Score: {overall.score_percent}%</p>
         </div>
+      </div>
+
 
         {/* ===============================
            TOPIC-WISE PERFORMANCE (A)
