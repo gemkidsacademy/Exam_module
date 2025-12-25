@@ -86,10 +86,12 @@ export default function GenerateExam_writing() {
   /* ---------------- UI (BUTTON ONLY) ---------------- */
   return (
     <div className="generate-writing-container">
+    
       {error && <div className="error-text">{error}</div>}
       {successMessage && (
         <div className="success-text">{successMessage}</div>
       )}
+      <h2>Generate Writing Exam</h2>
 
       <button
         className="primary-btn"
