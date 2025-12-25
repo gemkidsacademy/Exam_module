@@ -5,6 +5,8 @@ export default function StudentExamReports() {
   const [students, setStudents] = useState([]);
   const [selectedStudentId, setSelectedStudentId] = useState("");
   const [studentDetails, setStudentDetails] = useState(null);
+  const [reportsLoading, setReportsLoading] = useState(false);
+
 
   const [reports, setReports] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
@@ -62,37 +64,35 @@ export default function StudentExamReports() {
      Triggered by student_id
   ============================ */
   useEffect(() => {
-    if (!selectedStudentId) return;
+      if (!selectedStudentId) return;
+    
+      setReportsLoading(true);
+    
+      fetch(`${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-reports`)
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("✅ Reports received:", data);
+          setReports(Array.isArray(data) ? data : []);
+        })
+        .catch((err) => {
+          console.error("❌ Failed to load reports", err);
+          setReports([]);
+        })
+        .finally(() => {
+          setReportsLoading(false);
+        });
+    }, [selectedStudentId]);
 
-    console.log(
-      "📄 Fetching reports for student_id:",
-      selectedStudentId
-    );
-    console.log(
-      "➡️ Reports URL:",
-      `${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-reports`
-    );
-
-    fetch(
-      `${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-reports`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("✅ Reports received:", data);
-        setReports(data);
-      })
-      .catch((err) => {
-        console.error("❌ Failed to load reports", err);
-        alert("Failed to load reports");
-      });
-  }, [selectedStudentId]);
 
   /* ============================
      UI
   ============================ */
+  console.log("🧪 UI render → reports:", reports);
   return (
     <div className="student-exam-reports">
       <h2>Student Exam Reports</h2>
+      
+
 
       {/* ============================
          STEP 1: SELECT STUDENT ID
@@ -154,9 +154,10 @@ export default function StudentExamReports() {
 
           <h4>Selective Exam Reports</h4>
 
-          {reports.length === 0 && (
+          {!reportsLoading && reports.length === 0 && (
             <p className="empty-state">No Selective exam reports found.</p>
           )}
+
 
           <ul>
             {Array.isArray(reports) &&
