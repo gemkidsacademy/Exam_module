@@ -207,9 +207,11 @@ export default function StudentExamReports() {
                   <strong>{section.section_name}</strong> –{" "}
                   {section.performance_band}
                   <br />
-                  Strengths: {section.strengths_summary}
+                  <strong>Strengths:</strong>{" "}
+                  {section.strengths || "No strengths identified."}
                   <br />
-                  Improvement: {section.improvement_summary}
+                  <strong>Improvement:</strong>{" "}
+                  {section.improvements || "No improvement areas identified."}
                 </li>
               ))}
           </ul>
