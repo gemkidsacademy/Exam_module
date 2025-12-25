@@ -65,10 +65,8 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
       navigate("/AdminPanel");
     } else if (data?.class_name === "Selective") {
       navigate("/SelectiveDashboard");
-    } else if (data?.class_name === "Foundational") {
-      navigate("/selectiveFoundational");
     } else {
-      navigate("/ExamModule");
+      navigate("/selectiveFoundational");
     }
 
   } catch (err) {
