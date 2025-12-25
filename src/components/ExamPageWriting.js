@@ -4,10 +4,10 @@ import "./ExamPage.css";
 const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
 export default function WritingComponent({
-    studentId,
-    onExamStart,
-    onExamFinish
-  }) {
+  studentId,
+  onExamStart,
+  onExamFinish
+}) {
 
   /* -----------------------------------------------------------
      STATE
@@ -23,14 +23,19 @@ export default function WritingComponent({
      STEP 1 — Start writing exam session
   ----------------------------------------------------------- */
   const startExam = async () => {
+    console.log("🟢 startExam() called");
+
     try {
-      await fetch(
+      const res = await fetch(
         `${BACKEND_URL}/api/student/start-writing-exam?student_id=${studentId}`,
         { method: "POST" }
       );
+
+      const data = await res.json();
+      console.log("🟢 start-writing-exam response:", data);
+
     } catch (err) {
-      console.error("Failed to start writing exam:", err);
-      alert("Unable to start writing exam.");
+      console.error("❌ Failed to start writing exam:", err);
     }
   };
 
@@ -38,42 +43,69 @@ export default function WritingComponent({
      STEP 2 — Load current writing exam session
   ----------------------------------------------------------- */
   const loadExam = async () => {
-  try {
-    const res = await fetch(
-      `${BACKEND_URL}/api/exams/writing/current?student_id=${studentId}`
-    );
+    console.log("🟡 loadExam() called");
 
-    if (!res.ok) throw new Error("Failed to load writing exam");
+    try {
+      const res = await fetch(
+        `${BACKEND_URL}/api/exams/writing/current?student_id=${studentId}`
+      );
 
-    const data = await res.json();
+      console.log("🟡 writing/current status:", res.status);
 
-    // ✅ EXAM ALREADY COMPLETED (refresh / resume case)
-    if (data.completed === true) {
-      setCompleted(true);
-      onExamFinish?.();     // 🔓 unlock tabs
-      return;
+      if (!res.ok) {
+        console.error("❌ writing/current not OK");
+        throw new Error("Failed to load writing exam");
+      }
+
+      const data = await res.json();
+      console.log("🟡 writing/current response:", data);
+      console.log("🟡 typeof completed:", typeof data.completed);
+
+      // 🔴 COMPLETED PATH
+      if (data.completed === true) {
+        console.log("🔴 Exam marked completed → redirecting");
+
+        setCompleted(true);
+
+        if (typeof onExamFinish === "function") {
+          console.log("🔴 Calling onExamFinish()");
+          onExamFinish();
+        } else {
+          console.warn("⚠️ onExamFinish is NOT a function");
+        }
+
+        return;
+      }
+
+      // 🟢 ACTIVE PATH
+      console.log("🟢 Exam is active → rendering exam UI");
+
+      setExam(data.exam);
+      setTimeLeft(data.remaining_seconds);
+
+      if (typeof onExamStart === "function") {
+        console.log("🟢 Calling onExamStart()");
+        onExamStart();
+      } else {
+        console.warn("⚠️ onExamStart is NOT a function");
+      }
+
+    } catch (err) {
+      console.error("❌ loadExam error:", err);
+    } finally {
+      setLoading(false);
     }
-
-    // ✅ ACTIVE EXAM
-    setExam(data.exam);
-    setTimeLeft(data.remaining_seconds);
-    onExamStart?.();        // 🔒 lock tabs
-
-  } catch (err) {
-    console.error(err);
-    alert("Unable to load writing exam.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   /* -----------------------------------------------------------
      ON MOUNT: Start exam → Load exam
   ----------------------------------------------------------- */
   useEffect(() => {
+    console.log("🔵 WritingComponent mounted");
+
     const init = async () => {
-      await startExam();  // ensures StudentExamWriting row exists
-      await loadExam();   // now backend will not return 404
+      await startExam();
+      await loadExam();
     };
 
     init();
@@ -83,8 +115,15 @@ export default function WritingComponent({
      TIMER (DISPLAY ONLY)
   ----------------------------------------------------------- */
   useEffect(() => {
-    if (loading || completed) return;
-    if (timeLeft <= 0) return finishExam();
+    if (loading || completed) {
+      console.log("⏸ Timer paused (loading or completed)");
+      return;
+    }
+
+    if (timeLeft <= 0) {
+      console.log("⏰ Time reached zero → auto finish");
+      return finishExam();
+    }
 
     const timer = setInterval(() => {
       setTimeLeft((t) => Math.max(0, t - 1));
@@ -97,8 +136,10 @@ export default function WritingComponent({
      SUBMIT WRITING ANSWER
   ----------------------------------------------------------- */
   const finishExam = async () => {
+    console.log("🟣 finishExam() called");
+
     try {
-      await fetch(
+      const res = await fetch(
         `${BACKEND_URL}/api/exams/writing/submit?student_id=${studentId}`,
         {
           method: "POST",
@@ -106,11 +147,19 @@ export default function WritingComponent({
           body: JSON.stringify({ answer_text: answerText })
         }
       );
+
+      console.log("🟣 submit status:", res.status);
+
     } catch (err) {
-      console.error("Submission failed:", err);
+      console.error("❌ Submission failed:", err);
     } finally {
+      console.log("🟣 Marking completed + calling onExamFinish");
+
       setCompleted(true);
-      onExamFinish?.();
+
+      if (typeof onExamFinish === "function") {
+        onExamFinish();
+      }
     }
   };
 
@@ -130,12 +179,17 @@ export default function WritingComponent({
     return <div className="loading-screen">Loading writing exam…</div>;
   }
 
-  if (!exam) return null;
+  if (!exam && !completed) {
+    console.warn("⚠️ No exam data but not completed");
+    return null;
+  }
 
   /* -----------------------------------------------------------
      COMPLETED VIEW
   ----------------------------------------------------------- */
   if (completed) {
+    console.log("✅ Rendering COMPLETED screen");
+
     return (
       <div className="completed-screen">
         <h1>Writing Exam Completed</h1>
@@ -147,16 +201,19 @@ export default function WritingComponent({
   /* -----------------------------------------------------------
      MAIN RENDER
   ----------------------------------------------------------- */
+  console.log("🧠 Rendering ACTIVE writing exam");
+
   return (
     <div className="writing-container">
-      {/* HEADER */}
       <div className="writing-header">
         <div className="timer">Time Left: {formatTime(timeLeft)}</div>
       </div>
 
-      {/* COLLAPSIBLE PROMPT */}
       <div className="writing-question-box">
-        <div className="prompt-header" onClick={() => setShowPrompt(!showPrompt)}>
+        <div
+          className="prompt-header"
+          onClick={() => setShowPrompt(!showPrompt)}
+        >
           <span>Writing Prompt</span>
           <span>{showPrompt ? "▼ Hide" : "▶ Show"}</span>
         </div>
@@ -164,7 +221,6 @@ export default function WritingComponent({
         {showPrompt && <p className="writing-text">{exam.question_text}</p>}
       </div>
 
-      {/* ANSWER AREA */}
       <textarea
         className="writing-answer-box"
         placeholder="Start writing your response here..."
@@ -172,7 +228,6 @@ export default function WritingComponent({
         onChange={(e) => setAnswerText(e.target.value)}
       />
 
-      {/* SUBMIT */}
       <button className="submit-writing-btn" onClick={finishExam}>
         Submit Writing
       </button>
