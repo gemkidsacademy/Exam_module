@@ -159,22 +159,29 @@ export default function StudentExamReports() {
           )}
 
 
-          <ul>
-            {Array.isArray(reports) &&
-              reports.map((report, index) => (
-                <li key={report.id}>
-                  <button
-                    className="dashboard-button"
-                    onClick={() => {
-                      console.log("📘 Opening report:", report);
-                      setSelectedReport(report);
-                    }}
-                  >
-                    Selective Exam – {report.exam_date} (Attempt {index + 1})
-                  </button>
-                </li>
-              ))}
-          </ul>
+          <select
+            value={selectedReport?.id || ""}
+            onChange={(e) => {
+              const report = reports.find(
+                (r) => r.id === Number(e.target.value)
+              );
+              setSelectedReport(report || null);
+            }}
+          >
+            <option value="">-- Select Exam --</option>
+          
+            {reports.map((report) => (
+              <option key={report.id} value={report.id}>
+                {report.exam_type
+                  .replace("_", " ")
+                  .replace(/\b\w/g, c => c.toUpperCase())
+                }
+                {" — "}
+                {report.exam_date}
+              </option>
+            ))}
+          </select>
+
         </>
       )}
 
