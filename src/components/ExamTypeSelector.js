@@ -1,28 +1,54 @@
 import "./ExamTypeSelector.css";
+
 import UploadWord from "./UploadWord";
 import ReadingUploadPanel from "./ReadingUploadPanel";
 import UploadWord_writing from "./UploadWord_writing";
 
-
-
-
 export default function ExamTypeSelector({ examType, onSelect }) {
+  // --------------------------------------
+  // Exam selection options
+  // --------------------------------------
   const examOptions = [
     { label: "Thinking Skills Exam", value: "thinkingskills" },
     { label: "Mathematical Reasoning", value: "mathematical-reasoning" },
     { label: "Reading Exam", value: "reading" },
     { label: "Writing Exam", value: "writing" },
+    { label: "Foundational", value: "foundational" }, // ✅ NEW
   ];
 
-  if (examType === "thinkingskills") return <UploadWord />;
-  if (examType === "mathematical-reasoning") return <UploadWord />;
-  if (examType === "reading") return <ReadingUploadPanel />;
-  if (examType === "writing") return <UploadWord_writing />;
+  // --------------------------------------
+  // Render selected exam panel
+  // --------------------------------------
+  const renderExamPanel = () => {
+    switch (examType) {
+      case "thinkingskills":
+      case "mathematical-reasoning":
+      case "foundational": // ✅ NEW
+        return <UploadWord />;
 
+      case "reading":
+        return <ReadingUploadPanel />;
+
+      case "writing":
+        return <UploadWord_writing />;
+
+      default:
+        return null;
+    }
+  };
+
+  // --------------------------------------
+  // If an exam is selected, render its panel
+  // --------------------------------------
+  if (examType) {
+    return renderExamPanel();
+  }
+
+  // --------------------------------------
+  // Render exam type selector buttons
+  // --------------------------------------
   return (
     <div className="exam-selector-container">
-      
-
       <div className="exam-selector-grid">
         {examOptions.map((item) => (
           <button
