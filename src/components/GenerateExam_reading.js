@@ -90,9 +90,10 @@ export default function GenerateExam_reading() {
   --------------------------- */
   return (
     <div className="generate-reading-container">
+      
       {error && <p className="error-text">{error}</p>}
       {successMessage && <p className="success-text">{successMessage}</p>}
-
+      <h2>Generate Reading Exam</h2>
       <button
         className="primary-btn"
         onClick={handleGenerateExam}
