@@ -1,144 +1,126 @@
 import React, { useEffect, useState } from "react";
 import "./StudentExamReports.css";
 
+const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+
 export default function StudentExamReports() {
   const [students, setStudents] = useState([]);
   const [selectedStudentId, setSelectedStudentId] = useState("");
   const [studentDetails, setStudentDetails] = useState(null);
-  const [reportsLoading, setReportsLoading] = useState(false);
-
 
   const [reports, setReports] = useState([]);
-  const [selectedReport, setSelectedReport] = useState(null);
+  const [reportsLoading, setReportsLoading] = useState(false);
 
-  const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+  const [selectedDate, setSelectedDate] = useState("");
 
   /* ============================
-     Load Students (dropdown list)
-     Uses student_id as key
+     Helpers
+  ============================ */
+  const groupReportsByDate = (reports) => {
+    const grouped = {};
+    reports.forEach((r) => {
+      const date = new Date(r.created_at).toISOString().split("T")[0];
+      if (!grouped[date]) grouped[date] = [];
+      grouped[date].push(r);
+    });
+    return grouped;
+  };
+
+  const formatExamName = (type) => {
+    if (!type) return "";
+    if (type === "mathematical_reasoning") return "Mathematical Reasoning";
+    if (type === "thinking_skills" || type === "Thinking Skills")
+      return "Thinking Skills";
+    return type.charAt(0).toUpperCase() + type.slice(1);
+  };
+
+  /* ============================
+     Load Students
   ============================ */
   useEffect(() => {
-    console.log("📡 Fetching students list…");
-
     fetch(`${BACKEND_URL}/api/admin/students`)
       .then((res) => res.json())
-      .then((data) => {
-        console.log("✅ Students received:", data);
-        setStudents(data);
-      })
-      .catch((err) => {
-        console.error("❌ Failed to load students", err);
-        alert("Failed to load students");
-      });
+      .then(setStudents)
+      .catch(() => alert("Failed to load students"));
   }, []);
 
   /* ============================
      Load Student Details
-     Triggered by student_id
   ============================ */
   useEffect(() => {
     if (!selectedStudentId) return;
 
-    console.log("👤 Selected student_id:", selectedStudentId);
-    console.log(
-      "➡️ Fetching student details:",
-      `${BACKEND_URL}/api/admin/students/${selectedStudentId}`
-    );
-
     fetch(`${BACKEND_URL}/api/admin/students/${selectedStudentId}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log("✅ Student details received:", data);
         setStudentDetails(data);
         setReports([]);
-        setSelectedReport(null);
+        setSelectedDate("");
       })
-      .catch((err) => {
-        console.error("❌ Failed to load student details", err);
-        alert("Failed to load student details");
-      });
+      .catch(() => alert("Failed to load student details"));
   }, [selectedStudentId]);
 
   /* ============================
      Load Selective Reports
-     Triggered by student_id
   ============================ */
   useEffect(() => {
-      if (!selectedStudentId) return;
-    
-      setReportsLoading(true);
-    
-      fetch(`${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-reports`)
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("✅ Reports received:", data);
-          setReports(Array.isArray(data) ? data : []);
-        })
-        .catch((err) => {
-          console.error("❌ Failed to load reports", err);
-          setReports([]);
-        })
-        .finally(() => {
-          setReportsLoading(false);
-        });
-    }, [selectedStudentId]);
+    if (!selectedStudentId) return;
 
+    setReportsLoading(true);
+
+    fetch(
+      `${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-reports`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setReports(Array.isArray(data.reports) ? data.reports : []);
+      })
+      .catch(() => setReports([]))
+      .finally(() => setReportsLoading(false));
+  }, [selectedStudentId]);
+
+  /* ============================
+     Derived State
+  ============================ */
+  const groupedReports = groupReportsByDate(reports);
+  const availableDates = Object.keys(groupedReports).sort(
+    (a, b) => new Date(b) - new Date(a)
+  );
 
   /* ============================
      UI
   ============================ */
-  console.log("🧪 UI render → reports:", reports);
   return (
     <div className="student-exam-reports">
       <h2>Student Exam Reports</h2>
-      
 
-
-      {/* ============================
-         STEP 1: SELECT STUDENT ID
-      ============================ */}
+      {/* STEP 1: SELECT STUDENT */}
       {!studentDetails && (
         <>
           <h4>Select Student</h4>
-
-          <div className="student-select-box">
-            <select
-              value={selectedStudentId}
-              onChange={(e) => {
-                console.log("🟡 Dropdown changed → value:", e.target.value);
-                setSelectedStudentId(e.target.value);
-              }}
-            >
-              <option value="">-- Select Student ID --</option>
-
-              {Array.isArray(students) &&
-                students.map((student) => {
-                  console.log("🔹 Rendering option:", student);
-                  return (
-                    <option
-                      key={student.student_id}
-                      value={student.student_id}
-                    >
-                      {student.student_id} – {student.name}
-                    </option>
-                  );
-                })}
-            </select>
-          </div>
+          <select
+            value={selectedStudentId}
+            onChange={(e) => setSelectedStudentId(e.target.value)}
+          >
+            <option value="">-- Select Student ID --</option>
+            {students.map((s) => (
+              <option key={s.student_id} value={s.student_id}>
+                {s.student_id} – {s.name}
+              </option>
+            ))}
+          </select>
         </>
       )}
 
-      {/* ============================
-         STEP 2: STUDENT CONTEXT
-      ============================ */}
-      {studentDetails && !selectedReport && (
+      {/* STEP 2: STUDENT CONTEXT */}
+      {studentDetails && (
         <>
           <button
             onClick={() => {
-              console.log("↩️ Resetting student selection");
               setSelectedStudentId("");
               setStudentDetails(null);
               setReports([]);
+              setSelectedDate("");
             }}
           >
             ← Back to Students
@@ -152,81 +134,68 @@ export default function StudentExamReports() {
             <p><strong>Parent Email:</strong> {studentDetails.parent_email}</p>
           </div>
 
-          <h4>Selective Exam Reports</h4>
+          <h4>Selective Exam Attempts</h4>
 
-          {!reportsLoading && reports.length === 0 && (
+          {reportsLoading && <p>Loading reports…</p>}
+
+          {!reportsLoading && availableDates.length === 0 && (
             <p className="empty-state">No Selective exam reports found.</p>
           )}
 
-
-          <select
-            value={selectedReport?.id || ""}
-            onChange={(e) => {
-              const report = reports.find(
-                (r) => r.id === Number(e.target.value)
-              );
-              setSelectedReport(report || null);
-            }}
-          >
-            <option value="">-- Select Exam --</option>
-          
-            {reports.map((report) => (
-              <option key={report.id} value={report.id}>
-                {report.exam_type
-                  .replace("_", " ")
-                  .replace(/\b\w/g, c => c.toUpperCase())
-                }
-                {" — "}
-                {report.exam_date}
-              </option>
-            ))}
-          </select>
-
+          {/* STEP 3: SELECT ATTEMPT DATE */}
+          {availableDates.length > 0 && (
+            <>
+              <label>Select Attempt</label>
+              <select
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+              >
+                <option value="">-- Select Attempt --</option>
+                {availableDates.map((date) => (
+                  <option key={date} value={date}>
+                    {date}
+                  </option>
+                ))}
+              </select>
+            </>
+          )}
         </>
       )}
 
-      {/* ============================
-         STEP 3: VIEW REPORT
-      ============================ */}
-      {selectedReport && (
-        <>
-          <button onClick={() => setSelectedReport(null)}>
-            ← Back to Exams
-          </button>
+      {/* STEP 4: SHOW ALL EXAMS FOR DATE */}
+      {selectedDate && (
+        <div className="attempt-report-group">
+          <h3>Exam Reports – {selectedDate}</h3>
 
-          <h3>Selective Readiness Report</h3>
+          {groupedReports[selectedDate].map((report) => (
+            <div key={report.id} className="exam-report-card">
+              <h4>{formatExamName(report.exam_type)}</h4>
 
-          <p>
-            <strong>Overall Readiness:</strong>{" "}
-            {selectedReport.readiness_band}
-          </p>
+              <p>
+                <strong>Overall Readiness:</strong>{" "}
+                {report.readiness_band}
+              </p>
 
-          <p>
-            <strong>School Guidance:</strong>{" "}
-            {selectedReport.school_guidance_level}
-          </p>
+              <p>
+                <strong>School Guidance:</strong>{" "}
+                {report.school_guidance_level}
+              </p>
 
-          <h4>Section Performance</h4>
-          <ul className="section-list">
-            {Array.isArray(selectedReport.sections) &&
-              selectedReport.sections.map((section) => (
-                <li key={section.section_name}>
-                  <strong>{section.section_name}</strong> –{" "}
-                  {section.performance_band}
-                  <br />
-                  <strong>Strengths:</strong>{" "}
-                  {section.strengths || "No strengths identified."}
-                  <br />
-                  <strong>Improvement:</strong>{" "}
-                  {section.improvements || "No improvement areas identified."}
-                </li>
-              ))}
-          </ul>
+              <h5>Section Performance</h5>
+              <ul className="section-list">
+                {Array.isArray(report.sections) &&
+                  report.sections.map((section) => (
+                    <li key={section.section_name}>
+                      <strong>{section.section_name}</strong> –{" "}
+                      {section.performance_band}
+                    </li>
+                  ))}
+              </ul>
 
-          <p className="report-disclaimer">
-            {selectedReport.disclaimer}
-          </p>
-        </>
+              <p className="report-disclaimer">{report.disclaimer}</p>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
