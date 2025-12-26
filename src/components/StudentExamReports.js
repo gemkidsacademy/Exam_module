@@ -48,19 +48,19 @@ export default function StudentExamReports() {
      Load Students
   ============================ */
   useEffect(() => {
-    console.log("📡 Fetching students list…");
+  console.log("📡 Fetching students list…");
 
-    fetch(`${BACKEND_URL}/api/admin/students`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("✅ Students fetched:", data);
-        setStudents(data);
-      })
-      .catch((err) => {
-        console.error("❌ Failed to load students:", err);
-        alert("Failed to load students");
-      });
-  }, []);
+  fetch(`${BACKEND_URL}/api/admin/students`)
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("✅ Students fetched:", data);
+      setStudents(Array.isArray(data) ? data : []);
+    })
+    .catch((err) => {
+      console.error("❌ Failed to load students:", err);
+      alert("Failed to load students");
+    });
+}, []);
 
   /* ============================
      Load Student Details
@@ -92,35 +92,37 @@ export default function StudentExamReports() {
      Load Selective Reports
   ============================ */
   useEffect(() => {
-    if (!selectedStudentId) return;
+  if (!selectedStudentId) return;
 
-    console.log("📊 Fetching selective reports for:", selectedStudentId);
-    setReportsLoading(true);
+  console.log("📊 Fetching selective reports for:", selectedStudentId);
+  setReportsLoading(true);
 
-    fetch(
-      `${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-reports`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("📦 Raw selective-reports response:", data);
+  fetch(
+    `${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-reports`
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("📦 Raw selective-reports response:", data);
 
-        if (!data || !Array.isArray(data.reports)) {
-          console.warn("⚠️ data.reports is not an array:", data);
-          setReports([]);
-        } else {
-          console.log("✅ Parsed reports:", data.reports);
-          setReports(data.reports);
-        }
-      })
-      .catch((err) => {
-        console.error("❌ Failed to load reports:", err);
+      // Backend returns an ARRAY directly
+      if (Array.isArray(data)) {
+        console.log("✅ Reports array received. Count:", data.length);
+        setReports(data);
+      } else {
+        console.warn("⚠️ Unexpected reports response shape:", data);
         setReports([]);
-      })
-      .finally(() => {
-        setReportsLoading(false);
-        console.log("📊 Reports loading finished");
-      });
-  }, [selectedStudentId]);
+      }
+    })
+    .catch((err) => {
+      console.error("❌ Failed to load selective reports:", err);
+      setReports([]);
+    })
+    .finally(() => {
+      setReportsLoading(false);
+      console.log("📊 Reports loading finished");
+    });
+}, [selectedStudentId]);
+
 
   /* ============================
      Derived State
