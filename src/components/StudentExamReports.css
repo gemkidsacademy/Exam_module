@@ -3,9 +3,11 @@
 ============================ */
 
 .student-exam-reports {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 24px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 24px 32px;
+  box-sizing: border-box;
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   color: #111827;
 }
