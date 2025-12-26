@@ -17,18 +17,21 @@ export default function StudentExamReports() {
      Helpers
   ============================ */
 
-  const groupReportsByAttempt = (reports) => {
-  const grouped = {};
-
-  reports.forEach((r) => {
-    const key = `Attempt ${r.exam_attempt_id}`;
-
-    if (!grouped[key]) grouped[key] = [];
-    grouped[key].push(r);
-  });
-
-  return grouped;
-};
+  const groupReportsByDate = (reports) => {
+    const grouped = {};
+  
+    reports.forEach((r) => {
+      if (!r.exam_date) return;
+  
+      if (!grouped[r.exam_date]) {
+        grouped[r.exam_date] = [];
+      }
+  
+      grouped[r.exam_date].push(r);
+    });
+  
+    return grouped;
+  };
 
 
   const formatExamName = (type) => {
@@ -122,11 +125,14 @@ export default function StudentExamReports() {
   /* ============================
      Derived State
   ============================ */
-  const groupedReports = groupReportsByAttempt(reports);
+  const groupedReports = groupReportsByDate(reports);
 
   const availableDates = Object.keys(groupedReports).sort(
     (a, b) => new Date(b) - new Date(a)
   );
+
+
+  
 
   console.log("🧪 availableDates:", availableDates);
   console.log("🧪 selectedDate:", selectedDate);
@@ -201,21 +207,20 @@ export default function StudentExamReports() {
           {/* STEP 3: SELECT ATTEMPT DATE */}
           {availableDates.length > 0 && (
             <>
-              <label>Select Attempt</label>
-              <select
-                value={selectedDate}
-                onChange={(e) => {
-                  console.log("🟢 Attempt date selected:", e.target.value);
-                  setSelectedDate(e.target.value);
-                }}
-              >
-                <option value="">-- Select Attempt --</option>
-                {availableDates.map((date) => (
-                  <option key={date} value={date}>
-                    {date}
-                  </option>
-                ))}
-              </select>
+              <label>Select Attempt Date</label>
+
+                <select
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                >
+                  <option value="">-- Select Date --</option>
+                  {availableDates.map((date) => (
+                    <option key={date} value={date}>
+                      {date}
+                    </option>
+                  ))}
+                </select>
+
             </>
           )}
         </>
