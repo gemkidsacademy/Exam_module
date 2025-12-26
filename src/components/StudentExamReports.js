@@ -17,24 +17,19 @@ export default function StudentExamReports() {
      Helpers
   ============================ */
 
-  const groupReportsByDate = (reports) => {
-    console.log("🧪 groupReportsByDate input:", reports);
+  const groupReportsByAttempt = (reports) => {
+  const grouped = {};
 
-    const grouped = {};
-    reports.forEach((r) => {
-      if (!r.created_at) {
-        console.warn("⚠️ Report missing created_at:", r);
-        return;
-      }
+  reports.forEach((r) => {
+    const key = `Attempt ${r.exam_attempt_id}`;
 
-      const date = new Date(r.created_at).toISOString().split("T")[0];
-      if (!grouped[date]) grouped[date] = [];
-      grouped[date].push(r);
-    });
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(r);
+  });
 
-    console.log("🧪 groupReportsByDate output:", grouped);
-    return grouped;
-  };
+  return grouped;
+};
+
 
   const formatExamName = (type) => {
     if (!type) return "Unknown Exam";
@@ -127,7 +122,8 @@ export default function StudentExamReports() {
   /* ============================
      Derived State
   ============================ */
-  const groupedReports = groupReportsByDate(reports);
+  const groupedReports = groupReportsByAttempt(reports);
+
   const availableDates = Object.keys(groupedReports).sort(
     (a, b) => new Date(b) - new Date(a)
   );
