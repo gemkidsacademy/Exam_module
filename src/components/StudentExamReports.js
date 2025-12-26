@@ -229,33 +229,55 @@ export default function StudentExamReports() {
       {/* STEP 4: SHOW ALL EXAMS FOR DATE */}
       {selectedDate && (
         <div className="attempt-report-group">
-          <h3>Exam Reports – {selectedDate}</h3>
-
+          <h3 className="attempt-title">
+            Exam Reports – {selectedDate}
+          </h3>
+        
           {groupedReports[selectedDate]?.map((report) => (
             <div key={report.id} className="exam-report-card">
-              <h4>{formatExamName(report.exam_type)}</h4>
-
-              <p>
-                <strong>Overall Readiness:</strong>{" "}
-                {report.readiness_band}
-              </p>
-
-              <p>
-                <strong>School Guidance:</strong>{" "}
-                {report.school_guidance_level}
-              </p>
-
-              <h5>Section Performance</h5>
-              <ul className="section-list">
+              {/* Header */}
+              <div className="exam-header">
+                <h4>{formatExamName(report.exam_type)}</h4>
+              </div>
+        
+              {/* Summary Row */}
+              <div className="exam-summary-row">
+                <div className="summary-box">
+                  <span className="label">Overall Readiness</span>
+                  <span className="value">
+                    {report.readiness_band}
+                  </span>
+                </div>
+        
+                <div className="summary-box">
+                  <span className="label">School Guidance</span>
+                  <span className="value">
+                    {report.school_guidance_level}
+                  </span>
+                </div>
+              </div>
+        
+              {/* Section Performance */}
+              <h5 className="section-title">Section Performance</h5>
+        
+              <div className="section-grid">
                 {Array.isArray(report.sections) &&
                   report.sections.map((section) => (
-                    <li key={section.section_name}>
-                      <strong>{section.section_name}</strong> –{" "}
-                      {section.performance_band}
-                    </li>
+                    <div
+                      key={section.section_name}
+                      className="section-card"
+                    >
+                      <span className="section-name">
+                        {section.section_name}
+                      </span>
+                      <span className="section-band">
+                        {section.performance_band}
+                      </span>
+                    </div>
                   ))}
-              </ul>
-
+              </div>
+        
+              {/* Disclaimer */}
               <p className="report-disclaimer">
                 {report.disclaimer}
               </p>
