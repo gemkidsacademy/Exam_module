@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
 import StudentExamReports from "./StudentExamReports";
+import SelectiveReadinessOverall from "./SelectiveReadinessOverall";
+
+
 
 import "./AdminPanel.css";
 
