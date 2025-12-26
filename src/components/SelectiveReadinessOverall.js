@@ -184,13 +184,27 @@ export default function SelectiveReadinessOverall() {
           </table>
 
           {/* School Recommendations */}
-          <h4>Recommended School Targets</h4>
-          <ul className="school-list">
-            {Array.isArray(overall.school_recommendation) &&
-              overall.school_recommendation.map((school) => (
-                <li key={school}>{school}</li>
-              ))}
-          </ul>
+          <h4 className="recommendation-title">
+            {overall.readiness_band.startsWith("Band 4")
+              ? "Recommended Next Steps"
+              : "Recommended School Targets"}
+          </h4>
+          
+          <div
+            className={
+              overall.readiness_band.startsWith("Band 4")
+                ? "recommendation-box warning"
+                : "recommendation-box"
+            }
+          >
+            <ul>
+              {Array.isArray(overall.school_recommendation) &&
+                overall.school_recommendation.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+            </ul>
+          </div>
+
 
           <p className="explanation">
             Overall Selective Readiness is calculated as an equal-weight
