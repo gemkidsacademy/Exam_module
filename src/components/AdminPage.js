@@ -110,7 +110,7 @@ const AdminPanel = () => {
     { id: "add-quiz", label: "Create Exam" },
     { id: "generate-exam", label: "Generate Exam" },
     { id: "student-exam-reports", label: "Student Exam Reports" },
-
+    { id: "selective-readiness-overall", label: "Selective Readiness (Overall)" },
   ];
 
   /* ============================
@@ -418,6 +418,13 @@ const AdminPanel = () => {
                    <StudentExamReports />
                  </div>
                )}
+               {/* ===== SELECTIVE READINESS (OVERALL) ===== */}
+               {activeTab === "selective-readiness-overall" && (
+                 <div className="tab-panel">
+                   <SelectiveReadinessOverall />
+                 </div>
+               )}
+
 
 
 
