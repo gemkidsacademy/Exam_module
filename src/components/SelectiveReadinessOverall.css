@@ -1,51 +1,156 @@
+/* ===============================
+   OVERALL CONTAINER
+================================ */
 .overall-readiness-container {
-  padding: 20px;
+  padding: 24px 28px;
+  max-width: 1100px;
+  background: #ffffff;
 }
 
+/* ===============================
+   SELECTORS
+================================ */
 .selector-row {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   display: flex;
   flex-direction: column;
-  max-width: 320px;
+  max-width: 360px;
 }
 
+.selector-row label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.selector-row select {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  background: #ffffff;
+}
+
+/* ===============================
+   SCORE SUMMARY
+================================ */
 .score-row {
   display: flex;
-  gap: 24px;
-  margin: 16px 0;
+  gap: 28px;
+  margin: 20px 0 12px;
+  flex-wrap: wrap;
 }
 
 .score-box {
-  background: #f7f8fc;
-  padding: 16px;
-  border-radius: 8px;
-  min-width: 160px;
+  background: #f8fafc;
+  padding: 18px 20px;
+  border-radius: 10px;
+  min-width: 200px;
+  border: 1px solid #e5e7eb;
 }
 
 .score-box .label {
   font-size: 12px;
   color: #6b7280;
+  margin-bottom: 6px;
 }
 
 .score-box .value {
-  font-size: 22px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
 }
 
+/* ===============================
+   OVERRIDE WARNING
+================================ */
+.override-warning {
+  margin: 14px 0 10px;
+  padding: 12px 14px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #9a3412;
+}
+
+/* ===============================
+   BREAKDOWN TABLE
+================================ */
 .breakdown-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 12px;
+  margin-top: 14px;
+  font-size: 14px;
+}
+
+.breakdown-table th {
+  background: #f9fafb;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
 }
 
 .breakdown-table th,
 .breakdown-table td {
   border: 1px solid #e5e7eb;
-  padding: 8px;
+  padding: 10px 12px;
 }
 
-.explanation {
-  margin-top: 16px;
+.breakdown-table td {
+  color: #111827;
+}
+
+/* ===============================
+   SCHOOL TARGETS
+================================ */
+.school-targets {
+  margin-top: 18px;
+}
+
+.school-targets h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.school-targets ul {
+  padding-left: 18px;
+  margin: 6px 0;
+}
+
+.school-targets li {
   font-size: 13px;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+/* ===============================
+   EXPLANATION FOOTER
+================================ */
+.explanation {
+  margin-top: 18px;
+  font-size: 12.5px;
   color: #4b5563;
+  line-height: 1.5;
+}
+
+/* ===============================
+   BUTTON
+================================ */
+.generate-button {
+  margin-top: 8px;
+  padding: 10px 16px;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.generate-button:hover {
+  background: #1d4ed8;
 }
