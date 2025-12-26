@@ -1,0 +1,51 @@
+.overall-readiness-container {
+  padding: 20px;
+}
+
+.selector-row {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  max-width: 320px;
+}
+
+.score-row {
+  display: flex;
+  gap: 24px;
+  margin: 16px 0;
+}
+
+.score-box {
+  background: #f7f8fc;
+  padding: 16px;
+  border-radius: 8px;
+  min-width: 160px;
+}
+
+.score-box .label {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.score-box .value {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+.breakdown-table th,
+.breakdown-table td {
+  border: 1px solid #e5e7eb;
+  padding: 8px;
+}
+
+.explanation {
+  margin-top: 16px;
+  font-size: 13px;
+  color: #4b5563;
+}
