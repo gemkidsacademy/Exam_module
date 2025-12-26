@@ -169,14 +169,14 @@ export default function SelectiveReadinessOverall() {
               </tr>
             </thead>
             <tbody>
-              {Object.entries(overall.components).map(
-                ([subject, score]) => (
-                  <tr key={subject}>
-                    <td>{subject.replace("_", " ")}</td>
-                    <td>{score}%</td>
-                  </tr>
-                )
-              )}
+              {overall.components &&
+              Object.entries(overall.components).map(([subject, score]) => (
+                <tr key={subject}>
+                  <td>{subject.replace("_", " ")}</td>
+                  <td>{score}</td>
+                </tr>
+              ))}
+
             </tbody>
           </table>
 
