@@ -16,32 +16,50 @@ export default function StudentExamReports() {
   /* ============================
      Helpers
   ============================ */
+
   const groupReportsByDate = (reports) => {
+    console.log("🧪 groupReportsByDate input:", reports);
+
     const grouped = {};
     reports.forEach((r) => {
+      if (!r.created_at) {
+        console.warn("⚠️ Report missing created_at:", r);
+        return;
+      }
+
       const date = new Date(r.created_at).toISOString().split("T")[0];
       if (!grouped[date]) grouped[date] = [];
       grouped[date].push(r);
     });
+
+    console.log("🧪 groupReportsByDate output:", grouped);
     return grouped;
   };
 
   const formatExamName = (type) => {
-    if (!type) return "";
+    if (!type) return "Unknown Exam";
     if (type === "mathematical_reasoning") return "Mathematical Reasoning";
     if (type === "thinking_skills" || type === "Thinking Skills")
       return "Thinking Skills";
-    return type.charAt(0).toUpperCase() + type.slice(1);
+    return type.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
   };
 
   /* ============================
      Load Students
   ============================ */
   useEffect(() => {
+    console.log("📡 Fetching students list…");
+
     fetch(`${BACKEND_URL}/api/admin/students`)
       .then((res) => res.json())
-      .then(setStudents)
-      .catch(() => alert("Failed to load students"));
+      .then((data) => {
+        console.log("✅ Students fetched:", data);
+        setStudents(data);
+      })
+      .catch((err) => {
+        console.error("❌ Failed to load students:", err);
+        alert("Failed to load students");
+      });
   }, []);
 
   /* ============================
@@ -50,14 +68,24 @@ export default function StudentExamReports() {
   useEffect(() => {
     if (!selectedStudentId) return;
 
+    console.log("👤 Selected student:", selectedStudentId);
+    console.log(
+      "➡️ Fetching student details:",
+      `${BACKEND_URL}/api/admin/students/${selectedStudentId}`
+    );
+
     fetch(`${BACKEND_URL}/api/admin/students/${selectedStudentId}`)
       .then((res) => res.json())
       .then((data) => {
+        console.log("✅ Student details fetched:", data);
         setStudentDetails(data);
         setReports([]);
         setSelectedDate("");
       })
-      .catch(() => alert("Failed to load student details"));
+      .catch((err) => {
+        console.error("❌ Failed to load student details:", err);
+        alert("Failed to load student details");
+      });
   }, [selectedStudentId]);
 
   /* ============================
@@ -66,6 +94,7 @@ export default function StudentExamReports() {
   useEffect(() => {
     if (!selectedStudentId) return;
 
+    console.log("📊 Fetching selective reports for:", selectedStudentId);
     setReportsLoading(true);
 
     fetch(
@@ -73,10 +102,24 @@ export default function StudentExamReports() {
     )
       .then((res) => res.json())
       .then((data) => {
-        setReports(Array.isArray(data.reports) ? data.reports : []);
+        console.log("📦 Raw selective-reports response:", data);
+
+        if (!data || !Array.isArray(data.reports)) {
+          console.warn("⚠️ data.reports is not an array:", data);
+          setReports([]);
+        } else {
+          console.log("✅ Parsed reports:", data.reports);
+          setReports(data.reports);
+        }
       })
-      .catch(() => setReports([]))
-      .finally(() => setReportsLoading(false));
+      .catch((err) => {
+        console.error("❌ Failed to load reports:", err);
+        setReports([]);
+      })
+      .finally(() => {
+        setReportsLoading(false);
+        console.log("📊 Reports loading finished");
+      });
   }, [selectedStudentId]);
 
   /* ============================
@@ -86,6 +129,9 @@ export default function StudentExamReports() {
   const availableDates = Object.keys(groupedReports).sort(
     (a, b) => new Date(b) - new Date(a)
   );
+
+  console.log("🧪 availableDates:", availableDates);
+  console.log("🧪 selectedDate:", selectedDate);
 
   /* ============================
      UI
@@ -98,9 +144,13 @@ export default function StudentExamReports() {
       {!studentDetails && (
         <>
           <h4>Select Student</h4>
+
           <select
             value={selectedStudentId}
-            onChange={(e) => setSelectedStudentId(e.target.value)}
+            onChange={(e) => {
+              console.log("🟡 Student dropdown changed:", e.target.value);
+              setSelectedStudentId(e.target.value);
+            }}
           >
             <option value="">-- Select Student ID --</option>
             {students.map((s) => (
@@ -117,6 +167,7 @@ export default function StudentExamReports() {
         <>
           <button
             onClick={() => {
+              console.log("↩️ Resetting student selection");
               setSelectedStudentId("");
               setStudentDetails(null);
               setReports([]);
@@ -139,7 +190,14 @@ export default function StudentExamReports() {
           {reportsLoading && <p>Loading reports…</p>}
 
           {!reportsLoading && availableDates.length === 0 && (
-            <p className="empty-state">No Selective exam reports found.</p>
+            <>
+              <p className="empty-state">
+                No Selective exam reports found.
+              </p>
+              <pre className="debug-box">
+                reports.length = {reports.length}
+              </pre>
+            </>
           )}
 
           {/* STEP 3: SELECT ATTEMPT DATE */}
@@ -148,7 +206,10 @@ export default function StudentExamReports() {
               <label>Select Attempt</label>
               <select
                 value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
+                onChange={(e) => {
+                  console.log("🟢 Attempt date selected:", e.target.value);
+                  setSelectedDate(e.target.value);
+                }}
               >
                 <option value="">-- Select Attempt --</option>
                 {availableDates.map((date) => (
@@ -167,7 +228,7 @@ export default function StudentExamReports() {
         <div className="attempt-report-group">
           <h3>Exam Reports – {selectedDate}</h3>
 
-          {groupedReports[selectedDate].map((report) => (
+          {groupedReports[selectedDate]?.map((report) => (
             <div key={report.id} className="exam-report-card">
               <h4>{formatExamName(report.exam_type)}</h4>
 
@@ -192,7 +253,9 @@ export default function StudentExamReports() {
                   ))}
               </ul>
 
-              <p className="report-disclaimer">{report.disclaimer}</p>
+              <p className="report-disclaimer">
+                {report.disclaimer}
+              </p>
             </div>
           ))}
         </div>
