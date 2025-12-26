@@ -7,7 +7,7 @@ export default function SelectiveReadinessOverall() {
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState("");
   const [reports, setReports] = useState([]);
-  const [selectedTimestamp, setSelectedTimestamp] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
   const [overall, setOverall] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -18,26 +18,30 @@ export default function SelectiveReadinessOverall() {
     const loadStudents = async () => {
       const res = await fetch(`${BACKEND_URL}/api/admin/students`);
       const data = await res.json();
-      setStudents(data);
+      setStudents(Array.isArray(data) ? data : []);
     };
+
     loadStudents();
   }, []);
 
   /* -----------------------------------
-     Load reports for selected student
+     Load selective reports for student
   ----------------------------------- */
   useEffect(() => {
     if (!selectedStudent) return;
 
     const loadReports = async () => {
       setLoading(true);
+
       const res = await fetch(
         `${BACKEND_URL}/api/admin/students/${selectedStudent}/selective-reports`
       );
-      const data = await res.json();
 
-      setReports(data.reports || []);
-      setOverall(data.overall_readiness || null);
+      const data = await res.json();
+      setReports(Array.isArray(data) ? data : []);
+      setSelectedDate("");
+      setOverall(null);
+
       setLoading(false);
     };
 
@@ -45,22 +49,39 @@ export default function SelectiveReadinessOverall() {
   }, [selectedStudent]);
 
   /* -----------------------------------
-     Group reports by timestamp
+     Generate overall readiness (ADMIN ACTION)
   ----------------------------------- */
-  const groupedByAttempt = reports.reduce((acc, r) => {
-    const ts = r.created_at;
-    if (!acc[ts]) acc[ts] = [];
-    acc[ts].push(r);
+  const generateOverallReport = async () => {
+    if (!selectedStudent || !selectedDate) return;
+
+    setLoading(true);
+
+    const res = await fetch(
+      `${BACKEND_URL}/api/admin/students/${selectedStudent}/overall-selective-report?exam_date=${selectedDate}`,
+      { method: "POST" }
+    );
+
+    const data = await res.json();
+    setOverall(data);
+
+    setLoading(false);
+  };
+
+  /* -----------------------------------
+     Group reports by exam_date
+  ----------------------------------- */
+  const reportsByDate = reports.reduce((acc, r) => {
+    if (!r.exam_date) return acc;
+
+    if (!acc[r.exam_date]) acc[r.exam_date] = [];
+    acc[r.exam_date].push(r);
+
     return acc;
   }, {});
 
-  const attemptTimestamps = Object.keys(groupedByAttempt).sort(
+  const availableDates = Object.keys(reportsByDate).sort(
     (a, b) => new Date(b) - new Date(a)
   );
-
-  const selectedAttemptReports = selectedTimestamp
-    ? groupedByAttempt[selectedTimestamp]
-    : [];
 
   /* -----------------------------------
      UI
@@ -74,10 +95,7 @@ export default function SelectiveReadinessOverall() {
         <label>Student ID</label>
         <select
           value={selectedStudent}
-          onChange={(e) => {
-            setSelectedStudent(e.target.value);
-            setSelectedTimestamp("");
-          }}
+          onChange={(e) => setSelectedStudent(e.target.value)}
         >
           <option value="">Select student</option>
           {students.map((s) => (
@@ -88,29 +106,44 @@ export default function SelectiveReadinessOverall() {
         </select>
       </div>
 
-      {/* Attempt Selector */}
-      {selectedStudent && (
+      {/* Attempt Date Selector */}
+      {selectedStudent && availableDates.length > 0 && (
         <div className="selector-row">
-          <label>Exam Attempt</label>
+          <label>Exam Attempt Date</label>
           <select
-            value={selectedTimestamp}
-            onChange={(e) => setSelectedTimestamp(e.target.value)}
+            value={selectedDate}
+            onChange={(e) => {
+              setSelectedDate(e.target.value);
+              setOverall(null);
+            }}
           >
-            <option value="">Select attempt timestamp</option>
-            {attemptTimestamps.map((ts) => (
-              <option key={ts} value={ts}>
-                {new Date(ts).toLocaleString()}
+            <option value="">Select date</option>
+            {availableDates.map((date) => (
+              <option key={date} value={date}>
+                {date}
               </option>
             ))}
           </select>
         </div>
       )}
 
+      {/* Generate Button */}
+      {selectedStudent && selectedDate && (
+        <div className="generate-row">
+          <button
+            className="generate-button"
+            onClick={generateOverallReport}
+          >
+            Generate Overall Readiness Report
+          </button>
+        </div>
+      )}
+
       {/* Loading */}
       {loading && <p className="loading">Loading report...</p>}
 
-      {/* Overall Readiness */}
-      {selectedTimestamp && overall && (
+      {/* Overall Readiness Result */}
+      {overall && (
         <div className="overall-summary">
           <h3>Overall Selective Readiness</h3>
 
@@ -140,7 +173,7 @@ export default function SelectiveReadinessOverall() {
                 ([subject, score]) => (
                   <tr key={subject}>
                     <td>{subject.replace("_", " ")}</td>
-                    <td>{score}</td>
+                    <td>{score}%</td>
                   </tr>
                 )
               )}
@@ -149,17 +182,18 @@ export default function SelectiveReadinessOverall() {
 
           <p className="explanation">
             Overall Selective Readiness is calculated as an equal-weight
-            average of Reading, Mathematical Reasoning, Thinking Skills, and
-            Writing. This result is rule-based and deterministic.
+            average of Reading, Mathematical Reasoning, Thinking Skills,
+            and Writing. Readiness bands and school guidance follow
+            predefined rule-based criteria.
           </p>
         </div>
       )}
 
       {/* Empty State */}
-      {selectedTimestamp && !overall && (
+      {!loading && selectedDate && !overall && (
         <p className="empty">
           Overall readiness will be available once all four exams are
-          completed.
+          completed for this attempt.
         </p>
       )}
     </div>
