@@ -154,3 +154,38 @@
 .generate-button:hover {
   background: #1d4ed8;
 }
+.recommendation-title {
+  margin-top: 20px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.recommendation-box {
+  margin-top: 8px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: #f0f9ff;
+  border-left: 4px solid #3b82f6;
+}
+
+.recommendation-box ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.recommendation-box li {
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #1f2933;
+}
+
+/* Band 4 emphasis */
+.recommendation-box.warning {
+  background: #fff7ed;
+  border-left-color: #f97316;
+}
+
+.recommendation-box.warning li {
+  font-weight: 500;
+}
