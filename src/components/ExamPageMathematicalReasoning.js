@@ -274,8 +274,7 @@ export default function ExamPageMathematicalReasoning({
         <p className="question-text">{currentQ.question}</p>
 
         {normalizedOptions.map((opt, i) => {
-          const optionKey = opt.split(")")[0];
-
+          const optionKey = opt.split(")")[0].toUpperCase();
           return (
             <button
               key={i}
@@ -286,6 +285,7 @@ export default function ExamPageMathematicalReasoning({
             >
               {opt}
             </button>
+
           );
         })}
       </div>
