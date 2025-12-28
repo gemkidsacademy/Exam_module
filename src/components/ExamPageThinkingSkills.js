@@ -183,7 +183,7 @@ export default function ExamPageThinkingSkills({
   
     setAnswers(prev => ({
       ...prev,
-      [qid]: optionKey   // ✅ stores "B"
+      [qid]: optionKey.toUpperCase()
     }));
   };
 
@@ -263,7 +263,8 @@ export default function ExamPageThinkingSkills({
         <p className="question-text">{currentQ.question}</p>
 
         {normalizedOptions.map((opt, i) => {
-          const optionKey = opt.split(")")[0];
+          const optionKey = opt.split(")")[0].trim().toUpperCase();
+
 
           return (
             <button
