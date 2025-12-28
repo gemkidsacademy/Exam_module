@@ -120,6 +120,12 @@ export default function ExamPageMathematicalReasoning({
 
     prevIndexRef.current = currentIndex;
   }, [currentIndex, questions, answers]);
+  useEffect(() => {
+    if (questions.length > 0) {
+      console.log("🧠 SAMPLE QUESTION OBJECT:", questions[0]);
+    }
+  }, [questions]);
+
 
   /* ============================================================
      FINISH EXAM (SUBMIT ONLY — NO UI DECISIONS)
@@ -135,6 +141,10 @@ export default function ExamPageMathematicalReasoning({
       };
 
       console.log("📤 finish-exam payload:", payload);
+      console.log(
+        "🧪 FINAL ANSWERS OBJECT:",
+        JSON.stringify(answers, null, 2)
+      );
 
       try {
         await fetch(
@@ -184,7 +194,7 @@ export default function ExamPageMathematicalReasoning({
   
     setAnswers(prev => ({
       ...prev,
-      [qid]: optionKey   // ✅ stores "B"
+      [qid]: optionKey.toUpperCase().trim()
     }));
   };
 
