@@ -17,6 +17,8 @@ export default function ExamPageThinkingSkills({
 
   const hasSubmittedRef = useRef(false);
   const prevIndexRef = useRef(null);
+  const OPTION_KEYS = ["A", "B", "C", "D"];
+
   
   /**
    * mode:
@@ -263,9 +265,8 @@ export default function ExamPageThinkingSkills({
         <p className="question-text">{currentQ.question}</p>
 
         {normalizedOptions.map((opt, i) => {
-          const optionKey = opt.split(")")[0].trim().toUpperCase();
-
-
+          const optionKey = OPTION_KEYS[i]; // ✅ ALWAYS A, B, C, D
+        
           return (
             <button
               key={i}
@@ -274,10 +275,12 @@ export default function ExamPageThinkingSkills({
                 answers[currentQ.q_id] === optionKey ? "selected" : ""
               }`}
             >
-              {opt}
+              <strong>{optionKey})</strong>{" "}
+              {opt.replace(/^[A-D]\)\s*/, "")}
             </button>
           );
         })}
+
       </div>
 
       {/* NAVIGATION */}
