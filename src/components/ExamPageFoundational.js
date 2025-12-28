@@ -77,8 +77,7 @@ export default function ExamPageFoundationalSkills() {
 
   /* ============================================================
      LOAD REPORT
-  ============================================================ */
-  const loadReport = useCallback(async () => {
+    const loadReport = useCallback(async () => {
     try {
       const res = await fetch(
         `https://web-production-481a5.up.railway.app/api/student/exam-report/foundational-skills?student_id=${studentId}`
@@ -93,6 +92,7 @@ export default function ExamPageFoundationalSkills() {
       console.error("❌ loadReport error:", err);
     }
   }, [studentId]);
+============================================================ */
 
   /* ============================================================
      LOAD SECTION (ATOMIC)
