@@ -167,6 +167,7 @@ function App() {
               />
             }
           />
+          {/*
           <Route
             path="/selectiveFoundational"
             element={
@@ -175,6 +176,8 @@ function App() {
               </PrivateRoute>
             }
           />
+          */}
+
 
   
           <Route
