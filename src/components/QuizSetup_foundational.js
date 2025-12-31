@@ -2,54 +2,67 @@ import React, { useState } from "react";
 import "./QuizSetup_foundational.css";
 
 export default function QuizSetup_foundational() {
-  const [availableTopics, setAvailableTopics] = useState([]);
-
+ 
   const [quiz, setQuiz] = useState({
     className: "",
     subject: "",
     sections: [
-      { name: "", topic: "", ai: 0, db: 0, total: 0, time: 0, intro: "" },
-      { name: "", topic: "", ai: 0, db: 0, total: 0, time: 0, intro: "" },
-      { name: "", topic: "", ai: "", db: "", total: 0, time: "", intro: "" },
+      { name: "", topic: "", availableTopics: [], ai: 0, db: 0, total: 0, time: 0, intro: "" },
+      { name: "", topic: "", availableTopics: [], ai: 0, db: 0, total: 0, time: 0, intro: "" },
+      { name: "", topic: "", availableTopics: [], ai: "", db: "", total: 0, time: "", intro: "" },
     ],
   });
   React.useEffect(() => {
-    setQuiz((prev) => ({
-      ...prev,
-      sections: prev.sections.map((sec) => ({
-        ...sec,
-        topic: "",
-      })),
-    }));
-  }, [quiz.className, quiz.subject]);
+  console.log("🔄 Class or Subject changed. Resetting topics.");
+
+  setQuiz((prev) => ({
+    ...prev,
+    sections: prev.sections.map((sec) => ({
+      ...sec,
+      topic: "",
+      availableTopics: [],
+    })),
+  }));
+}, [quiz.className, quiz.subject]);
+
   React.useEffect(() => {
-      console.log("📌 [Topic Fetch Effect Triggered]");
-      console.log("➡️  Current className:", quiz.className);
-      console.log("➡️  Current subject:", quiz.subject);
-    
-      if (!quiz.className || !quiz.subject) {
-        console.log("⚠️  Missing class or subject. Clearing availableTopics.");
-        setAvailableTopics([]);
-        return;
-      }
-    
-      const url = `https://web-production-481a5.up.railway.app/api/topics-exam-setup?class_name=${quiz.className}&subject=${quiz.subject}`;
-      console.log("🌐 Fetching topics from URL:", url);
-    
-      fetch(url)
-        .then((res) => {
-          console.log("📥 Response status:", res.status);
-          return res.json();
-        })
-        .then((data) => {
-          console.log("✅ Topics received from backend:", data);
-          setAvailableTopics(data);
-        })
-        .catch((err) => {
-          console.error("❌ Error fetching topics:", err);
-          setAvailableTopics([]);
+  if (!quiz.className || !quiz.subject) return;
+
+  quiz.sections.forEach((section, index) => {
+    // 🚫 Skip optional section if empty
+    if (index === 2 && isSection3Empty()) return;
+
+    const difficulty =
+      index === 0 ? "Easy" : index === 1 ? "Medium" : "Hard";
+
+    const url = `https://web-production-481a5.up.railway.app/api/topics-exam-setup?class_name=${quiz.className}&subject=${quiz.subject}&difficulty=${difficulty}`;
+
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        setQuiz((prev) => {
+          const sections = [...prev.sections];
+          sections[index] = {
+            ...sections[index],
+            availableTopics: data,
+          };
+          return { ...prev, sections };
         });
-    }, [quiz.className, quiz.subject]);
+      })
+      .catch(() => {
+        setQuiz((prev) => {
+          const sections = [...prev.sections];
+          sections[index] = {
+            ...sections[index],
+            availableTopics: [],
+          };
+          return { ...prev, sections };
+        });
+      });
+  });
+}, [quiz.className, quiz.subject]);
+
+
 
 
 
@@ -263,11 +276,12 @@ export default function QuizSetup_foundational() {
               >
                 <option value="">Select Topic</option>
               
-                {availableTopics.map((topic, i) => (
+                {sec.availableTopics.map((topic, i) => (
                   <option key={i} value={topic}>
                     {topic}
                   </option>
                 ))}
+
               </select>
 
               <label>AI Questions:</label>
