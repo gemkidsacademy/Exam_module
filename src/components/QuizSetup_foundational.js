@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import "./QuizSetup_foundational.css";
 
 export default function QuizSetup_foundational() {
+  const [availableTopics, setAvailableTopics] = useState([]);
+
   const [quiz, setQuiz] = useState({
     className: "",
     subject: "",
@@ -11,6 +13,30 @@ export default function QuizSetup_foundational() {
       { name: "", topic: "", ai: "", db: "", total: 0, time: "", intro: "" },
     ],
   });
+  React.useEffect(() => {
+    setQuiz((prev) => ({
+      ...prev,
+      sections: prev.sections.map((sec) => ({
+        ...sec,
+        topic: "",
+      })),
+    }));
+  }, [quiz.className, quiz.subject]);
+  React.useEffect(() => {
+    if (!quiz.className || !quiz.subject) {
+      setAvailableTopics([]);
+      return;
+    }
+  
+    fetch(
+      `https://web-production-481a5.up.railway.app/api/topics-exam-setup?class_name=${quiz.className}&subject=${quiz.subject}`
+    )
+      .then((res) => res.json())
+      .then((data) => setAvailableTopics(data))
+      .catch(() => setAvailableTopics([]));
+  }, [quiz.className, quiz.subject]);
+
+
 
   React.useEffect(() => {
     setQuiz((prev) => ({
@@ -213,17 +239,21 @@ export default function QuizSetup_foundational() {
                 rows={4}
               />
               <label>Topic(s):</label>
-              <input
-                type="text"
+              <select
                 value={sec.topic}
                 onChange={(e) =>
                   handleSectionChange(index, "topic", e.target.value)
                 }
-                placeholder="e.g. Nouns, Verbs"
                 required={index !== 2}
-              />
-
-
+              >
+                <option value="">Select Topic</option>
+              
+                {availableTopics.map((topic, i) => (
+                  <option key={i} value={topic}>
+                    {topic}
+                  </option>
+                ))}
+              </select>
 
               <label>AI Questions:</label>
               <input
