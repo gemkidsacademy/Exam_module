@@ -115,83 +115,100 @@ export default function QuizSetup_foundational() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!quiz.className || !quiz.subject) {
-      alert("Please select class and subject.");
-      return;
-    }
+  console.log("🟢 SUBMIT: Quiz setup initiated");
 
-    if (!quiz.sections[0].name.trim() || !quiz.sections[1].name.trim()) {
-      alert("Section 1 and Section 2 must have names.");
-      return;
-    }
+  if (!quiz.className || !quiz.subject) {
+    alert("Please select class and subject.");
+    return;
+  }
 
-    // SECTION 3 RULES
-    const section3Empty = isSection3Empty();
+  if (!quiz.sections[0].name.trim() || !quiz.sections[1].name.trim()) {
+    alert("Section 1 and Section 2 must have names.");
+    return;
+  }
 
-    if (
-      !section3Empty &&
-      (
-        !quiz.sections[2].name.trim() ||
-        quiz.sections[2].ai === "" ||
-        quiz.sections[2].db === "" ||
-        quiz.sections[2].time === "" ||
-        quiz.sections[2].intro.trim() === "" ||
-        quiz.sections[2].topic.trim() === ""
-      )
-    ) {
-      alert(
-        "Section 3 is optional, but if any field is filled, ALL fields must be filled including intro text and topic."
-      );
-      return;
-    }
+  const section3Empty = isSection3Empty();
 
-    if (section3Empty && totalQuestions > 40) {
-      alert("Total questions cannot exceed 40 when only 2 sections are used.");
-      return;
-    }
+  // Validate optional section 3
+  if (
+    !section3Empty &&
+    (
+      !quiz.sections[2].name.trim() ||
+      quiz.sections[2].ai === "" ||
+      quiz.sections[2].db === "" ||
+      quiz.sections[2].time === "" ||
+      quiz.sections[2].intro.trim() === "" ||
+      quiz.sections[2].topic.trim() === ""
+    )
+  ) {
+    alert(
+      "Section 3 is optional, but if any field is filled, ALL fields must be filled including intro text and topic."
+    );
+    return;
+  }
 
-    if (!section3Empty && totalQuestions > 50) {
-      alert("Total questions cannot exceed 50 when all 3 sections are used.");
-      return;
-    }
+  if (section3Empty && totalQuestions > 40) {
+    alert("Total questions cannot exceed 40 when only 2 sections are used.");
+    return;
+  }
 
-    const finalSections = quiz.sections.filter((_, i) => !(i === 2 && section3Empty));
+  if (!section3Empty && totalQuestions > 50) {
+    alert("Total questions cannot exceed 50 when all 3 sections are used.");
+    return;
+  }
 
-    const payload = {
-      class_name: quiz.className,
-      subject: quiz.subject,
-      sections: finalSections.map((s) => ({
+  const finalSections = quiz.sections.filter(
+    (_, i) => !(i === 2 && section3Empty)
+  );
+
+  const payload = {
+    class_name: quiz.className,
+    subject: quiz.subject,
+    sections: finalSections.map((s, index) => {
+      const sectionPayload = {
         name: s.name.trim(),
-        topic: s.topic.trim(),
+        topic: s.topic.trim(),              // ✅ EXPLICIT topic inclusion
         ai: Number(s.ai) || 0,
         db: Number(s.db) || 0,
         total: Number(s.total) || 0,
         time: Number(s.time) || 0,
         intro: s.intro.trim(),
-      })),
+      };
 
-    };
-
-    try {
-      const res = await fetch(
-        "https://web-production-481a5.up.railway.app/api/quizzes-foundational",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (!res.ok) throw new Error("Failed to save quiz setup");
-
-      alert("Exam setup saved successfully!");
-    } catch (err) {
-      console.error(err);
-      alert("Error saving quiz setup. Please try again.");
-    }
+      console.log(`📦 Section ${index + 1} payload:`, sectionPayload);
+      return sectionPayload;
+    }),
   };
+
+  console.log("🚀 Final payload sent to backend:");
+  console.log(JSON.stringify(payload, null, 2));
+
+  try {
+    const res = await fetch(
+      "https://web-production-481a5.up.railway.app/api/quizzes-foundational",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!res.ok) {
+      console.error("❌ Backend response not OK:", res.status);
+      throw new Error("Failed to save quiz setup");
+    }
+
+    const data = await res.json();
+    console.log("✅ Backend success response:", data);
+
+    alert("Exam setup saved successfully!");
+  } catch (err) {
+    console.error("❌ Error saving quiz setup:", err);
+    alert("Error saving quiz setup. Please try again.");
+  }
+};
 
   return (
     <div className="quiz-setup-container">
