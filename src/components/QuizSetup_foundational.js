@@ -23,18 +23,33 @@ export default function QuizSetup_foundational() {
     }));
   }, [quiz.className, quiz.subject]);
   React.useEffect(() => {
-    if (!quiz.className || !quiz.subject) {
-      setAvailableTopics([]);
-      return;
-    }
-  
-    fetch(
-      `https://web-production-481a5.up.railway.app/api/topics-exam-setup?class_name=${quiz.className}&subject=${quiz.subject}`
-    )
-      .then((res) => res.json())
-      .then((data) => setAvailableTopics(data))
-      .catch(() => setAvailableTopics([]));
-  }, [quiz.className, quiz.subject]);
+      console.log("📌 [Topic Fetch Effect Triggered]");
+      console.log("➡️  Current className:", quiz.className);
+      console.log("➡️  Current subject:", quiz.subject);
+    
+      if (!quiz.className || !quiz.subject) {
+        console.log("⚠️  Missing class or subject. Clearing availableTopics.");
+        setAvailableTopics([]);
+        return;
+      }
+    
+      const url = `https://web-production-481a5.up.railway.app/api/topics-exam-setup?class_name=${quiz.className}&subject=${quiz.subject}`;
+      console.log("🌐 Fetching topics from URL:", url);
+    
+      fetch(url)
+        .then((res) => {
+          console.log("📥 Response status:", res.status);
+          return res.json();
+        })
+        .then((data) => {
+          console.log("✅ Topics received from backend:", data);
+          setAvailableTopics(data);
+        })
+        .catch((err) => {
+          console.error("❌ Error fetching topics:", err);
+          setAvailableTopics([]);
+        });
+    }, [quiz.className, quiz.subject]);
 
 
 
