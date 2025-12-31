@@ -6,9 +6,9 @@ export default function QuizSetup_foundational() {
     className: "",
     subject: "",
     sections: [
-      { name: "", ai: 0, db: 0, total: 0, time: 0, intro: "" },
-      { name: "", ai: 0, db: 0, total: 0, time: 0, intro: "" },
-      { name: "", ai: "", db: "", total: 0, time: "", intro: "" },
+      { name: "", topic: "", ai: 0, db: 0, total: 0, time: 0, intro: "" },
+      { name: "", topic: "", ai: 0, db: 0, total: 0, time: 0, intro: "" },
+      { name: "", topic: "", ai: "", db: "", total: 0, time: "", intro: "" },
     ],
   });
 
@@ -30,13 +30,20 @@ export default function QuizSetup_foundational() {
       (s.ai === "" || s.ai === 0) &&
       (s.db === "" || s.db === 0) &&
       (s.time === "" || s.time === 0) &&
-      (!s.intro || s.intro.trim() === "")
+      (!s.intro || s.intro.trim() === "") &&
+      (!s.topic || s.topic.trim() === "")
     );
   };
 
   const handleSectionChange = (index, field, value) => {
     const sections = [...quiz.sections];
-    const numeric = field === "intro" ? value : value === "" ? "" : Number(value);
+    const numeric =
+      field === "intro" || field === "topic"
+        ? value
+        : value === ""
+        ? ""
+        : Number(value);
+
 
     sections[index][field] = numeric;
 
@@ -79,10 +86,13 @@ export default function QuizSetup_foundational() {
         quiz.sections[2].ai === "" ||
         quiz.sections[2].db === "" ||
         quiz.sections[2].time === "" ||
-        quiz.sections[2].intro.trim() === ""
+        quiz.sections[2].intro.trim() === "" ||
+        quiz.sections[2].topic.trim() === ""
       )
     ) {
-      alert("Section 3 is optional, but if any field is filled, ALL fields must be filled including intro text.");
+      alert(
+        "Section 3 is optional, but if any field is filled, ALL fields must be filled including intro text and topic."
+      );
       return;
     }
 
@@ -103,12 +113,14 @@ export default function QuizSetup_foundational() {
       subject: quiz.subject,
       sections: finalSections.map((s) => ({
         name: s.name.trim(),
+        topic: s.topic.trim(),
         ai: Number(s.ai) || 0,
         db: Number(s.db) || 0,
         total: Number(s.total) || 0,
         time: Number(s.time) || 0,
         intro: s.intro.trim(),
       })),
+
     };
 
     try {
@@ -200,6 +212,17 @@ export default function QuizSetup_foundational() {
                 placeholder="Enter intro/instructions for this section"
                 rows={4}
               />
+              <label>Topic(s):</label>
+              <input
+                type="text"
+                value={sec.topic}
+                onChange={(e) =>
+                  handleSectionChange(index, "topic", e.target.value)
+                }
+                placeholder="e.g. Nouns, Verbs"
+                required={index !== 2}
+              />
+
 
 
               <label>AI Questions:</label>
