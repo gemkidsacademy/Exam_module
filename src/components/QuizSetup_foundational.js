@@ -29,17 +29,21 @@ export default function QuizSetup_foundational() {
   if (!quiz.className || !quiz.subject) return;
 
   quiz.sections.forEach((section, index) => {
-    // 🚫 Skip optional section if empty
-    if (index === 2 && isSection3Empty()) return;
-
     const difficulty =
       index === 0 ? "Easy" : index === 1 ? "Medium" : "Hard";
 
-    const url = `https://web-production-481a5.up.railway.app/api/topics-exam-setup?class_name=${quiz.className}&subject=${quiz.subject}&difficulty=${difficulty}`;
+    const url =
+      `https://web-production-481a5.up.railway.app/api/topics-exam-setup` +
+      `?class_name=${quiz.className}` +
+      `&subject=${quiz.subject}` +
+      `&difficulty=${difficulty}`;
+
+    console.log("🌐 Fetching topics for:", difficulty, url);
 
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
+        console.log(`✅ Topics for ${difficulty}:`, data);
         setQuiz((prev) => {
           const sections = [...prev.sections];
           sections[index] = {
@@ -49,15 +53,8 @@ export default function QuizSetup_foundational() {
           return { ...prev, sections };
         });
       })
-      .catch(() => {
-        setQuiz((prev) => {
-          const sections = [...prev.sections];
-          sections[index] = {
-            ...sections[index],
-            availableTopics: [],
-          };
-          return { ...prev, sections };
-        });
+      .catch((err) => {
+        console.error(`❌ Error fetching topics for ${difficulty}`, err);
       });
   });
 }, [quiz.className, quiz.subject]);
