@@ -76,7 +76,7 @@ export default function ExamPageFoundationalSkills() {
 
 
    /*============================================================*/
-     LOAD REPORT
+     
     const loadReport = useCallback(async () => {
     try {
       const res = await fetch(
