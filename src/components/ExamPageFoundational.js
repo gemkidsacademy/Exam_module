@@ -75,7 +75,7 @@ export default function ExamPageFoundationalSkills() {
   };
 
 
-   ============================================================
+   /*============================================================*/
      LOAD REPORT
     const loadReport = useCallback(async () => {
     try {
@@ -92,7 +92,7 @@ export default function ExamPageFoundationalSkills() {
       console.error("❌ loadReport error:", err);
     }
   }, [studentId]);
-============================================================ 
+/*============================================================ */
 
   /* ============================================================
      LOAD SECTION (ATOMIC)
