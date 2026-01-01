@@ -109,20 +109,23 @@ export default function ExamPageFoundationalSkills() {
 
 
   const loadSection = (section, sectionIndex) => {
-    if (!section || !Array.isArray(section.questions)) {
-      console.error("❌ Invalid section payload:", section);
-      return;
-    }
-    hasSubmittedRef.current = false;
-  
-    const normalized = normalizeQuestions(section.questions);
-  
-    setQuestions(normalized);
-    setSectionName(section.name || "");
-    setCurrentSectionIndex(sectionIndex);
-    setCurrentIndex(0);
-    setVisited({});
-  };
+        if (!section || !Array.isArray(section.questions)) {
+          console.error("❌ Invalid section payload:", section);
+          return;
+        }
+      
+        hasSubmittedRef.current = false;
+      
+        const normalized = normalizeQuestions(section.questions);
+      
+        setQuestions(normalized);
+        setSectionName(section.name || "");
+        setCurrentSectionIndex(sectionIndex);
+        setCurrentIndex(0);
+      
+        setAnswers({});        // ✅ RESET answers
+        setVisited({});        // ✅ RESET visited
+      };
 
   /* ============================================================
      START / RESUME EXAM
