@@ -147,7 +147,7 @@ export default function ExamPageFoundationalSkills() {
       const data = await res.json();
 
       if (data.completed === true) {
-        /*await loadReport();*/
+        await loadReport();
         return;
       }
       console.log("START-EXAM RESPONSE →", data);
@@ -235,7 +235,7 @@ export default function ExamPageFoundationalSkills() {
         }
       );
 
-      /*await loadReport();*/
+      await loadReport();
     } catch (err) {
       console.error("❌ finish-exam error:", err);
     }
