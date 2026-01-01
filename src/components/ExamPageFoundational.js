@@ -187,9 +187,10 @@ export default function ExamPageFoundationalSkills() {
   const handleAnswer = (optionKey) => {
     setAnswers(prev => ({
       ...prev,
-      [currentQ.q_id]: optionKey // ✅ USE REAL q_id
+      [currentIndex]: optionKey
     }));
   };
+
 
 
   /* ============================================================
@@ -305,12 +306,13 @@ export default function ExamPageFoundationalSkills() {
             key={q.q_id}
             
             className={`index-circle ${
-              answers[q.q_id]
+              answers[i]
                 ? "index-answered"
                 : visited[i]
                 ? "index-visited"
                 : "index-not-visited"
             }`}
+
             onClick={() => jumpToQuestion(i)}
           >
             {i + 1}
@@ -330,8 +332,9 @@ export default function ExamPageFoundationalSkills() {
               type="button"
               onClick={() => handleAnswer(optionKey)}
               className={`option-btn ${
-                answers[currentQ.q_id] === optionKey ? "selected" : ""
+                answers[currentIndex] === optionKey ? "selected" : ""
               }`}
+
 
             >
               {opt}
