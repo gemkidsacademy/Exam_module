@@ -18,7 +18,7 @@ body {
 .loading {
   text-align: center;
   font-size: 18px;
-  padding: 60px 20px;
+  padding: 64px 20px;
   color: #475569;
 }
 
@@ -27,15 +27,12 @@ body {
 ============================================================ */
 .exam-container {
   width: 100%;
-  max-width: none;              /* 🔥 remove width cap */
-  margin: 24px 0;               /* 🔥 stop centering */
+  margin: 24px 0;
   padding: 24px clamp(16px, 4vw, 48px);
   background: #ffffff;
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
   position: relative;
-  z-index: 2;
 }
 
 .foundational-exam {
@@ -49,7 +46,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
   font-weight: 600;
 }
 
@@ -68,29 +65,19 @@ body {
 ============================================================ */
 .section-title {
   font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 14px;
-  color: #020617;
+  font-weight: 800;
+  margin-bottom: 16px;
 }
 
 /* ============================================================
-   QUESTION INDEX ROW (FIXED HITBOX)
+   QUESTION INDEX
 ============================================================ */
 .index-row {
   display: flex;
   gap: 10px;
-
   overflow-x: auto;
-  overflow-y: hidden;       /* prevents vertical click blocking */
-
-  height: 56px;             /* locks scroll container height */
-  align-items: center;
-
-  padding: 10px 0;
-  margin-bottom: 18px;
-
-  position: relative;
-  z-index: 1;
+  padding: 8px 0;
+  margin-bottom: 20px;
 }
 
 .index-circle {
@@ -98,16 +85,13 @@ body {
   height: 40px;
   border-radius: 50%;
   display: flex;
-  justify-content: center;
   align-items: center;
-
+  justify-content: center;
+  font-weight: 700;
   cursor: pointer;
-  font-weight: 600;
-  border: 2px solid transparent;
-  transition: transform 0.2s ease;
+  transition: transform 0.15s ease;
 }
 
-/* Index states */
 .index-not-visited {
   background: #e5e7eb;
   color: #374151;
@@ -124,7 +108,7 @@ body {
 }
 
 .index-circle:hover {
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 
 /* ============================================================
@@ -133,75 +117,61 @@ body {
 .question-card {
   background: #f8fafc;
   border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 24px;
   margin-bottom: 24px;
-
-  position: relative;
-  z-index: 3;
 }
 
 .question-text {
   font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 18px;
+  font-weight: 700;
   line-height: 1.5;
+  margin-bottom: 18px;
 }
 
 /* ============================================================
-   OPTIONS (CLICK SAFE)
+   OPTIONS
 ============================================================ */
 .option-btn {
   width: 100%;
-  text-align: left;
-
   padding: 14px 16px;
   margin-bottom: 12px;
-
   font-size: 16px;
   border-radius: 10px;
   border: 2px solid #e5e7eb;
   background: #ffffff;
-
   cursor: pointer;
-  transition: all 0.2s ease;
-
-  position: relative;
-  z-index: 4;
+  transition: all 0.15s ease;
+  text-align: left;
 }
 
 .option-btn:hover {
   background: #f1f5f9;
-  border-color: #cbd5f5;
 }
 
 .option-btn.selected {
   background: #2563eb;
-  color: #ffffff;
   border-color: #2563eb;
+  color: #ffffff;
 }
 
 /* ============================================================
-   NAVIGATION BUTTONS
+   NAVIGATION
 ============================================================ */
 .nav-buttons {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-
-  position: relative;
-  z-index: 4;
 }
 
 .nav-btn {
   padding: 12px 22px;
   font-size: 16px;
-  font-weight: 600;
-
+  font-weight: 700;
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform 0.15s ease;
 }
 
 .nav-btn.prev {
@@ -219,13 +189,13 @@ body {
   color: #ffffff;
 }
 
+.nav-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
 .nav-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.nav-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
 }
 
 /* ============================================================
@@ -233,119 +203,139 @@ body {
 ============================================================ */
 .report-page {
   width: 100%;
-  max-width: none;              /* 🔥 remove width cap */
-  margin: 32px 0;               /* 🔥 stop centering */
+  margin: 32px 0;
   padding: 32px clamp(16px, 4vw, 48px);
 }
 
 .report-title {
   text-align: center;
-  font-size: 26px;
-  font-weight: 800;
-  margin-bottom: 32px;
+  font-size: 28px;
+  font-weight: 900;
+  margin-bottom: 36px;
 }
 
 /* ============================================================
-   REPORT GRID
+   REPORT CARDS
 ============================================================ */
-.report-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-
 .report-card {
   background: #ffffff;
-  border-radius: 14px;
-  padding: 24px;
-  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 28px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
 }
 
 .report-card h3 {
-  margin-top: 0;
-  margin-bottom: 16px;
   font-size: 20px;
+  margin-bottom: 18px;
 }
 
 /* ============================================================
    DONUT
 ============================================================ */
 .donut {
-  width: 140px;
-  height: 140px;
+  position: relative;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   margin: 20px auto;
+  background: var(--donut-bg, #e5e7eb);
+}
 
-  background: conic-gradient(
-    #2563eb calc(var(--percent, 75) * 1%),
-    #e5e7eb 0
-  );
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.donut::after {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  background: #ffffff;
+  border-radius: 50%;
 }
 
 .donut span {
-  font-size: 24px;
-  font-weight: 700;
+  position: relative;
+  z-index: 1;
+  font-size: 26px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 /* ============================================================
    STATS
 ============================================================ */
-.stats {
+.stats-row {
   display: flex;
-  justify-content: space-around;
-  margin-top: 16px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  font-weight: 700;
+  gap: 8px;
+}
+
+/* ============================================================
+   TOPIC PERFORMANCE
+============================================================ */
+.topic-bar {
+  margin-bottom: 18px;
+}
+
+.topic-title {
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.bar {
+  display: flex;
+  height: 10px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #e5e7eb;
+}
+
+.bar-correct {
+  background: #22c55e;
+}
+
+.bar-incorrect {
+  background: #ef4444;
+}
+
+.bar-not-attempted {
+  background: #cbd5e1;
+}
+
+.bar-legend {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 14px;
   font-weight: 600;
 }
 
 /* ============================================================
-   TOPIC BREAKDOWN
+   IMPROVEMENT AREAS
 ============================================================ */
-.topic-bar {
-  display: grid;
-  grid-template-columns: 1fr 4fr auto;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.topic-name {
-  font-weight: 600;
-}
-
-.bar {
-  height: 10px;
-  background: #e5e7eb;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.bar-fill {
-  height: 100%;
-  background: #2563eb;
-  border-radius: 6px;
-}
-
-.percent {
-  font-weight: 600;
+.improvement-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #991b1b;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 
 /* ============================================================
    RESPONSIVE
 ============================================================ */
 @media (max-width: 768px) {
-  .exam-container {
-    padding: 20px;
-  }
-
-  .report-grid {
-    grid-template-columns: 1fr;
-  }
-
   .nav-buttons {
+    flex-direction: column;
+  }
+
+  .stats-row {
     flex-direction: column;
   }
 }
