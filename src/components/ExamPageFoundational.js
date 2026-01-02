@@ -6,6 +6,9 @@ export default function ExamPageFoundationalSkills() {
 
   const hasStartedRef = useRef(false);
   const hasSubmittedRef = useRef(false);
+  // ADD THIS
+  const [allAnswers, setAllAnswers] = useState({});
+
 
   /* =========================
      MODE
@@ -94,7 +97,7 @@ export default function ExamPageFoundationalSkills() {
     setSectionName(section.difficulty || "");
     setCurrentSectionIndex(index);
     setCurrentIndex(0);
-    setAnswers({});
+    
     setVisited({});
   };
 
@@ -160,7 +163,11 @@ export default function ExamPageFoundationalSkills() {
   ========================= */
   const handleAnswer = (optionKey) => {
     const qid = questions[currentIndex].q_id;
-    setAnswers((prev) => ({ ...prev, [qid]: optionKey }));
+  
+    setAllAnswers(prev => ({
+      ...prev,
+      [qid]: optionKey
+    }));
   };
 
   /* =========================
@@ -193,7 +200,12 @@ export default function ExamPageFoundationalSkills() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ student_id: studentId, answers, reason })
+          body: JSON.stringify({
+              student_id: studentId,
+              answers: allAnswers,
+              reason
+            })
+
         }
       );
 
@@ -258,7 +270,8 @@ export default function ExamPageFoundationalSkills() {
           <div
             key={q.q_id}
             className={`index-circle ${
-              answers[q.q_id]
+              allAnswers[q.q_id]
+
                 ? "index-answered"
                 : visited[i]
                 ? "index-visited"
@@ -282,7 +295,7 @@ export default function ExamPageFoundationalSkills() {
               type="button"
               onClick={() => handleAnswer(optionKey)}
               className={`option-btn ${
-                answers[currentQ.q_id] === optionKey ? "selected" : ""
+                allAnswers[currentQ.q_id] === optionKey ? "selected" : ""
               }`}
             >
               {opt}
