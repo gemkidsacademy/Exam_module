@@ -306,11 +306,14 @@ body {
 }
 
 .bar-legend {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  gap: 16px;
   margin-top: 6px;
   font-size: 14px;
   font-weight: 600;
+  color: #334155;
+  white-space: nowrap;
 }
 
 /* ============================================================
