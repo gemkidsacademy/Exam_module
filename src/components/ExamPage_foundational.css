@@ -274,6 +274,13 @@ body {
 /* ============================================================
    TOPIC PERFORMANCE (CRITICAL FIX)
 ============================================================ */
+.topic-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: center;
+}
+
 .topic-bar {
   margin-bottom: 22px;
 }
