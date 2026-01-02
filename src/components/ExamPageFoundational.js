@@ -357,36 +357,40 @@ function FoundationalSkillsReport({ report }) {
     return <p className="loading">Generating your report…</p>;
   }
 
-  const { overall, topic_wise_performance, improvement_areas } = report;
+  const {
+    overall,
+    topic_wise_performance = [],
+    improvement_areas = []
+  } = report;
 
   const accuracy = Math.round(
     (overall.correct / overall.total_questions) * 100
   );
 
-  const donutBackground =
-    accuracy === 0
-      ? "#e5e7eb"
-      : `conic-gradient(#22c55e ${accuracy * 3.6}deg, #e5e7eb 0deg)`;
+  const donutStyle = {
+    "--donut-bg":
+      accuracy === 0
+        ? "#e5e7eb"
+        : `conic-gradient(#22c55e ${accuracy * 3.6}deg, #e5e7eb 0deg)`
+  };
 
   return (
     <div className="report-page">
+      {/* ======================================================
+          TITLE
+      ====================================================== */}
       <h2 className="report-title">
         You scored {overall.correct} out of {overall.total_questions}
       </h2>
 
-      {/* =====================
+      {/* ======================================================
           OVERALL ACCURACY
-      ===================== */}
+      ====================================================== */}
       <div className="report-card">
         <h3>Overall Accuracy</h3>
 
-        <div className="donut-wrapper">
-          <div
-            className="donut"
-            style={{ background: donutBackground }}
-          >
-            <span>{accuracy}%</span>
-          </div>
+        <div className="donut" style={donutStyle}>
+          <span>{accuracy}%</span>
         </div>
 
         <div className="stats-row">
@@ -398,14 +402,15 @@ function FoundationalSkillsReport({ report }) {
         </div>
       </div>
 
-      {/* =====================
+      {/* ======================================================
           TOPIC-WISE PERFORMANCE
-      ===================== */}
+      ====================================================== */}
       <div className="report-card">
         <h3>Topic-wise Performance</h3>
 
         {topic_wise_performance.map((t) => {
           const total = t.total || 1;
+
           const correctPct = (t.correct / total) * 100;
           const incorrectPct = (t.incorrect / total) * 100;
           const notAttemptedPct = (t.not_attempted / total) * 100;
@@ -439,9 +444,9 @@ function FoundationalSkillsReport({ report }) {
         })}
       </div>
 
-      {/* =====================
+      {/* ======================================================
           IMPROVEMENT AREAS
-      ===================== */}
+      ====================================================== */}
       <div className="report-card">
         <h3>Improvement Areas</h3>
 
