@@ -418,7 +418,7 @@ function FoundationalSkillsReport({ report }) {
           return (
             <div key={t.topic} className="topic-bar">
               <div className="topic-title">{t.topic}</div>
-
+            
               <div className="bar">
                 <div
                   className="bar-correct"
@@ -433,13 +433,14 @@ function FoundationalSkillsReport({ report }) {
                   style={{ width: `${notAttemptedPct}%` }}
                 />
               </div>
-
+            
               <div className="bar-legend">
                 <span>Correct: {t.correct}</span>
                 <span>Incorrect: {t.incorrect}</span>
                 <span>Not Attempted: {t.not_attempted}</span>
               </div>
             </div>
+
           );
         })}
       </div>
