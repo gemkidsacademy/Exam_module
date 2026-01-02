@@ -418,29 +418,33 @@ function FoundationalSkillsReport({ report }) {
           return (
             <div key={t.topic} className="topic-bar">
               <div className="topic-title">{t.topic}</div>
-
-              <div className="bar">
-                <div
-                  className="bar-correct"
-                  style={{ width: `${correctPct}%` }}
-                />
-                <div
-                  className="bar-incorrect"
-                  style={{ width: `${incorrectPct}%` }}
-                />
-                <div
-                  className="bar-not-attempted"
-                  style={{ width: `${notAttemptedPct}%` }}
-                />
-              </div>
-
-              {/* ✅ Legend stays INSIDE topic-bar */}
-              <div className="bar-legend">
-                <span>Correct: {t.correct}</span>
-                <span>Incorrect: {t.incorrect}</span>
-                <span>Not Attempted: {t.not_attempted}</span>
+            
+              <div className="topic-row">
+                <div>
+                  <div className="bar">
+                    <div
+                      className="bar-correct"
+                      style={{ width: `${correctPct}%` }}
+                    />
+                    <div
+                      className="bar-incorrect"
+                      style={{ width: `${incorrectPct}%` }}
+                    />
+                    <div
+                      className="bar-not-attempted"
+                      style={{ width: `${notAttemptedPct}%` }}
+                    />
+                  </div>
+            
+                  <div className="bar-legend">
+                    <span>Correct: {t.correct}</span>
+                    <span>Incorrect: {t.incorrect}</span>
+                    <span>Not Attempted: {t.not_attempted}</span>
+                  </div>
+                </div>
               </div>
             </div>
+
           );
         })}
       </div>
