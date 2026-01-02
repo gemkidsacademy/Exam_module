@@ -363,9 +363,9 @@ function FoundationalSkillsReport({ report }) {
     improvement_areas = []
   } = report;
 
-  const accuracy = Math.round(
-    (overall.correct / overall.total_questions) * 100
-  );
+  const accuracy = overall.total_questions
+    ? Math.round((overall.correct / overall.total_questions) * 100)
+    : 0;
 
   const donutStyle = {
     "--donut-bg":
@@ -376,16 +376,16 @@ function FoundationalSkillsReport({ report }) {
 
   return (
     <div className="report-page">
-      {/* ======================================================
+      {/* =========================
           TITLE
-      ====================================================== */}
+      ========================= */}
       <h2 className="report-title">
         You scored {overall.correct} out of {overall.total_questions}
       </h2>
 
-      {/* ======================================================
+      {/* =========================
           OVERALL ACCURACY
-      ====================================================== */}
+      ========================= */}
       <div className="report-card">
         <h3>Overall Accuracy</h3>
 
@@ -402,9 +402,9 @@ function FoundationalSkillsReport({ report }) {
         </div>
       </div>
 
-      {/* ======================================================
+      {/* =========================
           TOPIC-WISE PERFORMANCE
-      ====================================================== */}
+      ========================= */}
       <div className="report-card">
         <h3>Topic-wise Performance</h3>
 
@@ -418,7 +418,7 @@ function FoundationalSkillsReport({ report }) {
           return (
             <div key={t.topic} className="topic-bar">
               <div className="topic-title">{t.topic}</div>
-            
+
               <div className="bar">
                 <div
                   className="bar-correct"
@@ -433,21 +433,21 @@ function FoundationalSkillsReport({ report }) {
                   style={{ width: `${notAttemptedPct}%` }}
                 />
               </div>
-            
+
+              {/* ✅ Legend stays INSIDE topic-bar */}
               <div className="bar-legend">
                 <span>Correct: {t.correct}</span>
                 <span>Incorrect: {t.incorrect}</span>
                 <span>Not Attempted: {t.not_attempted}</span>
               </div>
             </div>
-
           );
         })}
       </div>
 
-      {/* ======================================================
+      {/* =========================
           IMPROVEMENT AREAS
-      ====================================================== */}
+      ========================= */}
       <div className="report-card">
         <h3>Improvement Areas</h3>
 
@@ -461,3 +461,4 @@ function FoundationalSkillsReport({ report }) {
     </div>
   );
 }
+
