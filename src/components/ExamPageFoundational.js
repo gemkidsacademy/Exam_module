@@ -359,13 +359,99 @@ function FoundationalSkillsReport({ report }) {
 
   const { overall, topic_wise_performance, improvement_areas } = report;
 
+  const accuracy = Math.round(
+    (overall.correct / overall.total_questions) * 100
+  );
+
+  const donutBackground =
+    accuracy === 0
+      ? "#e5e7eb"
+      : `conic-gradient(#22c55e ${accuracy * 3.6}deg, #e5e7eb 0deg)`;
+
   return (
     <div className="report-page">
       <h2 className="report-title">
         You scored {overall.correct} out of {overall.total_questions}
       </h2>
 
-      {/* report UI unchanged */}
+      {/* =====================
+          OVERALL ACCURACY
+      ===================== */}
+      <div className="report-card">
+        <h3>Overall Accuracy</h3>
+
+        <div className="donut-wrapper">
+          <div
+            className="donut"
+            style={{ background: donutBackground }}
+          >
+            <span>{accuracy}%</span>
+          </div>
+        </div>
+
+        <div className="stats-row">
+          <span>Total: {overall.total_questions}</span>
+          <span>Attempted: {overall.attempted}</span>
+          <span>Correct: {overall.correct}</span>
+          <span>Incorrect: {overall.incorrect}</span>
+          <span>Not Attempted: {overall.not_attempted}</span>
+        </div>
+      </div>
+
+      {/* =====================
+          TOPIC-WISE PERFORMANCE
+      ===================== */}
+      <div className="report-card">
+        <h3>Topic-wise Performance</h3>
+
+        {topic_wise_performance.map((t) => {
+          const total = t.total || 1;
+          const correctPct = (t.correct / total) * 100;
+          const incorrectPct = (t.incorrect / total) * 100;
+          const notAttemptedPct = (t.not_attempted / total) * 100;
+
+          return (
+            <div key={t.topic} className="topic-bar">
+              <div className="topic-title">{t.topic}</div>
+
+              <div className="bar">
+                <div
+                  className="bar-correct"
+                  style={{ width: `${correctPct}%` }}
+                />
+                <div
+                  className="bar-incorrect"
+                  style={{ width: `${incorrectPct}%` }}
+                />
+                <div
+                  className="bar-not-attempted"
+                  style={{ width: `${notAttemptedPct}%` }}
+                />
+              </div>
+
+              <div className="bar-legend">
+                <span>Correct: {t.correct}</span>
+                <span>Incorrect: {t.incorrect}</span>
+                <span>Not Attempted: {t.not_attempted}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* =====================
+          IMPROVEMENT AREAS
+      ===================== */}
+      <div className="report-card">
+        <h3>Improvement Areas</h3>
+
+        {improvement_areas.map((t) => (
+          <div key={t.topic} className="improvement-row">
+            <span>{t.topic}</span>
+            <span>{t.accuracy}%</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
