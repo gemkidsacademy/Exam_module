@@ -1,7 +1,9 @@
 /* ============================================================
    GLOBAL RESET
 ============================================================ */
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -32,7 +34,6 @@ body {
   background: #ffffff;
   border-radius: 16px;
   box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
-  position: relative;
 }
 
 .foundational-exam {
@@ -84,9 +85,8 @@ body {
   min-width: 40px;
   height: 40px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   font-weight: 700;
   cursor: pointer;
   transition: transform 0.15s ease;
@@ -141,8 +141,8 @@ body {
   border: 2px solid #e5e7eb;
   background: #ffffff;
   cursor: pointer;
-  transition: all 0.15s ease;
   text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .option-btn:hover {
@@ -215,7 +215,7 @@ body {
 }
 
 /* ============================================================
-   REPORT CARDS
+   REPORT CARD
 ============================================================ */
 .report-card {
   background: #ffffff;
@@ -255,9 +255,8 @@ body {
   z-index: 1;
   font-size: 26px;
   font-weight: 900;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   height: 100%;
 }
 
@@ -266,23 +265,22 @@ body {
 ============================================================ */
 .stats-row {
   display: flex;
-  justify-content: space-between;
   flex-wrap: wrap;
+  gap: 10px 16px;
   margin-top: 18px;
   font-weight: 700;
-  gap: 8px;
 }
 
 /* ============================================================
-   TOPIC PERFORMANCE
+   TOPIC PERFORMANCE (CRITICAL FIX)
 ============================================================ */
 .topic-bar {
-  margin-bottom: 18px;
+  margin-bottom: 22px;
 }
 
 .topic-title {
   font-weight: 800;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .bar {
@@ -305,26 +303,22 @@ body {
   background: #cbd5e1;
 }
 
+/* ✅ METRICS – FLEX, WRAPPING, NEVER CLIPPED */
 .bar-legend {
   display: flex;
-  gap: 16px;
-  align-items: center;
-
-  margin-top: 8px;
-  font-size: 14px;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-top: 10px;
+  font-size: 13px;
   font-weight: 600;
   color: #334155;
-
-  flex-wrap: wrap;          /* ✅ allow wrapping */
-  white-space: normal;     /* ✅ allow line breaks */
-  overflow: visible;       /* ✅ NEVER clip text */
 }
 
 .bar-legend span {
-  padding: 2px 8px;
-  border-radius: 6px;
   background: #f1f5f9;
-  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
 }
 
 /* ============================================================
