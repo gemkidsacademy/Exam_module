@@ -146,14 +146,14 @@ export default function SelectiveReadinessOverall() {
 
           <div className="score-row">
             <div className="score-box">
-              <span className="label">Overall Score</span>
+              <span className="label">Overall Score: </span>
               <span className="value">
                 {overall.overall_percent}%
               </span>
             </div>
 
             <div className="score-box">
-              <span className="label">Readiness Band</span>
+              <span className="label">Readiness Band: </span>
               <span className="value">
                 {overall.readiness_band}
               </span>
