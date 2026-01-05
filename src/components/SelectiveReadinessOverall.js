@@ -142,8 +142,7 @@ export default function SelectiveReadinessOverall() {
       ============================ */}
       {overall && (
         <div className="overall-summary">
-          <h3>Overall Selective Readiness</h3>
-
+          <h3 className="overall-title">Overall Selective Readiness</h3>
           <div className="score-row">
             <div className="score-box">
               <span className="label">Overall Score: </span>
