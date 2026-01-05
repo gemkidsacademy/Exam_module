@@ -10,6 +10,13 @@ export default function SelectiveReadinessOverall() {
   const [selectedDate, setSelectedDate] = useState("");
   const [overall, setOverall] = useState(null);
   const [loading, setLoading] = useState(false);
+  const SUBJECT_LABELS = {
+    reading: "Reading",
+    mathematical_reasoning: "Mathematical Reasoning",
+    thinking_skills: "Thinking Skills",
+    writing: "Writing",
+  };
+
 
   /* ============================
      Load students
@@ -175,7 +182,7 @@ export default function SelectiveReadinessOverall() {
                 Object.entries(overall.components).map(
                   ([subject, score]) => (
                     <tr key={subject}>
-                      <td>{subject.replace("_", " ")}</td>
+                      <td>{SUBJECT_LABELS[subject] || subject}</td>
                       <td>{score}</td>
                     </tr>
                   )
