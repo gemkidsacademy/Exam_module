@@ -189,3 +189,12 @@
 .recommendation-box.warning li {
   font-weight: 500;
 }
+
+.overall-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0f172a;            /* deep slate */
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e5e7eb; /* subtle divider */
+}
