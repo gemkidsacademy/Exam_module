@@ -6,17 +6,18 @@ const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 export default function SelectiveReadinessOverall() {
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState("");
-  const [reports, setReports] = useState([]);
+  const [availableDates, setAvailableDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
+  const [reports, setReports] = useState([]);
   const [overall, setOverall] = useState(null);
   const [loading, setLoading] = useState(false);
+
   const SUBJECT_LABELS = {
     reading: "Reading",
     mathematical_reasoning: "Mathematical Reasoning",
     thinking_skills: "Thinking Skills",
     writing: "Writing",
   };
-
 
   /* ============================
      Load students
@@ -28,7 +29,7 @@ export default function SelectiveReadinessOverall() {
   }, []);
 
   /* ============================
-     Load selective reports
+     Load AVAILABLE EXAM DATES
   ============================ */
   useEffect(() => {
     if (!selectedStudent) return;
@@ -36,19 +37,39 @@ export default function SelectiveReadinessOverall() {
     setLoading(true);
 
     fetch(
-      `${BACKEND_URL}/api/admin/students/${selectedStudent}/selective-reports`
+      `${BACKEND_URL}/api/admin/students/${selectedStudent}/selective-report-dates`
     )
       .then((res) => res.json())
       .then((data) => {
-        setReports(Array.isArray(data) ? data : []);
+        setAvailableDates(Array.isArray(data) ? data : []);
         setSelectedDate("");
+        setReports([]);
         setOverall(null);
       })
       .finally(() => setLoading(false));
   }, [selectedStudent]);
 
   /* ============================
-     Generate Overall Report (ADMIN ACTION)
+     Load selective reports FOR DATE
+  ============================ */
+  useEffect(() => {
+    if (!selectedStudent || !selectedDate) return;
+
+    setLoading(true);
+
+    fetch(
+      `${BACKEND_URL}/api/admin/students/${selectedStudent}/selective-reports?exam_date=${selectedDate}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setReports(Array.isArray(data) ? data : []);
+        setOverall(null);
+      })
+      .finally(() => setLoading(false));
+  }, [selectedStudent, selectedDate]);
+
+  /* ============================
+     Generate Overall Report
   ============================ */
   const generateOverallReport = async () => {
     if (!selectedStudent || !selectedDate) return;
@@ -64,20 +85,6 @@ export default function SelectiveReadinessOverall() {
     setOverall(data);
     setLoading(false);
   };
-
-  /* ============================
-     Group reports by date
-  ============================ */
-  const reportsByDate = reports.reduce((acc, r) => {
-    if (!r.exam_date) return acc;
-    acc[r.exam_date] = acc[r.exam_date] || [];
-    acc[r.exam_date].push(r);
-    return acc;
-  }, {});
-
-  const availableDates = Object.keys(reportsByDate).sort(
-    (a, b) => new Date(b) - new Date(a)
-  );
 
   /* ============================
      UI
@@ -108,10 +115,7 @@ export default function SelectiveReadinessOverall() {
           <label>Exam Attempt Date</label>
           <select
             value={selectedDate}
-            onChange={(e) => {
-              setSelectedDate(e.target.value);
-              setOverall(null);
-            }}
+            onChange={(e) => setSelectedDate(e.target.value)}
           >
             <option value="">Select date</option>
             {availableDates.map((date) => (
@@ -126,10 +130,7 @@ export default function SelectiveReadinessOverall() {
       {/* Generate Button */}
       {selectedStudent && selectedDate && (
         <div className="generate-row">
-          <button
-            className="generate-button"
-            onClick={generateOverallReport}
-          >
+          <button className="generate-button" onClick={generateOverallReport}>
             Generate Overall Readiness Report
           </button>
         </div>
@@ -143,30 +144,25 @@ export default function SelectiveReadinessOverall() {
       {overall && (
         <div className="overall-summary">
           <h3 className="overall-title">Overall Selective Readiness</h3>
+
           <div className="score-row">
             <div className="score-box">
               <span className="label">Overall Score: </span>
-              <span className="value">
-                {overall.overall_percent}%
-              </span>
+              <span className="value">{overall.overall_percent}%</span>
             </div>
 
             <div className="score-box">
               <span className="label">Readiness Band: </span>
-              <span className="value">
-                {overall.readiness_band}
-              </span>
+              <span className="value">{overall.readiness_band}</span>
             </div>
           </div>
 
-          {/* Override Warning */}
           {overall.override_flag && (
             <div className="override-warning">
               ⚠️ {overall.override_message}
             </div>
           )}
 
-          {/* Component Breakdown */}
           <h4>Component Breakdown</h4>
 
           <table className="breakdown-table">
@@ -177,25 +173,23 @@ export default function SelectiveReadinessOverall() {
               </tr>
             </thead>
             <tbody>
-              {overall.components &&
-                Object.entries(overall.components).map(
-                  ([subject, score]) => (
-                    <tr key={subject}>
-                      <td>{SUBJECT_LABELS[subject] || subject}</td>
-                      <td>{score}</td>
-                    </tr>
-                  )
-                )}
+              {Object.entries(overall.components || {}).map(
+                ([subject, score]) => (
+                  <tr key={subject}>
+                    <td>{SUBJECT_LABELS[subject] || subject}</td>
+                    <td>{score}</td>
+                  </tr>
+                )
+              )}
             </tbody>
           </table>
 
-          {/* School Recommendations */}
           <h4 className="recommendation-title">
             {overall.readiness_band.startsWith("Band 4")
               ? "Recommended Next Steps"
               : "Recommended School Targets"}
           </h4>
-          
+
           <div
             className={
               overall.readiness_band.startsWith("Band 4")
@@ -204,13 +198,11 @@ export default function SelectiveReadinessOverall() {
             }
           >
             <ul>
-              {Array.isArray(overall.school_recommendation) &&
-                overall.school_recommendation.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
+              {overall.school_recommendation?.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
             </ul>
           </div>
-
 
           <p className="explanation">
             Overall Selective Readiness is calculated as an equal-weight
@@ -222,8 +214,8 @@ export default function SelectiveReadinessOverall() {
 
       {!loading && selectedDate && !overall && (
         <p className="empty">
-          Overall readiness will be available once all four exams are
-          completed for this attempt.
+          Overall readiness will be available once all four exams are completed
+          for this attempt.
         </p>
       )}
     </div>
