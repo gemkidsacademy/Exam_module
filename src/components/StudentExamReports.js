@@ -14,7 +14,11 @@ import {
 const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
 /* ============================
-   CONSTANTS<h5>Strengths</h5>
+   CONSTANTS
+============================ */
+
+const READINESS_SCORE_MAP = {
+  "Not Yet Selective Ready": 30,
   "Developing Selective Potential": 50,
   "Approaching Selective Readiness": 70,
   "Strong Selective Potential": 90
@@ -26,13 +30,6 @@ const SECTION_GRADE_MAP = {
   C: 60,
   D: 40
 };
-
-const READINESS_STAGES = [
-  "Not Yet Selective Ready",
-  "Developing Selective Potential",
-  "Approaching Selective Readiness",
-  "Strong Selective Potential"
-];
 
 /* ============================
    COMPONENT
@@ -154,14 +151,7 @@ export default function StudentExamReports() {
           score: SECTION_GRADE_MAP[s.performance_band] || 0
         }));
 
-        const strengths = report.sections
-          .filter(s => ["A", "B"].includes(s.performance_band))
-          .map(s => s.section_name);
-
-        const focusAreas = report.sections
-          .filter(s => ["C", "D"].includes(s.performance_band))
-          .map(s => s.section_name);
-
+        
         return (
           <div key={report.id} className="exam-report-card">
 
@@ -200,30 +190,7 @@ export default function StudentExamReports() {
         );
       })}
 
-      {/* Progress Over Time */}
-      {availableDates.length > 1 && reports.length > 0 && (
-        <>
-          <h4>Progress Over Time</h4>
-          <div style={{ width: "100%", height: 250 }}>
-            <ResponsiveContainer>
-              <LineChart
-                data={availableDates.map(d => {
-                  const r = reports.find(rep => rep.exam_date === d);
-                  return {
-                    date: d,
-                    score: READINESS_SCORE_MAP[r?.readiness_band] || 0
-                  };
-                })}
-              >
-                <XAxis dataKey="date" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip />
-                <Line type="monotone" dataKey="score" stroke="#2563eb" strokeWidth={3} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </>
-      )}
+      
     </div>
   );
 }
