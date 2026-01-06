@@ -27,6 +27,12 @@ export default function SelectiveReadinessOverall() {
   };
 
   /* ============================
+     Helpers
+  ============================ */
+  const normalizeScore = (subject, value) =>
+    subject === "writing" ? Math.round((value / 20) * 100) : value;
+
+  /* ============================
      Load students
   ============================ */
   useEffect(() => {
@@ -42,7 +48,6 @@ export default function SelectiveReadinessOverall() {
     if (!selectedStudent) return;
 
     setLoading(true);
-
     fetch(
       `${BACKEND_URL}/api/admin/students/${selectedStudent}/selective-report-dates`
     )
@@ -62,54 +67,74 @@ export default function SelectiveReadinessOverall() {
     if (!selectedStudent || !selectedDate) return;
 
     setLoading(true);
-
     const res = await fetch(
       `${BACKEND_URL}/api/admin/students/${selectedStudent}/overall-selective-report?exam_date=${selectedDate}`,
       { method: "POST" }
     );
-
     const data = await res.json();
     setOverall(data);
     setLoading(false);
   };
 
   /* ============================
-     Prepare derived visuals
+     Derived visuals
   ============================ */
-
-  // Subject chart
   const subjectChartData = overall
-    ? Object.entries(overall.components).map(([key, value]) => ({
-        subject: SUBJECT_LABELS[key],
-        score: key === "writing" ? Math.round((value / 20) * 100) : value,
+    ? Object.entries(overall.components).map(([k, v]) => ({
+        subject: SUBJECT_LABELS[k],
+        score: normalizeScore(k, v),
       }))
     : [];
 
-  // Writing %
-  const writingPercent = overall
-    ? Math.round((overall.components.writing / 20) * 100)
-    : 0;
-
-  // Balance Index
   let balanceIndex = null;
   let strengths = [];
   let improvements = [];
 
   if (overall) {
-    const normalized = Object.entries(overall.components).map(
-      ([key, value]) =>
-        key === "writing" ? (value / 20) * 100 : value
+    const normalizedScores = Object.entries(overall.components).map(
+      ([k, v]) => normalizeScore(k, v)
     );
 
-    const max = Math.max(...normalized);
-    const min = Math.min(...normalized);
-    balanceIndex = Math.round(100 - (max - min));
+    balanceIndex = Math.round(
+      100 - (Math.max(...normalizedScores) - Math.min(...normalizedScores))
+    );
 
-    Object.entries(overall.components).forEach(([key, value]) => {
-      const percent = key === "writing" ? (value / 20) * 100 : value;
-      if (percent >= 90) strengths.push(SUBJECT_LABELS[key]);
-      else improvements.push(SUBJECT_LABELS[key]);
+    Object.entries(overall.components).forEach(([k, v]) => {
+      const pct = normalizeScore(k, v);
+      if (pct >= 90) strengths.push(SUBJECT_LABELS[k]);
+      else improvements.push(SUBJECT_LABELS[k]);
     });
+  }
+
+  /* ============================
+     Subject Focus Card
+  ============================ */
+  function SubjectFocusCard({ subjectKey, label, rawScore }) {
+    const percent = normalizeScore(subjectKey, rawScore);
+    const isWarning = subjectKey === "writing" && percent < 95;
+
+    return (
+      <div className={`subject-focus ${isWarning ? "warning" : ""}`}>
+        <h4>{label} Performance</h4>
+
+        <div className="progress-bar">
+          <div
+            className="progress-fill"
+            style={{
+              width: `${percent}%`,
+              background: isWarning
+                ? "linear-gradient(90deg,#f59e0b,#f97316)"
+                : "#2563eb"
+            }}
+          />
+        </div>
+
+        <p>
+          {label} Score: {rawScore}
+          {subjectKey === "writing" ? " / 20" : " / 100"} ({percent}%)
+        </p>
+      </div>
+    );
   }
 
   /* ============================
@@ -145,9 +170,7 @@ export default function SelectiveReadinessOverall() {
           >
             <option value="">Select date</option>
             {availableDates.map(date => (
-              <option key={date} value={date}>
-                {date}
-              </option>
+              <option key={date} value={date}>{date}</option>
             ))}
           </select>
         </div>
@@ -190,14 +213,14 @@ export default function SelectiveReadinessOverall() {
             </p>
           </div>
 
-          {/* Strengths vs improvements */}
+          {/* Strengths & focus */}
           <div className="chart-section">
             <div className="chart-title">Strengths & Focus Areas</div>
-            <p><strong>Strengths:</strong> {strengths.join(", ")}</p>
-            <p><strong>Needs Improvement:</strong> {improvements.join(", ")}</p>
+            <p><strong>Strengths:</strong> {strengths.join(", ") || "—"}</p>
+            <p><strong>Needs Improvement:</strong> {improvements.join(", ") || "None identified"}</p>
           </div>
 
-          {/* Subject chart */}
+          {/* Subject bar chart */}
           <div className="chart-section">
             <div className="chart-title">Subject Performance Overview</div>
             <ResponsiveContainer width="100%" height={300}>
@@ -205,28 +228,22 @@ export default function SelectiveReadinessOverall() {
                 <XAxis dataKey="subject" />
                 <YAxis domain={[0, 100]} />
                 <Tooltip />
-                <Bar
-                  dataKey="score"
-                  fill="#2563eb"
-                  radius={[6, 6, 0, 0]}
-                />
+                <Bar dataKey="score" fill="#2563eb" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Writing focus */}
-          <div className="writing-focus">
-            <h4>Writing Performance</h4>
-            <div className="progress-bar">
-              <div
-                className="progress-fill"
-                style={{ width: `${writingPercent}%` }}
+          {/* Subject focus cards */}
+          <div className="chart-section">
+            <div className="chart-title">Subject Performance Detail</div>
+            {Object.entries(overall.components).map(([k, v]) => (
+              <SubjectFocusCard
+                key={k}
+                subjectKey={k}
+                label={SUBJECT_LABELS[k]}
+                rawScore={v}
               />
-            </div>
-            <p>
-              Writing Score: {overall.components.writing} / 20 (
-              {writingPercent}%)
-            </p>
+            ))}
           </div>
 
           {overall.override_flag && (
