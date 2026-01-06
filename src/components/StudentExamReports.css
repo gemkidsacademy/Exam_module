@@ -262,3 +262,24 @@
   background: #2563eb;
   border-radius: 6px;
 }
+.writing-score {
+  margin-top: 8px;
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+.reading-score {
+  margin-top: 8px;
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+.math-score {
+  margin-top: 8px;
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+.thinking-score {
+  margin-top: 8px;
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+
