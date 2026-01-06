@@ -1,4 +1,12 @@
 import { useEffect, useState } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer
+} from "recharts";
 import "./SelectiveReadinessOverall.css";
 
 const BACKEND_URL = "https://web-production-481a5.up.railway.app";
@@ -8,7 +16,6 @@ export default function SelectiveReadinessOverall() {
   const [selectedStudent, setSelectedStudent] = useState("");
   const [availableDates, setAvailableDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
-  const [reports, setReports] = useState([]);
   const [overall, setOverall] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +36,7 @@ export default function SelectiveReadinessOverall() {
   }, []);
 
   /* ============================
-     Load AVAILABLE EXAM DATES
+     Load available exam dates
   ============================ */
   useEffect(() => {
     if (!selectedStudent) return;
@@ -43,30 +50,10 @@ export default function SelectiveReadinessOverall() {
       .then((data) => {
         setAvailableDates(Array.isArray(data) ? data : []);
         setSelectedDate("");
-        setReports([]);
         setOverall(null);
       })
       .finally(() => setLoading(false));
   }, [selectedStudent]);
-
-  /* ============================
-     Load selective reports FOR DATE
-  ============================ */
-  useEffect(() => {
-    if (!selectedStudent || !selectedDate) return;
-
-    setLoading(true);
-
-    fetch(
-      `${BACKEND_URL}/api/admin/students/${selectedStudent}/selective-reports?exam_date=${selectedDate}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setReports(Array.isArray(data) ? data : []);
-        setOverall(null);
-      })
-      .finally(() => setLoading(false));
-  }, [selectedStudent, selectedDate]);
 
   /* ============================
      Generate Overall Report
@@ -85,6 +72,23 @@ export default function SelectiveReadinessOverall() {
     setOverall(data);
     setLoading(false);
   };
+
+  /* ============================
+     Prepare chart data
+  ============================ */
+  const subjectChartData = overall
+    ? Object.entries(overall.components).map(([key, value]) => ({
+        subject: SUBJECT_LABELS[key] || key,
+        score:
+          key === "writing"
+            ? Math.round((value / 20) * 100) // normalize writing
+            : value,
+      }))
+    : [];
+
+  const writingPercent = overall
+    ? Math.round((overall.components.writing / 20) * 100)
+    : 0;
 
   /* ============================
      UI
@@ -143,80 +147,92 @@ export default function SelectiveReadinessOverall() {
       ============================ */}
       {overall && (
         <div className="overall-summary">
-          <h3 className="overall-title">Overall Selective Readiness</h3>
+          <h3>Overall Selective Readiness</h3>
 
+          {/* Score cards */}
           <div className="score-row">
             <div className="score-box">
-              <span className="label">Overall Score: </span>
+              <span className="label">Overall Score</span>
               <span className="value">{overall.overall_percent}%</span>
             </div>
-
             <div className="score-box">
-              <span className="label">Readiness Band: </span>
+              <span className="label">Readiness Band</span>
               <span className="value">{overall.readiness_band}</span>
             </div>
           </div>
 
+          {/* Subject comparison chart */}
+          <h4>Subject Performance Overview</h4>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={subjectChartData}>
+              <XAxis dataKey="subject" />
+              <YAxis domain={[0, 100]} />
+              <Tooltip />
+              <Bar dataKey="score" radius={[6, 6, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+
+          {/* Writing focus */}
+          <div className="writing-focus">
+            <h4>Writing Performance</h4>
+            <div className="progress-bar">
+              <div
+                className="progress-fill warning"
+                style={{ width: `${writingPercent}%` }}
+              />
+            </div>
+            <p>
+              Writing Score: {overall.components.writing} / 20 (
+              {writingPercent}%)
+            </p>
+          </div>
+
+          {/* Override warning */}
           {overall.override_flag && (
             <div className="override-warning">
               ⚠️ {overall.override_message}
             </div>
           )}
 
+          {/* Table (transparency) */}
           <h4>Component Breakdown</h4>
-
           <table className="breakdown-table">
             <thead>
               <tr>
                 <th>Subject</th>
-                <th>Score</th>
+                <th>Raw Score</th>
               </tr>
             </thead>
             <tbody>
-              {Object.entries(overall.components || {}).map(
-                ([subject, score]) => (
-                  <tr key={subject}>
-                    <td>{SUBJECT_LABELS[subject] || subject}</td>
-                    <td>{score}</td>
-                  </tr>
-                )
-              )}
+              {Object.entries(overall.components).map(([subject, score]) => (
+                <tr key={subject}>
+                  <td>{SUBJECT_LABELS[subject]}</td>
+                  <td>{score}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
 
-          <h4 className="recommendation-title">
+          {/* School recommendations */}
+          <h4>
             {overall.readiness_band.startsWith("Band 4")
               ? "Recommended Next Steps"
               : "Recommended School Targets"}
           </h4>
-
-          <div
-            className={
-              overall.readiness_band.startsWith("Band 4")
-                ? "recommendation-box warning"
-                : "recommendation-box"
-            }
-          >
+          <div className="recommendation-box">
             <ul>
-              {overall.school_recommendation?.map((item) => (
+              {overall.school_recommendation.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
           </div>
 
           <p className="explanation">
-            Overall Selective Readiness is calculated as an equal-weight
-            average of Reading, Mathematical Reasoning, Thinking Skills,
-            and Writing. Results are rule-based and advisory only.
+            Overall Selective Readiness is calculated as an equal-weight average
+            of Reading, Mathematical Reasoning, Thinking Skills, and Writing.
+            Results are advisory only.
           </p>
         </div>
-      )}
-
-      {!loading && selectedDate && !overall && (
-        <p className="empty">
-          Overall readiness will be available once all four exams are completed
-          for this attempt.
-        </p>
       )}
     </div>
   );
