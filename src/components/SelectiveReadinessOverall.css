@@ -310,4 +310,33 @@
 .score-row {
   gap: 20px;
 }
+/* ===============================
+   SUBJECT FOCUS CARDS
+================================ */
+
+.subject-focus {
+  margin-top: 18px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+}
+
+.subject-focus.warning {
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.subject-focus h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #0f172a;
+}
+
+.subject-focus p {
+  font-size: 0.85rem;
+  color: #475569;
+  margin-top: 6px;
+}
 
