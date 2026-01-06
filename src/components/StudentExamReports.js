@@ -21,7 +21,8 @@ const READINESS_SCORE_MAP = {
   "Not Yet Selective Ready": 30,
   "Developing Selective Potential": 50,
   "Approaching Selective Readiness": 70,
-  "Strong Selective Potential": 90
+  "Strong Selective Potential": 90,
+  "Ready": 85
 };
 
 const SECTION_GRADE_MAP = {
@@ -171,18 +172,21 @@ export default function StudentExamReports() {
             </div>
 
             
-            {/* Section Performance Chart */}
-            <h5>Section Performance</h5>
-            <div style={{ width: "100%", height: 220 }}>
-              <ResponsiveContainer>
-                <BarChart data={sectionChartData}>
-                  <XAxis dataKey="section" />
-                  <YAxis domain={[0, 100]} />
-                  <Tooltip />
-                  <Bar dataKey="score" fill="#2563eb" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            {report.exam_type !== "writing" && (
+              <>
+                <h5>Section Performance</h5>
+                <div style={{ width: "100%", height: 220 }}>
+                  <ResponsiveContainer>
+                    <BarChart data={sectionChartData}>
+                      <XAxis dataKey="section" />
+                      <YAxis domain={[0, 100]} />
+                      <Tooltip />
+                      <Bar dataKey="score" fill="#2563eb" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </>
+            )}
 
             
             <p className="report-disclaimer">{report.disclaimer}</p>
