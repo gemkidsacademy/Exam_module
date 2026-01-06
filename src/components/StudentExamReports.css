@@ -250,3 +250,15 @@
   color: #6b7280;
   font-style: italic;
 }
+.readiness-bar {
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  margin-top: 6px;
+}
+
+.readiness-fill {
+  height: 100%;
+  background: #2563eb;
+  border-radius: 6px;
+}
