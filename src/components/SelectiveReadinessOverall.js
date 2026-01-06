@@ -81,7 +81,7 @@ export default function SelectiveReadinessOverall() {
         subject: SUBJECT_LABELS[key] || key,
         score:
           key === "writing"
-            ? Math.round((value / 20) * 100) // normalize writing
+            ? Math.round((value / 20) * 100)
             : value,
       }))
     : [];
@@ -95,7 +95,7 @@ export default function SelectiveReadinessOverall() {
   ============================ */
   return (
     <div className="overall-readiness-container">
-      <h2>Selective Readiness (Overall)</h2>
+      <h2 className="overall-title">Overall Selective Readiness</h2>
 
       {/* Student Selector */}
       <div className="selector-row">
@@ -133,11 +133,9 @@ export default function SelectiveReadinessOverall() {
 
       {/* Generate Button */}
       {selectedStudent && selectedDate && (
-        <div className="generate-row">
-          <button className="generate-button" onClick={generateOverallReport}>
-            Generate Overall Readiness Report
-          </button>
-        </div>
+        <button className="generate-button" onClick={generateOverallReport}>
+          Generate Overall Readiness Report
+        </button>
       )}
 
       {loading && <p className="loading">Loading report...</p>}
@@ -147,37 +145,37 @@ export default function SelectiveReadinessOverall() {
       ============================ */}
       {overall && (
         <div className="overall-summary">
-          <h3>Overall Selective Readiness</h3>
-
           {/* Score cards */}
           <div className="score-row">
             <div className="score-box">
-              <span className="label">Overall Score</span>
-              <span className="value">{overall.overall_percent}%</span>
+              <div className="label">Overall Score</div>
+              <div className="value">{overall.overall_percent}%</div>
             </div>
             <div className="score-box">
-              <span className="label">Readiness Band</span>
-              <span className="value">{overall.readiness_band}</span>
+              <div className="label">Readiness Band</div>
+              <div className="value">{overall.readiness_band}</div>
             </div>
           </div>
 
           {/* Subject comparison chart */}
-          <h4>Subject Performance Overview</h4>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={subjectChartData}>
-              <XAxis dataKey="subject" />
-              <YAxis domain={[0, 100]} />
-              <Tooltip />
-              <Bar dataKey="score" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="chart-section">
+            <div className="chart-title">Subject Performance Overview</div>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={subjectChartData}>
+                <XAxis dataKey="subject" />
+                <YAxis domain={[0, 100]} />
+                <Tooltip />
+                <Bar dataKey="score" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
 
           {/* Writing focus */}
           <div className="writing-focus">
             <h4>Writing Performance</h4>
             <div className="progress-bar">
               <div
-                className="progress-fill warning"
+                className="progress-fill"
                 style={{ width: `${writingPercent}%` }}
               />
             </div>
@@ -194,7 +192,7 @@ export default function SelectiveReadinessOverall() {
             </div>
           )}
 
-          {/* Table (transparency) */}
+          {/* Component table */}
           <h4>Component Breakdown</h4>
           <table className="breakdown-table">
             <thead>
@@ -213,24 +211,30 @@ export default function SelectiveReadinessOverall() {
             </tbody>
           </table>
 
-          {/* School recommendations */}
-          <h4>
-            {overall.readiness_band.startsWith("Band 4")
-              ? "Recommended Next Steps"
-              : "Recommended School Targets"}
-          </h4>
-          <div className="recommendation-box">
-            <ul>
-              {overall.school_recommendation.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
+          {/* Recommendations */}
+          <div className="school-targets">
+            <h4 className="recommendation-title">
+              {overall.readiness_band.startsWith("Band 4")
+                ? "Recommended Next Steps"
+                : "Recommended School Targets"}
+            </h4>
+            <div
+              className={`recommendation-box ${
+                overall.readiness_band.startsWith("Band 4") ? "warning" : ""
+              }`}
+            >
+              <ul>
+                {overall.school_recommendation.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           <p className="explanation">
             Overall Selective Readiness is calculated as an equal-weight average
             of Reading, Mathematical Reasoning, Thinking Skills, and Writing.
-            Results are advisory only.
+            Results are rule-based and advisory only.
           </p>
         </div>
       )}
