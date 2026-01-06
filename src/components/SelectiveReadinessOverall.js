@@ -165,7 +165,12 @@ export default function SelectiveReadinessOverall() {
                 <XAxis dataKey="subject" />
                 <YAxis domain={[0, 100]} />
                 <Tooltip />
-                <Bar dataKey="score" radius={[6, 6, 0, 0]} />
+                <Bar
+                  dataKey="score"
+                  fill="#2563eb"     // ✅ same blue as your button
+                  radius={[6, 6, 0, 0]}
+                />
+
               </BarChart>
             </ResponsiveContainer>
           </div>
