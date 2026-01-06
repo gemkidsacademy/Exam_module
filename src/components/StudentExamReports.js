@@ -169,7 +169,31 @@ export default function StudentExamReports() {
                   }}
                 />
               </div>
+              {/* ✅ Writing score appears here */}
+                {report.exam_type === "writing" && (
+                  <p className="writing-score">
+                    <strong>Writing Score:</strong> {report.overall_score} / 20
+                  </p>
+                )}
+              {/* Reading */}
+              {report.exam_type === "reading" && (
+                <p className="reading-score">
+                  <strong>Overall Reading Accuracy:</strong> {report.overall_score}%
+                </p>
+              )}
             </div>
+             {/* Mathematical Reasoning */}
+              {report.exam_type === "mathematical_reasoning" && (
+                <p className="math-score">
+                  <strong>Overall Mathematical Reasoning Accuracy:</strong> {report.overall_score}%
+                </p>
+              )}
+              {/* Thinking Skills */}
+              {report.exam_type === "thinking_skills" && (
+                <p className="thinking-score">
+                  <strong>Overall Thinking Skills Accuracy:</strong> {report.overall_score}%
+                </p>
+              )}
 
             
             {report.exam_type !== "writing" && (
