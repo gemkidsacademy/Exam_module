@@ -1,5 +1,16 @@
 import React, { useEffect, useState } from "react";
 import "./StudentExamReports.css";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line
+} from "recharts";
+
 
 const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
@@ -18,6 +29,21 @@ export default function StudentExamReports() {
   /* ============================
      Helpers
   ============================ */
+  // Maps readiness bands to numeric scores (for visuals only)
+  const READINESS_SCORE_MAP = {
+    "Not Yet Selective Ready": 30,
+    "Developing Selective Potential": 50,
+    "Approaching Selective Readiness": 70,
+    "Strong Selective Potential": 90
+  };
+  
+  // Maps section grades to numeric values
+  const SECTION_GRADE_MAP = {
+    "A": 90,
+    "B": 75,
+    "C": 60,
+    "D": 40
+  };
 
   
 
@@ -234,7 +260,20 @@ export default function StudentExamReports() {
                   <span className="value">
                     {report.readiness_band}
                   </span>
+                {/* ✅ ADD THIS VISUAL BAR HERE */}
+                  <div className="readiness-visual">
+                    <div className="readiness-bar">
+                      <div
+                        className="readiness-fill"
+                        style={{
+                          width: `${
+                            READINESS_SCORE_MAP[report.readiness_band] || 0
+                          }%`
+                        }}
+                      />
+                    </div>
                 </div>
+                
         
                 <div className="summary-box">
                   <span className="label">School Guidance</span>
