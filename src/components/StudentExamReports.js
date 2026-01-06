@@ -7,6 +7,8 @@ export default function StudentExamReports() {
   const [students, setStudents] = useState([]);
   const [selectedStudentId, setSelectedStudentId] = useState("");
   const [studentDetails, setStudentDetails] = useState(null);
+  const [availableDates, setAvailableDates] = useState([]);
+
 
   const [reports, setReports] = useState([]);
   const [reportsLoading, setReportsLoading] = useState(false);
@@ -17,21 +19,7 @@ export default function StudentExamReports() {
      Helpers
   ============================ */
 
-  const groupReportsByDate = (reports) => {
-    const grouped = {};
   
-    reports.forEach((r) => {
-      if (!r.exam_date) return;
-  
-      if (!grouped[r.exam_date]) {
-        grouped[r.exam_date] = [];
-      }
-  
-      grouped[r.exam_date].push(r);
-    });
-  
-    return grouped;
-  };
 
 
   const formatExamName = (type) => {
@@ -86,57 +74,56 @@ export default function StudentExamReports() {
       });
   }, [selectedStudentId]);
 
-  /* ============================
-     Load Selective Reports
-  ============================ */
   useEffect(() => {
   if (!selectedStudentId) return;
 
-  console.log("📊 Fetching selective reports for:", selectedStudentId);
-  setReportsLoading(true);
+  console.log("📅 Fetching selective report dates for:", selectedStudentId);
 
   fetch(
-    `${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-reports`
+    `${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-report-dates`
   )
     .then((res) => res.json())
     .then((data) => {
-      console.log("📦 Raw selective-reports response:", data);
-
-      // Backend returns an ARRAY directly
-      if (Array.isArray(data)) {
-        console.log("✅ Reports array received. Count:", data.length);
-        setReports(data);
-      } else {
-        console.warn("⚠️ Unexpected reports response shape:", data);
-        setReports([]);
-      }
+      console.log("📅 Available dates:", data);
+      setAvailableDates(Array.isArray(data) ? data : []);
+      setSelectedDate(""); // reset when student changes
     })
-    .catch((err) => {
-      console.error("❌ Failed to load selective reports:", err);
-      setReports([]);
-    })
-    .finally(() => {
-      setReportsLoading(false);
-      console.log("📊 Reports loading finished");
+    .catch(() => {
+      setAvailableDates([]);
+      setSelectedDate("");
     });
 }, [selectedStudentId]);
 
 
   /* ============================
-     Derived State
+     Load Selective Reports
   ============================ */
-  const groupedReports = groupReportsByDate(reports);
+  useEffect(() => {
+  if (!selectedStudentId || !selectedDate) return;
 
-  const availableDates = Object.keys(groupedReports).sort(
-    (a, b) => new Date(b) - new Date(a)
+  console.log(
+    "📊 Fetching reports for:",
+    selectedStudentId,
+    "on",
+    selectedDate
   );
+
+  setReportsLoading(true);
+
+  fetch(
+    `${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-reports?exam_date=${selectedDate}`
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("📦 Reports response:", data);
+      setReports(Array.isArray(data) ? data : []);
+    })
+    .catch(() => setReports([]))
+    .finally(() => setReportsLoading(false));
+}, [selectedStudentId, selectedDate]);
 
 
   
-
-  console.log("🧪 availableDates:", availableDates);
-  console.log("🧪 selectedDate:", selectedDate);
-
   /* ============================
      UI
   ============================ */
@@ -233,7 +220,7 @@ export default function StudentExamReports() {
             Exam Reports – {selectedDate}
           </h3>
         
-          {groupedReports[selectedDate]?.map((report) => (
+          {reports.map((report) => (
             <div key={report.id} className="exam-report-card">
               {/* Header */}
               <div className="exam-header">
