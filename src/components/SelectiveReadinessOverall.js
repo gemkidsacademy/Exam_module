@@ -31,8 +31,8 @@ export default function SelectiveReadinessOverall() {
   ============================ */
   useEffect(() => {
     fetch(`${BACKEND_URL}/api/admin/students`)
-      .then((res) => res.json())
-      .then((data) => setStudents(Array.isArray(data) ? data : []));
+      .then(res => res.json())
+      .then(data => setStudents(Array.isArray(data) ? data : []));
   }, []);
 
   /* ============================
@@ -46,8 +46,8 @@ export default function SelectiveReadinessOverall() {
     fetch(
       `${BACKEND_URL}/api/admin/students/${selectedStudent}/selective-report-dates`
     )
-      .then((res) => res.json())
-      .then((data) => {
+      .then(res => res.json())
+      .then(data => {
         setAvailableDates(Array.isArray(data) ? data : []);
         setSelectedDate("");
         setOverall(null);
@@ -74,21 +74,43 @@ export default function SelectiveReadinessOverall() {
   };
 
   /* ============================
-     Prepare chart data
+     Prepare derived visuals
   ============================ */
+
+  // Subject chart
   const subjectChartData = overall
     ? Object.entries(overall.components).map(([key, value]) => ({
-        subject: SUBJECT_LABELS[key] || key,
-        score:
-          key === "writing"
-            ? Math.round((value / 20) * 100)
-            : value,
+        subject: SUBJECT_LABELS[key],
+        score: key === "writing" ? Math.round((value / 20) * 100) : value,
       }))
     : [];
 
+  // Writing %
   const writingPercent = overall
     ? Math.round((overall.components.writing / 20) * 100)
     : 0;
+
+  // Balance Index
+  let balanceIndex = null;
+  let strengths = [];
+  let improvements = [];
+
+  if (overall) {
+    const normalized = Object.entries(overall.components).map(
+      ([key, value]) =>
+        key === "writing" ? (value / 20) * 100 : value
+    );
+
+    const max = Math.max(...normalized);
+    const min = Math.min(...normalized);
+    balanceIndex = Math.round(100 - (max - min));
+
+    Object.entries(overall.components).forEach(([key, value]) => {
+      const percent = key === "writing" ? (value / 20) * 100 : value;
+      if (percent >= 90) strengths.push(SUBJECT_LABELS[key]);
+      else improvements.push(SUBJECT_LABELS[key]);
+    });
+  }
 
   /* ============================
      UI
@@ -97,7 +119,7 @@ export default function SelectiveReadinessOverall() {
     <div className="overall-readiness-container">
       <h2 className="overall-title">Overall Selective Readiness</h2>
 
-      {/* Student Selector */}
+      {/* Student selector */}
       <div className="selector-row">
         <label>Student ID</label>
         <select
@@ -105,7 +127,7 @@ export default function SelectiveReadinessOverall() {
           onChange={(e) => setSelectedStudent(e.target.value)}
         >
           <option value="">Select student</option>
-          {students.map((s) => (
+          {students.map(s => (
             <option key={s.student_id} value={s.student_id}>
               {s.student_id}
             </option>
@@ -113,7 +135,7 @@ export default function SelectiveReadinessOverall() {
         </select>
       </div>
 
-      {/* Exam Date Selector */}
+      {/* Date selector */}
       {selectedStudent && availableDates.length > 0 && (
         <div className="selector-row">
           <label>Exam Attempt Date</label>
@@ -122,7 +144,7 @@ export default function SelectiveReadinessOverall() {
             onChange={(e) => setSelectedDate(e.target.value)}
           >
             <option value="">Select date</option>
-            {availableDates.map((date) => (
+            {availableDates.map(date => (
               <option key={date} value={date}>
                 {date}
               </option>
@@ -131,7 +153,6 @@ export default function SelectiveReadinessOverall() {
         </div>
       )}
 
-      {/* Generate Button */}
       {selectedStudent && selectedDate && (
         <button className="generate-button" onClick={generateOverallReport}>
           Generate Overall Readiness Report
@@ -140,9 +161,6 @@ export default function SelectiveReadinessOverall() {
 
       {loading && <p className="loading">Loading report...</p>}
 
-      {/* ============================
-         OVERALL REPORT
-      ============================ */}
       {overall && (
         <div className="overall-summary">
           {/* Score cards */}
@@ -157,7 +175,29 @@ export default function SelectiveReadinessOverall() {
             </div>
           </div>
 
-          {/* Subject comparison chart */}
+          {/* Balance index */}
+          <div className="chart-section">
+            <div className="chart-title">Overall Balance Index</div>
+            <div className="progress-bar">
+              <div
+                className="progress-fill"
+                style={{ width: `${balanceIndex}%` }}
+              />
+            </div>
+            <p className="explanation">
+              Balance Score: {balanceIndex}% (higher means more evenly balanced
+              performance across subjects)
+            </p>
+          </div>
+
+          {/* Strengths vs improvements */}
+          <div className="chart-section">
+            <div className="chart-title">Strengths & Focus Areas</div>
+            <p><strong>Strengths:</strong> {strengths.join(", ")}</p>
+            <p><strong>Needs Improvement:</strong> {improvements.join(", ")}</p>
+          </div>
+
+          {/* Subject chart */}
           <div className="chart-section">
             <div className="chart-title">Subject Performance Overview</div>
             <ResponsiveContainer width="100%" height={300}>
@@ -167,10 +207,9 @@ export default function SelectiveReadinessOverall() {
                 <Tooltip />
                 <Bar
                   dataKey="score"
-                  fill="#2563eb"     // ✅ same blue as your button
+                  fill="#2563eb"
                   radius={[6, 6, 0, 0]}
                 />
-
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -190,14 +229,13 @@ export default function SelectiveReadinessOverall() {
             </p>
           </div>
 
-          {/* Override warning */}
           {overall.override_flag && (
             <div className="override-warning">
               ⚠️ {overall.override_message}
             </div>
           )}
 
-          {/* Component table */}
+          {/* Table */}
           <h4>Component Breakdown</h4>
           <table className="breakdown-table">
             <thead>
@@ -207,10 +245,10 @@ export default function SelectiveReadinessOverall() {
               </tr>
             </thead>
             <tbody>
-              {Object.entries(overall.components).map(([subject, score]) => (
-                <tr key={subject}>
-                  <td>{SUBJECT_LABELS[subject]}</td>
-                  <td>{score}</td>
+              {Object.entries(overall.components).map(([k, v]) => (
+                <tr key={k}>
+                  <td>{SUBJECT_LABELS[k]}</td>
+                  <td>{v}</td>
                 </tr>
               ))}
             </tbody>
@@ -229,7 +267,7 @@ export default function SelectiveReadinessOverall() {
               }`}
             >
               <ul>
-                {overall.school_recommendation.map((item) => (
+                {overall.school_recommendation.map(item => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
@@ -239,7 +277,7 @@ export default function SelectiveReadinessOverall() {
           <p className="explanation">
             Overall Selective Readiness is calculated as an equal-weight average
             of Reading, Mathematical Reasoning, Thinking Skills, and Writing.
-            Results are rule-based and advisory only.
+            Results are advisory only.
           </p>
         </div>
       )}
