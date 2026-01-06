@@ -11,307 +11,244 @@ import {
   Line
 } from "recharts";
 
-
 const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+
+/* ============================
+   CONSTANTS
+============================ */
+
+const READINESS_SCORE_MAP = {
+  "Not Yet Selective Ready": 30,
+  "Developing Selective Potential": 50,
+  "Approaching Selective Readiness": 70,
+  "Strong Selective Potential": 90
+};
+
+const SECTION_GRADE_MAP = {
+  A: 90,
+  B: 75,
+  C: 60,
+  D: 40
+};
+
+const READINESS_STAGES = [
+  "Not Yet Selective Ready",
+  "Developing Selective Potential",
+  "Approaching Selective Readiness",
+  "Strong Selective Potential"
+];
+
+/* ============================
+   COMPONENT
+============================ */
 
 export default function StudentExamReports() {
   const [students, setStudents] = useState([]);
   const [selectedStudentId, setSelectedStudentId] = useState("");
   const [studentDetails, setStudentDetails] = useState(null);
   const [availableDates, setAvailableDates] = useState([]);
-
-
   const [reports, setReports] = useState([]);
   const [reportsLoading, setReportsLoading] = useState(false);
-
   const [selectedDate, setSelectedDate] = useState("");
 
   /* ============================
      Helpers
   ============================ */
-  // Maps readiness bands to numeric scores (for visuals only)
-  const READINESS_SCORE_MAP = {
-    "Not Yet Selective Ready": 30,
-    "Developing Selective Potential": 50,
-    "Approaching Selective Readiness": 70,
-    "Strong Selective Potential": 90
-  };
-  
-  // Maps section grades to numeric values
-  const SECTION_GRADE_MAP = {
-    "A": 90,
-    "B": 75,
-    "C": 60,
-    "D": 40
-  };
 
-  
-
-
-  const formatExamName = (type) => {
-    if (!type) return "Unknown Exam";
-    if (type === "mathematical_reasoning") return "Mathematical Reasoning";
-    if (type === "thinking_skills" || type === "Thinking Skills")
-      return "Thinking Skills";
-    return type.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  };
+  const formatExamName = (type) =>
+    type ? type.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase()) : "Unknown Exam";
 
   /* ============================
-     Load Students
+     Data Fetching
   ============================ */
+
   useEffect(() => {
-  console.log("📡 Fetching students list…");
+    fetch(`${BACKEND_URL}/api/admin/students`)
+      .then(res => res.json())
+      .then(data => setStudents(Array.isArray(data) ? data : []));
+  }, []);
 
-  fetch(`${BACKEND_URL}/api/admin/students`)
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("✅ Students fetched:", data);
-      setStudents(Array.isArray(data) ? data : []);
-    })
-    .catch((err) => {
-      console.error("❌ Failed to load students:", err);
-      alert("Failed to load students");
-    });
-}, []);
-
-  /* ============================
-     Load Student Details
-  ============================ */
   useEffect(() => {
     if (!selectedStudentId) return;
 
-    console.log("👤 Selected student:", selectedStudentId);
-    console.log(
-      "➡️ Fetching student details:",
-      `${BACKEND_URL}/api/admin/students/${selectedStudentId}`
-    );
-
     fetch(`${BACKEND_URL}/api/admin/students/${selectedStudentId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("✅ Student details fetched:", data);
+      .then(res => res.json())
+      .then(data => {
         setStudentDetails(data);
         setReports([]);
         setSelectedDate("");
-      })
-      .catch((err) => {
-        console.error("❌ Failed to load student details:", err);
-        alert("Failed to load student details");
       });
   }, [selectedStudentId]);
 
   useEffect(() => {
-  if (!selectedStudentId) return;
+    if (!selectedStudentId) return;
 
-  console.log("📅 Fetching selective report dates for:", selectedStudentId);
+    fetch(
+      `${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-report-dates`
+    )
+      .then(res => res.json())
+      .then(data => setAvailableDates(Array.isArray(data) ? data : []));
+  }, [selectedStudentId]);
 
-  fetch(
-    `${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-report-dates`
-  )
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("📅 Available dates:", data);
-      setAvailableDates(Array.isArray(data) ? data : []);
-      setSelectedDate(""); // reset when student changes
-    })
-    .catch(() => {
-      setAvailableDates([]);
-      setSelectedDate("");
-    });
-}, [selectedStudentId]);
-
-
-  /* ============================
-     Load Selective Reports
-  ============================ */
   useEffect(() => {
-  if (!selectedStudentId || !selectedDate) return;
+    if (!selectedStudentId || !selectedDate) return;
 
-  console.log(
-    "📊 Fetching reports for:",
-    selectedStudentId,
-    "on",
-    selectedDate
-  );
+    setReportsLoading(true);
 
-  setReportsLoading(true);
+    fetch(
+      `${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-reports?exam_date=${selectedDate}`
+    )
+      .then(res => res.json())
+      .then(data => setReports(Array.isArray(data) ? data : []))
+      .finally(() => setReportsLoading(false));
+  }, [selectedStudentId, selectedDate]);
 
-  fetch(
-    `${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-reports?exam_date=${selectedDate}`
-  )
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("📦 Reports response:", data);
-      setReports(Array.isArray(data) ? data : []);
-    })
-    .catch(() => setReports([]))
-    .finally(() => setReportsLoading(false));
-}, [selectedStudentId, selectedDate]);
-
-
-  
   /* ============================
      UI
   ============================ */
+
   return (
     <div className="student-exam-reports">
       <h2>Student Exam Reports</h2>
 
-      {/* STEP 1: SELECT STUDENT */}
       {!studentDetails && (
+        <select
+          value={selectedStudentId}
+          onChange={e => setSelectedStudentId(e.target.value)}
+        >
+          <option value="">-- Select Student --</option>
+          {students.map(s => (
+            <option key={s.student_id} value={s.student_id}>
+              {s.student_id} – {s.name}
+            </option>
+          ))}
+        </select>
+      )}
+
+      {studentDetails && (
         <>
-          <h4>Select Student</h4>
+          <button onClick={() => {
+            setSelectedStudentId("");
+            setStudentDetails(null);
+            setReports([]);
+            setSelectedDate("");
+          }}>
+            ← Back
+          </button>
+
+          <h4>{studentDetails.name}</h4>
 
           <select
-            value={selectedStudentId}
-            onChange={(e) => {
-              console.log("🟡 Student dropdown changed:", e.target.value);
-              setSelectedStudentId(e.target.value);
-            }}
+            value={selectedDate}
+            onChange={e => setSelectedDate(e.target.value)}
           >
-            <option value="">-- Select Student ID --</option>
-            {students.map((s) => (
-              <option key={s.student_id} value={s.student_id}>
-                {s.student_id} – {s.name}
-              </option>
+            <option value="">-- Select Attempt Date --</option>
+            {availableDates.map(d => (
+              <option key={d} value={d}>{d}</option>
             ))}
           </select>
         </>
       )}
 
-      {/* STEP 2: STUDENT CONTEXT */}
-      {studentDetails && (
-        <>
-          <button
-            onClick={() => {
-              console.log("↩️ Resetting student selection");
-              setSelectedStudentId("");
-              setStudentDetails(null);
-              setReports([]);
-              setSelectedDate("");
-            }}
-          >
-            ← Back to Students
-          </button>
+      {reportsLoading && <p>Loading reports…</p>}
 
-          <div className="student-info-box">
-            <p><strong>Student ID:</strong> {studentDetails.student_id}</p>
-            <p><strong>Name:</strong> {studentDetails.name}</p>
-            <p><strong>Class:</strong> {studentDetails.class_name}</p>
-            <p><strong>Class Day:</strong> {studentDetails.class_day}</p>
-            <p><strong>Parent Email:</strong> {studentDetails.parent_email}</p>
-          </div>
+      {reports.map(report => {
+        const sectionChartData = report.sections.map(s => ({
+          section: s.section_name,
+          score: SECTION_GRADE_MAP[s.performance_band] || 0
+        }));
 
-          <h4>Selective Exam Attempts</h4>
+        const strengths = report.sections
+          .filter(s => ["A", "B"].includes(s.performance_band))
+          .map(s => s.section_name);
 
-          {reportsLoading && <p>Loading reports…</p>}
+        const focusAreas = report.sections
+          .filter(s => ["C", "D"].includes(s.performance_band))
+          .map(s => s.section_name);
 
-          {!reportsLoading && availableDates.length === 0 && (
-            <>
-              <p className="empty-state">
-                No Selective exam reports found.
-              </p>
-              <pre className="debug-box">
-                reports.length = {reports.length}
-              </pre>
-            </>
-          )}
+        return (
+          <div key={report.id} className="exam-report-card">
 
-          {/* STEP 3: SELECT ATTEMPT DATE */}
-          {availableDates.length > 0 && (
-            <>
-              <label>Select Attempt Date</label>
+            <h4>{formatExamName(report.exam_type)}</h4>
 
-                <select
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                >
-                  <option value="">-- Select Date --</option>
-                  {availableDates.map((date) => (
-                    <option key={date} value={date}>
-                      {date}
-                    </option>
-                  ))}
-                </select>
-
-            </>
-          )}
-        </>
-      )}
-
-      {/* STEP 4: SHOW ALL EXAMS FOR DATE */}
-      {selectedDate && (
-        <div className="attempt-report-group">
-          <h3 className="attempt-title">
-            Exam Reports – {selectedDate}
-          </h3>
-        
-          {reports.map((report) => (
-            <div key={report.id} className="exam-report-card">
-              {/* Header */}
-              <div className="exam-header">
-                <h4>{formatExamName(report.exam_type)}</h4>
+            {/* Overall Readiness */}
+            <div className="summary-box">
+              <strong>{report.readiness_band}</strong>
+              <div className="readiness-bar">
+                <div
+                  className="readiness-fill"
+                  style={{
+                    width: `${READINESS_SCORE_MAP[report.readiness_band] || 0}%`
+                  }}
+                />
               </div>
-        
-              {/* Summary Row */}
-              <div className="exam-summary-row">
-                <div className="summary-box">
-                  <span className="label">Overall Readiness</span>
-                  <span className="value">
-                    {report.readiness_band}
-                  </span>
-
-                  {/* Visual readiness bar */}
-                  <div className="readiness-visual">
-                    <div className="readiness-bar">
-                      <div
-                        className="readiness-fill"
-                        style={{
-                          width: `${
-                            READINESS_SCORE_MAP[report.readiness_band] || 0
-                          }%`
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="summary-box">
-                  <span className="label">School Guidance</span>
-                  <span className="value">
-                    {report.school_guidance_level}
-                  </span>
-                </div>
-              </div>
-
-        
-              {/* Section Performance */}
-              <h5 className="section-title">Section Performance</h5>
-        
-              <div className="section-grid">
-                {Array.isArray(report.sections) &&
-                  report.sections.map((section) => (
-                    <div
-                      key={section.section_name}
-                      className="section-card"
-                    >
-                      <span className="section-name">
-                        {section.section_name}
-                      </span>
-                      <span className="section-band">
-                        {section.performance_band}
-                      </span>
-                    </div>
-                  ))}
-              </div>
-        
-              {/* Disclaimer */}
-              <p className="report-disclaimer">
-                {report.disclaimer}
-              </p>
             </div>
-          ))}
-        </div>
+
+            {/* Readiness Ladder */}
+            <div className="readiness-ladder">
+              {READINESS_STAGES.map(stage => (
+                <div
+                  key={stage}
+                  className={stage === report.readiness_band ? "ladder-step active" : "ladder-step"}
+                >
+                  {stage}
+                </div>
+              ))}
+            </div>
+
+            {/* Section Performance Chart */}
+            <h5>Section Performance</h5>
+            <div style={{ width: "100%", height: 220 }}>
+              <ResponsiveContainer>
+                <BarChart data={sectionChartData}>
+                  <XAxis dataKey="section" />
+                  <YAxis domain={[0, 100]} />
+                  <Tooltip />
+                  <Bar dataKey="score" fill="#2563eb" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Strengths vs Focus */}
+            <div className="strength-focus">
+              <div>
+                <h5>Strengths</h5>
+                {strengths.join(", ") || "—"}
+              </div>
+              <div>
+                <h5>Focus Areas</h5>
+                {focusAreas.join(", ") || "—"}
+              </div>
+            </div>
+
+            <p className="report-disclaimer">{report.disclaimer}</p>
+          </div>
+        );
+      })}
+
+      {/* Progress Over Time */}
+      {availableDates.length > 1 && reports.length > 0 && (
+        <>
+          <h4>Progress Over Time</h4>
+          <div style={{ width: "100%", height: 250 }}>
+            <ResponsiveContainer>
+              <LineChart
+                data={availableDates.map(d => {
+                  const r = reports.find(rep => rep.exam_date === d);
+                  return {
+                    date: d,
+                    score: READINESS_SCORE_MAP[r?.readiness_band] || 0
+                  };
+                })}
+              >
+                <XAxis dataKey="date" />
+                <YAxis domain={[0, 100]} />
+                <Tooltip />
+                <Line type="monotone" dataKey="score" stroke="#2563eb" strokeWidth={3} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </>
       )}
     </div>
   );
