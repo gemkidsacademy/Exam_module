@@ -260,7 +260,8 @@ export default function StudentExamReports() {
                   <span className="value">
                     {report.readiness_band}
                   </span>
-                {/* ✅ ADD THIS VISUAL BAR HERE */}
+
+                  {/* Visual readiness bar */}
                   <div className="readiness-visual">
                     <div className="readiness-bar">
                       <div
@@ -272,9 +273,9 @@ export default function StudentExamReports() {
                         }}
                       />
                     </div>
+                  </div>
                 </div>
-                
-        
+
                 <div className="summary-box">
                   <span className="label">School Guidance</span>
                   <span className="value">
@@ -282,6 +283,7 @@ export default function StudentExamReports() {
                   </span>
                 </div>
               </div>
+
         
               {/* Section Performance */}
               <h5 className="section-title">Section Performance</h5>
