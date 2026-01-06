@@ -87,18 +87,23 @@ export default function SelectiveReadinessOverall() {
     : [];
 
   let balanceIndex = null;
+  let rawBalance = null;
   let strengths = [];
   let improvements = [];
-
+  
   if (overall) {
     const normalizedScores = Object.entries(overall.components).map(
       ([k, v]) => normalizeScore(k, v)
     );
-
-    balanceIndex = Math.round(
-      100 - (Math.max(...normalizedScores) - Math.min(...normalizedScores))
-    );
-
+  
+    // 1️⃣ Compute raw balance (true mathematical value)
+    rawBalance =
+      100 - (Math.max(...normalizedScores) - Math.min(...normalizedScores));
+  
+    // 2️⃣ Clamp for UI so bar never appears "empty"
+    balanceIndex = Math.max(15, Math.round(rawBalance));
+  
+    // 3️⃣ Strengths vs improvements
     Object.entries(overall.components).forEach(([k, v]) => {
       const pct = normalizeScore(k, v);
       if (pct >= 90) strengths.push(SUBJECT_LABELS[k]);
@@ -111,12 +116,14 @@ export default function SelectiveReadinessOverall() {
   ============================ */
   function SubjectFocusCard({ subjectKey, label, rawScore }) {
     const percent = normalizeScore(subjectKey, rawScore);
-    const isWarning = subjectKey === "writing" && percent < 95;
-
+  
+    const isWarning =
+      subjectKey === "writing" && percent < 95;
+  
     return (
       <div className={`subject-focus ${isWarning ? "warning" : ""}`}>
         <h4>{label} Performance</h4>
-
+  
         <div className="progress-bar">
           <div
             className="progress-fill"
@@ -128,7 +135,7 @@ export default function SelectiveReadinessOverall() {
             }}
           />
         </div>
-
+  
         <p>
           {label} Score: {rawScore}
           {subjectKey === "writing" ? " / 20" : " / 100"} ({percent}%)
