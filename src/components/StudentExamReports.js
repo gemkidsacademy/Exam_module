@@ -14,11 +14,7 @@ import {
 const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
 /* ============================
-   CONSTANTS
-============================ */
-
-const READINESS_SCORE_MAP = {
-  "Not Yet Selective Ready": 30,
+   CONSTANTS<h5>Strengths</h5>
   "Developing Selective Potential": 50,
   "Approaching Selective Readiness": 70,
   "Strong Selective Potential": 90
@@ -184,18 +180,7 @@ export default function StudentExamReports() {
               </div>
             </div>
 
-            {/* Readiness Ladder */}
-            <div className="readiness-ladder">
-              {READINESS_STAGES.map(stage => (
-                <div
-                  key={stage}
-                  className={stage === report.readiness_band ? "ladder-step active" : "ladder-step"}
-                >
-                  {stage}
-                </div>
-              ))}
-            </div>
-
+            
             {/* Section Performance Chart */}
             <h5>Section Performance</h5>
             <div style={{ width: "100%", height: 220 }}>
@@ -209,18 +194,7 @@ export default function StudentExamReports() {
               </ResponsiveContainer>
             </div>
 
-            {/* Strengths vs Focus */}
-            <div className="strength-focus">
-              <div>
-                <h5>Strengths</h5>
-                {strengths.join(", ") || "—"}
-              </div>
-              <div>
-                <h5>Focus Areas</h5>
-                {focusAreas.join(", ") || "—"}
-              </div>
-            </div>
-
+            
             <p className="report-disclaimer">{report.disclaimer}</p>
           </div>
         );
