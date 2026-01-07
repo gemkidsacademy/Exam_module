@@ -5,159 +5,167 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line
 } from "recharts";
+import "./StudentExamReport.css";
 
-/* ======================================================
-   MOCK DATA — PHASE 1 ($500 PROJECT)
-   Single exam snapshot only
-====================================================== */
+/* ============================
+   MOCK DATA
+============================ */
 
-const mockCurrentExamReport = {
-  student: {
-    id: "STU-001",
-    name: "Student A"
-  },
-  exam: {
-    name: "Foundational Assessment – January",
-    date: "2026-01-05"
-  },
-  overall: {
-    scorePercent: 72,
-    readinessBand: "Approaching Readiness"
-  },
-  topics: [
-    { name: "Mathematical Reasoning", scorePercent: 80 },
-    { name: "Reading Comprehension", scorePercent: 65 },
-    { name: "Writing Skills", scorePercent: 70 },
-    { name: "Thinking Skills", scorePercent: 73 }
-  ]
+const examSummary = {
+  examName: "NSW Selective Thinking Skills Test",
+  totalQuestions: 20,
+  attempted: 20,
+  correct: 8,
+  incorrect: 12,
+  notAttempted: 0,
+  accuracy: 40,
+  scorePercent: 40,
+  result: "Fail"
 };
 
-/* ======================================================
+const topicPerformance = [
+  {
+    topic: "Time Reasoning",
+    total: 10,
+    attempted: 10,
+    correct: 3,
+    incorrect: 7,
+    notAttempted: 0
+  },
+  {
+    topic: "Pattern Recognition",
+    total: 6,
+    attempted: 6,
+    correct: 4,
+    incorrect: 2,
+    notAttempted: 0
+  },
+  {
+    topic: "Logical Sequences",
+    total: 4,
+    attempted: 4,
+    correct: 1,
+    incorrect: 3,
+    notAttempted: 0
+  }
+];
+
+/* ============================
+   DERIVED DATA
+============================ */
+
+const accuracyPie = [
+  { name: "Correct", value: examSummary.correct },
+  { name: "Incorrect", value: examSummary.incorrect },
+  { name: "Not Attempted", value: examSummary.notAttempted }
+];
+
+const COLORS = ["#22c55e", "#ef4444", "#94a3b8"];
+
+/* ============================
    COMPONENT
-====================================================== */
+============================ */
 
-const StudentCurrentExamReport = () => {
-  const { student, exam, overall, topics } = mockCurrentExamReport;
-
-  const weakestTopics = [...topics]
-    .sort((a, b) => a.scorePercent - b.scorePercent)
-    .slice(0, 2);
-
+export default function StudentExamReportMock() {
   return (
-    <div style={styles.page}>
-      {/* Header */}
-      <div style={styles.header}>
-        <h2 style={styles.title}>Current Exam Report</h2>
-        <p style={styles.subTitle}>
-          {exam.name} • {exam.date}
-        </p>
-      </div>
+    <div className="report-container">
 
-      {/* Overall Summary */}
-      <div style={styles.card}>
-        <h3 style={styles.cardTitle}>Overall Result</h3>
-        <div style={styles.scoreRow}>
-          <span style={styles.score}>{overall.scorePercent}%</span>
-          <span style={styles.band}>{overall.readinessBand}</span>
+      <h2>{examSummary.examName}</h2>
+
+      {/* ============================
+          OVERALL ACCURACY
+      ============================ */}
+      <section className="card">
+        <h3>Overall Accuracy & Result</h3>
+
+        <div className="summary-grid">
+          <div>
+            <p><strong>Total Questions:</strong> {examSummary.totalQuestions}</p>
+            <p><strong>Attempted:</strong> {examSummary.attempted}</p>
+            <p><strong>Correct:</strong> {examSummary.correct}</p>
+            <p><strong>Incorrect:</strong> {examSummary.incorrect}</p>
+            <p><strong>Not Attempted:</strong> {examSummary.notAttempted}</p>
+            <p><strong>Accuracy:</strong> {examSummary.accuracy}%</p>
+            <p><strong>Score:</strong> {examSummary.scorePercent}%</p>
+            <p><strong>Result:</strong> {examSummary.result}</p>
+          </div>
+
+          <ResponsiveContainer width={250} height={250}>
+            <PieChart>
+              <Pie
+                data={accuracyPie}
+                dataKey="value"
+                innerRadius={60}
+                outerRadius={90}
+                paddingAngle={4}
+              >
+                {accuracyPie.map((_, i) => (
+                  <Cell key={i} fill={COLORS[i]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
-      </div>
+      </section>
 
-      {/* Topic-wise Performance */}
-      <div style={styles.card}>
-        <h3 style={styles.cardTitle}>Topic-wise Performance</h3>
+      {/* ============================
+          TOPIC-WISE PERFORMANCE
+      ============================ */}
+      <section className="card">
+        <h3>Topic-wise Performance</h3>
 
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={topics}>
-            <XAxis dataKey="name" />
-            <YAxis domain={[0, 100]} />
+          <BarChart data={topicPerformance}>
+            <XAxis dataKey="topic" />
+            <YAxis />
             <Tooltip />
-            <Bar dataKey="scorePercent" />
+            <Bar dataKey="correct" stackId="a" fill="#22c55e" />
+            <Bar dataKey="incorrect" stackId="a" fill="#ef4444" />
+            <Bar dataKey="notAttempted" stackId="a" fill="#94a3b8" />
           </BarChart>
         </ResponsiveContainer>
-      </div>
+      </section>
 
-      {/* Improvement Areas */}
-      <div style={styles.card}>
-        <h3 style={styles.cardTitle}>Areas to Improve</h3>
-        <ul style={styles.list}>
-          {weakestTopics.map((topic) => (
-            <li key={topic.name} style={styles.listItem}>
-              {topic.name} – {topic.scorePercent}%
-            </li>
-          ))}
-        </ul>
+      {/* ============================
+          IMPROVEMENT AREAS
+      ============================ */}
+      <section className="card">
+        <h3>Improvement Areas</h3>
 
-        <p style={styles.note}>
-          Focus on these topics to improve overall performance in the next exam.
+        {topicPerformance
+          .sort((a, b) => a.correct - b.correct)
+          .map(topic => {
+            const accuracy = Math.round(
+              (topic.correct / topic.total) * 100
+            );
+
+            return (
+              <div key={topic.topic} className="improvement-row">
+                <span>{topic.topic}</span>
+                <div className="progress-bar">
+                  <div
+                    className="progress-fill"
+                    style={{ width: `${accuracy}%` }}
+                  />
+                </div>
+                <span>{accuracy}%</span>
+              </div>
+            );
+          })}
+
+        <p className="note">
+          Topics with fewer questions may show limited accuracy trends.
         </p>
-      </div>
+      </section>
+
     </div>
   );
-};
-
-/* ======================================================
-   BASIC INLINE STYLES (PHASE 1 – SIMPLE & CLEAN)
-====================================================== */
-
-const styles = {
-  page: {
-    maxWidth: "900px",
-    margin: "40px auto",
-    padding: "24px",
-    fontFamily: "Inter, system-ui, sans-serif",
-    background: "#f8fafc"
-  },
-  header: {
-    marginBottom: "24px"
-  },
-  title: {
-    margin: 0,
-    fontSize: "1.8rem",
-    color: "#0f172a"
-  },
-  subTitle: {
-    marginTop: "6px",
-    color: "#475569"
-  },
-  card: {
-    background: "#ffffff",
-    borderRadius: "14px",
-    padding: "20px",
-    marginBottom: "24px",
-    boxShadow: "0 8px 24px rgba(15,23,42,0.06)"
-  },
-  cardTitle: {
-    marginBottom: "16px",
-    color: "#0f172a"
-  },
-  scoreRow: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: "16px"
-  },
-  score: {
-    fontSize: "2.5rem",
-    fontWeight: "700",
-    color: "#2563eb"
-  },
-  band: {
-    fontSize: "1rem",
-    color: "#334155"
-  },
-  list: {
-    paddingLeft: "18px",
-    marginBottom: "12px"
-  },
-  listItem: {
-    marginBottom: "6px",
-    color: "#334155"
-  },
-  note: {
-    fontSize: "0.9rem",
-    color: "#64748b"
-  }
-};
-
-export default StudentCurrentExamReport;
+}
