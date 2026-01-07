@@ -35,7 +35,7 @@ export default function StudentReportShell() {
         </select>
       
         {/* ================= STUDENT FILTER ================= */}
-        {reportType === "student" && (
+        {(reportType === "student" || reportType === "cumulative") && (
           <select
             value={studentId}
             onChange={e => setStudentId(e.target.value)}
@@ -46,6 +46,7 @@ export default function StudentReportShell() {
             <option value="S003">Student S003</option>
           </select>
         )}
+
       
         {/* ================= CLASS FILTERS ================= */}
         {reportType === "class" && (
@@ -89,50 +90,51 @@ export default function StudentReportShell() {
 
       {/* ================= REPORT CONTENT ================= */}
 
-      {/* 🚧 GATE: student must be selected */}
-      {reportType === "student" && !studentId && (
-        <div className="empty-state">
-          <h3>Select a student to view the report</h3>
-          <p>
-            Please choose a student ID from the dropdown above to view their
-            exam report.
-          </p>
-        </div>
-      )}
+{/* 🚧 STUDENT GATE */}
+{reportType === "student" && !studentId && (
+  <div className="empty-state">
+    <h3>Select a student to view the report</h3>
+    <p>Please choose a student ID from the dropdown above.</p>
+  </div>
+)}
 
-      {/* ✅ Student report only after student is selected */}
-      {reportType === "student" && studentId && (
-        <StudentCurrentExamReport studentId={studentId} />
-      )}
+{/* ✅ STUDENT REPORT */}
+{reportType === "student" && studentId && (
+  <StudentCurrentExamReport studentId={studentId} />
+)}
 
-      {/* Other reports don’t need student selection */}
-      {/* 🚧 GATE: class name & day must be selected */}
-      {reportType === "class" && (!className || !classDay) && (
-        <div className="empty-state">
-          <h3>Select class details to view the report</h3>
-          <p>
-            Please select both a class name and a class day to view the class
-            performance report.
-          </p>
-        </div>
-      )}
-      
-      {/* ✅ Class report only after class + day selected */}
-      {reportType === "class" && className && classDay && (
-        <ClassReportMock
-          className={className}
-          classDay={classDay}
-          exam={exam}
-          date={date}
-        />
-      )}
+{/* 🚧 CLASS GATE */}
+{reportType === "class" && (!className || !classDay) && (
+  <div className="empty-state">
+    <h3>Select class details to view the report</h3>
+    <p>Please select both a class name and class day.</p>
+  </div>
+)}
 
-      {reportType === "cumulative" && (
-        <CumulativeReportMock exam={exam} />
-      )}
+{/* ✅ CLASS REPORT */}
+{reportType === "class" && className && classDay && (
+  <ClassReportMock
+    className={className}
+    classDay={classDay}
+    exam={exam}
+    date={date}
+  />
+)}
 
+{/* 🚧 CUMULATIVE GATE (ADD THIS HERE) */}
+{reportType === "cumulative" && !studentId && (
+  <div className="empty-state">
+    <h3>Select a student to view cumulative progress</h3>
+    <p>
+      Please choose a student ID to view progress across multiple exam attempts.
+    </p>
+  </div>
+)}
 
-      {showPDF && <PDFPreviewMock onClose={() => setShowPDF(false)} />}
-    </div>
-  );
-}
+{/* ✅ CUMULATIVE REPORT */}
+{reportType === "cumulative" && studentId && (
+  <CumulativeReportMock
+    studentId={studentId}
+    exam={exam}
+  />
+)}
