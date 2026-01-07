@@ -16,20 +16,32 @@ export default function ClassReportMock({
   exam,
   date
 }) {
-  const key = `${exam}|${date}`;
-  const data = mockExamData[key];
+  console.log("📥 ClassReportMock received:", {
+    className,
+    classDay,
+    exam,
+    date
+  });
 
-  // 🚧 SAFETY GUARD — REQUIRED
+  const key = `${exam}|${date}`;
+  console.log("🔑 Computed key:", key);
+
+  console.log("📦 mockExamData:", mockExamData);
+  console.log("🗂 Available keys:", Object.keys(mockExamData));
+
+  const data = mockExamData[key];
+  console.log("📄 Resolved data:", data);
+
   if (!data) {
     return (
       <div className="empty-state">
         <h3>No data available</h3>
-        <p>
-          No class report exists for the selected exam and date.
-        </p>
+        <p>No class report exists for the selected exam and date.</p>
       </div>
     );
   }
+
+
 
   return (
     <div className="report-container">
