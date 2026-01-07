@@ -1,5 +1,5 @@
-  export const mockExamData = {
-  "Thinking Skills|2024-01-10": {
+export const mockExamData = {
+  "thinking_skills|2024-01-10": {
     classSummary: {
       averageScore: 62,
       highestScore: 88,
@@ -19,7 +19,7 @@
     ]
   },
 
-  "Thinking Skills|2024-02-15": {
+  "thinking_skills|2024-02-15": {
     classSummary: {
       averageScore: 68,
       highestScore: 91,
