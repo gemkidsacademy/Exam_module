@@ -106,7 +106,27 @@ export default function StudentReportShell() {
       )}
 
       {/* Other reports don’t need student selection */}
-      {reportType === "class" && <ClassReportMock />}
+      {/* 🚧 GATE: class name & day must be selected */}
+      {reportType === "class" && (!className || !classDay) && (
+        <div className="empty-state">
+          <h3>Select class details to view the report</h3>
+          <p>
+            Please select both a class name and a class day to view the class
+            performance report.
+          </p>
+        </div>
+      )}
+      
+      {/* ✅ Class report only after class + day selected */}
+      {reportType === "class" && className && classDay && (
+        <ClassReportMock
+          className={className}
+          classDay={classDay}
+          exam={exam}
+          date={date}
+        />
+      )}
+
       {reportType === "cumulative" && <CumulativeReportMock />}
 
       {showPDF && <PDFPreviewMock onClose={() => setShowPDF(false)} />}
