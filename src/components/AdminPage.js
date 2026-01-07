@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import StudentExamReports from "./StudentExamReports";
 import SelectiveReadinessOverall from "./SelectiveReadinessOverall";
-import StudentCurrentExamReport from "./StudentCurrentExamReport";
+import StudentReportShell from "./StudentReportShell";
 
 
 
@@ -430,7 +430,7 @@ const AdminPanel = () => {
                {/* ===== TOPIC REPORT (LIMITED) ===== */}
                {activeTab === "topic-report-limited" && (
                  <div className="tab-panel">
-                   <StudentCurrentExamReport />
+                   <StudentReportShell />
                  </div>
                )}
 
