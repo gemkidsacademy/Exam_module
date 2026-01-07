@@ -127,7 +127,10 @@ export default function StudentReportShell() {
         />
       )}
 
-      {reportType === "cumulative" && <CumulativeReportMock />}
+      {reportType === "cumulative" && (
+        <CumulativeReportMock exam={exam} />
+      )}
+
 
       {showPDF && <PDFPreviewMock onClose={() => setShowPDF(false)} />}
     </div>
