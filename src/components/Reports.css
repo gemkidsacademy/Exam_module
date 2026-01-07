@@ -1,0 +1,27 @@
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 10px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.ai-text {
+  margin-top: 12px;
+  color: #334155;
+  font-size: 0.95rem;
+}
+
+.topic-block {
+  margin-bottom: 32px;
+}
