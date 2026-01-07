@@ -33,7 +33,7 @@ export default function StudentReportShell() {
           <option value="class">Per Class Report</option>
           <option value="cumulative">Cumulative Progress</option>
         </select>
-      
+
         {/* ================= STUDENT FILTER ================= */}
         {(reportType === "student" || reportType === "cumulative") && (
           <select
@@ -47,7 +47,6 @@ export default function StudentReportShell() {
           </select>
         )}
 
-      
         {/* ================= CLASS FILTERS ================= */}
         {reportType === "class" && (
           <>
@@ -60,7 +59,7 @@ export default function StudentReportShell() {
               <option value="Class B">Class B</option>
               <option value="Class C">Class C</option>
             </select>
-      
+
             <select
               value={classDay}
               onChange={e => setClassDay(e.target.value)}
@@ -72,69 +71,76 @@ export default function StudentReportShell() {
             </select>
           </>
         )}
-      
+
         <select value={exam} onChange={e => setExam(e.target.value)}>
           <option value="thinking_skills">Thinking Skills</option>
           <option value="reading">Reading</option>
           <option value="mathematics">Mathematics</option>
           <option value="writing">Writing</option>
         </select>
-      
+
         <select value={date} onChange={e => setDate(e.target.value)}>
           <option value="2024-01-10">10 Jan 2024</option>
           <option value="2024-02-15">15 Feb 2024</option>
         </select>
-      
+
         <button onClick={() => setShowPDF(true)}>Preview PDF</button>
       </div>
 
       {/* ================= REPORT CONTENT ================= */}
 
-{/* 🚧 STUDENT GATE */}
-{reportType === "student" && !studentId && (
-  <div className="empty-state">
-    <h3>Select a student to view the report</h3>
-    <p>Please choose a student ID from the dropdown above.</p>
-  </div>
-)}
+      {/* 🚧 STUDENT GATE */}
+      {reportType === "student" && !studentId && (
+        <div className="empty-state">
+          <h3>Select a student to view the report</h3>
+          <p>Please choose a student ID from the dropdown above.</p>
+        </div>
+      )}
 
-{/* ✅ STUDENT REPORT */}
-{reportType === "student" && studentId && (
-  <StudentCurrentExamReport studentId={studentId} />
-)}
+      {/* ✅ STUDENT REPORT */}
+      {reportType === "student" && studentId && (
+        <StudentCurrentExamReport studentId={studentId} />
+      )}
 
-{/* 🚧 CLASS GATE */}
-{reportType === "class" && (!className || !classDay) && (
-  <div className="empty-state">
-    <h3>Select class details to view the report</h3>
-    <p>Please select both a class name and class day.</p>
-  </div>
-)}
+      {/* 🚧 CLASS GATE */}
+      {reportType === "class" && (!className || !classDay) && (
+        <div className="empty-state">
+          <h3>Select class details to view the report</h3>
+          <p>Please select both a class name and class day.</p>
+        </div>
+      )}
 
-{/* ✅ CLASS REPORT */}
-{reportType === "class" && className && classDay && (
-  <ClassReportMock
-    className={className}
-    classDay={classDay}
-    exam={exam}
-    date={date}
-  />
-)}
+      {/* ✅ CLASS REPORT */}
+      {reportType === "class" && className && classDay && (
+        <ClassReportMock
+          className={className}
+          classDay={classDay}
+          exam={exam}
+          date={date}
+        />
+      )}
 
-{/* 🚧 CUMULATIVE GATE (ADD THIS HERE) */}
-{reportType === "cumulative" && !studentId && (
-  <div className="empty-state">
-    <h3>Select a student to view cumulative progress</h3>
-    <p>
-      Please choose a student ID to view progress across multiple exam attempts.
-    </p>
-  </div>
-)}
+      {/* 🚧 CUMULATIVE GATE */}
+      {reportType === "cumulative" && !studentId && (
+        <div className="empty-state">
+          <h3>Select a student to view cumulative progress</h3>
+          <p>
+            Please choose a student ID to view progress across multiple exam
+            attempts.
+          </p>
+        </div>
+      )}
 
-{/* ✅ CUMULATIVE REPORT */}
-{reportType === "cumulative" && studentId && (
-  <CumulativeReportMock
-    studentId={studentId}
-    exam={exam}
-  />
-)}
+      {/* ✅ CUMULATIVE REPORT */}
+      {reportType === "cumulative" && studentId && (
+        <CumulativeReportMock
+          studentId={studentId}
+          exam={exam}
+        />
+      )}
+
+      {showPDF && <PDFPreviewMock onClose={() => setShowPDF(false)} />}
+
+    </div>
+  );
+}
