@@ -3,13 +3,15 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer
 } from "recharts";
 import { mockExamData } from "./mockData";
-import PDFPreviewMock from "./PDFPreviewMock";
+
 import "./Reports.css";
 
-export default function ClassReportMock() {
-  const [exam, setExam] = useState("Thinking Skills");
-  const [date, setDate] = useState("2024-01-10");
-  const [showPDF, setShowPDF] = useState(false);
+export default function ClassReportMock({
+  className,
+  classDay,
+  exam,
+  date
+}) {  
 
   const key = `${exam}|${date}`;
   const data = mockExamData[key];
@@ -17,21 +19,7 @@ export default function ClassReportMock() {
   return (
     <div className="report-container">
 
-      {/* ===== FILTER BAR ===== */}
-      <div className="filters-bar">
-        <select value={exam} onChange={e => setExam(e.target.value)}>
-          <option>Thinking Skills</option>
-        </select>
-
-        <select value={date} onChange={e => setDate(e.target.value)}>
-          <option value="2024-01-10">10 Jan 2024</option>
-          <option value="2024-02-15">15 Feb 2024</option>
-        </select>
-
-        <button onClick={() => setShowPDF(true)}>
-          Preview PDF
-        </button>
-      </div>
+      
 
       {/* ===== SUMMARY ===== */}
       <section className="card">
@@ -83,8 +71,7 @@ export default function ClassReportMock() {
         </ResponsiveContainer>
       </section>
 
-      {/* ===== PDF PREVIEW ===== */}
-      {showPDF && <PDFPreviewMock onClose={() => setShowPDF(false)} />}
+      
     </div>
   );
 }
