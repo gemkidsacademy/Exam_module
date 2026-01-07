@@ -26,7 +26,10 @@ export default function StudentReportShell() {
           <select
             value={reportType}
             onChange={e => {
-              setReportType(e.target.value);
+              const next = e.target.value;
+              console.log("🔁 Report type changed:", next);
+
+              setReportType(next);
               setStudentId("");
               setClassName("");
               setClassDay("");
@@ -43,7 +46,10 @@ export default function StudentReportShell() {
           <div className="filter-group">
             <select
               value={studentId}
-              onChange={e => setStudentId(e.target.value)}
+              onChange={e => {
+                console.log("👤 Student selected:", e.target.value);
+                setStudentId(e.target.value);
+              }}
             >
               <option value="">Student</option>
               <option value="S001">Student S001</option>
@@ -58,7 +64,10 @@ export default function StudentReportShell() {
           <div className="filter-group">
             <select
               value={className}
-              onChange={e => setClassName(e.target.value)}
+              onChange={e => {
+                console.log("🏫 Class selected:", e.target.value);
+                setClassName(e.target.value);
+              }}
             >
               <option value="">Class</option>
               <option value="Class A">Class A</option>
@@ -68,7 +77,10 @@ export default function StudentReportShell() {
 
             <select
               value={classDay}
-              onChange={e => setClassDay(e.target.value)}
+              onChange={e => {
+                console.log("📅 Class day selected:", e.target.value);
+                setClassDay(e.target.value);
+              }}
             >
               <option value="">Day</option>
               <option value="Monday">Monday</option>
@@ -82,7 +94,10 @@ export default function StudentReportShell() {
         <div className="filter-group">
           <select
             value={exam}
-            onChange={e => setExam(e.target.value)}
+            onChange={e => {
+              console.log("📘 Exam selected:", e.target.value);
+              setExam(e.target.value);
+            }}
           >
             <option value="thinking_skills">Thinking Skills</option>
             <option value="reading">Reading</option>
@@ -93,7 +108,10 @@ export default function StudentReportShell() {
           {reportType !== "cumulative" && (
             <select
               value={date}
-              onChange={e => setDate(e.target.value)}
+              onChange={e => {
+                console.log("🕒 Date selected:", e.target.value);
+                setDate(e.target.value);
+              }}
             >
               <option value="2024-01-10">10 Jan 2024</option>
               <option value="2024-02-15">15 Feb 2024</option>
@@ -135,12 +153,21 @@ export default function StudentReportShell() {
 
       {/* ✅ CLASS REPORT */}
       {reportType === "class" && className && classDay && (
-        <ClassReportMock
-          className={className}
-          classDay={classDay}
-          exam={exam}
-          date={date}
-        />
+        <>
+          {console.log("🚀 Rendering ClassReportMock with:", {
+            className,
+            classDay,
+            exam,
+            date
+          })}
+
+          <ClassReportMock
+            className={className}
+            classDay={classDay}
+            exam={exam}
+            date={date}
+          />
+        </>
       )}
 
       {/* 🚧 CUMULATIVE GATE */}
