@@ -104,14 +104,15 @@ const AdminPanel = () => {
      Tabs Config
   ============================ */
   const tabs = [
-    { id: "database", label: "Exam Module User Management" },
-    { id: "exam-type-selector", label: "Upload Questions Word Document" },
-    { id: "upload-image-folder", label: "Upload Exam Image Folder" },
-    { id: "add-quiz", label: "Create Exam" },
-    { id: "generate-exam", label: "Generate Exam" },
-    { id: "student-exam-reports", label: "Student Exam Reports" },
-    { id: "selective-readiness-overall", label: "Selective Readiness (Overall)" },
-  ];
+   { id: "database", label: "Exam Module User Management" },
+   { id: "exam-type-selector", label: "Upload Questions Word Document" },
+   { id: "upload-image-folder", label: "Upload Exam Image Folder" },
+   { id: "add-quiz", label: "Create Exam" },
+   { id: "generate-exam", label: "Generate Exam" },
+   { id: "student-exam-reports", label: "Student Exam Reports" },
+   { id: "topic-report-limited", label: "Topic Report (Limited)" },
+   { id: "selective-readiness-overall", label: "Selective Readiness (Overall)" },
+   ];
 
   /* ============================
      User Callbacks
@@ -422,6 +423,12 @@ const AdminPanel = () => {
                {activeTab === "selective-readiness-overall" && (
                  <div className="tab-panel">
                    <SelectiveReadinessOverall />
+                 </div>
+               )}
+               {/* ===== TOPIC REPORT (LIMITED) ===== */}
+               {activeTab === "topic-report-limited" && (
+                 <div className="tab-panel">
+                   <StudentCurrentExamReport />
                  </div>
                )}
 
