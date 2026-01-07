@@ -12,7 +12,8 @@ import {
   LineChart,
   Line
 } from "recharts";
-import "./StudentExamReport.css";
+import "./StudentCurrentExamReport.css";
+
 
 /* ============================
    MOCK DATA
