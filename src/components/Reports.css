@@ -25,3 +25,57 @@
 .topic-block {
   margin-bottom: 32px;
 }
+.filters-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.filters-bar select,
+.filters-bar button {
+  padding: 8px 12px;
+}
+
+.pdf-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.pdf-modal {
+  background: white;
+  width: 700px;
+  max-height: 90vh;
+  overflow: auto;
+  border-radius: 12px;
+}
+
+.pdf-header,
+.pdf-footer {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pdf-page {
+  padding: 24px;
+  font-family: "Times New Roman", serif;
+}
+
+.pdf-page h2 {
+  text-align: center;
+}
+
+.primary {
+  background: #2563eb;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+}
