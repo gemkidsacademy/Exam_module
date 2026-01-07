@@ -79,3 +79,20 @@
   border-radius: 6px;
   border: none;
 }
+.empty-state {
+  margin-top: 40px;
+  padding: 40px;
+  text-align: center;
+  border: 2px dashed #e5e7eb;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.empty-state h3 {
+  margin-bottom: 8px;
+  color: #0f172a;
+}
+
+.empty-state p {
+  color: #64748b;
+}
