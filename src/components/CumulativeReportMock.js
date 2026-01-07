@@ -7,140 +7,78 @@ import {
   Tooltip,
   ResponsiveContainer
 } from "recharts";
+import { mockSameExamProgress } from "./mockProgressData";
 import "./Reports.css";
 
-/* ============================
-   MOCK DATA
-============================ */
+export default function CumulativeReportMock({ exam = "thinking_skills" }) {
+  const data = mockSameExamProgress[exam] || [];
 
-const examProgress = [
-  { exam: "Exam 1", score: 55, accuracy: 52 },
-  { exam: "Exam 2", score: 61, accuracy: 58 },
-  { exam: "Exam 3", score: 68, accuracy: 64 },
-  { exam: "Exam 4", score: 72, accuracy: 70 }
-];
-
-const topicTrends = [
-  {
-    topic: "Time Reasoning",
-    data: [
-      { exam: "E1", score: 40 },
-      { exam: "E2", score: 52 },
-      { exam: "E3", score: 60 }
-    ]
-  },
-  {
-    topic: "Pattern Recognition",
-    data: [
-      { exam: "E2", score: 65 },
-      { exam: "E3", score: 68 },
-      { exam: "E4", score: 75 }
-    ]
+  if (data.length < 2) {
+    return (
+      <div className="empty-state">
+        <h3>Not enough data to show progress</h3>
+        <p>
+          The student needs at least two attempts of the same exam to show
+          improvement over time.
+        </p>
+      </div>
+    );
   }
-];
 
-/* ============================
-   COMPONENT
-============================ */
+  const first = data[0];
+  const last = data[data.length - 1];
+  const scoreChange = last.score - first.score;
 
-export default function CumulativeReportMock() {
   return (
     <div className="report-container">
 
-      <h2>Student Progress Over Time</h2>
+      <h3>Progress Over Time (Same Exam)</h3>
+      <p className="subtitle">
+        This chart shows how the student has performed in repeated attempts of
+        the same exam.
+      </p>
 
-      {/* ================= OVERALL TREND ================= */}
-      <section className="card">
-        <h3>Overall Progress Summary</h3>
+      {/* ================= LINE CHART ================= */}
+      <ResponsiveContainer width="100%" height={300}>
+        <LineChart data={data}>
+          <XAxis dataKey="date" />
+          <YAxis domain={[0, 100]} />
+          <Tooltip />
+          <Line
+            type="monotone"
+            dataKey="score"
+            stroke="#2563eb"
+            strokeWidth={3}
+            name="Score"
+          />
+          <Line
+            type="monotone"
+            dataKey="accuracy"
+            stroke="#22c55e"
+            strokeWidth={3}
+            name="Accuracy"
+          />
+        </LineChart>
+      </ResponsiveContainer>
 
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={examProgress}>
-            <XAxis dataKey="exam" />
-            <YAxis domain={[0, 100]} />
-            <Tooltip />
-            <Line
-              type="monotone"
-              dataKey="score"
-              stroke="#2563eb"
-              strokeWidth={3}
-            />
-            <Line
-              type="monotone"
-              dataKey="accuracy"
-              stroke="#22c55e"
-              strokeWidth={3}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-
-        <p className="ai-text">
-          The student’s overall performance shows a steady improvement across
-          the selected exams, with both score and accuracy increasing
-          consistently.
+      {/* ================= AI-STYLE SUMMARY ================= */}
+      <div className="card ai-summary">
+        <h4>Progress Summary</h4>
+        <p>
+          The student’s score changed from <strong>{first.score}%</strong> to{" "}
+          <strong>{last.score}%</strong> over{" "}
+          <strong>{data.length}</strong> attempts.
         </p>
-      </section>
 
-      {/* ================= TOPIC TRENDS ================= */}
-      <section className="card">
-        <h3>Topic-wise Progress Over Time</h3>
-
-        {topicTrends.map(topic => (
-          <div key={topic.topic} className="topic-block">
-            <h4>{topic.topic}</h4>
-
-            <ResponsiveContainer width="100%" height={220}>
-              <LineChart data={topic.data}>
-                <XAxis dataKey="exam" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="score"
-                  stroke="#f59e0b"
-                  strokeWidth={3}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-
-            {topic.data.length < 3 && (
-              <p className="note">
-                Limited data available for this topic. Trends may not be fully
-                representative.
-              </p>
-            )}
-          </div>
-        ))}
-      </section>
-
-      {/* ================= AI INSIGHTS ================= */}
-      <section className="card">
-        <h3>AI Insights & Suggestions</h3>
-
-        <ul>
-          <li>
-            <strong>Performance Trend:</strong> Overall improvement observed
-            across recent exams.
-          </li>
-          <li>
-            <strong>Strong Areas:</strong> Pattern Recognition is improving
-            steadily.
-          </li>
-          <li>
-            <strong>Needs Attention:</strong> Time Reasoning accuracy is still
-            below target.
-          </li>
-          <li>
-            <strong>Next Exam Target:</strong> Aim to increase overall score by
-            8% in the next exam.
-          </li>
-        </ul>
-
-        <p className="ai-text">
-          This report suggests positive progress over time. Continued practice
-          in weaker areas will help the student build confidence and achieve
-          stronger results in upcoming exams.
+        <p>
+          {scoreChange > 0
+            ? `This indicates a steady improvement of ${scoreChange} percentage points,
+               suggesting that practice and feedback are having a positive impact.`
+            : scoreChange === 0
+            ? "The student’s performance has remained consistent across attempts."
+            : "The student’s performance has declined, indicating a need for review and support."}
         </p>
-      </section>
+      </div>
 
     </div>
   );
