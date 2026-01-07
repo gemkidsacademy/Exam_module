@@ -11,7 +11,7 @@ export default function StudentReportShell() {
   const [className, setClassName] = useState("");
   const [classDay, setClassDay] = useState("");
 
-  const [exam, setExam] = useState("Thinking Skills");
+  const [exam, setExam] = useState("thinking_skills");
   const [date, setDate] = useState("2024-01-10");
   const [showPDF, setShowPDF] = useState(false);
 
@@ -21,55 +21,94 @@ export default function StudentReportShell() {
       {/* ================= FILTER BAR ================= */}
       <div className="filters-bar">
 
-  {/* Report Type */}
-  <div className="filter-group">
-    <select value={reportType} onChange={...}>
-      <option value="student">Per Student Report</option>
-      <option value="class">Per Class Report</option>
-      <option value="cumulative">Cumulative Progress</option>
-    </select>
-  </div>
+        {/* -------- Report Type -------- */}
+        <div className="filter-group">
+          <select
+            value={reportType}
+            onChange={e => {
+              setReportType(e.target.value);
+              setStudentId("");
+              setClassName("");
+              setClassDay("");
+            }}
+          >
+            <option value="student">Per Student Report</option>
+            <option value="class">Per Class Report</option>
+            <option value="cumulative">Cumulative Progress</option>
+          </select>
+        </div>
 
-  {/* Class Context */}
-  {reportType === "class" && (
-    <div className="filter-group">
-      <select value={className} onChange={...}>
-        <option value="">Class</option>
-        <option value="Class A">Class A</option>
-        <option value="Class B">Class B</option>
-      </select>
+        {/* -------- Student Context -------- */}
+        {(reportType === "student" || reportType === "cumulative") && (
+          <div className="filter-group">
+            <select
+              value={studentId}
+              onChange={e => setStudentId(e.target.value)}
+            >
+              <option value="">Student</option>
+              <option value="S001">Student S001</option>
+              <option value="S002">Student S002</option>
+              <option value="S003">Student S003</option>
+            </select>
+          </div>
+        )}
 
-      <select value={classDay} onChange={...}>
-        <option value="">Day</option>
-        <option value="Monday">Monday</option>
-        <option value="Wednesday">Wednesday</option>
-      </select>
-    </div>
-  )}
+        {/* -------- Class Context -------- */}
+        {reportType === "class" && (
+          <div className="filter-group">
+            <select
+              value={className}
+              onChange={e => setClassName(e.target.value)}
+            >
+              <option value="">Class</option>
+              <option value="Class A">Class A</option>
+              <option value="Class B">Class B</option>
+              <option value="Class C">Class C</option>
+            </select>
 
-  {/* Exam Context */}
-  <div className="filter-group">
-    <select value={exam} onChange={...}>
-      <option value="thinking_skills">Thinking Skills</option>
-      <option value="reading">Reading</option>
-    </select>
+            <select
+              value={classDay}
+              onChange={e => setClassDay(e.target.value)}
+            >
+              <option value="">Day</option>
+              <option value="Monday">Monday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Friday">Friday</option>
+            </select>
+          </div>
+        )}
 
-    {reportType !== "cumulative" && (
-      <select value={date} onChange={...}>
-        <option value="2024-01-10">10 Jan 2024</option>
-        <option value="2024-02-15">15 Feb 2024</option>
-      </select>
-    )}
-  </div>
+        {/* -------- Exam Context -------- */}
+        <div className="filter-group">
+          <select
+            value={exam}
+            onChange={e => setExam(e.target.value)}
+          >
+            <option value="thinking_skills">Thinking Skills</option>
+            <option value="reading">Reading</option>
+            <option value="mathematics">Mathematics</option>
+            <option value="writing">Writing</option>
+          </select>
 
-  {/* Action */}
-  <div className="filter-action">
-    <button onClick={() => setShowPDF(true)}>
-      Preview PDF
-    </button>
-  </div>
+          {reportType !== "cumulative" && (
+            <select
+              value={date}
+              onChange={e => setDate(e.target.value)}
+            >
+              <option value="2024-01-10">10 Jan 2024</option>
+              <option value="2024-02-15">15 Feb 2024</option>
+            </select>
+          )}
+        </div>
 
-</div>
+        {/* -------- Action -------- */}
+        <div className="filter-action">
+          <button onClick={() => setShowPDF(true)}>
+            Preview PDF
+          </button>
+        </div>
+
+      </div>
 
       {/* ================= REPORT CONTENT ================= */}
 
@@ -90,7 +129,7 @@ export default function StudentReportShell() {
       {reportType === "class" && (!className || !classDay) && (
         <div className="empty-state">
           <h3>Select class details to view the report</h3>
-          <p>Please select both a class name and class day.</p>
+          <p>Please select both a class name and a class day.</p>
         </div>
       )}
 
