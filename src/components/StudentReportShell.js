@@ -79,10 +79,13 @@ export default function StudentReportShell() {
           <option value="writing">Writing</option>
         </select>
 
-        <select value={date} onChange={e => setDate(e.target.value)}>
-          <option value="2024-01-10">10 Jan 2024</option>
-          <option value="2024-02-15">15 Feb 2024</option>
-        </select>
+        {reportType !== "cumulative" && (
+          <select value={date} onChange={e => setDate(e.target.value)}>
+            <option value="2024-01-10">10 Jan 2024</option>
+            <option value="2024-02-15">15 Feb 2024</option>
+          </select>
+        )}
+
 
         <button onClick={() => setShowPDF(true)}>Preview PDF</button>
       </div>
