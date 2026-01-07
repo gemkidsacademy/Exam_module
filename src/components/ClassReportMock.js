@@ -1,9 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer
 } from "recharts";
 import { mockExamData } from "./mockData";
-
 import "./Reports.css";
 
 export default function ClassReportMock({
@@ -11,15 +15,29 @@ export default function ClassReportMock({
   classDay,
   exam,
   date
-}) {  
-
+}) {
   const key = `${exam}|${date}`;
   const data = mockExamData[key];
+
+  // 🚧 SAFETY GUARD — REQUIRED
+  if (!data) {
+    return (
+      <div className="empty-state">
+        <h3>No data available</h3>
+        <p>
+          No class report exists for the selected exam and date.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="report-container">
 
-      
+      {/* ===== CONTEXT HEADER ===== */}
+      <h2>
+        {className} – {classDay} | {exam.replace("_", " ")} ({date})
+      </h2>
 
       {/* ===== SUMMARY ===== */}
       <section className="card">
@@ -27,8 +45,8 @@ export default function ClassReportMock({
         <p>
           The class achieved an average score of{" "}
           <strong>{data.classSummary.averageScore}%</strong>, with a highest
-          score of <strong>{data.classSummary.highestScore}%</strong>.
-          {" "} {data.classSummary.completed} out of{" "}
+          score of <strong>{data.classSummary.highestScore}%</strong>.{" "}
+          {data.classSummary.completed} out of{" "}
           {data.classSummary.totalStudents} students completed the exam.
         </p>
       </section>
@@ -71,7 +89,6 @@ export default function ClassReportMock({
         </ResponsiveContainer>
       </section>
 
-      
     </div>
   );
 }
