@@ -68,20 +68,21 @@ export default function StudentReportShell() {
 
     {/* Attempts (Cumulative only) */}
     {reportType === "cumulative" && (
-      <select
-        value={attemptCount}
+      <input
+        type="number"
+        min="1"
+        step="1"
+        placeholder="Attempts"
+        value={attemptCount ?? ""}
         disabled={!studentId}
         onChange={e => {
-          console.log("🔢 Attempt count selected:", e.target.value);
-          setAttemptCount(Number(e.target.value));
+          const value = e.target.value;
+          console.log("🔢 Attempt count selected:", value);
+          setAttemptCount(value === "" ? null : Number(value));
         }}
-      >
-        <option value="">Attempts</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-      </select>
+      />
     )}
+
   </div>
 )}
 
