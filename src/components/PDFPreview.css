@@ -45,3 +45,48 @@
     inset: 0;
   }
 }
+/* ===== PDF HEADER ===== */
+.pdf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+/* ===== PDF ACTION BUTTONS ===== */
+.pdf-header button {
+  appearance: none;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Primary action */
+.pdf-header button:first-child {
+  background-color: #2563eb; /* blue */
+  color: #ffffff;
+  margin-right: 8px;
+}
+
+.pdf-header button:first-child:hover {
+  background-color: #1d4ed8;
+}
+
+/* Secondary action */
+.pdf-header button:last-child {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.pdf-header button:last-child:hover {
+  background-color: #e5e7eb;
+}
+
+/* Focus ring (accessibility) */
+.pdf-header button
