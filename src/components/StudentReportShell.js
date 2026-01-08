@@ -43,21 +43,26 @@ export default function StudentReportShell() {
 
         {/* -------- Student Context -------- */}
         {(reportType === "student" || reportType === "cumulative") && (
-          <div className="filter-group">
-            <select
-              value={studentId}
-              onChange={e => {
-                console.log("👤 Student selected:", e.target.value);
-                setStudentId(e.target.value);
-              }}
-            >
-              <option value="">Student</option>
-              <option value="S001">Student S001</option>
-              <option value="S002">Student S002</option>
-              <option value="S003">Student S003</option>
-            </select>
-          </div>
-        )}
+        <div className="filter-group student-with-attempts">
+          <select
+            value={studentId}
+            onChange={e => {
+              console.log("👤 Student selected:", e.target.value);
+              setStudentId(e.target.value);
+            }}
+          >
+            <option value="">Student</option>
+            <option value="S001">Student S001</option>
+            <option value="S002">Student S002</option>
+            <option value="S003">Student S003</option>
+          </select>
+      
+          {reportType === "cumulative" && (
+            <span className="attempts-label">Attempts</span>
+          )}
+        </div>
+      )}
+
 
         {/* -------- Class Context -------- */}
         {reportType === "class" && (
