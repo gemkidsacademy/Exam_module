@@ -1,0 +1,47 @@
+.pdf-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+
+.pdf-modal {
+  background: white;
+  width: 900px;
+  max-height: 90vh;
+  margin: 40px auto;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.pdf-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pdf-content {
+  padding: 24px;
+  overflow: auto;
+}
+
+/* PRINT MODE */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .pdf-content,
+  .pdf-content * {
+    visibility: visible;
+  }
+
+  .pdf-content {
+    position: absolute;
+    inset: 0;
+  }
+}
