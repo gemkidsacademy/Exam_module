@@ -209,4 +209,9 @@
 .table tr:last-child td {
   border-bottom: none;
 }
+.student-with-attempts {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
 
