@@ -37,7 +37,8 @@ export default function StudentReportShell() {
               setStudentId("");
               setClassName("");
               setClassDay("");
-              setAttemptCount("");
+              setAttemptCount(null);
+
             }}
           >
             <option value="student">Per Student Report</option>
@@ -56,7 +57,8 @@ export default function StudentReportShell() {
       onChange={e => {
         console.log("👤 Student selected:", e.target.value);
         setStudentId(e.target.value);
-        setAttemptCount(""); // reset attempt count when student changes
+        setAttemptCount(null);
+ // reset attempt count when student changes
 
       }}
     >
@@ -151,7 +153,14 @@ export default function StudentReportShell() {
 
         {/* -------- Action -------- */}
         <div className="filter-action">
-          <button onClick={() => setShowPDF(true)}>
+          <button
+            disabled={
+              (reportType === "student" && !studentId) ||
+              (reportType === "class" && (!className || !classDay)) ||
+              (reportType === "cumulative" && (!studentId || !attemptCount))
+            }
+            onClick={() => setShowPDF(true)}
+          >
             Preview PDF
           </button>
         </div>
@@ -218,7 +227,31 @@ export default function StudentReportShell() {
         />
       )}
 
-      {showPDF && <PDFPreviewMock onClose={() => setShowPDF(false)} />}
+      {showPDF && (
+        <PDFPreviewMock onClose={() => setShowPDF(false)}>
+          {reportType === "student" && studentId && (
+            <StudentCurrentExamReport studentId={studentId} />
+          )}
+      
+          {reportType === "class" && className && classDay && (
+            <ClassReportMock
+              className={className}
+              classDay={classDay}
+              exam={exam}
+              date={date}
+            />
+          )}
+      
+          {reportType === "cumulative" && studentId && attemptCount && (
+            <CumulativeReportMock
+              studentId={studentId}
+              exam={exam}
+              attemptCount={attemptCount}
+            />
+          )}
+        </PDFPreviewMock>
+      )}
+
 
     </div>
   );
