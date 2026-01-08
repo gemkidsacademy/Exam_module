@@ -14,6 +14,8 @@ export default function StudentReportShell() {
   const [exam, setExam] = useState("thinking_skills");
   const [date, setDate] = useState("2024-01-10");
   const [showPDF, setShowPDF] = useState(false);
+  const [attempt, setAttempt] = useState("");
+
 
   return (
     <div>
@@ -43,25 +45,41 @@ export default function StudentReportShell() {
 
         {/* -------- Student Context -------- */}
         {(reportType === "student" || reportType === "cumulative") && (
-        <div className="filter-group student-with-attempts">
-          <select
-            value={studentId}
-            onChange={e => {
-              console.log("👤 Student selected:", e.target.value);
-              setStudentId(e.target.value);
-            }}
-          >
-            <option value="">Student</option>
-            <option value="S001">Student S001</option>
-            <option value="S002">Student S002</option>
-            <option value="S003">Student S003</option>
-          </select>
-      
-          {reportType === "cumulative" && (
-            <span className="attempts-label">Attempts</span>
-          )}
-        </div>
-      )}
+  <div className="filter-group student-with-attempts">
+
+    {/* Student */}
+    <select
+      value={studentId}
+      onChange={e => {
+        console.log("👤 Student selected:", e.target.value);
+        setStudentId(e.target.value);
+        setAttempt(""); // reset attempt when student changes
+      }}
+    >
+      <option value="">Student</option>
+      <option value="S001">Student S001</option>
+      <option value="S002">Student S002</option>
+      <option value="S003">Student S003</option>
+    </select>
+
+    {/* Attempts (Cumulative only) */}
+    {reportType === "cumulative" && (
+      <select
+        value={attempt}
+        onChange={e => {
+          console.log("🔁 Attempt selected:", e.target.value);
+          setAttempt(e.target.value);
+        }}
+      >
+        <option value="">Attempts</option>
+        <option value="1">Attempt 1</option>
+        <option value="2">Attempt 2</option>
+        <option value="3">Attempt 3</option>
+      </select>
+    )}
+
+  </div>
+)}
 
 
         {/* -------- Class Context -------- */}
@@ -178,21 +196,19 @@ export default function StudentReportShell() {
       )}
 
       {/* 🚧 CUMULATIVE GATE */}
-      {reportType === "cumulative" && !studentId && (
+      {reportType === "cumulative" && (!studentId || !attempt) && (
         <div className="empty-state">
-          <h3>Select a student to view cumulative progress</h3>
-          <p>
-            Please choose a student ID to view progress across multiple exam
-            attempts.
-          </p>
+          <h3>Select student and attempt</h3>
+          <p>Please choose a student and an attempt to view cumulative progress.</p>
         </div>
       )}
 
       {/* ✅ CUMULATIVE REPORT */}
-      {reportType === "cumulative" && studentId && (
+      {reportType === "cumulative" && studentId && attempt && (
         <CumulativeReportMock
           studentId={studentId}
           exam={exam}
+          attempt={attempt}
         />
       )}
 
