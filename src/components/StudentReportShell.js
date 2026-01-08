@@ -103,6 +103,8 @@ export default function StudentReportShell() {
             <option value="reading">Reading</option>
             <option value="mathematics">Mathematics</option>
             <option value="writing">Writing</option>
+            <option value="Foundational">Foundational</option>
+            
           </select>
 
           {reportType !== "cumulative" && (
