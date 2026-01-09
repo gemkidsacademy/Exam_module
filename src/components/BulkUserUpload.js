@@ -1,69 +1,50 @@
 import React, { useState } from "react";
-import mammoth from "mammoth";
 
-const BulkUserUpload = () => {
-  const [users, setUsers] = useState([]);
+const BulkUserUpload = ({ onClose }) => {
+  const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleFileUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
 
     setError("");
-    setUsers([]);
-
-    try {
-      const arrayBuffer = await file.arrayBuffer();
-      const result = await mammoth.convertToHtml({ arrayBuffer });
-
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(result.value, "text/html");
-
-      const rows = doc.querySelectorAll("table tr");
-
-      if (rows.length < 2) {
-        throw new Error("No user rows found in document");
-      }
-
-      const parsedUsers = [];
-
-      for (let i = 1; i < rows.length; i++) {
-        const cells = rows[i].querySelectorAll("td");
-
-        if (cells.length < 3) continue;
-
-        parsedUsers.push({
-          name: cells[0].innerText.trim(),
-          email: cells[1].innerText.trim(),
-          role: cells[2].innerText.trim(),
-        });
-      }
-
-      setUsers(parsedUsers);
-    } catch (err) {
-      setError("Failed to read Word document");
-    }
+    setFile(selectedFile);
   };
 
   const handleSubmit = async () => {
-    if (users.length === 0) return;
+    if (!file) {
+      setError("Please select a file first");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
 
     setLoading(true);
+    setError("");
 
     try {
-      await fetch("/api/admin/bulk-users", {
+      const response = await fetch("/api/admin/bulk-users", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ users }),
+        body: formData,
       });
 
-      alert("Users uploaded successfully");
-      setUsers([]);
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const result = await response.json();
+
+      alert(
+        `Upload completed.\nSuccess: ${result.success}\nFailed: ${result.failed}`
+      );
+
+      setFile(null);
+      onClose();
     } catch (err) {
-      alert("Upload failed");
+      setError("Failed to upload users. Please check the file format.");
     } finally {
       setLoading(false);
     }
@@ -75,29 +56,27 @@ const BulkUserUpload = () => {
 
       <input
         type="file"
-        accept=".docx"
-        onChange={handleFileUpload}
+        accept=".docx,.csv"
+        onChange={handleFileChange}
       />
+
+      {file && (
+        <p style={{ marginTop: 8 }}>
+          Selected file: <strong>{file.name}</strong>
+        </p>
+      )}
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {users.length > 0 && (
-        <>
-          <h3>Preview ({users.length} users)</h3>
+      <div style={{ marginTop: 16 }}>
+        <button onClick={handleSubmit} disabled={loading}>
+          {loading ? "Uploading..." : "Upload"}
+        </button>
 
-          <ul>
-            {users.map((user, index) => (
-              <li key={index}>
-                {user.name} — {user.email} — {user.role}
-              </li>
-            ))}
-          </ul>
-
-          <button onClick={handleSubmit} disabled={loading}>
-            {loading ? "Uploading..." : "Confirm & Upload"}
-          </button>
-        </>
-      )}
+        <button onClick={onClose} style={{ marginLeft: 8 }}>
+          Cancel
+        </button>
+      </div>
     </div>
   );
 };
