@@ -16,41 +16,47 @@ const BulkUserUpload = ({ onClose }) => {
   };
 
   const handleSubmit = async () => {
-    if (!file) {
-      setError("Please select a file first");
-      return;
-    }
+  if (!file) {
+    setError("Please select a file first");
+    return;
+  }
 
-    const formData = new FormData();
-    formData.append("file", file);
+  const formData = new FormData();
+  formData.append("file", file);
 
-    setLoading(true);
-    setError("");
+  setLoading(true);
+  setError("");
 
-    try {
-      const response = await fetch("/api/admin/bulk-users", {
+  try {
+    const response = await fetch(
+      "https://web-production-481a5.up.railway.app/api/admin/bulk-users-exam-module",
+      {
         method: "POST",
         body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Upload failed");
       }
+    );
 
-      const result = await response.json();
-
-      alert(
-        `Upload completed.\nSuccess: ${result.success}\nFailed: ${result.failed}`
-      );
-
-      setFile(null);
-      onClose();
-    } catch (err) {
-      setError("Failed to upload users. Please check the file format.");
-    } finally {
-      setLoading(false);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Upload failed");
     }
-  };
+
+    const result = await response.json();
+
+    alert(
+      `Upload completed.\nSuccess: ${result.success}\nFailed: ${result.failed}`
+    );
+
+    setFile(null);
+    onClose();
+  } catch (err) {
+    setError(
+      err.message || "Failed to upload users. Please check the file format."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="bulk-upload-container">
