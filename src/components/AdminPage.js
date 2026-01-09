@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import StudentExamReports from "./StudentExamReports";
 import SelectiveReadinessOverall from "./SelectiveReadinessOverall";
 import StudentReportShell from "./StudentReportShell";
+import BulkUserUpload from "./BulkUserUpload";
+
 
 
 
@@ -160,6 +162,10 @@ const AdminPanel = () => {
           {/* ================= MENU ================= */}
           {userMode === "menu" && (
             <div className="user-actions-grid">
+               <div className="action-card" onClick={() => setUserMode("add-user-bulk")}>
+                <h3>Add User Bulk</h3>
+                <p>upload file to add bulk users</p>
+              </div>
               <div className="action-card" onClick={() => setUserMode("add")}>
                 <h3>Add User</h3>
                 <p>Create a new student account</p>
@@ -184,7 +190,11 @@ const AdminPanel = () => {
               </div>
             </div>
           )}
-      
+
+          {/* ================= ADD USERS BULK ================= */}
+          {userMode === "add-user-bulk" && (
+            <BulkUserUpload onClose={() => setUserMode("menu")} />
+          )}
           {/* ================= ADD ================= */}
           {userMode === "add" && (
             <AddUserForm onClose={() => setUserMode("menu")} />
