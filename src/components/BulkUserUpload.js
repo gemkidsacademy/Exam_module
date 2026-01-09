@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import "./bulk-upload.css";
+
 
 const BulkUserUpload = ({ onClose }) => {
   const [file, setFile] = useState(null);
@@ -51,29 +53,45 @@ const BulkUserUpload = ({ onClose }) => {
   };
 
   return (
-    <div style={{ maxWidth: 600 }}>
-      <h2>Bulk User Upload</h2>
+    <div className="bulk-upload-container">
+      <div className="bulk-upload-title">Bulk User Upload</div>
 
-      <input
-        type="file"
-        accept=".docx,.csv"
-        onChange={handleFileChange}
-      />
+      <div className="file-input-wrapper">
+        <label className="custom-file-btn">
+          Choose File
+          <input
+            type="file"
+            accept=".csv,.docx"
+            onChange={handleFileChange}
+            disabled={loading}
+          />
+        </label>
 
-      {file && (
-        <p style={{ marginTop: 8 }}>
-          Selected file: <strong>{file.name}</strong>
+        <span className="file-name">
+          {file ? file.name : "No file chosen"}
+        </span>
+      </div>
+
+      {error && (
+        <p style={{ marginTop: 8, color: "#dc2626", fontSize: 13 }}>
+          {error}
         </p>
       )}
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <div style={{ marginTop: 16 }}>
-        <button onClick={handleSubmit} disabled={loading}>
+      <div className="bulk-upload-actions">
+        <button
+          className="btn-upload"
+          onClick={handleSubmit}
+          disabled={loading}
+        >
           {loading ? "Uploading..." : "Upload"}
         </button>
 
-        <button onClick={onClose} style={{ marginLeft: 8 }}>
+        <button
+          className="btn-cancel"
+          onClick={onClose}
+          disabled={loading}
+        >
           Cancel
         </button>
       </div>
