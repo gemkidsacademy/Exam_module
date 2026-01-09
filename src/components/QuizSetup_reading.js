@@ -73,9 +73,9 @@ export default function QuizSetup_reading() {
   const fetchReadingTopics = async () => {
     try {
       const params = new URLSearchParams({
-        class_name: quiz.className,
         difficulty: quiz.difficulty,
       });
+
 
       const res = await fetch(
         `https://web-production-481a5.up.railway.app/api/reading/topics?${params.toString()}`
