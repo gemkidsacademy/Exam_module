@@ -1,19 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
 import "./QuizSetup.css";
 
 export default function QuizSetup_reading() {
   const [quiz, setQuiz] = useState({
     className: "selective",
-    subject: "Reading Comprehension",  // MUST MATCH DATABASE EXACTLY
+    subject: "reading_comprehension",  // canonical API key
     difficulty: "",
     numTopics: 1,
     topics: [],
   });
-  const READING_TOPIC_OPTIONS = [
-    "Comparative analysis",
-    "Gapped Text",
-    "Main Idea and Summary"
-  ];
+  
+  const [availableTopics, setAvailableTopics] = useState([]);
+
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [loading, setLoading] = useState(false);
 
@@ -64,6 +63,39 @@ export default function QuizSetup_reading() {
       return { ...prev, topics };
     });
   };
+  useEffect(() => {
+  // Do not fetch until difficulty is selected
+  if (!quiz.difficulty) {
+    setAvailableTopics([]);
+    return;
+  }
+
+  const fetchReadingTopics = async () => {
+    try {
+      const params = new URLSearchParams({
+        class_name: quiz.className,
+        difficulty: quiz.difficulty,
+      });
+
+      const res = await fetch(
+        `https://web-production-481a5.up.railway.app/api/reading/topics?${params.toString()}`
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to load reading topics");
+      }
+
+      const data = await res.json();
+      setAvailableTopics(data);
+    } catch (err) {
+      console.error("Failed to fetch reading topics", err);
+      setAvailableTopics([]);
+    }
+  };
+
+  fetchReadingTopics();
+}, [quiz.className, quiz.difficulty]);
+
 
   // ---------------------------------------
   // SUBMIT TO BACKEND
@@ -196,11 +228,12 @@ export default function QuizSetup_reading() {
                 required
               >
                 <option value="">Select Topic</option>
-                {READING_TOPIC_OPTIONS.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
+                {availableTopics.map((t) => (
+                  <option key={t.name} value={t.name}>
+                    {t.name}
                   </option>
                 ))}
+
               </select>
 
               <label>Total Questions for this Topic:</label>
