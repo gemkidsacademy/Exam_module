@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
 import "./QuizSetup_writing.css";
 
 const BACKEND_URL = "https://web-production-481a5.up.railway.app";
@@ -11,6 +12,8 @@ export default function QuizSetup_writing() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [availableTopics, setAvailableTopics] = useState([]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,10 +33,11 @@ export default function QuizSetup_writing() {
 
     const payload = {
       class_name: form.className,
-      subject: "Writing",
-      topic: form.topic.trim(),   // fully editable text
+      subject: "writing",   // canonical API key
+      topic: form.topic.trim(),
       difficulty: form.difficulty
     };
+
 
     try {
       setLoading(true);
@@ -67,6 +71,37 @@ export default function QuizSetup_writing() {
       setLoading(false);
     }
   };
+  useEffect(() => {
+  if (!form.difficulty) {
+    setAvailableTopics([]);
+    return;
+  }
+
+  const fetchWritingTopics = async () => {
+    try {
+      const params = new URLSearchParams({
+        difficulty: form.difficulty,
+      });
+
+      const res = await fetch(
+        `${BACKEND_URL}/api/writing/topics?${params.toString()}`
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to load writing topics");
+      }
+
+      const data = await res.json();
+      setAvailableTopics(data);
+    } catch (err) {
+      console.error("Failed to fetch writing topics", err);
+      setAvailableTopics([]);
+    }
+  };
+
+  fetchWritingTopics();
+}, [form.difficulty]);
+
 
   return (
     <div className="quiz-setup-container">
@@ -91,14 +126,21 @@ export default function QuizSetup_writing() {
 
         {/* TOPIC (FULLY EDITABLE) */}
         <label>Topic:</label>
-        <input
-          type="text"
+        <select
           name="topic"
           value={form.topic}
           onChange={handleChange}
-          placeholder="e.g. Narrative, Persuasive, Descriptive, Argumentative"
           required
-        />
+        >
+          <option value="">Select Topic</option>
+        
+          {availableTopics.map((t) => (
+            <option key={t.name} value={t.name}>
+              {t.name}
+            </option>
+          ))}
+        </select>
+
 
         {/* DIFFICULTY */}
         <label>Difficulty Level:</label>
