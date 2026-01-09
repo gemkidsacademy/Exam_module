@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
 import "./QuizSetup.css";
 
 export default function QuizSetup_MathematicalReasoning() {
+  const [availableTopics, setAvailableTopics] = useState([]);
+
   const [quiz, setQuiz] = useState({
     className: "selective",
     subject: "mathematical_reasoning",
@@ -65,6 +68,39 @@ export default function QuizSetup_MathematicalReasoning() {
       return { ...prev, topics };
     });
   };
+  useEffect(() => {
+  // Do not fetch until difficulty is selected
+  if (!quiz.difficulty) {
+    setAvailableTopics([]);
+    return;
+  }
+
+  const fetchTopics = async () => {
+    try {
+      const params = new URLSearchParams({
+        class_name: quiz.className,
+        subject: quiz.subject, // mathematical_reasoning
+        difficulty: quiz.difficulty,
+      });
+
+      const res = await fetch(
+        `https://web-production-481a5.up.railway.app/api/topics?${params.toString()}`
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to load topics");
+      }
+
+      const data = await res.json();
+      setAvailableTopics(data);
+    } catch (err) {
+      console.error("Failed to fetch topics", err);
+      setAvailableTopics([]);
+    }
+  };
+
+  fetchTopics();
+}, [quiz.className, quiz.subject, quiz.difficulty]);
 
   /* ============================
      SUBMIT
@@ -172,14 +208,21 @@ export default function QuizSetup_MathematicalReasoning() {
               <h4>Topic {index + 1}</h4>
 
               <label>Topic Name:</label>
-              <input
-                type="text"
+              <select
                 value={topic.name}
                 onChange={(e) =>
                   handleTopicNameChange(index, e.target.value)
                 }
                 required
-              />
+              >
+                <option value="">Select a topic</option>
+              
+                {availableTopics.map((t) => (
+                  <option key={t.name} value={t.name}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
 
               <label>AI Questions:</label>
               <input
