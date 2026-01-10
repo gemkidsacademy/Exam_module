@@ -1,85 +1,89 @@
-/* Shared layout */
+  /* Shared layout */
+  /* Shared layout — FULL SCREEN GATE */
 .welcome-wrapper,
 .instructions-wrapper {
-  min-height: 100vh;
+  position: fixed;
+  inset: 0;                 /* top: 0; right: 0; bottom: 0; left: 0 */
   display: flex;
   justify-content: center;
   align-items: center;
   background: #eef1f4;
+  z-index: 1000;            /* sit above dashboard */
 }
 
-.welcome-card,
-.instructions-card {
-  background: #ffffff;
-  padding: 36px 40px;
-  max-width: 520px;
-  width: 100%;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  border-radius: 4px;
-}
-
-/* Welcome screen */
-.welcome-title {
-  font-size: 28px;
-  margin-bottom: 16px;
-}
-
-.welcome-text {
-  font-size: 14px;
-  color: #374151;
-  margin-bottom: 24px;
-}
-
-.access-code {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 24px;
-}
-
-.access-code-box {
-  background: #6b7280;
-  color: #ffffff;
-  padding: 10px 14px;
-  font-weight: 700;
-  border-radius: 4px;
-}
-
-/* Instructions screen */
-.instructions-title {
-  font-size: 24px;
-  margin-bottom: 8px;
-}
-
-.instructions-subject {
-  font-size: 18px;
-  margin-bottom: 20px;
-}
-
-.instructions-heading {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-
-.instructions-list {
-  font-size: 14px;
-  color: #374151;
-  margin-bottom: 24px;
-  padding-left: 18px;
-}
-
-/* Primary button */
-.primary-btn {
-  background: #002b6b;
-  color: #ffffff;
-  border: none;
-  padding: 12px 24px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.primary-btn:hover {
-  background: #001f4f;
-}
+  
+  .welcome-card,
+  .instructions-card {
+    background: #ffffff;
+    padding: 36px 40px;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+  }
+  
+  /* Welcome screen */
+  .welcome-title {
+    font-size: 28px;
+    margin-bottom: 16px;
+  }
+  
+  .welcome-text {
+    font-size: 14px;
+    color: #374151;
+    margin-bottom: 24px;
+  }
+  
+  .access-code {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  
+  .access-code-box {
+    background: #6b7280;
+    color: #ffffff;
+    padding: 10px 14px;
+    font-weight: 700;
+    border-radius: 4px;
+  }
+  
+  /* Instructions screen */
+  .instructions-title {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+  
+  .instructions-subject {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+  
+  .instructions-heading {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  
+  .instructions-list {
+    font-size: 14px;
+    color: #374151;
+    margin-bottom: 24px;
+    padding-left: 18px;
+  }
+  
+  /* Primary button */
+  .primary-btn {
+    background: #002b6b;
+    color: #ffffff;
+    border: none;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .primary-btn:hover {
+    background: #001f4f;
+  }
