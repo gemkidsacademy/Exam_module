@@ -63,11 +63,18 @@ const SelectiveDashboard = () => {
       {/* 1️⃣ SUBJECT SELECTION */}
       {examPhase === "selection" && (
         <div className="subject-selection-wrapper">
+      
+          {/* ⭐ GEM KIDS ACADEMY LOGO ⭐ */}
+          <img
+            src="https://gemkidsacademy.com.au/wp-content/uploads/2024/10/cropped-logo-4-1.png"
+            alt="Gem Kids Academy"
+            className="dashboard-logo"
+          />
+      
           <div className="subject-selection-card">
             <h1 className="dashboard-title">
               Selective High School Placement Practice Test
             </h1>
-
             <div className="title-divider" />
 
             <div className="subject-buttons">
