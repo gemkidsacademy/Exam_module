@@ -6,31 +6,40 @@ const WelcomeScreen = ({ onNext }) => {
   const accessCode = ["X", "M", "M", "K", "B", "W", "L", "X"];
 
   return (
-    <div className="welcome-wrapper">
-      <div className="welcome-card">
-        <h1 className="welcome-title">Welcome</h1>
+  <div className="welcome-wrapper">
 
-        <p className="welcome-text">
-          In the online practice tests, a student access code has been
-          automatically generated for you. On test day, students will be
-          required to enter the student access code that is on their Test
-          Admission Ticket (TAT).
-        </p>
+    {/* ⭐ GEM KIDS ACADEMY LOGO ⭐ */}
+    <img
+      src="https://gemkidsacademy.com.au/wp-content/uploads/2024/10/cropped-logo-4-1.png"
+      alt="Gem Kids Academy"
+      className="dashboard-logo"
+    />
 
-        <div className="access-code">
-          {accessCode.map((char, index) => (
-            <span key={index} className="access-code-box">
-              {char}
-            </span>
-          ))}
-        </div>
+    <div className="welcome-card">
+      <h1 className="welcome-title">Welcome</h1>
 
-        <button className="primary-btn" onClick={onNext}>
-          Next
-        </button>
+      <p className="welcome-text">
+        In the online practice tests, a student access code has been
+        automatically generated for you. On test day, students will be
+        required to enter the student access code that is on their Test
+        Admission Ticket (TAT).
+      </p>
+
+      <div className="access-code">
+        {accessCode.map((char, index) => (
+          <span key={index} className="access-code-box">
+            {char}
+          </span>
+        ))}
       </div>
+
+      <button className="primary-btn" onClick={onNext}>
+        Next
+      </button>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default WelcomeScreen;
