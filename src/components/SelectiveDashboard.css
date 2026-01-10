@@ -25,7 +25,7 @@
   background: #ffffff;
   padding: 36px 40px 32px;
   max-width: 420px;
-  width: 100%;
+  width: 420px;              /* 🔒 hard lock */
   text-align: center;
   box-shadow: 0 0 0 1px #e5e7eb;
 }
@@ -52,6 +52,7 @@
   flex-direction: column;
   gap: 16px;
   margin-bottom: 28px;
+  align-items: center;       /* 🔒 stop stretch */
 }
 
 .subject-button {
@@ -62,6 +63,10 @@
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+
+  width: 100%;               /* button fills card */
+  max-width: 300px;          /* 🔒 visual width */
+  display: block;            /* consistent */
 }
 
 .subject-button:hover {
