@@ -3,6 +3,7 @@
 .instructions-wrapper {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;   /* ✅ THIS FIXES IT */
   justify-content: center;
   align-items: center;
   background: #eef1f4;
@@ -82,4 +83,8 @@
 
 .primary-btn:hover {
   background: #001f4f;
+}
+.dashboard-logo {
+  width: 180px;
+  margin-bottom: 24px; /* space between logo and card */
 }
