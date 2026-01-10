@@ -7,32 +7,46 @@ import "./InstructionsScreen.css";
 */
 const INSTRUCTIONS_BY_SUBJECT = {
   thinking_skills: [
-    "You have 40 minutes to complete 40 questions.",
-    "Some questions may include diagrams or patterns.",
-    "Choose the option that best completes the pattern or sequence.",
-    "Calculators and dictionaries are not allowed.",
-  ],
-
+  "Please read these instructions carefully.",
+  "You have 40 minutes to complete 40 questions in this test.",
+  "For each question there are four possible answers. Choose the one correct answer.",
+  "You will not lose marks for incorrect answers, so you should attempt all questions.",
+  "Calculators and dictionaries are not allowed.",
+],
   mathematical_reasoning: [
-    "You have 40 minutes to complete 40 questions.",
-    "Each question tests numerical and logical reasoning.",
-    "Rough working may be done on the provided paper.",
-    "Calculators are not allowed.",
-  ],
+  "Please read these instructions carefully.",
+  "You have 40 minutes to complete 35 questions in this test.",
+  "For each question there are five possible answers. Choose the one correct answer.",
+  "You will not lose marks for incorrect answers, so you should attempt all questions.",
+  "Calculators and dictionaries are not allowed.",
+],
 
   reading: [
-    "You will read several passages in this test.",
-    "Answer each question based only on the information in the passage.",
-    "Some questions may require comparing information across texts.",
-    "You have 40 minutes to complete this section.",
-  ],
+  "Please read these instructions carefully.",
+  "You have 45 minutes to complete 17 questions in this test.",
+  "For Questions 1–8, choose one correct answer to each question.",
+  "For Question 9, choose the eight correct answers.",
+  "For Questions 10–15, choose one correct answer to each question.",
+  "For Question 16, choose the six correct answers.",
+  "For Question 17, choose the ten correct answers.",
+  "You will not lose marks for incorrect answers, so you should attempt all questions.",
+  "Some words and phrases are in bold in the texts as they are referred to in some questions.",
+  "Calculators and dictionaries are not allowed.",
+],
+
 
   writing: [
-    "This test assesses spelling, grammar, and written expression.",
-    "Read each question carefully before answering.",
-    "Some questions require selecting the best sentence or word choice.",
-    "You have 40 minutes to complete this test.",
-  ],
+  "Please read these instructions carefully.",
+  "You have 30 minutes to complete this test.",
+  "This test contains one writing task.",
+  "The task provides an opportunity for you to show how well you can choose, develop, and organise ideas and communicate them effectively in writing.",
+  "Before you begin writing, take time to think carefully about what you need to say and how the organisation and layout of your response might help express your message.",
+  "You will receive a higher mark if you produce an original and engaging response to the writing task.",
+  "You will receive a lower mark if your writing does not address the topic outlined in the writing task.",
+  "Calculators and dictionaries are not allowed.",
+  "This test will not be marked.",
+],
+
 };
 
 const DEFAULT_INSTRUCTIONS = [
