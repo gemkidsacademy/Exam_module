@@ -1,190 +1,114 @@
-
----------------------
 /* ============================================================
-   EXAM ROOT — FULL WIDTH GUARANTEE
+   GLOBAL DASHBOARD LAYOUT
 ============================================================ */
+
+.selective-dashboard {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   SUBJECT SELECTION — NSW STYLE (IMAGE MATCH)
+============================================================ */
+
+.subject-selection-wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #eef1f4;
+}
+
+.subject-selection-card {
+  background: #ffffff;
+  padding: 36px 40px 32px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 0 0 1px #e5e7eb;
+}
+
+/* Title */
+.dashboard-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0b3c6d;
+  margin-bottom: 16px;
+}
+
+/* Red divider line */
+.title-divider {
+  height: 2px;
+  background: #d32f2f;
+  width: 100%;
+  margin-bottom: 28px;
+}
+
+/* Subject buttons */
+.subject-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.subject-button {
+  background: #002b6b;
+  color: #ffffff;
+  border: none;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.subject-button:hover {
+  background: #001f4f;
+}
+
+/* Footer */
+.footer-text {
+  font-size: 14px;
+  color: #374151;
+  margin-bottom: 10px;
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.footer-link {
+  color: #0b3c6d;
+  font-weight: 600;
+  text-decoration: underline;
+  font-size: 14px;
+}
+
+/* ============================================================
+   EXAM LAYOUT — FULL WIDTH GUARANTEE
+============================================================ */
+
+.content-area {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 .exam-root {
   width: 100%;
 }
+
 .reading-mode {
   width: 100%;
 }
 
-
-/* ============================================================
-   GLOBAL LAYOUT
-============================================================ */
-.selective-dashboard {
-  width: 100%;          /* ✅ respect document flow */
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-/* ============================================================
-   TOP HORIZONTAL MENU
-============================================================ */
-
-
-
-/* ============================================================
-   MAIN CONTENT AREA — FULL WIDTH
-============================================================ */
-.content-area {
-  width: 100%;
-  max-width: none;     /* remove constraint */
-  margin: 0;           /* stop centering */
-  padding: 0;          /* exam controls its own spacing */
-  box-sizing: border-box;
-}
-
-
-.subject-title {
-  display: none; /* fully removed */
-}
-
-/* ============================================================
-   QUIZ CARD (for menu screen, not exam page)
-============================================================ */
-.quiz-card {
-  width: 100%;
-  max-width: 420px;
-  background: #f0fdf4;
-  border-radius: 12px;
-  padding: 18px;
-  margin: 20px auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-}
-
-.quiz-header {
-  background: #dcfce7;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 12px;
-}
-
-.quiz-title {
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0;
-  color: #111827;
-}
-
-.quiz-meta-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.difficulty-pill {
-  background: #fee2e2;
-  color: #b91c1c;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.attempts-pill {
-  font-size: 14px;
-  color: #374151;
-  font-weight: 500;
-}
-
-.questions-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.questions-text {
-  font-size: 15px;
-  font-weight: 500;
-  color: #374151;
-}
-
-.quiz-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.results-btn,
-.start-btn,
-.resume-btn {
-  flex: 1;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  font-size: 14px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-/* Results */
-.results-btn {
-  background: #f3f4f6;
-  color: #111827;
-}
-
-.results-btn:hover {
-  background: #e5e7eb;
-}
-
-/* Start / Resume */
-.start-btn,
-.resume-btn {
-  background: #2563eb;
-  color: #ffffff;
-}
-
-.start-btn:hover,
-.resume-btn:hover {
-  background: #1d4ed8;
-}
 .exam-shell {
   width: 100%;
   max-width: 100%;
-}
-/* ============================================================
-   SUBJECT SELECTION SCREEN (IMAGE MATCH)
-============================================================ */
-
-.subject-selection {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.dashboard-title {
-  font-size: 30px;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 32px;
-}
-
-.subject-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  width: 100%;
-  max-width: 360px;
-}
-
-.subject-button {
-  background-color: #002b6b;
-  color: white;
-  border: none;
-  padding: 18px 20px;
-  font-size: 18px;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.subject-button:hover {
-  background-color: #001f4f;
 }
