@@ -272,7 +272,25 @@ export default function ExamPageMathematicalReasoning({
       {/* QUESTION CARD */}
       <div className="question-card">
         <p className="question-text">{currentQ.question}</p>
-
+      
+        {/* ✅ IMAGE RENDERING (ADD THIS BLOCK) */}
+        {Array.isArray(currentQ.images) && currentQ.images.length > 0 && (
+          <div className="question-images">
+            {currentQ.images.map((imgUrl, idx) => (
+              <img
+                key={idx}
+                src={imgUrl}
+                alt={`Question diagram ${idx + 1}`}
+                className="question-image"
+                onError={(e) => {
+                  console.error("❌ Image failed to load:", imgUrl);
+                  e.target.style.display = "none";
+                }}
+              />
+            ))}
+          </div>
+        )}
+      
         {normalizedOptions.map((opt, i) => {
           const optionKey = opt.split(")")[0].toUpperCase();
           return (
@@ -285,10 +303,10 @@ export default function ExamPageMathematicalReasoning({
             >
               {opt}
             </button>
-
           );
         })}
       </div>
+
 
       {/* NAVIGATION */}
       <div className="nav-buttons">
