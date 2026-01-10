@@ -54,22 +54,37 @@ const SelectiveDashboard = () => {
   return (
     <div className="selective-dashboard">
       {/* SUBJECT SELECTION SCREEN */}
+      {/* SUBJECT SELECTION SCREEN */}
       {!activeSubject && (
-        <div className="subject-selection">
-          <h1 className="dashboard-title">
-            Selective High School Placement Practice Test
-          </h1>
-
-          <div className="subject-buttons">
-            {SUBJECTS.map((subject) => (
-              <button
-                key={subject.key}
-                className="subject-button"
-                onClick={() => handleSubjectSelect(subject)}
-              >
-                {subject.label}
-              </button>
-            ))}
+        <div className="subject-selection-wrapper">
+          <div className="subject-selection-card">
+            <h1 className="dashboard-title">
+              Selective High School Placement Practice Test
+            </h1>
+      
+            <div className="title-divider" />
+      
+            <div className="subject-buttons">
+              {SUBJECTS.map((subject) => (
+                <button
+                  key={subject.key}
+                  className="subject-button"
+                  onClick={() => handleSubjectSelect(subject)}
+                >
+                  {subject.label}
+                </button>
+              ))}
+            </div>
+      
+            <p className="footer-text">
+              For more test preparation resources and information, return to the NSW
+              Department of Education webpage for:
+            </p>
+      
+            <div className="footer-links">
+              <a href="#" className="footer-link">Parents and carers</a>
+              <a href="#" className="footer-link">Students</a>
+            </div>
           </div>
         </div>
       )}
@@ -85,7 +100,7 @@ const SelectiveDashboard = () => {
               onExamStart={() => setExamInProgress(true)}
               onExamFinish={() => {
                 setExamInProgress(false);
-                setActiveSubject(null); // return to selection screen
+                
               }}
             />
           </div>
