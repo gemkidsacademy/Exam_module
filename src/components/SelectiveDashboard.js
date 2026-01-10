@@ -7,6 +7,9 @@ import ExamPageMathematicalReasoning from "./ExamPageMathematicalReasoning";
 import ReadingComponent from "./ReadingComponent";
 import ExamPageWriting from "./ExamPageWriting";
 
+import WelcomeScreen from "./WelcomeScreen";
+import InstructionsScreen from "./InstructionsScreen";
+
 /*
   SUBJECT CONFIG
   - UI label
@@ -39,6 +42,8 @@ const SUBJECTS = [
 const SelectiveDashboard = () => {
   const [activeSubject, setActiveSubject] = useState(null);
   const [examInProgress, setExamInProgress] = useState(false);
+  const [examPhase, setExamPhase] = useState("selection");
+  // phases: selection → welcome → instructions → exam
 
   const studentId = sessionStorage.getItem("student_id");
   const ActiveComponent = activeSubject?.component;
@@ -49,21 +54,22 @@ const SelectiveDashboard = () => {
       return;
     }
     setActiveSubject(subject);
+    setExamPhase("welcome");
   };
 
   return (
     <div className="selective-dashboard">
-      {/* SUBJECT SELECTION SCREEN */}
-      {/* SUBJECT SELECTION SCREEN */}
-      {!activeSubject && (
+
+      {/* 1️⃣ SUBJECT SELECTION */}
+      {examPhase === "selection" && (
         <div className="subject-selection-wrapper">
           <div className="subject-selection-card">
             <h1 className="dashboard-title">
               Selective High School Placement Practice Test
             </h1>
-      
+
             <div className="title-divider" />
-      
+
             <div className="subject-buttons">
               {SUBJECTS.map((subject) => (
                 <button
@@ -75,22 +81,27 @@ const SelectiveDashboard = () => {
                 </button>
               ))}
             </div>
-      
-            <p className="footer-text">
-              For more test preparation resources and information, return to the NSW
-              Department of Education webpage for:
-            </p>
-      
-            <div className="footer-links">
-              <a href="#" className="footer-link">Parents and carers</a>
-              <a href="#" className="footer-link">Students</a>
-            </div>
           </div>
         </div>
       )}
 
-      {/* EXAM SCREEN */}
-      {activeSubject && (
+      {/* 2️⃣ WELCOME SCREEN */}
+      {examPhase === "welcome" && (
+        <WelcomeScreen
+          onNext={() => setExamPhase("instructions")}
+        />
+      )}
+
+      {/* 3️⃣ INSTRUCTIONS SCREEN */}
+      {examPhase === "instructions" && (
+        <InstructionsScreen
+          subject={activeSubject.key}
+          onNext={() => setExamPhase("exam")}
+        />
+      )}
+
+      {/* 4️⃣ EXAM */}
+      {examPhase === "exam" && (
         <main className="content-area">
           <div className="exam-root">
             <ActiveComponent
@@ -98,14 +109,12 @@ const SelectiveDashboard = () => {
               subject={activeSubject.key}
               difficulty="advanced"
               onExamStart={() => setExamInProgress(true)}
-              onExamFinish={() => {
-                setExamInProgress(false);
-                
-              }}
+              onExamFinish={() => setExamInProgress(false)}
             />
           </div>
         </main>
       )}
+
     </div>
   );
 };
