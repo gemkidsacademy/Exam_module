@@ -56,26 +56,30 @@ export default function GenerateExam() {
       `${BACKEND_URL}/api/quizzes/generate`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          difficulty: "medium", // or selectedDifficulty from UI
-        }),
+          difficulty: "medium" // or from UI later
+        })
       }
     );
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || "Exam generation failed");
 
+    if (!res.ok) {
+      throw new Error(data.detail || "Failed to generate exam");
+    }
+
+    // ✅ success only
     setGeneratedExam(data);
+
   } catch (err) {
-    console.error(err);
-    setError("Failed to generate exam. Check console for details.");
+    console.error("Generate exam failed:", err.message);
+    setError(err.message);
   } finally {
     setLoading(false);
   }
 };
+
 
   /* ---------------- UI ---------------- */
   return (
@@ -107,12 +111,18 @@ export default function GenerateExam() {
                 <div key={q.q_id} className="question-card">
                   <strong>Q{q.q_id}.</strong> {q.question}
                   <ul>
-                    {Object.entries(q.options).map(([key, value]) => (
-                      <li key={key}>
-                        <strong>{key}.</strong> {value}
-                      </li>
-                    ))}
+                    {Array.isArray(q.options)
+                      ? q.options.map((opt, idx) => (
+                          <li key={idx}>{opt}</li>
+                        ))
+                      : Object.entries(q.options).map(([key, value]) => (
+                          <li key={key}>
+                            <strong>{key}.</strong> {value}
+                          </li>
+                        ))
+                    }
                   </ul>
+
                   <div className="correct-answer">
                     Correct Answer: {q.correct}
                   </div>
