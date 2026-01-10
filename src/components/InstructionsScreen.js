@@ -63,28 +63,37 @@ const InstructionsScreen = ({ subject, onNext }) => {
     INSTRUCTIONS_BY_SUBJECT[subject] || DEFAULT_INSTRUCTIONS;
 
   return (
-    <div className="instructions-wrapper">
-      <div className="instructions-card">
-        <h1 className="instructions-title">
-          Selective High School Placement Practice Test
-        </h1>
+  <div className="instructions-wrapper">
 
-        <h2 className="instructions-subject">{subjectLabel}</h2>
+    {/* ⭐ GEM KIDS ACADEMY LOGO ⭐ */}
+    <img
+      src="https://gemkidsacademy.com.au/wp-content/uploads/2024/10/cropped-logo-4-1.png"
+      alt="Gem Kids Academy"
+      className="dashboard-logo"
+    />
 
-        <h3 className="instructions-heading">Instructions</h3>
+    <div className="instructions-card">
+      <h1 className="instructions-title">
+        Selective High School Placement Practice Test
+      </h1>
 
-        <ul className="instructions-list">
-          {instructions.map((text, index) => (
-            <li key={index}>{text}</li>
-          ))}
-        </ul>
+      <h2 className="instructions-subject">{subjectLabel}</h2>
 
-        <button className="primary-btn" onClick={onNext}>
-          Next
-        </button>
-      </div>
+      <h3 className="instructions-heading">Instructions</h3>
+
+      <ul className="instructions-list">
+        {instructions.map((text, index) => (
+          <li key={index}>{text}</li>
+        ))}
+      </ul>
+
+      <button className="primary-btn" onClick={onNext}>
+        Next
+      </button>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default InstructionsScreen;
