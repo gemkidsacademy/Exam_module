@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import "./SelectiveDashboard.css";
 
-// IMPORT COMPONENTS
+// EXAM COMPONENTS (UNCHANGED)
 import ExamPageThinkingSkills from "./ExamPageThinkingSkills";
 import ExamPageMathematicalReasoning from "./ExamPageMathematicalReasoning";
 import ReadingComponent from "./ReadingComponent";
 import ExamPageWriting from "./ExamPageWriting";
 
+/*
+  SUBJECT CONFIG
+  - UI label
+  - backend subject key
+  - exam component
+*/
 const SUBJECTS = [
   {
     label: "Thinking Skills",
@@ -37,7 +43,7 @@ const SelectiveDashboard = () => {
   const studentId = sessionStorage.getItem("student_id");
   const ActiveComponent = activeSubject?.component;
 
-  const handleSubjectClick = (subject) => {
+  const handleSubjectSelect = (subject) => {
     if (examInProgress) {
       alert("Please submit your current exam before switching subjects.");
       return;
@@ -47,8 +53,8 @@ const SelectiveDashboard = () => {
 
   return (
     <div className="selective-dashboard">
-      {!activeSubject ? (
-        /* SUBJECT SELECTION SCREEN */
+      {/* SUBJECT SELECTION SCREEN */}
+      {!activeSubject && (
         <div className="subject-selection">
           <h1 className="dashboard-title">
             Selective High School Placement Practice Test
@@ -59,15 +65,17 @@ const SelectiveDashboard = () => {
               <button
                 key={subject.key}
                 className="subject-button"
-                onClick={() => handleSubjectClick(subject)}
+                onClick={() => handleSubjectSelect(subject)}
               >
                 {subject.label}
               </button>
             ))}
           </div>
         </div>
-      ) : (
-        /* EXAM SCREEN */
+      )}
+
+      {/* EXAM SCREEN */}
+      {activeSubject && (
         <main className="content-area">
           <div className="exam-root">
             <ActiveComponent
@@ -77,7 +85,7 @@ const SelectiveDashboard = () => {
               onExamStart={() => setExamInProgress(true)}
               onExamFinish={() => {
                 setExamInProgress(false);
-                setActiveSubject(null);
+                setActiveSubject(null); // return to selection screen
               }}
             />
           </div>
