@@ -7,91 +7,82 @@ import ExamPageMathematicalReasoning from "./ExamPageMathematicalReasoning";
 import ReadingComponent from "./ReadingComponent";
 import ExamPageWriting from "./ExamPageWriting";
 
-
-
-import WelcomeScreen from "./WelcomeScreen";
-
-const SUBJECT_KEY_MAP = {
-  "Thinking skills": "thinking_skills",
-  "Mathematical Reasoning": "mathematical_reasoning",
-  "Reading": "reading",
-  "Writing": "writing",
-};
-
-const COMPONENT_MAP = {
-  "Thinking skills": ExamPageThinkingSkills,
-  "Mathematical Reasoning": ExamPageMathematicalReasoning,
-  "Reading": ReadingComponent,
-  "Writing": ExamPageWriting,
-};
+const SUBJECTS = [
+  {
+    label: "Thinking Skills",
+    key: "thinking_skills",
+    component: ExamPageThinkingSkills,
+  },
+  {
+    label: "Mathematical Reasoning",
+    key: "mathematical_reasoning",
+    component: ExamPageMathematicalReasoning,
+  },
+  {
+    label: "Reading",
+    key: "reading",
+    component: ReadingComponent,
+  },
+  {
+    label: "Writing",
+    key: "writing",
+    component: ExamPageWriting,
+  },
+];
 
 const SelectiveDashboard = () => {
-  const [activeTab, setActiveTab] = useState(null);
+  const [activeSubject, setActiveSubject] = useState(null);
   const [examInProgress, setExamInProgress] = useState(false);
 
-
   const studentId = sessionStorage.getItem("student_id");
-  const tabs = Object.keys(SUBJECT_KEY_MAP);
+  const ActiveComponent = activeSubject?.component;
 
-  const ActiveComponent = COMPONENT_MAP[activeTab];
-  const subjectKey = SUBJECT_KEY_MAP[activeTab];
+  const handleSubjectClick = (subject) => {
+    if (examInProgress) {
+      alert("Please submit your current exam before switching subjects.");
+      return;
+    }
+    setActiveSubject(subject);
+  };
 
   return (
     <div className="selective-dashboard">
+      {!activeSubject ? (
+        /* SUBJECT SELECTION SCREEN */
+        <div className="subject-selection">
+          <h1 className="dashboard-title">
+            Selective High School Placement Practice Test
+          </h1>
 
-      {/* Horizontal Menu */}
-      <nav className="horizontal-menu">
-        {tabs.map((tab) => (
-          <div
-            key={tab}
-            className={`menu-item ${activeTab === tab ? "active" : ""}`}
-            onClick={() => {
-              if (examInProgress) {
-                alert("Please submit your current exam before switching subjects.");
-                return;
-              }
-              setActiveTab(tab);
-            }}
-
-          >
-            {tab}
+          <div className="subject-buttons">
+            {SUBJECTS.map((subject) => (
+              <button
+                key={subject.key}
+                className="subject-button"
+                onClick={() => handleSubjectClick(subject)}
+              >
+                {subject.label}
+              </button>
+            ))}
           </div>
-        ))}
-      </nav>
-
-      {/* Content */}
-      <main className="content-area">
-
-        {ActiveComponent ? (
+        </div>
+      ) : (
+        /* EXAM SCREEN */
+        <main className="content-area">
           <div className="exam-root">
-            {activeTab === "Reading" ? (
-              <div className="reading-mode">
-                <ActiveComponent
-                  studentId={studentId}
-                  subject={subjectKey}
-                  difficulty="advanced"
-                  onExamStart={() => setExamInProgress(true)}
-                  onExamFinish={() => setExamInProgress(false)}
-                />
-              </div>
-            ) : (
-              <ActiveComponent
-                studentId={studentId}
-                subject={subjectKey}
-                difficulty="advanced"
-                onExamStart={() => setExamInProgress(true)}
-                onExamFinish={() => setExamInProgress(false)}
-              />
-            )}
+            <ActiveComponent
+              studentId={studentId}
+              subject={activeSubject.key}
+              difficulty="advanced"
+              onExamStart={() => setExamInProgress(true)}
+              onExamFinish={() => {
+                setExamInProgress(false);
+                setActiveSubject(null);
+              }}
+            />
           </div>
-        ) : (
-          <WelcomeScreen />
-        )}
-      
-      </main>
-
-
-
+        </main>
+      )}
     </div>
   );
 };
