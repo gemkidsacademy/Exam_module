@@ -26,7 +26,8 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
   const navigate = useNavigate();
   const server = "https://web-production-481a5.up.railway.app";
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+  e.preventDefault(); 
   try {
     setError(null);
 
@@ -86,9 +87,9 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
         style={{ width: "180px", marginBottom: "20px" }}
       />
 
-      <div style={styles.loginBox}>
+      <form style={styles.loginBox} onSubmit={handleLogin}>
         <h2>Login</h2>
-
+      
         <input
           type="text"
           placeholder="Username"
@@ -96,7 +97,7 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
           onChange={(e) => setUsername(e.target.value)}
           style={styles.input}
         />
-
+      
         <input
           type="password"
           placeholder="Password"
@@ -104,14 +105,15 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
           onChange={(e) => setPassword(e.target.value)}
           style={styles.input}
         />
-
-        <button onClick={handleLogin} style={styles.button}>
+      
+        <button type="submit" style={styles.button}>
           Login
         </button>
-
+      
         {error && <p style={styles.error}>{error}</p>}
-      </div>
+      </form>
     </div>
+
   );
 }
 
