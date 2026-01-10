@@ -25,9 +25,12 @@
   background: #ffffff;
   padding: 36px 40px 32px;
   max-width: 420px;
-  width: 420px;              /* 🔒 hard lock */
+  width: 420px;
   text-align: center;
-  box-shadow: 0 0 0 1px #e5e7eb;
+
+  /* 🔑 visual separation */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
 }
 
 /* Title */
@@ -116,4 +119,7 @@
 .exam-shell {
   width: 100%;
   max-width: 100%;
+}
+body {
+  background: #eef1f4 !important;
 }
