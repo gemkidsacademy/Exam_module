@@ -9,34 +9,86 @@ export default function ReportShell() {
   const [exam, setExam] = useState("Thinking Skills");
   const [reportType, setReportType] = useState("student");
 
+  const [shouldGenerate, setShouldGenerate] = useState(false);
+
   return (
     <div className="report-shell">
-
-      {/* ================= TOP CONTROLS ================= */}
+      {/* ================= FILTER BAR ================= */}
       <div className="filters-bar">
-        <select value={student} onChange={e => setStudent(e.target.value)}>
-          <option value="S001">Student S001</option>
-          <option value="S002">Student S002</option>
-        </select>
+        <div className="filters-left">
+          <div className="filter-group">
+            <label>Student</label>
+            <select
+              value={student}
+              onChange={e => {
+                setStudent(e.target.value);
+                setShouldGenerate(false);
+              }}
+            >
+              <option value="S001">Student S001</option>
+              <option value="S002">Student S002</option>
+            </select>
+          </div>
 
-        <select value={exam} onChange={e => setExam(e.target.value)}>
-          <option>Thinking Skills</option>
-          <option>Reading</option>
-          <option>Mathematics</option>
-        </select>
+          <div className="filter-group">
+            <label>Exam</label>
+            <select
+              value={exam}
+              onChange={e => {
+                setExam(e.target.value);
+                setShouldGenerate(false);
+              }}
+            >
+              <option>Thinking Skills</option>
+              <option>Reading</option>
+              <option>Mathematics</option>
+            </select>
+          </div>
 
-        <select value={reportType} onChange={e => setReportType(e.target.value)}>
-          <option value="student">Per Student Report</option>
-          <option value="class">Per Class Report</option>
-          <option value="cumulative">Cumulative Progress</option>
-        </select>
+          <div className="filter-group">
+            <label>Report Type</label>
+            <select
+              value={reportType}
+              onChange={e => {
+                setReportType(e.target.value);
+                setShouldGenerate(false);
+              }}
+            >
+              <option value="student">Per Student Report</option>
+              <option value="class">Per Class Report</option>
+              <option value="cumulative">Cumulative Progress</option>
+            </select>
+          </div>
+        </div>
+
+        {/* ACTION */}
+        <div className="filters-right">
+          <button
+            className="primary-btn"
+            onClick={() => setShouldGenerate(true)}
+          >
+            Generate
+          </button>
+          <span className="action-hint">Render report using selected filters</span>
+        </div>
       </div>
 
       {/* ================= REPORT BODY ================= */}
-      {reportType === "student" && <StudentReportMock />}
-      {reportType === "class" && <ClassReportMock />}
-      {reportType === "cumulative" && <CumulativeReportMock />}
+      {shouldGenerate && (
+        <>
+          {reportType === "student" && (
+            <StudentReportMock student={student} exam={exam} />
+          )}
 
+          {reportType === "class" && (
+            <ClassReportMock exam={exam} />
+          )}
+
+          {reportType === "cumulative" && (
+            <CumulativeReportMock student={student} exam={exam} />
+          )}
+        </>
+      )}
     </div>
   );
 }
