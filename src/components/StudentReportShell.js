@@ -19,7 +19,6 @@ export default function StudentReportShell() {
   const [selectedAttemptDates, setSelectedAttemptDates] = useState([]);
   const [pendingAttemptDate, setPendingAttemptDate] = useState("");
 
-
   const MOCK_ATTEMPT_DATES = {
     S001: ["2024-01-05", "2024-01-20", "2024-02-10", "2024-03-01"],
     S002: ["2024-01-12", "2024-02-18"],
@@ -36,16 +35,13 @@ export default function StudentReportShell() {
             value={reportType}
             onChange={e => {
               const next = e.target.value;
-              console.log("🔁 Report type changed:", next);
-
               setReportType(next);
               setStudentId("");
               setClassName("");
               setClassDay("");
               setAvailableAttemptDates([]);
-               setPendingAttemptDate("");
+              setPendingAttemptDate("");
               setSelectedAttemptDates([]);
-              
             }}
           >
             <option value="student">Per Student Report</option>
@@ -61,8 +57,6 @@ export default function StudentReportShell() {
               value={studentId}
               onChange={e => {
                 const student = e.target.value;
-                console.log("👤 Student selected:", student);
-
                 setStudentId(student);
                 setPendingAttemptDate("");
                 setSelectedAttemptDates([]);
@@ -79,69 +73,64 @@ export default function StudentReportShell() {
 
             {/* -------- Attempt Dates (Cumulative only) -------- */}
             {reportType === "cumulative" && (
-  <>
-    <div className="attempt-group">          
-    <div className="attempt-selector">
-      <select
-        value={pendingAttemptDate}
-        disabled={!studentId}
-        onChange={e => setPendingAttemptDate(e.target.value)}
-      >
-        <option value="">Select attempt date</option>
-        {availableAttemptDates.map(date => (
-          <option key={date} value={date}>
-            {new Date(date).toLocaleDateString()}
-          </option>
-        ))}
-      </select>
+              <div className="attempt-group">
+                <div className="attempt-selector">
+                  <select
+                    value={pendingAttemptDate}
+                    disabled={!studentId}
+                    onChange={e => setPendingAttemptDate(e.target.value)}
+                  >
+                    <option value="">Select attempt date</option>
+                    {availableAttemptDates.map(date => (
+                      <option key={date} value={date}>
+                        {new Date(date).toLocaleDateString()}
+                      </option>
+                    ))}
+                  </select>
 
-      <button
-        type="button"
-        disabled={!pendingAttemptDate}
-        onClick={() => {
-          if (!selectedAttemptDates.includes(pendingAttemptDate)) {
-            setSelectedAttemptDates(prev => [...prev, pendingAttemptDate]);
-          }
-          setPendingAttemptDate("");
-        }}
-      >
-        Add
-      </button>
-    </div>
+                  <button
+                    type="button"
+                    disabled={!pendingAttemptDate}
+                    onClick={() => {
+                      if (!selectedAttemptDates.includes(pendingAttemptDate)) {
+                        setSelectedAttemptDates(prev => [
+                          ...prev,
+                          pendingAttemptDate
+                        ]);
+                      }
+                      setPendingAttemptDate("");
+                    }}
+                  >
+                    Add
+                  </button>
+                </div>
 
-    {selectedAttemptDates.length > 0 && (
-      <div className="selected-attempts">
-        <p>Selected Attempts:</p>
-        <ul>
-          {selectedAttemptDates.map(date => (
-            <li key={date}>
-              {new Date(date).toLocaleDateString()}
-              <button
-                type="button"
-                onClick={() =>
-                  setSelectedAttemptDates(prev =>
-                    prev.filter(d => d !== date)
-                  )
-                }
-              >
-                ✕
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-    )}
-  </>
-)}
-</div> 
-)}
-</div>
-
-
-  
-
-    
-
+                {selectedAttemptDates.length > 0 && (
+                  <div className="selected-attempts">
+                    <p>Selected Attempts:</p>
+                    <ul>
+                      {selectedAttemptDates.map(date => (
+                        <li key={date}>
+                          {new Date(date).toLocaleDateString()}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setSelectedAttemptDates(prev =>
+                                prev.filter(d => d !== date)
+                              )
+                            }
+                          >
+                            ✕
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* -------- Class Context -------- */}
         {reportType === "class" && (
