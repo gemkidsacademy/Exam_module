@@ -17,6 +17,8 @@ export default function StudentReportShell() {
 
   const [availableAttemptDates, setAvailableAttemptDates] = useState([]);
   const [selectedAttemptDates, setSelectedAttemptDates] = useState([]);
+  const [pendingAttemptDate, setPendingAttemptDate] = useState("");
+
 
   const MOCK_ATTEMPT_DATES = {
     S001: ["2024-01-05", "2024-01-20", "2024-02-10", "2024-03-01"],
@@ -41,7 +43,9 @@ export default function StudentReportShell() {
               setClassName("");
               setClassDay("");
               setAvailableAttemptDates([]);
+               setPendingAttemptDate("");
               setSelectedAttemptDates([]);
+              
             }}
           >
             <option value="student">Per Student Report</option>
@@ -60,6 +64,7 @@ export default function StudentReportShell() {
                 console.log("👤 Student selected:", student);
 
                 setStudentId(student);
+                setPendingAttemptDate("");
                 setSelectedAttemptDates([]);
                 setAvailableAttemptDates(
                   student ? MOCK_ATTEMPT_DATES[student] || [] : []
@@ -74,28 +79,58 @@ export default function StudentReportShell() {
 
             {/* -------- Attempt Dates (Cumulative only) -------- */}
             {reportType === "cumulative" && (
-              <select
-                multiple
-                disabled={!studentId}
-                value={selectedAttemptDates}
-                onChange={e => {
-                  const values = Array.from(
-                    e.target.selectedOptions
-                  ).map(option => option.value);
+  <div className="attempt-selector">
+    <select
+      value={pendingAttemptDate}
+      disabled={!studentId}
+      onChange={e => setPendingAttemptDate(e.target.value)}
+    >
+      <option value="">Select attempt date</option>
+      {availableAttemptDates.map(date => (
+        <option key={date} value={date}>
+          {new Date(date).toLocaleDateString()}
+        </option>
+      ))}
+    </select>
+    {reportType === "cumulative" && selectedAttemptDates.length > 0 && (
+  <div className="selected-attempts">
+    <p>Selected Attempts:</p>
+    <ul>
+      {selectedAttemptDates.map(date => (
+        <li key={date}>
+          {new Date(date).toLocaleDateString()}
+          <button
+            type="button"
+            onClick={() =>
+              setSelectedAttemptDates(prev =>
+                prev.filter(d => d !== date)
+              )
+            }
+          >
+            ✕
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+  
 
-                  console.log("📅 Selected attempt dates:", values);
-                  setSelectedAttemptDates(values);
-                }}
-              >
-                {availableAttemptDates.map(date => (
-                  <option key={date} value={date}>
-                    {new Date(date).toLocaleDateString()}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-        )}
+    <button
+      type="button"
+      disabled={!pendingAttemptDate}
+      onClick={() => {
+        if (!selectedAttemptDates.includes(pendingAttemptDate)) {
+          setSelectedAttemptDates(prev => [...prev, pendingAttemptDate]);
+        }
+        setPendingAttemptDate("");
+      }}
+    >
+      Add
+    </button>
+  </div>
+)}
+
 
         {/* -------- Class Context -------- */}
         {reportType === "class" && (
