@@ -24,13 +24,13 @@ export default function SelectiveReadinessOverall() {
   const [overall, setOverall] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const printRef = useRef();
-  
+  const printRef = useRef(null);
+
   const handlePrint = useReactToPrint({
-  content: () => printRef.current,
-  documentTitle: "Selective_Readiness_Report",
-  removeAfterPrint: false,
-});
+    contentRef: printRef,
+    documentTitle: "Selective_Readiness_Report",
+    removeAfterPrint: false,
+  });
 
 
 
