@@ -388,5 +388,33 @@
 .pdf-print-root {
   background: #ffffff;
 }
+/* Hide printable content on screen */
+.print-only {
+  display: none;
+}
+
+/* Show printable content ONLY during print */
+@media print {
+  .print-only {
+    display: block;
+  }
+
+  /* Hide everything else */
+  body * {
+    visibility: hidden;
+  }
+
+  .print-only,
+  .print-only * {
+    visibility: visible;
+  }
+
+  .print-only {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
 
 
