@@ -12,6 +12,12 @@ export default function QuizSetup_reading() {
   });
   
   const [availableTopics, setAvailableTopics] = useState([]);
+  const getUsedTopicNames = (currentIndex) => {
+  return quiz.topics
+    .map((t, i) => (i !== currentIndex ? t.name : null))
+    .filter(Boolean);
+};
+
 
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -228,7 +234,11 @@ export default function QuizSetup_reading() {
                 required
               >
                 <option value="">Select Topic</option>
-                {availableTopics.map((t) => (
+                {availableTopics
+                .filter(
+                  (t) => !getUsedTopicNames(index).includes(t.name)
+                )
+                .map((t) => (
                   <option key={t.name} value={t.name}>
                     {t.name}
                   </option>
