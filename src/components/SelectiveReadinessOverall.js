@@ -166,6 +166,50 @@ export default function SelectiveReadinessOverall() {
     <h2 className="overall-title">Overall Selective Readiness</h2>
 
     {/* selectors + buttons */}
+    {/* ================= STUDENT SELECTOR ================= */}
+<div className="selector-row">
+  <label>Student ID</label>
+  <select
+    value={selectedStudent}
+    onChange={(e) => setSelectedStudent(e.target.value)}
+  >
+    <option value="">Select student</option>
+    {students.map((s) => (
+      <option key={s.student_id} value={s.student_id}>
+        {s.student_id}
+      </option>
+    ))}
+  </select>
+</div>
+
+{/* ================= DATE SELECTOR ================= */}
+{selectedStudent && availableDates.length > 0 && (
+  <div className="selector-row">
+    <label>Exam Attempt Date</label>
+    <select
+      value={selectedDate}
+      onChange={(e) => setSelectedDate(e.target.value)}
+    >
+      <option value="">Select date</option>
+      {availableDates.map((date) => (
+        <option key={date} value={date}>
+          {date}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
+
+{/* ================= ACTION BUTTON ================= */}
+{selectedStudent && selectedDate && (
+  <button
+    className="generate-button"
+    onClick={generateOverallReport}
+  >
+    Generate Overall Readiness Report
+  </button>
+)}
+
 
     {overall && (
       <div className="overall-summary">
