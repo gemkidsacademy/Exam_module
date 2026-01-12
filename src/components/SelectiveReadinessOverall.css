@@ -384,15 +384,23 @@
   background: #f9fafb;
 }
 
-/* PRINT ROOT */
-/* Keep printable content hidden on screen */
+/* ===============================
+   PRINT ROOT (FIXED)
+================================ */
+
+/* Keep printable content out of view, but mounted */
 .print-only {
-  display: none;
+  visibility: hidden;
+  position: absolute;
+  left: -9999px;
+  top: 0;
 }
 
-/* Print rules */
+/* ===============================
+   PRINT RULES
+================================ */
 @media print {
-  /* Hide modal + app UI */
+  /* Hide app UI + modal */
   .pdf-modal-overlay,
   .pdf-modal,
   .overall-readiness-container {
@@ -401,6 +409,14 @@
 
   /* Show printable content */
   .print-only {
+    visibility: visible;
+    position: static;
     display: block !important;
+  }
+
+  /* Optional: reset body for clean PDF */
+  body {
+    margin: 0;
+    background: #ffffff;
   }
 }
