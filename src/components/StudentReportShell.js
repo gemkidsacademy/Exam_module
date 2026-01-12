@@ -14,17 +14,20 @@ export default function StudentReportShell() {
   const [exam, setExam] = useState("thinking_skills");
   const [date, setDate] = useState("2024-01-10");
   const [showPDF, setShowPDF] = useState(false);
-  const [attemptCount, setAttemptCount] = useState(null);
 
+  const [availableAttemptDates, setAvailableAttemptDates] = useState([]);
+  const [selectedAttemptDates, setSelectedAttemptDates] = useState([]);
 
-
+  const MOCK_ATTEMPT_DATES = {
+    S001: ["2024-01-05", "2024-01-20", "2024-02-10", "2024-03-01"],
+    S002: ["2024-01-12", "2024-02-18"],
+    S003: ["2024-03-03"]
+  };
 
   return (
     <div>
-
       {/* ================= FILTER BAR ================= */}
       <div className="filters-bar">
-
         {/* -------- Report Type -------- */}
         <div className="filter-group">
           <select
@@ -37,8 +40,8 @@ export default function StudentReportShell() {
               setStudentId("");
               setClassName("");
               setClassDay("");
-              setAttemptCount(null);
-
+              setAvailableAttemptDates([]);
+              setSelectedAttemptDates([]);
             }}
           >
             <option value="student">Per Student Report</option>
@@ -49,55 +52,57 @@ export default function StudentReportShell() {
 
         {/* -------- Student Context -------- */}
         {(reportType === "student" || reportType === "cumulative") && (
-  <div className="filter-group student-with-attempts">
+          <div className="filter-group student-with-attempts">
+            <select
+              value={studentId}
+              onChange={e => {
+                const student = e.target.value;
+                console.log("👤 Student selected:", student);
 
-    {/* Student */}
-    <select
-      value={studentId}
-      onChange={e => {
-        console.log("👤 Student selected:", e.target.value);
-        setStudentId(e.target.value);
-        setAttemptCount(null);
- // reset attempt count when student changes
+                setStudentId(student);
+                setSelectedAttemptDates([]);
+                setAvailableAttemptDates(
+                  student ? MOCK_ATTEMPT_DATES[student] || [] : []
+                );
+              }}
+            >
+              <option value="">Student</option>
+              <option value="S001">Student S001</option>
+              <option value="S002">Student S002</option>
+              <option value="S003">Student S003</option>
+            </select>
 
-      }}
-    >
-      <option value="">Student</option>
-      <option value="S001">Student S001</option>
-      <option value="S002">Student S002</option>
-      <option value="S003">Student S003</option>
-    </select>
+            {/* -------- Attempt Dates (Cumulative only) -------- */}
+            {reportType === "cumulative" && (
+              <select
+                multiple
+                disabled={!studentId}
+                value={selectedAttemptDates}
+                onChange={e => {
+                  const values = Array.from(
+                    e.target.selectedOptions
+                  ).map(option => option.value);
 
-    {/* Attempts (Cumulative only) */}
-    {reportType === "cumulative" && (
-      <input
-        type="number"
-        min="1"
-        step="1"
-        placeholder="Attempts"
-        value={attemptCount ?? ""}
-        disabled={!studentId}
-        onChange={e => {
-          const value = e.target.value;
-          console.log("🔢 Attempt count selected:", value);
-          setAttemptCount(value === "" ? null : Number(value));
-        }}
-      />
-    )}
-
-  </div>
-)}
-
+                  console.log("📅 Selected attempt dates:", values);
+                  setSelectedAttemptDates(values);
+                }}
+              >
+                {availableAttemptDates.map(date => (
+                  <option key={date} value={date}>
+                    {new Date(date).toLocaleDateString()}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+        )}
 
         {/* -------- Class Context -------- */}
         {reportType === "class" && (
           <div className="filter-group">
             <select
               value={className}
-              onChange={e => {
-                console.log("🏫 Class selected:", e.target.value);
-                setClassName(e.target.value);
-              }}
+              onChange={e => setClassName(e.target.value)}
             >
               <option value="">Class</option>
               <option value="Class A">Class A</option>
@@ -107,10 +112,7 @@ export default function StudentReportShell() {
 
             <select
               value={classDay}
-              onChange={e => {
-                console.log("📅 Class day selected:", e.target.value);
-                setClassDay(e.target.value);
-              }}
+              onChange={e => setClassDay(e.target.value)}
             >
               <option value="">Day</option>
               <option value="Monday">Monday</option>
@@ -122,29 +124,16 @@ export default function StudentReportShell() {
 
         {/* -------- Exam Context -------- */}
         <div className="filter-group">
-          <select
-            value={exam}
-            onChange={e => {
-              console.log("📘 Exam selected:", e.target.value);
-              setExam(e.target.value);
-            }}
-          >
+          <select value={exam} onChange={e => setExam(e.target.value)}>
             <option value="thinking_skills">Thinking Skills</option>
             <option value="reading">Reading</option>
             <option value="mathematics">Mathematics</option>
             <option value="writing">Writing</option>
             <option value="Foundational">Foundational</option>
-            
           </select>
 
           {reportType !== "cumulative" && (
-            <select
-              value={date}
-              onChange={e => {
-                console.log("🕒 Date selected:", e.target.value);
-                setDate(e.target.value);
-              }}
-            >
+            <select value={date} onChange={e => setDate(e.target.value)}>
               <option value="2024-01-10">10 Jan 2024</option>
               <option value="2024-02-15">15 Feb 2024</option>
             </select>
@@ -157,82 +146,47 @@ export default function StudentReportShell() {
             disabled={
               (reportType === "student" && !studentId) ||
               (reportType === "class" && (!className || !classDay)) ||
-              (reportType === "cumulative" && (!studentId || !attemptCount))
+              (reportType === "cumulative" &&
+                (!studentId || selectedAttemptDates.length === 0))
             }
             onClick={() => setShowPDF(true)}
           >
             Preview PDF
           </button>
         </div>
-
       </div>
 
       {/* ================= REPORT CONTENT ================= */}
 
-      {/* 🚧 STUDENT GATE */}
-      {reportType === "student" && !studentId && (
-        <div className="empty-state">
-          <h3>Select a student to view the report</h3>
-          <p>Please choose a student ID from the dropdown above.</p>
-        </div>
-      )}
-
-      {/* ✅ STUDENT REPORT */}
       {reportType === "student" && studentId && (
         <StudentCurrentExamReport studentId={studentId} />
       )}
 
-      {/* 🚧 CLASS GATE */}
-      {reportType === "class" && (!className || !classDay) && (
-        <div className="empty-state">
-          <h3>Select class details to view the report</h3>
-          <p>Please select both a class name and a class day.</p>
-        </div>
-      )}
-
-      {/* ✅ CLASS REPORT */}
       {reportType === "class" && className && classDay && (
-        <>
-          {console.log("🚀 Rendering ClassReportMock with:", {
-            className,
-            classDay,
-            exam,
-            date
-          })}
-
-          <ClassReportMock
-            className={className}
-            classDay={classDay}
-            exam={exam}
-            date={date}
-          />
-        </>
-      )}
-
-      {/* 🚧 CUMULATIVE GATE */}
-      {reportType === "cumulative" && (!studentId || !attemptCount) && (
-        <div className="empty-state">
-          <h3>Select student and attempts</h3>
-          <p>Please choose a student and number of recent attempts.</p>
-        </div>
-      )}
-
-
-      {/* ✅ CUMULATIVE REPORT */}
-      {reportType === "cumulative" && studentId && attemptCount && (
-        <CumulativeReportMock
-          studentId={studentId}
+        <ClassReportMock
+          className={className}
+          classDay={classDay}
           exam={exam}
-          attemptCount={attemptCount}
+          date={date}
         />
       )}
+
+      {reportType === "cumulative" &&
+        studentId &&
+        selectedAttemptDates.length > 0 && (
+          <CumulativeReportMock
+            studentId={studentId}
+            exam={exam}
+            attemptDates={selectedAttemptDates}
+          />
+        )}
 
       {showPDF && (
         <PDFPreviewMock onClose={() => setShowPDF(false)}>
           {reportType === "student" && studentId && (
             <StudentCurrentExamReport studentId={studentId} />
           )}
-      
+
           {reportType === "class" && className && classDay && (
             <ClassReportMock
               className={className}
@@ -241,18 +195,18 @@ export default function StudentReportShell() {
               date={date}
             />
           )}
-      
-          {reportType === "cumulative" && studentId && attemptCount && (
-            <CumulativeReportMock
-              studentId={studentId}
-              exam={exam}
-              attemptCount={attemptCount}
-            />
-          )}
+
+          {reportType === "cumulative" &&
+            studentId &&
+            selectedAttemptDates.length > 0 && (
+              <CumulativeReportMock
+                studentId={studentId}
+                exam={exam}
+                attemptDates={selectedAttemptDates}
+              />
+            )}
         </PDFPreviewMock>
       )}
-
-
     </div>
   );
 }
