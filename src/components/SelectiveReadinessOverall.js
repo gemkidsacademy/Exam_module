@@ -249,12 +249,40 @@ export default function SelectiveReadinessOverall() {
           <div className="pdf-toolbar">
             <button
   onClick={() => {
-    console.log("PRINT NODE:", printRef.current);
+    console.group("🖨️ PRINT DEBUG");
+
+    console.log("1️⃣ printRef.current:", printRef.current);
+
+    if (printRef.current) {
+      console.log(
+        "2️⃣ innerHTML length:",
+        printRef.current.innerHTML.length
+      );
+
+      console.log(
+        "3️⃣ innerHTML preview:",
+        printRef.current.innerHTML.slice(0, 300)
+      );
+
+      console.log(
+        "4️⃣ childElementCount:",
+        printRef.current.childElementCount
+      );
+
+      console.log(
+        "5️⃣ offsetHeight:",
+        printRef.current.offsetHeight
+      );
+    }
+
+    console.groupEnd();
+
     handlePrint();
   }}
 >
   Save / Print PDF
 </button>
+
 
 
             <button onClick={() => setShowPreview(false)}>Close</button>
