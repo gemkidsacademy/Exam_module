@@ -206,15 +206,14 @@ export default function SelectiveReadinessOverall() {
         <button className="generate-button" onClick={generateOverallReport}>
           Generate Overall Readiness Report
         </button>
+        <button
+          className="generate-button secondary"
+          onClick={() => setShowPreview(true)}
+        >
+          Preview PDF
+        </button>
 
-        {overall && (
-          <button
-            className="generate-button secondary"
-            onClick={handlePrint}
-          >
-            Save / Print PDF
-          </button>
-        )}
+        
       </div>
     )}
 
@@ -261,6 +260,22 @@ export default function SelectiveReadinessOverall() {
             {improvements.join(", ") || "None identified"}
           </p>
         </div>
+        {showPreview && overall && (
+          <div className="pdf-modal-overlay">
+            <div className="pdf-modal">
+
+              {/* ===== Toolbar ===== */}
+              <div className="pdf-toolbar">
+                <button onClick={handlePrint}>Save / Print PDF</button>
+                <button onClick={() => setShowPreview(false)}>Close</button>
+              </div>
+
+              
+
+            </div>
+          </div>
+        )}
+
 
         {/* Subject bar chart */}
         <div className="chart-section">
