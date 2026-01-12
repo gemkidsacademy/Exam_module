@@ -271,20 +271,18 @@ export default function SelectiveReadinessOverall() {
       </div>
     )}
 
-    {overall && (
-      <div className="print-only">
-        <PrintRoot
-          ref={printRef}
-          overall={overall}
-          balanceIndex={balanceIndex}
-          strengths={strengths}
-          improvements={improvements}
-          subjectChartData={subjectChartData}
-          SUBJECT_LABELS={SUBJECT_LABELS}
-        />
-      </div>
+    <div className="print-only">
+      <PrintRoot
+        ref={printRef}
+        overall={overall}
+        balanceIndex={balanceIndex}
+        strengths={strengths}
+        improvements={improvements}
+        subjectChartData={subjectChartData}
+        SUBJECT_LABELS={SUBJECT_LABELS}
+      />
+    </div>
 
-    )}
     
    </div>
 );
