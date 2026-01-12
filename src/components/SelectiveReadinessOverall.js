@@ -27,7 +27,7 @@ export default function SelectiveReadinessOverall() {
   const printRef = useRef(null);
 
   const handlePrint = useReactToPrint({
-  content: () => printRef.current,
+  contentRef: printRef,
   documentTitle: "Selective_Readiness_Report",
 });
 
@@ -244,10 +244,8 @@ export default function SelectiveReadinessOverall() {
       <div className="pdf-modal-overlay">
         <div className="pdf-modal">
           <div className="pdf-toolbar">
-            <button
-              onClick={handlePrint}
-              disabled={!printRef.current}
-            >
+            <button onClick={handlePrint}>
+
               Save / Print PDF
             </button>
 
