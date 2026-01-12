@@ -10,6 +10,7 @@ export default function ReportShell() {
   const [reportType, setReportType] = useState("student");
 
   const [shouldGenerate, setShouldGenerate] = useState(false);
+  const [showPDF, setShowPDF] = useState(false);
 
   return (
     <div className="report-shell">
@@ -61,15 +62,22 @@ export default function ReportShell() {
           </div>
         </div>
 
-        {/* ACTION */}
+        {/* ACTIONS */}
         <div className="filters-right">
           <button
-            className="primary-btn"
+            className="secondary-btn"
             onClick={() => setShouldGenerate(true)}
           >
             Generate
           </button>
-          <span className="action-hint">Render report using selected filters</span>
+
+          <button
+            className="primary-btn"
+            disabled={!shouldGenerate}
+            onClick={() => setShowPDF(true)}
+          >
+            Preview PDF
+          </button>
         </div>
       </div>
 
@@ -88,6 +96,18 @@ export default function ReportShell() {
             <CumulativeReportMock student={student} exam={exam} />
           )}
         </>
+      )}
+
+      {/* ================= PDF PREVIEW ================= */}
+      {showPDF && (
+        <div className="pdf-overlay">
+          <div className="pdf-modal">
+            <button onClick={() => setShowPDF(false)}>Close</button>
+            {reportType === "student" && <StudentReportMock />}
+            {reportType === "class" && <ClassReportMock />}
+            {reportType === "cumulative" && <CumulativeReportMock />}
+          </div>
+        </div>
       )}
     </div>
   );
