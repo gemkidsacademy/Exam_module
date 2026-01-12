@@ -165,52 +165,62 @@ export default function SelectiveReadinessOverall() {
   <div className="overall-readiness-container">
     <h2 className="overall-title">Overall Selective Readiness</h2>
 
-    {/* selectors + buttons */}
     {/* ================= STUDENT SELECTOR ================= */}
-<div className="selector-row">
-  <label>Student ID</label>
-  <select
-    value={selectedStudent}
-    onChange={(e) => setSelectedStudent(e.target.value)}
-  >
-    <option value="">Select student</option>
-    {students.map((s) => (
-      <option key={s.student_id} value={s.student_id}>
-        {s.student_id}
-      </option>
-    ))}
-  </select>
-</div>
+    <div className="selector-row">
+      <label>Student ID</label>
+      <select
+        value={selectedStudent}
+        onChange={(e) => setSelectedStudent(e.target.value)}
+      >
+        <option value="">Select student</option>
+        {students.map((s) => (
+          <option key={s.student_id} value={s.student_id}>
+            {s.student_id}
+          </option>
+        ))}
+      </select>
+    </div>
 
-{/* ================= DATE SELECTOR ================= */}
-{selectedStudent && availableDates.length > 0 && (
-  <div className="selector-row">
-    <label>Exam Attempt Date</label>
-    <select
-      value={selectedDate}
-      onChange={(e) => setSelectedDate(e.target.value)}
-    >
-      <option value="">Select date</option>
-      {availableDates.map((date) => (
-        <option key={date} value={date}>
-          {date}
-        </option>
-      ))}
-    </select>
-  </div>
-)}
+    {/* ================= DATE SELECTOR ================= */}
+    {selectedStudent && availableDates.length > 0 && (
+      <div className="selector-row">
+        <label>Exam Attempt Date</label>
+        <select
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+        >
+          <option value="">Select date</option>
+          {availableDates.map((date) => (
+            <option key={date} value={date}>
+              {date}
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
 
-{/* ================= ACTION BUTTON ================= */}
-{selectedStudent && selectedDate && (
-  <button
-    className="generate-button"
-    onClick={generateOverallReport}
-  >
-    Generate Overall Readiness Report
-  </button>
-)}
+    {/* ================= ACTION BUTTONS ================= */}
+    {selectedStudent && selectedDate && (
+      <div className="action-row">
+        <button
+          className="generate-button"
+          onClick={generateOverallReport}
+        >
+          Generate Overall Readiness Report
+        </button>
 
+        {overall && (
+          <button
+            className="generate-button secondary"
+            onClick={() => setShowPreview(true)}
+          >
+            Preview PDF
+          </button>
+        )}
+      </div>
+    )}
 
+    {/* ================= SCREEN REPORT ================= */}
     {overall && (
       <div className="overall-summary">
         <ReportContent
@@ -225,6 +235,7 @@ export default function SelectiveReadinessOverall() {
       </div>
     )}
 
+    {/* ================= PDF PREVIEW MODAL ================= */}
     {showPreview && overall && (
       <div className="pdf-modal-overlay">
         <div className="pdf-modal">
@@ -250,6 +261,7 @@ export default function SelectiveReadinessOverall() {
       </div>
     )}
 
+    {/* ================= PRINT ROOT (HIDDEN) ================= */}
     {overall && (
       <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
         <PrintRoot
@@ -265,6 +277,7 @@ export default function SelectiveReadinessOverall() {
     )}
   </div>
 );
+
 
 
 
