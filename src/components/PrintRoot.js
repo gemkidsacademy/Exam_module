@@ -2,49 +2,57 @@
 import { forwardRef } from "react";
 
 const PrintRoot = forwardRef(function PrintRoot(
-  { overall, balanceIndex, strengths, improvements, SUBJECT_LABELS },
+  {
+    overall,
+    balanceIndex,
+    strengths,
+    improvements,
+    SUBJECT_LABELS,
+  },
   ref
 ) {
-  if (!overall) {
-    return <div ref={ref} />;
-  }
-
   return (
     <div ref={ref} className="pdf-print-root">
-      <div className="overall-summary">
-
-        <div className="score-row">
-          <div className="score-box">
-            <div className="label">Overall Score</div>
-            <div className="value">{overall.overall_percent}%</div>
-          </div>
-
-          <div className="score-box">
-            <div className="label">Readiness Band</div>
-            <div className="value">{overall.readiness_band}</div>
-          </div>
+      {!overall ? (
+        <div style={{ padding: "40px", textAlign: "center" }}>
+          Preparing report…
         </div>
+      ) : (
+        <div className="overall-summary">
 
-        <h4>Component Breakdown</h4>
+          <div className="score-row">
+            <div className="score-box">
+              <div className="label">Overall Score</div>
+              <div className="value">{overall.overall_percent}%</div>
+            </div>
 
-        <table className="breakdown-table">
-          <thead>
-            <tr>
-              <th>Subject</th>
-              <th>Score</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.entries(overall.components).map(([k, v]) => (
-              <tr key={k}>
-                <td>{SUBJECT_LABELS[k]}</td>
-                <td>{v}</td>
+            <div className="score-box">
+              <div className="label">Readiness Band</div>
+              <div className="value">{overall.readiness_band}</div>
+            </div>
+          </div>
+
+          <h4>Component Breakdown</h4>
+
+          <table className="breakdown-table">
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Score</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {Object.entries(overall.components).map(([k, v]) => (
+                <tr key={k}>
+                  <td>{SUBJECT_LABELS[k]}</td>
+                  <td>{v}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-      </div>
+        </div>
+      )}
     </div>
   );
 });
