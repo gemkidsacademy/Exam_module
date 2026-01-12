@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, forwardRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import PrintRoot from "./PrintRoot";
 import ReportContent from "./ReportContent";
 
@@ -25,10 +25,13 @@ export default function SelectiveReadinessOverall() {
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const printRef = useRef();
+  
   const handlePrint = useReactToPrint({
   content: () => printRef.current,
   documentTitle: "Selective_Readiness_Report",
+  removeAfterPrint: false,
 });
+
 
 
   
@@ -242,7 +245,13 @@ export default function SelectiveReadinessOverall() {
       <div className="pdf-modal-overlay">
         <div className="pdf-modal">
           <div className="pdf-toolbar">
-            <button onClick={handlePrint}>Save / Print PDF</button>
+            <button
+              onClick={handlePrint}
+              disabled={!printRef.current}
+            >
+              Save / Print PDF
+            </button>
+
             <button onClick={() => setShowPreview(false)}>Close</button>
           </div>
 
@@ -263,17 +272,20 @@ export default function SelectiveReadinessOverall() {
       </div>
     )}
 
-    <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
-    <PrintRoot
-      ref={printRef}
-      overall={overall}
-      balanceIndex={balanceIndex}
-      strengths={strengths}
-      improvements={improvements}
-      subjectChartData={subjectChartData}
-      SUBJECT_LABELS={SUBJECT_LABELS}
-    />
-  </div>
+    {overall && (
+      <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
+        <PrintRoot
+          ref={printRef}
+          overall={overall}
+          balanceIndex={balanceIndex}
+          strengths={strengths}
+          improvements={improvements}
+          subjectChartData={subjectChartData}
+          SUBJECT_LABELS={SUBJECT_LABELS}
+        />
+      </div>
+    )}
+
    {/* ✅ CLOSE overall-readiness-container */}
 
 );
