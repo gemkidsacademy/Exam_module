@@ -2,6 +2,7 @@
 import { forwardRef } from "react";
 
 const PrintRoot = forwardRef(function PrintRoot(props, ref) {
+  
   const {
     overall,
     balanceIndex,
@@ -9,6 +10,12 @@ const PrintRoot = forwardRef(function PrintRoot(props, ref) {
     improvements,
     SUBJECT_LABELS,
   } = props;
+  console.group("📄 PrintRoot render");
+  console.log("overall:", overall);
+  console.log("balanceIndex:", balanceIndex);
+  console.log("strengths:", strengths);
+  console.log("improvements:", improvements);
+  console.groupEnd();
 
   return (
     // ✅ REF IS ALWAYS ATTACHED TO A REAL DOM NODE
