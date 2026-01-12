@@ -19,6 +19,9 @@ export default function StudentReportShell() {
   const [selectedAttemptDates, setSelectedAttemptDates] = useState([]);
   const [pendingAttemptDate, setPendingAttemptDate] = useState("");
 
+  const [shouldGenerate, setShouldGenerate] = useState(false);
+
+
   const MOCK_ATTEMPT_DATES = {
     S001: ["2024-01-05", "2024-01-20", "2024-02-10", "2024-03-01"],
     S002: ["2024-01-12", "2024-02-18"],
@@ -179,28 +182,51 @@ export default function StudentReportShell() {
 
   {/* ACTION */}
   <div className="filters-right">
-    <button
-      className="primary-btn"
-      disabled={
-        (reportType === "student" && !studentId) ||
-        (reportType === "class" && (!className || !classDay)) ||
-        (reportType === "cumulative" &&
-          (!studentId || selectedAttemptDates.length === 0))
-      }
-      onClick={() => setShowPDF(true)}
-    >
-      Preview PDF
-    </button>
-    <span className="action-hint">Generate printable report</span>
-  </div>
+  <button
+    className="secondary-btn"
+    onClick={() => setShouldGenerate(true)}
+  >
+    Generate
+  </button>
+
+  <button
+    className="primary-btn"
+    disabled={!shouldGenerate}
+    onClick={() => setShowPDF(true)}
+  >
+    Preview PDF
+  </button>
+</div>
+
 </div>
 
 
       {/* ================= REPORT CONTENT ================= */}
 
-      {reportType === "student" && studentId && (
-        <StudentCurrentExamReport studentId={studentId} />
-      )}
+      {shouldGenerate && reportType === "student" && studentId && (
+  <StudentCurrentExamReport studentId={studentId} />
+)}
+
+{shouldGenerate && reportType === "class" && className && classDay && (
+  <ClassReportMock
+    className={className}
+    classDay={classDay}
+    exam={exam}
+    date={date}
+  />
+)}
+
+{shouldGenerate &&
+  reportType === "cumulative" &&
+  studentId &&
+  selectedAttemptDates.length > 0 && (
+    <CumulativeReportMock
+      studentId={studentId}
+      exam={exam}
+      attemptDates={selectedAttemptDates}
+    />
+)}
+
 
       {reportType === "class" && className && classDay && (
         <ClassReportMock
