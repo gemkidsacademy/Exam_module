@@ -26,9 +26,11 @@ export default function SelectiveReadinessOverall() {
   const [showPreview, setShowPreview] = useState(false);
   const printRef = useRef();
   const handlePrint = useReactToPrint({
-    content: () => printRef.current,
-    documentTitle: "Selective_Readiness_Report",
-  });
+  content: () => printRef.current,
+  documentTitle: "Selective_Readiness_Report",
+});
+
+
   
   const SUBJECT_LABELS = {
     reading: "Reading",
@@ -261,25 +263,18 @@ export default function SelectiveReadinessOverall() {
       </div>
     )}
 
-    {/* ================= PRINT ROOT (HIDDEN) ================= */}
-    {overall && (
-      <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
-        <PrintRoot
-          ref={printRef}
-          overall={overall}
-          balanceIndex={balanceIndex}
-          strengths={strengths}
-          improvements={improvements}
-          subjectChartData={subjectChartData}
-          SUBJECT_LABELS={SUBJECT_LABELS}
-        />
-      </div>
-    )}
+    <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
+    <PrintRoot
+      ref={printRef}
+      overall={overall}
+      balanceIndex={balanceIndex}
+      strengths={strengths}
+      improvements={improvements}
+      subjectChartData={subjectChartData}
+      SUBJECT_LABELS={SUBJECT_LABELS}
+    />
   </div>
+   {/* ✅ CLOSE overall-readiness-container */}
+
 );
-
-
-
-
-
 }
