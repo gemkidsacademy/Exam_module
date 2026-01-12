@@ -401,30 +401,20 @@
   display: none !important;
 }
 
+/* Hide on screen */
+.print-only {
+  display: none;
+}
+
+/* Print */
 @media print {
-  /* Hide everything */
-  body,
-  body * {
-    visibility: hidden !important;
+  .print-only {
+    display: block;
   }
 
-  /* Hide modal explicitly */
+  /* hide modal only */
   .pdf-modal-overlay,
   .pdf-modal {
     display: none !important;
-  }
-
-  /* Show printable content */
-  .print-only,
-  .print-only * {
-    visibility: visible !important;
-  }
-
-  .print-only {
-    display: block !important;
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
-    width: 100% !important;
   }
 }
