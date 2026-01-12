@@ -385,30 +385,22 @@
 }
 
 /* PRINT ROOT */
-.pdf-print-root {
-  background: #ffffff;
-}
-/* ===========================
-   PRINT (react-to-print)
-=========================== */
-
-/* Keep printable content in DOM but off-screen */
+/* Keep printable content hidden on screen */
 .print-only {
-  position: absolute;
-  left: -9999px;
-  top: 0;
+  display: none;
 }
 
-/* Print overrides */
+/* Print rules */
 @media print {
-  /* Hide modal UI */
+  /* Hide modal + app UI */
   .pdf-modal-overlay,
-  .pdf-modal {
+  .pdf-modal,
+  .overall-readiness-container {
     display: none !important;
   }
 
-  /* Bring printable content into view */
+  /* Show printable content */
   .print-only {
-    position: static;
+    display: block !important;
   }
 }
