@@ -273,7 +273,7 @@ export default function SelectiveReadinessOverall() {
     )}
 
     {overall && (
-      <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
+      <div className="print-only">
         <PrintRoot
           ref={printRef}
           overall={overall}
@@ -284,6 +284,7 @@ export default function SelectiveReadinessOverall() {
           SUBJECT_LABELS={SUBJECT_LABELS}
         />
       </div>
+
     )}
     
    </div>
