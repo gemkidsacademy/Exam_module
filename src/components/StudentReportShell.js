@@ -47,6 +47,8 @@ export default function StudentReportShell() {
           setAvailableAttemptDates([]);
           setPendingAttemptDate("");
           setSelectedAttemptDates([]);
+          setShouldGenerate(false);
+
         }}
       >
         <option value="student">Per Student Report</option>
@@ -56,6 +58,7 @@ export default function StudentReportShell() {
     </div>
 
     {/* Student + Attempts */}
+
     {(reportType === "student" || reportType === "cumulative") && (
       <div className="filter-group wide">
         <label>Student</label>
@@ -66,6 +69,8 @@ export default function StudentReportShell() {
             setStudentId(student);
             setPendingAttemptDate("");
             setSelectedAttemptDates([]);
+            setShouldGenerate(false);
+
             setAvailableAttemptDates(
               student ? MOCK_ATTEMPT_DATES[student] || [] : []
             );
@@ -140,7 +145,10 @@ export default function StudentReportShell() {
         <label>Class</label>
         <select
           value={className}
-          onChange={e => setClassName(e.target.value)}
+          onChange={e => {
+            setClassName(e.target.value);
+            setShouldGenerate(false);
+          }}
         >
           <option value="">Select class</option>
           <option value="Class A">Class A</option>
@@ -150,8 +158,12 @@ export default function StudentReportShell() {
 
         <select
           value={classDay}
-          onChange={e => setClassDay(e.target.value)}
+          onChange={e => {
+            setClassDay(e.target.value);
+            setShouldGenerate(false);
+          }}
         >
+
           <option value="">Select day</option>
           <option value="Monday">Monday</option>
           <option value="Wednesday">Wednesday</option>
@@ -183,11 +195,18 @@ export default function StudentReportShell() {
   {/* ACTION */}
   <div className="filters-right">
   <button
-    className="secondary-btn"
-    onClick={() => setShouldGenerate(true)}
-  >
-    Generate
-  </button>
+  className="secondary-btn"
+  disabled={
+    (reportType === "student" && !studentId) ||
+    (reportType === "class" && (!className || !classDay)) ||
+    (reportType === "cumulative" &&
+      (!studentId || selectedAttemptDates.length === 0))
+  }
+  onClick={() => setShouldGenerate(true)}
+>
+  Generate
+</button>
+
 
   <button
     className="primary-btn"
@@ -203,17 +222,23 @@ export default function StudentReportShell() {
 
       {/* ================= REPORT CONTENT ================= */}
 
-      {shouldGenerate && reportType === "student" && studentId && (
-  <StudentCurrentExamReport studentId={studentId} />
+
+{shouldGenerate &&
+  reportType === "student" &&
+  studentId && (
+    <StudentCurrentExamReport studentId={studentId} />
 )}
 
-{shouldGenerate && reportType === "class" && className && classDay && (
-  <ClassReportMock
-    className={className}
-    classDay={classDay}
-    exam={exam}
-    date={date}
-  />
+{shouldGenerate &&
+  reportType === "class" &&
+  className &&
+  classDay && (
+    <ClassReportMock
+      className={className}
+      classDay={classDay}
+      exam={exam}
+      date={date}
+    />
 )}
 
 {shouldGenerate &&
@@ -226,53 +251,35 @@ export default function StudentReportShell() {
       attemptDates={selectedAttemptDates}
     />
 )}
+{/* ================= PDF PREVIEW ================= */}
 
+{showPDF && (
+  <PDFPreviewMock onClose={() => setShowPDF(false)}>
+    {reportType === "student" && studentId && (
+      <StudentCurrentExamReport studentId={studentId} />
+    )}
 
-      {reportType === "class" && className && classDay && (
-        <ClassReportMock
-          className={className}
-          classDay={classDay}
+    {reportType === "class" && className && classDay && (
+      <ClassReportMock
+        className={className}
+        classDay={classDay}
+        exam={exam}
+        date={date}
+      />
+    )}
+
+    {reportType === "cumulative" &&
+      studentId &&
+      selectedAttemptDates.length > 0 && (
+        <CumulativeReportMock
+          studentId={studentId}
           exam={exam}
-          date={date}
+          attemptDates={selectedAttemptDates}
         />
       )}
+  </PDFPreviewMock>
+)}
 
-      {reportType === "cumulative" &&
-        studentId &&
-        selectedAttemptDates.length > 0 && (
-          <CumulativeReportMock
-            studentId={studentId}
-            exam={exam}
-            attemptDates={selectedAttemptDates}
-          />
-        )}
-
-      {showPDF && (
-        <PDFPreviewMock onClose={() => setShowPDF(false)}>
-          {reportType === "student" && studentId && (
-            <StudentCurrentExamReport studentId={studentId} />
-          )}
-
-          {reportType === "class" && className && classDay && (
-            <ClassReportMock
-              className={className}
-              classDay={classDay}
-              exam={exam}
-              date={date}
-            />
-          )}
-
-          {reportType === "cumulative" &&
-            studentId &&
-            selectedAttemptDates.length > 0 && (
-              <CumulativeReportMock
-                studentId={studentId}
-                exam={exam}
-                attemptDates={selectedAttemptDates}
-              />
-            )}
-        </PDFPreviewMock>
-      )}
     </div>
   );
 }
