@@ -388,33 +388,27 @@
 .pdf-print-root {
   background: #ffffff;
 }
-/* Hide printable content on screen */
-.print-only {
-  display: none;
-}
-
 /* ===========================
-   PRINT OVERRIDE (FINAL)
+   PRINT (react-to-print)
 =========================== */
 
+/* Keep printable content in DOM but off-screen */
 .print-only {
-  display: none !important;
+  position: absolute;
+  left: -9999px;
+  top: 0;
 }
 
-/* Hide on screen */
-.print-only {
-  display: none;
-}
-
-/* Print */
+/* Print overrides */
 @media print {
-  .print-only {
-    display: block;
-  }
-
-  /* hide modal only */
+  /* Hide modal UI */
   .pdf-modal-overlay,
   .pdf-modal {
     display: none !important;
+  }
+
+  /* Bring printable content into view */
+  .print-only {
+    position: static;
   }
 }
