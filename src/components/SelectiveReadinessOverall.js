@@ -47,6 +47,8 @@ export default function SelectiveReadinessOverall() {
   const normalizeScore = (subject, value) =>
     subject === "writing" ? Math.round((value / 20) * 100) : value;
 
+  
+
   /* ============================
      Load students
   ============================ */
@@ -344,7 +346,14 @@ export default function SelectiveReadinessOverall() {
         <div className="pdf-modal">
 
           <div className="pdf-toolbar">
-            <button onClick={handlePrint}>Save / Print PDF</button>
+            <button onClick={() => {
+              if (printRef.current) {
+                handlePrint();
+              }
+            }}>
+              Save / Print PDF
+            </button>
+
             <button onClick={() => setShowPreview(false)}>Close</button>
           </div>
 
