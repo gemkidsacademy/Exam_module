@@ -285,8 +285,7 @@ export default function SelectiveReadinessOverall() {
         />
       </div>
     )}
-
-   {/* ✅ CLOSE overall-readiness-container */}
-
+    
+   </div>
 );
 }
