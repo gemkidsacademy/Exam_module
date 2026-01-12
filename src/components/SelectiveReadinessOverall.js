@@ -33,6 +33,7 @@ export default function SelectiveReadinessOverall() {
 
 
 
+
   
   const SUBJECT_LABELS = {
     reading: "Reading",
@@ -244,10 +245,15 @@ export default function SelectiveReadinessOverall() {
       <div className="pdf-modal-overlay">
         <div className="pdf-modal">
           <div className="pdf-toolbar">
-            <button onClick={handlePrint}>
+            <button
+  onClick={() => {
+    console.log("PRINT NODE:", printRef.current);
+    handlePrint();
+  }}
+>
+  Save / Print PDF
+</button>
 
-              Save / Print PDF
-            </button>
 
             <button onClick={() => setShowPreview(false)}>Close</button>
           </div>
