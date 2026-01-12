@@ -1,22 +1,14 @@
-// PrintRoot.js
+// PrintRoot.jsx
 import { forwardRef } from "react";
 
 const PrintRoot = forwardRef(
-  (
-    {
-      overall,
-      balanceIndex,
-      strengths,
-      improvements,
-      SUBJECT_LABELS
-    },
-    ref
-  ) => {
+  ({ overall, balanceIndex, strengths, improvements, SUBJECT_LABELS }, ref) => {
     return (
       <div ref={ref} className="pdf-print-root">
-        {overall ? (
+        {!overall ? (
+          <div style={{ minHeight: "1px" }} />
+        ) : (
           <div className="overall-summary">
-
             {/* SCORE CARDS */}
             <div className="score-row">
               <div className="score-box">
@@ -49,7 +41,7 @@ const PrintRoot = forwardRef(
               </p>
               <p>
                 <strong>Needs Improvement:</strong>{" "}
-                {improvements.length ? improvements.join(", ") : "None identified"}
+                {improvements.length ? improvements.join(", ") : "None"}
               </p>
             </div>
 
@@ -63,26 +55,19 @@ const PrintRoot = forwardRef(
                 </tr>
               </thead>
               <tbody>
-                {Object.entries(overall.components).map(([key, value]) => (
-                  <tr key={key}>
-                    <td>{SUBJECT_LABELS[key]}</td>
-                    <td>{value}</td>
+                {Object.entries(overall.components).map(([k, v]) => (
+                  <tr key={k}>
+                    <td>{SUBJECT_LABELS[k]}</td>
+                    <td>{v}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
 
-            {/* FOOTNOTE */}
             <p className="explanation">
-              Overall Selective Readiness is calculated as an equal-weight average
-              of Reading, Mathematical Reasoning, Thinking Skills, and Writing.
               Results are advisory only.
             </p>
-
           </div>
-        ) : (
-          // IMPORTANT: ref must still exist
-          <div style={{ minHeight: "1px" }} />
         )}
       </div>
     );
