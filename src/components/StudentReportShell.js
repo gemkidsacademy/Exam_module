@@ -80,6 +80,7 @@ export default function StudentReportShell() {
             {/* -------- Attempt Dates (Cumulative only) -------- */}
             {reportType === "cumulative" && (
   <>
+    <div className="attempt-group">          
     <div className="attempt-selector">
       <select
         value={pendingAttemptDate}
@@ -134,6 +135,7 @@ export default function StudentReportShell() {
 )}
 </div> 
 )}
+</div>
 
 
   
