@@ -1,277 +1,314 @@
-import React, { useState, useEffect } from "react";
-
-import "./QuizSetup.css";
-
-export default function QuizSetup_reading() {
-  const [quiz, setQuiz] = useState({
-    className: "selective",
-    subject: "reading_comprehension",  // canonical API key
-    difficulty: "",
-    numTopics: 1,
-    topics: [],
-  });
+  import React, { useState, useEffect } from "react";
   
-  const [availableTopics, setAvailableTopics] = useState([]);
-  const getUsedTopicNames = (currentIndex) => {
-  return quiz.topics
-    .map((t, i) => (i !== currentIndex ? t.name : null))
-    .filter(Boolean);
-};
-
-
-  const [totalQuestions, setTotalQuestions] = useState(0);
-  const [loading, setLoading] = useState(false);
-
-  // ---------------------------------------
-  // HANDLE FORM INPUTS
-  // ---------------------------------------
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setQuiz((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const generateTopics = () => {
-    const num = parseInt(quiz.numTopics) || 1;
-
-    const topicsArray = Array.from({ length: num }, () => ({
-      topic_id: "",     // Admin will select from dropdown later
-      name: "",
-      num_questions: 0,
-    }));
-
-    setQuiz((prev) => ({ ...prev, topics: topicsArray }));
-    setTotalQuestions(0);
-  };
-
-  const handleTopicSelect = (index, value) => {
-    setQuiz((prev) => {
-      const topics = [...prev.topics];
-      topics[index].name = value;
-      return { ...prev, topics };
+  import "./QuizSetup.css";
+  
+  export default function QuizSetup_reading() {
+    const [quiz, setQuiz] = useState({
+      className: "selective",
+      subject: "reading_comprehension",  // canonical API key
+      difficulty: "",
+      numTopics: 1,
+      topics: [],
     });
+    const FIXED_TOPIC_QUESTION_RULES = {
+      "Comparative Analysis": 10,
+      "Main Idea and Summary": 6,
+      "Gapped Text": 6,
+    };
+    const [availableTopics, setAvailableTopics] = useState([]);
+    const getUsedTopicNames = (currentIndex) => {
+    return quiz.topics
+      .map((t, i) => (i !== currentIndex ? t.name : null))
+      .filter(Boolean);
   };
-
-
-  const handleTopicTotalChange = (index, value) => {
-    const numValue = Number(value) || 0;
-
+  
+  
+    const [totalQuestions, setTotalQuestions] = useState(0);
+    const [loading, setLoading] = useState(false);
+  
+    // ---------------------------------------
+    // HANDLE FORM INPUTS
+    // ---------------------------------------
+    const handleInputChange = (e) => {
+      const { name, value } = e.target;
+      setQuiz((prev) => ({ ...prev, [name]: value }));
+    };
+  
+    const generateTopics = () => {
+      const num = parseInt(quiz.numTopics) || 1;
+  
+      const topicsArray = Array.from({ length: num }, () => ({
+        topic_id: "",     // Admin will select from dropdown later
+        name: "",
+        num_questions: 0,
+      }));
+  
+      setQuiz((prev) => ({ ...prev, topics: topicsArray }));
+      setTotalQuestions(0);
+    };
+  
+    const handleTopicSelect = (index, value) => {
     setQuiz((prev) => {
       const topics = [...prev.topics];
-      topics[index].num_questions = numValue;
-
+  
+      topics[index].name = value;
+  
+      // 🔒 Apply fixed-question rules if present
+      if (FIXED_TOPIC_QUESTION_RULES[value] !== undefined) {
+        topics[index].num_questions = FIXED_TOPIC_QUESTION_RULES[value];
+      }
+  
+      // Recalculate global total
       const globalTotal = topics.reduce(
         (sum, t) => sum + (Number(t.num_questions) || 0),
         0
       );
-
+  
       setTotalQuestions(globalTotal);
-
+  
       return { ...prev, topics };
     });
   };
-  useEffect(() => {
-  // Do not fetch until difficulty is selected
-  if (!quiz.difficulty) {
-    setAvailableTopics([]);
-    return;
-  }
-
-  const fetchReadingTopics = async () => {
-    try {
-      const params = new URLSearchParams({
-        difficulty: quiz.difficulty,
+  
+  
+    const handleTopicTotalChange = (index, value) => {
+      const numValue = Number(value) || 0;
+  
+      setQuiz((prev) => {
+        const topics = [...prev.topics];
+        topics[index].num_questions = numValue;
+  
+        const globalTotal = topics.reduce(
+          (sum, t) => sum + (Number(t.num_questions) || 0),
+          0
+        );
+  
+        setTotalQuestions(globalTotal);
+  
+        return { ...prev, topics };
       });
-
-
-      const res = await fetch(
-        `https://web-production-481a5.up.railway.app/api/reading/topics?${params.toString()}`
-      );
-
-      if (!res.ok) {
-        throw new Error("Failed to load reading topics");
-      }
-
-      const data = await res.json();
-      setAvailableTopics(data);
-    } catch (err) {
-      console.error("Failed to fetch reading topics", err);
-      setAvailableTopics([]);
-    }
-  };
-
-  fetchReadingTopics();
-}, [quiz.className, quiz.difficulty]);
-
-
-  // ---------------------------------------
-  // SUBMIT TO BACKEND
-  // ---------------------------------------
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!quiz.className || !quiz.subject || !quiz.difficulty) {
-      alert("Please select class, subject, and difficulty.");
-      return;
-    }
-
-    if (quiz.topics.length === 0) {
-      alert("Please generate at least one topic.");
-      return;
-    }
-
-    if (totalQuestions > 40) {
-      alert("Total questions cannot exceed 40.");
-      return;
-    }
-
-    const payload = {
-      class_name: quiz.className.trim(),
-      subject: quiz.subject,
-      difficulty: quiz.difficulty,
-      topics: quiz.topics.map((t) => ({
-        name: t.name.trim(),
-        num_questions: Number(t.num_questions),
-      })),
     };
-
-    try {
-      setLoading(true);
-
-      const response = await fetch("https://web-production-481a5.up.railway.app/api/admin/create-reading-config", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-      setLoading(false);
-
-      if (!response.ok) {
-        alert("Error: " + data.detail);
+    useEffect(() => {
+    // Do not fetch until difficulty is selected
+    if (!quiz.difficulty) {
+      setAvailableTopics([]);
+      return;
+    }
+  
+    const fetchReadingTopics = async () => {
+      try {
+        const params = new URLSearchParams({
+          difficulty: quiz.difficulty,
+        });
+  
+  
+        const res = await fetch(
+          `https://web-production-481a5.up.railway.app/api/reading/topics?${params.toString()}`
+        );
+  
+        if (!res.ok) {
+          throw new Error("Failed to load reading topics");
+        }
+  
+        const data = await res.json();
+        setAvailableTopics(data);
+      } catch (err) {
+        console.error("Failed to fetch reading topics", err);
+        setAvailableTopics([]);
+      }
+    };
+  
+    fetchReadingTopics();
+  }, [quiz.className, quiz.difficulty]);
+  
+  
+    // ---------------------------------------
+    // SUBMIT TO BACKEND
+    // ---------------------------------------
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+  
+      if (!quiz.className || !quiz.subject || !quiz.difficulty) {
+        alert("Please select class, subject, and difficulty.");
         return;
       }
+  
+      if (quiz.topics.length === 0) {
+        alert("Please generate at least one topic.");
+        return;
+      }
+  
+      if (totalQuestions < 30 || totalQuestions > 38) {
+         alert(
+          `Reading exam must contain between 30 and 38 questions. Currently selected: ${totalQuestions}.`
+        );
+        return;
+      }
+  
+      const payload = {
+        class_name: quiz.className.trim(),
+        subject: quiz.subject,
+        difficulty: quiz.difficulty,
+        topics: quiz.topics.map((t) => ({
+          name: t.name.trim(),
+          num_questions: Number(t.num_questions),
+        })),
+      };
+  
+      try {
+        setLoading(true);
+  
+        const response = await fetch("https://web-production-481a5.up.railway.app/api/admin/create-reading-config", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+  
+        const data = await response.json();
+        setLoading(false);
+  
+        if (!response.ok) {
+          alert("Error: " + data.detail);
+          return;
+        }
+  
+        alert(
+          `Reading Exam Created!\nConfig ID: ${data.config_id}\nCreated At: ${data.created_at}`
+        );
+  
+      } catch (err) {
+        setLoading(false);
+        console.error(err);
+        alert("Failed to create exam. Check console for details.");
+      }
+    };
+  
+    // ---------------------------------------
+    // RENDER
+    // ---------------------------------------
+    return (
+      <div className="quiz-setup-container">
+        <form onSubmit={handleSubmit}>
+          
+          {/* CLASS */}
+          <label>Class:</label>
+          <input
+            type="text"
+            value="Selective"
+            readOnly
+            style={{
+              backgroundColor: "#f3f3f3",
+              cursor: "not-allowed"
+            }}
+          />
+          {/* SUBJECT */}
+          <label>Subject:</label>
+          <input
+            type="text"
+            value="Reading Comprehension"
+            readOnly
+            style={{ backgroundColor: "#f3f3f3", cursor: "not-allowed" }}
+          />
+  
+          {/* DIFFICULTY */}
+          <label>Difficulty Level:</label>
+          <select
+            name="difficulty"
+            value={quiz.difficulty}
+            onChange={handleInputChange}
+            required
+          >
+            <option value="">Select Difficulty</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+  
+          {/* NUMBER OF TOPICS */}
+          <label>Number of Topics:</label>
+          <input
+            type="number"
+            name="numTopics"
+            min="1"
+            value={quiz.numTopics}
+            onChange={handleInputChange}
+          />
+  
+          <button type="button" onClick={generateTopics}>
+            Generate Topics
+          </button>
+  
+          {/* TOPIC CARDS */}
+          <div className="topics-container">
+            {quiz.topics.map((topic, index) => (
+              <div className="topic" key={index}>
+                <h4>Topic {index + 1}</h4>
+  
+                <label>Topic Name:</label>
+                <select
+                  value={topic.name}
+                  onChange={(e) =>
+                    handleTopicSelect(index, e.target.value)
+                  }
+                  required
+                >
+                  <option value="">Select Topic</option>
+                  {availableTopics
+                  .filter(
+                    (t) => !getUsedTopicNames(index).includes(t.name)
+                  )
+                  .map((t) => (
+                    <option key={t.name} value={t.name}>
+                      {t.name}
+                    </option>
+                  ))}
+  
+                </select>
+  
+                <label>Total Questions for this Topic:</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={topic.num_questions}
+                  onChange={(e) =>
+                    handleTopicTotalChange(index, e.target.value)
+                  }
+                  disabled={FIXED_TOPIC_QUESTION_RULES[topic.name] !== undefined}
+                  style={
+                    FIXED_TOPIC_QUESTION_RULES[topic.name] !== undefined
+                      ? { backgroundColor: "#f3f3f3", cursor: "not-allowed" }
+                      : {}
+                  }
+                  required
+                />
+  
+              </div>
+            ))}
+          </div>
+  
+          {/* TOTAL */}
+          <div className="total-section">
+            <h3>Total Questions: {totalQuestions}</h3>
+            {(totalQuestions < 30 || totalQuestions > 38) && (
+              <div className="warning">
+                Total must be between 30 and 38 questions.
+              </div>
+            )}
 
-      alert(
-        `Reading Exam Created!\nConfig ID: ${data.config_id}\nCreated At: ${data.created_at}`
-      );
-
-    } catch (err) {
-      setLoading(false);
-      console.error(err);
-      alert("Failed to create exam. Check console for details.");
-    }
-  };
-
-  // ---------------------------------------
-  // RENDER
-  // ---------------------------------------
-  return (
-    <div className="quiz-setup-container">
-      <form onSubmit={handleSubmit}>
-        
-        {/* CLASS */}
-        <label>Class:</label>
-        <input
-          type="text"
-          value="Selective"
-          readOnly
-          style={{
-            backgroundColor: "#f3f3f3",
-            cursor: "not-allowed"
-          }}
-        />
-        {/* SUBJECT */}
-        <label>Subject:</label>
-        <input
-          type="text"
-          value="Reading Comprehension"
-          readOnly
-          style={{ backgroundColor: "#f3f3f3", cursor: "not-allowed" }}
-        />
-
-        {/* DIFFICULTY */}
-        <label>Difficulty Level:</label>
-        <select
-          name="difficulty"
-          value={quiz.difficulty}
-          onChange={handleInputChange}
-          required
-        >
-          <option value="">Select Difficulty</option>
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-        </select>
-
-        {/* NUMBER OF TOPICS */}
-        <label>Number of Topics:</label>
-        <input
-          type="number"
-          name="numTopics"
-          min="1"
-          value={quiz.numTopics}
-          onChange={handleInputChange}
-        />
-
-        <button type="button" onClick={generateTopics}>
-          Generate Topics
-        </button>
-
-        {/* TOPIC CARDS */}
-        <div className="topics-container">
-          {quiz.topics.map((topic, index) => (
-            <div className="topic" key={index}>
-              <h4>Topic {index + 1}</h4>
-
-              <label>Topic Name:</label>
-              <select
-                value={topic.name}
-                onChange={(e) =>
-                  handleTopicSelect(index, e.target.value)
-                }
-                required
-              >
-                <option value="">Select Topic</option>
-                {availableTopics
-                .filter(
-                  (t) => !getUsedTopicNames(index).includes(t.name)
-                )
-                .map((t) => (
-                  <option key={t.name} value={t.name}>
-                    {t.name}
-                  </option>
-                ))}
-
-              </select>
-
-              <label>Total Questions for this Topic:</label>
-              <input
-                type="number"
-                min="0"
-                value={topic.num_questions}
-                onChange={(e) =>
-                  handleTopicTotalChange(index, e.target.value)
-                }
-                required
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* TOTAL */}
-        <div className="total-section">
-          <h3>Total Questions: {totalQuestions}</h3>
-          {totalQuestions > 40 && (
-            <div className="warning">Total cannot exceed 40!</div>
-          )}
-        </div>
-
-        <button type="submit" disabled={loading || totalQuestions > 40}>
-          {loading ? "Saving..." : "Create Reading Exam"}
-        </button>
-      </form>
-    </div>
-  );
-}
+          </div>
+  
+          <button
+            type="submit"
+            disabled={
+              loading || totalQuestions < 30 || totalQuestions > 38
+            }
+          >
+  
+            {loading ? "Saving..." : "Create Reading Exam"}
+          </button>
+        </form>
+      </div>
+    );
+  }
