@@ -14,6 +14,9 @@ export default function ExamPageThinkingSkills({
     onExamFinish
   }) {
   const studentId = sessionStorage.getItem("student_id");
+  const IMAGE_BASE =
+  "https://storage.googleapis.com/exammoduleimages/";
+
 
   const hasSubmittedRef = useRef(false);
   const prevIndexRef = useRef(null);
@@ -275,15 +278,20 @@ export default function ExamPageThinkingSkills({
     }
 
     if (block.type === "image") {
+      const src = block.src.startsWith("http")
+        ? block.src
+        : IMAGE_BASE + block.src;
+    
       return (
         <img
           key={idx}
-          src={block.src}
+          src={src}
           alt={`Question visual ${idx + 1}`}
           className="question-image"
         />
       );
     }
+
 
     return null;
   })}
