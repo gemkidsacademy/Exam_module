@@ -124,8 +124,8 @@
         return;
       }
   
-      if (totalQuestions > 40) {
-        alert("Total questions cannot exceed 40.");
+      if (totalQuestions !== 35) {
+        alert("Total questions must be 35.");
         return;
       }
   
