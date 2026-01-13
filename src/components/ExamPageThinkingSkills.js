@@ -263,22 +263,31 @@ export default function ExamPageThinkingSkills({
       {/* QUESTION CARD */}
 <div className="question-card">
 
-  {/* ✅ IMAGES */}
-  {currentQ.images && currentQ.images.length > 0 && (
-    <div className="question-images">
-      {currentQ.images.map((url, idx) => (
+  {/* QUESTION BLOCKS */}
+<div className="question-blocks">
+  {currentQ.blocks?.map((block, idx) => {
+    if (block.type === "text") {
+      return (
+        <p key={idx} className="question-text">
+          {block.content}
+        </p>
+      );
+    }
+
+    if (block.type === "image") {
+      return (
         <img
           key={idx}
-          src={url}
+          src={block.src}
           alt={`Question visual ${idx + 1}`}
           className="question-image"
         />
-      ))}
-    </div>
-  )}
+      );
+    }
 
-  {/* QUESTION TEXT */}
-  <p className="question-text">{currentQ.question}</p>
+    return null;
+  })}
+</div>
 
   {/* OPTIONS */}
   {normalizedOptions.map((opt, i) => {
