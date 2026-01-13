@@ -261,27 +261,43 @@ export default function ExamPageThinkingSkills({
       </div>
 
       {/* QUESTION CARD */}
-      <div className="question-card">
-        <p className="question-text">{currentQ.question}</p>
+<div className="question-card">
 
-        {normalizedOptions.map((opt, i) => {
-          const optionKey = OPTION_KEYS[i]; // ✅ ALWAYS A, B, C, D
-        
-          return (
-            <button
-              key={i}
-              onClick={() => handleAnswer(optionKey)}
-              className={`option-btn ${
-                answers[currentQ.q_id] === optionKey ? "selected" : ""
-              }`}
-            >
-              <strong>{optionKey})</strong>{" "}
-              {opt.replace(/^[A-D]\)\s*/, "")}
-            </button>
-          );
-        })}
+  {/* ✅ IMAGES */}
+  {currentQ.images && currentQ.images.length > 0 && (
+    <div className="question-images">
+      {currentQ.images.map((url, idx) => (
+        <img
+          key={idx}
+          src={url}
+          alt={`Question visual ${idx + 1}`}
+          className="question-image"
+        />
+      ))}
+    </div>
+  )}
 
-      </div>
+  {/* QUESTION TEXT */}
+  <p className="question-text">{currentQ.question}</p>
+
+  {/* OPTIONS */}
+  {normalizedOptions.map((opt, i) => {
+    const optionKey = OPTION_KEYS[i];
+    return (
+      <button
+        key={i}
+        onClick={() => handleAnswer(optionKey)}
+        className={`option-btn ${
+          answers[currentQ.q_id] === optionKey ? "selected" : ""
+        }`}
+      >
+        <strong>{optionKey})</strong>{" "}
+        {opt.replace(/^[A-D]\)\s*/, "")}
+      </button>
+    );
+  })}
+
+</div>
 
       {/* NAVIGATION */}
       <div className="nav-buttons">
