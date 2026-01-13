@@ -134,7 +134,7 @@ export default function QuizSetup() {
     }
 
     if (totalQuestions !== 40) {
-      alert("Total questions across all topics cannot exceed 40.");
+      alert("Total questions across all topics must be 40.");
       return;
     }
 
