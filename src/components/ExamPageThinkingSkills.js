@@ -278,9 +278,12 @@ export default function ExamPageThinkingSkills({
     }
 
     if (block.type === "image") {
-      const src = block.src.startsWith("http")
-        ? block.src
-        : IMAGE_BASE + block.src;
+      const cleanSrc = block.src?.trim();
+      if (!cleanSrc) return null;
+    
+      const src = cleanSrc.startsWith("http")
+        ? cleanSrc
+        : IMAGE_BASE + cleanSrc;
     
       return (
         <img
@@ -288,9 +291,11 @@ export default function ExamPageThinkingSkills({
           src={src}
           alt={`Question visual ${idx + 1}`}
           className="question-image"
+          loading="lazy"
         />
       );
     }
+
 
 
     return null;
