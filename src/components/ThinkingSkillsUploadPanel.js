@@ -29,8 +29,8 @@ export default function ThinkingSkillsUploadPanel() {
         </>
       )}
 
-      {activeUpload === "standard" && <UploadWord_TS_Standard />}
-      {activeUpload === "image-options" && <UploadWord_TS_ImageOptions />}
+      {activeUpload === "standard" && <UploadWord />}
+      {activeUpload === "image-options" && <UploadWord2 />}
     </div>
   );
 }
