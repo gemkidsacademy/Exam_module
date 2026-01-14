@@ -23,7 +23,7 @@ export default function UploadWord2() {
     setUploading(true);
 
     try {
-      const res = await fetch("https://web-production-481a5.up.railway.app/upload-word", {
+      const res = await fetch("https://web-production-481a5.up.railway.app/upload-word(new endpoint please)", {
         method: "POST",
         body: formData,
       });
