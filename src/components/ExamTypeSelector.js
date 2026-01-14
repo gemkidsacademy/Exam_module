@@ -1,52 +1,54 @@
-import "./ExamTypeSelector.css";
+import { useState } from "react";
 
 import UploadWord from "./UploadWord";
+import UploadWord_ImageOptions from "./UploadWord_ImageOptions";
 import ReadingUploadPanel from "./ReadingUploadPanel";
 import UploadWord_writing from "./UploadWord_writing";
+import QuestionTypeSelector from "./QuestionTypeSelector";
 
 export default function ExamTypeSelector({ examType, onSelect }) {
-  // --------------------------------------
-  // Exam selection options
-  // --------------------------------------
+  const [questionType, setQuestionType] = useState(null);
+
   const examOptions = [
     { label: "Thinking Skills Exam", value: "thinkingskills" },
     { label: "Mathematical Reasoning", value: "mathematical-reasoning" },
     { label: "Reading Exam", value: "reading" },
     { label: "Writing Exam", value: "writing" },
-    { label: "Foundational", value: "foundational" }, // ✅ NEW
+    { label: "Foundational", value: "foundational" },
   ];
 
-  // --------------------------------------
-  // Render selected exam panel
-  // --------------------------------------
-  const renderExamPanel = () => {
-    switch (examType) {
-      case "thinkingskills":
-      case "mathematical-reasoning":
-      case "foundational": // ✅ NEW
-        return <UploadWord />;
+  const requiresQuestionType = [
+    "thinkingskills",
+    "mathematical-reasoning",
+    "foundational",
+  ].includes(examType);
 
-      case "reading":
-        return <ReadingUploadPanel />;
-
-      case "writing":
-        return <UploadWord_writing />;
-
-      default:
-        return null;
+  const renderUploadPanel = () => {
+    if (!requiresQuestionType) {
+      if (examType === "reading") return <ReadingUploadPanel />;
+      if (examType === "writing") return <UploadWord_writing />;
+      return null;
     }
+
+    if (!questionType) {
+      return <QuestionTypeSelector onSelect={setQuestionType} />;
+    }
+
+    if (questionType === "standard") {
+      return <UploadWord />;
+    }
+
+    if (questionType === "image-options") {
+      return <UploadWord_ImageOptions />;
+    }
+
+    return null;
   };
 
-  // --------------------------------------
-  // If an exam is selected, render its panel
-  // --------------------------------------
   if (examType) {
-    return renderExamPanel();
+    return renderUploadPanel();
   }
 
-  // --------------------------------------
-  // Render exam type selector buttons
-  // --------------------------------------
   return (
     <div className="exam-selector-container">
       <div className="exam-selector-grid">
