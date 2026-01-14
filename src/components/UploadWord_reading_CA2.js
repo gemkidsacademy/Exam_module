@@ -23,7 +23,7 @@ export default function UploadWord_reading_CA() {
     setUploading(true);
 
     try {
-      const res = await fetch("https://web-production-481a5.up.railway.app/upload-word-reading-comparative-ai", {
+      const res = await fetch("https://web-production-481a5.up.railway.app/upload-word-reading-comparative-ai(new end point please)", {
         method: "POST",
         body: formData,
       });
