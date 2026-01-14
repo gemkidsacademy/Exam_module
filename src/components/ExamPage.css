@@ -562,3 +562,8 @@
   position: relative;
   z-index: 2;
 }
+.option-image {
+  max-width: 100%;
+  height: auto;
+  margin-top: 8px;
+}
