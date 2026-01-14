@@ -3,6 +3,8 @@ import "./ExamTypeSelector.css";
 import UploadWord from "./UploadWord";
 import ReadingUploadPanel from "./ReadingUploadPanel";
 import UploadWord_writing from "./UploadWord_writing";
+import ThinkingSkillsUploadPanel from "./ThinkingSkillsUploadPanel";
+
 
 export default function ExamTypeSelector({ examType, onSelect }) {
   // --------------------------------------
@@ -21,10 +23,13 @@ export default function ExamTypeSelector({ examType, onSelect }) {
   // --------------------------------------
   const renderExamPanel = () => {
     switch (examType) {
-      case "thinkingskills":
+      
       case "mathematical-reasoning":
       case "foundational": // ✅ NEW
         return <UploadWord />;
+
+      case "thinkingskills":
+        return <ThinkingSkillsUploadPanel />;
 
       case "reading":
         return <ReadingUploadPanel />;
