@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./ThinkingSkillsUploadPanel.css";
 
-import UploadWord "./UploadWord";
+import UploadWord from "./UploadWord";
 import UploadWord2 from "./UploadWord2";
 
 export default function ThinkingSkillsUploadPanel() {
