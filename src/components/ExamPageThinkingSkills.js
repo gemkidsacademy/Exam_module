@@ -33,6 +33,8 @@ export default function ExamPageThinkingSkills({
 
   // ---------------- EXAM STATE ----------------
   const [questions, setQuestions] = useState([]);
+  
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
@@ -221,11 +223,8 @@ export default function ExamPageThinkingSkills({
   // ---------------- EXAM UI ----------------
   const currentQ = questions[currentIndex];
   if (!currentQ) return null;
-  const normalizedOptions = Array.isArray(currentQ.options)
-    ? currentQ.options
-    : Object.entries(currentQ.options || {}).map(
-        ([k, v]) => `${k}) ${v}`
-      );
+  const optionEntries = Object.entries(currentQ.options || {});
+
   return (
   <div className="exam-shell">
     <div className="exam-container">
@@ -303,21 +302,37 @@ export default function ExamPageThinkingSkills({
 </div>
 
   {/* OPTIONS */}
-  {normalizedOptions.map((opt, i) => {
-    const optionKey = OPTION_KEYS[i];
-    return (
-      <button
-        key={i}
-        onClick={() => handleAnswer(optionKey)}
-        className={`option-btn ${
-          answers[currentQ.q_id] === optionKey ? "selected" : ""
-        }`}
-      >
-        <strong>{optionKey})</strong>{" "}
-        {opt.replace(/^[A-D]\)\s*/, "")}
-      </button>
-    );
-  })}
+{optionEntries.map(([optionKey, optionValue]) => {
+  const isSelected = answers[currentQ.q_id] === optionKey;
+
+  return (
+    <button
+      key={optionKey}
+      onClick={() => handleAnswer(optionKey)}
+      className={`option-btn ${isSelected ? "selected" : ""}`}
+    >
+      <strong>{optionKey})</strong>
+
+      {/* TEXT OPTION */}
+      {optionValue.type === "text" && (
+        <span className="option-text">
+          {optionValue.content}
+        </span>
+      )}
+
+      {/* IMAGE OPTION */}
+      {optionValue.type === "image" && (
+        <img
+          src={optionValue.src}
+          alt={`Option ${optionKey}`}
+          className="option-image"
+          loading="lazy"
+        />
+      )}
+    </button>
+  );
+})}
+
 
 </div>
 
