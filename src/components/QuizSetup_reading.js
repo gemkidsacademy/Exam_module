@@ -138,12 +138,14 @@
         return;
       }
   
-      if (totalQuestions < 30 || totalQuestions > 38) {
-         alert(
-          `Reading exam must contain between 30 and 38 questions. Currently selected: ${totalQuestions}.`
-        );
-        return;
-      }
+      // TEMPORARILY DISABLED – question count restriction
+// if (totalQuestions < 30 || totalQuestions > 38) {
+//   alert(
+//     `Reading exam must contain between 30 and 38 questions. Currently selected: ${totalQuestions}.`
+//   );
+//   return;
+// }
+
   
       const payload = {
         class_name: quiz.className.trim(),
@@ -291,14 +293,16 @@
           {/* TOTAL */}
           <div className="total-section">
             <h3>Total Questions: {totalQuestions}</h3>
-            {(totalQuestions < 30 || totalQuestions > 38) && (
-              <div className="warning">
-                Total must be between 30 and 38 questions.
-              </div>
-            )}
+            {/* TEMPORARILY DISABLED – question count warning */}
+{/* {(totalQuestions < 30 || totalQuestions > 38) && (
+  <div className="warning">
+    Total must be between 30 and 38 questions.
+  </div>
+)} */}
+
 
           </div>
-  
+{/*
           <button
             type="submit"
             disabled={
@@ -308,6 +312,14 @@
   
             {loading ? "Saving..." : "Create Reading Exam"}
           </button>
+          */}
+        <button
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? "Saving..." : "Create Reading Exam"}
+        </button>
+
         </form>
       </div>
     );
