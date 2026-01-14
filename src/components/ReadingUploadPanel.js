@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import "./ReadingUploadPanel.css";
 import UploadWord_reading_GT from "./UploadWord_reading_GT";
-import UploadWord_reading_CA from "./UploadWord_reading_CA";
+import UploadWord_reading_CA from "./UploadWord_reading_CA";//handles 4 extracts
+import UploadWord_reading_CA2 from "./UploadWord_reading_CA2";// added to handle 2 extracts 
+
 import UploadWord_reading_MI from "./UploadWord_reading_MI";
 
 
@@ -32,14 +34,21 @@ export default function ReadingUploadPanel() {
             className="upload-btn comparative"
             onClick={() => setActiveUpload("comparative")}
           >
-            Upload Comparative Analysis Questions
+            Upload Comparative Analysis Questions ( 4 Extracts)
           </button>
+          <button
+            className="upload-btn comparative"
+            onClick={() => setActiveUpload("comparative2")}
+          >
+            Upload Comparative Analysis Questions ( 2 Extracts)
+          </button>    
         </>
       )}
 
       {activeUpload === "gapped" && <UploadWord_reading_GT />}
       {activeUpload === "comparative" && <UploadWord_reading_CA />}
       {activeUpload === "main-idea" && <UploadWord_reading_MI />}
+      {activeUpload === "comparative2" && <UploadWord_reading_CA2 />}
     </div>
   );
 }
