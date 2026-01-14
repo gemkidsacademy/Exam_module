@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./ThinkingSkillsUploadPanel.css";
 
-import UploadWord_TS_Standard from "./UploadWord_TS_Standard";
-import UploadWord_TS_ImageOptions from "./UploadWord_TS_ImageOptions";
+import UploadWord "./UploadWord";
+import UploadWord2 from "./UploadWord2";
 
 export default function ThinkingSkillsUploadPanel() {
   const [activeUpload, setActiveUpload] = useState(null);
