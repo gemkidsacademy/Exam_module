@@ -81,7 +81,7 @@ export default function ReadingComponent({
           ...q,
           topic: section.topic,
           answer_options: section.answer_options || {},
-          reading_material: section.reading_material || {}
+          section_ref: section
         }))
       );
       console.log("📘 Flattened questions count:", flatQuestions.length);
@@ -327,7 +327,8 @@ useEffect(() => {
   }
 
   const options = currentQuestion.answer_options;
-  const rm = currentQuestion.reading_material || {};
+  const rm = currentQuestion.section_ref?.reading_material || {};
+
   
 
   /* =============================
