@@ -265,19 +265,23 @@ export default function QuizSetup() {
               ) : (
                 <table>
                   <thead>
-                    <tr>
-                      <th>Topic</th>
-                      <th>Total Questions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {questionBank.map((row) => (
-                      <tr key={row.topic}>
-                        <td>{row.topic}</td>
-                        <td>{row.total_questions}</td>
+                      <tr>
+                        <th>Difficulty</th>
+                        <th>Topic</th>
+                        <th>Total Questions</th>
                       </tr>
-                    ))}
-                  </tbody>
+                    </thead>
+
+                  <tbody>
+                 {questionBank.map((row, idx) => (
+                   <tr key={`${row.difficulty}-${row.topic}-${idx}`}>
+                     <td>{row.difficulty}</td>
+                     <td>{row.topic}</td>
+                     <td>{row.total_questions}</td>
+                   </tr>
+                 ))}
+               </tbody>
+
                 </table>
               )}
             </div>
