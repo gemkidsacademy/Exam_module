@@ -11,10 +11,14 @@ export default function QuizSetup_reading() {
   });
 
   const FIXED_TOPIC_QUESTION_RULES = {
-    "Comparative Analysis": 10,
     "Main Idea and Summary": 6,
     "Gapped Text": 6,
   };
+  
+  const CHOICE_TOPIC_QUESTION_RULES = {
+    "Comparative Analysis": [8, 10],
+  };
+
 
   const [availableTopics, setAvailableTopics] = useState([]);
   const [totalQuestions, setTotalQuestions] = useState(0);
@@ -46,23 +50,30 @@ export default function QuizSetup_reading() {
   };
 
   const handleTopicSelect = (index, value) => {
-    setQuiz((prev) => {
-      const topics = [...prev.topics];
-      topics[index].name = value;
+  setQuiz((prev) => {
+    const topics = [...prev.topics];
+    topics[index].name = value;
 
-      if (FIXED_TOPIC_QUESTION_RULES[value] !== undefined) {
-        topics[index].num_questions = FIXED_TOPIC_QUESTION_RULES[value];
-      }
+    // Fixed topics → auto set
+    if (FIXED_TOPIC_QUESTION_RULES[value] !== undefined) {
+      topics[index].num_questions = FIXED_TOPIC_QUESTION_RULES[value];
+    }
 
-      const globalTotal = topics.reduce(
-        (sum, t) => sum + (Number(t.num_questions) || 0),
-        0
-      );
+    // Choice-based topics → default to first option
+    if (CHOICE_TOPIC_QUESTION_RULES[value]) {
+      topics[index].num_questions = CHOICE_TOPIC_QUESTION_RULES[value][0];
+    }
 
-      setTotalQuestions(globalTotal);
-      return { ...prev, topics };
-    });
-  };
+    const globalTotal = topics.reduce(
+      (sum, t) => sum + (Number(t.num_questions) || 0),
+      0
+    );
+
+    setTotalQuestions(globalTotal);
+    return { ...prev, topics };
+  });
+};
+
 
   const handleTopicTotalChange = (index, value) => {
     const numValue = Number(value) || 0;
@@ -241,18 +252,40 @@ export default function QuizSetup_reading() {
               </select>
 
               <label>Total Questions for this Topic:</label>
-              <input
-                type="number"
-                min="0"
-                value={topic.num_questions}
-                onChange={(e) =>
-                  handleTopicTotalChange(index, e.target.value)
-                }
-                disabled={
-                  FIXED_TOPIC_QUESTION_RULES[topic.name] !== undefined
-                }
-                required
-              />
+              
+              {/* Comparative Analysis → dropdown */}
+              {CHOICE_TOPIC_QUESTION_RULES[topic.name] ? (
+                <select
+                  value={topic.num_questions}
+                  onChange={(e) =>
+                    handleTopicTotalChange(index, e.target.value)
+                  }
+                >
+                  {CHOICE_TOPIC_QUESTION_RULES[topic.name].map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                /* Fixed or free numeric input */
+                <input
+                  type="number"
+                  min="0"
+                  value={topic.num_questions}
+                  onChange={(e) =>
+                    handleTopicTotalChange(index, e.target.value)
+                  }
+                  disabled={FIXED_TOPIC_QUESTION_RULES[topic.name] !== undefined}
+                  style={
+                    FIXED_TOPIC_QUESTION_RULES[topic.name] !== undefined
+                      ? { backgroundColor: "#f3f3f3", cursor: "not-allowed" }
+                      : {}
+                  }
+                  required
+                />
+              )}
+
             </div>
           ))}
         </div>
