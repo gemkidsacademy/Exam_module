@@ -4,6 +4,9 @@ import "./UploadPDF.css"; // You can rename this if you want
 export default function UploadWord_reading_CA() {
   const [wordFile, setWordFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
+
 
   const handleFileChange = (e) => {
     setWordFile(e.target.files[0]);
@@ -31,17 +34,20 @@ export default function UploadWord_reading_CA() {
       if (!res.ok) throw new Error("Upload failed");
 
       const data = await res.json();
-      alert(data.message || "Word document uploaded successfully!");
+      setResult(data);
+      setError(null);
       setWordFile(null);
     } catch (err) {
       console.error(err);
-      alert("Error uploading Word document.");
+      setError("Error uploading Word document.");
+      setResult(null);
     } finally {
       setUploading(false);
     }
   };
 
   return (
+  <>
     <div className="upload-pdf-container">
       <h2>Upload Word Document for Quiz Questions</h2>
 
@@ -63,5 +69,36 @@ export default function UploadWord_reading_CA() {
         Upload a Word document to populate quiz questions in the database.
       </p>
     </div>
-  );
+
+    {result && (
+      <div className={`upload-result ${result.status}`}>
+        <p><strong>{result.message}</strong></p>
+
+        <p>
+          🎉 Total saved exams:{" "}
+          <strong>{result.summary.total_exams_saved}</strong>
+        </p>
+
+        {result.status === "partial_success" && (
+          <p className="warning">
+            ⚠️ Some exam blocks were skipped due to validation errors.
+          </p>
+        )}
+
+        {result.saved_exam_ids?.length > 0 && (
+          <p>
+            Saved Exam IDs: {result.saved_exam_ids.join(", ")}
+          </p>
+        )}
+      </div>
+    )}
+
+    {error && (
+      <div className="upload-error">
+        ❌ {error}
+      </div>
+    )}
+  </>
+);
+
 }
