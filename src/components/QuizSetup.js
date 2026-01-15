@@ -50,23 +50,13 @@ export default function QuizSetup() {
     setQuiz((prev) => ({ ...prev, topics: topicsArray }));
     setTotalQuestions(0);
   };
+     
   const handleViewQuestionBank = async () => {
-  if (!quiz.className || !quiz.subject || !quiz.difficulty) {
-    alert("Please select class, subject, and difficulty first.");
-    return;
-  }
-
   try {
     setQbLoading(true);
 
-    const params = new URLSearchParams({
-      class_name: quiz.className,
-      subject: quiz.subject,
-      difficulty: quiz.difficulty,
-    });
-
     const res = await fetch(
-      `https://web-production-481a5.up.railway.app/api/admin/question-bank-thinking-skills?${params.toString()}`
+      "https://web-production-481a5.up.railway.app/api/admin/question-bank-thinking-skills"
     );
 
     if (!res.ok) {
@@ -83,6 +73,7 @@ export default function QuizSetup() {
     setQbLoading(false);
   }
 };
+
 
 
   const handleTopicChange = (index, field, value) => {
