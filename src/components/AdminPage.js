@@ -110,7 +110,7 @@ const AdminPanel = () => {
   const tabs = [
    { id: "database", label: "Exam Module User Management" },
    { id: "exam-type-selector", label: "Upload Questions Word Document" },
-   { id: "upload-image-folder", label: "Upload Exam Image Folder" },
+   { id: "upload-image-folder", label: "Exam Image Folder" },
    { id: "add-quiz", label: "Create Exam" },
    { id: "generate-exam", label: "Generate Exam" },
    { id: "student-exam-reports", label: "Student Exam Reports" },
