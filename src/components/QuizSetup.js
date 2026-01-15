@@ -9,6 +9,10 @@ import "./QuizSetup.css";
 
 export default function QuizSetup() {
   const [availableTopics, setAvailableTopics] = useState([]);
+  const [questionBank, setQuestionBank] = useState([]);
+  const [showQuestionBank, setShowQuestionBank] = useState(false);
+  const [qbLoading, setQbLoading] = useState(false);
+
   const getUsedTopicNames = (currentIndex) => {
   return quiz.topics
     .map((t, i) => (i !== currentIndex ? t.name : null))
@@ -46,6 +50,40 @@ export default function QuizSetup() {
     setQuiz((prev) => ({ ...prev, topics: topicsArray }));
     setTotalQuestions(0);
   };
+  const handleViewQuestionBank = async () => {
+  if (!quiz.className || !quiz.subject || !quiz.difficulty) {
+    alert("Please select class, subject, and difficulty first.");
+    return;
+  }
+
+  try {
+    setQbLoading(true);
+
+    const params = new URLSearchParams({
+      class_name: quiz.className,
+      subject: quiz.subject,
+      difficulty: quiz.difficulty,
+    });
+
+    const res = await fetch(
+      `https://web-production-481a5.up.railway.app/api/admin/question-bank-thinking-skills?${params.toString()}`
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to load question bank");
+    }
+
+    const data = await res.json();
+    setQuestionBank(data);
+    setShowQuestionBank(true);
+  } catch (err) {
+    console.error(err);
+    alert("Failed to fetch question bank data.");
+  } finally {
+    setQbLoading(false);
+  }
+};
+
 
   const handleTopicChange = (index, field, value) => {
     setQuiz((prev) => {
@@ -218,6 +256,42 @@ export default function QuizSetup() {
         <button type="button" onClick={generateTopics}>
           Generate Topics
         </button>
+        <button
+            type="button"
+            onClick={handleViewQuestionBank}
+            style={{ marginLeft: "10px" }}
+          >
+            View Question Bank
+       </button>
+       {showQuestionBank && (
+            <div className="question-bank">
+              <h3>Question Bank (Thinking Skills)</h3>
+          
+              {qbLoading ? (
+                <p>Loading...</p>
+              ) : questionBank.length === 0 ? (
+                <p>No questions found.</p>
+              ) : (
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Topic</th>
+                      <th>Total Questions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {questionBank.map((row) => (
+                      <tr key={row.topic}>
+                        <td>{row.topic}</td>
+                        <td>{row.total_questions}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
+
 
         <div className="topics-container">
           {quiz.topics.map((topic, index) => (
