@@ -114,3 +114,25 @@
     margin: 20px;
   }
 }
+.question-bank {
+  margin-top: 20px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  background: #fafafa;
+}
+
+.question-bank table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.question-bank th,
+.question-bank td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.question-bank th {
+  background: #f0f0f0;
+}
