@@ -29,7 +29,7 @@ export default function ExamTypeSelector({ examType, onSelect }) {
         return <UploadWord />;
 
       case "thinkingskills":
-        return <ThinkingSkillsUploadPanel />;
+        return <UploadWord />;
 
       case "reading":
         return <ReadingUploadPanel />;
