@@ -39,7 +39,16 @@ export default function UploadWordReadingCA() {
 
       const data = await res.json();
 
-      alert(`${data.summary.total_exams_saved} questions added successfully`);
+      const { total_exams_saved, total_exams_failed } = data.summary;
+
+      if (total_exams_failed > 0) {
+        alert(
+          `${total_exams_saved} exams added successfully. ` +
+          `${total_exams_failed} exam(s) were not added due to validation errors.`
+        );
+      } else {
+        alert(`${total_exams_saved} exams added successfully.`);
+      }
 
       setWordFile(null);
       setError(null);
