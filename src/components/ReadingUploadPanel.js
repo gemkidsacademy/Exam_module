@@ -34,14 +34,9 @@ export default function ReadingUploadPanel() {
             className="upload-btn comparative"
             onClick={() => setActiveUpload("comparative")}
           >
-            Upload Comparative Analysis Questions ( 4 Extracts)
+            Upload Comparative Analysis Questions 
           </button>
-          <button
-            className="upload-btn comparative"
-            onClick={() => setActiveUpload("comparative2")}
-          >
-            Upload Comparative Analysis Questions ( 2 Extracts)
-          </button>    
+              
         </>
       )}
 
