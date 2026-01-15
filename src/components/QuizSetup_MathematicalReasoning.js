@@ -4,7 +4,10 @@
   
   export default function QuizSetup_MathematicalReasoning() {
     const [availableTopics, setAvailableTopics] = useState([]);
-  
+    const [questionBank, setQuestionBank] = useState([]);
+    const [showQuestionBank, setShowQuestionBank] = useState(false);
+    const [qbLoading, setQbLoading] = useState(false);
+
     const [quiz, setQuiz] = useState({
       className: "selective",
       subject: "mathematical_reasoning",
@@ -24,6 +27,29 @@
     /* ============================
        HANDLERS
     ============================ */
+    const handleViewQuestionBank = async () => {
+  try {
+    setQbLoading(true);
+
+    const res = await fetch(
+      "https://web-production-481a5.up.railway.app/api/admin/question-bank-mathematical-reasoning"
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to load question bank");
+    }
+
+    const data = await res.json();
+    setQuestionBank(data);
+    setShowQuestionBank(true);
+  } catch (err) {
+    console.error(err);
+    alert("Failed to fetch question bank data.");
+  } finally {
+    setQbLoading(false);
+  }
+};
+
     const handleInputChange = (e) => {
       const { name, value } = e.target;
       setQuiz((prev) => ({ ...prev, [name]: value }));
@@ -206,6 +232,44 @@
           <button type="button" onClick={generateTopics}>
             Generate Topics
           </button>
+          <button
+            type="button"
+            onClick={handleViewQuestionBank}
+            style={{ marginLeft: "10px" }}
+          >
+            View Question Bank
+          </button>
+          {showQuestionBank && (
+            <div className="question-bank">
+              <h3>Question Bank (Mathematical Reasoning)</h3>
+          
+              {qbLoading ? (
+                <p>Loading...</p>
+              ) : questionBank.length === 0 ? (
+                <p>No questions found.</p>
+              ) : (
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Difficulty</th>
+                      <th>Topic</th>
+                      <th>Total Questions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {questionBank.map((row, idx) => (
+                      <tr key={`${row.difficulty}-${row.topic}-${idx}`}>
+                        <td>{row.difficulty}</td>
+                        <td>{row.topic}</td>
+                        <td>{row.total_questions}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
+
   
           {/* TOPICS */}
           <div className="topics-container">
