@@ -270,42 +270,54 @@ export default function ExamPageMathematicalReasoning({
       </div>
 
       {/* QUESTION CARD */}
-      <div className="question-card">
-        <p className="question-text">{currentQ.question}</p>
-      
-        {/* ✅ IMAGE RENDERING (ADD THIS BLOCK) */}
-        {Array.isArray(currentQ.images) && currentQ.images.length > 0 && (
-          <div className="question-images">
-            {currentQ.images.map((imgUrl, idx) => (
-              <img
-                key={idx}
-                src={imgUrl}
-                alt={`Question diagram ${idx + 1}`}
-                className="question-image"
-                onError={(e) => {
-                  console.error("❌ Image failed to load:", imgUrl);
-                  e.target.style.display = "none";
-                }}
-              />
-            ))}
-          </div>
-        )}
-      
-        {normalizedOptions.map((opt, i) => {
-          const optionKey = opt.split(")")[0].toUpperCase();
-          return (
-            <button
-              key={i}
-              onClick={() => handleAnswer(optionKey)}
-              className={`option-btn ${
-                answers[currentQ.q_id] === optionKey ? "selected" : ""
-              }`}
-            >
-              {opt}
-            </button>
-          );
-        })}
-      </div>
+<div className="question-card">
+
+  {/* ✅ RENDER QUESTION BLOCKS */}
+  {Array.isArray(currentQ.question_blocks) &&
+    currentQ.question_blocks.map((block, idx) => {
+      if (block.type === "text") {
+        return (
+          <p key={idx} className="question-text">
+            {block.content}
+          </p>
+        );
+      }
+
+      if (block.type === "image") {
+        return (
+          <img
+            key={idx}
+            src={block.src}
+            alt={`Question visual ${idx + 1}`}
+            className="question-image"
+            onError={(e) => {
+              console.error("❌ Image failed:", block.src);
+              e.target.style.display = "none";
+            }}
+          />
+        );
+      }
+
+      return null;
+    })}
+
+  {/* OPTIONS */}
+  {normalizedOptions.map((opt, i) => {
+    const optionKey = opt.split(")")[0].toUpperCase();
+    return (
+      <button
+        key={i}
+        onClick={() => handleAnswer(optionKey)}
+        className={`option-btn ${
+          answers[currentQ.q_id] === optionKey ? "selected" : ""
+        }`}
+      >
+        {opt}
+      </button>
+    );
+  })}
+</div>
+
 
 
       {/* NAVIGATION */}
