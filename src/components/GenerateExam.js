@@ -7,6 +7,13 @@ export default function GenerateExam() {
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
+  const renderText = (val) => {
+  if (!val) return "";
+  if (typeof val === "string") return val;
+  if (typeof val === "object") return val.content ?? "";
+  return String(val);
+};
+
 
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
@@ -109,25 +116,27 @@ export default function GenerateExam() {
             <div className="questions-preview">
               {generatedExam.questions.map((q) => (
                 <div key={q.q_id} className="question-card">
-                  <strong>Q{q.q_id}.</strong> {q.question}
+                  <strong>Q{q.q_id}.</strong> {renderText(q.question)}
+              
                   <ul>
                     {Array.isArray(q.options)
                       ? q.options.map((opt, idx) => (
-                          <li key={idx}>{opt}</li>
+                          <li key={idx}>{renderText(opt)}</li>
                         ))
                       : Object.entries(q.options).map(([key, value]) => (
                           <li key={key}>
-                            <strong>{key}.</strong> {value}
+                            <strong>{key}.</strong> {renderText(value)}
                           </li>
                         ))
                     }
                   </ul>
-
+              
                   <div className="correct-answer">
-                    Correct Answer: {q.correct}
+                    Correct Answer: {renderText(q.correct)}
                   </div>
                 </div>
               ))}
+
             </div>
           ) : (
             <p>No questions found.</p>
