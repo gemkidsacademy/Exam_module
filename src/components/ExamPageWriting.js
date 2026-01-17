@@ -132,9 +132,24 @@
         `${BACKEND_URL}/api/exams/writing/current?student_id=${studentId}`
       );
 
+      // 🔴 No ACTIVE exam → exam is completed → load result
+      if (res.status === 404) {
+        console.log("🟡 No active writing exam → loading result");
+      
+        setCompleted(true);
+        await loadResult();
+      
+        if (typeof onExamFinish === "function") {
+          onExamFinish();
+        }
+      
+        return;
+      }
+      
       if (!res.ok) {
         throw new Error("Failed to load writing exam");
       }
+
 
       const data = await res.json();
 
@@ -178,10 +193,11 @@
        TIMER (DISPLAY ONLY)
     ----------------------------------------------------------- */
     useEffect(() => {
-      if (loading || completed) {
-        console.log("⏸ Timer paused (loading or completed)");
-        return;
-      }
+    if (loading || completed || !exam) {
+      console.log("⏸ Timer paused (loading, completed, or no exam)");
+      return;
+    }
+
   
       if (timeLeft <= 0) {
         console.log("⏰ Time reached zero → auto finish");
@@ -242,9 +258,9 @@
     }
   
     if (!exam && !completed) {
-      console.warn("⚠️ No exam data but not completed");
-      return null;
+      return <div className="loading-screen">Preparing writing exam…</div>;
     }
+
   
     /* -----------------------------------------------------------
        COMPLETED VIEW
