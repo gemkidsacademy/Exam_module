@@ -134,17 +134,30 @@
 
       // 🔴 No ACTIVE exam → exam is completed → load result
       if (res.status === 404) {
-        console.log("🟡 No active writing exam → loading result");
-      
+      console.log("🟡 No active exam → checking for result");
+    
+      const resultRes = await fetch(
+        `${BACKEND_URL}/api/exams/writing/result?student_id=${studentId}`
+      );
+    
+      // 🔴 Completed exam exists
+      if (resultRes.ok) {
+        const data = await resultRes.json();
+        setResult(data);
         setCompleted(true);
-        await loadResult();
-      
+    
         if (typeof onExamFinish === "function") {
           onExamFinish();
         }
-      
         return;
       }
+    
+      // 🟢 No exam at all → start fresh
+      console.log("🟢 No exam found → starting new writing exam");
+      await startExam();
+      return init();
+    }
+
       
       if (!res.ok) {
         throw new Error("Failed to load writing exam");
