@@ -137,10 +137,13 @@ export default function StudentExamReports() {
             onChange={e => setSelectedDate(e.target.value)}
           >
             <option value="">-- Select Attempt Date --</option>
-            {availableDates.map(d => (
-              <option key={d} value={d}>{d}</option>
+            {availableDates.map(date => (
+              <option key={date} value={date}>
+                Week Starting - {date}
+              </option>
             ))}
           </select>
+
         </>
       )}
 
