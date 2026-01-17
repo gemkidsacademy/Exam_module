@@ -59,22 +59,8 @@ export default function GenerateExam() {
   setGeneratedExam(null);
 
   try {
-    // 1️⃣ Diagnostic ping
-    const diagRes = await fetch(`${BACKEND_URL}/__diagnostic_ping`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" }
-    });
-
-    if (!diagRes.ok) {
-      throw new Error("Diagnostic ping failed");
-    }
-
-    const diagData = await diagRes.json();
-    console.log("Diagnostic OK:", diagData);
-
-    // 2️⃣ Generate exam
     const res = await fetch(
-      `${BACKEND_URL}/api/quizzes/generate-new`,
+      `${BACKEND_URL}/__diagnostic_ping`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -85,18 +71,18 @@ export default function GenerateExam() {
     );
 
     const data = await res.json();
-    console.log("Generate response:", data);
+    console.log("Diagnostic response:", data);
 
     if (!res.ok) {
-      throw new Error(data.detail || "Failed to generate exam");
+      throw new Error(data.detail || "Diagnostic endpoint failed");
     }
 
-    // ✅ success
+    // Treat diagnostic response like success output
     setGeneratedExam(data);
 
   } catch (err) {
-    console.error("❌ Generate exam failed:", err);
-    setError(err.message || "Failed to generate exam");
+    console.error("❌ Diagnostic call failed:", err);
+    setError(err.message || "Diagnostic failed");
   } finally {
     setLoading(false);
   }
