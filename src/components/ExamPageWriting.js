@@ -254,7 +254,11 @@
       <div className="completed-screen">
         <h1>Writing</h1>
   
-        <p><strong>Status:</strong> {result.status}</p>
+        <p>
+          <strong>Status:</strong>{" "}
+          <span className="status">{result.status}</span>
+        </p>
+
   
         <div className="score-bar">
           <span>Writing Score: {result.score} / {result.max_score}</span>
