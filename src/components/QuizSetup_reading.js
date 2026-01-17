@@ -32,39 +32,41 @@ export default function QuizSetup_reading() {
   const [questionBank, setQuestionBank] = useState([]);
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
+  
+
   const handleViewQuestionBank = async () => {
-    if (!quiz.difficulty) {
-      alert("Please select difficulty first.");
-      return;
+  if (!quiz.difficulty) {
+    alert("Please select difficulty first.");
+    return;
+  }
+
+  try {
+    setLoadingQuestions(true);
+    setShowQuestionBank(false);
+
+    const params = new URLSearchParams({
+      subject: quiz.subject,
+      class_name: quiz.className, // ✅ correct
+    });
+
+    const res = await fetch(
+      `https://web-production-481a5.up.railway.app/api/reading/question-bank?${params.toString()}`
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch question bank");
     }
-  
-    try {
-      setLoadingQuestions(true);
-      setShowQuestionBank(false);
-  
-      const params = new URLSearchParams({
-        difficulty: quiz.difficulty,
-        subject: quiz.subject,
-      });
-  
-      const res = await fetch(
-        `https://web-production-481a5.up.railway.app/api/reading/question-bank?${params.toString()}`
-      );
-  
-      if (!res.ok) {
-        throw new Error("Failed to fetch question bank");
-      }
-  
-      const data = await res.json();
-      setQuestionBank(data.questions || []);
-      setShowQuestionBank(true);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to load question bank");
-    } finally {
-      setLoadingQuestions(false);
-    }
-  };
+
+    const data = await res.json();
+    setQuestionBank(data.rows || []);
+    setShowQuestionBank(true);
+  } catch (err) {
+    console.error(err);
+    alert("Failed to load question bank");
+  } finally {
+    setLoadingQuestions(false);
+  }
+};
 
 
   const getUsedTopicNames = (currentIndex) =>
@@ -352,29 +354,39 @@ export default function QuizSetup_reading() {
         {/* ---------------------------- */}
           {/* QUESTION BANK PREVIEW */}
           {/* ---------------------------- */}
-          {showQuestionBank && (
-            <div className="question-bank">
-              <h3>Question Bank</h3>
-          
-              {loadingQuestions ? (
-                <p>Loading questions...</p>
-              ) : questionBank.length === 0 ? (
-                <p>No questions found.</p>
-              ) : (
-                <ul>
-                  {questionBank.map((q, idx) => (
-                    <li key={q.id || idx} className="question-item">
-                      <strong>{idx + 1}.</strong> {q.question_text}
-                      <div className="question-meta">
-                        <span>Topic: {q.topic}</span> |{" "}
-                        <span>Difficulty: {q.difficulty}</span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
+          {/* ---------------------------- */}
+{/* QUESTION BANK SUMMARY */}
+{/* ---------------------------- */}
+{showQuestionBank && (
+  <div className="question-bank">
+    <h3>Question Bank Summary</h3>
+
+    {loadingQuestions ? (
+      <p>Loading summary...</p>
+    ) : questionBank.length === 0 ? (
+      <p>No questions found.</p>
+    ) : (
+      <table className="question-bank-table">
+        <thead>
+          <tr>
+            <th>Difficulty</th>
+            <th>Topic</th>
+            <th>Total Questions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {questionBank.map((row, idx) => (
+            <tr key={idx}>
+              <td>{row.difficulty}</td>
+              <td>{row.topic}</td>
+              <td>{row.total_questions}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+)}
 
         <div className="total-section">
           <h3>Total Questions: {totalQuestions}</h3>
