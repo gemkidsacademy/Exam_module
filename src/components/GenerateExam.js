@@ -22,7 +22,7 @@ export default function GenerateExam() {
 
     try {
       const response = await fetch(
-        `${BACKEND_URL}/api/quizzes/generate-new`,
+        `${BACKEND_URL}/generate-new-mr`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
