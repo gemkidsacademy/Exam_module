@@ -59,33 +59,49 @@ export default function GenerateExam() {
   setGeneratedExam(null);
 
   try {
+    // 1️⃣ Diagnostic ping
+    const diagRes = await fetch(`${BACKEND_URL}/__diagnostic_ping`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" }
+    });
+
+    if (!diagRes.ok) {
+      throw new Error("Diagnostic ping failed");
+    }
+
+    const diagData = await diagRes.json();
+    console.log("Diagnostic OK:", diagData);
+
+    // 2️⃣ Generate exam
     const res = await fetch(
-      `${BACKEND_URL}/api/exams/generate-thinking-skills`,
+      `${BACKEND_URL}/api/quizzes/generate-new`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          difficulty: "medium" // or from UI later
+          difficulty: "medium"
         })
       }
     );
 
     const data = await res.json();
+    console.log("Generate response:", data);
 
     if (!res.ok) {
       throw new Error(data.detail || "Failed to generate exam");
     }
 
-    // ✅ success only
+    // ✅ success
     setGeneratedExam(data);
 
   } catch (err) {
-    console.error("Generate exam failed:", err.message);
-    setError(err.message);
+    console.error("❌ Generate exam failed:", err);
+    setError(err.message || "Failed to generate exam");
   } finally {
     setLoading(false);
   }
 };
+
 
 
   /* ---------------- UI ---------------- */
