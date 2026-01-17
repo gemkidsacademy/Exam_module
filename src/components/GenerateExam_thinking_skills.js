@@ -18,15 +18,18 @@ export default function GenerateExam_thinking_skills() {
 
   try {
     const res = await fetch(
-      `${BACKEND_URL}/api/exams/generate-thinking-skills`,
+      `${BACKEND_URL}/__diagnostic_ping`,
       {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          difficulty: "easy" // fixed difficulty for now
-        })
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
       }
     );
+  
+    const data = await res.json();
+    console.log("Diagnostic response:", data);
+  } catch (err) {
+    console.error("Diagnostic error:", err);
+  }
 
     const data = await res.json();
 
