@@ -60,7 +60,7 @@ export default function GenerateExam() {
 
   try {
     const res = await fetch(
-      `${BACKEND_URL}/api/quizzes/generate-new`,
+      `${BACKEND_URL}/api/exams/generate-thinking-skills`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
