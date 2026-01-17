@@ -2,7 +2,22 @@
   import "./ExamPage.css";
   
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
-  
+  const parseWritingPrompt = (text) => {
+      if (!text) return {};
+    
+      const sections = {};
+      const regex =
+        /(TITLE|TASK|STATEMENT|INSTRUCTIONS|OPENING SENTENCE|GUIDELINES):([\s\S]*?)(?=(TITLE|TASK|STATEMENT|INSTRUCTIONS|OPENING SENTENCE|GUIDELINES):|$)/g;
+    
+      let match;
+      while ((match = regex.exec(text)) !== null) {
+        const key = match[1].toLowerCase().replace(" ", "_");
+        const value = match[2].trim();
+        sections[key] = value;
+      }
+    
+      return sections;
+    };
   export default function WritingComponent({
     studentId,
     onExamStart,
@@ -19,24 +34,13 @@
     const [loading, setLoading] = useState(true);
     const [showPrompt, setShowPrompt] = useState(true);
     const [result, setResult] = useState(null);
-    const parsedPrompt = exam ? parseWritingPrompt(exam.question_text) : {};
+    
+    const parsedPrompt = React.useMemo(() => {
+      if (!exam?.question_text) return {};
+      return parseWritingPrompt(exam.question_text);
+    }, [exam]);
 
-    const parseWritingPrompt = (text) => {
-      if (!text) return {};
     
-      const sections = {};
-      const regex =
-        /(TITLE|TASK|STATEMENT|INSTRUCTIONS|OPENING SENTENCE|GUIDELINES):([\s\S]*?)(?=(TITLE|TASK|STATEMENT|INSTRUCTIONS|OPENING SENTENCE|GUIDELINES):|$)/g;
-    
-      let match;
-      while ((match = regex.exec(text)) !== null) {
-        const key = match[1].toLowerCase().replace(" ", "_");
-        const value = match[2].trim();
-        sections[key] = value;
-      }
-    
-      return sections;
-    };
     
       
   
