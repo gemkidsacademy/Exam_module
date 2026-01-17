@@ -12,40 +12,38 @@ export default function GenerateExam_thinking_skills() {
      Generate Exam
   =========================== */
   const handleGenerateExam = async () => {
-  setLoading(true);
-  setError("");
-  setGeneratedExam(null);
+    setLoading(true);
+    setError("");
+    setGeneratedExam(null);
 
-  try {
-    const res = await fetch(
-      `${BACKEND_URL}/__diagnostic_ping`,
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" }
+    try {
+      const res = await fetch(
+        `${BACKEND_URL}/api/exams/generate-thinking-skills`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            difficulty: "easy"
+          })
+        }
+      );
+
+      const data = await res.json();
+      console.log("Response:", data);
+
+      if (!res.ok) {
+        throw new Error(data.detail || "Exam generation failed");
       }
-    );
-  
-    const data = await res.json();
-    console.log("Diagnostic response:", data);
-  } catch (err) {
-    console.error("Diagnostic error:", err);
-  }
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.detail || "Exam generation failed");
+      setGeneratedExam(data);
+      alert("Exam generated successfully!");
+    } catch (err) {
+      console.error("❌ Generate exam failed:", err);
+      setError("Failed to generate exam. Check console for details.");
+    } finally {
+      setLoading(false);
     }
-
-    setGeneratedExam(data);
-    alert("Exam generated successfully!");
-  } catch (err) {
-    console.error("❌ Generate exam failed:", err);
-    setError("Failed to generate exam. Check console for details.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   /* ===========================
      UI
@@ -61,7 +59,6 @@ export default function GenerateExam_thinking_skills() {
         onClick={handleGenerateExam}
         disabled={loading}
       >
-
         {loading ? "Generating..." : "Generate Exam"}
       </button>
 
