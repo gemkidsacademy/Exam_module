@@ -9,6 +9,12 @@ export default function QuizSetup_reading() {
     numTopics: 1,
     topics: [],
   });
+  const ALLOW_DUPLICATE_TOPICS = ["Comparative analysis"];
+  const MAX_TOPIC_USAGE = {
+    "Comparative analysis": 2
+  };
+
+
 
   const FIXED_TOPIC_QUESTION_RULES = {
     "Main Idea and Summary": 6,
@@ -241,14 +247,24 @@ export default function QuizSetup_reading() {
               >
                 <option value="">Select Topic</option>
                 {availableTopics
-                  .filter(
-                    (t) => !getUsedTopicNames(index).includes(t.name)
-                  )
+                  .filter((t) => {
+                    const usedNames = getUsedTopicNames(index);
+                    const usageCount = usedNames.filter(name => name === t.name).length;
+                
+                    // Enforce max usage if defined
+                    if (MAX_TOPIC_USAGE[t.name] !== undefined) {
+                      return usageCount < MAX_TOPIC_USAGE[t.name];
+                    }
+                
+                    // Default: allow only once
+                    return !usedNames.includes(t.name);
+                  })
                   .map((t) => (
                     <option key={t.name} value={t.name}>
                       {t.name}
                     </option>
                   ))}
+
               </select>
 
               <label>Total Questions for this Topic:</label>
