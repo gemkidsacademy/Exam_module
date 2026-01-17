@@ -11,7 +11,7 @@ export default function QuizSetup_reading() {
   });
   const ALLOW_DUPLICATE_TOPICS = ["Comparative analysis"];
   const MAX_TOPIC_USAGE = {
-    "Comparative analysis": 2
+    "Comparative analysis": 3
   };
 
 
