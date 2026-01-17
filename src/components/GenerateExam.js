@@ -79,7 +79,9 @@ export default function GenerateExam() {
                   className="question-card"
                 >
                   <strong>Q{question.q_id}.</strong>{" "}
-                  {renderText(question.question)}
+                  {question.question_blocks?.map((block, i) => (
+                    <p key={i}>{renderText(block)}</p>
+                  ))}
 
                   <ul>
                     {Array.isArray(question.options)
