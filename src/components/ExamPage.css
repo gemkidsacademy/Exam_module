@@ -666,4 +666,22 @@
   color: #6b7280; /* gray-500 */
   line-height: 1.5;
 }
+.writing-title {
+  margin-bottom: 10px;
+}
+
+.writing-statement {
+  margin: 10px 0;
+  padding-left: 12px;
+  border-left: 3px solid #ccc;
+  font-style: italic;
+}
+
+.opening-sentence {
+  margin: 10px 0;
+}
+
+.writing-text ul {
+  margin-top: 6px;
+}
 
