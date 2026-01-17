@@ -35,22 +35,17 @@ export default function QuizSetup_reading() {
   
 
   const handleViewQuestionBank = async () => {
-  if (!quiz.difficulty) {
-    alert("Please select difficulty first.");
-    return;
-  }
-
   try {
     setLoadingQuestions(true);
     setShowQuestionBank(false);
 
     const params = new URLSearchParams({
       subject: quiz.subject,
-      class_name: quiz.className, // ✅ correct
+      class_name: quiz.className,
     });
 
     const res = await fetch(
-      `https://web-production-481a5.up.railway.app/api/reading/question-bank?${params.toString()}`
+      `https://web-production-481a5.up.railway.app/api/reading/question-bank?${params}`
     );
 
     if (!res.ok) {
