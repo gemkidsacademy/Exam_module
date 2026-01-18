@@ -182,6 +182,21 @@ export default function StudentReportShell() {
         <option value="writing">Writing</option>
         <option value="foundational">Foundational</option>
       </select>
+      {reportType === "cumulative" && (
+      <div className="topic-group">
+        <label>Topics</label>
+        <select
+          value={topic}
+          onChange={e => setTopic(e.target.value)}
+        >
+          <option value="">Select topic</option>
+          <option value="comprehension">Comprehension</option>
+          <option value="logic">Logic</option>
+          <option value="vocabulary">Vocabulary</option>
+          <option value="problem_solving">Problem Solving</option>
+        </select>
+      </div>
+    )}
 
       {reportType !== "cumulative" && (
         <select value={date} onChange={e => setDate(e.target.value)}>
