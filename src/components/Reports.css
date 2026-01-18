@@ -315,3 +315,13 @@
   background: #9ca3af;
   cursor: not-allowed;
 }
+.exam-topic-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.topic-group {
+  display: flex;
+  flex-direction: column;
+}
