@@ -323,3 +323,8 @@
     width: 100%;
   }
 }
+.exam-topics-actions-row {
+  display: flex;
+  flex-direction: column; /* stack Exam → Actions vertically */
+  gap: 16px;              /* 👈 THIS creates the missing gap */
+}
