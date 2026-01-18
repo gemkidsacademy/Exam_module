@@ -336,8 +336,9 @@
 }
 .actions-group {
   display: flex;
-  align-items: center; /* THIS fixes baseline drift */
-  gap: 12px;
+  flex-direction: column;   /* 👈 stack vertically */
+  align-items: flex-start;  /* align buttons to the left */
+  gap: 10px;
 }
 .filter-group,
 .exam-topics-actions-row {
@@ -359,8 +360,7 @@
   color: white;
 }
 .actions-group button {
-  height: 44px;
-  padding: 0 20px;
+  width: 160px;   /* or 100% if you want full-width */
 }
 .secondary-btn,
 .primary-btn {
@@ -377,4 +377,53 @@
   border-radius: 10px;
   cursor: pointer;
 }
+/* ===============================
+   ACTION BUTTONS (FINAL)
+================================ */
+
+.secondary-btn,
+.primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 44px;
+  width: 160px;
+  padding: 0 20px;
+
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+
+  border-radius: 10px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.secondary-btn {
+  background: #ffffff;
+  border: 1px solid #d0d7e2;
+  color: #111827;
+}
+
+.secondary-btn:hover {
+  background: #f9fafb;
+}
+
+.primary-btn {
+  background: #2563eb;
+  border: 1px solid transparent; /* keeps alignment */
+  color: #ffffff;
+}
+
+.primary-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+.actions-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
 
