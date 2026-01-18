@@ -330,3 +330,27 @@
   grid-template-columns: 220px 220px;
   gap: 20px;
 }
+.actions-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+.filter-group,
+.exam-topics-actions-row {
+  margin-bottom: 20px;
+}
+.primary-btn,
+.secondary-btn {
+  min-width: 140px;
+  height: 44px;
+}
+
+.secondary-btn {
+  background: #ffffff;
+  border: 1px solid #d0d7e2;
+}
+
+.primary-btn {
+  background: #2563eb;
+  color: white;
+}
