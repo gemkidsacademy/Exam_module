@@ -237,6 +237,7 @@ export default function StudentReportShell() {
 </div>
 
 </div>
+</div>
 
 
       {/* ================= REPORT CONTENT ================= */}
