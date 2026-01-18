@@ -178,7 +178,7 @@ export default function StudentReportShell() {
 <div className="exam-topics-actions-row">
   <div className="exam-topics-group">
     <div className="field">
-      <label>Exam</label>
+      <label>Exam: </label>
       <select value={exam} onChange={e => setExam(e.target.value)}>
         <option value="thinking_skills">Thinking Skills</option>
         <option value="reading">Reading</option>
@@ -190,7 +190,7 @@ export default function StudentReportShell() {
 
     {reportType === "cumulative" && (
       <div className="field">
-        <label>Topics</label>
+        <label>Topics: </label>
         <select value={topic} onChange={e => setTopic(e.target.value)}>
           <option value="">Select topic</option>
           <option value="comprehension">Comprehension</option>
