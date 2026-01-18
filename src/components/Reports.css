@@ -325,3 +325,8 @@
   display: flex;
   flex-direction: column;
 }
+.exam-topics-group {
+  display: grid;
+  grid-template-columns: 220px 220px;
+  gap: 20px;
+}
