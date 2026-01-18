@@ -174,8 +174,10 @@ export default function StudentReportShell() {
       </div>
     )}
 
-    {/* Exam Context */}
-    <div className="filter-group">
+    {/* Exam + Topics + Actions */}
+<div className="exam-topics-actions-row">
+  <div className="exam-topics-group">
+    <div className="field">
       <label>Exam</label>
       <select value={exam} onChange={e => setExam(e.target.value)}>
         <option value="thinking_skills">Thinking Skills</option>
@@ -184,13 +186,12 @@ export default function StudentReportShell() {
         <option value="writing">Writing</option>
         <option value="foundational">Foundational</option>
       </select>
-      {reportType === "cumulative" && (
-      <div className="topic-group">
+    </div>
+
+    {reportType === "cumulative" && (
+      <div className="field">
         <label>Topics</label>
-        <select
-          value={topic}
-          onChange={e => setTopic(e.target.value)}
-        >
+        <select value={topic} onChange={e => setTopic(e.target.value)}>
           <option value="">Select topic</option>
           <option value="comprehension">Comprehension</option>
           <option value="logic">Logic</option>
@@ -200,38 +201,39 @@ export default function StudentReportShell() {
       </div>
     )}
 
-      {reportType !== "cumulative" && (
+    {reportType !== "cumulative" && (
+      <div className="field">
+        <label>Date</label>
         <select value={date} onChange={e => setDate(e.target.value)}>
           <option value="2024-01-10">10 Jan 2024</option>
           <option value="2024-02-15">15 Feb 2024</option>
         </select>
-      )}
-    </div>
+      </div>
+    )}
   </div>
 
-  {/* ACTION */}
-  <div className="filters-right">
-  <button
-  className="secondary-btn"
-  disabled={
-    (reportType === "student" && !studentId) ||
-    (reportType === "class" && (!className || !classDay)) ||
-    (reportType === "cumulative" &&
-      (!studentId || selectedAttemptDates.length === 0))
-  }
-  onClick={() => setShouldGenerate(true)}
->
-  Generate
-</button>
+  <div className="actions-group">
+    <button
+      className="secondary-btn"
+      disabled={
+        (reportType === "student" && !studentId) ||
+        (reportType === "class" && (!className || !classDay)) ||
+        (reportType === "cumulative" &&
+          (!studentId || selectedAttemptDates.length === 0))
+      }
+      onClick={() => setShouldGenerate(true)}
+    >
+      Generate
+    </button>
 
-
-  <button
-    className="primary-btn"
-    disabled={!shouldGenerate}
-    onClick={() => setShowPDF(true)}
-  >
-    Preview PDF
-  </button>
+    <button
+      className="primary-btn"
+      disabled={!shouldGenerate}
+      onClick={() => setShowPDF(true)}
+    >
+      Preview PDF
+    </button>
+  </div>
 </div>
 
 </div>
