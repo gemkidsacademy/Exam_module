@@ -213,27 +213,29 @@ export default function StudentReportShell() {
   </div>
 
   <div className="actions-group">
-    <button
-      className="secondary-btn"
-      disabled={
-        (reportType === "student" && !studentId) ||
-        (reportType === "class" && (!className || !classDay)) ||
-        (reportType === "cumulative" &&
-          (!studentId || selectedAttemptDates.length === 0))
-      }
-      onClick={() => setShouldGenerate(true)}
-    >
-      Generate
-    </button>
+  <button
+    className="secondary-btn"
+    disabled={
+      (reportType === "student" && !studentId) ||
+      (reportType === "class" && (!className || !classDay)) ||
+      (reportType === "cumulative" &&
+        (!studentId || selectedAttemptDates.length === 0))
+    }
+    onClick={() => setShouldGenerate(true)}
+  >
+    Generate
+  </button>
 
+  {shouldGenerate && (
     <button
       className="primary-btn"
-      disabled={!shouldGenerate}
       onClick={() => setShowPDF(true)}
     >
       Preview PDF
     </button>
-  </div>
+  )}
+</div>
+
 </div>
 
 </div>
