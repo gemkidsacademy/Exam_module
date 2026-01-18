@@ -7,6 +7,8 @@ import "./Reports.css";
 
 export default function StudentReportShell() {
   const [reportType, setReportType] = useState("student");
+  const [topic, setTopic] = useState("");
+
   const [studentId, setStudentId] = useState("");
   const [className, setClassName] = useState("");
   const [classDay, setClassDay] = useState("");
