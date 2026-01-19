@@ -77,13 +77,17 @@ export default function ReadingComponent({
 
       // 🔑 Reading exams come directly from exam_json.questions
       const flatQuestions = (data.exam_json?.sections || []).flatMap(section =>
-        (section.questions || []).map(q => ({
-          ...q,
-          topic: section.topic,
-          answer_options: section.answer_options || {},
-          section_ref: section
-        }))
-      );
+          (section.questions || []).map(q => ({
+            ...q,
+            topic: section.topic,
+        
+            // ✅ prefer question options, fallback to section options
+            answer_options: q.answer_options || section.answer_options || {},
+        
+            section_ref: section
+          }))
+        );
+
       console.log("📘 Flattened questions count:", flatQuestions.length);
 
       setExam(data.exam_json);
@@ -333,7 +337,9 @@ useEffect(() => {
     return <div>Loading Exam…</div>;
   }
 
-  const options = currentQuestion.answer_options;
+  const options = currentQuestion.answer_options || {};
+  const hasOptions = Object.keys(options).length > 0;
+
   const rm = currentQuestion.section_ref?.reading_material || {};
 
   
@@ -415,20 +421,26 @@ useEffect(() => {
           </p>
 
           <div className="options">
-            {Object.entries(options).map(([k, v]) => (
-              <button
-                key={k}
-                className={`option-btn ${
-                  answers[currentQuestion.question_id] === k
-                    ? "selected"
-                    : ""
-                }`}
-                onClick={() => handleSelect(k)}
-              >
-                <strong>{k}.</strong> {v}
-              </button>
-            ))}
-          </div>
+              {!hasOptions && (
+                <div className="no-options-warning">
+                  ⚠️ No answer options available for this question
+                </div>
+              )}
+            
+              {Object.entries(options).map(([k, v]) => (
+                <button
+                  key={k}
+                  className={`option-btn ${
+                    answers[currentQuestion.question_id] === k
+                      ? "selected"
+                      : ""
+                  }`}
+                  onClick={() => handleSelect(k)}
+                >
+                  <strong>{k}.</strong> {v}
+                </button>
+              ))}
+            </div>
 
           <div className="nav-buttons">
             <button disabled={index === 0} onClick={() => goTo(index - 1)}>
