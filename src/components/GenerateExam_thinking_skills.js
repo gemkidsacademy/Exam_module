@@ -65,11 +65,13 @@ export default function GenerateExam_thinking_skills() {
       {generatedExam && (
         <div className="generated-output">
           <h3>Generated Exam</h3>
-          <p>
+          <div className="generated-output">
+            <h3>Generated Exam</h3>
+          
             <p><strong>Exam ID:</strong> {generatedExam.exam_id}</p>
-            <strong>Total Questions:</strong>{" "}
-            {generatedExam.total_questions}
-          </p>
+            <p><strong>Total Questions:</strong> {generatedExam.total_questions}</p>
+          </div>
+
         </div>
       )}
     </div>
