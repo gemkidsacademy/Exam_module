@@ -77,7 +77,7 @@ export default function GenerateExam_reading() {
       // ✅ success only AFTER backend response
       setGeneratedExam(data);
       setSuccessMessage(
-        `Exam created successfully.
+        `Exam created successfully.`
       );
 
     } catch (err) {
