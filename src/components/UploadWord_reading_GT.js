@@ -31,7 +31,14 @@ export default function UploadWord_reading_GT() {
       if (!res.ok) throw new Error("Upload failed");
 
       const data = await res.json();
-      alert(data.message || "Word document uploaded successfully!");
+
+      let summary = `${data.message}\n\n` +
+        `Total exams detected: ${data.total_detected}\n` +
+        `Successfully added: ${data.successfully_saved}\n` +
+        `Failed: ${data.failed}`;
+      
+      alert(summary);
+      
       setWordFile(null);
     } catch (err) {
       console.error(err);
