@@ -18,6 +18,9 @@
     
       return sections;
     };
+  const clamp = (value, min, max) =>
+    Math.min(Math.max(value, min), max);
+
   export default function WritingComponent({
     studentId,
     onExamStart,
@@ -28,6 +31,7 @@
        STATE
     ----------------------------------------------------------- */
     const [exam, setExam] = useState(null);
+      
     const [timeLeft, setTimeLeft] = useState(0);
     const [answerText, setAnswerText] = useState("");
     const [completed, setCompleted] = useState(false);
@@ -310,14 +314,19 @@
       <p>
         <strong>Selective Readiness:</strong>{" "}
         <span className="status">{result.status}</span>
+
+      </p>
+      <p className="scale-note">
+        Scoring is based on NSW Selective criteria (25 marks total).
       </p>
 
       <div className="score-bar">
         <span>
-          Writing Score: {result.score} / {result.max_score}
+          Writing Score: {result.score} / 25
         </span>
-        <progress value={result.score} max={result.max_score} />
+        <progress value={result.score} max={25} />
       </div>
+
 
       <p className="advisory-text">{result.advisory}</p>
 
@@ -327,12 +336,29 @@
 
           <h2>Category Scores</h2>
           <ul>
-            <li>Audience, Purpose & Form: {evalData.category_scores.audience_purpose_form} / 4</li>
-            <li>Ideas & Content: {evalData.category_scores.ideas_content} / 4</li>
-            <li>Structure & Organisation: {evalData.category_scores.structure_organisation} / 4</li>
-            <li>Language & Vocabulary: {evalData.category_scores.language_vocabulary} / 4</li>
-            <li>Grammar, Spelling & Punctuation: {evalData.category_scores.grammar_spelling_punctuation} / 4</li>
+            <li>
+              Audience, Purpose & Form:{" "}
+              {clamp(evalData.category_scores.audience_purpose_form, 0, 5)} / 5
+            </li>
+            <li>
+              Ideas & Content:{" "}
+              {clamp(evalData.category_scores.ideas_content, 0, 5)} / 5
+            </li>
+            <li>
+              Structure & Organisation:{" "}
+              {clamp(evalData.category_scores.structure_organisation, 0, 5)} / 5
+            </li>
+            <li>
+              Language & Vocabulary:{" "}
+              {clamp(evalData.category_scores.language_vocabulary, 0, 5)} / 5
+            </li>
+            <li>
+              Grammar, Spelling & Punctuation:{" "}
+              {clamp(evalData.category_scores.grammar_spelling_punctuation, 0, 5)} / 5
+            </li>
           </ul>
+
+
 
           <h2>Strengths</h2>
           <p>{evalData.strengths}</p>
