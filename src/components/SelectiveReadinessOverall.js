@@ -200,9 +200,10 @@ export default function SelectiveReadinessOverall() {
           <option value="">Select date</option>
           {availableDates.map((date) => (
             <option key={date} value={date}>
-              {date}
+              Week starting {date}
             </option>
           ))}
+
         </select>
       </div>
     )}
