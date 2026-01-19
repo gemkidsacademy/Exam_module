@@ -66,6 +66,7 @@ export default function GenerateExam_thinking_skills() {
         <div className="generated-output">
           <h3>Generated Exam</h3>
           <p>
+            <p><strong>Exam ID:</strong> {generatedExam.exam_id}</p>
             <strong>Total Questions:</strong>{" "}
             {generatedExam.total_questions}
           </p>
