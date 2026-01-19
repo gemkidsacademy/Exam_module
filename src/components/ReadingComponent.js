@@ -118,14 +118,21 @@ export default function ReadingComponent({
      GROUP QUESTIONS BY TOPIC
   ============================= */
   const groupedQuestions = useMemo(() => {
-    const g = {};
-    questions.forEach((q, i) => {
-      const key = q.topic || "Other";
-      if (!g[key]) g[key] = [];
-      g[key].push(i);
-    });
-    return g;
-  }, [questions]);
+      const g = {};
+      questions.forEach((q, i) => {
+        const key = q.section_ref.section_id;
+    
+        if (!g[key]) {
+          g[key] = {
+            topic: q.section_ref.topic,
+            indexes: []
+          };
+        }
+    
+        g[key].indexes.push(i);
+      });
+      return g;
+    }, [questions]);
 
   /* =============================
      LOAD REPORT
@@ -345,12 +352,16 @@ useEffect(() => {
       </div>
 
       <div className="question-index-grouped">
-        {Object.entries(groupedQuestions).map(([topic, idxs]) => (
-          <div key={topic} className="topic-group">
-            <div className="topic-title">{prettyTopic(topic)}</div>
+        {Object.entries(groupedQuestions).map(([sectionId, data]) => (
+          <div key={sectionId} className="topic-group">
+            <div className="topic-title">
+              {prettyTopic(data.topic)}
+            </div>
+        
             <div className="topic-circles">
-              {idxs.map((i) => (
+              {data.indexes.map((i) => (
                 <div
+                  key={questions[i].question_id}
                   className={`index-circle
                     ${visited[i] ? "visited" : ""}
                     ${answers[questions[i].question_id] ? "answered" : ""}
@@ -360,11 +371,12 @@ useEffect(() => {
                 >
                   {questions[i].question_number}
                 </div>
-
               ))}
             </div>
           </div>
         ))}
+
+            
       </div>
 
       <div className="exam-body">
