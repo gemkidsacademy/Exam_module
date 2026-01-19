@@ -76,7 +76,10 @@ export default function GenerateExam_reading() {
 
       // ✅ success only AFTER backend response
       setGeneratedExam(data);
-      setSuccessMessage("Exam created successfully.");
+      setSuccessMessage(
+        `Exam created successfully. Exam ID: ${data.generated_exam_id}`
+      );
+
     } catch (err) {
       console.error(err);
       setError("Failed to generate exam. Check console for details.");
