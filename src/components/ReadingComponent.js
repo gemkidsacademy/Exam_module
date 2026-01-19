@@ -369,7 +369,7 @@ useEffect(() => {
                   `}
                   onClick={() => goTo(i)}
                 >
-                  {i + 1}
+                  {questions[i].question_number}
                 </div>
               ))}
             </div>
