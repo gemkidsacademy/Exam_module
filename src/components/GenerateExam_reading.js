@@ -77,7 +77,7 @@ export default function GenerateExam_reading() {
       // ✅ success only AFTER backend response
       setGeneratedExam(data);
       setSuccessMessage(
-        `Exam created successfully. Exam ID: ${data.generated_exam_id}`
+        `Exam created successfully.
       );
 
     } catch (err) {
@@ -108,7 +108,7 @@ export default function GenerateExam_reading() {
       {/* Optional: keep preview logic if backend returns exam */}
       {generatedExam && (
         <div className="generated-output">
-          <p><strong>Exam ID:</strong> {generatedExam.exam_id}</p>
+          <p><strong>Exam ID:</strong> {generatedExam.generated_exam_id}</p>
         </div>
       )}
     </div>
