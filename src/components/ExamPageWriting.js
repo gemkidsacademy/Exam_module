@@ -301,30 +301,54 @@
        COMPLETED VIEW
     ----------------------------------------------------------- */
     if (completed && result) {
-    return (
-      <div className="completed-screen">
-        <h1>Writing</h1>
-  
-        <p>
-          <strong>Status:</strong>{" "}
-          <span className="status">{result.status}</span>
-        </p>
+  const evalData = result.evaluation;
 
-  
-        <div className="score-bar">
-          <span>Writing Score: {result.score} / {result.max_score}</span>
-          <progress
-            value={result.score}
-            max={result.max_score}
-          />
-        </div>
-  
-        <p className="advisory-text">
-          {result.advisory}
-        </p>
+  return (
+    <div className="completed-screen">
+      <h1>Writing Report</h1>
+
+      <p>
+        <strong>Selective Readiness:</strong>{" "}
+        <span className="status">{result.status}</span>
+      </p>
+
+      <div className="score-bar">
+        <span>
+          Writing Score: {result.score} / {result.max_score}
+        </span>
+        <progress value={result.score} max={result.max_score} />
       </div>
-    );
-  }
+
+      <p className="advisory-text">{result.advisory}</p>
+
+      {/* ---------- AI EVALUATION ---------- */}
+      {evalData && (
+        <div className="ai-report">
+
+          <h2>Category Scores</h2>
+          <ul>
+            <li>Audience, Purpose & Form: {evalData.category_scores.audience_purpose_form} / 4</li>
+            <li>Ideas & Content: {evalData.category_scores.ideas_content} / 4</li>
+            <li>Structure & Organisation: {evalData.category_scores.structure_organisation} / 4</li>
+            <li>Language & Vocabulary: {evalData.category_scores.language_vocabulary} / 4</li>
+            <li>Grammar, Spelling & Punctuation: {evalData.category_scores.grammar_spelling_punctuation} / 4</li>
+          </ul>
+
+          <h2>Strengths</h2>
+          <p>{evalData.strengths}</p>
+
+          <h2>Improvements Needed</h2>
+          <p>{evalData.improvements}</p>
+
+          <h2>Teacher Feedback</h2>
+          <p>{evalData.teacher_feedback}</p>
+
+        </div>
+      )}
+    </div>
+  );
+}
+
   
   
     /* -----------------------------------------------------------
