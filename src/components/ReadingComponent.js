@@ -77,17 +77,14 @@ export default function ReadingComponent({
 
       // 🔑 Reading exams come directly from exam_json.questions
       const flatQuestions = (data.exam_json?.sections || []).flatMap(section =>
-          (section.questions || []).map(q => ({
-            ...q,
-            topic: section.topic,
-        
-            // ✅ prefer question options, fallback to section options
-            answer_options: q.answer_options || section.answer_options || {},
-        
-            section_ref: section
-          }))
-        );
-
+      (section.questions || []).map(q => ({
+        ...q,
+        topic: section.topic,
+        passage_style: section.passage_style || "informational", // ✅ ADD
+        answer_options: q.answer_options || section.answer_options || {},
+        section_ref: section
+      }))
+    );
       console.log("📘 Flattened questions count:", flatQuestions.length);
 
       setExam(data.exam_json);
@@ -340,7 +337,12 @@ useEffect(() => {
   const options = currentQuestion.answer_options || {};
   const hasOptions = Object.keys(options).length > 0;
 
-  const rm = currentQuestion.section_ref?.reading_material || {};
+  const rm = currentQuestion.section_ref?.reading_material ?? "";
+  const passageStyle =
+      currentQuestion.passage_style ||
+      currentQuestion.section_ref?.passage_style ||
+      "informational";
+
 
   
 
@@ -348,113 +350,123 @@ useEffect(() => {
      EXAM UI
   ============================= */
   return (
-    <div className="exam-container">
-      <div className="exam-header">
-        <div>Reading Comprehension Exam</div>
-        <div className="timer-box">Time Left: {formatTime(timeLeft)}</div>
-        <div className="counter">
-          Question {index + 1} / {questions.length}
-        </div>
+  <div className="exam-container">
+    <div className="exam-header">
+      <div>Reading Comprehension Exam</div>
+      <div className="timer-box">Time Left: {formatTime(timeLeft)}</div>
+      <div className="counter">
+        Question {index + 1} / {questions.length}
       </div>
+    </div>
 
-      <div className="question-index-grouped">
-        {Object.entries(groupedQuestions).map(([sectionId, data]) => (
-          <div key={sectionId} className="topic-group">
-            <div className="topic-title">
-              {prettyTopic(data.topic)}
-            </div>
-        
-            <div className="topic-circles">
-              {data.indexes.map((i) => (
-                <div
-                  key={questions[i].question_id}
-                  className={`index-circle
-                    ${visited[i] ? "visited" : ""}
-                    ${answers[questions[i].question_id] ? "answered" : ""}
-                    ${i === index ? "active" : ""}
-                  `}
-                  onClick={() => goTo(i)}
-                >
-                  {i + 1}
-                </div>
-              ))}
-            </div>
+    <div className="question-index-grouped">
+      {Object.entries(groupedQuestions).map(([sectionId, data]) => (
+        <div key={sectionId} className="topic-group">
+          <div className="topic-title">
+            {prettyTopic(data.topic)}
           </div>
-        ))}
 
-            
-      </div>
-
-      <div className="exam-body">
-        <div className="passage-pane">
-          {rm.title && <h3>{rm.title}</h3>}
-        
-          {/* Comparative Analysis */}
-          {rm.extracts && (
-            <div className="extracts">
-              {Object.entries(rm.extracts).map(([key, text]) => (
-                <div key={key} className="extract">
-                  <strong>{key}.</strong> {text}
-                </div>
-              ))}
-            </div>
-          )}
-        
-          {/* Gapped Text */}
-          {rm.content && (
-            <p className="reading-content">{rm.content}</p>
-          )}
-        
-          {/* Main Idea / Paragraph-based */}
-          {rm.paragraphs &&
-            Object.entries(rm.paragraphs).map(([num, text]) => (
-              <p key={num} className="reading-paragraph">
-                <strong>{num}.</strong> {text}
-              </p>
+          <div className="topic-circles">
+            {data.indexes.map((i) => (
+              <div
+                key={questions[i].question_id}
+                className={`index-circle
+                  ${visited[i] ? "visited" : ""}
+                  ${answers[questions[i].question_id] ? "answered" : ""}
+                  ${i === index ? "active" : ""}
+                `}
+                onClick={() => goTo(i)}
+              >
+                {i + 1}
+              </div>
             ))}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div className="exam-body">
+      <div className={`passage-pane ${passageStyle}`}>
+
+        {/* LITERARY PASSAGE */}
+        {passageStyle === "literary" && (
+          <pre className="literary-passage">
+            {typeof rm === "string" ? rm : ""}
+          </pre>
+        )}
+
+
+        {/* NON-LITERARY PASSAGE */}
+        {passageStyle !== "literary" && (
+          <>
+            {rm.title && <h3>{rm.title}</h3>}
+
+            {rm.extracts && (
+              <div className="extracts">
+                {Object.entries(rm.extracts).map(([key, text]) => (
+                  <div key={key} className="extract">
+                    <strong>{key}.</strong> {text}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {rm.content && (
+              <p className="reading-content">{rm.content}</p>
+            )}
+
+            {rm.paragraphs &&
+              Object.entries(rm.paragraphs).map(([num, text]) => (
+                <p key={num} className="reading-paragraph">
+                  <strong>{num}.</strong> {text}
+                </p>
+              ))}
+          </>
+        )}
+      </div>
+
+      <div className="question-pane">
+        <p className="question-text">
+          Q{currentQuestion.question_number}.{" "}
+          {currentQuestion.question_text}
+        </p>
+
+        <div className="options">
+          {!hasOptions && (
+            <div className="no-options-warning">
+              ⚠️ No answer options available for this question
+            </div>
+          )}
+
+          {Object.entries(options).map(([k, v]) => (
+            <button
+              key={k}
+              className={`option-btn ${
+                answers[currentQuestion.question_id] === k
+                  ? "selected"
+                  : ""
+              }`}
+              onClick={() => handleSelect(k)}
+            >
+              <strong>{k}.</strong> {v}
+            </button>
+          ))}
         </div>
 
-        <div className="question-pane">
-          <p className="question-text">
-            Q{currentQuestion.question_number}.{" "}
-            {currentQuestion.question_text}
-          </p>
+        <div className="nav-buttons">
+          <button disabled={index === 0} onClick={() => goTo(index - 1)}>
+            Previous
+          </button>
 
-          <div className="options">
-              {!hasOptions && (
-                <div className="no-options-warning">
-                  ⚠️ No answer options available for this question
-                </div>
-              )}
-            
-              {Object.entries(options).map(([k, v]) => (
-                <button
-                  key={k}
-                  className={`option-btn ${
-                    answers[currentQuestion.question_id] === k
-                      ? "selected"
-                      : ""
-                  }`}
-                  onClick={() => handleSelect(k)}
-                >
-                  <strong>{k}.</strong> {v}
-                </button>
-              ))}
-            </div>
-
-          <div className="nav-buttons">
-            <button disabled={index === 0} onClick={() => goTo(index - 1)}>
-              Previous
-            </button>
-
-            {index < questions.length - 1 ? (
-              <button onClick={() => goTo(index + 1)}>Next</button>
-            ) : (
-              <button onClick={autoSubmit}>Finish</button>
-            )}
-          </div>
+          {index < questions.length - 1 ? (
+            <button onClick={() => goTo(index + 1)}>Next</button>
+          ) : (
+            <button onClick={autoSubmit}>Finish</button>
+          )}
         </div>
       </div>
     </div>
-  );
+  </div>
+);
+
 }
