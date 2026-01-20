@@ -23,7 +23,7 @@ export default function UploadWord_reading_MI_Type2() {
     setUploading(true);
 
     try {
-      const res = await fetch("https://web-production-481a5.up.railway.app/upload-word-reading-main-idea-ai", {
+      const res = await fetch("https://web-production-481a5.up.railway.app/upload-word-reading-literary-ai", {
         method: "POST",
         body: formData,
       });
