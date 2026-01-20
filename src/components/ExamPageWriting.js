@@ -31,7 +31,14 @@
        STATE
     ----------------------------------------------------------- */
     const [exam, setExam] = useState(null);
-      
+    const CATEGORY_LABELS = {
+      audience_purpose_form: "Audience, Purpose & Form",
+      ideas_content: "Ideas & Content",
+      structure_organisation: "Structure & Organisation",
+      language_vocabulary: "Language & Vocabulary",
+      grammar_spelling_punctuation: "Grammar, Spelling & Punctuation"
+    };
+
     const [timeLeft, setTimeLeft] = useState(0);
     const [answerText, setAnswerText] = useState("");
     const [completed, setCompleted] = useState(false);
@@ -334,37 +341,32 @@
       {evalData && (
         <div className="ai-report">
 
-          <h2>Category Scores</h2>
-          <ul>
-            <li>
-              Audience, Purpose & Form:{" "}
-              {clamp(evalData.category_scores.audience_purpose_form, 0, 5)} / 5
-            </li>
-            <li>
-              Ideas & Content:{" "}
-              {clamp(evalData.category_scores.ideas_content, 0, 5)} / 5
-            </li>
-            <li>
-              Structure & Organisation:{" "}
-              {clamp(evalData.category_scores.structure_organisation, 0, 5)} / 5
-            </li>
-            <li>
-              Language & Vocabulary:{" "}
-              {clamp(evalData.category_scores.language_vocabulary, 0, 5)} / 5
-            </li>
-            <li>
-              Grammar, Spelling & Punctuation:{" "}
-              {clamp(evalData.category_scores.grammar_spelling_punctuation, 0, 5)} / 5
-            </li>
-          </ul>
+          
 
 
 
-          <h2>Strengths</h2>
-          <p>{evalData.strengths}</p>
+          <h2>Category Evaluation</h2>
 
-          <h2>Improvements Needed</h2>
-          <p>{evalData.improvements}</p>
+          {Object.entries(evalData.categories).map(([key, data]) => (
+            <section key={key}>
+              <h3>{CATEGORY_LABELS[key]}</h3>
+
+              <p>{data.score} / 5</p>
+          
+              <strong>Strengths</strong>
+              <ul>
+                {data.strengths.map((s, i) => <li key={i}>{s}</li>)}
+              </ul>
+          
+              <strong>Improvements Needed</strong>
+              <ul>
+                {data.improvements.map((i, idx) => <li key={idx}>{i}</li>)}
+              </ul>
+            </section>
+          ))}
+
+
+          
 
           <h2>Teacher Feedback</h2>
           <p>{evalData.teacher_feedback}</p>
