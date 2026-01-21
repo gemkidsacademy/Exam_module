@@ -45,6 +45,8 @@
     const [loading, setLoading] = useState(true);
     const [showPrompt, setShowPrompt] = useState(true);
     const [result, setResult] = useState(null);
+    const [submitting, setSubmitting] = useState(false);
+
     
     const parsedPrompt = React.useMemo(() => {
       if (!exam?.question_text) return {};
@@ -152,7 +154,23 @@
         setLoading(false);
       }
     };
-  
+    useEffect(() => {
+      if (loading || completed || submitting || !exam) {
+        console.log("⏸ Timer paused");
+        return;
+      }
+    
+      if (timeLeft <= 0) {
+        return finishExam();
+      }
+    
+      const timer = setInterval(() => {
+        setTimeLeft((t) => Math.max(0, t - 1));
+      }, 1000);
+    
+      return () => clearInterval(timer);
+    }, [timeLeft, loading, completed, submitting]);
+
     /* -----------------------------------------------------------
        ON MOUNT: Start exam → Load exam
     ----------------------------------------------------------- */
@@ -235,34 +253,17 @@
   init();
 }, [studentId]);
 
-    /* -----------------------------------------------------------
-       TIMER (DISPLAY ONLY)
-    ----------------------------------------------------------- */
-    useEffect(() => {
-    if (loading || completed || !exam) {
-      console.log("⏸ Timer paused (loading, completed, or no exam)");
-      return;
-    }
-
-  
-      if (timeLeft <= 0) {
-        console.log("⏰ Time reached zero → auto finish");
-        return finishExam();
-      }
-  
-      const timer = setInterval(() => {
-        setTimeLeft((t) => Math.max(0, t - 1));
-      }, 1000);
-  
-      return () => clearInterval(timer);
-    }, [timeLeft, loading, completed]);
+    
   
     /* -----------------------------------------------------------
        SUBMIT WRITING ANSWER
     ----------------------------------------------------------- */
     const finishExam = async () => {
+      if (submitting) return; // safety guard
+    
       console.log("🟣 finishExam() called");
-  
+      setSubmitting(true); // 🔒 LOCK UI IMMEDIATELY
+    
       try {
         const res = await fetch(
           `${BACKEND_URL}/api/exams/writing/submit?student_id=${studentId}`,
@@ -272,21 +273,21 @@
             body: JSON.stringify({ answer_text: answerText })
           }
         );
-  
+    
         console.log("🟣 submit status:", res.status);
-  
+    
       } catch (err) {
         console.error("❌ Submission failed:", err);
       } finally {
         setCompleted(true);
         await loadResult();
-      
+    
         if (typeof onExamFinish === "function") {
           onExamFinish();
         }
       }
     };
-  
+
     /* -----------------------------------------------------------
        HELPERS
     ----------------------------------------------------------- */
@@ -452,14 +453,30 @@
   
         <textarea
           className="writing-answer-box"
-          placeholder="Start writing your response here..."
+          placeholder={
+            submitting
+              ? "Submitting your writing for evaluation..."
+              : "Start writing your response here..."
+          }
           value={answerText}
+          disabled={submitting}
           onChange={(e) => setAnswerText(e.target.value)}
         />
+
   
-        <button className="submit-writing-btn" onClick={finishExam}>
-          Submit Writing
+        <button
+          className="submit-writing-btn"
+          onClick={finishExam}
+          disabled={submitting}
+        >
+          {submitting ? "Evaluating…" : "Submit Writing"}
         </button>
+        {submitting && (
+          <div className="processing-overlay">
+            <div className="spinner" />
+            <p>Evaluating your writing. Please wait…</p>
+          </div>
+        )}
       </div>
     );
   }
