@@ -882,5 +882,11 @@ progress::-webkit-progress-value {
 .ai-report h3 {
   font-weight: 700;
 }
+.section-label {
+  font-weight: 400; /* normal */
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
+
 
 
