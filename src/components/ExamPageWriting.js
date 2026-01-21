@@ -354,12 +354,13 @@
 
               <p>{data.score} / 5</p>
           
-              <strong>Strengths</strong>
+              <p className="section-label">Strengths</p>
               <ul>
                 {data.strengths.map((s, i) => <li key={i}>{s}</li>)}
               </ul>
           
-              <strong>Improvements Needed</strong>
+              <p className="section-label">Improvements Needed</p>
+
 
               {data.improvements && data.improvements.length > 0 ? (
                 <ul>
