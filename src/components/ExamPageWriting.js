@@ -321,9 +321,11 @@
 
       <p>
         <strong>Selective Readiness:</strong>{" "}
-        <span className="status">{result.status}</span>
-
+        <span className="status">
+          {result.selective_readiness_band}
+        </span>
       </p>
+
       <p className="scale-note">
         Scoring is based on NSW Selective criteria (25 marks total).
       </p>
