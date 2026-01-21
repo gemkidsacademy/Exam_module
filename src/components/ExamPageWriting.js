@@ -360,9 +360,17 @@
               </ul>
           
               <strong>Improvements Needed</strong>
-              <ul>
-                {data.improvements.map((i, idx) => <li key={idx}>{i}</li>)}
-              </ul>
+
+              {data.improvements && data.improvements.length > 0 ? (
+                <ul>
+                  {data.improvements.map((i, idx) => (
+                    <li key={idx}>{i}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="na-text">N/A</p>
+              )}
+
             </section>
           ))}
 
