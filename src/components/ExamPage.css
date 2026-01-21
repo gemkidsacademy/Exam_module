@@ -874,4 +874,10 @@ progress::-webkit-progress-value {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+.na-text {
+  font-style: italic;
+  color: #777;
+  margin-top: 4px;
+}
+
 
