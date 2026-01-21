@@ -175,7 +175,7 @@ export default function StudentExamReports() {
               {/* ✅ Writing score appears here */}
                 {report.exam_type === "writing" && (
                   <p className="writing-score">
-                    <strong>Writing Score:</strong> {report.overall_score} / 20
+                    <strong>Writing Score:</strong> {report.overall_score} / 25
                   </p>
                 )}
 
