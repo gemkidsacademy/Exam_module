@@ -178,6 +178,7 @@ export default function StudentExamReports() {
                     <strong>Writing Score:</strong> {report.overall_score} / 20
                   </p>
                 )}
+
               {/* Reading */}
               {report.exam_type === "reading" && (
                 <p className="reading-score">
