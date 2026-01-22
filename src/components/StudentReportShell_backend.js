@@ -50,7 +50,7 @@ export default function StudentReportShell_backend() {
   }, [studentId, exam, reportType]);
 
   useEffect(() => {
-  fetch("https://web-production-481a5.up.railway.app/api/students")
+  fetch("https://web-production-481a5.up.railway.app/api/admin/students")
     .then(res => {
       if (!res.ok) {
         throw new Error("Failed to fetch students");
