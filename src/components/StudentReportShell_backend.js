@@ -28,7 +28,8 @@ export default function StudentReportShell_backend() {
 
   const [shouldGenerate, setShouldGenerate] = useState(false);
   useEffect(() => {
-  if (!exam) {
+  // Run ONLY for Per Class Report
+  if (reportType !== "class" || !exam) {
     setAvailableExamDates([]);
     return;
   }
@@ -44,13 +45,13 @@ export default function StudentReportShell_backend() {
     })
     .then(data => {
       setAvailableExamDates(data.dates || []);
-      setDate("");
+      setDate(""); // reset previously selected date
     })
     .catch(err => {
       console.error("Error loading exam dates:", err);
       setAvailableExamDates([]);
     });
-}, [exam]);
+}, [exam, reportType]);
 
   useEffect(() => {
       if (!studentId || reportType !== "cumulative") {
@@ -99,11 +100,7 @@ export default function StudentReportShell_backend() {
 
 
 
-  const MOCK_ATTEMPT_DATES = {
-    S001: ["2024-01-05", "2024-01-20", "2024-02-10", "2024-03-01"],
-    S002: ["2024-01-12", "2024-02-18"],
-    S003: ["2024-03-03"]
-  };
+  
 
   return (
     <div>
@@ -279,9 +276,14 @@ export default function StudentReportShell_backend() {
       <div className="field">
         <label>Date</label>
         <select value={date} onChange={e => setDate(e.target.value)}>
-          <option value="2024-01-10">10 Jan 2024</option>
-          <option value="2024-02-15">15 Feb 2024</option>
+          <option value="">Select date</option>
+          {availableExamDates.map(d => (
+            <option key={d} value={d}>
+              {new Date(d).toLocaleDateString()}
+            </option>
+          ))}
         </select>
+
       </div>
     )}
   </div>
@@ -291,7 +293,7 @@ export default function StudentReportShell_backend() {
     className="secondary-btn"
     disabled={
       (reportType === "student" && !studentId) ||
-      (reportType === "class" && (!className || !classDay)) ||
+      (reportType === "class" && !exam)  ||
       (reportType === "cumulative" &&
         (!studentId || selectedAttemptDates.length === 0))
     }
