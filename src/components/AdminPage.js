@@ -5,6 +5,9 @@ import StudentExamReports from "./StudentExamReports";
 import SelectiveReadinessOverall from "./SelectiveReadinessOverall";
 import StudentReportShell from "./StudentReportShell";
 import BulkUserUpload from "./BulkUserUpload";
+import StudentReportShell_backend from "./BulkUserUpload";
+
+
 
 
 
@@ -108,15 +111,17 @@ const AdminPanel = () => {
      Tabs Config
   ============================ */
   const tabs = [
-   { id: "database", label: "Exam Module User Management" },
-   { id: "exam-type-selector", label: "Upload Questions Word Document" },
-   { id: "upload-image-folder", label: "Exam Image Folder" },
-   { id: "add-quiz", label: "Create Exam" },
-   { id: "generate-exam", label: "Generate Exam" },
-   { id: "student-exam-reports", label: "Student Exam Reports" },
-   { id: "topic-report-limited", label: "Topic Report (Front End only)" },
-   { id: "selective-readiness-overall", label: "Selective Readiness (Overall)" },
-   ];
+  { id: "database", label: "Exam Module User Management" },
+  { id: "exam-type-selector", label: "Upload Questions Word Document" },
+  { id: "upload-image-folder", label: "Exam Image Folder" },
+  { id: "add-quiz", label: "Create Exam" },
+  { id: "generate-exam", label: "Generate Exam" },
+  { id: "student-exam-reports", label: "Student Exam Reports" },
+  { id: "topic-report-limited", label: "Topic Report (Front End only)" },
+  { id: "topic-report-limited-2", label: "Topic Report (Front End only 2)" },
+  { id: "selective-readiness-overall", label: "Selective Readiness (Overall)" },
+];
+
 
   /* ============================
      User Callbacks
@@ -441,6 +446,11 @@ const AdminPanel = () => {
                {activeTab === "topic-report-limited" && (
                  <div className="tab-panel">
                    <StudentReportShell />
+                 </div>
+               )}
+               {activeTab === "topic-report-limited-2" && (
+                 <div className="tab-panel">
+                   <StudentReportShell_backend />
                  </div>
                )}
 
