@@ -26,28 +26,28 @@ export default function StudentReportShell_backend() {
 
   const [shouldGenerate, setShouldGenerate] = useState(false);
   useEffect(() => {
-    if (!studentId || reportType !== "cumulative") {
-      setAvailableAttemptDates([]);
-      return;
-    }
-  
-    fetch(
-      `https://web-production-481a5.up.railway.app/api/students/${studentId}/exam-attempts?exam=${exam}`
-    )
-      .then(res => {
-        if (!res.ok) {
-          throw new Error("Failed to fetch exam attempts");
-        }
-        return res.json();
-      })
-      .then(data => {
-        setAvailableAttemptDates(data.attemptDates || []);
-      })
-      .catch(err => {
-        console.error("Error loading attempt dates:", err);
+      if (!studentId || reportType !== "cumulative") {
         setAvailableAttemptDates([]);
-      });
-  }, [studentId, exam, reportType]);
+        return;
+      }
+    
+      fetch(
+        `https://web-production-481a5.up.railway.app/api/students/${studentId}/exam-attempts?exam=${exam}`
+      )
+        .then(res => {
+          if (!res.ok) {
+            throw new Error("Failed to fetch exam attempts");
+          }
+          return res.json();
+        })
+        .then(data => {
+          setAvailableAttemptDates(data.attemptDates || []);
+        })
+        .catch(err => {
+          console.error("Error loading attempt dates:", err);
+          setAvailableAttemptDates([]);
+        });
+    }, [studentId, exam, reportType]);
 
   useEffect(() => {
       fetch("https://web-production-481a5.up.railway.app/api/admin/students")
