@@ -60,7 +60,7 @@ export default function UploadWord_reading_MI() {
       {wordFile && <p>Selected file: {wordFile.name}</p>}
 
       <p className="note">
-        Upload a Word document to populate quiz questions in the database.
+        Upload a Main Idea and Summary(Type 1) Word document to populate quiz questions in the database.
       </p>
     </div>
   );
