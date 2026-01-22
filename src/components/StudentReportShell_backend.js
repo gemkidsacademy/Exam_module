@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import StudentCurrentExamReport from "./StudentCurrentExamReport";
 import ClassReportMock from "./ClassReportMock";
 import CumulativeReportMock from "./CumulativeReportMock";
@@ -8,6 +8,9 @@ import "./Reports.css";
 export default function StudentReportShell_backend() {
   const [reportType, setReportType] = useState("student");
   const [topic, setTopic] = useState("");
+
+  const [students, setStudents] = useState([]);
+
 
   const [studentId, setStudentId] = useState("");
   const [className, setClassName] = useState("");
@@ -22,6 +25,45 @@ export default function StudentReportShell_backend() {
   const [pendingAttemptDate, setPendingAttemptDate] = useState("");
 
   const [shouldGenerate, setShouldGenerate] = useState(false);
+  useEffect(() => {
+    if (!studentId || reportType !== "cumulative") {
+      setAvailableAttemptDates([]);
+      return;
+    }
+  
+    fetch(
+      `https://web-production-481a5.up.railway.app/api/students/${studentId}/exam-attempts?exam=${exam}`
+    )
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch exam attempts");
+        }
+        return res.json();
+      })
+      .then(data => {
+        setAvailableAttemptDates(data.attemptDates || []);
+      })
+      .catch(err => {
+        console.error("Error loading attempt dates:", err);
+        setAvailableAttemptDates([]);
+      });
+  }, [studentId, exam, reportType]);
+
+  useEffect(() => {
+  fetch("https://web-production-481a5.up.railway.app/api/students")
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch students");
+      }
+      return res.json();
+    })
+    .then(data => setStudents(data.students || []))
+    .catch(err => {
+      console.error("Error loading students:", err);
+      setStudents([]);
+    });
+}, []);
+
 
 
   const MOCK_ATTEMPT_DATES = {
@@ -65,24 +107,23 @@ export default function StudentReportShell_backend() {
       <div className="filter-group wide">
         <label>Student</label>
         <select
-          value={studentId}
-          onChange={e => {
-            const student = e.target.value;
-            setStudentId(student);
-            setPendingAttemptDate("");
-            setSelectedAttemptDates([]);
-            setShouldGenerate(false);
+            value={studentId}
+            onChange={e => {
+              const student = e.target.value;
+              setStudentId(student);
+              setPendingAttemptDate("");
+              setSelectedAttemptDates([]);
+              setShouldGenerate(false);
+            }}
+          >
+            <option value="">Select student</option>
+            {students.map(s => (
+              <option key={s.id} value={s.id}>
+                {s.label}
+              </option>
+            ))}
+          </select>
 
-            setAvailableAttemptDates(
-              student ? MOCK_ATTEMPT_DATES[student] || [] : []
-            );
-          }}
-        >
-          <option value="">Select student</option>
-          <option value="S001">Student S001</option>
-          <option value="S002">Student S002</option>
-          <option value="S003">Student S003</option>
-        </select>
 
         {reportType === "cumulative" && (
           <div className="attempt-group">
