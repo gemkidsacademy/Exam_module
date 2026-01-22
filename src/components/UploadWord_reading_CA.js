@@ -80,7 +80,7 @@ export default function UploadWordReadingCA() {
       {wordFile && <p>Selected file: {wordFile.name}</p>}
 
       <p className="note">
-        Upload a Word document to populate quiz questions in the database.
+        Upload a Comparative Analysis Word document to populate quiz questions in the database.
       </p>
 
       {error && <p className="error">{error}</p>}
