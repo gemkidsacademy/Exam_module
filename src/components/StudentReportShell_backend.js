@@ -28,31 +28,37 @@ export default function StudentReportShell_backend() {
 
   const [shouldGenerate, setShouldGenerate] = useState(false);
   useEffect(() => {
-    console.log("Exam dates effect fired", { reportType, exam });
-  
-    if (reportType !== "class" || !exam) {
-      setAvailableExamDates([]);
-      return;
-    }
+  if (!exam) {
+    setAvailableExamDates([]);
+    return;
+  }
 
-  fetch(
-    `https://web-production-481a5.up.railway.app/api/exams/dates?exam=${exam}`
-  )
-    .then(res => {
-      if (!res.ok) {
-        throw new Error("Failed to fetch exam dates");
-      }
-      return res.json();
-    })
-    .then(data => {
-      setAvailableExamDates(data.dates || []);
-      setDate(""); // reset previously selected date
-    })
-    .catch(err => {
-      console.error("Error loading exam dates:", err);
-      setAvailableExamDates([]);
-    });
-}, [exam, reportType]);
+  // PER STUDENT REPORT
+  if (reportType === "student" && studentId) {
+    fetch(
+      `https://web-production-481a5.up.railway.app/api/exams/dates?exam=${exam}&student_id=${studentId}`
+    )
+      .then(res => res.json())
+      .then(data => {
+        setAvailableExamDates(data.dates || []);
+        setDate("");
+      });
+    return;
+  }
+
+  // PER CLASS REPORT
+  if (reportType === "class") {
+    fetch(
+      `https://web-production-481a5.up.railway.app/api/exams/dates?exam=${exam}`
+    )
+      .then(res => res.json())
+      .then(data => {
+        setAvailableExamDates(data.dates || []);
+        setDate("");
+      });
+  }
+}, [exam, reportType, studentId]);
+
 
   useEffect(() => {
       if (!studentId || reportType !== "cumulative") {
