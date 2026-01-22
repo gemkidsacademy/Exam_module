@@ -450,7 +450,7 @@ const AdminPanel = () => {
                )}
                {activeTab === "topic-report-limited-2" && (
                  <div className="tab-panel">
-                   <StudentReportShell_backend />
+                   <StudentReportShell />
                  </div>
                )}
 
