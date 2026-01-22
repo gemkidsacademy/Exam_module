@@ -58,10 +58,9 @@ export default function StudentReportShell_backend() {
           return res.json();
         })
         .then(data => {
-          // data is an array, not an object
           const normalized = data.map(s => ({
             id: s.student_id,
-            label: s.name
+            label: `${s.student_id} – ${s.name}`   // ✅ ID is now displayed
           }));
           setStudents(normalized);
         })
