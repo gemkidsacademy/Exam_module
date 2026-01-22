@@ -104,6 +104,8 @@ export default function SelectiveReadinessOverall() {
     if (!res.ok) {
       // Backend-controlled error handling
       setError(data);
+      setShowPreview(false);
+
       return;
     }
 
@@ -122,37 +124,36 @@ export default function SelectiveReadinessOverall() {
   /* ============================
      Derived visuals
   ============================ */
-  const subjectChartData = overall
+  const subjectChartData =
+  overall && overall.components
     ? Object.entries(overall.components).map(([k, v]) => ({
         subject: SUBJECT_LABELS[k],
         score: normalizeScore(k, v),
       }))
     : [];
 
+
   let balanceIndex = null;
   let rawBalance = null;
   let strengths = [];
   let improvements = [];
   
-  if (overall) {
-    const normalizedScores = Object.entries(overall.components).map(
-      ([k, v]) => normalizeScore(k, v)
-    );
-  
-    // 1️⃣ Compute raw balance (true mathematical value)
-    rawBalance =
-      100 - (Math.max(...normalizedScores) - Math.min(...normalizedScores));
-  
-    // 2️⃣ Clamp for UI so bar never appears "empty"
-    balanceIndex = Math.max(15, Math.round(rawBalance));
-  
-    // 3️⃣ Strengths vs improvements
-    Object.entries(overall.components).forEach(([k, v]) => {
-      const pct = normalizeScore(k, v);
-      if (pct >= 90) strengths.push(SUBJECT_LABELS[k]);
-      else improvements.push(SUBJECT_LABELS[k]);
-    });
-  }
+  if (overall && overall.components) {
+  const normalizedScores = Object.entries(overall.components).map(
+    ([k, v]) => normalizeScore(k, v)
+  );
+
+  rawBalance =
+    100 - (Math.max(...normalizedScores) - Math.min(...normalizedScores));
+
+  balanceIndex = Math.max(15, Math.round(rawBalance));
+
+  Object.entries(overall.components).forEach(([k, v]) => {
+    const pct = normalizeScore(k, v);
+    if (pct >= 90) strengths.push(SUBJECT_LABELS[k]);
+    else improvements.push(SUBJECT_LABELS[k]);
+  });
+}
 
   /* ============================
      Subject Focus Card
