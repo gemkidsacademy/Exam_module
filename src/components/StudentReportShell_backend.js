@@ -8,6 +8,8 @@ import "./Reports.css";
 export default function StudentReportShell_backend() {
   const [reportType, setReportType] = useState("student");
   const [topic, setTopic] = useState("");
+  const [availableExamDates, setAvailableExamDates] = useState([]);
+
 
   const [students, setStudents] = useState([]);
 
@@ -25,6 +27,31 @@ export default function StudentReportShell_backend() {
   const [pendingAttemptDate, setPendingAttemptDate] = useState("");
 
   const [shouldGenerate, setShouldGenerate] = useState(false);
+  useEffect(() => {
+  if (!exam) {
+    setAvailableExamDates([]);
+    return;
+  }
+
+  fetch(
+    `https://web-production-481a5.up.railway.app/api/exams/dates?exam=${exam}`
+  )
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch exam dates");
+      }
+      return res.json();
+    })
+    .then(data => {
+      setAvailableExamDates(data.dates || []);
+      setDate("");
+    })
+    .catch(err => {
+      console.error("Error loading exam dates:", err);
+      setAvailableExamDates([]);
+    });
+}, [exam]);
+
   useEffect(() => {
       if (!studentId || reportType !== "cumulative") {
         setAvailableAttemptDates([]);
