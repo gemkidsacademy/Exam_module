@@ -252,12 +252,14 @@ export default function StudentReportShell_backend() {
     <div className="field">
       <label>Exam: </label>
       <select value={exam} onChange={e => setExam(e.target.value)}>
+        <option value="">Select exam</option>
         <option value="thinking_skills">Thinking Skills</option>
         <option value="reading">Reading</option>
         <option value="mathematics">Mathematics</option>
         <option value="writing">Writing</option>
         <option value="foundational">Foundational</option>
       </select>
+
     </div>
 
     {reportType === "cumulative" && (
