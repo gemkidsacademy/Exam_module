@@ -5,7 +5,7 @@ import StudentExamReports from "./StudentExamReports";
 import SelectiveReadinessOverall from "./SelectiveReadinessOverall";
 import StudentReportShell from "./StudentReportShell";
 import BulkUserUpload from "./BulkUserUpload";
-import StudentReportShell_backend from "./BulkUserUpload";
+import StudentReportShell_backend from "./StudentReportShell_backend";
 
 
 
