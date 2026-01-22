@@ -17,6 +17,8 @@ import "./SelectiveReadinessOverall.css";
 const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
 export default function SelectiveReadinessOverall() {
+  const [error, setError] = useState(null);
+
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState("");
   const [availableDates, setAvailableDates] = useState([]);
@@ -85,17 +87,37 @@ export default function SelectiveReadinessOverall() {
      Generate Overall Report
   ============================ */
   const generateOverallReport = async () => {
-    if (!selectedStudent || !selectedDate) return;
+  if (!selectedStudent || !selectedDate) return;
 
-    setLoading(true);
+  setLoading(true);
+  setError(null);
+  setOverall(null);
+
+  try {
     const res = await fetch(
       `${BACKEND_URL}/api/admin/students/${selectedStudent}/overall-selective-report?exam_date=${selectedDate}`,
       { method: "POST" }
     );
+
     const data = await res.json();
+
+    if (!res.ok) {
+      // Backend-controlled error handling
+      setError(data);
+      return;
+    }
+
     setOverall(data);
+  } catch (err) {
+    setError({
+      code: "NETWORK_ERROR",
+      message: "Unable to reach server. Please try again."
+    });
+  } finally {
     setLoading(false);
-  };
+  }
+};
+
 
   /* ============================
      Derived visuals
@@ -214,9 +236,11 @@ export default function SelectiveReadinessOverall() {
         <button
           className="generate-button"
           onClick={generateOverallReport}
+          disabled={loading}
         >
-          Generate Overall Readiness Report
+          {loading ? "Generating..." : "Generate Overall Readiness Report"}
         </button>
+
 
         {overall && (
           <button
@@ -228,9 +252,30 @@ export default function SelectiveReadinessOverall() {
         )}
       </div>
     )}
+    {error && (
+      <div className="error-box">
+        <h4>Unable to Generate Report</h4>
+    
+        <p>{error.message}</p>
+    
+        {error.code === "INCOMPLETE_EXAMS" && (
+          <p>
+            Missing exams:{" "}
+            <strong>{error.missing_subjects.join(", ")}</strong>
+          </p>
+        )}
+    
+        {error.code === "NO_EXAMS_FOUND" && (
+          <p>
+            The student has not attempted any exams on the selected date.
+          </p>
+        )}
+      </div>
+    )}
 
     {/* ================= SCREEN REPORT ================= */}
-    {overall && (
+    {overall && !error && (
+
       <div className="overall-summary">
         <ReportContent
           overall={overall}
@@ -243,6 +288,7 @@ export default function SelectiveReadinessOverall() {
         />
       </div>
     )}
+    
 
     {/* ================= PDF PREVIEW MODAL ================= */}
     {showPreview && overall && (
