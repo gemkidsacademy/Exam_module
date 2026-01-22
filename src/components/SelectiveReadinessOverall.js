@@ -255,7 +255,7 @@ export default function SelectiveReadinessOverall() {
     )}
     {error && (
       <div className="error-box">
-        <h4>Unable to Generate Report</h4>
+        <h4>Unable to Generate Report because the student has not attempted all four exams</h4>
     
         <p>{error.message}</p>
     
