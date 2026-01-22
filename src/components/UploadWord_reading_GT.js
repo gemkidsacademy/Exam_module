@@ -67,7 +67,7 @@ export default function UploadWord_reading_GT() {
       {wordFile && <p>Selected file: {wordFile.name}</p>}
 
       <p className="note">
-        Upload a Word document to populate quiz questions in the database.
+        Upload a Gapped Text Word document to populate quiz questions in the database.
       </p>
     </div>
   );
