@@ -9,6 +9,10 @@ export default function StudentReportShell_backend() {
   const [reportType, setReportType] = useState("class");
   const [topic, setTopic] = useState("");
   const [availableExamDates, setAvailableExamDates] = useState([]);
+  const [reportData, setReportData] = useState(null);
+  const [loadingReport, setLoadingReport] = useState(false);
+  const [reportError, setReportError] = useState(null);
+
 
 
   const [students, setStudents] = useState([]);
@@ -27,6 +31,46 @@ export default function StudentReportShell_backend() {
   const [pendingAttemptDate, setPendingAttemptDate] = useState("");
 
   const [shouldGenerate, setShouldGenerate] = useState(false);
+  useEffect(() => {
+    if (
+      !shouldGenerate ||
+      reportType !== "student" ||
+      !studentId ||
+      !exam ||
+      !date
+    ) {
+      return;
+    }
+  
+    setLoadingReport(true);
+    setReportError(null);
+  
+    fetch(
+      `https://web-production-481a5.up.railway.app/api/reports/student` +
+      `?student_id=${studentId}&exam=${exam}&date=${date}`
+    )
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Failed to load student report");
+        }
+        return res.json();
+      })
+      .then(data => {
+        setReportData(data);
+      })
+      .catch(err => {
+        console.error(err);
+        setReportError(err.message);
+        setReportData(null);
+      })
+      .finally(() => {
+        setLoadingReport(false);
+        setShouldGenerate(false);
+      });
+  
+  }, [shouldGenerate, reportType, studentId, exam, date]);
+
+  
   useEffect(() => {
   if (!exam) {
     setAvailableExamDates([]);
@@ -330,12 +374,17 @@ export default function StudentReportShell_backend() {
       {/* ================= REPORT CONTENT ================= */}
 
 
-{shouldGenerate &&
-  reportType === "student" &&
-  studentId && (
-    <StudentCurrentExamReport studentId={studentId} />
+{loadingReport && reportType === "student" && (
+  <p>Loading report…</p>
 )}
 
+{reportError && reportType === "student" && (
+  <p className="error">{reportError}</p>
+)}
+
+{reportData && reportType === "student" && (
+  <StudentCurrentExamReport data={reportData} />
+)}
 {shouldGenerate &&
   reportType === "class" &&
   className &&
@@ -362,9 +411,10 @@ export default function StudentReportShell_backend() {
 
 {showPDF && (
   <PDFPreviewMock onClose={() => setShowPDF(false)}>
-    {reportType === "student" && studentId && (
-      <StudentCurrentExamReport studentId={studentId} />
+    {reportType === "student" && reportData && (
+      <StudentCurrentExamReport data={reportData} />
     )}
+
 
     {reportType === "class" && className && classDay && (
       <ClassReportMock
