@@ -32,6 +32,12 @@ export default function SelectiveReadinessOverall() {
   contentRef: printRef,
   documentTitle: "Selective_Readiness_Report",
 });
+const MAX_SCORES = {
+  reading: 100,
+  mathematical_reasoning: 100,
+  thinking_skills: 100,
+  writing: 25,
+};
 
 
 
@@ -50,8 +56,10 @@ export default function SelectiveReadinessOverall() {
   /* ============================
      Helpers
   ============================ */
-  const normalizeScore = (subject, value) =>
-    subject === "writing" ? Math.round((value / 20) * 100) : value;
+  const normalizeScore = (subject, value) => {
+    const max = MAX_SCORES[subject];
+    return Math.round((value / max) * 100);
+  };
 
   
 
@@ -181,9 +189,9 @@ export default function SelectiveReadinessOverall() {
         </div>
   
         <p>
-          {label} Score: {rawScore}
-          {subjectKey === "writing" ? " / 20" : " / 100"} ({percent}%)
+          {label} Score: {rawScore} / {MAX_SCORES[subjectKey]} ({percent}%)
         </p>
+
       </div>
     );
   }
