@@ -6,7 +6,7 @@ import PDFPreviewMock from "./PDFPreviewMock";
 import "./Reports.css";
 
 export default function StudentReportShell_backend() {
-  const [reportType, setReportType] = useState("student");
+  const [reportType, setReportType] = useState("class");
   const [topic, setTopic] = useState("");
   const [availableExamDates, setAvailableExamDates] = useState([]);
 
@@ -18,7 +18,7 @@ export default function StudentReportShell_backend() {
   const [className, setClassName] = useState("");
   const [classDay, setClassDay] = useState("");
 
-  const [exam, setExam] = useState("thinking_skills");
+  const [exam, setExam] = useState("");
   const [date, setDate] = useState("2024-01-10");
   const [showPDF, setShowPDF] = useState(false);
 
@@ -28,11 +28,12 @@ export default function StudentReportShell_backend() {
 
   const [shouldGenerate, setShouldGenerate] = useState(false);
   useEffect(() => {
-  // Run ONLY for Per Class Report
-  if (reportType !== "class" || !exam) {
-    setAvailableExamDates([]);
-    return;
-  }
+    console.log("Exam dates effect fired", { reportType, exam });
+  
+    if (reportType !== "class" || !exam) {
+      setAvailableExamDates([]);
+      return;
+    }
 
   fetch(
     `https://web-production-481a5.up.railway.app/api/exams/dates?exam=${exam}`
