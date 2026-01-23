@@ -250,7 +250,7 @@ export default function QuizSetup_foundational() {
             >
               <option value="">Select Subject</option>
               <option value="english">English</option>
-              <option value="maths">Maths</option>
+              
             </select>
           </div>
 
