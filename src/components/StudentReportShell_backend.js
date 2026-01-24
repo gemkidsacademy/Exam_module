@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+"import React, { useState, useEffect } from "react";
 import StudentCurrentExamReport from "./StudentCurrentExamReport";
 import ClassReportMock from "./ClassReportMock";
 import CumulativeReportMock from "./CumulativeReportMock";
@@ -16,6 +16,8 @@ export default function StudentReportShell_backend() {
 
 
   const [students, setStudents] = useState([]);
+  const [dateWarning, setDateWarning] = useState("");
+
 
 
   const [studentId, setStudentId] = useState("");
@@ -23,7 +25,7 @@ export default function StudentReportShell_backend() {
   const [classDay, setClassDay] = useState("");
 
   const [exam, setExam] = useState("");
-  const [date, setDate] = useState("2024-01-10");
+  const [date, setDate] = useState("");
   const [showPDF, setShowPDF] = useState(false);
 
   const [availableAttemptDates, setAvailableAttemptDates] = useState([]);
@@ -32,43 +34,48 @@ export default function StudentReportShell_backend() {
 
   const [shouldGenerate, setShouldGenerate] = useState(false);
   useEffect(() => {
-    if (
-      !shouldGenerate ||
-      reportType !== "student" ||
-      !studentId ||
-      !exam ||
-      !date
-    ) {
-      return;
-    }
-  
-    setLoadingReport(true);
-    setReportError(null);
-  
-    fetch(
-      `https://web-production-481a5.up.railway.app/api/reports/student` +
-      `?student_id=${studentId}&exam=${exam}&date=${date}`
-    )
-      .then(res => {
-        if (!res.ok) {
-          throw new Error("Failed to load student report");
-        }
-        return res.json();
-      })
-      .then(data => {
-        setReportData(data);
-      })
-      .catch(err => {
-        console.error(err);
-        setReportError(err.message);
-        setReportData(null);
-      })
-      .finally(() => {
-        setLoadingReport(false);
-        setShouldGenerate(false);
-      });
-  
-  }, [shouldGenerate, reportType, studentId, exam, date]);
+  // Only generate when explicitly requested
+  if (
+    !shouldGenerate ||
+    reportType !== "student" ||
+    !studentId ||
+    !exam ||
+    !date
+  ) {
+    return;
+  }
+
+  setLoadingReport(true);
+  setReportError(null);
+
+  // 🔑 Route writing and MCQ to correct endpoints
+  const url =
+    exam === "writing"
+      ? `https://web-production-481a5.up.railway.app/api/reports/student/writing?student_id=${studentId}&date=${date}`
+      : `https://web-production-481a5.up.railway.app/api/reports/student?student_id=${studentId}&exam=${exam}&date=${date}`;
+
+  fetch(url)
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to load student report");
+      }
+      return res.json();
+    })
+    .then(data => {
+      setReportData(data);
+    })
+    .catch(err => {
+      console.error("Student report load error:", err);
+      setReportError(err.message);
+      setReportData(null);
+    })
+    .finally(() => {
+      setLoadingReport(false);
+      setShouldGenerate(false); // reset trigger
+    });
+
+}, [shouldGenerate, reportType, studentId, exam, date]);
+
 
   
   useEffect(() => {
@@ -82,9 +89,8 @@ export default function StudentReportShell_backend() {
   if (reportType === "student" && studentId) {
     const url =
       exam === "writing"
-        ? `https://web-production-481a5.up.railway.app/api/reports/student/writing?student_id=${studentId}&date=${date}`
-        : `https://web-production-481a5.up.railway.app/api/reports/student?student_id=${studentId}&exam=${exam}&date=${date}`;
-
+        ? `https://web-production-481a5.up.railway.app/api/exams/writing/dates?student_id=${studentId}`
+        : `https://web-production-481a5.up.railway.app/api/exams/dates?exam=${exam}&student_id=${studentId}`;
   
     fetch(url)
       .then(res => res.json())
@@ -95,6 +101,7 @@ export default function StudentReportShell_backend() {
   
     return;
   }
+
 
 
   // PER CLASS REPORT
@@ -335,7 +342,14 @@ export default function StudentReportShell_backend() {
     {reportType !== "cumulative" && (
       <div className="field">
         <label>Date</label>
-        <select value={date} onChange={e => setDate(e.target.value)}>
+        <select
+          value={date}
+          onChange={e => {
+            setDate(e.target.value);
+            setDateWarning("");
+          }}
+        >
+
           <option value="">Select date</option>
           {availableExamDates.map(d => (
             <option key={d} value={d}>
@@ -343,6 +357,12 @@ export default function StudentReportShell_backend() {
             </option>
           ))}
         </select>
+         {/* 🔴 ADD WARNING RIGHT HERE */}
+          {dateWarning && (
+            <p className="error" style={{ marginTop: "6px" }}>
+              {dateWarning}
+            </p>
+          )}
 
       </div>
     )}
@@ -357,7 +377,17 @@ export default function StudentReportShell_backend() {
       (reportType === "cumulative" &&
         (!studentId || selectedAttemptDates.length === 0))
     }
-    onClick={() => setShouldGenerate(true)}
+    onClick={() => {
+      // 🔴 Student report requires date
+      if (reportType === "student" && !date) {
+        setDateWarning("Please select a date before generating the report.");
+        return;
+      }
+    
+      setDateWarning("");
+      setShouldGenerate(true);
+    }}
+
   >
     Generate
   </button>
