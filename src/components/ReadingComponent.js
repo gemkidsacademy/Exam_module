@@ -91,21 +91,45 @@
         );
     
         const examData = await examRes.json();
+        console.log("📘 EXAM CONTENT (raw):", examData);
+        console.log("📘 exam_json:", examData.exam_json);
+        console.log("📘 exam_json.sections:", examData.exam_json?.sections);
+        console.log("📘 sections length:", examData.exam_json?.sections?.length);
         console.log("📘 EXAM CONTENT:", examData);
     
-        const flatQuestions = (examData.exam_json?.sections || []).flatMap(
-          (section) =>
-            (section.questions || []).map((q) => ({
-              ...q,
-              topic: section.topic,
-              passage_style: section.passage_style || "informational",
-              answer_options: q.answer_options || section.answer_options || {},
-              section_ref: section
-            }))
-        );
-    
+        const sections = examData.exam_json?.sections || [];
+
+console.log("🧩 FLATTEN: sections =", sections);
+
+const flatQuestions = sections.flatMap((section, sIdx) => {
+  console.log(`🧩 Section ${sIdx}`, section);
+
+  const qs = section.questions || [];
+  console.log(`🧩 Section ${sIdx} questions count:`, qs.length);
+
+  return qs.map((q, qIdx) => {
+    console.log(`🧩 Q ${sIdx}-${qIdx}`, q.question_id);
+    return {
+      ...q,
+      topic: section.topic,
+      passage_style: section.passage_style || "informational",
+      answer_options: q.answer_options || section.answer_options || {},
+      section_ref: section
+    };
+  });
+});
+
+console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
+
         setExam(examData.exam_json);
         setQuestions(flatQuestions);
+        setTimeout(() => {
+  console.log("🧠 STATE AFTER SET", {
+    exam,
+    questionsCount: questions.length
+  });
+}, 0);
+
     
         onExamStart?.();
       };
@@ -345,8 +369,15 @@
       ============================= */
       const currentQuestion = questions[index];
       if (!exam || !currentQuestion) {
-        return <div>Loading Exam…</div>;
-      }
+          console.log("⛔ RENDER BLOCKED", {
+            exam,
+            currentQuestion,
+            questionsCount: questions.length,
+            index
+          });
+          return <div>Loading Exam…</div>;
+        }
+
     
       const options = currentQuestion.answer_options || {};
       const hasOptions = Object.keys(options).length > 0;
