@@ -8,77 +8,30 @@ import {
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell,
-  LineChart,
-  Line
+  Cell
 } from "recharts";
 import "./StudentCurrentExamReport.css";
 
-
-/* ============================
-   MOCK DATA
-============================ */
-
-const examSummary = {
-  examName: "NSW Selective Thinking Skills Test",
-  totalQuestions: 20,
-  attempted: 20,
-  correct: 8,
-  incorrect: 12,
-  notAttempted: 0,
-  accuracy: 40,
-  scorePercent: 40,
-  result: "Fail"
-};
-
-const topicPerformance = [
-  {
-    topic: "Time Reasoning",
-    total: 10,
-    attempted: 10,
-    correct: 3,
-    incorrect: 7,
-    notAttempted: 0
-  },
-  {
-    topic: "Pattern Recognition",
-    total: 6,
-    attempted: 6,
-    correct: 4,
-    incorrect: 2,
-    notAttempted: 0
-  },
-  {
-    topic: "Logical Sequences",
-    total: 4,
-    attempted: 4,
-    correct: 1,
-    incorrect: 3,
-    notAttempted: 0
-  }
-];
-
-/* ============================
-   DERIVED DATA
-============================ */
-
-const accuracyPie = [
-  { name: "Correct", value: examSummary.correct },
-  { name: "Incorrect", value: examSummary.incorrect },
-  { name: "Not Attempted", value: examSummary.notAttempted }
-];
-
 const COLORS = ["#22c55e", "#ef4444", "#94a3b8"];
 
-/* ============================
-   COMPONENT
-============================ */
+export default function StudentCurrentExamReport({ data }) {
+  if (!data) return null;
 
-export default function StudentExamReportMock() {
+  const { summary, topics, improvement_areas, exam, date } = data;
+
+  const accuracyPie = [
+    { name: "Correct", value: summary.correct },
+    { name: "Incorrect", value: summary.incorrect },
+    { name: "Not Attempted", value: summary.not_attempted }
+  ];
+
   return (
     <div className="report-container">
 
-      <h2>{examSummary.examName}</h2>
+      <h2>
+        {exam.replace(/_/g, " ").toUpperCase()} —{" "}
+        {new Date(date).toLocaleDateString()}
+      </h2>
 
       {/* ============================
           OVERALL ACCURACY
@@ -88,14 +41,14 @@ export default function StudentExamReportMock() {
 
         <div className="summary-grid">
           <div>
-            <p><strong>Total Questions:</strong> {examSummary.totalQuestions}</p>
-            <p><strong>Attempted:</strong> {examSummary.attempted}</p>
-            <p><strong>Correct:</strong> {examSummary.correct}</p>
-            <p><strong>Incorrect:</strong> {examSummary.incorrect}</p>
-            <p><strong>Not Attempted:</strong> {examSummary.notAttempted}</p>
-            <p><strong>Accuracy:</strong> {examSummary.accuracy}%</p>
-            <p><strong>Score:</strong> {examSummary.scorePercent}%</p>
-            <p><strong>Result:</strong> {examSummary.result}</p>
+            <p><strong>Total Questions:</strong> {summary.total_questions}</p>
+            <p><strong>Attempted:</strong> {summary.attempted}</p>
+            <p><strong>Correct:</strong> {summary.correct}</p>
+            <p><strong>Incorrect:</strong> {summary.incorrect}</p>
+            <p><strong>Not Attempted:</strong> {summary.not_attempted}</p>
+            <p><strong>Accuracy:</strong> {summary.accuracy}%</p>
+            <p><strong>Score:</strong> {summary.score}%</p>
+            <p><strong>Result:</strong> {summary.result}</p>
           </div>
 
           <ResponsiveContainer width={250} height={250}>
@@ -124,13 +77,12 @@ export default function StudentExamReportMock() {
         <h3>Topic-wise Performance</h3>
 
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={topicPerformance}>
+          <BarChart data={topics}>
             <XAxis dataKey="topic" />
             <YAxis />
             <Tooltip />
             <Bar dataKey="correct" stackId="a" fill="#22c55e" />
             <Bar dataKey="incorrect" stackId="a" fill="#ef4444" />
-            <Bar dataKey="notAttempted" stackId="a" fill="#94a3b8" />
           </BarChart>
         </ResponsiveContainer>
       </section>
@@ -141,26 +93,18 @@ export default function StudentExamReportMock() {
       <section className="card">
         <h3>Improvement Areas</h3>
 
-        {topicPerformance
-          .sort((a, b) => a.correct - b.correct)
-          .map(topic => {
-            const accuracy = Math.round(
-              (topic.correct / topic.total) * 100
-            );
-
-            return (
-              <div key={topic.topic} className="improvement-row">
-                <span>{topic.topic}</span>
-                <div className="progress-bar">
-                  <div
-                    className="progress-fill"
-                    style={{ width: `${accuracy}%` }}
-                  />
-                </div>
-                <span>{accuracy}%</span>
-              </div>
-            );
-          })}
+        {improvement_areas.map(area => (
+          <div key={area.topic} className="improvement-row">
+            <span>{area.topic}</span>
+            <div className="progress-bar">
+              <div
+                className="progress-fill"
+                style={{ width: `${100 - area.weakness}%` }}
+              />
+            </div>
+            <span>{100 - area.weakness}%</span>
+          </div>
+        ))}
 
         <p className="note">
           Topics with fewer questions may show limited accuracy trends.
