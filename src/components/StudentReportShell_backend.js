@@ -1,4 +1,4 @@
-"import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import StudentCurrentExamReport from "./StudentCurrentExamReport";
 import ClassReportMock from "./ClassReportMock";
 import CumulativeReportMock from "./CumulativeReportMock";
