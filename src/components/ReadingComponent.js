@@ -134,12 +134,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
         setExam(examData.exam_json);
         setIndex(0); // ✅ REQUIRED
         setQuestions(flatQuestions);
-        setTimeout(() => {
-  console.log("🧠 STATE AFTER SET", {
-    exam,
-    questionsCount: questions.length
-  });
-}, 0);
+        
 
     
         onExamStart?.();
@@ -378,16 +373,11 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
       /* =============================
          SAFE GUARD
       ============================= */
-      const currentQuestion = questions[index];
-      if (!exam || !currentQuestion) {
-          console.log("⛔ RENDER BLOCKED", {
-            exam,
-            currentQuestion,
-            questionsCount: questions.length,
-            index
-          });
-          return <div>Loading Exam…</div>;
-        }
+      if (!exam || questions.length === 0) {
+      return <div>Loading Exam…</div>;
+    }
+    
+    const currentQuestion = questions[index];
 
     
       const options = currentQuestion.answer_options || {};
