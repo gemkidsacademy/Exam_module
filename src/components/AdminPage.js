@@ -118,7 +118,7 @@ const AdminPanel = () => {
   { id: "generate-exam", label: "Generate Exam" },
   { id: "student-exam-reports", label: "Student Exam Reports" },
   { id: "topic-report-limited", label: "Topic Report (Front End only)" },
-  { id: "topic-report-limited-2", label: "Topic Report (Front End only 2)" },
+  { id: "topic-report-limited-2", label: "Topic Report (coming soon)" },
   { id: "selective-readiness-overall", label: "Selective Readiness (Overall)" },
 ];
 
