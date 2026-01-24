@@ -19,24 +19,29 @@ export default function ReadingComponent({
   const [visited, setVisited] = useState({});
   const [finished, setFinished] = useState(false);
 
-  const [sessionId, setSessionId] = useState(null);
+  const [attemptId, setAttemptId] = useState(null);
+
   const [timeLeft, setTimeLeft] = useState(null);
 
   const [report, setReport] = useState(null);
   const normalizedReport = useMemo(() => {
-    if (!report) return null;
-  
-    return {
-      total: report.overall.total_questions,
-      attempted: report.overall.attempted,
-      correct: report.overall.correct,
-      incorrect: report.overall.incorrect,
-      not_attempted: report.overall.not_attempted,
-      accuracy: report.overall.accuracy,
-      topics: report.topics || [],
-      improvement_order: report.improvement_order || []
-    };
-  }, [report]);
+      if (!report) return null;
+    
+      return {
+        total: report.overall.total_questions,
+        attempted: report.overall.attempted,
+        correct: report.overall.correct,
+        incorrect: report.overall.incorrect,
+        not_attempted: report.overall.not_attempted,
+        accuracy: report.overall.accuracy,
+        score: report.overall.score,
+        result: report.overall.result,   // ✅ PASS / FAIL
+        has_sufficient_data: report.has_sufficient_data,
+        topics: report.topics || [],
+        improvement_order: report.improvement_order || []
+      };
+    }, [report]);
+
   const [loadingReport, setLoadingReport] = useState(false);
 
   /* =============================
@@ -55,54 +60,48 @@ export default function ReadingComponent({
      LOAD EXAM
   ============================= */
   useEffect(() => {
-    if (!studentId) return;
+  if (!studentId) return;
 
-    const loadExam = async () => {
-      const res = await fetch(
-        `${BACKEND_URL}/api/exams/start-reading?student_id=${studentId}`,
-        { method: "POST" }
-      );
-
-      const data = await res.json();
-
-      console.log("🧪 API RESPONSE DATA:", data);
-
-
-      if (data.finished === true) {
-        setSessionId(data.session_id);
-        setFinished(true);
-        onExamFinish?.();  
-        return;
+  const loadExam = async () => {
+    const res = await fetch(
+      `${BACKEND_URL}/api/exams/start-reading`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ student_id: studentId })
       }
+    );
 
-      // 🔑 Reading exams come directly from exam_json.questions
-      const flatQuestions = (data.exam_json?.sections || []).flatMap(section =>
+    const data = await res.json();
+    console.log("🧪 API RESPONSE DATA:", data);
+
+    if (data.completed === true) {
+      setFinished(true);
+      onExamFinish?.();
+      return;
+    }
+
+    const flatQuestions = (data.exam_json?.sections || []).flatMap(section =>
       (section.questions || []).map(q => ({
         ...q,
         topic: section.topic,
-        passage_style: section.passage_style || "informational", // ✅ ADD
+        passage_style: section.passage_style || "informational",
         answer_options: q.answer_options || section.answer_options || {},
         section_ref: section
       }))
     );
-      console.log("📘 Flattened questions count:", flatQuestions.length);
 
-      setExam(data.exam_json);
-      setQuestions(flatQuestions);
-      setSessionId(data.session_id);
-      onExamStart?.();  
+    setExam(data.exam_json);
+    setQuestions(flatQuestions);
+    setAttemptId(data.attempt_id);
+    onExamStart?.();
 
-      const durationSeconds = (data.duration_minutes || 40) * 60;
-      const start = new Date(data.start_time).getTime();
-      const now = new Date(data.server_now).getTime();
+    // ✅ CHANGE 3 (correct)
+    setTimeLeft(data.remaining_time);
+  };
 
-      setTimeLeft(
-        Math.max(durationSeconds - Math.floor((now - start) / 1000), 0)
-      );
-    };
-
-    loadExam();
-  }, [studentId]);
+  loadExam();
+}, [studentId]);
 
   /* =============================
      TIMER
@@ -138,37 +137,9 @@ export default function ReadingComponent({
   /* =============================
      LOAD REPORT
   ============================= */
-  const loadReport = async () => {
-  if (!sessionId) return;
+  
+    
 
-  setLoadingReport(true);
-  console.log("📊 Loading report for session:", sessionId);
-
-  try {
-    const res = await fetch(
-      `${BACKEND_URL}/api/exams/reading-report?session_id=${sessionId}`
-    );
-
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error("❌ report load failed:", errText);
-      return;
-    }
-
-    const data = await res.json();
-    setReport(data);
-
-  } catch (err) {
-    console.error("❌ report load error:", err);
-  } finally {
-    setLoadingReport(false);
-  }
-};
-useEffect(() => {
-  if (finished && sessionId) {
-    loadReport();
-  }
-}, [finished, sessionId]);
 
 
   /* =============================
@@ -184,8 +155,8 @@ useEffect(() => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          session_id: sessionId,
-          answers   // 🔑 raw answers only (keyed by question_id)
+          session_id: attemptId,
+          answers
         })
       }
     );
@@ -196,8 +167,13 @@ useEffect(() => {
       return;
     }
 
+    const data = await res.json();
+
+    // ✅ CHANGE 4B: hydrate report immediately
+    setReport(data.report);
+
     setFinished(true);
-    onExamFinish?.();  
+    onExamFinish?.();
 
   } catch (err) {
     console.error("❌ submit-reading error:", err);
@@ -234,6 +210,13 @@ useEffect(() => {
     <h1>
       You scored {normalizedReport.correct} out of {normalizedReport.total}
     </h1>
+    <div
+      className={`result-badge ${
+        normalizedReport.result === "Pass" ? "pass" : "fail"
+      }`}
+    >
+      {normalizedReport.result}
+    </div>
 
     <div className="report-grid">
 
@@ -278,47 +261,60 @@ useEffect(() => {
       </div>
 
       {/* =============================
-          IMPROVEMENT AREAS (NEW)
-      ============================= */}
-      <div className="card">
-        <h3>Improvement Areas</h3>
-        <p className="section-note">
-          Topics are ranked from weakest to strongest based on performance.
-        </p>
+    IMPROVEMENT AREAS
+============================= */}
+{normalizedReport.has_sufficient_data && (
+  <div className="card">
+    <h3>Improvement Areas</h3>
+    <p className="section-note">
+      Topics are ranked from weakest to strongest based on performance.
+    </p>
 
-        {normalizedReport.improvement_order.map((topic, idx) => {
-          const t = normalizedReport.topics.find(
-            (x) => x.topic === topic
-          );
+    {normalizedReport.improvement_order.map((topic, idx) => {
+      const t = normalizedReport.topics.find(
+        (x) => x.topic === topic
+      );
 
-          if (!t) return null;
+      if (!t) return null;
 
-          return (
-            <div key={topic} className="improve-row">
-              <strong>
-                {idx + 1}. {prettyTopic(topic)}
-              </strong>
+      return (
+        <div key={topic} className="improve-row">
+          <strong>
+            {idx + 1}. {prettyTopic(topic)}
+          </strong>
 
-              <div className="bar">
-                <div
-                  className="fill red"
-                  style={{ width: `${t.accuracy}%` }}
-                />
-              </div>
+          <div className="bar">
+            <div
+              className="fill red"
+              style={{ width: `${t.accuracy}%` }}
+            />
+          </div>
 
-              <small>
-                Accuracy: {t.accuracy}% · Attempted: {t.attempted}/{t.total}
-              </small>
+          <small>
+            Accuracy: {t.accuracy}% · Attempted: {t.attempted}/{t.total}
+          </small>
+        </div>
+      );
+    })}
+  </div>
+)}
+{/* =============================
+    IMPROVEMENT AREAS (INSUFFICIENT DATA)
+============================= */}
+{!normalizedReport.has_sufficient_data && (
+  <div className="card">
+    <h3>Improvement Areas</h3>
+    <p className="section-note">
+      Not enough data is available to identify improvement areas yet.
+    </p>
 
-              {t.total < 3 && (
-                <div className="low-data-warning">
-                  Limited data available for this topic
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+    <div className="low-data-warning">
+      Try attempting more questions to get a detailed topic-wise analysis.
+    </div>
+  </div>
+)}
+
+
 
     </div>
   </div>
