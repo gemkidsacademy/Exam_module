@@ -368,4 +368,23 @@
   line-height: 1.6;
   max-width: 100%;
 }
+.result-badge {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.result-badge.pass {
+  background-color: #e6f7ee;
+  color: #1f7a4d;
+}
+
+.result-badge.fail {
+  background-color: #fdeaea;
+  color: #b3261e;
+}
+
 
