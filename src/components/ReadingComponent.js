@@ -457,9 +457,16 @@ export default function ReadingComponent({
           {index < questions.length - 1 ? (
             <button onClick={() => goTo(index + 1)}>Next</button>
           ) : (
-            <button type="button" onClick={autoSubmit}>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                autoSubmit();
+              }}
+            >
               Finish
             </button>
+
 
           )}
         </div>
