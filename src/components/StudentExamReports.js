@@ -22,9 +22,13 @@ const READINESS_SCORE_MAP = {
   "Developing Selective Potential": 50,
   "Approaching Selective Readiness": 70,
   "Strong Selective Potential": 90,
-  "Ready": 85
-};
+  "Ready": 85,
 
+  // Writing-specific
+  "Very Competitive": 90,
+  "Competitive": 75,
+  "Needs Improvement": 45
+};
 const SECTION_GRADE_MAP = {
   A: 90,
   B: 75,
