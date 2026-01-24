@@ -66,6 +66,7 @@ export default function StudentCurrentExamReport({ data }) {
               <p><strong>Result:</strong> {summary.result}</p>
             </div>
 
+            {!isWriting && (
             <ResponsiveContainer width={250} height={250}>
               <PieChart>
                 <Pie
@@ -82,6 +83,40 @@ export default function StudentCurrentExamReport({ data }) {
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+          )}
+          {isWriting && (
+            <div style={{ width: "100%", marginTop: "12px" }}>
+              <div
+                style={{
+                  height: "14px",
+                  backgroundColor: "#e5e7eb",
+                  borderRadius: "999px",
+                  overflow: "hidden"
+                }}
+              >
+                <div
+                  style={{
+                    width: `${summary.score}%`,
+                    height: "100%",
+                    backgroundColor:
+                      summary.score >= 85
+                        ? "#22c55e"
+                        : summary.score >= 70
+                        ? "#f59e0b"
+                        : "#ef4444",
+                    transition: "width 0.4s ease"
+                  }}
+                />
+              </div>
+          
+              <div style={{ marginTop: "6px", fontWeight: "600" }}>
+                Writing score: {summary.score}%
+              </div>
+            </div>
+          )}
+
+
+                  
           </div>
         </section>
       )}
