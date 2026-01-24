@@ -97,6 +97,8 @@
         );
     
         const examData = await examRes.json();
+        console.log("🚨 FULL examData OBJECT:", JSON.stringify(examData, null, 2));
+
         console.log("📘 EXAM CONTENT (raw):", examData);
         console.log("📘 exam_json:", examData.exam_json);
         console.log("📘 exam_json.sections:", examData.exam_json?.sections);
