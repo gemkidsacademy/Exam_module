@@ -77,18 +77,25 @@ export default function StudentReportShell_backend() {
     return;
   }
 
+  
   // PER STUDENT REPORT
   if (reportType === "student" && studentId) {
-    fetch(
-      `https://web-production-481a5.up.railway.app/api/exams/dates?exam=${exam}&student_id=${studentId}`
-    )
+    const url =
+      exam === "writing"
+        ? `https://web-production-481a5.up.railway.app/api/reports/student/writing?student_id=${studentId}&date=${date}`
+        : `https://web-production-481a5.up.railway.app/api/reports/student?student_id=${studentId}&exam=${exam}&date=${date}`;
+
+  
+    fetch(url)
       .then(res => res.json())
       .then(data => {
         setAvailableExamDates(data.dates || []);
         setDate("");
       });
+  
     return;
   }
+
 
   // PER CLASS REPORT
   if (reportType === "class") {
