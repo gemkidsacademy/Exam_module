@@ -60,6 +60,12 @@
          LOAD EXAM
       ============================= */
       useEffect(() => {
+      console.log("🧠 STATE UPDATED", {
+        exam,
+        questionsCount: questions.length
+      });
+    }, [exam, questions]);
+      useEffect(() => {
       if (!studentId) return;
     
       const loadExam = async () => {
@@ -98,30 +104,33 @@
         console.log("📘 EXAM CONTENT:", examData);
     
         const sections = examData.exam_json?.sections || [];
+        sections.forEach((section, i) => {
+          console.log(`🧱 SECTION ${i} KEYS:`, Object.keys(section));
+        });
+
 
 console.log("🧩 FLATTEN: sections =", sections);
 
 const flatQuestions = sections.flatMap((section, sIdx) => {
-  console.log(`🧩 Section ${sIdx}`, section);
+  const qs =
+    section.questions ||
+    section.items ||
+    section.question_list ||
+    [];
 
-  const qs = section.questions || [];
-  console.log(`🧩 Section ${sIdx} questions count:`, qs.length);
-
-  return qs.map((q, qIdx) => {
-    console.log(`🧩 Q ${sIdx}-${qIdx}`, q.question_id);
-    return {
-      ...q,
-      topic: section.topic,
-      passage_style: section.passage_style || "informational",
-      answer_options: q.answer_options || section.answer_options || {},
-      section_ref: section
-    };
-  });
+  return qs.map((q) => ({
+    ...q,
+    topic: section.topic,
+    passage_style: section.passage_style || "informational",
+    answer_options: q.answer_options || section.answer_options || {},
+    section_ref: section
+  }));
 });
 
 console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
 
         setExam(examData.exam_json);
+        setIndex(0); // ✅ REQUIRED
         setQuestions(flatQuestions);
         setTimeout(() => {
   console.log("🧠 STATE AFTER SET", {
