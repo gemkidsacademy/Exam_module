@@ -39,23 +39,34 @@ export default function ClassCurrentExamReport({ data }) {
       </div>
 
       {/* ================= SCORE DISTRIBUTION ================= */}
-      <div className="score-distribution">
-        <h3>Score Distribution</h3>
-        <div className="distribution-bars">
-          {score_distribution.map(bucket => (
-            <div className="distribution-row" key={bucket.range}>
-              <span className="range">{bucket.range}</span>
-              <div className="bar">
-                <div
-                  className="fill"
-                  style={{ width: `${bucket.count * 5}px` }}
-                />
+      {/* Score Distribution */}
+        <div className="score-distribution">
+          <h3>Score Distribution</h3>
+        
+          {score_distribution.map(bucket => {
+            const maxCount = Math.max(
+              ...score_distribution.map(b => b.count)
+            );
+        
+            const widthPercent =
+              maxCount === 0 ? 0 : (bucket.count / maxCount) * 100;
+        
+            return (
+              <div key={bucket.range} className="score-row">
+                <div className="score-label">{bucket.range}</div>
+        
+                <div className="score-bar-wrapper">
+                  <div
+                    className="score-bar"
+                    style={{ width: `${widthPercent}%` }}
+                  />
+                </div>
+        
+                <div className="score-count">{bucket.count}</div>
               </div>
-              <span className="count">{bucket.count}</span>
-            </div>
-          ))}
+            );
+          })}
         </div>
-      </div>
 
       {/* ================= LEADERBOARD ================= */}
       <div className="leaderboard-section">
