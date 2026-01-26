@@ -31,6 +31,8 @@ export default function StudentReportShell_backend() {
   const [availableAttemptDates, setAvailableAttemptDates] = useState([]);
   const [selectedAttemptDates, setSelectedAttemptDates] = useState([]);
   const [pendingAttemptDate, setPendingAttemptDate] = useState("");
+  const [classes, setClasses] = useState([]);
+
 
   const [shouldGenerate, setShouldGenerate] = useState(false);
   useEffect(() => {
@@ -76,7 +78,24 @@ export default function StudentReportShell_backend() {
 
 }, [shouldGenerate, reportType, studentId, exam, date]);
 
+  useEffect(() => {
+  fetch("https://web-production-481a5.up.railway.app/api/classes")
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch classes");
+      }
+      return res.json();
+    })
+    .then(data => {
+      setClasses(data.classes || []);
+    })
+    .catch(err => {
+      console.error("Error loading classes:", err);
+      setClasses([]);
+    });
+}, []);
 
+  
   
   useEffect(() => {
   if (!exam) {
@@ -289,10 +308,13 @@ export default function StudentReportShell_backend() {
           }}
         >
           <option value="">Select class</option>
-          <option value="Class A">Class A</option>
-          <option value="Class B">Class B</option>
-          <option value="Class C">Class C</option>
+          {classes.map(cls => (
+            <option key={cls} value={cls}>
+              {cls}
+            </option>
+          ))}
         </select>
+
 
         <select
           value={classDay}
