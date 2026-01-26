@@ -181,3 +181,19 @@
     background: #111827;
   }
 }
+/* ===============================
+   LEADERBOARD RANK HIGHLIGHTS
+================================ */
+
+.leaderboard tr.rank-1 {
+  background: #fef3c7; /* gold */
+  font-weight: 600;
+}
+
+.leaderboard tr.rank-2 {
+  background: #e5e7eb; /* silver */
+}
+
+.leaderboard tr.rank-3 {
+  background: #fde68a; /* bronze */
+}
