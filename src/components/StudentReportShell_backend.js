@@ -24,7 +24,7 @@ export default function StudentReportShell_backend() {
 
   const [studentId, setStudentId] = useState("");
   const [className, setClassName] = useState("");
-  const [classDay, setClassDay] = useState("");
+ 
 
   const [exam, setExam] = useState("");
   const [date, setDate] = useState("");
@@ -47,8 +47,7 @@ export default function StudentReportShell_backend() {
   if (
     !shouldGenerate ||
     reportType !== "class" ||
-    !className ||
-    !classDay ||
+    !className ||    
     !exam ||
     !date
   ) {
@@ -60,10 +59,8 @@ export default function StudentReportShell_backend() {
   setClassReportData(null);
 
   const url = `https://web-production-481a5.up.railway.app/api/reports/class?class_name=${encodeURIComponent(
-    className
-  )}&class_day=${encodeURIComponent(
-    classDay
-  )}&exam=${exam}&date=${date}`;
+  className
+)}&exam=${exam}&date=${date}`;
 
   fetch(url)
     .then(res => {
@@ -581,9 +578,19 @@ export default function StudentReportShell_backend() {
     )}
 
 
-    {reportType === "class" && classReportData && (
-  <ClassCurrentExamReport data={classReportData} />
-)}
+    {reportType === "class" &&
+      classReportData?.reports?.map(report => (
+        <ClassCurrentExamReport
+          key={report.class_day}
+          data={{
+            class_name: classReportData.class_name,
+            exam: classReportData.exam,
+            date: classReportData.date,
+            ...report
+          }}
+        />
+      ))}
+
 
 
     {reportType === "cumulative" &&
