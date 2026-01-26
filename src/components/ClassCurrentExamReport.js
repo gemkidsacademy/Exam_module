@@ -3,7 +3,17 @@ import "./ClassCurrentExamReport.css";
 export default function ClassCurrentExamReport({ data }) {
   if (!data) return null;
 
-  const { meta, summary, leaderboard, score_distribution } = data;
+  
+
+  const {
+    class_name,
+    class_day,
+    exam,
+    date,
+    summary,
+    leaderboard = [],
+    score_distribution = []
+  } = data;
 
   return (
     <div className="class-report">
@@ -11,11 +21,13 @@ export default function ClassCurrentExamReport({ data }) {
       {/* ================= HEADER ================= */}
       <div className="report-header">
         <h2>
-          {meta.class_name} – {meta.class_day}
+          {class_name} – {class_day} | {exam} ({date})
         </h2>
+
         <p className="report-subtitle">
-          {meta.exam} · {new Date(meta.date).toLocaleDateString()}
-        </p>
+        {exam} · {new Date(date).toLocaleDateString()}
+      </p>
+
       </div>
 
       {/* ================= SUMMARY ================= */}
