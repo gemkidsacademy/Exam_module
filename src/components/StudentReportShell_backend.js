@@ -543,9 +543,24 @@ export default function StudentReportShell_backend() {
   <p className="error">{classReportError}</p>
 )}
 
-{classReportData && reportType === "class" && (
-  <ClassCurrentExamReport data={classReportData} />
-)}
+{reportType === "class" &&
+  classReportData?.reports?.map(report => (
+    <div key={report.class_day} className="class-day-section">
+      <div className="class-day-label">
+        {report.class_day}
+      </div>
+    
+      <ClassCurrentExamReport
+        data={{
+          class_name: classReportData.class_name,
+          exam: classReportData.exam,
+          date: classReportData.date,
+          ...report
+        }}
+      />
+    </div>
+
+  ))}
 
 {shouldGenerate &&
   reportType === "cumulative" &&
