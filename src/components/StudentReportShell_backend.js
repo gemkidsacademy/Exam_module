@@ -310,25 +310,65 @@ export default function StudentReportShell_backend() {
       </div>
     )}
 
-    {/* Exam + Topics + Actions */}
+    {/* Exam + Topics + Actions */} 
 <div className="exam-topics-actions-row">
+  {/* ================= EXAM / TOPICS / DATE ================= */}
   <div className="exam-topics-group">
-    <div className="field">
-      <label>Exam: </label>
-      <select value={exam} onChange={e => setExam(e.target.value)}>
-        <option value="">Select exam</option>
-        <option value="thinking_skills">Thinking Skills</option>
-        <option value="reading">Reading</option>
-        <option value="mathematical_reasoning">Mathematical Reasoning</option>
-        <option value="writing">Writing</option>
-        <option value="foundational">Foundational</option>
-      </select>
 
+    {/* 🔑 Exam + Date locked on one row */}
+    <div className="exam-row">
+      {/* Exam */}
+      <div className="field">
+        <label>Exam</label>
+        <select
+          value={exam}
+          onChange={e => {
+            setExam(e.target.value);
+            setDate("");
+            setDateWarning("");
+          }}
+        >
+          <option value="">Select exam</option>
+          <option value="thinking_skills">Thinking Skills</option>
+          <option value="reading">Reading</option>
+          <option value="mathematical_reasoning">
+            Mathematical Reasoning
+          </option>
+          <option value="writing">Writing</option>
+          <option value="foundational">Foundational</option>
+        </select>
+      </div>
+
+      {/* Date (non-cumulative only) */}
+      {reportType !== "cumulative" && (
+        <div className="field">
+          <label>Date</label>
+          <select
+            value={date}
+            disabled={!exam}
+            onChange={e => {
+              setDate(e.target.value);
+              setDateWarning("");
+            }}
+          >
+            <option value="">Select date</option>
+            {availableExamDates.map(d => (
+              <option key={d} value={d}>
+                {new Date(d).toLocaleDateString()}
+              </option>
+            ))}
+          </select>
+
+          {/* 🔒 Reserved space so layout never jumps */}
+          <p className="error">{dateWarning || "\u00A0"}</p>
+        </div>
+      )}
     </div>
 
+    {/* Topics (cumulative only) */}
     {reportType === "cumulative" && (
       <div className="field">
-        <label>Topics: </label>
+        <label>Topics</label>
         <select value={topic} onChange={e => setTopic(e.target.value)}>
           <option value="">Select topic</option>
           <option value="comprehension">Comprehension</option>
@@ -338,75 +378,42 @@ export default function StudentReportShell_backend() {
         </select>
       </div>
     )}
-
-    {reportType !== "cumulative" && (
-      <div className="field">
-        <label>Date</label>
-        <select
-          value={date}
-          onChange={e => {
-            setDate(e.target.value);
-            setDateWarning("");
-          }}
-        >
-
-          <option value="">Select date</option>
-          {availableExamDates.map(d => (
-            <option key={d} value={d}>
-              {new Date(d).toLocaleDateString()}
-            </option>
-          ))}
-        </select>
-         {/* 🔴 ADD WARNING RIGHT HERE */}
-          {dateWarning && (
-            <p className="error" style={{ marginTop: "6px" }}>
-              {dateWarning}
-            </p>
-          )}
-
-      </div>
-    )}
   </div>
 
+  {/* ================= ACTIONS ================= */}
   <div className="actions-group">
-  <button
-    className="secondary-btn"
-    disabled={
-      (reportType === "student" && !studentId) ||
-      (reportType === "class" && !exam)  ||
-      (reportType === "cumulative" &&
-        (!studentId || selectedAttemptDates.length === 0))
-    }
-    onClick={() => {
-      // 🔴 Student report requires date
-      if (reportType === "student" && !date) {
-        setDateWarning("Please select a date before generating the report.");
-        return;
-      }
-    
-      setDateWarning("");
-      setShouldGenerate(true);
-    }}
-
-  >
-    Generate
-  </button>
-
-  {shouldGenerate && (
     <button
-      className="primary-btn"
-      onClick={() => setShowPDF(true)}
+      className="secondary-btn"
+      disabled={
+        (reportType === "student" && !studentId) ||
+        (reportType === "class" && !exam) ||
+        (reportType === "cumulative" &&
+          (!studentId || selectedAttemptDates.length === 0))
+      }
+      onClick={() => {
+        if (reportType === "student" && !date) {
+          setDateWarning("Please select a date before generating the report.");
+          return;
+        }
+
+        setDateWarning("");
+        setShouldGenerate(true);
+      }}
     >
-      Preview PDF
+      Generate
     </button>
-  )}
-</div>
 
+    {shouldGenerate && (
+      <button
+        className="primary-btn"
+        onClick={() => setShowPDF(true)}
+      >
+        Preview PDF
+      </button>
+    )}
+  </div>
 </div>
-
-</div>
-</div>
-
+  
 
       {/* ================= REPORT CONTENT ================= */}
 
