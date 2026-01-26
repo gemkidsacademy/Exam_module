@@ -75,7 +75,18 @@ export default function ClassCurrentExamReport({ data }) {
             </thead>
             <tbody>
               {leaderboard.map(row => (
-                <tr key={row.rank}>
+                <tr
+                  key={row.rank}
+                  className={
+                    row.rank === 1
+                      ? "rank-1"
+                      : row.rank === 2
+                      ? "rank-2"
+                      : row.rank === 3
+                      ? "rank-3"
+                      : ""
+                  }
+                >
                   <td>{row.rank}</td>
                   <td>{row.student}</td>
                   <td>{row.score}%</td>
@@ -83,6 +94,7 @@ export default function ClassCurrentExamReport({ data }) {
                 </tr>
               ))}
             </tbody>
+
           </table>
         )}
       </div>
