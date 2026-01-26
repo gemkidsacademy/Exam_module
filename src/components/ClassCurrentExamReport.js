@@ -6,14 +6,19 @@ export default function ClassCurrentExamReport({ data }) {
   
 
   const {
-    class_name,
-    class_day,
-    exam,
-    date,
-    summary,
-    leaderboard = [],
-    score_distribution = []
-  } = data;
+  class_name,
+  exam,
+  date,
+  summary = {
+    average_score: 0,
+    highest_score: 0,
+    students_attempted: 0,
+    students_total: 0
+  },
+  leaderboard = [],
+  score_distribution = []
+} = data;
+
 
   return (
     <div className="class-report">
@@ -21,8 +26,10 @@ export default function ClassCurrentExamReport({ data }) {
       {/* ================= HEADER ================= */}
       <div className="report-header">
         <h2>
-          {class_name} – {class_day} | {exam} ({date})
+          {class_name} | {exam}
         </h2>
+        
+       
 
         <p className="report-subtitle">
         {exam} · {new Date(date).toLocaleDateString()}
