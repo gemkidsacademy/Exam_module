@@ -3,6 +3,8 @@ import StudentCurrentExamReport from "./StudentCurrentExamReport";
 import ClassReportMock from "./ClassReportMock";
 import CumulativeReportMock from "./CumulativeReportMock";
 import PDFPreviewMock from "./PDFPreviewMock";
+import ClassCurrentExamReport from "./ClassCurrentExamReport";
+
 import "./Reports.css";
 
 export default function StudentReportShell_backend() {
@@ -33,10 +35,56 @@ export default function StudentReportShell_backend() {
   const [pendingAttemptDate, setPendingAttemptDate] = useState("");
   const [classes, setClasses] = useState([]);
   const [classDays, setClassDays] = useState([]);
+  const [classReportData, setClassReportData] = useState(null);
+  const [loadingClassReport, setLoadingClassReport] = useState(false);
+  const [classReportError, setClassReportError] = useState(null);
+
 
 
 
   const [shouldGenerate, setShouldGenerate] = useState(false);
+  useEffect(() => {
+  if (
+    !shouldGenerate ||
+    reportType !== "class" ||
+    !className ||
+    !classDay ||
+    !exam ||
+    !date
+  ) {
+    return;
+  }
+
+  setLoadingClassReport(true);
+  setClassReportError(null);
+  setClassReportData(null);
+
+  const url = `https://web-production-481a5.up.railway.app/api/reports/class?class_name=${encodeURIComponent(
+    className
+  )}&class_day=${encodeURIComponent(
+    classDay
+  )}&exam=${exam}&date=${date}`;
+
+  fetch(url)
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to load class report");
+      }
+      return res.json();
+    })
+    .then(data => {
+      setClassReportData(data);
+    })
+    .catch(err => {
+      console.error("Class report load error:", err);
+      setClassReportError(err.message);
+    })
+    .finally(() => {
+      setLoadingClassReport(false);
+      setShouldGenerate(false);
+    });
+}, [shouldGenerate, reportType, className, classDay, exam, date]);
+
   useEffect(() => {
   if (!className) {
     setClassDays([]);
@@ -485,16 +533,18 @@ export default function StudentReportShell_backend() {
 {reportData && reportType === "student" && (
   <StudentCurrentExamReport data={reportData} />
 )}
-{shouldGenerate &&
-  reportType === "class" &&
-  className &&
-  classDay && (
-    <ClassReportMock
-      className={className}
-      classDay={classDay}
-      exam={exam}
-      date={date}
-    />
+{/* ===== CLASS REPORT ===== */}
+
+{loadingClassReport && reportType === "class" && (
+  <p>Loading class report…</p>
+)}
+
+{classReportError && reportType === "class" && (
+  <p className="error">{classReportError}</p>
+)}
+
+{classReportData && reportType === "class" && (
+  <ClassCurrentExamReport data={classReportData} />
 )}
 
 {shouldGenerate &&
@@ -516,14 +566,10 @@ export default function StudentReportShell_backend() {
     )}
 
 
-    {reportType === "class" && className && classDay && (
-      <ClassReportMock
-        className={className}
-        classDay={classDay}
-        exam={exam}
-        date={date}
-      />
-    )}
+    {reportType === "class" && classReportData && (
+  <ClassCurrentExamReport data={classReportData} />
+)}
+
 
     {reportType === "cumulative" &&
       studentId &&
