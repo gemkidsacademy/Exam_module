@@ -1,0 +1,183 @@
+/* ===============================
+   WRAPPER
+================================ */
+
+.class-report {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-top: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ===============================
+   HEADER
+================================ */
+
+.report-header {
+  margin-bottom: 20px;
+}
+
+.report-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.report-subtitle {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* ===============================
+   SUMMARY
+================================ */
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.summary-card {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summary-card .label {
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.summary-card .value {
+  font-size: 22px;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* ===============================
+   SCORE DISTRIBUTION
+================================ */
+
+.score-distribution {
+  margin-bottom: 30px;
+}
+
+.score-distribution h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #111827;
+}
+
+.distribution-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.distribution-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 30px;
+  align-items: center;
+  gap: 10px;
+}
+
+.distribution-row .range {
+  font-size: 13px;
+  color: #374151;
+}
+
+.distribution-row .bar {
+  background: #e5e7eb;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.distribution-row .fill {
+  height: 100%;
+  background: #3b82f6;
+  border-radius: 999px;
+}
+
+.distribution-row .count {
+  font-size: 13px;
+  text-align: right;
+  color: #374151;
+}
+
+/* ===============================
+   LEADERBOARD
+================================ */
+
+.leaderboard-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #111827;
+}
+
+.leaderboard {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.leaderboard th {
+  text-align: left;
+  padding: 10px 12px;
+  background: #f3f4f6;
+  font-weight: 600;
+  color: #374151;
+}
+
+.leaderboard td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #111827;
+}
+
+.leaderboard tr:last-child td {
+  border-bottom: none;
+}
+
+/* ===============================
+   EMPTY STATES
+================================ */
+
+.muted {
+  font-size: 14px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* ===============================
+   PRINT / PDF FRIENDLY
+================================ */
+
+@media print {
+  .class-report {
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .summary-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+  }
+
+  .distribution-row .fill {
+    background: #111827;
+  }
+}
