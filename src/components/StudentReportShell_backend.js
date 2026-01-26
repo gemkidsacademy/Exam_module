@@ -14,6 +14,8 @@ export default function StudentReportShell_backend() {
   const [reportData, setReportData] = useState(null);
   const [loadingReport, setLoadingReport] = useState(false);
   const [reportError, setReportError] = useState(null);
+  const [selectedClassDay, setSelectedClassDay] = useState("");
+
 
 
 
@@ -43,6 +45,16 @@ export default function StudentReportShell_backend() {
 
 
   const [shouldGenerate, setShouldGenerate] = useState(false);
+  useEffect(() => {
+  if (
+    reportType === "class" &&
+    classReportData?.reports?.length > 0 &&
+    !selectedClassDay
+  ) {
+    setSelectedClassDay(classReportData.reports[0].class_day);
+  }
+}, [classReportData, reportType, selectedClassDay]);
+
   useEffect(() => {
   if (
     !shouldGenerate ||
@@ -491,6 +503,23 @@ export default function StudentReportShell_backend() {
 {reportData && reportType === "student" && (
   <StudentCurrentExamReport data={reportData} />
 )}
+{reportType === "class" &&
+  classReportData?.reports?.length > 0 && (
+    <div className="filter-group">
+      <label>Class Day</label>
+      <select
+        value={selectedClassDay}
+        onChange={e => setSelectedClassDay(e.target.value)}
+      >
+        {classReportData.reports.map(r => (
+          <option key={r.class_day} value={r.class_day}>
+            {r.class_day}
+          </option>
+        ))}
+      </select>
+    </div>
+)}
+
 {/* ===== CLASS REPORT ===== */}
 
 {loadingClassReport && reportType === "class" && (
@@ -502,23 +531,24 @@ export default function StudentReportShell_backend() {
 )}
 
 {reportType === "class" &&
-  classReportData?.reports?.map(report => (
-    <div key={report.class_day} className="class-day-section">
-      <div className="class-day-label">
-        {report.class_day}
-      </div>
-    
-      <ClassCurrentExamReport
-        data={{
-          class_name: classReportData.class_name,
-          exam: classReportData.exam,
-          date: classReportData.date,
-          ...report
-        }}
-      />
-    </div>
+  classReportData?.reports
+    ?.filter(r => r.class_day === selectedClassDay)
+    .map(report => (
+      <div key={report.class_day} className="class-day-section">
+        <div className="class-day-label">
+          {report.class_day}
+        </div>
 
-  ))}
+        <ClassCurrentExamReport
+          data={{
+            class_name: classReportData.class_name,
+            exam: classReportData.exam,
+            date: classReportData.date,
+            ...report
+          }}
+        />
+      </div>
+))}
 
 {shouldGenerate &&
   reportType === "cumulative" &&
@@ -540,17 +570,19 @@ export default function StudentReportShell_backend() {
 
 
     {reportType === "class" &&
-      classReportData?.reports?.map(report => (
-        <ClassCurrentExamReport
-          key={report.class_day}
-          data={{
-            class_name: classReportData.class_name,
-            exam: classReportData.exam,
-            date: classReportData.date,
-            ...report
-          }}
-        />
-      ))}
+      classReportData?.reports
+        ?.filter(r => r.class_day === selectedClassDay)
+        .map(report => (
+          <ClassCurrentExamReport
+            key={report.class_day}
+            data={{
+              class_name: classReportData.class_name,
+              exam: classReportData.exam,
+              date: classReportData.date,
+              ...report
+            }}
+          />
+    ))}
 
 
 
