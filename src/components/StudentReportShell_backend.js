@@ -32,9 +32,38 @@ export default function StudentReportShell_backend() {
   const [selectedAttemptDates, setSelectedAttemptDates] = useState([]);
   const [pendingAttemptDate, setPendingAttemptDate] = useState("");
   const [classes, setClasses] = useState([]);
+  const [classDays, setClassDays] = useState([]);
+
 
 
   const [shouldGenerate, setShouldGenerate] = useState(false);
+  useEffect(() => {
+  if (!className) {
+    setClassDays([]);
+    setClassDay("");
+    return;
+  }
+
+  fetch(
+    `https://web-production-481a5.up.railway.app/api/classes/${className}/days`
+  )
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch class days");
+      }
+      return res.json();
+    })
+    .then(data => {
+      setClassDays(data.days || []);
+      setClassDay("");
+    })
+    .catch(err => {
+      console.error("Error loading class days:", err);
+      setClassDays([]);
+      setClassDay("");
+    });
+}, [className]);
+
   useEffect(() => {
   // Only generate when explicitly requested
   if (
@@ -318,17 +347,20 @@ export default function StudentReportShell_backend() {
 
         <select
           value={classDay}
+          disabled={!className}
           onChange={e => {
             setClassDay(e.target.value);
             setShouldGenerate(false);
           }}
         >
-
           <option value="">Select day</option>
-          <option value="Monday">Monday</option>
-          <option value="Wednesday">Wednesday</option>
-          <option value="Friday">Friday</option>
+          {classDays.map(day => (
+            <option key={day} value={day}>
+              {day}
+            </option>
+          ))}
         </select>
+
       </div>
     )}
 
