@@ -46,10 +46,49 @@ export default function StudentReportShell_backend() {
   const [loadingCumulative, setLoadingCumulative] = useState(false);
   const [cumulativeError, setCumulativeError] = useState(null);
 
+  const [availableTopics, setAvailableTopics] = useState([]);
+  const [loadingTopics, setLoadingTopics] = useState(false);
+  const [topicsError, setTopicsError] = useState(null);
+  
+
+
 
 
 
   const [shouldGenerate, setShouldGenerate] = useState(false);
+  useEffect(() => {
+  if (reportType !== "cumulative" || !exam) {
+    setAvailableTopics([]);
+    setTopic("");
+    return;
+  }
+
+  setLoadingTopics(true);
+  setTopicsError(null);
+
+  fetch(
+    `https://web-production-481a5.up.railway.app/api/exams/${exam}/topics`
+  )
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to load topics");
+      }
+      return res.json();
+    })
+    .then(data => {
+      setAvailableTopics(data.topics || []);
+      setTopic(""); // reset selection when exam changes
+    })
+    .catch(err => {
+      console.error("Topics load error:", err);
+      setAvailableTopics([]);
+      setTopicsError(err.message);
+    })
+    .finally(() => {
+      setLoadingTopics(false);
+    });
+}, [exam, reportType]);
+
   useEffect(() => {
     if (
       !shouldGenerate ||
@@ -509,15 +548,29 @@ export default function StudentReportShell_backend() {
     {reportType === "cumulative" && (
       <div className="field">
         <label>Topics</label>
-        <select value={topic} onChange={e => setTopic(e.target.value)}>
-          <option value="">Select topic</option>
-          <option value="comprehension">Comprehension</option>
-          <option value="logic">Logic</option>
-          <option value="vocabulary">Vocabulary</option>
-          <option value="problem_solving">Problem Solving</option>
+    
+        <select
+          value={topic}
+          disabled={loadingTopics || availableTopics.length === 0}
+          onChange={e => setTopic(e.target.value)}
+        >
+          <option value="">
+            {loadingTopics ? "Loading topics..." : "Select topic"}
+          </option>
+    
+          {availableTopics.map(t => (
+            <option key={t.key} value={t.key}>
+              {t.label}
+            </option>
+          ))}
         </select>
+    
+        {topicsError && (
+          <p className="error">{topicsError}</p>
+        )}
       </div>
     )}
+
   </div>
 
   {/* ================= ACTIONS ================= */}
