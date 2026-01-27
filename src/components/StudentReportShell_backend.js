@@ -111,16 +111,32 @@
     fetch(
       `https://web-production-481a5.up.railway.app/api/reports/student/cumulative?${params.toString()}`
     )
-      .then(res => {
-        if (!res.ok) {
-          throw new Error(`Failed to load cumulative report (${res.status})`);
+      .then(async res => {
+        const data = await res.json();
+      
+        // ✅ VALID "no data" case (backend already told us this)
+        if (!res.ok && res.status === 400) {
+          console.warn("⚠️ No data for cumulative report", data);
+      
+          setCumulativeReportData(null);
+          setCumulativeError("No data found to generate the required report.");
+          return null;
         }
-        return res.json();
+      
+        // ❌ real error
+        if (!res.ok) {
+          throw new Error(data.detail || "Failed to load cumulative report");
+        }
+      
+        return data;
       })
       .then(data => {
+        if (!data) return; // no-data path already handled
+      
         console.log("✅ CUMULATIVE REPORT RECEIVED", data);
         setCumulativeReportData(data);
       })
+      
       .catch(err => {
         console.error("❌ Cumulative report load error:", err);
         setCumulativeError(err.message);
@@ -637,14 +653,16 @@
   {reportData && reportType === "student" && (
     <StudentCurrentExamReport data={reportData} />
   )}
-  {loadingCumulative && reportType === "cumulative" && (
+  {loadingCumulative && !cumulativeError && reportType === "cumulative" && (
     <p>Loading cumulative progress…</p>
   )}
-  
   {cumulativeError && reportType === "cumulative" && (
-    <p className="error">{cumulativeError}</p>
+    <div className="info-message">
+      {cumulativeError}
+    </div>
   )}
   
+    
   {reportType === "class" &&
     classReportData?.reports?.length > 0 && (
       <div className="filter-group">
