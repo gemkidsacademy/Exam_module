@@ -118,8 +118,9 @@
       params.append("exam", exam);
       params.append("topic", topic);
       selectedAttemptDates.forEach(d =>
-        params.append("attempt_dates[]", d)
+        params.append("attempt_dates", d)
       );
+
     
       fetch(
         `https://web-production-481a5.up.railway.app/api/reports/student/cumulative?${params.toString()}`
