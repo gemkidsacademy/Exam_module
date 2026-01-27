@@ -328,3 +328,10 @@
   flex-direction: column; /* stack Exam → Actions vertically */
   gap: 16px;              /* 👈 THIS creates the missing gap */
 }
+.info-message {
+  color: #555;
+  background: #f6f7f9;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 12px;
+}
