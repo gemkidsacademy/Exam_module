@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import StudentCurrentExamReport from "./StudentCurrentExamReport";
 import ClassReportMock from "./ClassReportMock";
-import CumulativeReportMock from "./CumulativeReportMock";
+
 import PDFPreviewMock from "./PDFPreviewMock";
 import ClassCurrentExamReport from "./ClassCurrentExamReport";
 
@@ -41,10 +41,67 @@ export default function StudentReportShell_backend() {
   const [loadingClassReport, setLoadingClassReport] = useState(false);
   const [classReportError, setClassReportError] = useState(null);
 
+  const [cumulativeReportData, setCumulativeReportData] = useState(null);
+  const [loadingCumulative, setLoadingCumulative] = useState(false);
+  const [cumulativeError, setCumulativeError] = useState(null);
+
 
 
 
   const [shouldGenerate, setShouldGenerate] = useState(false);
+  useEffect(() => {
+    if (
+      !shouldGenerate ||
+      reportType !== "cumulative" ||
+      !studentId ||
+      !exam ||
+      !topic ||
+      selectedAttemptDates.length === 0
+    ) {
+      return;
+    }
+  
+    setLoadingCumulative(true);
+    setCumulativeError(null);
+    setCumulativeReportData(null);
+  
+    const params = new URLSearchParams();
+    params.append("student_id", studentId);
+    params.append("exam", exam);
+    params.append("topic", topic);
+    selectedAttemptDates.forEach(d =>
+      params.append("attempt_dates[]", d)
+    );
+  
+    fetch(
+      `https://web-production-481a5.up.railway.app/api/reports/student/cumulative?${params.toString()}`
+    )
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Failed to load cumulative report");
+        }
+        return res.json();
+      })
+      .then(data => {
+        setCumulativeReportData(data);
+      })
+      .catch(err => {
+        console.error("Cumulative report load error:", err);
+        setCumulativeError(err.message);
+      })
+      .finally(() => {
+        setLoadingCumulative(false);
+        setShouldGenerate(false);
+      });
+  }, [
+    shouldGenerate,
+    reportType,
+    studentId,
+    exam,
+    topic,
+    selectedAttemptDates
+  ]);
+
   useEffect(() => {
   if (
     reportType === "class" &&
@@ -500,9 +557,18 @@ export default function StudentReportShell_backend() {
   <p className="error">{reportError}</p>
 )}
 
+
 {reportData && reportType === "student" && (
   <StudentCurrentExamReport data={reportData} />
 )}
+{loadingCumulative && reportType === "cumulative" && (
+  <p>Loading cumulative progress…</p>
+)}
+
+{cumulativeError && reportType === "cumulative" && (
+  <p className="error">{cumulativeError}</p>
+)}
+
 {reportType === "class" &&
   classReportData?.reports?.length > 0 && (
     <div className="filter-group">
@@ -550,15 +616,8 @@ export default function StudentReportShell_backend() {
       </div>
 ))}
 
-{shouldGenerate &&
-  reportType === "cumulative" &&
-  studentId &&
-  selectedAttemptDates.length > 0 && (
-    <CumulativeReportMock
-      studentId={studentId}
-      exam={exam}
-      attemptDates={selectedAttemptDates}
-    />
+{reportType === "cumulative" && cumulativeReportData && (
+  <CumulativeReport data={cumulativeReportData} />
 )}
 {/* ================= PDF PREVIEW ================= */}
 
@@ -586,15 +645,10 @@ export default function StudentReportShell_backend() {
 
 
 
-    {reportType === "cumulative" &&
-      studentId &&
-      selectedAttemptDates.length > 0 && (
-        <CumulativeReportMock
-          studentId={studentId}
-          exam={exam}
-          attemptDates={selectedAttemptDates}
-        />
-      )}
+    {reportType === "cumulative" && cumulativeReportData && (
+      <CumulativeReport data={cumulativeReportData} />
+    )}
+
   </PDFPreviewMock>
 )}
 
