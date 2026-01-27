@@ -215,6 +215,28 @@ function SimpleLineChart({ attempts }) {
         y2={height - padding}
         stroke="#ccc"
       />
+          {/* Y-axis label */}
+    <text
+      x={-height / 2}
+      y={16}
+      transform="rotate(-90)"
+      textAnchor="middle"
+      fontSize="12"
+      fill="#6b7280"
+    >
+      Score / Accuracy (%)
+    </text>
+
+    {/* X-axis label */}
+    <text
+      x={width / 2}
+      y={height - 6}
+      textAnchor="middle"
+      fontSize="12"
+      fill="#6b7280"
+    >
+      Attempts Over Time
+    </text>
 
       {/* Lines (only if 2+ attempts) */}
       {attempts.length > 1 && (
