@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import StudentCurrentExamReport from "./StudentCurrentExamReport";
 import ClassReportMock from "./ClassReportMock";
+import CumulativeReport from "./CumulativeReport";
 
 import PDFPreviewMock from "./PDFPreviewMock";
 import ClassCurrentExamReport from "./ClassCurrentExamReport";
