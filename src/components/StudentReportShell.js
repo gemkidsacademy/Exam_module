@@ -43,15 +43,17 @@ export default function StudentReportShell() {
         onChange={e => {
           const next = e.target.value;
           setReportType(next);
+        
           setStudentId("");
           setClassName("");
           setClassDay("");
           setAvailableAttemptDates([]);
           setPendingAttemptDate("");
           setSelectedAttemptDates([]);
+          setTopic("");
           setShouldGenerate(false);
-
         }}
+
       >
         <option value="student">Per Student Report</option>
         <option value="class">Per Class Report</option>
@@ -219,7 +221,10 @@ export default function StudentReportShell() {
       (reportType === "student" && !studentId) ||
       (reportType === "class" && (!className || !classDay)) ||
       (reportType === "cumulative" &&
-        (!studentId || selectedAttemptDates.length === 0))
+      (!studentId ||
+       selectedAttemptDates.length === 0 ||
+       !topic))
+
     }
     onClick={() => setShouldGenerate(true)}
   >
@@ -270,6 +275,7 @@ export default function StudentReportShell() {
     <CumulativeReportMock
       studentId={studentId}
       exam={exam}
+      topic={topic}
       attemptDates={selectedAttemptDates}
     />
 )}
@@ -296,6 +302,7 @@ export default function StudentReportShell() {
         <CumulativeReportMock
           studentId={studentId}
           exam={exam}
+          topic={topic}
           attemptDates={selectedAttemptDates}
         />
       )}
