@@ -104,7 +104,7 @@
   
     // ✅ IMPORTANT: FastAPI expects repeated params
     selectedAttemptDates.forEach(d =>
-      params.append("attempt_dates[]", d)
+      params.append("attempt_dates", d);
     );
   
     fetch(
