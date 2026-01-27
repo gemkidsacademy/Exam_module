@@ -95,102 +95,118 @@
 }, [reportType, className, exam]);
 
     useEffect(() => {
-    console.log("🟡 CUMULATIVE REPORT EFFECT CHECK", {
-      shouldGenerate,
-      reportType,
-      studentId,
-      exam,
-      topic,
-      selectedAttemptDates
-    });
-  
-    if (!shouldGenerate) {
-      console.log("⛔ Blocked: shouldGenerate = false");
-      return;
-    }
-  
-    if (reportType !== "cumulative") {
-      console.log("⛔ Blocked: reportType is not cumulative");
-      return;
-    }
-  
-    if (!studentId || !exam || !topic) {
-      console.log("⛔ Blocked: missing studentId / exam / topic");
-      return;
-    }
-  
-    if (selectedAttemptDates.length === 0) {
-      console.log("⛔ Blocked: no attempt dates selected");
-      return;
-    }
-  
-    console.log("🚀 CALLING CUMULATIVE API", {
-      studentId,
-      exam,
-      topic,
-      selectedAttemptDates
-    });
-  
-    setLoadingCumulative(true);
-    setCumulativeError(null);
-    setCumulativeReportData(null);
-  
-    const params = new URLSearchParams();
-    params.append("student_id", studentId);
-    params.append("exam", exam);
-    params.append("topic", topic);
-  
-    // ✅ IMPORTANT: FastAPI expects repeated params
-    selectedAttemptDates.forEach(d =>
-      params.append("attempt_dates", d)
-    );
-
-  
-    fetch(
-      `https://web-production-481a5.up.railway.app/api/reports/student/cumulative?${params.toString()}`
-    )
-      .then(async res => {
-        const data = await res.json();
-      
-        // ✅ VALID "no data" case (backend already told us this)
-        if (!res.ok && res.status === 400) {
-          console.warn("⚠️ No data for cumulative report", data);
-      
-          setCumulativeReportData(null);
-          setCumulativeError("No data found to generate the required report.");
-          return null;
-        }
-      
-        // ❌ real error
-        if (!res.ok) {
-          throw new Error(data.detail || "Failed to load cumulative report");
-        }
-      
-        return data;
-      })
-      .then(data => {
-        if (!data) return; // no-data path already handled
-      
-        console.log("✅ CUMULATIVE REPORT RECEIVED", data);
-        setCumulativeReportData(data);
-      })
-      
-      .catch(err => {
-        console.error("❌ Cumulative report load error:", err);
-        setCumulativeError(err.message);
-      })
-      .finally(() => {
-        setLoadingCumulative(false);
-        setShouldGenerate(false); // 🔒 reset trigger
-      });
-  }, [
+  console.log("🟡 CUMULATIVE EFFECT CHECK", {
     shouldGenerate,
     reportType,
     studentId,
     exam,
     topic,
     selectedAttemptDates
-  ]);
+  });
+
+  // =======================
+  // Guard conditions
+  // =======================
+
+  if (!shouldGenerate) {
+    console.log("⛔ Aborted: shouldGenerate is false");
+    return;
+  }
+
+  if (reportType !== "cumulative") {
+    console.log("⛔ Aborted: reportType is not cumulative");
+    setShouldGenerate(false);
+    return;
+  }
+
+  if (!studentId || !exam || !topic) {
+    console.log("⛔ Aborted: missing required params", {
+      studentId,
+      exam,
+      topic
+    });
+    setShouldGenerate(false);
+    return;
+  }
+
+  if (selectedAttemptDates.length === 0) {
+    console.log("⛔ Aborted: no attempt dates selected");
+    setShouldGenerate(false);
+    return;
+  }
+
+  // =======================
+  // Build request
+  // =======================
+
+  console.log("🚀 Preparing cumulative report request", {
+    studentId,
+    exam,
+    topicSentToBackend: topic,
+    attemptDates: selectedAttemptDates,
+    topicType: typeof topic,
+    topicLength: topic.length
+  });
+
+  setLoadingCumulative(true);
+  setCumulativeError(null);
+  setCumulativeReportData(null);
+
+  const params = new URLSearchParams();
+  params.append("student_id", studentId);
+  params.append("exam", exam);
+  params.append("topic", topic);
+
+  selectedAttemptDates.forEach(date =>
+    params.append("attempt_dates", date)
+  );
+
+  const requestUrl = `https://web-production-481a5.up.railway.app/api/reports/student/cumulative?${params.toString()}`;
+
+  console.log("🌐 FINAL CUMULATIVE REQUEST URL:", requestUrl);
+
+  // =======================
+  // Fetch
+  // =======================
+
+  fetch(requestUrl)
+    .then(async res => {
+      const data = await res.json();
+
+      if (!res.ok && res.status === 400) {
+        console.warn("⚠️ No data for cumulative report", data);
+        setCumulativeError("No data found to generate the required report.");
+        return null;
+      }
+
+      if (!res.ok) {
+        throw new Error(data.detail || "Failed to load cumulative report");
+      }
+
+      return data;
+    })
+    .then(data => {
+      if (!data) return;
+
+      console.log("✅ CUMULATIVE REPORT RECEIVED", data);
+      setCumulativeReportData(data);
+    })
+    .catch(err => {
+      console.error("❌ Cumulative report error:", err);
+      setCumulativeError(err.message);
+    })
+    .finally(() => {
+      setLoadingCumulative(false);
+      setShouldGenerate(false); // 🔒 reset trigger
+    });
+}, [
+  shouldGenerate,
+  reportType,
+  studentId,
+  exam,
+  topic,
+  selectedAttemptDates
+]);
 
     useEffect(() => {
     if (
@@ -629,8 +645,13 @@
           <select
             value={topic}
             disabled={loadingTopics || availableTopics.length === 0}
-            onChange={e => setTopic(e.target.value)}
+            onChange={e => {
+              const selected = e.target.value;
+              console.log("🟣 TOPIC SELECTED (UI):", selected);
+              setTopic(selected);
+            }}
           >
+
             <option value="">
               {loadingTopics ? "Loading topics..." : "Select topic"}
             </option>
