@@ -31,6 +31,8 @@ export default function CumulativeReport({ data }) {
     );
   }
 
+  const narrative = buildProgressNarrative(summary, attempts.length);
+
   return (
     <div className="cumulative-report">
       {/* ================= HEADER ================= */}
@@ -51,6 +53,13 @@ export default function CumulativeReport({ data }) {
       {summary && (
         <div className="progress-summary">
           <h3>Progress Summary</h3>
+
+          {/* Narrative line (matches original UI) */}
+          {narrative && (
+            <p className="progress-narrative">
+              {narrative}
+            </p>
+          )}
 
           <div className="summary-metrics">
             <Metric
@@ -115,6 +124,37 @@ export default function CumulativeReport({ data }) {
   );
 }
 
+/* ================= HELPERS ================= */
+
+/**
+ * Builds the narrative summary shown above metrics.
+ * Pure presentation logic — backend remains data-only.
+ */
+function buildProgressNarrative(summary, attemptsCount) {
+  if (!summary || attemptsCount < 2) return null;
+
+  const {
+    first_attempt_score,
+    latest_attempt_score,
+    score_change,
+    trend
+  } = summary;
+
+  const direction =
+    trend === "improving"
+      ? "steady improvement"
+      : trend === "declining"
+      ? "decline"
+      : "stable performance";
+
+  return (
+    `The student’s score changed from ${first_attempt_score}% to ` +
+    `${latest_attempt_score}% over ${attemptsCount} attempts.\n\n` +
+    `This indicates a ${direction} of ${Math.abs(score_change)} percentage points, ` +
+    `suggesting that practice and feedback are having a positive impact.`
+  );
+}
+
 /* ================= SUB-COMPONENTS ================= */
 
 function Metric({ label, value }) {
@@ -130,15 +170,16 @@ function Metric({ label, value }) {
  * SimpleLineChart
  * ---------------
  * Minimal SVG-based chart to stay PDF-safe.
+ * Renders dots for a single attempt and lines for multiple attempts.
  */
 function SimpleLineChart({ attempts }) {
   const width = 600;
   const height = 220;
   const padding = 30;
+  const maxY = 100;
 
   const scores = attempts.map(a => a.score);
   const accuracies = attempts.map(a => a.accuracy);
-  const maxY = 100;
 
   const xStep =
     attempts.length > 1
@@ -160,24 +201,56 @@ function SimpleLineChart({ attempts }) {
   return (
     <svg width={width} height={height} className="line-chart">
       {/* Axes */}
-      <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="#ccc" />
-      <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#ccc" />
-
-      {/* Score line */}
-      <polyline
-        fill="none"
-        stroke="#2563eb"
-        strokeWidth="2"
-        points={points(scores)}
+      <line
+        x1={padding}
+        y1={padding}
+        x2={padding}
+        y2={height - padding}
+        stroke="#ccc"
+      />
+      <line
+        x1={padding}
+        y1={height - padding}
+        x2={width - padding}
+        y2={height - padding}
+        stroke="#ccc"
       />
 
-      {/* Accuracy line */}
-      <polyline
-        fill="none"
-        stroke="#16a34a"
-        strokeWidth="2"
-        points={points(accuracies)}
-      />
+      {/* Lines (only if 2+ attempts) */}
+      {attempts.length > 1 && (
+        <>
+          <polyline
+            fill="none"
+            stroke="#2563eb"
+            strokeWidth="2"
+            points={points(scores)}
+          />
+          <polyline
+            fill="none"
+            stroke="#16a34a"
+            strokeWidth="2"
+            points={points(accuracies)}
+          />
+        </>
+      )}
+
+      {/* Single-attempt dots */}
+      {attempts.length === 1 && (
+        <>
+          <circle
+            cx={padding}
+            cy={yScale(scores[0])}
+            r="4"
+            fill="#2563eb"
+          />
+          <circle
+            cx={padding}
+            cy={yScale(accuracies[0])}
+            r="4"
+            fill="#16a34a"
+          />
+        </>
+      )}
     </svg>
   );
 }
