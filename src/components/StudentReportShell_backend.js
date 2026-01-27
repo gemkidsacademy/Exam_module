@@ -16,6 +16,8 @@
     const [loadingReport, setLoadingReport] = useState(false);
     const [reportError, setReportError] = useState(null);
     const [selectedClassDay, setSelectedClassDay] = useState("");
+    const [availableClassDates, setAvailableClassDates] = useState([]);
+
   
   
   
@@ -56,6 +58,42 @@
   
   
     const [shouldGenerate, setShouldGenerate] = useState(false);
+    useEffect(() => {
+  console.log("🏫 CLASS SESSION DATES EFFECT FIRED", {
+    reportType,
+    className,
+    exam
+  });
+
+  if (
+    reportType !== "class" ||
+    !className ||
+    !exam
+  ) {
+    setAvailableClassDates([]);
+    return;
+  }
+
+  fetch(
+    `https://web-production-481a5.up.railway.app/api/classes/${encodeURIComponent(
+      className
+    )}/exam-dates?exam=${exam}`
+  )
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch class dates");
+      }
+      return res.json();
+    })
+    .then(data => {
+      setAvailableClassDates(data.dates || []);
+    })
+    .catch(err => {
+      console.error("Error loading class dates:", err);
+      setAvailableClassDates([]);
+    });
+}, [reportType, className, exam]);
+
     useEffect(() => {
     console.log("🟡 CUMULATIVE REPORT EFFECT CHECK", {
       shouldGenerate,
@@ -500,6 +538,8 @@
             value={className}
             onChange={e => {
               setClassName(e.target.value);
+              setDate("");                 // 🔑 reset
+              setAvailableClassDates([]); 
               setShouldGenerate(false);
             }}
           >
@@ -547,28 +587,38 @@
   
         {/* Date (non-cumulative only) */}
         {reportType !== "cumulative" && (
-          <div className="field">
-            <label>Date</label>
-            <select
-              value={date}
-              disabled={!exam}
-              onChange={e => {
-                setDate(e.target.value);
-                setDateWarning("");
-              }}
-            >
-              <option value="">Select date</option>
-              {availableExamDates.map(d => (
-                <option key={d} value={d}>
-                  {new Date(d).toLocaleDateString()}
-                </option>
-              ))}
-            </select>
-  
-            {/* 🔒 Reserved space so layout never jumps */}
-            <p className="error">{dateWarning || "\u00A0"}</p>
-          </div>
-        )}
+  <div className="field">
+    <label>Date</label>
+    <select
+      value={date}
+      disabled={
+        !exam ||
+        (reportType === "class"
+          ? availableClassDates.length === 0
+          : availableExamDates.length === 0)
+      }
+
+      onChange={e => {
+        setDate(e.target.value);
+        setDateWarning("");
+      }}
+    >
+      <option value="">Select date</option>
+
+      {(reportType === "class"
+        ? availableClassDates
+        : availableExamDates
+      ).map(d => (
+        <option key={d} value={d}>
+          {new Date(d).toLocaleDateString()}
+        </option>
+      ))}
+    </select>
+
+    <p className="error">{dateWarning || "\u00A0"}</p>
+  </div>
+)}
+
       </div>
   
       {/* Topics (cumulative only) */}
