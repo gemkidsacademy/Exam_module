@@ -90,13 +90,7 @@
   }, [exam, reportType]);
   
     useEffect(() => {
-      console.log("🚀 CALLING CUMULATIVE API", {
-        studentId,
-        exam,
-        topic,
-        selectedAttemptDates
-      });
-
+      
       if (
         !shouldGenerate ||
         reportType !== "cumulative" ||
@@ -107,6 +101,13 @@
       ) {
         return;
       }
+      console.log("🚀 CALLING CUMULATIVE API", {
+              studentId,
+              exam,
+              topic,
+              selectedAttemptDates
+            });
+
     
       setLoadingCumulative(true);
       setCumulativeError(null);
