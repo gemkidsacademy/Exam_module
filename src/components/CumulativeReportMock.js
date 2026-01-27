@@ -11,14 +11,10 @@ import { mockSameExamProgress } from "./mockProgressData";
 import "./Reports.css";
 
 export default function CumulativeReportMock({
-    exam = "thinking_skills",
-    topic
-  }) {
-    const examData = mockSameExamProgress[exam] || [];
-  
-    const data = topic
-      ? examData.filter(row => row.topic === topic)
-      : examData;
+  exam = "thinking_skills"
+}) {
+  const data = mockSameExamProgress[exam] || [];
+
   if (data.length < 2) {
     return (
       <div className="empty-state">
@@ -37,7 +33,6 @@ export default function CumulativeReportMock({
 
   return (
     <div className="report-container">
-
       <h3>Progress Over Time (Same Exam)</h3>
       <p className="subtitle">
         This chart shows how the student has performed in repeated attempts of
@@ -67,7 +62,7 @@ export default function CumulativeReportMock({
         </LineChart>
       </ResponsiveContainer>
 
-      {/* ================= AI-STYLE SUMMARY ================= */}
+      {/* ================= SUMMARY ================= */}
       <div className="card ai-summary">
         <h4>Progress Summary</h4>
         <p>
@@ -85,7 +80,6 @@ export default function CumulativeReportMock({
             : "The student’s performance has declined, indicating a need for review and support."}
         </p>
       </div>
-
     </div>
   );
 }
