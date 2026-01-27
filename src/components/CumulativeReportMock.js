@@ -10,9 +10,15 @@ import {
 import { mockSameExamProgress } from "./mockProgressData";
 import "./Reports.css";
 
-export default function CumulativeReportMock({ exam = "thinking_skills" }) {
-  const data = mockSameExamProgress[exam] || [];
-
+export default function CumulativeReportMock({
+    exam = "thinking_skills",
+    topic
+  }) {
+    const examData = mockSameExamProgress[exam] || [];
+  
+    const data = topic
+      ? examData.filter(row => row.topic === topic)
+      : examData;
   if (data.length < 2) {
     return (
       <div className="empty-state">
