@@ -1,6 +1,5 @@
 import React from "react";
 
-
 /**
  * CumulativeReport
  * ----------------
@@ -13,12 +12,15 @@ export default function CumulativeReport({ data }) {
   if (!data) return null;
 
   const {
-    student,
+    student_id,
+    student_name,
     exam,
     topic,
     attempts = [],
     summary
   } = data;
+
+  const topicLabel = topic?.label ?? "Unknown topic";
 
   if (attempts.length === 0) {
     return (
@@ -34,8 +36,8 @@ export default function CumulativeReport({ data }) {
       <div className="report-header">
         <h2>Topic Progress Over Time</h2>
         <p className="subtext">
-          {student?.name} ({student?.id}) · {exam} · Topic:{" "}
-          <strong>{topic}</strong>
+          {student_name} ({student_id}) · {exam} · Topic:{" "}
+          <strong>{topicLabel}</strong>
         </p>
       </div>
 
@@ -48,16 +50,36 @@ export default function CumulativeReport({ data }) {
       {summary && (
         <div className="progress-summary">
           <h3>Progress Summary</h3>
-          <p>{summary.narrative}</p>
 
           <div className="summary-metrics">
-            <Metric label="Start Score" value={`${summary.start_score}%`} />
-            <Metric label="End Score" value={`${summary.end_score}%`} />
             <Metric
-              label="Net Change"
-              value={`${summary.net_change > 0 ? "+" : ""}${summary.net_change}%`}
+              label="Start Score"
+              value={`${summary.first_attempt_score}%`}
             />
-            <Metric label="Attempts" value={summary.attempts_count} />
+            <Metric
+              label="Latest Score"
+              value={`${summary.latest_attempt_score}%`}
+            />
+            <Metric
+              label="Score Change"
+              value={`${summary.score_change > 0 ? "+" : ""}${summary.score_change}%`}
+            />
+            <Metric
+              label="Start Accuracy"
+              value={`${summary.first_attempt_accuracy}%`}
+            />
+            <Metric
+              label="Latest Accuracy"
+              value={`${summary.latest_attempt_accuracy}%`}
+            />
+            <Metric
+              label="Accuracy Change"
+              value={`${summary.accuracy_change > 0 ? "+" : ""}${summary.accuracy_change}%`}
+            />
+            <Metric
+              label="Trend"
+              value={summary.trend}
+            />
           </div>
         </div>
       )}
@@ -71,6 +93,8 @@ export default function CumulativeReport({ data }) {
               <th>Date</th>
               <th>Score (%)</th>
               <th>Accuracy (%)</th>
+              <th>Questions</th>
+              <th>Correct</th>
             </tr>
           </thead>
           <tbody>
@@ -79,6 +103,8 @@ export default function CumulativeReport({ data }) {
                 <td>{new Date(a.date).toLocaleDateString()}</td>
                 <td>{a.score}%</td>
                 <td>{a.accuracy}%</td>
+                <td>{a.questions_attempted}</td>
+                <td>{a.correct_answers}</td>
               </tr>
             ))}
           </tbody>
@@ -103,7 +129,6 @@ function Metric({ label, value }) {
  * SimpleLineChart
  * ---------------
  * Minimal SVG-based chart to stay PDF-safe.
- * Replace with chart lib later if needed.
  */
 function SimpleLineChart({ attempts }) {
   const width = 600;
@@ -122,7 +147,7 @@ function SimpleLineChart({ attempts }) {
   const yScale = val =>
     height - padding - (val / maxY) * (height - padding * 2);
 
-  const points = (values) =>
+  const points = values =>
     values
       .map((v, i) => {
         const x = padding + i * xStep;
@@ -134,22 +159,10 @@ function SimpleLineChart({ attempts }) {
   return (
     <svg width={width} height={height} className="line-chart">
       {/* Axes */}
-      <line
-        x1={padding}
-        y1={padding}
-        x2={padding}
-        y2={height - padding}
-        stroke="#ccc"
-      />
-      <line
-        x1={padding}
-        y1={height - padding}
-        x2={width - padding}
-        y2={height - padding}
-        stroke="#ccc"
-      />
+      <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="#ccc" />
+      <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#ccc" />
 
-      {/* Score line (blue) */}
+      {/* Score line */}
       <polyline
         fill="none"
         stroke="#2563eb"
@@ -157,26 +170,13 @@ function SimpleLineChart({ attempts }) {
         points={points(scores)}
       />
 
-      {/* Accuracy line (green) */}
+      {/* Accuracy line */}
       <polyline
         fill="none"
         stroke="#16a34a"
         strokeWidth="2"
         points={points(accuracies)}
       />
-
-      {/* Legend */}
-      <g className="legend">
-        <rect x={padding} y={padding - 18} width="10" height="10" fill="#2563eb" />
-        <text x={padding + 15} y={padding - 9} fontSize="12">
-          Score
-        </text>
-
-        <rect x={padding + 80} y={padding - 18} width="10" height="10" fill="#16a34a" />
-        <text x={padding + 95} y={padding - 9} fontSize="12">
-          Accuracy
-        </text>
-      </g>
     </svg>
   );
 }
