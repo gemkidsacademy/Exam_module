@@ -57,100 +57,86 @@
   
     const [shouldGenerate, setShouldGenerate] = useState(false);
     useEffect(() => {
-    if (reportType !== "cumulative" || !exam) {
-      setAvailableTopics([]);
-      setTopic("");
-      return;
-    }
-  
-    setLoadingTopics(true);
-    setTopicsError(null);
-  
-    fetch(
-      `https://web-production-481a5.up.railway.app/api/exams/${exam}/topics`
-    )
-      .then(res => {
-        if (!res.ok) {
-          throw new Error("Failed to load topics");
-        }
-        return res.json();
-      })
-      .then(data => {
-        setAvailableTopics(data.topics || []);
-        setTopic(""); // reset selection when exam changes
-      })
-      .catch(err => {
-        console.error("Topics load error:", err);
-        setAvailableTopics([]);
-        setTopicsError(err.message);
-      })
-      .finally(() => {
-        setLoadingTopics(false);
-      });
-  }, [exam, reportType]);
-  
-    useEffect(() => {
-      
-      if (
-        !shouldGenerate ||
-        reportType !== "cumulative" ||
-        !studentId ||
-        !exam ||
-        !topic ||
-        selectedAttemptDates.length === 0
-      ) {
-        return;
-      }
-      console.log("🚀 CALLING CUMULATIVE API", {
-              studentId,
-              exam,
-              topic,
-              selectedAttemptDates
-            });
-
-    
-      setLoadingCumulative(true);
-      setCumulativeError(null);
-      setCumulativeReportData(null);
-    
-      const params = new URLSearchParams();
-      params.append("student_id", studentId);
-      params.append("exam", exam);
-      params.append("topic", topic);
-      selectedAttemptDates.forEach(d =>
-        params.append("attempt_dates", d)
-      );
-
-    
-      fetch(
-        `https://web-production-481a5.up.railway.app/api/reports/student/cumulative?${params.toString()}`
-      )
-        .then(res => {
-          if (!res.ok) {
-            throw new Error("Failed to load cumulative report");
-          }
-          return res.json();
-        })
-        .then(data => {
-          setCumulativeReportData(data);
-        })
-        .catch(err => {
-          console.error("Cumulative report load error:", err);
-          setCumulativeError(err.message);
-        })
-        .finally(() => {
-          setLoadingCumulative(false);
-          setShouldGenerate(false);
-        });
-    }, [
+    console.log("🟡 CUMULATIVE REPORT EFFECT CHECK", {
       shouldGenerate,
       reportType,
       studentId,
       exam,
       topic,
       selectedAttemptDates
-    ]);
+    });
   
+    if (!shouldGenerate) {
+      console.log("⛔ Blocked: shouldGenerate = false");
+      return;
+    }
+  
+    if (reportType !== "cumulative") {
+      console.log("⛔ Blocked: reportType is not cumulative");
+      return;
+    }
+  
+    if (!studentId || !exam || !topic) {
+      console.log("⛔ Blocked: missing studentId / exam / topic");
+      return;
+    }
+  
+    if (selectedAttemptDates.length === 0) {
+      console.log("⛔ Blocked: no attempt dates selected");
+      return;
+    }
+  
+    console.log("🚀 CALLING CUMULATIVE API", {
+      studentId,
+      exam,
+      topic,
+      selectedAttemptDates
+    });
+  
+    setLoadingCumulative(true);
+    setCumulativeError(null);
+    setCumulativeReportData(null);
+  
+    const params = new URLSearchParams();
+    params.append("student_id", studentId);
+    params.append("exam", exam);
+    params.append("topic", topic);
+  
+    // ✅ IMPORTANT: FastAPI expects repeated params
+    selectedAttemptDates.forEach(d =>
+      params.append("attempt_dates[]", d)
+    );
+  
+    fetch(
+      `https://web-production-481a5.up.railway.app/api/reports/student/cumulative?${params.toString()}`
+    )
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Failed to load cumulative report (${res.status})`);
+        }
+        return res.json();
+      })
+      .then(data => {
+        console.log("✅ CUMULATIVE REPORT RECEIVED", data);
+        setCumulativeReportData(data);
+      })
+      .catch(err => {
+        console.error("❌ Cumulative report load error:", err);
+        setCumulativeError(err.message);
+      })
+      .finally(() => {
+        setLoadingCumulative(false);
+        setShouldGenerate(false); // 🔒 reset trigger
+      });
+  }, [
+    shouldGenerate,
+    reportType,
+    studentId,
+    exam,
+    topic,
+    selectedAttemptDates
+  ]);
+
     useEffect(() => {
     if (
       reportType === "class" &&
@@ -266,44 +252,52 @@
     
     
     useEffect(() => {
-    if (!exam) {
-      setAvailableExamDates([]);
-      return;
-    }
-  
+      console.log("🟦 TOPICS EFFECT CHECK", {
+        reportType,
+        exam
+      });
     
-    // PER STUDENT REPORT
-    if (reportType === "student" && studentId) {
-      const url =
-        exam === "writing"
-          ? `https://web-production-481a5.up.railway.app/api/exams/writing/dates?student_id=${studentId}`
-          : `https://web-production-481a5.up.railway.app/api/exams/dates?exam=${exam}&student_id=${studentId}`;
+      // Only relevant for cumulative reports
+      if (reportType !== "cumulative") {
+        console.log("⛔ Skipping topics fetch (not cumulative)");
+        return;
+      }
     
-      fetch(url)
-        .then(res => res.json())
-        .then(data => {
-          setAvailableExamDates(data.dates || []);
-          setDate("");
-        });
+      if (!exam) {
+        console.log("⛔ Skipping topics fetch (no exam)");
+        setAvailableTopics([]);
+        return;
+      }
     
-      return;
-    }
-  
-  
-  
-    // PER CLASS REPORT
-    if (reportType === "class") {
+      console.log("📘 FETCHING TOPICS FOR EXAM:", exam);
+    
+      setLoadingTopics(true);
+      setTopicsError(null);
+    
       fetch(
-        `https://web-production-481a5.up.railway.app/api/exams/dates?exam=${exam}`
+        `https://web-production-481a5.up.railway.app/api/exams/${exam}/topics`
       )
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) {
+            throw new Error("Failed to load topics");
+          }
+          return res.json();
+        })
         .then(data => {
-          setAvailableExamDates(data.dates || []);
-          setDate("");
+          console.log("✅ TOPICS RECEIVED", data.topics);
+          setAvailableTopics(data.topics || []);
+          // ⚠️ DO NOT reset topic here
+        })
+        .catch(err => {
+          console.error("❌ Topics load error:", err);
+          setAvailableTopics([]);
+          setTopicsError(err.message);
+        })
+        .finally(() => {
+          setLoadingTopics(false);
         });
-    }
-  }, [exam, reportType, studentId]);
-  
+    }, [exam, reportType]);
+
   
     useEffect(() => {
       console.log("CUMULATIVE SESSION DATES EFFECT FIRED", {
