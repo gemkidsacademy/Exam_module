@@ -258,34 +258,38 @@ export default function StudentReportShell_backend() {
 
 
   useEffect(() => {
-      console.log("CUMULATIVE ATTEMPT EFFECT FIRED", {
-        reportType,
-        studentId,
-        exam
-      });
-
-      if (!studentId || reportType !== "cumulative") {
+    console.log("CUMULATIVE SESSION DATES EFFECT FIRED", {
+      reportType,
+      studentId,
+      exam
+    });
+  
+    if (
+      reportType !== "cumulative" ||
+      !studentId ||
+      !exam
+    ) {
+      setAvailableAttemptDates([]);
+      return;
+    }
+  
+    fetch(
+      `https://web-production-481a5.up.railway.app/api/exams/dates?exam=${exam}&student_id=${studentId}`
+    )
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch exam dates");
+        }
+        return res.json();
+      })
+      .then(data => {
+        setAvailableAttemptDates(data.dates || []);
+      })
+      .catch(err => {
+        console.error("Error loading cumulative session dates:", err);
         setAvailableAttemptDates([]);
-        return;
-      }
-    
-      fetch(
-        `https://web-production-481a5.up.railway.app/api/students/${studentId}/exam-attempts?exam=${exam}`
-      )
-        .then(res => {
-          if (!res.ok) {
-            throw new Error("Failed to fetch exam attempts");
-          }
-          return res.json();
-        })
-        .then(data => {
-          setAvailableAttemptDates(data.attemptDates || []);
-        })
-        .catch(err => {
-          console.error("Error loading attempt dates:", err);
-          setAvailableAttemptDates([]);
-        });
-    }, [studentId, exam, reportType]);
+      });
+  }, [studentId, exam, reportType]);
 
   useEffect(() => {
       fetch("https://web-production-481a5.up.railway.app/api/admin/students")
