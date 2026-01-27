@@ -258,6 +258,12 @@ export default function StudentReportShell_backend() {
 
 
   useEffect(() => {
+      console.log("CUMULATIVE ATTEMPT EFFECT FIRED", {
+        reportType,
+        studentId,
+        exam
+      });
+
       if (!studentId || reportType !== "cumulative") {
         setAvailableAttemptDates([]);
         return;
