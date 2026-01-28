@@ -887,6 +887,32 @@ progress::-webkit-progress-value {
   margin-top: 12px;
   margin-bottom: 4px;
 }
+/* ============================================
+   VIEW EXAM DETAILS BUTTON (FIX)
+============================================ */
+
+.view-exam-btn {
+  display: inline-block;
+  margin: 12px 0 24px 0;
+  padding: 10px 18px;
+
+  background: #2563eb;       /* blue */
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.view-exam-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+}
 
 
 
