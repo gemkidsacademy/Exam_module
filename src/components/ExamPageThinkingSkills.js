@@ -16,6 +16,8 @@ export default function ExamPageThinkingSkills({
 const studentId = sessionStorage.getItem("student_id");
 const IMAGE_BASE =
 "https://storage.googleapis.com/exammoduleimages/";
+console.log("🧠 ExamPageThinkingSkills MOUNTED");
+
 
 
 const hasSubmittedRef = useRef(false);
@@ -39,6 +41,8 @@ const [mode, setMode] = useState("loading");
 
 // ---------------- EXAM STATE ----------------
 const [questions, setQuestions] = useState([]);
+const [reviewQuestions, setReviewQuestions] = useState([]);
+
 
 
 const [currentIndex, setCurrentIndex] = useState(0);
@@ -72,6 +76,31 @@ const loadReport = useCallback(async () => {
     console.error("❌ loadReport error:", err);
   }
 }, [studentId]);
+useEffect(() => {
+  console.log("🔄 MODE CHANGED:", mode);
+}, [mode]);
+
+useEffect(() => {
+  if (mode !== "review") return;
+
+  const loadReview = async () => {
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/student/exam-review/thinking-skills?student_id=${studentId}`
+      );
+
+      const data = await res.json();
+      console.log("📘 review data:", data);
+
+      setReviewQuestions(data.questions);
+      setCurrentIndex(0);
+    } catch (err) {
+      console.error("❌ review load error:", err);
+    }
+  };
+
+  loadReview();
+}, [mode, studentId]);
 
 /* ============================================================
    START / RESUME EXAM (SINGLE SOURCE OF TRUTH)
