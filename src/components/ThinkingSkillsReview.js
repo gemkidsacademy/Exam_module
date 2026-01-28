@@ -5,6 +5,11 @@ export default function ThinkingSkillsReview({ studentId, examAttemptId }) {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   console.log("🧩 ThinkingSkillsReview MOUNTED");
+  useEffect(() => {
+  if (questions.length) {
+    console.log("🧪 Review UI question snapshot:", questions[0]);
+  }
+}, [questions]);
 
 
   useEffect(() => {
