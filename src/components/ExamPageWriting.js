@@ -1,7 +1,13 @@
   import React, { useState, useEffect } from "react";
   import "./ExamPage.css";
   
-  const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+  const API_BASE = process.env.REACT_APP_API_URL;
+  console.log("🧪 API_BASE:", API_BASE);
+
+  if (!API_BASE) {
+    throw new Error("❌ REACT_APP_API_URL is not defined");
+  }
+
   const parseWritingPrompt = (text) => {
       if (!text) return {};
     
@@ -46,6 +52,8 @@
     const [showPrompt, setShowPrompt] = useState(true);
     const [result, setResult] = useState(null);
     const [submitting, setSubmitting] = useState(false);
+    
+
 
     
     const parsedPrompt = React.useMemo(() => {
@@ -65,7 +73,7 @@
   
     try {
       const res = await fetch(
-        `${BACKEND_URL}/api/exams/writing/result?student_id=${studentId}`
+        `${API_BASE}/api/exams/writing/result?student_id=${studentId}`
       );
   
       if (!res.ok) {
@@ -86,7 +94,7 @@
   
       try {
         const res = await fetch(
-          `${BACKEND_URL}/api/student/start-writing-exam?student_id=${studentId}`,
+          `${API_BASE}/api/student/start-writing-exam?student_id=${studentId}`,
           { method: "POST" }
         );
   
@@ -106,7 +114,7 @@
   
       try {
         const res = await fetch(
-          `${BACKEND_URL}/api/exams/writing/current?student_id=${studentId}`
+          `${API_BASE}/api/exams/writing/current?student_id=${studentId}`
         );
   
         console.log("🟡 writing/current status:", res.status);
@@ -180,7 +188,7 @@
   const init = async () => {
     try {
       const res = await fetch(
-        `${BACKEND_URL}/api/exams/writing/current?student_id=${studentId}`
+        `${API_BASE}/api/exams/writing/current?student_id=${studentId}`
       );
 
       // 🔴 No ACTIVE exam → exam is completed → load result
@@ -188,7 +196,7 @@
       console.log("🟡 No active exam → checking for result");
     
       const resultRes = await fetch(
-        `${BACKEND_URL}/api/exams/writing/result?student_id=${studentId}`
+        `${API_BASE}/api/exams/writing/result?student_id=${studentId}`
       );
     
       // 🔴 Completed exam exists
@@ -266,7 +274,7 @@
     
       try {
         const res = await fetch(
-          `${BACKEND_URL}/api/exams/writing/submit?student_id=${studentId}`,
+          `${API_BASE}/api/exams/writing/submit?student_id=${studentId}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
