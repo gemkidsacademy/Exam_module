@@ -931,6 +931,19 @@ progress::-webkit-progress-value {
   background: #e5e7eb;
   color: #374151;
 }
+.option-btn.correct {
+  background: #d1fae5;
+  border-color: #22c55e;
+}
+
+.option-btn.incorrect {
+  background: #fee2e2;
+  border-color: #ef4444;
+}
+
+.option-btn.review {
+  cursor: default;
+}
 
 
 
