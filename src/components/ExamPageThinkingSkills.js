@@ -223,7 +223,26 @@ if (mode === "loading") {
 }
 
 if (mode === "report") {
-  return <ThinkingSkillsReport report={report} />;
+  return (
+    <ThinkingSkillsReport
+      report={report}
+      onViewExamDetails={() => setMode("review")}
+    />
+  );
+}
+if (mode === "review") {
+  return (
+    <div className="exam-shell">
+      <div className="exam-container">
+        <h2>Exam Review</h2>
+        <p>Read-only mode. Answers will be shown here.</p>
+
+        <button onClick={() => setMode("report")}>
+          Back to Report
+        </button>
+      </div>
+    </div>
+  );
 }
 
 // ---------------- EXAM UI ----------------
@@ -378,7 +397,7 @@ return (
 /* ============================================================
  REPORT COMPONENT
 ============================================================ */
-function ThinkingSkillsReport({ report }) {
+function ThinkingSkillsReport({ report, onViewExamDetails }) {
 if (!report?.overall) {
   return <p className="loading">Generating your report…</p>;
 }
@@ -400,6 +419,12 @@ return (
       You scored {overall.correct} out of {overall.total_questions} in NSW
       Selective Thinking Skills Test – Free Trial
     </h2>
+    <button
+     className="view-exam-btn"
+     onClick={onViewExamDetails}
+   >
+     View Exam Details
+   </button>
 
     <div className="report-grid">
 
