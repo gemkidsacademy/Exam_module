@@ -28,6 +28,8 @@ const API_BASE = process.env.REACT_APP_API_URL;
 if (!API_BASE) {
   throw new Error("❌ REACT_APP_API_URL is not defined");
 }
+const [examAttemptId, setExamAttemptId] = useState(null);
+
 
 
 
@@ -71,6 +73,7 @@ const loadReport = useCallback(async () => {
     console.log("📊 report loaded:", data);
 
     setReport(data);
+    setExamAttemptId(data.exam_attempt_id);
     setMode("report");
   } catch (err) {
     console.error("❌ loadReport error:", err);
@@ -81,12 +84,13 @@ useEffect(() => {
 }, [mode]);
 
 useEffect(() => {
-  if (mode !== "review") return;
+  if (mode !== "review" || !examAttemptId) return;
 
   const loadReview = async () => {
     try {
       const res = await fetch(
-        `${API_BASE}/api/student/exam-review/thinking-skills?student_id=${studentId}`
+        `${API_BASE}/api/student/exam-review/thinking-skills` +
+        `?student_id=${studentId}&exam_attempt_id=${examAttemptId}`
       );
 
       const data = await res.json();
@@ -100,7 +104,7 @@ useEffect(() => {
   };
 
   loadReview();
-}, [mode, studentId]);
+}, [mode, studentId, examAttemptId]);
 
 /* ============================================================
    START / RESUME EXAM (SINGLE SOURCE OF TRUTH)
@@ -230,10 +234,13 @@ const handleAnswer = (optionKey) => {
 };
 
 const goToQuestion = (idx) => {
-  const qid = questions[idx]?.q_id;
-  if (qid) {
+  const qid = activeQuestions[idx]?.q_id;
+  if (!qid) return;
+
+  if (!isReview) {
     setVisited(prev => ({ ...prev, [qid]: true }));
   }
+
   setCurrentIndex(idx);
 };
 
@@ -247,6 +254,13 @@ const formatTime = (seconds) => {
 /* ============================================================
    RENDER
 ============================================================ */
+const isReview = mode === "review";
+const activeQuestions = isReview ? reviewQuestions : questions;
+if (!activeQuestions.length) {
+  return <p className="loading">Loading…</p>;
+}
+
+
 if (mode === "loading") {
   return <p className="loading">Loading…</p>;
 }
@@ -259,23 +273,10 @@ if (mode === "report") {
     />
   );
 }
-if (mode === "review") {
-  return (
-    <div className="exam-shell">
-      <div className="exam-container">
-        <h2>Exam Review</h2>
-        <p>Read-only mode. Answers will be shown here.</p>
 
-        <button onClick={() => setMode("report")}>
-          Back to Report
-        </button>
-      </div>
-    </div>
-  );
-}
 
 // ---------------- EXAM UI ----------------
-const currentQ = questions[currentIndex];
+const currentQ = activeQuestions[currentIndex];
 if (!currentQ) return null;
 const optionEntries = Object.entries(currentQ.options || {});
 
@@ -285,36 +286,54 @@ return (
 
     {/* HEADER */}
     <div className="exam-header">
-      <div className="timer">⏳ {formatTime(timeLeft)}</div>
+      {!isReview && (
+        <div className="timer">⏳ {formatTime(timeLeft)}</div>
+      )}
+
       <div className="counter">
-        Question {currentIndex + 1} / {questions.length}
+        Question {currentIndex + 1} / {activeQuestions.length}
       </div>
     </div>
 
     {/* QUESTION INDEX */}
     <div className="index-row">
-      {questions.map((q, i) => {
-        let cls = "index-circle index-not-visited";
+  {activeQuestions.map((q, i) => {
+    let cls = "index-circle";
 
-        if (visited[q.q_id]) {
-          cls = "index-circle index-visited";
-        }
+    if (isReview) {
+      // 🟡 REVIEW MODE
+      if (!q.student_answer) {
+        cls += " index-skipped";
+      } else if (q.student_answer === q.correct_answer) {
+        cls += " index-correct";
+      } else {
+        cls += " index-incorrect";
+      }
+    } else {
+      // 🔵 EXAM MODE (existing behavior)
+      cls += " index-not-visited";
 
-        if (answers[q.q_id]) {
-          cls = "index-circle index-answered";
-        }
+      if (visited[q.q_id]) {
+        cls = "index-circle index-visited";
+      }
 
-        return (
-          <div
-            key={q.q_id}
-            className={cls}
-            onClick={() => goToQuestion(i)}
-          >
-            {i + 1}
-          </div>
-        );
-      })}
-    </div>
+      if (answers[q.q_id]) {
+        cls = "index-circle index-answered";
+      }
+    }
+
+    return (
+      <div
+        key={q.q_id}
+        className={cls}
+        onClick={() => goToQuestion(i)}
+      >
+        {i + 1}
+      </div>
+    );
+  })}
+</div>
+
 
     {/* QUESTION CARD */}
 <div className="question-card">
@@ -357,34 +376,58 @@ return (
 
 {/* OPTIONS */}
 {optionEntries.map(([optionKey, optionValue]) => {
-const isSelected = answers[currentQ.q_id] === optionKey;
+const studentAnswer = isReview
+  ? currentQ.student_answer      // backend
+  : answers[currentQ.q_id];      // live exam
+
+const correctAnswer = isReview
+  ? currentQ.correct_answer
+  : null;
+let optionClass = "option-btn";
+
+if (isReview) {
+  // ✅ review mode logic
+  if (optionKey === correctAnswer) {
+    optionClass += " correct";
+  } else if (
+    studentAnswer &&
+    optionKey === studentAnswer &&
+    studentAnswer !== correctAnswer
+  ) {
+    optionClass += " incorrect";
+  }
+} else {
+  // ✅ normal exam mode
+  if (studentAnswer === optionKey) {
+    optionClass += " selected";
+  }
+}
+
 
 return (
-  <button
-    key={optionKey}
-    onClick={() => handleAnswer(optionKey)}
-    className={`option-btn ${isSelected ? "selected" : ""}`}
-  >
-    <strong>{optionKey})</strong>
+    <button
+      key={optionKey}
+      disabled={isReview}
+      className={optionClass}
+      onClick={() => !isReview && handleAnswer(optionKey)}
+    >
+      <strong>{optionKey})</strong>
 
-    {/* TEXT OPTION */}
-    {optionValue.type === "text" && (
-      <span className="option-text">
-        {optionValue.content}
-      </span>
-    )}
+      {optionValue.type === "text" && (
+        <span className="option-text">
+          {optionValue.content}
+        </span>
+      )}
 
-    {/* IMAGE OPTION */}
-    {optionValue.type === "image" && (
-      <img
-        src={optionValue.src}
-        alt={`Option ${optionKey}`}
-        className="option-image"
-        loading="lazy"
-      />
-    )}
-  </button>
-);
+      {optionValue.type === "image" && (
+        <img
+          src={optionValue.src}
+          alt={`Option ${optionKey}`}
+          className="option-image"
+        />
+      )}
+    </button>
+  );
 })}
 
 
@@ -400,7 +443,7 @@ return (
         Previous
       </button>
 
-      {currentIndex < questions.length - 1 ? (
+      {currentIndex < activeQuestions.length - 1 ? (
         <button
           className="nav-btn next"
           onClick={() => goToQuestion(currentIndex + 1)}
