@@ -24,6 +24,8 @@ console.log("🧠 ExamPageThinkingSkills MOUNTED");
 
 const hasSubmittedRef = useRef(false);
 const prevIndexRef = useRef(null);
+const [reviewQuestions, setReviewQuestions] = useState([]);
+
 const API_BASE = process.env.REACT_APP_API_URL;
 
 if (!API_BASE) {
@@ -233,7 +235,8 @@ const formatTime = (seconds) => {
 /* ============================================================
    RENDER
 ============================================================ */
-const isReview = false; // exam-only flag now
+const isReview = mode === "review";
+
 const activeQuestions = questions;
 
 
@@ -254,10 +257,19 @@ if (mode === "report") {
     />
   );
 }
-if (mode === "review") {
+if (mode === "review" && !reviewQuestions.length) {
   return (
     <ThinkingSkillsReview
       studentId={studentId}
+      examAttemptId={examAttemptId}
+      onLoaded={(qs) => {
+        console.log("🧩 Review questions loaded:", qs.length);
+        setReviewQuestions(qs);
+        setQuestions(qs);        // 🔑 reuse exam renderer
+        setCurrentIndex(0);
+        setVisited({});          // clean slate
+        setAnswers({});          // answers come from backend now
+      }}
     />
   );
 }
@@ -314,7 +326,8 @@ return (
       <div
         key={q.q_id}
         className={cls}
-        onClick={() => goToQuestion(i)}
+        onClick={() => !isReview && goToQuestion(i)}
+
       >
         {i + 1}
       </div>
@@ -439,12 +452,15 @@ return (
           Next
         </button>
       ) : (
+        {!isReview && (
         <button
           className="nav-btn finish"
           onClick={() => finishExam("manual_submit")}
         >
           Finish Exam
         </button>
+      )}
+
       )}
     </div>
 
