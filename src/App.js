@@ -24,7 +24,11 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const server = "https://web-production-481a5.up.railway.app";
+  const server = process.env.REACT_APP_API_URL;
+
+  if (!server) {
+    throw new Error("❌ REACT_APP_API_URL is not defined");
+  }
 
   const handleLogin = async (e) => {
   e.preventDefault(); 
