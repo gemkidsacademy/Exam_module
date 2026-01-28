@@ -482,10 +482,14 @@ return (
     </h2>
     <button
       className="view-exam-btn"
-      onClick={() => setMode("review")}
+      onClick={() => {
+        console.log("➡️ View Exam Details clicked");
+        onViewExamDetails();
+      }}
     >
       View Exam Details
     </button>
+
 
 
     <div className="report-grid">
