@@ -969,6 +969,17 @@ body {
 .selective-dashboard {
   display: block !important;
 }
+/* 🔥 SAFETY OVERRIDE — FORCE TEXT VISIBLE */
+.index-circle {
+  color: #374151; /* slate-700 */
+}
+
+/* Only white text when background is dark */
+.index-circle.index-current,
+.index-circle.index-correct,
+.index-circle.index-incorrect {
+  color: #ffffff;
+}
 
    
 
