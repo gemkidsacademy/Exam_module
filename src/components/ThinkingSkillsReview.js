@@ -4,6 +4,8 @@ export default function ThinkingSkillsReview({ studentId, examAttemptId }) {
   const API_BASE = process.env.REACT_APP_API_URL;
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
+  console.log("🧩 ThinkingSkillsReview MOUNTED");
+
 
   useEffect(() => {
     if (!studentId || !examAttemptId) return;
