@@ -514,9 +514,9 @@ return (
     <button
       className="view-exam-btn"
       onClick={() => {
-        sessionStorage.setItem("thinking_skills_completed", "true");
-        setMode("review");
-      }}
+      sessionStorage.setItem("thinking_skills_completed", "true");
+      onViewExamDetails();
+    }}
     >
       View Exam Details
     </button>
