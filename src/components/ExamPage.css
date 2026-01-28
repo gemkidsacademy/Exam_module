@@ -1018,6 +1018,10 @@ body {
 
   box-sizing: border-box;
 }
+.index-row {
+  outline: 4px solid red;
+  background: rgba(255, 0, 0, 0.05);
+}
 
    
 
