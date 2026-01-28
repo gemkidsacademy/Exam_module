@@ -965,8 +965,11 @@ body {
 
   box-sizing: border-box;
 }
+/* 🔥 FINAL GUARANTEED FIX */
+.selective-dashboard {
+  display: block !important;
+}
 
-/* Flex parents MUST allow shrinking */
    
 
 
