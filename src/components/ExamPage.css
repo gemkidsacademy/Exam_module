@@ -430,6 +430,10 @@
 .report-page {
   padding: 30px;
   background: #f7f8fc;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .report-title {
