@@ -143,9 +143,9 @@
    HEADER
 ============================================ */
 .exam-header {
-  display: flex;
-  justify-content: space-between;
+  display: block;          /* 🔥 stop flex from interfering */
   margin-bottom: 18px;
+
   font-size: 20px;
   font-weight: 600;
 }
