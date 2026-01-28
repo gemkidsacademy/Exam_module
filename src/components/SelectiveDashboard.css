@@ -151,3 +151,7 @@ body {
 .exam-shell {
   min-width: 0 !important;
 }
+/* 🔥 FINAL GUARANTEED FIX */
+.selective-dashboard {
+  display: block !important;
+}
