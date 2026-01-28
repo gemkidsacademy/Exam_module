@@ -258,7 +258,7 @@ if (mode === "review") {
   return (
     <ThinkingSkillsReview
       studentId={studentId}
-      examAttemptId={examAttemptId}
+      examAttemptId={report?.exam_attempt_id}
     />
   );
 }
