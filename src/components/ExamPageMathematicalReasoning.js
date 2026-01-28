@@ -32,6 +32,12 @@ export default function ExamPageMathematicalReasoning({
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
   const [timeLeft, setTimeLeft] = useState(null);
+  const API_BASE = process.env.REACT_APP_API_URL;
+
+  if (!API_BASE) {
+    throw new Error("❌ REACT_APP_API_URL is not defined");
+  }
+
 
   // ---------------- REPORT ----------------
   const [report, setReport] = useState(null);
@@ -42,7 +48,7 @@ export default function ExamPageMathematicalReasoning({
   const loadReport = useCallback(async () => {
     try {
       const res = await fetch(
-        `https://web-production-481a5.up.railway.app/api/student/exam-report/mathematical-reasoning?student_id=${studentId}`
+        `${API_BASE}/api/student/exam-report/mathematical-reasoning?student_id=${studentId}`
       );
 
       if (!res.ok) {
@@ -69,7 +75,7 @@ export default function ExamPageMathematicalReasoning({
     const startExam = async () => {
       try {
         const res = await fetch(
-          "https://web-production-481a5.up.railway.app/api/student/start-exam",
+          `${API_BASE}/api/student/start-exam`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -148,7 +154,7 @@ export default function ExamPageMathematicalReasoning({
 
       try {
         await fetch(
-          "https://web-production-481a5.up.railway.app/api/student/finish-exam",
+          `${API_BASE}/api/student/finish-exam`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
