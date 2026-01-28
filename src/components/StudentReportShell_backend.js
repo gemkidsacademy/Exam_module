@@ -17,8 +17,12 @@
     const [reportError, setReportError] = useState(null);
     const [selectedClassDay, setSelectedClassDay] = useState("");
     const [availableClassDates, setAvailableClassDates] = useState([]);
-    const API_BASE =
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
+    if (!API_BASE) {
+      throw new Error("❌ NEXT_PUBLIC_API_URL is missing at build time");
+    }
+    
     console.log("🧪 API_BASE (vercel):", API_BASE);
 
 
