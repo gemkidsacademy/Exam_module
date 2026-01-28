@@ -6,8 +6,12 @@
         onExamStart,
         onExamFinish
       }) {
-      const BACKEND_URL = "https://web-production-481a5.up.railway.app";
-    
+      const API_BASE = process.env.REACT_APP_API_URL;
+      console.log("🔗 API_BASE:", API_BASE);
+      if (!API_BASE) {
+       console.error("❌ REACT_APP_API_URL is not defined");
+      }
+
       /* =============================
          STATE
       ============================= */
@@ -71,7 +75,7 @@
       const loadExam = async () => {
         // 1️⃣ Start / resume attempt
         const res = await fetch(
-          `${BACKEND_URL}/api/exams/start-reading`,
+          `${API_BASE}/api/exams/start-reading`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -93,7 +97,7 @@
     
         // 2️⃣ Fetch exam content (NEW)
         const examRes = await fetch(
-          `${BACKEND_URL}/api/exams/reading-content/${meta.exam_id}`
+          `${API_BASE}/api/exams/reading-content/${meta.exam_id}`
         );
     
         const examData = await examRes.json();
@@ -198,7 +202,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
     
       try {
         const res = await fetch(
-          `${BACKEND_URL}/api/exams/submit-reading`,
+          `${API_BASE}/api/exams/submit-reading`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
