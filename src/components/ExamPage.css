@@ -964,12 +964,17 @@ body {
 }
 
 .index-row {
-  display: block !important;
-  white-space: nowrap !important;
-  overflow-x: auto !important;
-  overflow-y: visible !important;
-  width: 100% !important;
-  max-width: none !important;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+
+  gap: 10px;
+
+  width: 100%;
+  max-width: 100%;
+
+  overflow-x: auto;
+  overflow-y: visible;
 }
 
 
