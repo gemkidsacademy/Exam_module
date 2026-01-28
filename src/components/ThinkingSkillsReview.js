@@ -1,57 +1,48 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-export default function ThinkingSkillsReview({ studentId, examAttemptId }) {
+export default function ThinkingSkillsReview({
+  studentId,
+  examAttemptId,
+  onLoaded
+}) {
   const API_BASE = process.env.REACT_APP_API_URL;
-  const [questions, setQuestions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  console.log("🧩 ThinkingSkillsReview MOUNTED");
-  useEffect(() => {
-  if (questions.length) {
-    console.log("🧪 Review UI question snapshot:", questions[0]);
-  }
-}, [questions]);
 
+  console.log("🧩 ThinkingSkillsReview MOUNTED (loader)");
 
   useEffect(() => {
-  console.log("🧪 Review effect triggered", { studentId, API_BASE });
+    console.log("🧪 Review effect triggered", { studentId, examAttemptId });
 
-  if (!studentId) {
-    console.log("⛔ Review blocked – missing studentId");
-    return;
-  }
-
-  console.log("🚀 Calling exam-review endpoint (student-only)");
-
-  const loadReview = async () => {
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/student/exam-review/thinking-skills?student_id=${studentId}`
-      );
-
-      const data = await res.json();
-      console.log("📘 Review response received:", data);
-
-      setQuestions(data.questions || []);
-    } catch (err) {
-      console.error("❌ Failed to load exam review:", err);
-    } finally {
-      setLoading(false);
+    if (!studentId) {
+      console.log("⛔ Review blocked – missing studentId");
+      return;
     }
-  };
 
-  loadReview();
-}, [studentId, API_BASE]);
+    const loadReview = async () => {
+      try {
+        console.log("🚀 Calling exam-review endpoint");
 
-  if (loading) return <p>Loading review…</p>;
+        const res = await fetch(
+          `${API_BASE}/api/student/exam-review/thinking-skills?student_id=${studentId}`
+        );
 
-  return (
-    <div>
-      <h2>Exam Review</h2>
-      {questions.map(q => (
-        <div key={q.q_id}>
-          <pre>{JSON.stringify(q, null, 2)}</pre>
-        </div>
-      ))}
-    </div>
-  );
+        if (!res.ok) {
+          throw new Error(`Review fetch failed: ${res.status}`);
+        }
+
+        const data = await res.json();
+        console.log("📘 Review response received:", data);
+
+        // 🔑 Hand data back to parent
+        onLoaded?.(data.questions || []);
+
+      } catch (err) {
+        console.error("❌ Failed to load exam review:", err);
+      }
+    };
+
+    loadReview();
+  }, [studentId, examAttemptId, API_BASE, onLoaded]);
+
+  // ⛔ No UI here — parent renders everything
+  return <p className="loading">Loading review…</p>;
 }
