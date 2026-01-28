@@ -5,6 +5,7 @@ useRef,
 useCallback
 } from "react";
 import "./ExamPage.css";
+import ThinkingSkillsReview from "./ThinkingSkillsReview";
 
 /* ============================================================
  MAIN COMPONENT
@@ -18,13 +19,11 @@ const IMAGE_BASE =
 "https://storage.googleapis.com/exammoduleimages/";
 console.log("🧠 ExamPageThinkingSkills MOUNTED");
 
-const persistedMode = sessionStorage.getItem("thinking_skills_mode");
 
-const didInitRef = useRef(false);
+
 
 const hasSubmittedRef = useRef(false);
 const prevIndexRef = useRef(null);
-const OPTION_KEYS = ["A", "B", "C", "D"];
 const API_BASE = process.env.REACT_APP_API_URL;
 
 if (!API_BASE) {
@@ -41,12 +40,13 @@ const [examAttemptId, setExamAttemptId] = useState(null);
  * - exam    → active attempt
  * - report  → completed attempt
  */
-const [mode, setMode] = useState(persistedMode || "loading");
+const [mode, setMode] = useState("loading");
+
 
 
 // ---------------- EXAM STATE ----------------
 const [questions, setQuestions] = useState([]);
-const [reviewQuestions, setReviewQuestions] = useState([]);
+
 
 
 
@@ -82,41 +82,13 @@ const loadReport = useCallback(async () => {
     console.error("❌ loadReport error:", err);
   }
 }, [studentId]);
-useEffect(() => {
-  sessionStorage.setItem("thinking_skills_mode", mode);
-}, [mode]);
 
 useEffect(() => {
   console.log("🔄 MODE CHANGED:", mode);
 }, [mode]);
 
-useEffect(() => {
-  if (mode !== "review") return;
-  if (!report?.exam_attempt_id) return;
 
-  const attemptId = report.exam_attempt_id;
-
-  console.log("🚀 loading review exam", attemptId);
-
-  const loadReview = async () => {
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/student/exam-review/thinking-skills` +
-        `?student_id=${studentId}&exam_attempt_id=${attemptId}`
-      );
-
-      const data = await res.json();
-      console.log("📘 review data:", data);
-
-      setReviewQuestions(data.questions || []);
-      setCurrentIndex(0);
-    } catch (err) {
-      console.error("❌ review load error:", err);
-    }
-  };
-
-  loadReview();
-}, [mode, report]); // 🔑 only what actually matters
+ // 🔑 only what actually matters
 
 /* ============================================================
    START / RESUME EXAM (SINGLE SOURCE OF TRUTH)
@@ -124,12 +96,7 @@ useEffect(() => {
 useEffect(() => {
   if (!studentId) return;
 
-  const completed = sessionStorage.getItem("thinking_skills_completed");
-  if (completed === "true") {
-    console.log("🛑 startExam permanently blocked (completed)");
-    return;
-  }
-
+  
   if (mode === "report" || mode === "review") {
     console.log("⛔ startExam skipped, mode =", mode);
     return;
@@ -249,13 +216,10 @@ const handleAnswer = (optionKey) => {
 };
 
 const goToQuestion = (idx) => {
-  const qid = activeQuestions[idx]?.q_id;
-  if (!qid) return;
+  if (idx < 0 || idx >= questions.length) return;
 
-  if (!isReview) {
-    setVisited(prev => ({ ...prev, [qid]: true }));
-  }
-
+  const qid = questions[idx].q_id;
+  setVisited(prev => ({ ...prev, [qid]: true }));
   setCurrentIndex(idx);
 };
 
@@ -269,17 +233,14 @@ const formatTime = (seconds) => {
 /* ============================================================
    RENDER
 ============================================================ */
-const isReview = mode === "review";
-const activeQuestions = isReview ? reviewQuestions : questions;
+const isReview = false; // exam-only flag now
+const activeQuestions = questions;
+
 
 // Only block loading for exam & review
-if (
-  (mode === "exam" || mode === "review") &&
-  !activeQuestions.length
-) {
+if (mode === "exam" && !questions.length) {
   return <p className="loading">Loading…</p>;
 }
-
 
 if (mode === "loading") {
   return <p className="loading">Loading…</p>;
@@ -290,6 +251,14 @@ if (mode === "report") {
     <ThinkingSkillsReport
       report={report}
       onViewExamDetails={() => setMode("review")}
+    />
+  );
+}
+if (mode === "review") {
+  return (
+    <ThinkingSkillsReview
+      studentId={studentId}
+      examAttemptId={examAttemptId}
     />
   );
 }
@@ -513,10 +482,7 @@ return (
     </h2>
     <button
       className="view-exam-btn"
-      onClick={() => {
-      sessionStorage.setItem("thinking_skills_completed", "true");
-      onViewExamDetails();
-    }}
+      onClick={() => setMode("review")}
     >
       View Exam Details
     </button>
