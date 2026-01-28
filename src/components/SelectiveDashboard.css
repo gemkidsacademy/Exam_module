@@ -1,3 +1,7 @@
+/* 🔥 TEMP DEBUG — REMOVE FLEX */
+.selective-dashboard {
+  display: block !important;
+}
 
 /* ============================================================
    GLOBAL DASHBOARD LAYOUT
