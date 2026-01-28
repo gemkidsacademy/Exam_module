@@ -1,8 +1,3 @@
-/* 🔥 TEMP DEBUG — REMOVE FLEX */
-.selective-dashboard {
-  display: block !important;
-}
-
 /* ============================================================
    GLOBAL DASHBOARD LAYOUT
 ============================================================ */
@@ -15,14 +10,14 @@
 }
 
 /* ============================================================
-   SUBJECT SELECTION — NSW STYLE (IMAGE MATCH)
+   SUBJECT SELECTION
 ============================================================ */
 
 .subject-selection-wrapper {
   position: fixed;
   inset: 0;
   display: flex;
-  flex-direction: column;   /* 🔑 THIS LINE */
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   background: #eef1f4;
@@ -32,16 +27,15 @@
 .subject-selection-card {
   background: #ffffff;
   padding: 36px 40px 32px;
-  max-width: 420px;
   width: 420px;
+  max-width: 420px;
   text-align: center;
-
-  /* 🔑 visual separation */
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   border-radius: 4px;
 }
 
 /* Title */
+
 .dashboard-title {
   font-size: 28px;
   font-weight: 700;
@@ -49,7 +43,8 @@
   margin-bottom: 16px;
 }
 
-/* Red divider line */
+/* Divider */
+
 .title-divider {
   height: 2px;
   background: #d32f2f;
@@ -58,12 +53,13 @@
 }
 
 /* Subject buttons */
+
 .subject-buttons {
   display: flex;
   flex-direction: column;
   gap: 16px;
   margin-bottom: 28px;
-  align-items: center;       /* 🔒 stop stretch */
+  align-items: center;
 }
 
 .subject-button {
@@ -74,10 +70,9 @@
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-
-  width: 100%;               /* button fills card */
-  max-width: 300px;          /* 🔒 visual width */
-  display: block;            /* consistent */
+  width: 100%;
+  max-width: 300px;
+  display: block;
 }
 
 .subject-button:hover {
@@ -85,6 +80,7 @@
 }
 
 /* Footer */
+
 .footer-text {
   font-size: 14px;
   color: #374151;
@@ -105,57 +101,32 @@
 }
 
 /* ============================================================
-   EXAM LAYOUT — FULL WIDTH GUARANTEE
+   EXAM LAYOUT
 ============================================================ */
 
-.content-area {
-  width: 100%;
-  max-width: none;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.exam-root {
-  width: 100%;
-}
-
+.content-area,
+.exam-root,
+.exam-shell,
 .reading-mode {
-  width: 100%;
-}
-
-.exam-shell {
   width: 100%;
   max-width: 100%;
 }
+
 body {
-  background: #eef1f4 !important;
+  background: #eef1f4;
 }
+
 .dashboard-logo {
   width: 180px;
   margin-bottom: 24px;
 }
-/* ============================================
-   🔓 UNLOCK HORIZONTAL SCROLL (CRITICAL FIX)
-============================================ */
 
-.selective-dashboard,
-.content-area,
-.exam-root,
-.exam-shell {
-  overflow-x: visible !important;
-}
-/* ============================================
-   🔓 FLEX OVERFLOW UNLOCK (MANDATORY)
-============================================ */
+/* ============================================================
+   FIX: EXAM HEADER WIDTH CLAMP
+============================================================ */
 
-.selective-dashboard,
-.content-area,
-.exam-root,
-.exam-shell {
-  min-width: 0 !important;
-}
-/* 🔥 FINAL GUARANTEED FIX */
-.selective-dashboard {
-  display: block !important;
+.exam-header {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: visible;
 }
