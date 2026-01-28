@@ -973,7 +973,8 @@ body {
   gap: 10px;
 
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: visible;
+
 }
 
 
