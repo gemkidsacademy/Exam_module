@@ -24,7 +24,7 @@ console.log("🧠 ExamPageThinkingSkills MOUNTED");
 
 const hasSubmittedRef = useRef(false);
 const prevIndexRef = useRef(null);
-const [reviewQuestions, setReviewQuestions] = useState([]);
+
 
 const API_BASE = process.env.REACT_APP_API_URL;
 
@@ -221,7 +221,11 @@ const goToQuestion = (idx) => {
   if (idx < 0 || idx >= questions.length) return;
 
   const qid = questions[idx].q_id;
-  setVisited(prev => ({ ...prev, [qid]: true }));
+
+  if (!isReview) {
+    setVisited(prev => ({ ...prev, [qid]: true }));
+  }
+
   setCurrentIndex(idx);
 };
 
@@ -257,19 +261,19 @@ if (mode === "report") {
     />
   );
 }
-if (mode === "review" && !reviewQuestions.length) {
+ 
+if (mode === "review" && !questions.length) {
   return (
     <ThinkingSkillsReview
       studentId={studentId}
       examAttemptId={examAttemptId}
       onLoaded={(qs) => {
-        console.log("🧩 Review questions loaded:", qs.length);
-        setReviewQuestions(qs);
-        setQuestions(qs);        // 🔑 reuse exam renderer
+        setQuestions(qs);
         setCurrentIndex(0);
-        setVisited({});          // clean slate
-        setAnswers({});          // answers come from backend now
+        setVisited({});
+        setAnswers({});
       }}
+
     />
   );
 }
@@ -444,24 +448,24 @@ return (
         Previous
       </button>
 
-      {currentIndex < activeQuestions.length - 1 ? (
-        <button
-          className="nav-btn next"
-          onClick={() => goToQuestion(currentIndex + 1)}
-        >
-          Next
-        </button>
-      ) : (
-        {!isReview && (
-        <button
-          className="nav-btn finish"
-          onClick={() => finishExam("manual_submit")}
-        >
-          Finish Exam
-        </button>
-      )}
+      {currentIndex < activeQuestions.length - 1 && (
+       <button
+         className="nav-btn next"
+         onClick={() => goToQuestion(currentIndex + 1)}
+       >
+         Next
+       </button>
+     )}
+     
+     {currentIndex === activeQuestions.length - 1 && !isReview && (
+       <button
+         className="nav-btn finish"
+         onClick={() => finishExam("manual_submit")}
+       >
+         Finish Exam
+       </button>
+     )}
 
-      )}
     </div>
 
   </div>
