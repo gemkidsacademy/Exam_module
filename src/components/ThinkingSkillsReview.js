@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import styles from "./ThinkingSkillsReview.module.css";
 
 export default function ThinkingSkillsReview({
   studentId,
@@ -7,44 +8,40 @@ export default function ThinkingSkillsReview({
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
 
-  console.log("🧩 ThinkingSkillsReview MOUNTED (loader)");
-
   useEffect(() => {
-    console.log("🧪 Review effect triggered", { studentId, examAttemptId });
-
     if (!studentId) {
-      console.log("⛔ Review blocked – missing studentId");
       return;
     }
 
     const loadReview = async () => {
       try {
-        console.log("🚀 Calling exam-review endpoint");
-
-        const res = await fetch(
+        const response = await fetch(
           `${API_BASE}/api/student/exam-review/thinking-skills?student_id=${studentId}`
         );
 
-        if (!res.ok) {
-          throw new Error(`Review fetch failed: ${res.status}`);
+        if (!response.ok) {
+          throw new Error(`Review fetch failed with status ${response.status}`);
         }
 
-        const data = await res.json();
-        console.log("📘 Review response received:", data);
-         console.log("🧪 Review payload shape check:", {
-          sample: data.questions?.[0]
-        });
-        // 🔑 Hand data back to parent
-        onLoaded?.(data.questions || []);
+        const data = await response.json();
 
-      } catch (err) {
-        console.error("❌ Failed to load exam review:", err);
+        const questions = Array.isArray(data.questions)
+          ? data.questions
+          : [];
+
+        onLoaded?.(questions);
+      } catch (error) {
+        console.error("Failed to load thinking skills review", error);
+        onLoaded?.([]);
       }
     };
 
     loadReview();
   }, [studentId, examAttemptId, API_BASE, onLoaded]);
 
-  // ⛔ No UI here — parent renders everything
-  return <p className="loading">Loading review…</p>;
+  return (
+    <p className={styles.loading}>
+      Loading review…
+    </p>
+  );
 }
