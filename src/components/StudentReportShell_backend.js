@@ -19,6 +19,7 @@
     const [availableClassDates, setAvailableClassDates] = useState([]);
     const API_BASE =
       process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    console.log("🧪 API_BASE (vercel):", API_BASE);
 
 
   
