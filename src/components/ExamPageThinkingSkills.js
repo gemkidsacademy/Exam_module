@@ -18,7 +18,9 @@ const IMAGE_BASE =
 "https://storage.googleapis.com/exammoduleimages/";
 console.log("🧠 ExamPageThinkingSkills MOUNTED");
 
+const persistedMode = sessionStorage.getItem("thinking_skills_mode");
 
+const didInitRef = useRef(false);
 
 const hasSubmittedRef = useRef(false);
 const prevIndexRef = useRef(null);
@@ -39,7 +41,8 @@ const [examAttemptId, setExamAttemptId] = useState(null);
  * - exam    → active attempt
  * - report  → completed attempt
  */
-const [mode, setMode] = useState("loading");
+const [mode, setMode] = useState(persistedMode || "loading");
+
 
 // ---------------- EXAM STATE ----------------
 const [questions, setQuestions] = useState([]);
@@ -80,6 +83,10 @@ const loadReport = useCallback(async () => {
   }
 }, [studentId]);
 useEffect(() => {
+  sessionStorage.setItem("thinking_skills_mode", mode);
+}, [mode]);
+
+useEffect(() => {
   console.log("🔄 MODE CHANGED:", mode);
 }, [mode]);
 
@@ -116,44 +123,44 @@ useEffect(() => {
 ============================================================ */
 useEffect(() => {
   if (!studentId) return;
+
+  const completed = sessionStorage.getItem("thinking_skills_completed");
+  if (completed === "true") {
+    console.log("🛑 startExam permanently blocked (completed)");
+    return;
+  }
+
   if (mode === "report" || mode === "review") {
     console.log("⛔ startExam skipped, mode =", mode);
     return;
-  }  
+  }
+
   const startExam = async () => {
-    try {
-      const res = await fetch(
-         `${API_BASE}/api/student/start-exam-thinkingskills`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ student_id: studentId })
-        }
-      );
-
-      const data = await res.json();
-      console.log("📥 start-exam:", data);
-
-      // ✅ COMPLETED → SHOW REPORT
-      if (data.completed === true) {
-        await loadReport();
-         
-        return;
+    const res = await fetch(
+      `${API_BASE}/api/student/start-exam-thinkingskills`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ student_id: studentId })
       }
+    );
 
-      // ✅ NEW / IN-PROGRESS → SHOW EXAM
-      setQuestions(data.questions || []);
-      setTimeLeft(data.remaining_time);
-      setMode("exam");
-      onExamStart?.();
+    const data = await res.json();
 
-    } catch (err) {
-      console.error("❌ start-exam error:", err);
+    if (data.completed === true) {
+      sessionStorage.setItem("thinking_skills_completed", "true");
+      await loadReport();
+      return;
     }
+
+    setQuestions(data.questions || []);
+    setTimeLeft(data.remaining_time);
+    setMode("exam");
+    onExamStart?.();
   };
 
   startExam();
-}, [studentId, loadReport, mode]);
+}, [studentId]);
 
 /* ============================================================
    MARK VISITED QUESTIONS
@@ -505,11 +512,15 @@ return (
       Selective Thinking Skills Test – Free Trial
     </h2>
     <button
-     className="view-exam-btn"
-     onClick={onViewExamDetails}
-   >
-     View Exam Details
-   </button>
+      className="view-exam-btn"
+      onClick={() => {
+        sessionStorage.setItem("thinking_skills_completed", "true");
+        setMode("review");
+      }}
+    >
+      View Exam Details
+    </button>
+
 
     <div className="report-grid">
 
