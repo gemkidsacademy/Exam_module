@@ -11,7 +11,11 @@ import {
   Line
 } from "recharts";
 
-const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+const BACKEND_URL = process.env.REACT_APP_API_URL;
+
+if (!BACKEND_URL) {
+  throw new Error("❌ REACT_APP_API_URL is not defined");
+}
 
 /* ============================
    CONSTANTS
