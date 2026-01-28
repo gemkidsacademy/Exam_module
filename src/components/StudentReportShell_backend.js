@@ -68,6 +68,40 @@
   
     const [shouldGenerate, setShouldGenerate] = useState(false);
     useEffect(() => {
+      console.log("🟢 STUDENT EXAM DATES EFFECT", {
+        reportType,
+        studentId,
+        exam
+      });
+    
+      if (
+        reportType !== "student" ||
+        !studentId ||
+        !exam
+      ) {
+        setAvailableExamDates([]);
+        return;
+      }
+    
+      fetch(
+        `${API_BASE}/api/exams/dates?exam=${exam}&student_id=${studentId}`
+      )
+        .then(res => {
+          if (!res.ok) {
+            throw new Error("Failed to fetch student exam dates");
+          }
+          return res.json();
+        })
+        .then(data => {
+          setAvailableExamDates(data.dates || []);
+        })
+        .catch(err => {
+          console.error("Student exam dates error:", err);
+          setAvailableExamDates([]);
+        });
+    }, [studentId, exam, reportType]);
+
+    useEffect(() => {
   console.log("🏫 CLASS SESSION DATES EFFECT FIRED", {
     reportType,
     className,
