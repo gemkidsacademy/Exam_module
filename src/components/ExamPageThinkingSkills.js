@@ -5,6 +5,8 @@ useRef,
 useCallback
 } from "react";
 import "./ExamPage.css";
+import styles from "./ExamPageThinkingSkills.module.css";
+
 import ThinkingSkillsReview from "./ThinkingSkillsReview";
 
 /* ============================================================
@@ -286,11 +288,11 @@ if (!currentQ) return null;
 const optionEntries = Object.entries(currentQ.options || {});
 
 return (
-<div className="exam-shell">
-  <div className="exam-container">
+<div className={styles.examShell}>
+  <div className={styles.examContainer}>
 
     {/* HEADER */}
-    <div className="exam-header">
+    <div className={styles.examHeader}>
       {!isReview && (
         <div className="timer">⏳ {formatTime(timeLeft)}</div>
       )}
@@ -301,45 +303,33 @@ return (
     </div>
 
     {/* QUESTION INDEX */}
-    <div className="index-row">
-  {activeQuestions.map((q, i) => {
-    let cls = "index-circle";
+    <div className={styles.indexRow}>
+      {activeQuestions.map((q, i) => {
+        let cls = styles.indexCircle;
 
-    if (isReview) {
-      // 🟡 REVIEW MODE
-      if (!q.student_answer) {
-        cls += " index-skipped";
-      } else if (q.student_answer === q.correct_answer) {
-        cls += " index-correct";
-      } else {
-        cls += " index-incorrect";
-      }
-    } else {
-      // 🔵 EXAM MODE (existing behavior)
-      cls += " index-not-visited";
+        if (isReview) {
+          if (!q.student_answer) cls += ` ${styles.indexSkipped}`;
+          else if (q.student_answer === q.correct_answer)
+            cls += ` ${styles.indexCorrect}`;
+          else cls += ` ${styles.indexIncorrect}`;
+        } else {
+          cls += ` ${styles.indexNotVisited}`;
 
-      if (visited[q.q_id]) {
-        cls = "index-circle index-visited";
-      }
+          if (visited[q.q_id]) cls = `${styles.indexCircle} ${styles.indexVisited}`;
+          if (answers[q.q_id]) cls = `${styles.indexCircle} ${styles.indexAnswered}`;
+        }
 
-      if (answers[q.q_id]) {
-        cls = "index-circle index-answered";
-      }
-    }
-
-    return (
-      <div
-        key={q.q_id}
-        className={cls}
-        onClick={() => goToQuestion(i)}
-
-
-      >
-        {i + 1}
-      </div>
-    );
-  })}
-</div>
+        return (
+          <div
+            key={q.q_id}
+            className={cls}
+            onClick={() => goToQuestion(i)}
+          >
+            {i + 1}
+          </div>
+        );
+      })}
+    </div>
 
 
     {/* QUESTION CARD */}
