@@ -111,8 +111,10 @@ useEffect(() => {
 ============================================================ */
 useEffect(() => {
   if (!studentId) return;
-  if (mode === "review") return;     // ✅ ADD THIS
-  if (mode === "report") return;  
+  if (mode === "report" || mode === "review") {
+    console.log("⛔ startExam skipped, mode =", mode);
+    return;
+  }  
   const startExam = async () => {
     try {
       const res = await fetch(
@@ -146,7 +148,7 @@ useEffect(() => {
   };
 
   startExam();
-}, [studentId, loadReport]);
+}, [studentId, loadReport, mode]);
 
 /* ============================================================
    MARK VISITED QUESTIONS
