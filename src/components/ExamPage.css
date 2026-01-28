@@ -932,13 +932,13 @@ progress::-webkit-progress-value {
   color: #374151;
 }
 .option-btn.correct {
-  background: #d1fae5;
-  border-color: #22c55e;
+  background-color: #dcfce7 !important;
+  border-color: #22c55e !important;
 }
 
 .option-btn.incorrect {
-  background: #fee2e2;
-  border-color: #ef4444;
+  background-color: #fee2e2 !important;
+  border-color: #ef4444 !important;
 }
 
 .option-btn.review {
