@@ -1,0 +1,44 @@
+/* ExamPageThinkingSkills.module.css */
+
+.examShell {
+  width: 100%;
+}
+
+.examContainer {
+  width: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.examHeader {
+  display: block;
+  margin-bottom: 18px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.indexRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 10px;
+
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.indexCircle {
+  min-width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  cursor: pointer;
+
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+}
