@@ -17,6 +17,9 @@
     const [reportError, setReportError] = useState(null);
     const [selectedClassDay, setSelectedClassDay] = useState("");
     const [availableClassDates, setAvailableClassDates] = useState([]);
+    const API_BASE =
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 
   
   
@@ -75,7 +78,7 @@
   }
 
   fetch(
-    `https://web-production-481a5.up.railway.app/api/classes/${encodeURIComponent(
+    `${API_BASE}/api/classes/${encodeURIComponent(
       className
     )}/exam-dates?exam=${exam}`
   )
@@ -161,7 +164,7 @@
     params.append("attempt_dates", date)
   );
 
-  const requestUrl = `https://web-production-481a5.up.railway.app/api/reports/student/cumulative?${params.toString()}`;
+  const requestUrl = `${API_BASE}/api/reports/student/cumulative?${params.toString()}`;
 
   console.log("🌐 FINAL CUMULATIVE REQUEST URL:", requestUrl);
 
@@ -233,7 +236,7 @@
     setClassReportError(null);
     setClassReportData(null);
   
-    const url = `https://web-production-481a5.up.railway.app/api/reports/class?class_name=${encodeURIComponent(
+    const url = `${API_BASE}/api/reports/class?class_name=${encodeURIComponent(
     className
   )}&exam=${exam}&date=${date}`;
   
@@ -278,8 +281,8 @@
     // 🔑 Route writing and MCQ to correct endpoints
     const url =
       exam === "writing"
-        ? `https://web-production-481a5.up.railway.app/api/reports/student/writing?student_id=${studentId}&date=${date}`
-        : `https://web-production-481a5.up.railway.app/api/reports/student?student_id=${studentId}&exam=${exam}&date=${date}`;
+        ? `${API_BASE}/api/reports/student/writing?student_id=${studentId}&date=${date}`
+        : `${API_BASE}/api/reports/student?student_id=${studentId}&exam=${exam}&date=${date}`;
   
     fetch(url)
       .then(res => {
@@ -304,7 +307,7 @@
   }, [shouldGenerate, reportType, studentId, exam, date]);
   
     useEffect(() => {
-    fetch("https://web-production-481a5.up.railway.app/api/classes")
+    fetch(`${API_BASE}/api/classes`)
       .then(res => {
         if (!res.ok) {
           throw new Error("Failed to fetch classes");
@@ -346,7 +349,7 @@
       setTopicsError(null);
     
       fetch(
-        `https://web-production-481a5.up.railway.app/api/exams/${exam}/topics`
+        `${API_BASE}/api/exams/${exam}/topics`
       )
         .then(res => {
           if (!res.ok) {
@@ -387,7 +390,7 @@
       }
     
       fetch(
-        `https://web-production-481a5.up.railway.app/api/exams/dates?exam=${exam}&student_id=${studentId}`
+        `${API_BASE}/api/exams/dates?exam=${exam}&student_id=${studentId}`
       )
         .then(res => {
           if (!res.ok) {
@@ -405,7 +408,7 @@
     }, [studentId, exam, reportType]);
   
     useEffect(() => {
-        fetch("https://web-production-481a5.up.railway.app/api/admin/students")
+        fetch(`${API_BASE}/api/admin/students`)
           .then(res => {
             if (!res.ok) {
               throw new Error("Failed to fetch students");
