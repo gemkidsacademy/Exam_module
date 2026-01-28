@@ -111,7 +111,8 @@ useEffect(() => {
 ============================================================ */
 useEffect(() => {
   if (!studentId) return;
-
+  if (mode === "review") return;     // ✅ ADD THIS
+  if (mode === "report") return;  
   const startExam = async () => {
     try {
       const res = await fetch(
