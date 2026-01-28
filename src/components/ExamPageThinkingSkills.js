@@ -85,24 +85,31 @@ useEffect(() => {
 
 useEffect(() => {
   if (mode !== "review") return;
+  if (!report?.exam_attempt_id) return;
 
-  const attemptId = examAttemptId || report?.exam_attempt_id;
-  if (!attemptId) return;
+  const attemptId = report.exam_attempt_id;
 
   console.log("🚀 loading review exam", attemptId);
 
   const loadReview = async () => {
-    const res = await fetch(
-      `${API_BASE}/api/student/exam-review/thinking-skills` +
-      `?student_id=${studentId}&exam_attempt_id=${attemptId}`
-    );
-    const data = await res.json();
-    setReviewQuestions(data.questions || []);
-    setCurrentIndex(0);
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/student/exam-review/thinking-skills` +
+        `?student_id=${studentId}&exam_attempt_id=${attemptId}`
+      );
+
+      const data = await res.json();
+      console.log("📘 review data:", data);
+
+      setReviewQuestions(data.questions || []);
+      setCurrentIndex(0);
+    } catch (err) {
+      console.error("❌ review load error:", err);
+    }
   };
 
   loadReview();
-}, [mode, examAttemptId, report]);
+}, [mode, report]); // 🔑 only what actually matters
 
 /* ============================================================
    START / RESUME EXAM (SINGLE SOURCE OF TRUTH)
