@@ -162,8 +162,10 @@
 ============================================ */
 .index-row {
   display: flex;
+  flex-wrap: nowrap;
   gap: 10px;
-  overflow-x: auto;
+  overflow-x: auto;         /* 👈 horizontal scroll */
+  overflow-y: hidden;
   padding: 12px 0;
   margin-bottom: 28px;
 }
