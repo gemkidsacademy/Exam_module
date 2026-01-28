@@ -483,7 +483,7 @@ return (
     <button
       className="view-exam-btn"
       onClick={() => {
-        console.log("➡️ View Exam Details clicked");
+        console.log("🟢 View Exam Details button clicked");
         onViewExamDetails();
       }}
     >
