@@ -917,6 +917,20 @@ progress::-webkit-progress-value {
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
 }
+.index-correct {
+  background: #22c55e;
+  color: white;
+}
+
+.index-incorrect {
+  background: #ef4444;
+  color: white;
+}
+
+.index-skipped {
+  background: #e5e7eb;
+  color: #374151;
+}
 
 
 
