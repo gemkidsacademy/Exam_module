@@ -84,7 +84,10 @@ useEffect(() => {
 }, [mode]);
 
 useEffect(() => {
-  if (mode !== "review" || !examAttemptId) return;
+  if (mode !== "review") return;
+  if (!examAttemptId) return;
+
+  console.log("🚀 loading review exam", examAttemptId);
 
   const loadReview = async () => {
     try {
@@ -96,7 +99,7 @@ useEffect(() => {
       const data = await res.json();
       console.log("📘 review data:", data);
 
-      setReviewQuestions(data.questions);
+      setReviewQuestions(data.questions || []);
       setCurrentIndex(0);
     } catch (err) {
       console.error("❌ review load error:", err);
@@ -104,7 +107,7 @@ useEffect(() => {
   };
 
   loadReview();
-}, [mode, studentId, examAttemptId]);
+}, [mode, examAttemptId]); // 👈 IMPORTANT: studentId not needed here
 
 /* ============================================================
    START / RESUME EXAM (SINGLE SOURCE OF TRUTH)
