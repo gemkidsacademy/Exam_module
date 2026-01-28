@@ -125,7 +125,7 @@ useEffect(() => {
       // ✅ COMPLETED → SHOW REPORT
       if (data.completed === true) {
         await loadReport();
-        onExamFinish?.();  
+         
         return;
       }
 
