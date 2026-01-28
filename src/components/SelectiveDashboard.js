@@ -112,12 +112,13 @@ const SelectiveDashboard = () => {
         <main className="content-area">
           <div className="exam-root">
             <ActiveComponent
-              studentId={studentId}
-              subject={activeSubject.key}
-              difficulty="advanced"
-              onExamStart={() => setExamInProgress(true)}
-              onExamFinish={() => setExamInProgress(false)}
-            />
+            key={`exam-${activeSubject.key}`}   // 🔑 THIS LINE FIXES IT
+            studentId={studentId}
+            subject={activeSubject.key}
+            difficulty="advanced"
+            onExamStart={() => setExamInProgress(true)}
+            onExamFinish={() => setExamInProgress(false)}
+          />
           </div>
         </main>
       )}
