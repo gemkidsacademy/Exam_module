@@ -160,22 +160,6 @@
 /* ============================================
    QUESTION NUMBER SCROLLER (FIXED)
 ============================================ */
-.index-row {
-  display: flex;
-  flex-wrap: nowrap;
-
-  width: 100%;
-  max-width: 100%;
-
-  gap: 10px;
-  padding: 12px 16px;
-  margin-bottom: 28px;
-
-  overflow-x: auto;
-  overflow-y: hidden;
-
-  box-sizing: border-box;
-}
 
 /* Base circle (neutral / unanswered fallback) */
 .index-circle {
@@ -953,6 +937,37 @@ progress::-webkit-progress-value {
 .option-btn.review {
   cursor: default;
 }
+/* ============================================
+   🔥 FINAL HARD UNLOCK — DO NOT SKIP
+============================================ */
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+}
+
+
+/* 🚨 THIS IS THE REAL FIX */
+.index-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+
+  padding: 12px 16px;
+  margin-bottom: 28px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  width: auto;              /* 🔑 critical */
+  max-width: 100%;
+
+  box-sizing: border-box;
+}
+
+/* Flex parents MUST allow shrinking */
+   
 
 
 
