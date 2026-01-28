@@ -31,7 +31,9 @@ export default function ThinkingSkillsReview({
 
         const data = await res.json();
         console.log("📘 Review response received:", data);
-
+         console.log("🧪 Review payload shape check:", {
+          sample: data.questions?.[0]
+        });
         // 🔑 Hand data back to parent
         onLoaded?.(data.questions || []);
 
