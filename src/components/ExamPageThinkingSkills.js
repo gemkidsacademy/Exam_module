@@ -43,6 +43,7 @@ const [examAttemptId, setExamAttemptId] = useState(null);
  * - report  → completed attempt
  */
 const [mode, setMode] = useState("loading");
+const isReview = mode === "review";
 
 
 
@@ -135,6 +136,8 @@ useEffect(() => {
    MARK VISITED QUESTIONS
 ============================================================ */
 useEffect(() => {
+  if (isReview) return;   // 👈 ADD THIS
+
   if (prevIndexRef.current !== null) {
     const prevIdx = prevIndexRef.current;
     const prevQid = questions[prevIdx]?.q_id;
@@ -144,13 +147,11 @@ useEffect(() => {
       if (prevQ && !answers[prevQ.q_id]) {
         setVisited(prev => ({ ...prev, [prevQ.q_id]: true }));
       }
-
     }
   }
 
   prevIndexRef.current = currentIndex;
-}, [currentIndex, questions, answers]);
-
+}, [currentIndex, questions, answers, isReview]);
 /* ============================================================
    FINISH EXAM (SUBMIT ONLY — NO UI DECISIONS)
 ============================================================ */
@@ -239,7 +240,7 @@ const formatTime = (seconds) => {
 /* ============================================================
    RENDER
 ============================================================ */
-const isReview = mode === "review";
+
 
 const activeQuestions = questions;
 
@@ -330,7 +331,8 @@ return (
       <div
         key={q.q_id}
         className={cls}
-        onClick={() => !isReview && goToQuestion(i)}
+        onClick={() => goToQuestion(i)}
+
 
       >
         {i + 1}
@@ -411,11 +413,10 @@ if (isReview) {
 
 return (
     <button
-      key={optionKey}
-      disabled={isReview}
-      className={optionClass}
+      className={optionClass + (isReview ? " review" : "")}
       onClick={() => !isReview && handleAnswer(optionKey)}
     >
+
       <strong>{optionKey})</strong>
 
       {optionValue.type === "text" && (
