@@ -17,10 +17,11 @@
     const [reportError, setReportError] = useState(null);
     const [selectedClassDay, setSelectedClassDay] = useState("");
     const [availableClassDates, setAvailableClassDates] = useState([]);
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+    const API_BASE = process.env.REACT_APP_API_URL;
+
 
     if (!API_BASE) {
-      throw new Error("❌ NEXT_PUBLIC_API_URL is missing at build time");
+      throw new Error("❌ REACT_APP_API_URL is not defined");
     }
     
     console.log("🧪 API_BASE (vercel):", API_BASE);
