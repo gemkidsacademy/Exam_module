@@ -8,32 +8,34 @@ export default function ThinkingSkillsReview({ studentId, examAttemptId }) {
 
 
   useEffect(() => {
-  console.log("🧪 Review effect check", {
-    studentId,
-    examAttemptId,
-    API_BASE
-  });
+  console.log("🧪 Review effect triggered", { studentId, API_BASE });
 
-  if (!studentId || !examAttemptId) {
-    console.log("⛔ Review blocked – missing params");
+  if (!studentId) {
+    console.log("⛔ Review blocked – missing studentId");
     return;
   }
 
-  console.log("🚀 Review endpoint WILL be called");
+  console.log("🚀 Calling exam-review endpoint (student-only)");
 
   const loadReview = async () => {
-    const res = await fetch(
-  `${API_BASE}/api/student/exam-review/thinking-skills?student_id=${studentId}`
-  );
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/student/exam-review/thinking-skills?student_id=${studentId}`
+      );
 
-    const data = await res.json();
-    console.log("📘 Review response:", data);
-    setQuestions(data.questions || []);
-    setLoading(false);
+      const data = await res.json();
+      console.log("📘 Review response received:", data);
+
+      setQuestions(data.questions || []);
+    } catch (err) {
+      console.error("❌ Failed to load exam review:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   loadReview();
-}, [studentId, examAttemptId]);
+}, [studentId, API_BASE]);
 
   if (loading) return <p>Loading review…</p>;
 
