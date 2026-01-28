@@ -23,9 +23,9 @@ export default function ThinkingSkillsReview({ studentId, examAttemptId }) {
 
   const loadReview = async () => {
     const res = await fetch(
-      `${API_BASE}/api/student/exam-review/thinking-skills` +
-      `?student_id=${studentId}&exam_attempt_id=${examAttemptId}`
-    );
+  `${API_BASE}/api/student/exam-review/thinking-skills?student_id=${studentId}`
+  );
+
     const data = await res.json();
     console.log("📘 Review response:", data);
     setQuestions(data.questions || []);
