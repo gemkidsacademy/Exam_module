@@ -259,7 +259,12 @@ const formatTime = (seconds) => {
 ============================================================ */
 const isReview = mode === "review";
 const activeQuestions = isReview ? reviewQuestions : questions;
-if (!activeQuestions.length) {
+
+// Only block loading for exam & review
+if (
+  (mode === "exam" || mode === "review") &&
+  !activeQuestions.length
+) {
   return <p className="loading">Loading…</p>;
 }
 
