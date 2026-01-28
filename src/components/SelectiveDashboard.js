@@ -112,15 +112,19 @@ const SelectiveDashboard = () => {
         <main className="content-area">
           <div className="exam-root">
             <ActiveComponent
+              key={activeSubject.key}          // 🔑 preserves exam instance per subject
               studentId={studentId}
               subject={activeSubject.key}
               difficulty="advanced"
               onExamStart={() => setExamInProgress(true)}
-              onExamFinish={() => setExamInProgress(false)}
+              onExamFinish={() => {
+                setExamInProgress(false);
+                // ❗ do NOT change examPhase here
+              }}
             />
           </div>
         </main>
-      )}
+        )}
 
     </div>
   );
