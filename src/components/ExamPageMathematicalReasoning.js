@@ -403,9 +403,14 @@ return (
     =============================== */}
     <h2 className="report-title">
       You scored {overall.correct} out of {overall.total_questions} in NSW
-      Selective Thinking Skills Test – Free Trial
+      Selective Mathematical Reasoning Test – Free Trial
     </h2>
-
+    <button
+     className="view-exam-btn"
+     onClick={onViewExamDetails}
+   >
+     View Exam Details
+   </button>
     <div className="report-grid">
 
       {/* ===============================
