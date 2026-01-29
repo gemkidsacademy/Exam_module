@@ -6,6 +6,7 @@ useCallback
 } from "react";
 import "./ExamPage.css";
 import MathematicalReasoningReview from "./MathematicalReasoningReview";
+import "./ExamOptionStates_mr.css";
 
 /* ============================================================
  MAIN COMPONENT
