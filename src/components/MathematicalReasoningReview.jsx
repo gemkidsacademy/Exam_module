@@ -1,6 +1,5 @@
 export default function MathematicalReasoningReview({
   studentId,
-  examAttemptId,
   onExitReview
 }) {
   const [questions, setQuestions] = useState([]);
@@ -8,11 +7,11 @@ export default function MathematicalReasoningReview({
 
   useEffect(() => {
     fetch(
-      `${API_BASE}/api/student/exam-review/mathematical-reasoning?attempt_id=${examAttemptId}`
+      `${API_BASE}/api/student/exam-review/mathematical-reasoning?student_id=${studentId}`
     )
       .then(res => res.json())
-      .then(setQuestions);
-  }, [examAttemptId]);
+      .then(data => setQuestions(data.questions || []));
+  }, [studentId]);
 
   if (!questions.length) {
     return <p className="loading">Loading review…</p>;
