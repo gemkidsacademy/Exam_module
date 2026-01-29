@@ -5,8 +5,6 @@ import React, {
   useCallback
 } from "react";
 import "./ExamPage.css";
-import MathematicalReasoningReview from "./MathematicalReasoningReview";
-
 
 /* ============================================================
    MAIN COMPONENT
@@ -19,12 +17,6 @@ export default function ExamPageMathematicalReasoning({
 
   const hasSubmittedRef = useRef(false);
   const prevIndexRef = useRef(null);
-  const [mode, setMode] = useState("loading");
-  const isReview = mode === "review";
-  
-  // Needed for review fetch
-  const [examAttemptId, setExamAttemptId] = useState(null);
-
 
   /**
    * mode:
@@ -32,7 +24,7 @@ export default function ExamPageMathematicalReasoning({
    * - exam    → active attempt
    * - report  → completed attempt
    */
-  
+  const [mode, setMode] = useState("loading");
 
   // ---------------- EXAM STATE ----------------
   const [questions, setQuestions] = useState([]);
@@ -68,7 +60,6 @@ export default function ExamPageMathematicalReasoning({
       console.log("📊 report loaded:", data);
 
       setReport(data);
-      setExamAttemptId(data.exam_attempt_id); 
       setMode("report");
     } catch (err) {
       console.error("❌ loadReport error:", err);
@@ -236,14 +227,8 @@ export default function ExamPageMathematicalReasoning({
   }
 
   if (mode === "report") {
-    return (
-      <MathematicalReasoningReport
-        report={report}
-        onViewExamDetails={() => setMode("review")}
-      />
-    );
+    return <ThinkingSkillsReport report={report} />;
   }
-
 
   // ---------------- EXAM UI ----------------
   const currentQ = questions[currentIndex];
@@ -377,7 +362,7 @@ export default function ExamPageMathematicalReasoning({
 /* ============================================================
    REPORT COMPONENT
 ============================================================ */
-function MathematicalReasoningReport({ report, onViewExamDetails }) {
+function ThinkingSkillsReport({ report }) {
   if (!report?.overall) {
     return <p className="loading">Generating your report…</p>;
   }
@@ -400,17 +385,8 @@ function MathematicalReasoningReport({ report, onViewExamDetails }) {
       =============================== */}
       <h2 className="report-title">
         You scored {overall.correct} out of {overall.total_questions} in NSW
-        Selective Mathematical Resoning Test – Free Trial
+        Selective Thinking Skills Test – Free Trial
       </h2>
-      <button
-        className="view-exam-btn"
-        onClick={() => {
-          console.log("🟢 View Exam Details clicked");
-          onViewExamDetails();
-        }}
-      >
-        View Exam Details
-      </button>
 
       <div className="report-grid">
 
@@ -537,4 +513,4 @@ function MathematicalReasoningReport({ report, onViewExamDetails }) {
       </div>
     </div>
   );
-}
+}"
