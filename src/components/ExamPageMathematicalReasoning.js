@@ -265,19 +265,23 @@ if (mode === "review" && reviewQuestions.length === 0) {
 
 const currentQ = activeQuestions[currentIndex];
 if (!currentQ) return null;
+ 
 const normalizedOptions = Array.isArray(currentQ.options)
   ? currentQ.options
   : Object.entries(currentQ.options || {}).map(([key, value]) => {
+      // Backend sends objects like { type, content }
+      if (typeof value === "object" && value !== null) {
+        return value.content;
+      }
+
+      // Fallback (legacy / safety)
       if (typeof value === "string") {
         return `${key}) ${value}`;
       }
 
-      if (typeof value === "object" && value !== null) {
-        return `${key}) ${value.text ?? ""}`;
-      }
-
       return `${key})`;
     });
+ 
 return (
 <div className="exam-shell">
   <div className="exam-container">
