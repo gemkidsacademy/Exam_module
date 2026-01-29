@@ -69,6 +69,9 @@ const loadReport = useCallback(async () => {
     console.error("❌ loadReport error:", err);
   }
 }, [studentId]);
+useEffect(() => {
+  console.log("🔄 MODE CHANGED:", mode);
+}, [mode]);
 
 /* ============================================================
    START / RESUME EXAM (SINGLE SOURCE OF TRUTH)
@@ -406,11 +409,15 @@ return (
       Selective Mathematical Reasoning Test – Free Trial
     </h2>
     <button
-     className="view-exam-btn"
-     onClick={onViewExamDetails}
-   >
-     View Exam Details
-   </button>
+      className="view-exam-btn"
+      onClick={() => {
+        console.log("🟢 Review Exam button clicked");
+        onViewExamDetails();
+      }}
+    >
+      View Exam Details
+    </button>
+
     <div className="report-grid">
 
       {/* ===============================
