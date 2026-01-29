@@ -1,52 +1,39 @@
-import React, { useState, useEffect } from "react";
-import ReviewShell from "./ReviewShell"; // ✅ adjust path if needed
+import { useEffect } from "react";
 
 export default function MathematicalReasoningReview({
   studentId,
-  onExitReview
+  onLoaded
 }) {
-  console.log("🧠 MathematicalReasoningReview MOUNTED");
-
-  const [questions, setQuestions] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-
   const API_BASE = process.env.REACT_APP_API_URL;
 
-  if (!API_BASE) {
-    throw new Error("❌ REACT_APP_API_URL is not defined");
-  }
-
   useEffect(() => {
-    console.log("📥 Fetching review for student:", studentId);
+    if (!studentId) return;
 
-    fetch(
-      `${API_BASE}/api/student/exam-review/mathematical-reasoning?student_id=${studentId}`
-    )
-      .then(res => {
-        if (!res.ok) {
-          throw new Error("Failed to load review");
+    const loadReview = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE}/api/student/exam-review/mathematical-reasoning?student_id=${studentId}`
+        );
+
+        if (!response.ok) {
+          throw new Error(`Review fetch failed: ${response.status}`);
         }
-        return res.json();
-      })
-      .then(data => {
-        console.log("📊 Review response:", data);
-        setQuestions(data.questions || []);
-      })
-      .catch(err => {
-        console.error("❌ Review fetch failed:", err);
-      });
-  }, [studentId, API_BASE]);
 
-  if (!questions.length) {
-    return <p className="loading">Loading review…</p>;
-  }
+        const data = await response.json();
 
-  return (
-    <ReviewShell
-      questions={questions}
-      currentIndex={currentIndex}
-      setCurrentIndex={setCurrentIndex}
-      onExit={onExitReview}
-    />
-  );
+        const questions = Array.isArray(data.questions)
+          ? data.questions
+          : [];
+
+        onLoaded?.(questions);
+      } catch (err) {
+        console.error("Failed to load mathematical reasoning review", err);
+        onLoaded?.([]);
+      }
+    };
+
+    loadReview();
+  }, [studentId, API_BASE, onLoaded]);
+
+  return <p className="loading">Loading review…</p>;
 }
