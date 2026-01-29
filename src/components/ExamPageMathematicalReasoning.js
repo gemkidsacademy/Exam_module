@@ -327,8 +327,8 @@ return (
 <div className="question-card">
 
 {/* ✅ RENDER QUESTION BLOCKS */}
-{Array.isArray(currentQ.question_blocks) &&
-  currentQ.question_blocks.map((block, idx) => {
+{Array.isArray(currentQ.blocks) &&
+  currentQ.blocks.map((block, idx) => {
     if (block.type === "text") {
       return (
         <p key={idx} className="question-text">
@@ -344,10 +344,6 @@ return (
           src={block.src}
           alt={`Question visual ${idx + 1}`}
           className="question-image"
-          onError={(e) => {
-            console.error("❌ Image failed:", block.src);
-            e.target.style.display = "none";
-          }}
         />
       );
     }
