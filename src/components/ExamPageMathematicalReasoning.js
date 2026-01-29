@@ -267,9 +267,17 @@ const currentQ = activeQuestions[currentIndex];
 if (!currentQ) return null;
 const normalizedOptions = Array.isArray(currentQ.options)
   ? currentQ.options
-  : Object.entries(currentQ.options || {}).map(
-      ([k, v]) => `${k}) ${v}`
-    );
+  : Object.entries(currentQ.options || {}).map(([key, value]) => {
+      if (typeof value === "string") {
+        return `${key}) ${value}`;
+      }
+
+      if (typeof value === "object" && value !== null) {
+        return `${key}) ${value.text ?? ""}`;
+      }
+
+      return `${key})`;
+    });
 return (
 <div className="exam-shell">
   <div className="exam-container">
