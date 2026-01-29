@@ -265,22 +265,10 @@ if (mode === "review" && reviewQuestions.length === 0) {
 
 const currentQ = activeQuestions[currentIndex];
 if (!currentQ) return null;
+const isReview = mode === "review";
+const optionEntries = Object.entries(currentQ.options || {});
+
  
-const normalizedOptions = Array.isArray(currentQ.options)
-  ? currentQ.options
-  : Object.entries(currentQ.options || {}).map(([key, value]) => {
-      // Backend sends objects like { type, content }
-      if (typeof value === "object" && value !== null) {
-        return value.content;
-      }
-
-      // Fallback (legacy / safety)
-      if (typeof value === "string") {
-        return `${key}) ${value}`;
-      }
-
-      return `${key})`;
-    });
  
 return (
 <div className="exam-shell">
@@ -352,20 +340,37 @@ return (
   })}
 
 {/* OPTIONS */}
-{normalizedOptions.map((opt, i) => {
-  const optionKey = opt.split(")")[0].toUpperCase();
+{optionEntries.map(([key, opt], i) => {
+  const optionKey = key.toUpperCase();
+  const studentAnswer = currentQ.student_answer;
+  const correctAnswer = currentQ.correct_answer;
+
+  let statusClass = "";
+
+  if (isReview) {
+    if (optionKey === correctAnswer) {
+      statusClass = "option-correct";
+    } else if (optionKey === studentAnswer) {
+      statusClass = "option-wrong";
+    }
+  } else {
+    if (answers[currentQ.q_id] === optionKey) {
+      statusClass = "selected";
+    }
+  }
+
   return (
     <button
       key={i}
-      onClick={() => handleAnswer(optionKey)}
-      className={`option-btn ${
-        answers[currentQ.q_id] === optionKey ? "selected" : ""
-      }`}
+      disabled={isReview}
+      className={`option-btn ${statusClass}`}
+      onClick={() => !isReview && handleAnswer(optionKey)}
     >
-      {opt}
+      {opt?.content || opt}
     </button>
   );
 })}
+
 </div>
 
 
