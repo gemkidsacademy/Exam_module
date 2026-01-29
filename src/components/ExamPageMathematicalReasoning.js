@@ -113,7 +113,7 @@ useEffect(() => {
   };
 
   startExam();  
-}, [studentId, loadReport, mode]);
+}, [studentId, loadReport]);
 /* ============================================================
    MARK VISITED QUESTIONS
 ============================================================ */
