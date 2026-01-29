@@ -5,18 +5,24 @@ export default function MathematicalReasoningReview({
   onLoaded
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
-  if (!API_BASE) {
-    throw new Error("❌ REACT_APP_API_URL is not defined");
-  }
 
-   useEffect(() => {
+  useEffect(() => {
     console.log("🧠 MathematicalReasoningReview MOUNTED");
   }, []);
-  useEffect(() => {
-    if (!studentId) return;
 
+  useEffect(() => {
     const loadReview = async () => {
+      if (!studentId) {
+        console.warn("⏳ studentId not ready yet");
+        return;
+      }
+
       try {
+        console.log(
+          "📥 Fetching mathematical reasoning review for:",
+          studentId
+        );
+
         const response = await fetch(
           `${API_BASE}/api/student/exam-review/mathematical-reasoning?student_id=${studentId}`
         );
@@ -31,9 +37,18 @@ export default function MathematicalReasoningReview({
           ? data.questions
           : [];
 
+        console.log(
+          "📊 Mathematical reasoning review loaded:",
+          questions.length,
+          "questions"
+        );
+
         onLoaded?.(questions);
       } catch (err) {
-        console.error("Failed to load mathematical reasoning review", err);
+        console.error(
+          "❌ Failed to load mathematical reasoning review",
+          err
+        );
         onLoaded?.([]);
       }
     };
