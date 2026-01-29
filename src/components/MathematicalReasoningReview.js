@@ -5,7 +5,9 @@ export default function MathematicalReasoningReview({
   onLoaded
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
-
+   useEffect(() => {
+    console.log("🧠 MathematicalReasoningReview MOUNTED");
+  }, []);
   useEffect(() => {
     if (!studentId) return;
 
