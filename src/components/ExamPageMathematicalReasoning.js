@@ -30,6 +30,8 @@ const [mode, setMode] = useState("loading");
 
 // ---------------- EXAM STATE ----------------
 const [questions, setQuestions] = useState([]);
+const [reviewQuestions, setReviewQuestions] = useState([]);
+
 const [currentIndex, setCurrentIndex] = useState(0);
 const [answers, setAnswers] = useState({});
 const [visited, setVisited] = useState({});
@@ -120,19 +122,16 @@ useEffect(() => {
 useEffect(() => {
   if (prevIndexRef.current !== null) {
     const prevIdx = prevIndexRef.current;
-    const prevQid = questions[prevIdx]?.q_id;
+    const prevQ = activeQuestions[prevIdx];
 
-    if (prevQid && !answers[prevQid]) {
-      const prevQ = questions[prevIdx];
-      if (prevQ && !answers[prevQ.q_id]) {
-        setVisited(prev => ({ ...prev, [prevQ.q_id]: true }));
-      }
-
+    if (prevQ && !answers[prevQ.q_id]) {
+      setVisited(prev => ({ ...prev, [prevQ.q_id]: true }));
     }
   }
 
   prevIndexRef.current = currentIndex;
-}, [currentIndex, questions, answers]);
+}, [currentIndex, activeQuestions, answers]);
+ 
 useEffect(() => {
   if (questions.length > 0) {
     console.log("🧠 SAMPLE QUESTION OBJECT:", questions[0]);
@@ -202,7 +201,8 @@ useEffect(() => {
    ANSWER HANDLING
 ============================================================ */
 const handleAnswer = (optionKey) => {
-  const qid = questions[currentIndex]?.q_id;
+  if (mode === "review") return;
+  const qid = activeQuestions[currentIndex]?.q_id;
   if (!qid) return;
 
   setAnswers(prev => ({
@@ -212,7 +212,7 @@ const handleAnswer = (optionKey) => {
 };
 
 const goToQuestion = (idx) => {
-  const qid = questions[idx]?.q_id;
+  const qid = activeQuestions[idx]?.q_id;
   if (qid) {
     setVisited(prev => ({ ...prev, [qid]: true }));
   }
@@ -229,6 +229,9 @@ const formatTime = (seconds) => {
 /* ============================================================
    RENDER
 ============================================================ */
+const activeQuestions =
+  mode === "review" ? reviewQuestions : questions;
+
 if (mode === "loading") {
   return <p className="loading">Loading…</p>;
 }
@@ -242,16 +245,24 @@ return (
 
 );
 }
-if (mode === "review") {
+if (mode === "review" && reviewQuestions.length === 0) {
   return (
     <MathematicalReasoningReview
       studentId={studentId}
-      onExitReview={() => setMode("report")}
+      onLoaded={(questions) => {
+        console.log("✅ Review questions received:", questions.length);
+
+        setReviewQuestions(questions);
+        setCurrentIndex(0);
+      }}
     />
   );
 }
+
 // ---------------- EXAM UI ----------------
-const currentQ = questions[currentIndex];
+ 
+
+const currentQ = activeQuestions[currentIndex];
 if (!currentQ) return null;
 const normalizedOptions = Array.isArray(currentQ.options)
   ? currentQ.options
@@ -264,15 +275,19 @@ return (
 
     {/* HEADER */}
     <div className="exam-header">
-      <div className="timer">⏳ {formatTime(timeLeft)}</div>
+      {mode === "exam" && (
+        <div className="timer">⏳ {formatTime(timeLeft)}</div>
+      )}
+
       <div className="counter">
-        Question {currentIndex + 1} / {questions.length}
+        Question {currentIndex + 1} / {activeQuestions.length}
+
       </div>
     </div>
 
     {/* QUESTION INDEX */}
     <div className="index-row">
-      {questions.map((q, i) => {
+      {activeQuestions.map((q, i) => {
         let cls = "index-circle index-not-visited";
 
         if (visited[q.q_id]) {
@@ -348,36 +363,38 @@ return (
 
     {/* NAVIGATION */}
     <div className="nav-buttons">
+  <button
+    className="nav-btn prev"
+    onClick={() => goToQuestion(currentIndex - 1)}
+    disabled={currentIndex === 0}
+  >
+    Previous
+  </button>
+
+  {currentIndex < activeQuestions.length - 1 && (
+    <button
+      className="nav-btn next"
+      onClick={() => goToQuestion(currentIndex + 1)}
+    >
+      Next
+    </button>
+  )}
+
+  {mode !== "review" &&
+    currentIndex === activeQuestions.length - 1 && (
       <button
-        className="nav-btn prev"
-        onClick={() => goToQuestion(currentIndex - 1)}
-        disabled={currentIndex === 0}
+        className="nav-btn finish"
+        onClick={() => finishExam("manual_submit")}
       >
-        Previous
+        Finish Exam
       </button>
-
-      {currentIndex < questions.length - 1 ? (
-        <button
-          className="nav-btn next"
-          onClick={() => goToQuestion(currentIndex + 1)}
-        >
-          Next
-        </button>
-      ) : (
-        <button
-          className="nav-btn finish"
-          onClick={() => finishExam("manual_submit")}
-        >
-          Finish Exam
-        </button>
-      )}
-    </div>
-
-  </div>
+    )}
 </div>
+</div> {/* exam-container */}
+  </div>   {/* exam-shell */}
 );
-
 }
+
 
 /* ============================================================
  REPORT COMPONENT
