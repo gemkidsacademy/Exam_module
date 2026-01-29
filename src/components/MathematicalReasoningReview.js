@@ -1,3 +1,6 @@
+import React, { useState, useEffect } from "react";
+import ReviewShell from "./ReviewShell"; // ✅ adjust path if needed
+
 export default function MathematicalReasoningReview({
   studentId,
   onExitReview
@@ -19,7 +22,12 @@ export default function MathematicalReasoningReview({
     fetch(
       `${API_BASE}/api/student/exam-review/mathematical-reasoning?student_id=${studentId}`
     )
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Failed to load review");
+        }
+        return res.json();
+      })
       .then(data => {
         console.log("📊 Review response:", data);
         setQuestions(data.questions || []);
