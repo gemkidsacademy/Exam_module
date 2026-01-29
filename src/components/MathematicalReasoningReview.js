@@ -5,6 +5,10 @@ export default function MathematicalReasoningReview({
   onLoaded
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
+  if (!API_BASE) {
+    throw new Error("❌ REACT_APP_API_URL is not defined");
+  }
+
    useEffect(() => {
     console.log("🧠 MathematicalReasoningReview MOUNTED");
   }, []);
