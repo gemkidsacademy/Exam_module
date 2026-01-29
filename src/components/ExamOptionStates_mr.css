@@ -1,0 +1,46 @@
+/* ============================================================
+   EXAM OPTION VISUAL STATES (REVIEW + EXAM)
+   Safe, isolated, non-breaking
+============================================================ */
+
+/* Base option button (extends existing styles safely) */
+.option-btn {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* ================================
+   REVIEW MODE STATES
+================================ */
+
+/* 🟢 Correct answer */
+.option-btn.option-correct {
+  background-color: #dcfce7;   /* light green */
+  border: 2px solid #22c55e;
+  color: #14532d;
+  font-weight: 600;
+}
+
+/* 🔴 Student’s incorrect selection */
+.option-btn.option-wrong {
+  background-color: #fee2e2;   /* light red */
+  border: 2px solid #ef4444;
+  color: #7f1d1d;
+  font-weight: 600;
+}
+
+/* Disable hover & click effects in review */
+.option-btn:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+/* ================================
+   EXAM MODE (ACTIVE ATTEMPT)
+================================ */
+
+/* 🔵 Selected option during exam */
+.option-btn.selected {
+  background-color: #e0f2fe;
+  border: 2px solid #0284c7;
+  color: #0c4a6e;
+}
