@@ -30,10 +30,10 @@ const [mode, setMode] = useState("loading");
 
 // ---------------- EXAM STATE ----------------
 const [questions, setQuestions] = useState([]);
-const activeQuestions =
-  mode === "review" ? reviewQuestions : questions;
 
 const [reviewQuestions, setReviewQuestions] = useState([]);
+const activeQuestions =
+  mode === "review" ? reviewQuestions : questions;
 
 const [currentIndex, setCurrentIndex] = useState(0);
 const [answers, setAnswers] = useState({});
