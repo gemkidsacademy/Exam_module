@@ -11,50 +11,29 @@ export default function MathematicalReasoningReview({
   }, []);
 
   useEffect(() => {
-    const loadReview = async () => {
-      if (!studentId) {
-        console.warn("⏳ studentId not ready yet");
-        return;
-      }
+  if (!studentId) return;
 
-      try {
-        console.log(
-          "📥 Fetching mathematical reasoning review for:",
-          studentId
-        );
+  const loadReview = async () => {
+    const res = await fetch(
+      `${API_BASE}/api/student/exam-review/mathematical-reasoning?student_id=${studentId}`
+    );
 
-        const response = await fetch(
-          `${API_BASE}/api/student/exam-review/mathematical-reasoning?student_id=${studentId}`
-        );
+    const data = await res.json();
 
-        if (!response.ok) {
-          throw new Error(`Review fetch failed: ${response.status}`);
-        }
+    // 🔍 FULL RAW RESPONSE
+    console.log("📦 REVIEW RAW RESPONSE:", data);
 
-        const data = await response.json();
+    // 🔍 QUESTIONS ONLY
+    console.log("📋 REVIEW QUESTIONS ARRAY:", data.questions);
 
-        const questions = Array.isArray(data.questions)
-          ? data.questions
-          : [];
+    // 🔍 FIRST QUESTION (most important)
+    console.log("🧠 FIRST REVIEW QUESTION:", data.questions?.[0]);
 
-        console.log(
-          "📊 Mathematical reasoning review loaded:",
-          questions.length,
-          "questions"
-        );
+    onLoaded?.(data.questions || []);
+  };
 
-        onLoaded?.(questions);
-      } catch (err) {
-        console.error(
-          "❌ Failed to load mathematical reasoning review",
-          err
-        );
-        onLoaded?.([]);
-      }
-    };
-
-    loadReview();
-  }, [studentId, API_BASE, onLoaded]);
+  loadReview();
+}, [studentId, API_BASE, onLoaded]);
 
   return <p className="loading">Loading review…</p>;
 }
