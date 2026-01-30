@@ -18,7 +18,8 @@
       const [exam, setExam] = useState(null);
       const [questions, setQuestions] = useState([]);
       const [index, setIndex] = useState(0);
-    
+      const [finished, setFinished] = useState(false);
+
       const [answers, setAnswers] = useState({});
       const [visited, setVisited] = useState({});
           /**
@@ -157,11 +158,11 @@
         console.log("🧪 START-READING META:", meta);
     
        if (meta.completed === true) {
-          setReport(meta.report);   // ✅ hydrate
-          setMode("report");
+          setFinished(true);
           onExamFinish?.();
           return;
         }
+
 
 
     
