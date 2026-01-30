@@ -114,11 +114,16 @@
         console.log("🧪 START-READING META:", meta);
     
         if (meta.completed === true) {
-          await loadReportBySession(meta.attempt_id);
           setFinished(true);
+        
+          if (meta.attempt_id) {
+            await loadReportBySession(meta.attempt_id);
+          }
+        
           onExamFinish?.();
           return;
         }
+
 
         setAttemptId(meta.attempt_id);
         setTimeLeft(meta.remaining_time);
