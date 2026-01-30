@@ -6,12 +6,35 @@ import "./ExamPage_reading.css";
  *
  * Props:
  * - questions: review questions from backend
- * - onExit: optional callback to leave review
+ * - onExit: callback to leave review
  */
 export default function ReadingReview({ questions = [], onExit }) {
   const [index, setIndex] = useState(0);
 
   const currentQuestion = questions[index];
+
+  if (!currentQuestion) {
+    return <div>No review data available.</div>;
+  }
+
+  /* =============================
+     QUESTION TYPE
+  ============================= */
+  const isGappedText =
+    currentQuestion.passage_style === "gapped_text" ||
+    currentQuestion.type === "gapped_text";
+
+  /* =============================
+     OPTIONS SOURCE (CRITICAL FIX)
+  ============================= */
+  const options =
+    currentQuestion.answer_options &&
+    Object.keys(currentQuestion.answer_options).length > 0
+      ? currentQuestion.answer_options
+      : currentQuestion.reading_material?.options || {};
+
+  const rm = currentQuestion.reading_material ?? {};
+  const passageStyle = currentQuestion.passage_style || "informational";
 
   /* =============================
      GROUP QUESTIONS BY TOPIC
@@ -35,14 +58,6 @@ export default function ReadingReview({ questions = [], onExit }) {
     return g;
   }, [questions]);
 
-  if (!currentQuestion) {
-    return <div>No review data available.</div>;
-  }
-
-  const options = currentQuestion.answer_options || {};
-  const rm = currentQuestion.reading_material ?? "";
-  const passageStyle = currentQuestion.passage_style || "informational";
-
   /* =============================
      HELPERS
   ============================= */
@@ -54,6 +69,9 @@ export default function ReadingReview({ questions = [], onExit }) {
   ============================= */
   return (
     <div className="exam-container review-mode">
+      {/* =============================
+         HEADER
+      ============================= */}
       <div className="exam-header">
         <div>Reading Exam Review</div>
 
@@ -81,6 +99,7 @@ export default function ReadingReview({ questions = [], onExit }) {
             <div className="topic-circles">
               {data.indexes.map((i) => {
                 const q = questions[i];
+
                 const cls = [
                   "index-circle",
                   i === index ? "active" : "",
@@ -110,6 +129,9 @@ export default function ReadingReview({ questions = [], onExit }) {
          BODY
       ============================= */}
       <div className="exam-body">
+        {/* =============================
+           PASSAGE
+        ============================= */}
         <div className={`passage-pane ${passageStyle}`}>
           {/* Literary */}
           {passageStyle === "literary" && (
@@ -118,7 +140,7 @@ export default function ReadingReview({ questions = [], onExit }) {
             </pre>
           )}
 
-          {/* Non-literary */}
+          {/* Non-literary / Gapped */}
           {passageStyle !== "literary" && (
             <>
               {rm?.title && <h3>{rm.title}</h3>}
@@ -144,13 +166,25 @@ export default function ReadingReview({ questions = [], onExit }) {
           )}
         </div>
 
+        {/* =============================
+           QUESTION + OPTIONS
+        ============================= */}
         <div className="question-pane">
           <p className="question-text">
             Q{currentQuestion.question_number}.{" "}
             {currentQuestion.question_text}
           </p>
 
+          {/* =============================
+             OPTIONS (FIXED)
+          ============================= */}
           <div className="options">
+            {Object.keys(options).length === 0 && (
+              <div className="no-options-warning">
+                ⚠️ No answer options available for this question
+              </div>
+            )}
+
             {Object.entries(options).map(([k, v]) => {
               let cls = "option-btn";
 
@@ -168,6 +202,9 @@ export default function ReadingReview({ questions = [], onExit }) {
             })}
           </div>
 
+          {/* =============================
+             NAV
+          ============================= */}
           <div className="nav-buttons">
             <button
               disabled={index === 0}
