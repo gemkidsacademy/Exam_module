@@ -387,5 +387,19 @@
   background-color: #fdeaea;
   color: #b3261e;
 }
+.review-exam-btn {
+  margin-top: 16px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #222;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.review-exam-btn:hover {
+  background: #000;
+}
 
 
