@@ -124,6 +124,12 @@
       }
     };
       useEffect(() => {
+          if (finished && !report) {
+            loadExistingReport();
+          }
+        }, [finished]);
+
+      useEffect(() => {
           if (mode === "review") {
             console.log("🧪 REVIEW SAMPLE QUESTION:", questions[0]);
           }
