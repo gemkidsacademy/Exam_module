@@ -24,6 +24,28 @@
       const [finished, setFinished] = useState(false);
     
       const [attemptId, setAttemptId] = useState(null);
+      const loadReportBySession = async (sessionId) => {
+      try {
+        setLoadingReport(true);
+    
+        const res = await fetch(
+          `${API_BASE}/api/exams/reading-report?session_id=${sessionId}`
+        );
+    
+        if (!res.ok) {
+          throw new Error("Failed to load report");
+        }
+    
+        const data = await res.json();
+        setReport(data);
+    
+      } catch (err) {
+        console.error("❌ loadReportBySession error:", err);
+      } finally {
+        setLoadingReport(false);
+      }
+    };
+
       const handleReviewExam = () => {
           console.log("🟢 Review Exam clicked");
           // next step: call review endpoint here
@@ -92,11 +114,12 @@
         console.log("🧪 START-READING META:", meta);
     
         if (meta.completed === true) {
+          await loadReportBySession(meta.attempt_id);
           setFinished(true);
           onExamFinish?.();
           return;
         }
-    
+
         setAttemptId(meta.attempt_id);
         setTimeLeft(meta.remaining_time);
     
