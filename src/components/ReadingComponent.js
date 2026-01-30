@@ -18,20 +18,17 @@
       const [exam, setExam] = useState(null);
       const [questions, setQuestions] = useState([]);
       const [index, setIndex] = useState(0);
-      const [finished, setFinished] = useState(false);
-
+    
       const [answers, setAnswers] = useState({});
       const [visited, setVisited] = useState({});
-          /**
-     * mode:
-     * - exam
-     * - report
-     * - review
-     */
-      const [mode, setMode] = useState("exam");
-
+      const [finished, setFinished] = useState(false);
     
       const [attemptId, setAttemptId] = useState(null);
+      const handleReviewExam = () => {
+          console.log("🟢 Review Exam clicked");
+          // next step: call review endpoint here
+        };
+
     
       const [timeLeft, setTimeLeft] = useState(null);
     
@@ -59,34 +56,6 @@
       /* =============================
          HELPERS
       ============================= */
-      const loadExistingReport = async () => {
-      try {
-        setLoadingReport(true);
-    
-        const res = await fetch(
-          `${API_BASE}/api/exams/reading-report?student_id=${studentId}`
-        );
-    
-        if (!res.ok) {
-          throw new Error("Failed to load reading report");
-        }
-    
-        const data = await res.json();
-    
-        console.log("📊 LOADED EXISTING REPORT:", data);
-    
-        setReport(data.report);
-        setMode("report");
-    
-      } catch (err) {
-        console.error("❌ loadExistingReport error:", err);
-      } finally {
-        setLoadingReport(false);
-      }
-    };
-
-      const isReview = mode === "review";
-
       const formatTime = (seconds) => {
         const m = Math.floor(seconds / 60);
         const s = seconds % 60;
@@ -95,47 +64,6 @@
     
       const prettyTopic = (t = "Other") =>
         t.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-      const loadReviewExam = async () => {
-      try {
-        setLoadingReport(true);
-    
-        const res = await fetch(
-          `${API_BASE}/api/exams/review-reading?student_id=${studentId}`
-        );
-    
-        if (!res.ok) {
-          throw new Error("Failed to load review exam");
-        }
-    
-        const data = await res.json();
-    
-        console.log("📘 REVIEW QUESTIONS:", data.questions.length);
-    
-        // 🔴 IMPORTANT: overwrite questions with review data
-        setQuestions(data.questions);
-        setIndex(0);
-        setVisited({});
-        setMode("review");
-    
-      } catch (err) {
-        console.error("❌ loadReviewExam error:", err);
-      } finally {
-        setLoadingReport(false);
-      }
-    };
-      useEffect(() => {
-          if (finished && !report) {
-            loadExistingReport();
-          }
-        }, [finished]);
-
-      useEffect(() => {
-          if (mode === "review") {
-            console.log("🧪 REVIEW SAMPLE QUESTION:", questions[0]);
-          }
-        }, [mode, questions]);
-
-
     
       /* =============================
          LOAD EXAM
@@ -163,14 +91,11 @@
         const meta = await res.json();
         console.log("🧪 START-READING META:", meta);
     
-       if (meta.completed === true) {
+        if (meta.completed === true) {
           setFinished(true);
           onExamFinish?.();
           return;
         }
-
-
-
     
         setAttemptId(meta.attempt_id);
         setTimeLeft(meta.remaining_time);
@@ -231,46 +156,41 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
          TIMER
       ============================= */
       useEffect(() => {
-          if (mode !== "exam" || timeLeft === null) return;
-        
-          if (timeLeft <= 0) {
-            autoSubmit();
-            return;
-          }
-        
-          const t = setInterval(() => {
-            setTimeLeft((v) => (v > 0 ? v - 1 : 0));
-          }, 1000);
-        
-          return () => clearInterval(t);
-        }, [timeLeft, mode]);
-
+      if (timeLeft === null) return;
+    
+      if (timeLeft <= 0 && !finished) {
+        autoSubmit();
+        return;
+      }
+    
+      const t = setInterval(() => {
+        setTimeLeft((v) => (v > 0 ? v - 1 : 0));
+      }, 1000);
+    
+      return () => clearInterval(t);
+    }, [timeLeft, finished]);
+    
     
       /* =============================
          GROUP QUESTIONS BY TOPIC
       ============================= */
       const groupedQuestions = useMemo(() => {
-      const g = {};
+          const g = {};
+          questions.forEach((q, i) => {
+            const key = q.section_ref.section_id;
+        
+            if (!g[key]) {
+              g[key] = {
+                topic: q.section_ref.topic,
+                indexes: []
+              };
+            }
+        
+            g[key].indexes.push(i);
+          });
+          return g;
+        }, [questions]);
     
-      questions.forEach((q, i) => {
-        const key =
-          q.section_ref?.section_id ||
-          q.topic ||               // ✅ review-safe fallback
-          "Other";
-    
-        if (!g[key]) {
-          g[key] = {
-            topic: q.topic || "Other",
-            indexes: []
-          };
-        }
-    
-        g[key].indexes.push(i);
-      });
-    
-      return g;
-    }, [questions]);
-
       /* =============================
          LOAD REPORT
       ============================= */
@@ -283,7 +203,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
          SUBMIT
       ============================= */
       const autoSubmit = async () => {
-      if (mode !== "exam") return;
+      if (finished) return;
     
       try {
         const res = await fetch(
@@ -309,7 +229,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
         // ✅ CHANGE 4B: hydrate report immediately
         setReport(data.report);
     
-        setMode("report");
+        setFinished(true);
         onExamFinish?.();
     
       } catch (err) {
@@ -322,7 +242,6 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
          ANSWER HANDLING
       ============================= */
       const handleSelect = (letter) => {
-        if (isReview) return;
         const q = questions[index];
         setAnswers((prev) => ({
           ...prev,
@@ -338,7 +257,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
       /* =============================
          FINISHED VIEW
       ============================= */
-      if (mode === "report") {
+      if (finished) {
         if (loadingReport || !normalizedReport) {
           return <div>Loading your report…</div>;
         }
@@ -355,16 +274,13 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
         >
           {normalizedReport.result}
         </div>
-        {/* ✅ NEW BUTTON */}
-          <button
-            className="view-exam-btn"
-            onClick={() => {
-              console.log("🟢 Review Reading Exam clicked");
-              loadReviewExam();
-            }}          >
-            View Exam Details
-          </button>
-    
+        {/* ✅ NEW: Review Exam Button */}
+        <button
+          className="review-exam-btn"
+          onClick={handleReviewExam}
+        >
+          Review Exam
+        </button>
         <div className="report-grid">
     
           {/* =============================
@@ -498,12 +414,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
       <div className="exam-container">
         <div className="exam-header">
           <div>Reading Comprehension Exam</div>
-          {mode === "exam" && (
-              <div className="timer-box">
-                Time Left: {formatTime(timeLeft)}
-              </div>
-            )}
-
+          <div className="timer-box">Time Left: {formatTime(timeLeft)}</div>
           <div className="counter">
             Question {index + 1} / {questions.length}
           </div>
@@ -522,16 +433,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
                     key={questions[i].question_id}
                     className={`index-circle
                       ${visited[i] ? "visited" : ""}
-                      ${
-                          isReview
-                            ? questions[i].student_answer
-                              ? "answered"
-                              : ""
-                            : answers[questions[i].question_id]
-                              ? "answered"
-                              : ""
-                        }
-
+                      ${answers[questions[i].question_id] ? "answered" : ""}
                       ${i === index ? "active" : ""}
                     `}
                     onClick={() => goTo(i)}
@@ -597,31 +499,19 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
                 </div>
               )}
     
-              {Object.entries(options).map(([k, v]) => {
-                  let cls = "option-btn";
-                
-                  if (isReview) {
-                    if (k === currentQuestion.correct_answer) {
-                      cls += " option-correct";
-                    } else if (k === currentQuestion.student_answer) {
-                      cls += " option-wrong";
-                    }
-                  } else if (answers[currentQuestion.question_id] === k) {
-                    cls += " selected";
-                  }
-                
-                  return (
-                    <button
-                      key={k}
-                      disabled={isReview}
-                      className={cls}
-                      onClick={() => handleSelect(k)}
-                    >
-                      <strong>{k}.</strong> {v}
-                    </button>
-                  );
-                })}
-
+              {Object.entries(options).map(([k, v]) => (
+                <button
+                  key={k}
+                  className={`option-btn ${
+                    answers[currentQuestion.question_id] === k
+                      ? "selected"
+                      : ""
+                  }`}
+                  onClick={() => handleSelect(k)}
+                >
+                  <strong>{k}.</strong> {v}
+                </button>
+              ))}
             </div>
     
             <div className="nav-buttons">
@@ -630,15 +520,20 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
               </button>
     
               {index < questions.length - 1 ? (
-                  <button onClick={() => goTo(index + 1)}>Next</button>
-                ) : (
-                  mode === "exam" && (
-                    <button type="button" onClick={autoSubmit}>
-                      Finish
-                    </button>
-                  )
-                )}
-
+                <button onClick={() => goTo(index + 1)}>Next</button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    autoSubmit();
+                  }}
+                >
+                  Finish
+                </button>
+    
+    
+              )}
             </div>
           </div>
         </div>
