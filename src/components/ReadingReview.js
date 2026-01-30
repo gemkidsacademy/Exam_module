@@ -10,6 +10,25 @@ import "./ExamPage_reading.css";
  */
 export default function ReadingReview({ questions = [], onExit }) {
   const [index, setIndex] = useState(0);
+  const groupedQuestions = useMemo(() => {
+    const g = {};
+
+    questions.forEach((q, i) => {
+      const key = q.topic || "Other";
+
+      if (!g[key]) {
+        g[key] = {
+          topic: key,
+          indexes: []
+        };
+      }
+
+      g[key].indexes.push(i);
+    });
+
+    return g;
+  }, [questions]);
+
 
   const currentQuestion = questions[index];
 
@@ -39,25 +58,7 @@ export default function ReadingReview({ questions = [], onExit }) {
   /* =============================
      GROUP QUESTIONS BY TOPIC
   ============================= */
-  const groupedQuestions = useMemo(() => {
-    const g = {};
-
-    questions.forEach((q, i) => {
-      const key = q.topic || "Other";
-
-      if (!g[key]) {
-        g[key] = {
-          topic: key,
-          indexes: []
-        };
-      }
-
-      g[key].indexes.push(i);
-    });
-
-    return g;
-  }, [questions]);
-
+  
   /* =============================
      HELPERS
   ============================= */
