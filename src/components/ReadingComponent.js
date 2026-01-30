@@ -31,23 +31,33 @@ export default function ReadingComponent({
   const [reviewQuestions, setReviewQuestions] = useState([]);
     
   const handleReviewExam = async () => {
-      try {
-        const res = await fetch(
-          `${API_BASE}/api/exams/review-reading?student_id=${studentId}`
-        );
-    
-        if (!res.ok) {
-          throw new Error("Failed to load review");
-        }
-    
-        const data = await res.json();
-        setReviewQuestions(data.questions || []);
-        setMode("review");
-      } catch (err) {
-        console.error("❌ Review exam error:", err);
-        alert("Unable to load exam review.");
-      }
-    };
+  if (!attemptId) {
+    console.error("❌ No session_id available for review");
+    alert("Exam session not found.");
+    return;
+  }
+
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/exams/review-reading?session_id=${attemptId}`
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to load review");
+    }
+
+    const data = await res.json();
+
+    console.log("🧪 REVIEW PAYLOAD:", data);
+
+    setReviewQuestions(data.questions || []);
+    setMode("review");
+
+  } catch (err) {
+    console.error("❌ Review exam error:", err);
+    alert("Unable to load exam review.");
+  }
+};
 
   const loadReportBySession = async (sessionId) => {
   try {
