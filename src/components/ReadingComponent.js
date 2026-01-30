@@ -58,6 +58,32 @@
       /* =============================
          HELPERS
       ============================= */
+      const loadExistingReport = async () => {
+      try {
+        setLoadingReport(true);
+    
+        const res = await fetch(
+          `${API_BASE}/api/exams/reading-report?student_id=${studentId}`
+        );
+    
+        if (!res.ok) {
+          throw new Error("Failed to load reading report");
+        }
+    
+        const data = await res.json();
+    
+        console.log("📊 LOADED EXISTING REPORT:", data);
+    
+        setReport(data.report);
+        setMode("report");
+    
+      } catch (err) {
+        console.error("❌ loadExistingReport error:", err);
+      } finally {
+        setLoadingReport(false);
+      }
+    };
+
       const isReview = mode === "review";
 
       const formatTime = (seconds) => {
@@ -130,11 +156,14 @@
         const meta = await res.json();
         console.log("🧪 START-READING META:", meta);
     
-        if (meta.completed === true) {
+       if (meta.completed === true) {
+          setReport(meta.report);   // ✅ hydrate
           setMode("report");
           onExamFinish?.();
           return;
         }
+
+
     
         setAttemptId(meta.attempt_id);
         setTimeLeft(meta.remaining_time);
