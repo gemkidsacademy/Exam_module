@@ -68,6 +68,41 @@
     
       const prettyTopic = (t = "Other") =>
         t.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+      const loadReviewExam = async () => {
+      try {
+        setLoadingReport(true);
+    
+        const res = await fetch(
+          `${API_BASE}/api/exams/review-reading?student_id=${studentId}`
+        );
+    
+        if (!res.ok) {
+          throw new Error("Failed to load review exam");
+        }
+    
+        const data = await res.json();
+    
+        console.log("📘 REVIEW QUESTIONS:", data.questions.length);
+    
+        // 🔴 IMPORTANT: overwrite questions with review data
+        setQuestions(data.questions);
+        setIndex(0);
+        setVisited({});
+        setMode("review");
+    
+      } catch (err) {
+        console.error("❌ loadReviewExam error:", err);
+      } finally {
+        setLoadingReport(false);
+      }
+    };
+      useEffect(() => {
+          if (mode === "review") {
+            console.log("🧪 REVIEW SAMPLE QUESTION:", questions[0]);
+          }
+        }, [mode, questions]);
+
+
     
       /* =============================
          LOAD EXAM
@@ -179,22 +214,27 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
          GROUP QUESTIONS BY TOPIC
       ============================= */
       const groupedQuestions = useMemo(() => {
-          const g = {};
-          questions.forEach((q, i) => {
-            const key = q.section_ref.section_id;
-        
-            if (!g[key]) {
-              g[key] = {
-                topic: q.section_ref.topic,
-                indexes: []
-              };
-            }
-        
-            g[key].indexes.push(i);
-          });
-          return g;
-        }, [questions]);
+      const g = {};
     
+      questions.forEach((q, i) => {
+        const key =
+          q.section_ref?.section_id ||
+          q.topic ||               // ✅ review-safe fallback
+          "Other";
+    
+        if (!g[key]) {
+          g[key] = {
+            topic: q.topic || "Other",
+            indexes: []
+          };
+        }
+    
+        g[key].indexes.push(i);
+      });
+    
+      return g;
+    }, [questions]);
+
       /* =============================
          LOAD REPORT
       ============================= */
@@ -284,9 +324,8 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
             className="view-exam-btn"
             onClick={() => {
               console.log("🟢 Review Reading Exam clicked");
-              setMode("review");
-            }}
-          >
+              loadReviewExam();
+            }}          >
             View Exam Details
           </button>
     
@@ -447,7 +486,16 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
                     key={questions[i].question_id}
                     className={`index-circle
                       ${visited[i] ? "visited" : ""}
-                      ${answers[questions[i].question_id] ? "answered" : ""}
+                      ${
+                          isReview
+                            ? questions[i].student_answer
+                              ? "answered"
+                              : ""
+                            : answers[questions[i].question_id]
+                              ? "answered"
+                              : ""
+                        }
+
                       ${i === index ? "active" : ""}
                     `}
                     onClick={() => goTo(i)}
