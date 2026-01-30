@@ -145,6 +145,7 @@ export default function ReadingComponent({
     console.log("🧪 START-READING META:", meta);
 
     if (meta.completed === true) {
+      setAttemptId(meta.attempt_id);
       setFinished(true);
     
       if (meta.attempt_id) {
