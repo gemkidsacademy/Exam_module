@@ -21,7 +21,14 @@
     
       const [answers, setAnswers] = useState({});
       const [visited, setVisited] = useState({});
-      const [finished, setFinished] = useState(false);
+          /**
+     * mode:
+     * - exam
+     * - report
+     * - review
+     */
+      const [mode, setMode] = useState("exam");
+
     
       const [attemptId, setAttemptId] = useState(null);
     
@@ -51,6 +58,8 @@
       /* =============================
          HELPERS
       ============================= */
+      const isReview = mode === "review";
+
       const formatTime = (seconds) => {
         const m = Math.floor(seconds / 60);
         const s = seconds % 60;
@@ -87,7 +96,7 @@
         console.log("🧪 START-READING META:", meta);
     
         if (meta.completed === true) {
-          setFinished(true);
+          setMode("report");
           onExamFinish?.();
           return;
         }
@@ -151,20 +160,20 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
          TIMER
       ============================= */
       useEffect(() => {
-      if (timeLeft === null) return;
-    
-      if (timeLeft <= 0 && !finished) {
-        autoSubmit();
-        return;
-      }
-    
-      const t = setInterval(() => {
-        setTimeLeft((v) => (v > 0 ? v - 1 : 0));
-      }, 1000);
-    
-      return () => clearInterval(t);
-    }, [timeLeft, finished]);
-    
+          if (mode !== "exam" || timeLeft === null) return;
+        
+          if (timeLeft <= 0) {
+            autoSubmit();
+            return;
+          }
+        
+          const t = setInterval(() => {
+            setTimeLeft((v) => (v > 0 ? v - 1 : 0));
+          }, 1000);
+        
+          return () => clearInterval(t);
+        }, [timeLeft, mode]);
+
     
       /* =============================
          GROUP QUESTIONS BY TOPIC
@@ -198,7 +207,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
          SUBMIT
       ============================= */
       const autoSubmit = async () => {
-      if (finished) return;
+      if (mode !== "exam") return;
     
       try {
         const res = await fetch(
@@ -224,7 +233,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
         // ✅ CHANGE 4B: hydrate report immediately
         setReport(data.report);
     
-        setFinished(true);
+        setMode("report");
         onExamFinish?.();
     
       } catch (err) {
@@ -237,6 +246,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
          ANSWER HANDLING
       ============================= */
       const handleSelect = (letter) => {
+        if (isReview) return;
         const q = questions[index];
         setAnswers((prev) => ({
           ...prev,
@@ -252,7 +262,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
       /* =============================
          FINISHED VIEW
       ============================= */
-      if (finished) {
+      if (mode === "report") {
         if (loadingReport || !normalizedReport) {
           return <div>Loading your report…</div>;
         }
@@ -269,6 +279,16 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
         >
           {normalizedReport.result}
         </div>
+        {/* ✅ NEW BUTTON */}
+          <button
+            className="view-exam-btn"
+            onClick={() => {
+              console.log("🟢 Review Reading Exam clicked");
+              setMode("review");
+            }}
+          >
+            View Exam Details
+          </button>
     
         <div className="report-grid">
     
@@ -403,7 +423,12 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
       <div className="exam-container">
         <div className="exam-header">
           <div>Reading Comprehension Exam</div>
-          <div className="timer-box">Time Left: {formatTime(timeLeft)}</div>
+          {mode === "exam" && (
+              <div className="timer-box">
+                Time Left: {formatTime(timeLeft)}
+              </div>
+            )}
+
           <div className="counter">
             Question {index + 1} / {questions.length}
           </div>
@@ -488,19 +513,31 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
                 </div>
               )}
     
-              {Object.entries(options).map(([k, v]) => (
-                <button
-                  key={k}
-                  className={`option-btn ${
-                    answers[currentQuestion.question_id] === k
-                      ? "selected"
-                      : ""
-                  }`}
-                  onClick={() => handleSelect(k)}
-                >
-                  <strong>{k}.</strong> {v}
-                </button>
-              ))}
+              {Object.entries(options).map(([k, v]) => {
+                  let cls = "option-btn";
+                
+                  if (isReview) {
+                    if (k === currentQuestion.correct_answer) {
+                      cls += " option-correct";
+                    } else if (k === currentQuestion.student_answer) {
+                      cls += " option-wrong";
+                    }
+                  } else if (answers[currentQuestion.question_id] === k) {
+                    cls += " selected";
+                  }
+                
+                  return (
+                    <button
+                      key={k}
+                      disabled={isReview}
+                      className={cls}
+                      onClick={() => handleSelect(k)}
+                    >
+                      <strong>{k}.</strong> {v}
+                    </button>
+                  );
+                })}
+
             </div>
     
             <div className="nav-buttons">
@@ -509,20 +546,15 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
               </button>
     
               {index < questions.length - 1 ? (
-                <button onClick={() => goTo(index + 1)}>Next</button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    autoSubmit();
-                  }}
-                >
-                  Finish
-                </button>
-    
-    
-              )}
+                  <button onClick={() => goTo(index + 1)}>Next</button>
+                ) : (
+                  mode === "exam" && (
+                    <button type="button" onClick={autoSubmit}>
+                      Finish
+                    </button>
+                  )
+                )}
+
             </div>
           </div>
         </div>
