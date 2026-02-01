@@ -289,28 +289,39 @@ return (
 
     {/* QUESTION INDEX */}
     <div className="index-row">
-      {activeQuestions.map((q, i) => {
-        let cls = "index-circle index-not-visited";
+  {activeQuestions.map((q, i) => {
+    let cls = "index-circle";
 
-        if (visited[q.q_id]) {
-          cls = "index-circle index-visited";
-        }
+    if (isReview) {
+      if (!q.student_answer) {
+        cls += " index-not-visited";   // skipped
+      } else if (q.student_answer === q.correct_answer) {
+        cls += " index-answered";      // correct → green
+      } else {
+        cls += " index-wrong";         // incorrect → red
+      }
+    } else {
+      // 🔵 exam mode (unchanged behavior)
+      if (answers[q.q_id]) {
+        cls += " index-answered";
+      } else if (visited[q.q_id]) {
+        cls += " index-visited";
+      } else {
+        cls += " index-not-visited";
+      }
+    }
 
-        if (answers[q.q_id]) {
-          cls = "index-circle index-answered";
-        }
-
-        return (
-          <div
-            key={q.q_id}
-            className={cls}
-            onClick={() => goToQuestion(i)}
-          >
-            {i + 1}
-          </div>
-        );
-      })}
-    </div>
+    return (
+      <div
+        key={q.q_id}
+        className={cls}
+        onClick={() => goToQuestion(i)}
+      >
+        {i + 1}
+      </div>
+    );
+  })}
+</div>
 
     {/* QUESTION CARD */}
 <div className="question-card">
