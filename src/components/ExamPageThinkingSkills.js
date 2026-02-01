@@ -135,26 +135,6 @@ useEffect(() => {
 }, [studentId]);
 
 /* ============================================================
-   MARK VISITED QUESTIONS
-============================================================ */
-useEffect(() => {
-  if (isReview) return;   // 👈 ADD THIS
-
-  if (prevIndexRef.current !== null) {
-    const prevIdx = prevIndexRef.current;
-    const prevQid = questions[prevIdx]?.q_id;
-
-    if (prevQid && !answers[prevQid]) {
-      const prevQ = questions[prevIdx];
-      if (prevQ && !answers[prevQ.q_id]) {
-        setVisited(prev => ({ ...prev, [prevQ.q_id]: true }));
-      }
-    }
-  }
-
-  prevIndexRef.current = currentIndex;
-}, [currentIndex, questions, answers, isReview]);
-/* ============================================================
    FINISH EXAM (SUBMIT ONLY — NO UI DECISIONS)
 ============================================================ */
 const finishExam = useCallback(
@@ -308,15 +288,21 @@ return (
         let cls = styles.indexCircle;
 
         if (isReview) {
-          if (!q.student_answer) cls += ` ${styles.indexSkipped}`;
-          else if (q.student_answer === q.correct_answer)
+          if (!q.student_answer) {
+            cls += ` ${styles.indexSkipped}`;
+          } else if (q.student_answer === q.correct_answer) {
             cls += ` ${styles.indexCorrect}`;
-          else cls += ` ${styles.indexIncorrect}`;
+          } else {
+            cls += ` ${styles.indexIncorrect}`;
+          }
         } else {
-          cls += ` ${styles.indexNotVisited}`;
-
-          if (visited[q.q_id]) cls = `${styles.indexCircle} ${styles.indexVisited}`;
-          if (answers[q.q_id]) cls = `${styles.indexCircle} ${styles.indexAnswered}`;
+          if (answers[q.q_id]) {
+            cls += ` ${styles.indexAnswered}`;
+          } else if (visited[q.q_id]) {
+            cls += ` ${styles.indexVisited}`;
+          } else {
+            cls += ` ${styles.indexNotVisited}`;
+          }
         }
 
         return (
