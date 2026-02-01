@@ -109,18 +109,19 @@ useEffect(() => {
 
       // ✅ NORMALIZE QUESTIONS (CRITICAL FIX)
       const normalizedQuestions = (data.questions || []).map(q => {
-      console.log("🧪 RAW QUESTION OBJECT:", q);
-      console.log("🧪 RAW QUESTION KEYS:", Object.keys(q));
-    
-      return {
-        ...q,
-    
-         blocks: Array.isArray(q.question_blocks)
+         console.log("🧪 RAW QUESTION OBJECT:", q);
+         console.log("🧪 RAW QUESTION KEYS:", Object.keys(q));
+       
+         return {
+           ...q,
+           blocks: Array.isArray(q.question_blocks)
              ? q.question_blocks
              : Array.isArray(q.blocks)
              ? q.blocks
              : []
-         }));
+         };
+       });
+
 
 
       setQuestions(normalizedQuestions);
