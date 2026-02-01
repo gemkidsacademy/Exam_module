@@ -519,7 +519,7 @@ return (
     =============================== */}
     <h2 className="report-title">
       You scored {overall.correct} out of {overall.total_questions} in NSW
-      Selective Mathematical Reasoning Test – Free Trial
+      Selective Mathematical Reasoning Test 
     </h2>
     <button
       className="view-exam-btn"
