@@ -201,6 +201,11 @@ export default function ReadingComponent({
 console.log("🧩 FLATTEN: sections =", sections);
 
 const flatQuestions = sections.flatMap((section) => {
+   console.log("🧪 SECTION", idx, {
+    question_type: section.question_type,
+    topic: section.topic,
+    keys: Object.keys(section),
+  });  
   const qs =
     section.questions ||
     section.items ||
@@ -256,6 +261,11 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
       const g = {};
       questions.forEach((q, i) => {
         const key = q.section_ref.section_id;
+        console.log("🧩 GROUP KEY CHECK", {
+          section_id: q.section_ref.section_id,
+          topic: q.topic
+        });
+  
     
         if (!g[key]) {
           g[key] = {
