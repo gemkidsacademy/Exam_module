@@ -9,9 +9,9 @@ export default function QuizSetup_reading() {
     numTopics: 1,
     topics: [],
   });
-  const ALLOW_DUPLICATE_TOPICS = ["Comparative analysis"];
+  const ALLOW_DUPLICATE_TOPICS = ["Comparative Analysis"];
   const MAX_TOPIC_USAGE = {
-    "Comparative analysis": 3
+    "Comparative Analysis": 3
   };
 
 
