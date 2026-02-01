@@ -108,19 +108,30 @@ useEffect(() => {
       }
 
       // ✅ NORMALIZE QUESTIONS (CRITICAL FIX)
-      const normalizedQuestions = (data.questions || []).map(q => ({
+      const normalizedQuestions = (data.questions || []).map(q => {
+      console.log("🧪 RAW QUESTION OBJECT:", q);
+      console.log("🧪 RAW QUESTION KEYS:", Object.keys(q));
+    
+      return {
         ...q,
-
-        // unify exam + review schema
+    
         blocks: Array.isArray(q.blocks)
           ? q.blocks
           : [
               {
                 type: "text",
-                content: q.question_text ?? ""
+                content:
+                  q.question_text ??
+                  q.question ??
+                  q.text ??
+                  q.stem ??
+                  q.prompt ??
+                  "[NO QUESTION TEXT FOUND]"
               }
             ]
-      }));
+      };
+    });
+
 
       setQuestions(normalizedQuestions);
       setTimeLeft(data.remaining_time);
