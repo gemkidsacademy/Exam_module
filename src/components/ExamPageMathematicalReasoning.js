@@ -298,14 +298,17 @@ return (
     let cls = "index-circle";
 
     if (isReview) {
-      if (!q.student_answer) {
-        cls += " index-not-visited";   // skipped
-      } else if (q.student_answer === q.correct_answer) {
-        cls += " index-answered";      // correct → green
+        const student = q.student_answer?.trim().toUpperCase();
+        const correct = q.correct_answer?.trim().toUpperCase();
+      
+        if (!student) {
+          cls += " index-not-visited";   // skipped → grey
+        } else if (student === correct) {
+          cls += " index-answered";      // correct → green
+        } else {
+          cls += " index-wrong";         // incorrect → red
+        }
       } else {
-        cls += " index-wrong";         // incorrect → red
-      }
-    } else {
       // 🔵 exam mode (unchanged behavior)
       if (answers[q.q_id]) {
         cls += " index-answered";
@@ -359,16 +362,16 @@ return (
 {/* OPTIONS */}
 {optionEntries.map(([key, opt], i) => {
   const optionKey = key.toUpperCase();
-  const studentAnswer = currentQ.student_answer;
-  const correctAnswer = currentQ.correct_answer;
-
+  const student = currentQ.student_answer?.trim().toUpperCase();
+  const correct = currentQ.correct_answer?.trim().toUpperCase();
+  
   let statusClass = "";
-
+  
   if (isReview) {
-    if (optionKey === correctAnswer) {
-      statusClass = "option-correct";
-    } else if (optionKey === studentAnswer) {
-      statusClass = "option-wrong";
+    if (optionKey === correct) {
+      statusClass = "option-correct";     // green
+    } else if (optionKey === student) {
+      statusClass = "option-wrong";       // red
     }
   } else {
     if (answers[currentQ.q_id] === optionKey) {
