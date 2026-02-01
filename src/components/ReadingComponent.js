@@ -350,13 +350,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
     <h1>
       You scored {normalizedReport.correct} out of {normalizedReport.total}
     </h1>
-    <div
-      className={`result-badge ${
-        normalizedReport.result === "Pass" ? "pass" : "fail"
-      }`}
-    >
-      {normalizedReport.result}
-    </div>
+    
     {/* ✅ NEW: Review Exam Button */}
     <button
       className="review-exam-btn"
