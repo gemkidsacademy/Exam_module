@@ -115,22 +115,12 @@ useEffect(() => {
       return {
         ...q,
     
-        blocks: Array.isArray(q.blocks)
-          ? q.blocks
-          : [
-              {
-                type: "text",
-                content:
-                  q.question_text ??
-                  q.question ??
-                  q.text ??
-                  q.stem ??
-                  q.prompt ??
-                  "[NO QUESTION TEXT FOUND]"
-              }
-            ]
-      };
-    });
+         blocks: Array.isArray(q.question_blocks)
+             ? q.question_blocks
+             : Array.isArray(q.blocks)
+             ? q.blocks
+             : []
+         }));
 
 
       setQuestions(normalizedQuestions);
