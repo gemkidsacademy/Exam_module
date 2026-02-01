@@ -304,6 +304,14 @@ return (
             cls += ` ${styles.indexNotVisited}`;
           }
         }
+        // 🔍 DEBUG LOG (temporary)
+        console.log(
+          "INDEX CHECK",
+          q.q_id,
+          "visited:", visited[q.q_id],
+          "answer:", answers[q.q_id],
+          "answers obj:", answers
+        );
 
         return (
           <div
