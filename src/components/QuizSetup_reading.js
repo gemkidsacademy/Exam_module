@@ -22,7 +22,7 @@ export default function QuizSetup_reading() {
   };
   
   const CHOICE_TOPIC_QUESTION_RULES = {
-    "Comparative analysis": [8, 10],
+    "Comparative Analysis": [8, 10],
   };
 
 
