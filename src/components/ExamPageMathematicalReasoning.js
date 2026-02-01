@@ -282,13 +282,40 @@ if (mode === "review" && reviewQuestions.length === 0) {
       studentId={studentId}
       onLoaded={(questions) => {
         console.log("✅ Review questions received:", questions.length);
-        console.log("🧪 REVIEW QUESTION SAMPLE", {
-          q_id: questions[0]?.q_id,
-          student_answer: questions[0]?.student_answer,
-          correct_answer: questions[0]?.correct_answer,
-          full: questions[0]
+
+        const normalized = questions.map(q => {
+          const rawBlocks = Array.isArray(q.question_blocks)
+            ? q.question_blocks
+            : Array.isArray(q.blocks)
+            ? q.blocks
+            : [];
+
+          return {
+            ...q,
+            blocks: rawBlocks.map(block => {
+              if (
+                block?.type === "image" &&
+                block?.src &&
+                !block.src.startsWith("http")
+              ) {
+                return {
+                  ...block,
+                  src: `https://storage.googleapis.com/exammoduleimages/${block.src}`
+                };
+              }
+              return block;
+            })
+          };
         });
-        setReviewQuestions(questions);
+
+        console.log("🧪 REVIEW QUESTION SAMPLE (normalized)", {
+          q_id: normalized[0]?.q_id,
+          student_answer: normalized[0]?.student_answer,
+          correct_answer: normalized[0]?.correct_answer,
+          blocks: normalized[0]?.blocks
+        });
+
+        setReviewQuestions(normalized);
         setCurrentIndex(0);
       }}
     />
