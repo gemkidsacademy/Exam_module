@@ -50,7 +50,18 @@ export default function ReadingComponent({
 
     console.log("🧪 REVIEW PAYLOAD:", data);
 
-    setReviewQuestions(data.questions || []);
+    setReviewQuestions(
+      (data.questions || []).map((q) => ({
+        ...q,
+        answer_options:
+          (q.answer_options && Object.keys(q.answer_options).length > 0)
+            ? q.answer_options
+            : q.section_ref?.answer_options ||
+              q.section?.answer_options ||
+              {}
+      }))
+    );
+
     setMode("review");
 
   } catch (err) {
