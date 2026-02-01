@@ -25,7 +25,7 @@ console.log("🧠 ExamPageThinkingSkills MOUNTED");
 
 
 const hasSubmittedRef = useRef(false);
-const prevIndexRef = useRef(null);
+
 
 
 const API_BASE = process.env.REACT_APP_API_URL;
@@ -193,7 +193,8 @@ useEffect(() => {
 const handleAnswer = (optionKey) => {
   console.log("ANSWER CLICKED", optionKey, questions[currentIndex]?.q_id);
 
-  const qid = questions[currentIndex]?.q_id;
+  const qid = String(questions[currentIndex]?.q_id);
+
   if (!qid) return;
 
   setAnswers(prev => ({
@@ -205,7 +206,8 @@ const handleAnswer = (optionKey) => {
 const goToQuestion = (idx) => {
   if (idx < 0 || idx >= questions.length) return;
 
-  const qid = questions[idx].q_id;
+  const qid = String(questions[idx].q_id);
+
 
   if (!isReview) {
     setVisited(prev => ({ ...prev, [qid]: true }));
@@ -298,22 +300,27 @@ return (
             cls += ` ${styles.indexIncorrect}`;
           }
         } else {
-          if (answers[q.q_id]) {
+          const qid = String(q.q_id);
+
+          if (answers[qid]) {
             cls += ` ${styles.indexAnswered}`;
-          } else if (visited[q.q_id]) {
+          } else if (visited[qid]) {
             cls += ` ${styles.indexVisited}`;
           } else {
             cls += ` ${styles.indexNotVisited}`;
           }
+
         }
         // 🔍 DEBUG LOG (temporary)
+        const qid = String(q.q_id);
         console.log(
           "INDEX CHECK",
-          q.q_id,
-          "visited:", visited[q.q_id],
-          "answer:", answers[q.q_id],
+          qid,
+          "visited:", visited[qid],
+          "answer:", answers[qid],
           "answers obj:", answers
         );
+
 
         return (
           <div
@@ -370,9 +377,8 @@ return (
 {/* OPTIONS */}
 {optionEntries.map(([optionKey, optionValue]) => {
 const studentAnswer = isReview
-  ? currentQ.student_answer      // backend
-  : answers[currentQ.q_id];      // live exam
-
+  ? currentQ.student_answer
+  : answers[String(currentQ.q_id)];
 const correctAnswer = isReview
   ? currentQ.correct_answer
   : null;
