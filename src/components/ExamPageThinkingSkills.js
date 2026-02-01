@@ -191,6 +191,8 @@ useEffect(() => {
    ANSWER HANDLING
 ============================================================ */
 const handleAnswer = (optionKey) => {
+  console.log("ANSWER CLICKED", optionKey, questions[currentIndex]?.q_id);
+
   const qid = questions[currentIndex]?.q_id;
   if (!qid) return;
 
