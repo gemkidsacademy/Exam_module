@@ -109,18 +109,29 @@ useEffect(() => {
 
       // ✅ NORMALIZE QUESTIONS (CRITICAL FIX)
       const normalizedQuestions = (data.questions || []).map(q => {
-         console.log("🧪 RAW QUESTION OBJECT:", q);
-         console.log("🧪 RAW QUESTION KEYS:", Object.keys(q));
-       
-         return {
-           ...q,
-           blocks: Array.isArray(q.question_blocks)
-             ? q.question_blocks
-             : Array.isArray(q.blocks)
-             ? q.blocks
-             : []
-         };
-       });
+      const rawBlocks = Array.isArray(q.question_blocks)
+        ? q.question_blocks
+        : Array.isArray(q.blocks)
+        ? q.blocks
+        : [];
+    
+      return {
+        ...q,
+        blocks: rawBlocks.map(block => {
+          if (
+            block?.type === "image" &&
+            block?.src &&
+            !block.src.startsWith("http")
+          ) {
+            return {
+              ...block,
+              src: `https://storage.googleapis.com/exammoduleimages/${block.src}`
+            };
+          }
+          return block;
+        })
+      };
+    });
 
 
 
