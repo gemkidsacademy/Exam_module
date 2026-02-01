@@ -253,7 +253,12 @@ if (mode === "review" && reviewQuestions.length === 0) {
       studentId={studentId}
       onLoaded={(questions) => {
         console.log("✅ Review questions received:", questions.length);
-
+        console.log("🧪 REVIEW QUESTION SAMPLE", {
+          q_id: questions[0]?.q_id,
+          student_answer: questions[0]?.student_answer,
+          correct_answer: questions[0]?.correct_answer,
+          full: questions[0]
+        });
         setReviewQuestions(questions);
         setCurrentIndex(0);
       }}
