@@ -200,7 +200,7 @@ export default function ReadingComponent({
 
 console.log("🧩 FLATTEN: sections =", sections);
 
-const flatQuestions = sections.flatMap((section) => {
+const flatQuestions = sections.flatMap((section, idx) => {
    console.log("🧪 SECTION", idx, {
     question_type: section.question_type,
     topic: section.topic,
