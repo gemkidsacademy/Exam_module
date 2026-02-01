@@ -120,6 +120,13 @@ export default function ReadingComponent({
   /* =============================
      HELPERS
   ============================= */
+  const TOPIC_LABELS = {
+      main_idea: "Main Idea and Summary",
+      main_idea_and_summary: "Main Idea and Summary",
+      comparative_analysis: "Comparative Analysis",
+      gapped_text: "Gapped Text",
+    };
+
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -193,20 +200,20 @@ export default function ReadingComponent({
 
 console.log("🧩 FLATTEN: sections =", sections);
 
-const flatQuestions = sections.flatMap((section, sIdx) => {
-const qs =
-section.questions ||
-section.items ||
-section.question_list ||
-[];
+const flatQuestions = sections.flatMap((section) => {
+  const qs =
+    section.questions ||
+    section.items ||
+    section.question_list ||
+    [];
 
-return qs.map((q) => ({
-...q,
-topic: section.topic,
-passage_style: section.passage_style || "informational",
-answer_options: q.answer_options || section.answer_options || {},
-section_ref: section
-}));
+  return qs.map((q) => ({
+    ...q,
+    topic: TOPIC_LABELS[section.question_type] || "Other",
+    passage_style: section.passage_style || "informational",
+    answer_options: q.answer_options || section.answer_options || {},
+    section_ref: section
+  }));
 });
 
 console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
@@ -252,7 +259,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
     
         if (!g[key]) {
           g[key] = {
-            topic: q.section_ref.topic,
+            topic: q.topic,
             indexes: []
           };
         }
