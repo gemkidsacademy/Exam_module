@@ -976,6 +976,27 @@ body {
   overflow-x: auto;
   overflow-y: visible;
 }
+/* ============================================
+   FINAL FORCE FIX — MATHEMATICAL REVIEW INDEX
+============================================ */
+
+.index-row .index-circle.index-wrong {
+  background-color: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+}
+
+.index-row .index-circle.index-answered {
+  background-color: #22c55e !important;
+  border-color: #22c55e !important;
+  color: #ffffff !important;
+}
+
+.index-row .index-circle.index-not-visited {
+  background-color: #e5e7eb !important;
+  border-color: #cbd5e1 !important;
+  color: #475569 !important;
+}
 
 
 
