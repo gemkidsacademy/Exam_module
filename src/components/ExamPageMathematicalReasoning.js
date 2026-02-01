@@ -107,8 +107,22 @@ useEffect(() => {
         return;
       }
 
-      // ✅ NEW / IN-PROGRESS → SHOW EXAM
-      setQuestions(data.questions || []);
+      // ✅ NORMALIZE QUESTIONS (CRITICAL FIX)
+      const normalizedQuestions = (data.questions || []).map(q => ({
+        ...q,
+
+        // unify exam + review schema
+        blocks: Array.isArray(q.blocks)
+          ? q.blocks
+          : [
+              {
+                type: "text",
+                content: q.question_text ?? ""
+              }
+            ]
+      }));
+
+      setQuestions(normalizedQuestions);
       setTimeLeft(data.remaining_time);
       setMode("exam");
       onExamStart?.();
@@ -118,8 +132,10 @@ useEffect(() => {
     }
   };
 
-  startExam();  
+  startExam();
 }, [studentId, loadReport]);
+
+ 
 /* ============================================================
    MARK VISITED QUESTIONS
 ============================================================ */
