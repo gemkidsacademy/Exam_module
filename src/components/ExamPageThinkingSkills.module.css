@@ -42,3 +42,35 @@
   border: 1px solid #cbd5e1;
   color: #475569;
 }
+.indexAnswered {
+  background-color: #bbf7d0;
+  border-color: #16a34a;
+  color: #065f46;
+}
+
+.indexVisited {
+  background-color: #e5e7eb;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.indexNotVisited {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.indexCorrect {
+  background-color: #22c55e;
+  color: #ffffff;
+}
+
+.indexIncorrect {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
+.indexSkipped {
+  background-color: #e5e7eb;
+  color: #374151;
+}
