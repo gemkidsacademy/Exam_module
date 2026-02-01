@@ -318,6 +318,12 @@ return (
         cls += " index-not-visited";
       }
     }
+    console.log("🧪 INDEX DEBUG", {
+      qid: q.q_id,
+      student: q.student_answer,
+      correct: q.correct_answer,
+      computedClass: cls
+    });
 
     return (
       <div
