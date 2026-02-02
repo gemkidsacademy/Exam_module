@@ -401,5 +401,14 @@
 .review-exam-btn:hover {
   background: #000;
 }
+.overall-stats {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #555;
+}
+
+.overall-stats div {
+  margin: 4px 0;
+}
 
 
