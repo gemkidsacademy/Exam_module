@@ -120,6 +120,35 @@ export default function ReadingComponent({
   /* =============================
      HELPERS
   ============================= */
+  const normalizeMainIdeaReadingMaterial = (rm) => {
+      if (typeof rm !== "string") return rm;
+    
+      // Only run for Main Idea / Summary legacy blobs
+      if (!rm.includes("The Age of Transparency")) return rm;
+    
+      // Split instructions from body
+      const [instructionsPart, bodyPart] = rm.split("The Age of Transparency");
+    
+      if (!bodyPart) return rm;
+    
+      // Extract numbered paragraphs like "1: ... 2: ..."
+      const paragraphMatches = [...bodyPart.matchAll(/(\d+):\s*([^]+?)(?=\n\s*\d+:|$)/g)];
+    
+      if (paragraphMatches.length === 0) return rm;
+    
+      const paragraphs = {};
+      paragraphMatches.forEach((m, idx) => {
+        // Map to 15–20 instead of 1–6
+        paragraphs[15 + idx] = m[2].trim();
+      });
+    
+      return {
+        instructions: instructionsPart.trim(),
+        title: "The Age of Transparency",
+        paragraphs
+      };
+    };
+
   const TOPIC_LABELS = {
       main_idea: "Main Idea and Summary",
       main_idea_and_summary: "Main Idea and Summary",
@@ -492,7 +521,10 @@ const currentQuestion = questions[index];
   const options = currentQuestion.answer_options || {};
   const hasOptions = Object.keys(options).length > 0;
 
-  const rm = currentQuestion.section_ref?.reading_material ?? "";
+  /* const rm = currentQuestion.section_ref?.reading_material ?? "";*/
+  const rawRm = currentQuestion.section_ref?.reading_material ?? "";
+  const rm = normalizeMainIdeaReadingMaterial(rawRm);
+  
   const passageStyle =
       currentQuestion.passage_style ||
       currentQuestion.section_ref?.passage_style ||
