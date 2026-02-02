@@ -121,33 +121,38 @@ export default function ReadingComponent({
      HELPERS
   ============================= */
   const normalizeMainIdeaReadingMaterial = (rm) => {
-      if (typeof rm !== "string") return rm;
-    
-      // Only run for Main Idea / Summary legacy blobs
-      if (!rm.includes("The Age of Transparency")) return rm;
-    
-      // Split instructions from body
-      const [instructionsPart, bodyPart] = rm.split("The Age of Transparency");
-    
-      if (!bodyPart) return rm;
-    
-      // Extract numbered paragraphs like "1: ... 2: ..."
-      const paragraphMatches = [...bodyPart.matchAll(/(\d+):\s*([^]+?)(?=\n\s*\d+:|$)/g)];
-    
-      if (paragraphMatches.length === 0) return rm;
-    
-      const paragraphs = {};
-      paragraphMatches.forEach((m, idx) => {
-        // Map to 15–20 instead of 1–6
-        paragraphs[15 + idx] = m[2].trim();
-      });
-    
-      return {
-        instructions: instructionsPart.trim(),
-        title: "The Age of Transparency",
-        paragraphs
-      };
-    };
+  if (typeof rm !== "string") return rm;
+
+  // Split instructions from paragraph body
+  const splitIndex = rm.indexOf("paragraphs:");
+  if (splitIndex === -1) return rm;
+
+  const instructions = rm.slice(0, splitIndex).trim();
+  const body = rm.slice(splitIndex + "paragraphs:".length);
+
+  // Split on " 1: ", " 2: ", etc.
+  const parts = body.split(/\s+(?=\d+:)/);
+
+  const paragraphs = {};
+  parts.forEach((p, idx) => {
+    const match = p.match(/^(\d+):\s*(.*)$/s);
+    if (match) {
+      paragraphs[15 + idx] = match[2].trim();
+    }
+  });
+
+  if (Object.keys(paragraphs).length === 0) {
+    console.warn("⚠️ Main Idea normalization failed — no paragraphs detected");
+    return rm;
+  }
+
+  return {
+    instructions,
+    title: "The Age of Transparency",
+    paragraphs
+  };
+};
+
 
   const TOPIC_LABELS = {
       main_idea: "Main Idea and Summary",
@@ -526,12 +531,26 @@ const currentQuestion = questions[index];
   const rm = normalizeMainIdeaReadingMaterial(rawRm);
   
   const passageStyle =
-  currentQuestion.section_ref?.question_type === "main_idea"
+  ["main_idea", "main_idea_and_summary"].includes(
+  currentQuestion.section_ref?.question_type
+)
+
     ? "informational"
     : currentQuestion.passage_style ||
       currentQuestion.section_ref?.passage_style ||
       "informational";
 
+    console.log("MAIN IDEA DEBUG", {
+  question_type: currentQuestion.section_ref?.question_type,
+  passageStyle,
+  rmType: typeof rm,
+  hasParagraphs: !!rm?.paragraphs,
+  paragraphKeys: rm?.paragraphs && Object.keys(rm.paragraphs),
+  rmPreview:
+    typeof rm === "string"
+      ? rm.slice(0, 120)
+      : rm
+});
 
   
 
