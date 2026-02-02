@@ -526,7 +526,9 @@ const currentQuestion = questions[index];
   const rm = normalizeMainIdeaReadingMaterial(rawRm);
   
   const passageStyle =
-      currentQuestion.passage_style ||
+  currentQuestion.section_ref?.question_type === "main_idea"
+    ? "informational"
+    : currentQuestion.passage_style ||
       currentQuestion.section_ref?.passage_style ||
       "informational";
 
@@ -576,9 +578,9 @@ const currentQuestion = questions[index];
       <div className={`passage-pane ${passageStyle}`}>
 
         {/* LITERARY PASSAGE */}
-        {passageStyle === "literary" && (
+        {passageStyle === "literary" && typeof rm === "string" && (
           <pre className="literary-passage">
-            {typeof rm === "string" ? rm : ""}
+            {rm}
           </pre>
         )}
 
