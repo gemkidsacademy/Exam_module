@@ -37,6 +37,8 @@
        STATE
     ----------------------------------------------------------- */
     const [exam, setExam] = useState(null);
+    const [examActive, setExamActive] = useState(false);
+
     const CATEGORY_LABELS = {
       audience_purpose_form: "Audience, Purpose & Form",
       ideas_content: "Ideas & Content",
@@ -175,12 +177,16 @@
 }, [timeLeft, loading, completed, submitting]);
 
     useEffect(() => {
-  if (timeLeft === 0 && !completed && !submitting) {
+  if (
+    examActive &&
+    timeLeft === 0 &&
+    !completed &&
+    !submitting
+  ) {
     console.log("⏰ Time up → auto submitting writing exam");
     finishExam();
   }
-}, [timeLeft]);
-
+}, [timeLeft, examActive, completed, submitting]);
     /* -----------------------------------------------------------
        ON MOUNT: Start exam → Load exam
     ----------------------------------------------------------- */
@@ -242,6 +248,7 @@
       if (data.exam) {
         setExam(data.exam);
         setTimeLeft(data.remaining_seconds);
+        setExamActive(true);
 
         if (typeof onExamStart === "function") {
           onExamStart();
