@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import "./ExamPage_reading.css";
+import "./ReadingReviewIndex.css";
 
 /**
  * ReadingReview
@@ -62,6 +63,12 @@ export default function ReadingReview({ questions = [], onExit }) {
   /* =============================
      HELPERS
   ============================= */
+  const getQuestionStatus = (q) => {
+  if (!q.student_answer) return "skipped";
+  if (q.is_correct) return "correct";
+  return "wrong";
+};
+
   const prettyTopic = (t = "Other") =>
     t.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
@@ -103,12 +110,9 @@ export default function ReadingReview({ questions = [], onExit }) {
 
                 const cls = [
                   "index-circle",
-                  i === index ? "active" : "",
-                  q.student_answer
-                    ? q.is_correct
-                      ? "answered-correct"
-                      : "answered-wrong"
-                    : ""
+                  "review",
+                  getQuestionStatus(q),
+                  i === index ? "active" : ""
                 ].join(" ");
 
                 return (
