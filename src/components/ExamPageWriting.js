@@ -163,21 +163,23 @@
       }
     };
     useEffect(() => {
-      if (loading || completed || submitting || !exam) {
-        console.log("⏸ Timer paused");
-        return;
-      }
-    
-      if (timeLeft <= 0) {
-        return finishExam();
-      }
-    
-      const timer = setInterval(() => {
-        setTimeLeft((t) => Math.max(0, t - 1));
-      }, 1000);
-    
-      return () => clearInterval(timer);
-    }, [timeLeft, loading, completed, submitting]);
+  if (loading || completed || submitting) return;
+
+  if (timeLeft <= 0) return;
+
+  const timer = setInterval(() => {
+    setTimeLeft(t => Math.max(0, t - 1));
+  }, 1000);
+
+  return () => clearInterval(timer);
+}, [timeLeft, loading, completed, submitting]);
+
+    useEffect(() => {
+  if (timeLeft === 0 && !completed && !submitting) {
+    console.log("⏰ Time up → auto submitting writing exam");
+    finishExam();
+  }
+}, [timeLeft]);
 
     /* -----------------------------------------------------------
        ON MOUNT: Start exam → Load exam
@@ -479,7 +481,8 @@
               : "Start writing your response here..."
           }
           value={answerText}
-          disabled={submitting}
+          disabled={submitting || timeLeft === 0}
+          
           onChange={(e) => setAnswerText(e.target.value)}
         />
 
