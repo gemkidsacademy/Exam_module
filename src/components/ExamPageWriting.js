@@ -472,6 +472,7 @@
   
         <textarea
           className="writing-answer-box"
+          spellCheck={false}
           placeholder={
             submitting
               ? "Submitting your writing for evaluation..."
@@ -481,6 +482,7 @@
           disabled={submitting}
           onChange={(e) => setAnswerText(e.target.value)}
         />
+
 
   
         <button
