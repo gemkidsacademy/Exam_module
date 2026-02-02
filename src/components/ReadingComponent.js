@@ -415,14 +415,25 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
           OVERALL ACCURACY
       ============================= */}
       <div className="card">
-        <h3>Accuracy</h3>
-        <div
-          className="accuracy-circle"
-          style={{ "--p": normalizedReport.accuracy }}
-        >
-          <span>{normalizedReport.accuracy}%</span>
-        </div>
+      <h3>Overall Accuracy</h3>
+    
+      <div
+        className="accuracy-circle"
+        style={{ "--p": normalizedReport.accuracy }}
+      >
+        <span>{normalizedReport.accuracy}%</span>
       </div>
+    
+      <div className="overall-stats">
+        <div>Total Questions: {normalizedReport.total}</div>
+        <div>Attempted: {normalizedReport.attempted}</div>
+        <div>Correct: {normalizedReport.correct}</div>
+        <div>Incorrect: {normalizedReport.incorrect}</div>
+        <div>Not Attempted: {normalizedReport.not_attempted}</div>
+        <div>Score: {normalizedReport.score}%</div>
+      </div>
+    </div>
+
 
       {/* =============================
           TOPIC BREAKDOWN
