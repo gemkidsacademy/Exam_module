@@ -490,7 +490,7 @@ return (
     =============================== */}
     <h2 className="report-title">
       You scored {overall.correct} out of {overall.total_questions} in NSW
-      Selective Thinking Skills Test – Free Trial
+      Selective Thinking Skills Test 
     </h2>
     <button
       className="view-exam-btn"
