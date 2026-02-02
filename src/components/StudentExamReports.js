@@ -191,7 +191,7 @@ export default function StudentExamReports() {
               {report.exam_type === "reading" && (
                 <p className="reading-score">
                   <strong>Overall Reading Accuracy:</strong> {report.overall_score}%
-              <>
+              
                 </p>
               )}
             </div>
@@ -210,6 +210,7 @@ export default function StudentExamReports() {
 
             
             {report.exam_type === "reading" && report.sections?.length > 0 && (
+                 <>
                 <h5>Section Performance</h5>
                 <div style={{ width: "100%", height: 220 }}>
                   <ResponsiveContainer>
