@@ -1,0 +1,43 @@
+/* =====================================================
+   Reading Review – Question Index States
+   ===================================================== */
+
+/* Base review index circle */
+.index-circle.review {
+  font-weight: 600;
+  transition: 
+    background-color 0.2s ease,
+    transform 0.15s ease,
+    border 0.15s ease;
+}
+
+/* =============================
+   STATUS COLORS
+============================= */
+
+/* ✅ Correct answer */
+.index-circle.review.correct {
+  background-color: #2ecc71; /* green */
+  color: #ffffff;
+}
+
+/* ❌ Wrong answer */
+.index-circle.review.wrong {
+  background-color: #e74c3c; /* red */
+  color: #ffffff;
+}
+
+/* ⏭️ Skipped question */
+.index-circle.review.skipped {
+  background-color: #bdc3c7; /* grey */
+  color: #2c3e50;
+}
+
+/* =============================
+   ACTIVE QUESTION
+============================= */
+
+.index-circle.review.active {
+  border: 3px solid #000000;
+  transform: scale(1.05);
+}
