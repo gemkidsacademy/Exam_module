@@ -59,6 +59,8 @@ const [currentIndex, setCurrentIndex] = useState(0);
 const [answers, setAnswers] = useState({});
 const [visited, setVisited] = useState({});
 const [timeLeft, setTimeLeft] = useState(null);
+const [showConfirmFinish, setShowConfirmFinish] = useState(false);
+
 
 // ---------------- REPORT ----------------
 const [report, setReport] = useState(null);
@@ -452,16 +454,50 @@ return (
      
      {currentIndex === activeQuestions.length - 1 && !isReview && (
        <button
-         className="nav-btn finish"
-         onClick={() => finishExam("manual_submit")}
-       >
-         Finish Exam
-       </button>
+        className="nav-btn finish"
+        onClick={() => setShowConfirmFinish(true)}
+      >
+        Finish Exam
+      </button>
+
      )}
 
     </div>
 
   </div>
+  {showConfirmFinish && (
+  <div className="confirm-overlay">
+    <div className="confirm-modal">
+      <h3>Finish Exam?</h3>
+      <p>
+        Are you sure you want to submit your exam?
+        <br />
+        You won’t be able to change your answers after this.
+      </p>
+
+      <div className="confirm-actions">
+        <button
+          className="btn cancel"
+          onClick={() => setShowConfirmFinish(false)}
+        >
+          Cancel
+        </button>
+
+        <button
+          className="btn confirm"
+          onClick={() => {
+            setShowConfirmFinish(false);
+            finishExam("manual_submit");
+          }}
+        >
+          Yes, Submit Exam
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
 </div>
 );
 
