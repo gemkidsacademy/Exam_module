@@ -120,36 +120,7 @@ export default function ReadingComponent({
   /* =============================
      HELPERS
   ============================= */
-  const normalizeMainIdeaReadingMaterial = (rm) => {
-      if (typeof rm !== "string") return rm;
-    
-      // Only run for Main Idea / Summary legacy blobs
-      if (!rm.includes("The Age of Transparency")) return rm;
-    
-      // Split instructions from body
-      const [instructionsPart, bodyPart] = rm.split("The Age of Transparency");
-    
-      if (!bodyPart) return rm;
-    
-      // Extract numbered paragraphs like "1: ... 2: ..."
-      const paragraphMatches = [...bodyPart.matchAll(/(\d+):\s*([^]+?)(?=\n\s*\d+:|$)/g)];
-    
-      if (paragraphMatches.length === 0) return rm;
-    
-      const paragraphs = {};
-      paragraphMatches.forEach((m, idx) => {
-        // Map to 15–20 instead of 1–6
-        paragraphs[15 + idx] = m[2].trim();
-      });
-    
-      return {
-        instructions: instructionsPart.trim(),
-        title: "The Age of Transparency",
-        paragraphs
-      };
-    };
-
-  const TOPIC_LABELS = {
+    const TOPIC_LABELS = {
       main_idea: "Main Idea and Summary",
       main_idea_and_summary: "Main Idea and Summary",
       comparative_analysis: "Comparative Analysis",
@@ -521,7 +492,8 @@ const currentQuestion = questions[index];
   const options = currentQuestion.answer_options || {};
   const hasOptions = Object.keys(options).length > 0;
 
-  const rm = currentQuestion.section_ref?.reading_material ?? "";
+  const rm = currentQuestion.section_ref?.reading_material || {};
+
   
   const passageStyle =
       currentQuestion.passage_style ||
@@ -574,11 +546,29 @@ const currentQuestion = questions[index];
       <div className={`passage-pane ${passageStyle}`}>
 
         {/* LITERARY PASSAGE */}
-        {passageStyle === "literary" && (
-          <pre className="literary-passage">
-            {typeof rm === "string" ? rm : ""}
-          </pre>
+        {/* LITERARY PASSAGE (Main Idea & Summary) */}
+        {passageStyle === "literary" && rm && typeof rm === "object" && (
+          <div className="literary-passage">
+        
+            {rm.title && <h3>{rm.title}</h3>}
+        
+            {rm.instructions && (
+              <ul className="instructions">
+                {rm.instructions.map((line, i) => (
+                  <li key={i}>{line}</li>
+                ))}
+              </ul>
+            )}
+        
+            {rm.paragraphs &&
+              Object.entries(rm.paragraphs).map(([num, text]) => (
+                <p key={num} className="reading-paragraph">
+                  <strong>{num}.</strong> {text}
+                </p>
+              ))}
+          </div>
         )}
+
 
 
         {/* NON-LITERARY PASSAGE */}
