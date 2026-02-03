@@ -637,6 +637,9 @@
   border-radius: 999px;
   overflow: hidden;
   appearance: none;
+  -webkit-appearance: none;
+
+  accent-color: transparent; /* 🔥 THIS KILLS THE BLUE */
 }
 
 /* Chrome / Edge */
