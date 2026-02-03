@@ -431,8 +431,63 @@
     </div>
 
     <div className="writing-question-box">
-      ...
+  <div
+    className="prompt-header"
+    onClick={() => setShowPrompt(!showPrompt)}
+  >
+    <span>Writing Prompt</span>
+    <span>{showPrompt ? "▼ Hide" : "▶ Show"}</span>
+  </div>
+
+  {showPrompt && (
+    <div className="writing-text">
+
+      {parsedPrompt.title && (
+        <h2 className="writing-title">
+          {parsedPrompt.title}
+        </h2>
+      )}
+
+      {parsedPrompt.task && (
+        <p>
+          <strong>Task:</strong> {parsedPrompt.task}
+        </p>
+      )}
+
+      {parsedPrompt.statement && (
+        <blockquote className="writing-statement">
+          {parsedPrompt.statement}
+        </blockquote>
+      )}
+
+      {parsedPrompt.instructions && (
+        <p>
+          <strong>Instructions:</strong> {parsedPrompt.instructions}
+        </p>
+      )}
+
+      {parsedPrompt.opening_sentence && (
+        <p className="opening-sentence">
+          <em>{parsedPrompt.opening_sentence}</em>
+        </p>
+      )}
+
+      {parsedPrompt.guidelines && (
+        <>
+          <strong>Guidelines:</strong>
+          <ul>
+            {parsedPrompt.guidelines
+              .split("\n")
+              .map((line, idx) => (
+                <li key={idx}>{line}</li>
+              ))}
+          </ul>
+        </>
+      )}
+
     </div>
+  )}
+</div>
 
     <textarea
       className="writing-answer-box"
