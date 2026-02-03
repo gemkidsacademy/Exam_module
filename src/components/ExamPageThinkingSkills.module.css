@@ -74,3 +74,36 @@
   background-color: #e5e7eb;
   color: #374151;
 }
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.confirm-modal {
+  background: #fff;
+  padding: 24px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 420px;
+  text-align: center;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.confirm-actions .cancel {
+  background: #e5e7eb;
+}
+
+.confirm-actions .confirm {
+  background: #ef4444;
+  color: white;
+}
