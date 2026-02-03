@@ -25,7 +25,6 @@ export default function ReadingComponent({
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
   const [finished, setFinished] = useState(false);
-  const [showConfirmFinish, setShowConfirmFinish] = useState(false);
 
   const [attemptId, setAttemptId] = useState(null);
   const [mode, setMode] = useState("exam");
@@ -122,38 +121,33 @@ export default function ReadingComponent({
      HELPERS
   ============================= */
   const normalizeMainIdeaReadingMaterial = (rm) => {
-  if (typeof rm !== "string") return rm;
-
-  // Split instructions from paragraph body
-  const splitIndex = rm.indexOf("paragraphs:");
-  if (splitIndex === -1) return rm;
-
-  const instructions = rm.slice(0, splitIndex).trim();
-  const body = rm.slice(splitIndex + "paragraphs:".length);
-
-  // Split on " 1: ", " 2: ", etc.
-  const parts = body.split(/\s+(?=\d+:)/);
-
-  const paragraphs = {};
-  parts.forEach((p, idx) => {
-    const match = p.match(/^(\d+):\s*(.*)$/s);
-    if (match) {
-      paragraphs[15 + idx] = match[2].trim();
-    }
-  });
-
-  if (Object.keys(paragraphs).length === 0) {
-    console.warn("⚠️ Main Idea normalization failed — no paragraphs detected");
-    return rm;
-  }
-
-  return {
-    instructions,
-    title: "The Age of Transparency",
-    paragraphs
-  };
-};
-
+      if (typeof rm !== "string") return rm;
+    
+      // Only run for Main Idea / Summary legacy blobs
+      if (!rm.includes("The Age of Transparency")) return rm;
+    
+      // Split instructions from body
+      const [instructionsPart, bodyPart] = rm.split("The Age of Transparency");
+    
+      if (!bodyPart) return rm;
+    
+      // Extract numbered paragraphs like "1: ... 2: ..."
+      const paragraphMatches = [...bodyPart.matchAll(/(\d+):\s*([^]+?)(?=\n\s*\d+:|$)/g)];
+    
+      if (paragraphMatches.length === 0) return rm;
+    
+      const paragraphs = {};
+      paragraphMatches.forEach((m, idx) => {
+        // Map to 15–20 instead of 1–6
+        paragraphs[15 + idx] = m[2].trim();
+      });
+    
+      return {
+        instructions: instructionsPart.trim(),
+        title: "The Age of Transparency",
+        paragraphs
+      };
+    };
 
   const TOPIC_LABELS = {
       main_idea: "Main Idea and Summary",
@@ -274,24 +268,20 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
      TIMER
   ============================= */
   useEffect(() => {
-  if (timeLeft === null || finished) return;
+  if (timeLeft === null) return;
 
-  // ⏱️ TIME UP ALWAYS WINS
-  if (timeLeft <= 0) {
-    setShowConfirmFinish(false); // close modal if open
+  if (timeLeft <= 0 && !finished) {
     autoSubmit();
     return;
   }
-
-  // ⏸️ pause timer while confirm modal is open
-  if (showConfirmFinish) return;
 
   const t = setInterval(() => {
     setTimeLeft((v) => (v > 0 ? v - 1 : 0));
   }, 1000);
 
   return () => clearInterval(t);
-}, [timeLeft, finished, showConfirmFinish]);
+}, [timeLeft, finished]);
+
 
   /* =============================
      GROUP QUESTIONS BY TOPIC
@@ -420,25 +410,14 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
           OVERALL ACCURACY
       ============================= */}
       <div className="card">
-      <h3>Overall Accuracy</h3>
-    
-      <div
-        className="accuracy-circle"
-        style={{ "--p": normalizedReport.accuracy }}
-      >
-        <span>{normalizedReport.accuracy}%</span>
+        <h3>Accuracy</h3>
+        <div
+          className="accuracy-circle"
+          style={{ "--p": normalizedReport.accuracy }}
+        >
+          <span>{normalizedReport.accuracy}%</span>
+        </div>
       </div>
-    
-      <div className="overall-stats">
-        <div>Total Questions: {normalizedReport.total}</div>
-        <div>Attempted: {normalizedReport.attempted}</div>
-        <div>Correct: {normalizedReport.correct}</div>
-        <div>Incorrect: {normalizedReport.incorrect}</div>
-        <div>Not Attempted: {normalizedReport.not_attempted}</div>
-        <div>Score: {normalizedReport.score}%</div>
-      </div>
-    </div>
-
 
       {/* =============================
           TOPIC BREAKDOWN
@@ -542,31 +521,13 @@ const currentQuestion = questions[index];
   const options = currentQuestion.answer_options || {};
   const hasOptions = Object.keys(options).length > 0;
 
-  /* const rm = currentQuestion.section_ref?.reading_material ?? "";*/
-  const rawRm = currentQuestion.section_ref?.reading_material ?? "";
-  const rm = normalizeMainIdeaReadingMaterial(rawRm);
+  const rm = currentQuestion.section_ref?.reading_material ?? "";
   
   const passageStyle =
-  ["main_idea", "main_idea_and_summary"].includes(
-  currentQuestion.section_ref?.question_type
-)
-
-    ? "informational"
-    : currentQuestion.passage_style ||
+      currentQuestion.passage_style ||
       currentQuestion.section_ref?.passage_style ||
       "informational";
 
-    console.log("MAIN IDEA DEBUG", {
-  question_type: currentQuestion.section_ref?.question_type,
-  passageStyle,
-  rmType: typeof rm,
-  hasParagraphs: !!rm?.paragraphs,
-  paragraphKeys: rm?.paragraphs && Object.keys(rm.paragraphs),
-  rmPreview:
-    typeof rm === "string"
-      ? rm.slice(0, 120)
-      : rm
-});
 
   
 
@@ -613,9 +574,9 @@ const currentQuestion = questions[index];
       <div className={`passage-pane ${passageStyle}`}>
 
         {/* LITERARY PASSAGE */}
-        {passageStyle === "literary" && typeof rm === "string" && (
+        {passageStyle === "literary" && (
           <pre className="literary-passage">
-            {rm}
+            {typeof rm === "string" ? rm : ""}
           </pre>
         )}
 
@@ -689,7 +650,7 @@ const currentQuestion = questions[index];
               type="button"
               onClick={(e) => {
                 e.preventDefault();
-                setShowConfirmFinish(true);
+                autoSubmit();
               }}
             >
               Finish
@@ -700,38 +661,6 @@ const currentQuestion = questions[index];
         </div>
       </div>
     </div>
-    {showConfirmFinish && (
-  <div className="confirm-overlay">
-    <div className="confirm-modal">
-      <h3>Finish Reading Exam?</h3>
-      <p>
-        Are you sure you want to submit your reading exam?
-        <br />
-        You won’t be able to change your answers after this.
-      </p>
-
-      <div className="confirm-actions">
-        <button
-          className="btn cancel"
-          onClick={() => setShowConfirmFinish(false)}
-        >
-          Cancel
-        </button>
-
-        <button
-          className="btn confirm"
-          onClick={() => {
-            setShowConfirmFinish(false);
-            autoSubmit(); // ✅ final submit
-          }}
-        >
-          Yes, Submit Exam
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
   </div>
 );
 
