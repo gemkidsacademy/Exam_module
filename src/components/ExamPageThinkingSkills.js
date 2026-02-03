@@ -178,16 +178,19 @@ useEffect(() => {
   if (mode !== "exam" || timeLeft === null) return;
 
   if (timeLeft <= 0) {
+    setShowConfirmFinish(false); // ✅ force-close modal
     finishExam("time_expired");
     return;
   }
+
+  if (showConfirmFinish) return;
 
   const interval = setInterval(() => {
     setTimeLeft(t => t - 1);
   }, 1000);
 
   return () => clearInterval(interval);
-}, [timeLeft, mode, finishExam]);
+}, [timeLeft, mode, showConfirmFinish, finishExam]);
 
 /* ============================================================
    ANSWER HANDLING
