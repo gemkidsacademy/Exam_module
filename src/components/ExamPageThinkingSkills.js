@@ -535,7 +535,14 @@ return (
       className="view-exam-btn"
       onClick={() => {
         console.log("🟢 View Exam Details button clicked");
-        onViewExamDetails();
+    
+        // 🔥 force clean transition
+        setQuestions([]);
+        setCurrentIndex(0);
+        setVisited({});
+        setAnswers({});
+    
+        setMode("review");
       }}
     >
       View Exam Details
