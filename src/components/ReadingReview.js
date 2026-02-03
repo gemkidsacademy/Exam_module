@@ -32,6 +32,7 @@ export default function ReadingReview({ questions = [], onExit }) {
 
 
   const currentQuestion = questions[index];
+  
 
   if (!currentQuestion) {
     return <div>No review data available.</div>;
@@ -53,7 +54,11 @@ export default function ReadingReview({ questions = [], onExit }) {
       ? currentQuestion.answer_options
       : currentQuestion.reading_material?.options || {};
 
-  const rm = currentQuestion.reading_material ?? {};
+  const rm =
+    currentQuestion.reading_material ||
+    currentQuestion.section_ref?.reading_material ||
+    {};
+
   const passageStyle = currentQuestion.passage_style || "informational";
 
   /* =============================
@@ -139,11 +144,27 @@ export default function ReadingReview({ questions = [], onExit }) {
         ============================= */}
         <div className={`passage-pane ${passageStyle}`}>
           {/* Literary */}
-          {passageStyle === "literary" && (
-            <pre className="literary-passage">
-              {typeof rm === "string" ? rm : ""}
-            </pre>
-          )}
+          {passageStyle === "literary" && rm && typeof rm === "object" && (
+            <div className="literary-passage">
+              {rm.title && <h3>{rm.title}</h3>}
+            
+              {rm.instructions && (
+                <ul className="instructions">
+                  {rm.instructions.map((line, i) => (
+                    <li key={i}>{line}</li>
+                  ))}
+                </ul>
+              )}
+            
+              {rm.paragraphs &&
+                Object.entries(rm.paragraphs).map(([num, text]) => (
+                  <p key={num} className="reading-paragraph">
+                    <strong>{num}.</strong> {text}
+                  </p>
+                ))}
+            </div>
+            )}
+
 
           {/* Non-literary / Gapped */}
           {passageStyle !== "literary" && (
