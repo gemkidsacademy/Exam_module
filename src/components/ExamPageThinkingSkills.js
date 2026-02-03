@@ -34,6 +34,17 @@ if (!API_BASE) {
   throw new Error("❌ REACT_APP_API_URL is not defined");
 }
 const [examAttemptId, setExamAttemptId] = useState(null);
+const handleViewExamDetails = () => {
+  console.log("🟢 View Exam Details button clicked");
+
+  // 🔥 force clean transition
+  setQuestions([]);
+  setCurrentIndex(0);
+  setVisited({});
+  setAnswers({});
+
+  setMode("review");
+};
 
 
 
@@ -248,9 +259,10 @@ if (mode === "loading") {
 if (mode === "report") {
   return (
     <ThinkingSkillsReport
-      report={report}
-      onViewExamDetails={() => setMode("review")}
-    />
+     report={report}
+     onViewExamDetails={handleViewExamDetails}
+   />
+
   );
 }
  
@@ -533,20 +545,11 @@ return (
     </h2>
     <button
       className="view-exam-btn"
-      onClick={() => {
-        console.log("🟢 View Exam Details button clicked");
-    
-        // 🔥 force clean transition
-        setQuestions([]);
-        setCurrentIndex(0);
-        setVisited({});
-        setAnswers({});
-    
-        setMode("review");
-      }}
+      onClick={onViewExamDetails}
     >
       View Exam Details
     </button>
+
 
 
 
