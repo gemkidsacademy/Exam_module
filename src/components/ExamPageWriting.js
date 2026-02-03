@@ -357,8 +357,18 @@
       </p>
 
       <div className="score-bar">
-        <div style={{ height: 14, background: "red" }} />
+        <span>
+          Writing Score: {result.score} / 25
+        </span>
+      
+        <div className="score-progress">
+          <div
+            className="score-progress-fill"
+            style={{ width: `${(result.score / 25) * 100}%` }}
+          />
+        </div>
       </div>
+
 
 
       <p className="advisory-text">{result.advisory}</p>
