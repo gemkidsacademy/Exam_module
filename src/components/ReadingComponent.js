@@ -25,6 +25,7 @@ export default function ReadingComponent({
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
   const [finished, setFinished] = useState(false);
+  const [showConfirmFinish, setShowConfirmFinish] = useState(false);
 
   const [attemptId, setAttemptId] = useState(null);
   const [mode, setMode] = useState("exam");
@@ -273,20 +274,24 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
      TIMER
   ============================= */
   useEffect(() => {
-  if (timeLeft === null) return;
+  if (timeLeft === null || finished) return;
 
-  if (timeLeft <= 0 && !finished) {
+  // ⏱️ TIME UP ALWAYS WINS
+  if (timeLeft <= 0) {
+    setShowConfirmFinish(false); // close modal if open
     autoSubmit();
     return;
   }
+
+  // ⏸️ pause timer while confirm modal is open
+  if (showConfirmFinish) return;
 
   const t = setInterval(() => {
     setTimeLeft((v) => (v > 0 ? v - 1 : 0));
   }, 1000);
 
   return () => clearInterval(t);
-}, [timeLeft, finished]);
-
+}, [timeLeft, finished, showConfirmFinish]);
 
   /* =============================
      GROUP QUESTIONS BY TOPIC
@@ -684,7 +689,7 @@ const currentQuestion = questions[index];
               type="button"
               onClick={(e) => {
                 e.preventDefault();
-                autoSubmit();
+                setShowConfirmFinish(true);
               }}
             >
               Finish
@@ -695,6 +700,38 @@ const currentQuestion = questions[index];
         </div>
       </div>
     </div>
+    {showConfirmFinish && (
+  <div className="confirm-overlay">
+    <div className="confirm-modal">
+      <h3>Finish Reading Exam?</h3>
+      <p>
+        Are you sure you want to submit your reading exam?
+        <br />
+        You won’t be able to change your answers after this.
+      </p>
+
+      <div className="confirm-actions">
+        <button
+          className="btn cancel"
+          onClick={() => setShowConfirmFinish(false)}
+        >
+          Cancel
+        </button>
+
+        <button
+          className="btn confirm"
+          onClick={() => {
+            setShowConfirmFinish(false);
+            autoSubmit(); // ✅ final submit
+          }}
+        >
+          Yes, Submit Exam
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
   </div>
 );
 
