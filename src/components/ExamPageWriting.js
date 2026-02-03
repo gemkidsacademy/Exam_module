@@ -54,6 +54,8 @@
     const [showPrompt, setShowPrompt] = useState(true);
     const [result, setResult] = useState(null);
     const [submitting, setSubmitting] = useState(false);
+    const [showConfirmFinish, setShowConfirmFinish] = useState(false);
+
     
 
 
@@ -167,14 +169,18 @@
     useEffect(() => {
   if (loading || completed || submitting) return;
 
+  // ⏱️ time up always wins
   if (timeLeft <= 0) return;
+
+  // ⏸️ pause timer while confirm modal is open
+  if (showConfirmFinish) return;
 
   const timer = setInterval(() => {
     setTimeLeft(t => Math.max(0, t - 1));
   }, 1000);
 
   return () => clearInterval(timer);
-}, [timeLeft, loading, completed, submitting]);
+}, [timeLeft, loading, completed, submitting, showConfirmFinish]);
 
     useEffect(() => {
   if (
@@ -183,10 +189,13 @@
     !completed &&
     !submitting
   ) {
-    console.log("⏰ Time up → auto submitting writing exam");
+    setShowConfirmFinish(false); // 👈 close modal
     finishExam();
   }
 }, [timeLeft, examActive, completed, submitting]);
+
+    
+    
     /* -----------------------------------------------------------
        ON MOUNT: Start exam → Load exam
     ----------------------------------------------------------- */
@@ -402,6 +411,8 @@
 
         </div>
       )}
+    
+
     </div>
   );
 }
@@ -414,100 +425,69 @@
     console.log("🧠 Rendering ACTIVE writing exam");
   
     return (
-      <div className="writing-container">
-        <div className="writing-header">
-          <div className="timer">Time Left: {formatTime(timeLeft)}</div>
-        </div>
-  
-        <div className="writing-question-box">
-          <div
-            className="prompt-header"
-            onClick={() => setShowPrompt(!showPrompt)}
-          >
-            <span>Writing Prompt</span>
-            <span>{showPrompt ? "▼ Hide" : "▶ Show"}</span>
-          </div>
-  
-          {showPrompt && (
-            <div className="writing-text">
-          
-              {parsedPrompt.title && (
-                <h2 className="writing-title">
-                  {parsedPrompt.title}
-                </h2>
-              )}
-          
-              {parsedPrompt.task && (
-                <p>
-                  <strong>Task:</strong> {parsedPrompt.task}
-                </p>
-              )}
-          
-              {parsedPrompt.statement && (
-                <blockquote className="writing-statement">
-                  {parsedPrompt.statement}
-                </blockquote>
-              )}
-          
-              {parsedPrompt.instructions && (
-                <p>
-                  <strong>Instructions:</strong> {parsedPrompt.instructions}
-                </p>
-              )}
-          
-              {parsedPrompt.opening_sentence && (
-                <p className="opening-sentence">
-                  <em>{parsedPrompt.opening_sentence}</em>
-                </p>
-              )}
-          
-              {parsedPrompt.guidelines && (
-                <>
-                  <strong>Guidelines:</strong>
-                  <ul>
-                    {parsedPrompt.guidelines
-                      .split("\n")
-                      .map((line, idx) => (
-                        <li key={idx}>{line}</li>
-                      ))}
-                  </ul>
-                </>
-              )}
-          
-            </div>
-          )}
+  <div className="writing-container">
+    <div className="writing-header">
+      <div className="timer">Time Left: {formatTime(timeLeft)}</div>
+    </div>
 
-        </div>
-  
-        <textarea
-          className="writing-answer-box"
-          spellCheck={false}
-          placeholder={
-            submitting
-              ? "Submitting your writing for evaluation..."
-              : "Start writing your response here..."
-          }
-          value={answerText}
-          disabled={submitting || timeLeft === 0}
-          
-          onChange={(e) => setAnswerText(e.target.value)}
-        />
+    <div className="writing-question-box">
+      ...
+    </div>
 
+    <textarea
+      className="writing-answer-box"
+      spellCheck={false}
+      value={answerText}
+      disabled={submitting || timeLeft === 0}
+      onChange={(e) => setAnswerText(e.target.value)}
+    />
 
-  
-        <button
-          className="submit-writing-btn"
-          onClick={finishExam}
-          disabled={submitting}
-        >
-          {submitting ? "Evaluating…" : "Submit Writing"}
-        </button>
-        {submitting && (
-          <div className="processing-overlay">
-            <div className="spinner" />
-            <p>Evaluating your writing. Please wait…</p>
-          </div>
-        )}
+    <button
+      className="submit-writing-btn"
+      onClick={() => setShowConfirmFinish(true)}
+      disabled={submitting}
+    >
+      Submit Writing
+    </button>
+
+    {submitting && (
+      <div className="processing-overlay">
+        <div className="spinner" />
+        <p>Evaluating your writing. Please wait…</p>
       </div>
-    );
-  }
+    )}
+
+    {/* ✅ CONFIRM SUBMIT MODAL — HERE */}
+    {showConfirmFinish && (
+      <div className="confirm-overlay">
+        <div className="confirm-modal">
+          <h3>Submit Writing?</h3>
+          <p>
+            Are you sure you want to submit your writing?
+            <br />
+            You won’t be able to edit it after submission.
+          </p>
+
+          <div className="confirm-actions">
+            <button
+              className="btn cancel"
+              onClick={() => setShowConfirmFinish(false)}
+            >
+              Cancel
+            </button>
+
+            <button
+              className="btn confirm"
+              onClick={() => {
+                setShowConfirmFinish(false);
+                finishExam();
+              }}
+            >
+              Yes, Submit Writing
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+);
