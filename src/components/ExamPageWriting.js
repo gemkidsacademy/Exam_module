@@ -357,10 +357,7 @@
       </p>
 
       <div className="score-bar">
-        <span>
-          Writing Score: {result.score} / 25
-        </span>
-        <progress value={result.score} max={25} />
+        <div style={{ height: 14, background: "red" }} />
       </div>
 
 
