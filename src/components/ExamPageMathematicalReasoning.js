@@ -31,6 +31,8 @@ const [mode, setMode] = useState("loading");
 
 // ---------------- EXAM STATE ----------------
 const [questions, setQuestions] = useState([]);
+const [showConfirmFinish, setShowConfirmFinish] = useState(false);
+
 
 const [reviewQuestions, setReviewQuestions] = useState([]);
 const activeQuestions =
@@ -218,17 +220,22 @@ const finishExam = useCallback(
 useEffect(() => {
   if (mode !== "exam" || timeLeft === null) return;
 
+  // ⏱️ TIME UP ALWAYS WINS
   if (timeLeft <= 0) {
+    setShowConfirmFinish(false); // close modal if open
     finishExam("time_expired");
     return;
   }
+
+  // ⏸️ pause timer while confirm modal is open
+  if (showConfirmFinish) return;
 
   const interval = setInterval(() => {
     setTimeLeft(t => t - 1);
   }, 1000);
 
   return () => clearInterval(interval);
-}, [timeLeft, mode, finishExam]);
+}, [timeLeft, mode, showConfirmFinish, finishExam]);
 
 /* ============================================================
    ANSWER HANDLING
@@ -479,14 +486,47 @@ return (
       {mode !== "review" &&
         currentIndex === activeQuestions.length - 1 && (
           <button
-            className="nav-btn finish"
-            onClick={() => finishExam("manual_submit")}
-          >
-            Finish Exam
-          </button>
+           className="nav-btn finish"
+           onClick={() => setShowConfirmFinish(true)}
+         >
+           Finish Exam
+         </button>
+
         )}
     </div>
   </div> 
+  {showConfirmFinish && (
+  <div className="confirm-overlay">
+    <div className="confirm-modal">
+      <h3>Finish Exam?</h3>
+      <p>
+        Are you sure you want to submit your exam?
+        <br />
+        You won’t be able to change your answers after this.
+      </p>
+
+      <div className="confirm-actions">
+        <button
+          className="btn cancel"
+          onClick={() => setShowConfirmFinish(false)}
+        >
+          Cancel
+        </button>
+
+        <button
+          className="btn confirm"
+          onClick={() => {
+            setShowConfirmFinish(false);
+            finishExam("manual_submit");
+          }}
+        >
+          Yes, Submit Exam
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+   
 </div>
 )
 }
