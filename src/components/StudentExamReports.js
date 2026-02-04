@@ -199,7 +199,7 @@ export default function StudentExamReports() {
                   </p>
                 )}
 
-              {/* Reading */}
+              {/* Reading (extra features)
               {report.exam_type === "reading" && (
                 <div className="reading-score">
                   <p>
@@ -213,7 +213,13 @@ export default function StudentExamReports() {
                   </p>
                 </div>
               )}
+              */}
 
+            {report.exam_type === "reading" && (
+              <p className="reading-score">
+                <strong>Overall Reading Score:</strong> {report.overall_score}%
+              </p>
+            )}
 
             </div>
              {/* Mathematical Reasoning */}
