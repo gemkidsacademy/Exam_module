@@ -56,6 +56,17 @@ export default function StudentExamReports() {
   /* ============================
      Helpers
   ============================ */
+  const parseSummaryNotes = (notes) => {
+    if (!notes) return {};
+    const result = {};
+    notes.split(",").forEach(part => {
+      const [key, value] = part.split(":").map(s => s.trim());
+      if (key && value) {
+        result[key.toLowerCase()] = value.replace("%", "");
+      }
+    });
+    return result;
+  };
 
   const formatExamName = (type) =>
     type ? type.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase()) : "Unknown Exam";
@@ -163,7 +174,8 @@ export default function StudentExamReports() {
           score: SECTION_GRADE_MAP[s.performance_band] || 0
         }));
 
-        
+        const summary = parseSummaryNotes(report.summary_notes);
+
         return (
           <div key={report.id} className="exam-report-card">
 
@@ -189,11 +201,20 @@ export default function StudentExamReports() {
 
               {/* Reading */}
               {report.exam_type === "reading" && (
-                <p className="reading-score">
-                  <strong>Overall Reading Accuracy:</strong> {report.overall_score}%
-              
-                </p>
+                <div className="reading-score">
+                  <p>
+                    <strong>Overall Reading Score:</strong> {summary.score || report.overall_score}%
+                  </p>
+                  <p>
+                    <strong>Exam Coverage:</strong> {summary.coverage}%
+                  </p>
+                  <p>
+                    <strong>Accuracy (attempted questions):</strong> {summary.accuracy}%
+                  </p>
+                </div>
               )}
+
+
             </div>
              {/* Mathematical Reasoning */}
               {report.exam_type === "mathematical_reasoning" && (
