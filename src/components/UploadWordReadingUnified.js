@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import "./UploadPDF.css";
 
 export default function UploadWordReadingUnified() {
@@ -49,14 +49,12 @@ export default function UploadWordReadingUnified() {
 
       const data = await res.json();
 
-      // Hard failure only when backend could not process anything
       if (!res.ok && !data?.progress) {
         throw new Error(data.detail || "Upload failed");
       }
 
       setResult(data);
 
-      // Clear file ONLY on full success
       if (data.status === "success") {
         setWordFile(null);
       }
@@ -67,6 +65,31 @@ export default function UploadWordReadingUnified() {
       setUploading(false);
     }
   };
+
+  /* -------------------------------
+     NORMALISE PROGRESS PER BLOCK
+  -------------------------------- */
+  const blocks = useMemo(() => {
+    if (!result?.progress) return [];
+
+    const map = {};
+
+    result.progress.forEach((p) => {
+      if (!map[p.block]) {
+        map[p.block] = {
+          block: p.block,
+          question_type: p.question_type || "—",
+          status: p.status,
+          reason: p.reason || null,
+        };
+      } else {
+        map[p.block].status = p.status;
+        if (p.reason) map[p.block].reason = p.reason;
+      }
+    });
+
+    return Object.values(map).sort((a, b) => a.block - b.block);
+  }, [result]);
 
   return (
     <div className="upload-pdf-container">
@@ -92,48 +115,51 @@ export default function UploadWordReadingUnified() {
         Comprehension exams (Comparative, Gapped Text, Main Idea, Literary).
       </p>
 
-      {/* ---------- ERROR ---------- */}
+      {/* -------- ERROR -------- */}
       {error && (
         <div className="upload-error">
           <strong>Error:</strong> {error}
         </div>
       )}
 
-      {/* ---------- RESULT SUMMARY ---------- */}
+      {/* -------- SUMMARY -------- */}
       {result && (
         <div className="upload-result">
+          <h3>Upload Summary</h3>
           <p><strong>Status:</strong> {result.status}</p>
           <p><strong>Upload ID:</strong> {result.upload_id}</p>
           <p><strong>Total Blocks:</strong> {result.total_blocks}</p>
           <p><strong>Saved Exams:</strong> {result.saved_exam_ids.length}</p>
 
-          {/* ---------- PROGRESS DETAILS ---------- */}
-          {result.progress?.length > 0 && (
+          {/* -------- BLOCK REPORT TABLE -------- */}
+          {blocks.length > 0 && (
             <>
-              <p><strong>Processing Details:</strong></p>
-              <ul>
-                {result.progress.map((p, i) => (
-                  <li key={i}>
-                    Block {p.block} — {p.status}
-                    {p.question_type && ` (${p.question_type})`}
-                    {p.reason && ` — ${p.reason}`}
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
+              <h3>Block Processing Report</h3>
 
-          {/* ---------- FAILED BLOCKS ---------- */}
-          {result.failed_blocks?.length > 0 && (
-            <>
-              <p><strong>Failed Blocks:</strong></p>
-              <ul>
-                {result.failed_blocks.map((f, i) => (
-                  <li key={i}>
-                    Block {f.block}: {f.reason}
-                  </li>
-                ))}
-              </ul>
+              <table className="upload-report">
+                <thead>
+                  <tr>
+                    <th>Block</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {blocks.map((b) => (
+                    <tr key={b.block}>
+                      <td>{b.block}</td>
+                      <td>{b.question_type}</td>
+                      <td>
+                        {b.status === "saved" && "✅ Saved"}
+                        {b.status === "failed" && "❌ Failed"}
+                        {b.status === "processing" && "⏳ Processing"}
+                      </td>
+                      <td>{b.reason || "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </>
           )}
         </div>
