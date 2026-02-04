@@ -5,6 +5,7 @@ export default function UploadWordReadingUnified() {
   const [wordFile, setWordFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -17,6 +18,7 @@ export default function UploadWordReadingUnified() {
 
     setWordFile(file);
     setResult(null);
+    setError(null);
   };
 
   const handleUpload = async (e) => {
@@ -32,9 +34,12 @@ export default function UploadWordReadingUnified() {
 
     setUploading(true);
     setResult(null);
+    setError(null);
+
+    let res;
 
     try {
-      const res = await fetch(
+      res = await fetch(
         "https://web-production-481a5.up.railway.app/upload-word-reading-unified",
         {
           method: "POST",
@@ -44,17 +49,22 @@ export default function UploadWordReadingUnified() {
 
       const data = await res.json();
 
-      if (!res.ok) {
+      // Hard failure only when backend could not process anything
+      if (!res.ok && !data?.progress) {
         throw new Error(data.detail || "Upload failed");
       }
 
       setResult(data);
+
+      // Clear file ONLY on full success
+      if (data.status === "success") {
+        setWordFile(null);
+      }
     } catch (err) {
       console.error(err);
-      alert("Error uploading Word document. Please check the file format.");
+      setError(err.message || "Unexpected upload error");
     } finally {
       setUploading(false);
-      setWordFile(null);
     }
   };
 
@@ -67,6 +77,7 @@ export default function UploadWordReadingUnified() {
           type="file"
           accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
           onChange={handleFileChange}
+          disabled={uploading}
         />
 
         <button type="submit" disabled={uploading}>
@@ -81,6 +92,14 @@ export default function UploadWordReadingUnified() {
         Comprehension exams (Comparative, Gapped Text, Main Idea, Literary).
       </p>
 
+      {/* ---------- ERROR ---------- */}
+      {error && (
+        <div className="upload-error">
+          <strong>Error:</strong> {error}
+        </div>
+      )}
+
+      {/* ---------- RESULT SUMMARY ---------- */}
       {result && (
         <div className="upload-result">
           <p><strong>Status:</strong> {result.status}</p>
@@ -88,6 +107,23 @@ export default function UploadWordReadingUnified() {
           <p><strong>Total Blocks:</strong> {result.total_blocks}</p>
           <p><strong>Saved Exams:</strong> {result.saved_exam_ids.length}</p>
 
+          {/* ---------- PROGRESS DETAILS ---------- */}
+          {result.progress?.length > 0 && (
+            <>
+              <p><strong>Processing Details:</strong></p>
+              <ul>
+                {result.progress.map((p, i) => (
+                  <li key={i}>
+                    Block {p.block} — {p.status}
+                    {p.question_type && ` (${p.question_type})`}
+                    {p.reason && ` — ${p.reason}`}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {/* ---------- FAILED BLOCKS ---------- */}
           {result.failed_blocks?.length > 0 && (
             <>
               <p><strong>Failed Blocks:</strong></p>
