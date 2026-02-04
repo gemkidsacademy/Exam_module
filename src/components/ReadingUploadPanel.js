@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./ReadingUploadPanel.css";
-import UploadWord_reading_GT from "./UploadWord_reading_GT";
+import UploadWord_reading_GT from "./UploadWord_reading_GT"; 
 import UploadWord_reading_CA from "./UploadWord_reading_CA";//handles 4 extracts
 import UploadWord_reading_MI_Type2 from "./UploadWord_reading_MI_Type2";
 import UploadWordReadingUnified from "./UploadWordReadingUnified";
