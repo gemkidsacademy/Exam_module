@@ -38,7 +38,6 @@ export default function UploadWord() {
       if (!res.ok) throw new Error("Upload failed");
 
       const data = await res.json();
-
       setBlockReport(data.blocks || []);
       setSummary(data.summary || null);
       setWordFile(null);
@@ -50,9 +49,19 @@ export default function UploadWord() {
     }
   };
 
+  // -----------------------------
+  // Frontend-derived counts
+  // -----------------------------
+  const failedBlocks = blockReport.filter(
+    (b) => b.status === "failed"
+  ).length;
+
+  const totalSkipped =
+    (summary?.skipped_partial || 0) + failedBlocks;
+
   return (
     <div className="upload-pdf-container">
-      <h2>Upload Word Document for Thinking Skills/Mathematical Reasoning</h2>
+      <h2>Upload Word Document for Thinking Skills / Mathematical Reasoning</h2>
 
       <form onSubmit={handleUpload}>
         <input
@@ -87,43 +96,39 @@ export default function UploadWord() {
       {summary && (
         <div style={{ marginTop: "16px", fontSize: "14px" }}>
           ✅ Saved: <strong>{summary.saved}</strong> &nbsp;|&nbsp;
-          ⚠️ Skipped: <strong>{summary.skipped_partial}</strong>
+          ⚠️ Skipped: <strong>{totalSkipped}</strong>
         </div>
       )}
 
       {blockReport.length > 0 && (
-  <div style={{ marginTop: "24px" }}>
-    <h3>Block Processing Report</h3>
+        <div style={{ marginTop: "24px" }}>
+          <h3>Block Processing Report</h3>
 
-    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-      <thead>
-        <tr>
-          <th>Block</th>
-          <th>Status</th>
-          <th>Details</th>
-        </tr>
-      </thead>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr>
+                <th>Block</th>
+                <th>Status</th>
+                <th>Details</th>
+              </tr>
+            </thead>
 
-      <tbody>
-        {blockReport.map((row, idx) => (
-          <tr key={idx}>
-            <td>{row.block}</td>
-
-            <td style={{ textAlign: "center" }}>
-              {row.status === "success" && "✅"}
-              {row.status === "failed" && "❌"}
-              {row.status === "partial" && "⚠️"}
-            </td>
-
-            <td>{row.details}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)}
-
-      
+            <tbody>
+              {blockReport.map((row, idx) => (
+                <tr key={idx}>
+                  <td>{row.block}</td>
+                  <td style={{ textAlign: "center" }}>
+                    {row.status === "success" && "✅"}
+                    {row.status === "failed" && "❌"}
+                    {row.status === "partial" && "⚠️"}
+                  </td>
+                  <td>{row.details}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
