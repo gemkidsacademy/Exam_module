@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./UploadPDF.css"; // You can rename this if you want
+import "./UploadPDF.css";
 
 export default function UploadWord() {
   const [wordFile, setWordFile] = useState(null);
@@ -11,6 +11,7 @@ export default function UploadWord() {
 
   const handleUpload = async (e) => {
     e.preventDefault();
+
     if (!wordFile) {
       alert("Please select a Word document first.");
       return;
@@ -19,14 +20,16 @@ export default function UploadWord() {
     const formData = new FormData();
     formData.append("file", wordFile);
 
-
     setUploading(true);
 
     try {
-      const res = await fetch("https://web-production-481a5.up.railway.app/upload-word", {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch(
+        "https://web-production-481a5.up.railway.app/upload-word",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (!res.ok) throw new Error("Upload failed");
 
@@ -50,11 +53,19 @@ export default function UploadWord() {
           type="file"
           accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
           onChange={handleFileChange}
+          disabled={uploading}
         />
 
         <button type="submit" disabled={uploading}>
           {uploading ? "Uploading..." : "Upload Word File"}
         </button>
+
+        {/* INLINE WAIT MESSAGE */}
+        {uploading && (
+          <div className="upload-wait-inline">
+            ⏳ Please wait… processing your Word document.
+          </div>
+        )}
       </form>
 
       {wordFile && <p>Selected file: {wordFile.name}</p>}
