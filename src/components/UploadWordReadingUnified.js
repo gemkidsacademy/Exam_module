@@ -36,10 +36,8 @@ export default function UploadWordReadingUnified() {
     setResult(null);
     setError(null);
 
-    let res;
-
     try {
-      res = await fetch(
+      const res = await fetch(
         "https://web-production-481a5.up.railway.app/upload-word-reading-unified",
         {
           method: "POST",
@@ -93,6 +91,17 @@ export default function UploadWordReadingUnified() {
 
   return (
     <div className="upload-pdf-container">
+      {/* ---------- WAIT OVERLAY ---------- */}
+      {uploading && (
+        <div className="upload-overlay">
+          <div className="upload-overlay-box">
+            ⏳ Please wait
+            <br />
+            Processing Word document…
+          </div>
+        </div>
+      )}
+
       <h2>Upload Reading Comprehension Word Document</h2>
 
       <form onSubmit={handleUpload}>
@@ -104,9 +113,15 @@ export default function UploadWordReadingUnified() {
         />
 
         <button type="submit" disabled={uploading}>
-          {uploading ? "Uploading..." : "Upload Word File"}
+          {uploading ? "Uploading…" : "Upload Word File"}
         </button>
       </form>
+      {uploading && (
+        <div className="upload-wait-inline">
+          ⏳ Please wait… processing your Word document.
+        </div>
+      )}
+
 
       {wordFile && <p>Selected file: {wordFile.name}</p>}
 
@@ -115,23 +130,31 @@ export default function UploadWordReadingUnified() {
         Comprehension exams (Comparative, Gapped Text, Main Idea, Literary).
       </p>
 
-      {/* -------- ERROR -------- */}
+      {/* ---------- ERROR ---------- */}
       {error && (
         <div className="upload-error">
           <strong>Error:</strong> {error}
         </div>
       )}
 
-      {/* -------- SUMMARY -------- */}
+      {/* ---------- SUMMARY ---------- */}
       {result && (
         <div className="upload-result">
           <h3>Upload Summary</h3>
-          <p><strong>Status:</strong> {result.status}</p>
-          <p><strong>Upload ID:</strong> {result.upload_id}</p>
-          <p><strong>Total Blocks:</strong> {result.total_blocks}</p>
-          <p><strong>Saved Exams:</strong> {result.saved_exam_ids.length}</p>
 
-          {/* -------- BLOCK REPORT TABLE -------- */}
+          <p>
+            <strong>Status:</strong> {result.status}
+          </p>
+          <p>
+            <strong>Upload ID:</strong> {result.upload_id}
+          </p>
+          <p>
+            <strong>Total Blocks:</strong> {result.total_blocks}
+          </p>
+          <p>
+            <strong>Saved Exams:</strong> {result.saved_exam_ids.length}
+          </p>
+
           {blocks.length > 0 && (
             <>
               <h3>Block Processing Report</h3>
