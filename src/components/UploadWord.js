@@ -92,36 +92,36 @@ export default function UploadWord() {
       )}
 
       {blockReport.length > 0 && (
-        <div style={{ marginTop: "24px" }}>
-          <h3>Block Processing Report</h3>
+  <div style={{ marginTop: "24px" }}>
+    <h3>Block Processing Report</h3>
 
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                <th>Block</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Details</th>
-              </tr>
-            </thead>
+    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <thead>
+        <tr>
+          <th>Block</th>
+          <th>Status</th>
+          <th>Details</th>
+        </tr>
+      </thead>
 
-            <tbody>
-              {blockReport.map((row, idx) => (
-                <tr key={idx}>
-                  <td>{row.block}</td>
-                  <td>{row.type}</td>
-                  <td style={{ textAlign: "center" }}>
-                    {row.status === "success" && "✅"}
-                    {row.status === "failed" && "❌"}
-                    {row.status === "partial" && "⚠️"}
-                  </td>
-                  <td>{row.details}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <tbody>
+        {blockReport.map((row, idx) => (
+          <tr key={idx}>
+            <td>{row.block}</td>
+
+            <td style={{ textAlign: "center" }}>
+              {row.status === "success" && "✅"}
+              {row.status === "failed" && "❌"}
+              {row.status === "partial" && "⚠️"}
+            </td>
+
+            <td>{row.details}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
 
       <p className="note">
         Upload a Word document to populate quiz questions in the database.
