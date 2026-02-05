@@ -52,7 +52,7 @@ export default function UploadWord() {
 
   return (
     <div className="upload-pdf-container">
-      <h2>Upload Word Document for Quiz Questions</h2>
+      <h2>Upload Word Document for Thinking Skills/Mathematical Reasoning</h2>
 
       <form onSubmit={handleUpload}>
         <input
@@ -123,9 +123,7 @@ export default function UploadWord() {
   </div>
 )}
 
-      <p className="note">
-        Upload a Word document to populate quiz questions in the database.
-      </p>
+      
     </div>
   );
 }
