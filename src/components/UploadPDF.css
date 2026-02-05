@@ -1,4 +1,6 @@
-/* Container */
+/* ================================
+   Container (Card Style)
+================================ */
 .upload-pdf-container {
   max-width: 500px;
   margin: 40px auto;
@@ -6,10 +8,12 @@
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Heading */
+/* ================================
+   Heading
+================================ */
 .upload-pdf-container h2 {
   text-align: center;
   margin-bottom: 20px;
@@ -17,7 +21,9 @@
   font-weight: 700;
 }
 
-/* File input */
+/* ================================
+   File Input
+================================ */
 .upload-pdf-container input[type="file"] {
   width: 100%;
   padding: 10px;
@@ -27,7 +33,9 @@
   font-size: 14px;
 }
 
-/* Button */
+/* ================================
+   Button
+================================ */
 .upload-pdf-container button {
   width: 100%;
   padding: 12px;
@@ -52,86 +60,24 @@
   transform: none;
 }
 
-/* Note text */
+/* ================================
+   Selected File + Notes
+================================ */
+.upload-pdf-container p {
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #333;
+}
+
 .upload-pdf-container .note {
   margin-top: 15px;
   font-size: 0.9em;
   color: #555;
 }
 
-/* Selected file info */
-.upload-pdf-container p {
-  margin-top: 10px;
-  font-size: 0.9em;
-  color: #333;
-}
 /* ================================
-   Upload Word – Base Layout
+   Error
 ================================ */
-.upload-pdf-container {
-  max-width: 820px;
-  margin: 0 auto;
-  padding: 24px;
-}
-
-/* ================================
-   Please Wait Overlay
-================================ */
-.upload-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.upload-overlay-box {
-  background: #ffffff;
-  padding: 28px 36px;
-  border-radius: 10px;
-  text-align: center;
-  font-size: 16px;
-  font-weight: 600;
-  color: #1f2937;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-}
-
-/* ================================
-   Upload Form
-================================ */
-.upload-pdf-container form {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.upload-pdf-container input[type="file"] {
-  flex: 1;
-}
-
-.upload-pdf-container button {
-  padding: 8px 16px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.upload-pdf-container button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* ================================
-   Notes & Errors
-================================ */
-.note {
-  margin-top: 12px;
-  font-size: 14px;
-  color: #4b5563;
-}
-
 .upload-error {
   margin-top: 16px;
   padding: 12px;
@@ -176,4 +122,28 @@
 
 .upload-report tr:nth-child(even) {
   background: #f9fafb;
+}
+
+/* ================================
+   Please Wait Overlay (SAFE)
+================================ */
+.upload-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.upload-overlay-box {
+  background: #ffffff;
+  padding: 28px 36px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
