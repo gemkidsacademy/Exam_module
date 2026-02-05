@@ -49,24 +49,35 @@ export default function UploadWord() {
       <h2>Upload Word Document for Quiz Questions</h2>
 
       <form onSubmit={handleUpload}>
-        <input
-          type="file"
-          accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-          onChange={handleFileChange}
-          disabled={uploading}
-        />
+  <input
+    type="file"
+    accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    onChange={handleFileChange}
+    disabled={uploading}
+  />
 
-        <button type="submit" disabled={uploading}>
-          {uploading ? "Uploading..." : "Upload Word File"}
-        </button>
+  <button type="submit" disabled={uploading}>
+    {uploading ? "Uploading..." : "Upload Word File"}
+  </button>
 
-        {/* INLINE WAIT MESSAGE */}
-        {uploading && (
-          <div className="upload-wait-inline">
-            ⏳ Please wait… processing your Word document.
-          </div>
-        )}
-      </form>
+  {/* THIS MUST BE HERE */}
+  {uploading && (
+    <div
+      style={{
+        marginTop: "14px",
+        padding: "10px",
+        textAlign: "center",
+        fontSize: "14px",
+        fontWeight: 500,
+        background: "#f3f4f6",
+        borderRadius: "6px",
+        color: "#374151",
+      }}
+    >
+      ⏳ Please wait… processing your Word document.
+    </div>
+  )}
+</form>
 
       {wordFile && <p>Selected file: {wordFile.name}</p>}
 
