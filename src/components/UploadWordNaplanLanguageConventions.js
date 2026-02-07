@@ -38,7 +38,7 @@ export default function UploadWordNaplanLanguageConventions() {
 
     try {
       const res = await fetch(
-        "https://web-production-481a5.up.railway.app/upload-word-naplan-language-conventions",
+        "https://web-production-481a5.up.railway.app/upload-word-naplan",
         {
           method: "POST",
           body: formData,
@@ -47,8 +47,8 @@ export default function UploadWordNaplanLanguageConventions() {
 
       const data = await res.json();
 
-      if (!res.ok && !data?.progress) {
-        throw new Error(data.detail || "Upload failed");
+      if (!res.ok) {
+        throw new Error(data?.detail || "Upload failed");
       }
 
       setResult(data);
@@ -65,28 +65,11 @@ export default function UploadWordNaplanLanguageConventions() {
   };
 
   /* -------------------------------
-     NORMALISE PROGRESS PER BLOCK
+     BLOCK REPORT
   -------------------------------- */
   const blocks = useMemo(() => {
-    if (!result?.progress) return [];
-
-    const map = {};
-
-    result.progress.forEach((p) => {
-      if (!map[p.block]) {
-        map[p.block] = {
-          block: p.block,
-          question_type: p.question_type || "—",
-          status: p.status,
-          reason: p.reason || null,
-        };
-      } else {
-        map[p.block].status = p.status;
-        if (p.reason) map[p.block].reason = p.reason;
-      }
-    });
-
-    return Object.values(map).sort((a, b) => a.block - b.block);
+    if (!result?.blocks) return [];
+    return result.blocks;
   }, [result]);
 
   return (
@@ -146,13 +129,11 @@ export default function UploadWordNaplanLanguageConventions() {
             <strong>Status:</strong> {result.status}
           </p>
           <p>
-            <strong>Upload ID:</strong> {result.upload_id}
+            <strong>Saved Questions:</strong> {result.summary?.saved ?? 0}
           </p>
           <p>
-            <strong>Total Blocks:</strong> {result.total_blocks}
-          </p>
-          <p>
-            <strong>Saved Exams:</strong> {result.saved_exam_ids.length}
+            <strong>Skipped (Partial):</strong>{" "}
+            {result.summary?.skipped_partial ?? 0}
           </p>
 
           {blocks.length > 0 && (
@@ -163,22 +144,20 @@ export default function UploadWordNaplanLanguageConventions() {
                 <thead>
                   <tr>
                     <th>Block</th>
-                    <th>Type</th>
                     <th>Status</th>
                     <th>Details</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {blocks.map((b) => (
                     <tr key={b.block}>
                       <td>{b.block}</td>
-                      <td>{b.question_type}</td>
                       <td>
-                        {b.status === "saved" && "✅ Saved"}
+                        {b.status === "success" && "✅ Saved"}
                         {b.status === "failed" && "❌ Failed"}
-                        {b.status === "processing" && "⏳ Processing"}
                       </td>
-                      <td>{b.reason || "—"}</td>
+                      <td>{b.details || "—"}</td>
                     </tr>
                   ))}
                 </tbody>
