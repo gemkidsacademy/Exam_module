@@ -19,7 +19,7 @@ const ExamSelector = ({ examType, onSelect }) => {
 
           <button
             className="dashboard-button"
-            onClick={() => setSelectedCategory("foundational")}
+            onClick={() => setSelectedCategory("naplan")}
           >
             NAPLAN
           </button>
@@ -33,7 +33,7 @@ const ExamSelector = ({ examType, onSelect }) => {
         />
       )}
 
-      {selectedCategory === "foundational" && (
+      {selectedCategory === "naplan" && (
         <ExamTypeSelector_naplan
           examType={examType}
           onSelect={onSelect}
