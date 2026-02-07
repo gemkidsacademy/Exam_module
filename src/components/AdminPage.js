@@ -244,7 +244,7 @@ const AdminPanel = () => {
             onSelect={setCreateExamType}
           />
       
-          {/* ---------- NAPLAN UPLOADS ---------- */}
+          {/* ---------- NAPLAN UPLOADS ONLY ---------- */}
           {createExamType === "naplan_numeracy" && (
             <UploadWordNaplanNumeracy />
           )}
@@ -252,21 +252,9 @@ const AdminPanel = () => {
           {createExamType === "naplan_language_conventions" && (
             <UploadWordNaplanLanguageConventions />
           )}
-      
-          {/* ---------- SELECTIVE UPLOADS ---------- */}
-          {createExamType === "reading" && (
-            <UploadWordReadingUnified />
-          )}
-      
-          {createExamType === "writing" && (
-            <UploadWord_writing />
-          )}
-      
-          {createExamType === "thinking_skills" && (
-            <ThinkingSkillsUploadPanel />
-          )}
         </div>
       )}
+
 
       
       {/* ===== UPLOAD IMAGE FOLDER ===== */}
@@ -355,9 +343,7 @@ const AdminPanel = () => {
              {createExamType === "foundational" && <QuizSetup_foundational />}
              {createExamType === "reading" && <QuizSetup_reading />}
              {createExamType === "writing" && <QuizSetup_writing />}
-             {createExamType === "naplan_numeracy" && (<UploadWordNaplanNumeracy />)}
-            
-             {createExamType === "naplan_language_conventions" && (<UploadWordNaplanLanguageConventions />)}
+             
          
            </div>
          )}
