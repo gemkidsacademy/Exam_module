@@ -23,7 +23,7 @@ export default function ExamTypeSelector({ examType, onSelect }) {
   const renderExamPanel = () => {
     switch (examType) {
       case "thinking_skills":
-        return <ThinkingSkillsUploadPanel />;
+        return <UploadWord />;
 
       case "mathematical_reasoning":
       case "foundational":
