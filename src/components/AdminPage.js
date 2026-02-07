@@ -7,6 +7,8 @@ import StudentReportShell from "./StudentReportShell";
 import BulkUserUpload from "./BulkUserUpload";
 import StudentReportShell_backend from "./StudentReportShell_backend";
 import ExamSelector from "./ExamSelector";
+import UploadWordNaplanLanguageConventions from "./UploadWordNaplanLanguageConventions";
+import UploadWordNaplanNumeracy from "./UploadWordNaplanNumeracy";
 
 
 
@@ -329,6 +331,9 @@ const AdminPanel = () => {
              {createExamType === "foundational" && <QuizSetup_foundational />}
              {createExamType === "reading" && <QuizSetup_reading />}
              {createExamType === "writing" && <QuizSetup_writing />}
+             {createExamType === "naplan_numeracy" && (<UploadWordNaplanNumeracy />)}
+            
+            {createExamType === "naplan_language_conventions" && (<UploadWordNaplanLanguageConventions />)}
          
            </div>
          )}
