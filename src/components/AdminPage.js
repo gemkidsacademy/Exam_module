@@ -236,15 +236,39 @@ const AdminPanel = () => {
         </div>
       )} 
       */}
+      {/* ===== UPLOAD WORD QUESTIONS ===== */}
       {activeTab === "exam-type-selector" && (
         <div className="tab-panel">
           <ExamSelector
-           examType={createExamType}
-           onSelect={setCreateExamType}
-         />
-
+            examType={createExamType}
+            onSelect={setCreateExamType}
+          />
+      
+          {/* ---------- NAPLAN UPLOADS ---------- */}
+          {createExamType === "naplan_numeracy" && (
+            <UploadWordNaplanNumeracy />
+          )}
+      
+          {createExamType === "naplan_language_conventions" && (
+            <UploadWordNaplanLanguageConventions />
+          )}
+      
+          {/* ---------- SELECTIVE UPLOADS ---------- */}
+          {createExamType === "reading" && (
+            <UploadWordReadingUnified />
+          )}
+      
+          {createExamType === "writing" && (
+            <UploadWord_writing />
+          )}
+      
+          {createExamType === "thinking_skills" && (
+            <ThinkingSkillsUploadPanel />
+          )}
         </div>
       )}
+
+      
       {/* ===== UPLOAD IMAGE FOLDER ===== */}
       {activeTab === "upload-image-folder" && (
         <div className="tab-panel">
@@ -333,7 +357,7 @@ const AdminPanel = () => {
              {createExamType === "writing" && <QuizSetup_writing />}
              {createExamType === "naplan_numeracy" && (<UploadWordNaplanNumeracy />)}
             
-            {createExamType === "naplan_language_conventions" && (<UploadWordNaplanLanguageConventions />)}
+             {createExamType === "naplan_language_conventions" && (<UploadWordNaplanLanguageConventions />)}
          
            </div>
          )}
