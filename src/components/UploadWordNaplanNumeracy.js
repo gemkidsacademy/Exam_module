@@ -146,25 +146,24 @@ export default function UploadWordNaplanNumeracy() {
                 <thead>
                   <tr>
                     <th>Block</th>
-                    <th>Type</th>
                     <th>Status</th>
                     <th>Details</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {blocks.map((b) => (
-                    <tr key={b.block}>
-                      <td>{b.block}</td>
-                      <td>{b.type || "—"}</td>
-                        <td>
-                          {b.status === "success" && "✅ Saved"}
-                          {b.status === "failed" && "❌ Failed"}
-                        </td>
-                        <td>{b.details || "—"}</td>
 
-                    </tr>
-                  ))}
-                </tbody>
+                <tbody>
+                {blocks.map((b) => (
+                  <tr key={b.block}>
+                    <td>{b.block}</td>
+                    <td>
+                      {b.status === "success" && "✅ Saved"}
+                      {b.status === "failed" && "❌ Failed"}
+                    </td>
+                    <td>{b.details || "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+
               </table>
             </>
           )}
