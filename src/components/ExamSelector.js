@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./ExamSelector.css";
 import ExamTypeSelector from "./ExamTypeSelector";
+import ExamTypeSelector_naplan from "./ExamTypeSelector_naplan";
 
 const ExamSelector = ({ examType, onSelect }) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -27,6 +28,13 @@ const ExamSelector = ({ examType, onSelect }) => {
 
       {selectedCategory === "selective" && (
         <ExamTypeSelector
+          examType={examType}
+          onSelect={onSelect}
+        />
+      )}
+
+      {selectedCategory === "foundational" && (
+        <ExamTypeSelector_naplan
           examType={examType}
           onSelect={onSelect}
         />
