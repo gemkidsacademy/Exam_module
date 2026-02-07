@@ -236,7 +236,10 @@ const AdminPanel = () => {
       */}
       {activeTab === "exam-type-selector" && (
         <div className="tab-panel">
-          <ExamSelector onSelect={setCreateExamCategory} />
+          <ExamSelector
+           examType={createExamType}
+           onSelect={setCreateExamType}
+         />
 
         </div>
       )}
