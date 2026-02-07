@@ -112,7 +112,8 @@ const AdminPanel = () => {
   ============================ */
   const tabs = [
   { id: "database", label: "Exam Module User Management" },
-  { id: "exam-type-selector", label: "Upload Questions Word Document" },
+  /*{ id: "exam-type-selector", label: "Upload Questions Word Document" },*/
+  { id: "exam-type-selector", label: "Upload Questions Word Document" },   
   { id: "upload-image-folder", label: "Exam Image Folder" },
   { id: "add-quiz", label: "Create Exam" },
   { id: "generate-exam", label: "Generate Exam" },
@@ -223,7 +224,7 @@ const AdminPanel = () => {
         </div>
       )}
 
-      {/* ===== UPLOAD WORD QUESTIONS ===== */}
+      {/* ===== UPLOAD WORD QUESTIONS ===== 
       {activeTab === "exam-type-selector" && (
         <div className="tab-panel">
           <ExamTypeSelector
@@ -231,8 +232,14 @@ const AdminPanel = () => {
             onSelect={setCreateExamType}
           />
         </div>
-      )}
+      )} 
+      */}
+      {activeTab === "exam-type-selector" && (
+        <div className="tab-panel">
+          <ExamSelector onSelect={setCreateExamCategory} />
 
+        </div>
+      )}
       {/* ===== UPLOAD IMAGE FOLDER ===== */}
       {activeTab === "upload-image-folder" && (
         <div className="tab-panel">
