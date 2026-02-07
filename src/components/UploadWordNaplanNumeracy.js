@@ -68,25 +68,8 @@ export default function UploadWordNaplanNumeracy() {
      NORMALISE PROGRESS PER BLOCK
   -------------------------------- */
   const blocks = useMemo(() => {
-    if (!result?.progress) return [];
-
-    const map = {};
-
-    result.progress.forEach((p) => {
-      if (!map[p.block]) {
-        map[p.block] = {
-          block: p.block,
-          question_type: p.question_type || "—",
-          status: p.status,
-          reason: p.reason || null,
-        };
-      } else {
-        map[p.block].status = p.status;
-        if (p.reason) map[p.block].reason = p.reason;
-      }
-    });
-
-    return Object.values(map).sort((a, b) => a.block - b.block);
+    if (!result?.blocks) return [];
+    return result.blocks;
   }, [result]);
 
   return (
@@ -146,13 +129,13 @@ export default function UploadWordNaplanNumeracy() {
             <strong>Status:</strong> {result.status}
           </p>
           <p>
-            <strong>Upload ID:</strong> {result.upload_id}
+            <strong>Status:</strong> {result.status}
           </p>
           <p>
-            <strong>Total Blocks:</strong> {result.total_blocks}
+            <strong>Saved Questions:</strong> {result.summary?.saved ?? 0}
           </p>
           <p>
-            <strong>Saved Exams:</strong> {result.saved_exam_ids.length}
+            <strong>Skipped (Partial):</strong> {result.summary?.skipped_partial ?? 0}
           </p>
 
           {blocks.length > 0 && (
@@ -172,13 +155,13 @@ export default function UploadWordNaplanNumeracy() {
                   {blocks.map((b) => (
                     <tr key={b.block}>
                       <td>{b.block}</td>
-                      <td>{b.question_type}</td>
-                      <td>
-                        {b.status === "saved" && "✅ Saved"}
-                        {b.status === "failed" && "❌ Failed"}
-                        {b.status === "processing" && "⏳ Processing"}
-                      </td>
-                      <td>{b.reason || "—"}</td>
+                      <td>{b.type || "—"}</td>
+                        <td>
+                          {b.status === "success" && "✅ Saved"}
+                          {b.status === "failed" && "❌ Failed"}
+                        </td>
+                        <td>{b.details || "—"}</td>
+
                     </tr>
                   ))}
                 </tbody>
