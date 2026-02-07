@@ -1,7 +1,12 @@
 import React from "react";
 import "./ExamTypeSelector_naplan.css";
 
-const ExamTypeSelector_naplan = ({ onSelect }) => {
+const ExamTypeSelector_naplan = ({ examType, onSelect }) => {
+  // If an exam type is already selected, hide buttons
+  if (examType) {
+    return null;
+  }
+
   return (
     <div className="exam-selector-container">
       <button
