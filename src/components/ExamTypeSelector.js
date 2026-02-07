@@ -5,30 +5,28 @@ import ReadingUploadPanel from "./ReadingUploadPanel";
 import UploadWord_writing from "./UploadWord_writing";
 import ThinkingSkillsUploadPanel from "./ThinkingSkillsUploadPanel";
 
-
 export default function ExamTypeSelector({ examType, onSelect }) {
-  // --------------------------------------
-  // Exam selection options
-  // --------------------------------------
+  /* ============================
+     Exam selection options
+  ============================ */
   const examOptions = [
-    { label: "Thinking Skills Exam", value: "thinkingskills" },
-    { label: "Mathematical Reasoning", value: "mathematical-reasoning" },
+    { label: "Thinking Skills Exam", value: "thinking_skills" },
+    { label: "Mathematical Reasoning", value: "mathematical_reasoning" },
     { label: "Reading Exam", value: "reading" },
     { label: "Writing Exam", value: "writing" },
-    { label: "Foundational", value: "foundational" }, // ✅ NEW
+    { label: "Foundational", value: "foundational" },
   ];
 
-  // --------------------------------------
-  // Render selected exam panel
-  // --------------------------------------
+  /* ============================
+     Render selected exam panel
+  ============================ */
   const renderExamPanel = () => {
     switch (examType) {
-      
-      case "mathematical-reasoning":
-      case "foundational": // ✅ NEW
-        return <UploadWord />;
+      case "thinking_skills":
+        return <ThinkingSkillsUploadPanel />;
 
-      case "thinkingskills":
+      case "mathematical_reasoning":
+      case "foundational":
         return <UploadWord />;
 
       case "reading":
@@ -42,16 +40,17 @@ export default function ExamTypeSelector({ examType, onSelect }) {
     }
   };
 
-  // --------------------------------------
-  // If an exam is selected, render its panel
-  // --------------------------------------
+  /* ============================
+     If exam type is selected,
+     render its upload panel
+  ============================ */
   if (examType) {
     return renderExamPanel();
   }
 
-  // --------------------------------------
-  // Render exam type selector buttons
-  // --------------------------------------
+  /* ============================
+     Render exam type selector
+  ============================ */
   return (
     <div className="exam-selector-container">
       <div className="exam-selector-grid">
