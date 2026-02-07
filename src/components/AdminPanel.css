@@ -137,10 +137,12 @@
 .tab-panel {
   flex: 1;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 20px;
 
-  align-items: flex-start;
+  align-items: center;   /* center children horizontally */
+  justify-content: flex-start;
+
   overflow-y: auto;
   overflow-x: hidden;
 
