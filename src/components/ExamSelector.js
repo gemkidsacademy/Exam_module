@@ -2,18 +2,8 @@ import React, { useState } from "react";
 import "./ExamSelector.css";
 import ExamTypeSelector from "./ExamTypeSelector";
 
-const ExamSelector = ({ onSelect }) => {
+const ExamSelector = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
-
-  const handleSelectiveClick = () => {
-    setSelectedCategory("selective");
-    onSelect?.("selective"); // optional, keeps parent in sync
-  };
-
-  const handleFoundationalClick = () => {
-    setSelectedCategory("foundational");
-    onSelect?.("foundational");
-  };
 
   return (
     <div className="exam-selector-container">
@@ -22,14 +12,14 @@ const ExamSelector = ({ onSelect }) => {
         <>
           <button
             className="dashboard-button"
-            onClick={handleSelectiveClick}
+            onClick={() => setSelectedCategory("selective")}
           >
             Selective Exam
           </button>
 
           <button
             className="dashboard-button"
-            onClick={handleFoundationalClick}
+            onClick={() => setSelectedCategory("foundational")}
           >
             NAPLAN
           </button>
