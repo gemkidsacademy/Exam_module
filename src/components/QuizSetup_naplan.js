@@ -127,7 +127,7 @@ export default function QuizSetup_naplan({ examType }) {
         <option value="1">Year 1</option>
         <option value="3">Year 3</option>
       </select>
-
+      
       <label>Difficulty:</label>
       <select
         name="difficulty"
@@ -139,6 +139,14 @@ export default function QuizSetup_naplan({ examType }) {
         <option value="medium">Medium</option>
         <option value="hard">Hard</option>
       </select>
+      <label>Number of Topics:</label>
+        <input
+          type="number"
+          name="numTopics"
+          min="1"
+          value={quiz.numTopics}
+          onChange={handleInputChange}
+        />
 
       <div style={{ marginTop: "15px" }}>
         <button
