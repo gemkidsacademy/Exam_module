@@ -8,24 +8,28 @@ export default function QuizSetup_naplan({ examType }) {
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [qbLoading, setQbLoading] = useState(false);
   useEffect(() => {
-      if (examType) {
-        setQuiz((prev) => ({
-          ...prev,
-          subject: examType.replace("naplan_", ""),
-          topics: [],
-        }));
-        setAvailableTopics([]);
-        setTotalQuestions(0);
-        setShowQuestionBank(false);
-      }
-    }, [examType]);
+  if (examType) {
+    setQuiz((prev) => ({
+      ...prev,
+      subject: examType.replace("naplan_", ""),
+    }));
+    setAvailableTopics([]);
+    setTotalQuestions(0);
+    setShowQuestionBank(false);
+  }
+}, [examType]);
 
   const handleViewQuestionBank = async () => {
     try {
+      if (!quiz.year || !quiz.difficulty) {
+      alert("Please select year and difficulty first.");
+      return;
+      }
+
       setQbLoading(true);
   
       const res = await fetch(
-        `https://web-production-481a5.up.railway.app/api/admin/question-bank?class=naplan&subject=${quiz.subject}`
+        `https://web-production-481a5.up.railway.app/api/admin/question-bank/naplan?subject=${quiz.subject}&year=${quiz.year}`
       );
   
       if (!res.ok) {
@@ -46,12 +50,14 @@ export default function QuizSetup_naplan({ examType }) {
 
 
   const [quiz, setQuiz] = useState({
-    className: "naplan",
-    subject: examType?.replace("naplan_", "") || "",
-    difficulty: "",
-    numTopics: 1,
-    topics: [],
-  });
+  className: "naplan",
+  subject: examType?.replace("naplan_", "") || "",
+  year: "",
+  difficulty: "",
+  numTopics: 1,
+  topics: [],
+});
+
 
   const getUsedTopicNames = (currentIndex) =>
     quiz.topics
@@ -110,18 +116,21 @@ export default function QuizSetup_naplan({ examType }) {
      Fetch available topics
   ============================ */
   useEffect(() => {
-    if (!quiz.className || !quiz.subject || !quiz.difficulty) {
+    if (!quiz.className || !quiz.subject || !quiz.year || !quiz.difficulty) {
       setAvailableTopics([]);
       return;
     }
+
 
     const fetchTopics = async () => {
       try {
         const params = new URLSearchParams({
           class_name: quiz.className,
           subject: quiz.subject,
+          year: quiz.year,
           difficulty: quiz.difficulty,
         });
+
 
         
         const res = await fetch(
@@ -141,7 +150,16 @@ export default function QuizSetup_naplan({ examType }) {
     };
 
     fetchTopics();
-  }, [quiz.className, quiz.subject, quiz.difficulty]);
+  }, [quiz.className, quiz.subject, quiz.year, quiz.difficulty]);
+  useEffect(() => {
+  setQuiz((prev) => ({
+    ...prev,
+    topics: [],
+  }));
+  setTotalQuestions(0);
+  setShowQuestionBank(false);
+}, [quiz.year, quiz.difficulty]);
+
 
   /* ============================
      Submit
@@ -149,10 +167,11 @@ export default function QuizSetup_naplan({ examType }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!quiz.difficulty) {
-      alert("Please select difficulty.");
+    if (!quiz.year || !quiz.difficulty) {
+      alert("Please select year and difficulty first.");
       return;
     }
+
 
     if (quiz.topics.length === 0) {
       alert("Please generate topics.");
@@ -167,6 +186,7 @@ export default function QuizSetup_naplan({ examType }) {
     const payload = {
       class_name: quiz.className,
       subject: quiz.subject,
+      year: Number(quiz.year),
       difficulty: quiz.difficulty,
       num_topics: quiz.topics.length,
       topics: quiz.topics.map((t) => ({
@@ -175,7 +195,8 @@ export default function QuizSetup_naplan({ examType }) {
         db: Number(t.db),
         total: Number(t.total),
       })),
-    };
+      };
+
 
     try {
       const res = await fetch(
@@ -210,6 +231,20 @@ export default function QuizSetup_naplan({ examType }) {
           value={quiz.subject.replace("_", " ").toUpperCase()}
           readOnly
         />
+        <label>Year:</label>
+          <select
+            name="year"
+            value={quiz.year}
+            onChange={handleInputChange}
+            required
+          >
+            <option value="">Select Year</option>
+            <option value="3">Year 3</option>
+            <option value="5">Year 5</option>
+            <option value="7">Year 7</option>
+            <option value="9">Year 9</option>
+          </select>
+ 
 
         <label>Difficulty:</label>
         <select
@@ -233,17 +268,23 @@ export default function QuizSetup_naplan({ examType }) {
           onChange={handleInputChange}
         />
 
-        <button type="button" onClick={generateTopics}>
+        <button
+          type="button"
+          onClick={generateTopics}
+          disabled={!quiz.year || !quiz.difficulty}
+        >
           Generate Topics
         </button>
-
+        
         <button
           type="button"
           onClick={handleViewQuestionBank}
+          disabled={!quiz.year || !quiz.difficulty}
           style={{ marginLeft: "10px" }}
         >
           View Question Bank
         </button>
+
         {showQuestionBank && (
           <div className="question-bank">
             <h3>
