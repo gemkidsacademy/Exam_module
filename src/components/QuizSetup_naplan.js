@@ -148,7 +148,7 @@ export default function QuizSetup_naplan({ examType }) {
       setQbLoading(false);
     }
   };
-  const handleGenerateExam = () => {
+  const handleGenerateExam = async () => {
   if (!isTotalValid) {
     alert("Total questions do not meet NAPLAN requirements.");
     return;
@@ -159,20 +159,51 @@ export default function QuizSetup_naplan({ examType }) {
     return;
   }
 
-  // Temporary: inspect payload
+  // Build payload exactly as backend expects
   const payload = {
-    className: quiz.className,
-    subject: quiz.subject,
-    year: quiz.year,
-    difficulty: quiz.difficulty,
-    topics: quiz.topics,
-    totalQuestions,
+    class_name: quiz.className,            // "naplan"
+    subject: quiz.subject,                 // "numeracy"
+    year: Number(quiz.year),               // 3 or 5
+    difficulty: quiz.difficulty,           // "easy" | "medium" | "hard"
+    num_topics: quiz.topics.length,
+    topics: quiz.topics.map((t) => ({
+      name: t.name,
+      ai: t.ai,
+      db: t.db,
+      total: t.total,
+    })),
+    total_questions: totalQuestions,
   };
 
-  console.log("NAPLAN EXAM PAYLOAD:", payload);
+  console.log("📤 NAPLAN QUIZ PAYLOAD:", payload);
 
-  alert("Exam is ready to be generated (check console).");
+  try {
+    const res = await fetch(
+      "https://web-production-481a5.up.railway.app/api/quizzes-naplan-numeracy",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(errText || "Failed to create quiz");
+    }
+
+    const data = await res.json();
+    console.log("✅ QUIZ CREATED:", data);
+
+    alert("NAPLAN exam created successfully!");
+  } catch (err) {
+    console.error("❌ ERROR CREATING QUIZ:", err);
+    alert("Failed to create exam. Check console for details.");
+  }
 };
+
 
   /* ============================
      Fetch available topics
