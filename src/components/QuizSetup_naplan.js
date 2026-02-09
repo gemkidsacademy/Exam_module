@@ -4,20 +4,21 @@ import "./QuizSetup.css";
 export default function QuizSetup_naplan({ examType }) {
   const [availableTopics, setAvailableTopics] = useState([]);
   const [totalQuestions, setTotalQuestions] = useState(0);
+
   const [questionBank, setQuestionBank] = useState([]);
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [qbLoading, setQbLoading] = useState(false);
 
   const [quiz, setQuiz] = useState({
     className: "naplan",
-    subject: examType.replace("naplan_", ""), // ✅ RESTORED
+    subject: examType.replace("naplan_", ""), // ✅ SINGLE SOURCE
     year: "",
     difficulty: "",
     numTopics: 1,
     topics: [],
   });
 
-  /* keep subject in sync with examType */
+  /* keep subject synced with examType */
   useEffect(() => {
     setQuiz((prev) => ({
       ...prev,
@@ -34,16 +35,37 @@ export default function QuizSetup_naplan({ examType }) {
     setQuiz((prev) => ({ ...prev, [name]: value }));
   };
 
-  const generateTopics = () => {
-    const num = parseInt(quiz.numTopics) || 1;
-    const topicsArray = Array.from({ length: num }, () => ({
-      name: "",
-      ai: 0,
-      db: 0,
-      total: 0,
-    }));
-    setQuiz((prev) => ({ ...prev, topics: topicsArray }));
-    setTotalQuestions(0);
+  /* ============================
+     View Question Bank
+  ============================ */
+  const handleViewQuestionBank = async () => {
+    if (!quiz.year) {
+      alert("Please select year first.");
+      return;
+    }
+
+    try {
+      setQbLoading(true);
+      setShowQuestionBank(false);
+
+      console.log("[QB] subject:", quiz.subject);
+      console.log("[QB] year:", quiz.year);
+
+      const res = await fetch(
+        `https://web-production-481a5.up.railway.app/api/admin/question-bank/naplan?subject=${quiz.subject}&year=${quiz.year}`
+      );
+
+      if (!res.ok) throw new Error("Failed to load question bank");
+
+      const data = await res.json();
+      setQuestionBank(data);
+      setShowQuestionBank(true);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to fetch question bank.");
+    } finally {
+      setQbLoading(false);
+    }
   };
 
   /* ============================
@@ -118,13 +140,49 @@ export default function QuizSetup_naplan({ examType }) {
         <option value="hard">Hard</option>
       </select>
 
-      <button
-        type="button"
-        onClick={generateTopics}
-        disabled={!quiz.year || !quiz.difficulty}
-      >
-        Generate Topics
-      </button>
+      <div style={{ marginTop: "15px" }}>
+        <button
+          type="button"
+          onClick={handleViewQuestionBank}
+          disabled={!quiz.year}
+        >
+          View Question Bank
+        </button>
+      </div>
+
+      {/* ============================
+         Question Bank Table
+      ============================ */}
+      {showQuestionBank && (
+        <div className="question-bank" style={{ marginTop: "20px" }}>
+          <h3>Question Bank Summary</h3>
+
+          {qbLoading ? (
+            <p>Loading...</p>
+          ) : questionBank.length === 0 ? (
+            <p>No questions found.</p>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>Difficulty</th>
+                  <th>Topic</th>
+                  <th>Total Questions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {questionBank.map((row, idx) => (
+                  <tr key={`${row.difficulty}-${row.topic}-${idx}`}>
+                    <td>{row.difficulty}</td>
+                    <td>{row.topic}</td>
+                    <td>{row.total_questions}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
     </div>
   );
 }
