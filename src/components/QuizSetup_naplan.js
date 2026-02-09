@@ -123,10 +123,10 @@ export default function QuizSetup_naplan({ examType }) {
           difficulty: quiz.difficulty,
         });
 
+        
         const res = await fetch(
-          const res = await fetch(
-            `https://web-production-481a5.up.railway.app/api/topics?${params.toString()}`
-              );
+           `https://web-production-481a5.up.railway.app/api/topics?${params.toString()}`
+            );
 
         );
 
