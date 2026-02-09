@@ -239,10 +239,9 @@ export default function QuizSetup_naplan({ examType }) {
             required
           >
             <option value="">Select Year</option>
+            <option value="1">Year 1</option>
             <option value="3">Year 3</option>
-            <option value="5">Year 5</option>
-            <option value="7">Year 7</option>
-            <option value="9">Year 9</option>
+            
           </select>
  
 
