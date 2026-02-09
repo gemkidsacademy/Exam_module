@@ -85,19 +85,7 @@ const AdminPanel = () => {
   /* ============================
      State Reset Logic (FIXED)
   ============================ */
-  useEffect(() => {
-     if (activeTab === "add-quiz") {
-       setCreateExamCategory(null);
-       setCreateExamType(null);
-     }
-   
-     if (activeTab === "generate-exam") {
-       setGenerateExamCategory(null);
-       setGenerateExamType(null);
-       setGenerateExamStep("category"); // ✅ FIX
-     }
-   }, [activeTab]);
-
+  
    useEffect(() => {
      if (activeTab !== "database") {
        setUserMode("menu");
@@ -105,10 +93,18 @@ const AdminPanel = () => {
    }, [activeTab]);
 
    useEffect(() => {
-     if (activeTab !== "exam-type-selector") {
-       setCreateExamType("");
-     }
-   }, [activeTab]);
+  if (activeTab === "add-quiz") {
+    setCreateExamCategory(null);
+    setCreateExamType(null);
+  }
+
+  if (activeTab === "generate-exam") {
+    setGenerateExamCategory(null);
+    setGenerateExamType(null);
+    setGenerateExamStep("category");
+  }
+}, [activeTab]);
+
 
 
   /* ============================
