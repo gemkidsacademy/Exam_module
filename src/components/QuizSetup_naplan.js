@@ -148,6 +148,31 @@ export default function QuizSetup_naplan({ examType }) {
       setQbLoading(false);
     }
   };
+  const handleGenerateExam = () => {
+  if (!isTotalValid) {
+    alert("Total questions do not meet NAPLAN requirements.");
+    return;
+  }
+
+  if (!quiz.topics.length) {
+    alert("Please generate and select topics first.");
+    return;
+  }
+
+  // Temporary: inspect payload
+  const payload = {
+    className: quiz.className,
+    subject: quiz.subject,
+    year: quiz.year,
+    difficulty: quiz.difficulty,
+    topics: quiz.topics,
+    totalQuestions,
+  };
+
+  console.log("NAPLAN EXAM PAYLOAD:", payload);
+
+  alert("Exam is ready to be generated (check console).");
+};
 
   /* ============================
      Fetch available topics
@@ -311,7 +336,22 @@ export default function QuizSetup_naplan({ examType }) {
         >
           View Question Bank
         </button>
+        <button
+          type="button"
+          onClick={handleGenerateExam}
+          disabled={
+            !quiz.topics.length ||
+            !isTotalValid
+          }
+          style={{
+            backgroundColor: isTotalValid ? "#0d6efd" : "#ccc",
+            cursor: isTotalValid ? "pointer" : "not-allowed",
+          }}
+        >
+          Generate Exam
+        </button>
       </div>
+      
 
       {showQuestionBank && (
         <div className="question-bank" style={{ marginTop: "20px" }}>
