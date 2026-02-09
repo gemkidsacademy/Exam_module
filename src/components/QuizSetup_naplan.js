@@ -227,10 +227,17 @@ export default function QuizSetup_naplan({ examType }) {
         <input value="NAPLAN" readOnly />
 
         <label>Subject:</label>
-        <input
-          value={quiz.subject.replace("_", " ").toUpperCase()}
-          readOnly
-        />
+        <select
+          name="subject"
+          value={quiz.subject}
+          onChange={handleInputChange}
+          required
+        >
+          <option value="">Select Subject</option>
+          <option value="numeracy">Numeracy</option>
+          <option value="language_conventions">Language Conventions</option>
+        </select>
+
         <label>Year:</label>
           <select
             name="year"
