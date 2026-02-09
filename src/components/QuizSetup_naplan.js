@@ -1,90 +1,256 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import "./QuizSetup.css";
 
-const LABELS = {
-  naplan_numeracy: "NAPLAN – Numeracy",
-  naplan_language_conventions: "NAPLAN – Language Conventions",
-  naplan_reading: "NAPLAN – Reading",
-  naplan_writing: "NAPLAN – Writing",
-};
+export default function QuizSetup_naplan({ examType }) {
+  const [availableTopics, setAvailableTopics] = useState([]);
+  const [totalQuestions, setTotalQuestions] = useState(0);
 
-const QuizSetup_naplan = ({ examType }) => {
-  const [examName, setExamName] = useState("");
-  const [yearLevel, setYearLevel] = useState("");
-  const [timeLimit, setTimeLimit] = useState("");
-  const [totalQuestions, setTotalQuestions] = useState("");
+  const [quiz, setQuiz] = useState({
+    className: "naplan",
+    subject: examType?.replace("naplan_", "") || "",
+    difficulty: "",
+    numTopics: 1,
+    topics: [],
+  });
 
-  if (!examType) return null;
+  const getUsedTopicNames = (currentIndex) =>
+    quiz.topics
+      .map((t, i) => (i !== currentIndex ? t.name : null))
+      .filter(Boolean);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const payload = {
-      category: "naplan",
-      examType,
-      examName,
-      yearLevel,
-      timeLimit,
-      totalQuestions,
-    };
-
-    console.log("Creating NAPLAN exam:", payload);
-
-    // later:
-    // POST /api/exams
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setQuiz((prev) => ({ ...prev, [name]: value }));
   };
 
-  return (
-    <div style={{ maxWidth: "600px", margin: "0 auto" }}>
-      <h2>{LABELS[examType]}</h2>
+  const generateTopics = () => {
+    const num = parseInt(quiz.numTopics) || 1;
 
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: "15px" }}
-      >
+    const topicsArray = Array.from({ length: num }, () => ({
+      name: "",
+      ai: 0,
+      db: 0,
+      total: 0,
+    }));
+
+    setQuiz((prev) => ({ ...prev, topics: topicsArray }));
+    setTotalQuestions(0);
+  };
+
+  const handleTopicChange = (index, field, value) => {
+    setQuiz((prev) => {
+      const topics = [...prev.topics];
+      const numValue = Number(value) || 0;
+
+      topics[index][field] = numValue;
+      topics[index].total =
+        Number(topics[index].ai || 0) +
+        Number(topics[index].db || 0);
+
+      const globalTotal = topics.reduce(
+        (sum, t) => sum + (Number(t.total) || 0),
+        0
+      );
+
+      setTotalQuestions(globalTotal);
+
+      return { ...prev, topics };
+    });
+  };
+
+  const handleTopicNameChange = (index, value) => {
+    setQuiz((prev) => {
+      const topics = [...prev.topics];
+      topics[index].name = value;
+      return { ...prev, topics };
+    });
+  };
+
+  /* ============================
+     Fetch available topics
+  ============================ */
+  useEffect(() => {
+    if (!quiz.className || !quiz.subject || !quiz.difficulty) {
+      setAvailableTopics([]);
+      return;
+    }
+
+    const fetchTopics = async () => {
+      try {
+        const params = new URLSearchParams({
+          class_name: quiz.className,
+          subject: quiz.subject,
+          difficulty: quiz.difficulty,
+        });
+
+        const res = await fetch(
+          `https://web-production-481a5.up.railway.app/api/topics?${params}`
+        );
+
+        if (!res.ok) throw new Error("Failed to fetch topics");
+
+        const data = await res.json();
+        setAvailableTopics(data);
+      } catch (err) {
+        console.error(err);
+        setAvailableTopics([]);
+      }
+    };
+
+    fetchTopics();
+  }, [quiz.className, quiz.subject, quiz.difficulty]);
+
+  /* ============================
+     Submit
+  ============================ */
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!quiz.difficulty) {
+      alert("Please select difficulty.");
+      return;
+    }
+
+    if (quiz.topics.length === 0) {
+      alert("Please generate topics.");
+      return;
+    }
+
+    if (totalQuestions !== 40) {
+      alert("Total questions must be exactly 40.");
+      return;
+    }
+
+    const payload = {
+      class_name: quiz.className,
+      subject: quiz.subject,
+      difficulty: quiz.difficulty,
+      num_topics: quiz.topics.length,
+      topics: quiz.topics.map((t) => ({
+        name: t.name,
+        ai: Number(t.ai),
+        db: Number(t.db),
+        total: Number(t.total),
+      })),
+    };
+
+    try {
+      const res = await fetch(
+        "https://web-production-481a5.up.railway.app/api/quizzes",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to save NAPLAN quiz");
+
+      alert("NAPLAN exam created successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create exam.");
+    }
+  };
+
+  /* ============================
+     Render
+  ============================ */
+  return (
+    <div className="quiz-setup-container">
+      <form onSubmit={handleSubmit}>
+        <label>Class:</label>
+        <input value="NAPLAN" readOnly />
+
+        <label>Subject:</label>
         <input
-          type="text"
-          placeholder="Exam name"
-          value={examName}
-          onChange={(e) => setExamName(e.target.value)}
-          required
+          value={quiz.subject.replace("_", " ").toUpperCase()}
+          readOnly
         />
 
+        <label>Difficulty:</label>
         <select
-          value={yearLevel}
-          onChange={(e) => setYearLevel(e.target.value)}
+          name="difficulty"
+          value={quiz.difficulty}
+          onChange={handleInputChange}
           required
         >
-          <option value="">Select year level</option>
-          <option value="3">Year 3</option>
-          <option value="5">Year 5</option>
-          <option value="7">Year 7</option>
-          <option value="9">Year 9</option>
+          <option value="">Select Difficulty</option>
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
         </select>
 
+        <label>Number of Topics:</label>
         <input
           type="number"
-          placeholder="Time limit (minutes)"
-          value={timeLimit}
-          onChange={(e) => setTimeLimit(e.target.value)}
+          name="numTopics"
           min="1"
-          required
+          value={quiz.numTopics}
+          onChange={handleInputChange}
         />
 
-        <input
-          type="number"
-          placeholder="Total questions"
-          value={totalQuestions}
-          onChange={(e) => setTotalQuestions(e.target.value)}
-          min="1"
-          required
-        />
+        <button type="button" onClick={generateTopics}>
+          Generate Topics
+        </button>
 
-        <button type="submit" className="dashboard-button">
+        <div className="topics-container">
+          {quiz.topics.map((topic, index) => (
+            <div className="topic" key={index}>
+              <h4>Topic {index + 1}</h4>
+
+              <label>Topic Name:</label>
+              <select
+                value={topic.name}
+                onChange={(e) =>
+                  handleTopicNameChange(index, e.target.value)
+                }
+                required
+              >
+                <option value="">Select topic</option>
+                {availableTopics
+                  .filter(
+                    (t) =>
+                      !getUsedTopicNames(index).includes(t.name)
+                  )
+                  .map((t) => (
+                    <option key={t.id || t.name} value={t.name}>
+                      {t.name}
+                    </option>
+                  ))}
+              </select>
+
+              <label>AI Questions:</label>
+              <input
+                type="number"
+                min="0"
+                value={topic.ai}
+                onChange={(e) =>
+                  handleTopicChange(index, "ai", e.target.value)
+                }
+              />
+
+              <label>DB Questions:</label>
+              <input
+                type="number"
+                min="0"
+                value={topic.db}
+                onChange={(e) =>
+                  handleTopicChange(index, "db", e.target.value)
+                }
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="total-section">
+          <h3>Total Questions: {totalQuestions}</h3>
+        </div>
+
+        <button type="submit" disabled={totalQuestions !== 40}>
           Create NAPLAN Exam
         </button>
       </form>
     </div>
   );
-};
-
-export default QuizSetup_naplan;
+}
