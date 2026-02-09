@@ -4,6 +4,46 @@ import "./QuizSetup.css";
 export default function QuizSetup_naplan({ examType }) {
   const [availableTopics, setAvailableTopics] = useState([]);
   const [totalQuestions, setTotalQuestions] = useState(0);
+  const [questionBank, setQuestionBank] = useState([]);
+  const [showQuestionBank, setShowQuestionBank] = useState(false);
+  const [qbLoading, setQbLoading] = useState(false);
+  useEffect(() => {
+      if (examType) {
+        setQuiz((prev) => ({
+          ...prev,
+          subject: examType.replace("naplan_", ""),
+          topics: [],
+        }));
+        setAvailableTopics([]);
+        setTotalQuestions(0);
+        setShowQuestionBank(false);
+      }
+    }, [examType]);
+
+  const handleViewQuestionBank = async () => {
+    try {
+      setQbLoading(true);
+  
+      const res = await fetch(
+        `https://web-production-481a5.up.railway.app/api/admin/question-bank?class=naplan&subject=${quiz.subject}`
+      );
+  
+      if (!res.ok) {
+        throw new Error("Failed to load question bank");
+      }
+  
+      const data = await res.json();
+      setQuestionBank(data);
+      setShowQuestionBank(true);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to fetch question bank data.");
+    } finally {
+      setQbLoading(false);
+    }
+  };
+
+
 
   const [quiz, setQuiz] = useState({
     className: "naplan",
@@ -84,7 +124,10 @@ export default function QuizSetup_naplan({ examType }) {
         });
 
         const res = await fetch(
-          `https://web-production-481a5.up.railway.app/api/topics?${params}`
+          const res = await fetch(
+            `https://web-production-481a5.up.railway.app/api/topics?${params.toString()}`
+              );
+
         );
 
         if (!res.ok) throw new Error("Failed to fetch topics");
@@ -193,6 +236,49 @@ export default function QuizSetup_naplan({ examType }) {
         <button type="button" onClick={generateTopics}>
           Generate Topics
         </button>
+
+        <button
+          type="button"
+          onClick={handleViewQuestionBank}
+          style={{ marginLeft: "10px" }}
+        >
+          View Question Bank
+        </button>
+        {showQuestionBank && (
+          <div className="question-bank">
+            <h3>
+              Question Bank (
+              {quiz.subject.replace("_", " ").toUpperCase()}
+              )
+            </h3>
+        
+            {qbLoading ? (
+              <p>Loading...</p>
+            ) : questionBank.length === 0 ? (
+              <p>No questions found.</p>
+            ) : (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Difficulty</th>
+                    <th>Topic</th>
+                    <th>Total Questions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {questionBank.map((row, idx) => (
+                    <tr key={`${row.difficulty}-${row.topic}-${idx}`}>
+                      <td>{row.difficulty}</td>
+                      <td>{row.topic}</td>
+                      <td>{row.total_questions}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
+
 
         <div className="topics-container">
           {quiz.topics.map((topic, index) => (
