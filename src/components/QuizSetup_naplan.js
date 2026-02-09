@@ -7,12 +7,17 @@ export default function QuizSetup_naplan({ examType }) {
   const [questionBank, setQuestionBank] = useState([]);
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [qbLoading, setQbLoading] = useState(false);
-  // examType no longer controls subject for NAPLAN
   useEffect(() => {
-    setAvailableTopics([]);
-    setTotalQuestions(0);
-    setShowQuestionBank(false);
-  }, [examType]);
+  if (examType) {
+    setQuiz((prev) => ({
+      ...prev,
+      subject: examType.replace("naplan_", ""),
+    }));
+  }
+}, [examType]);
+
+  // examType no longer controls subject for NAPLAN
+  
 
   useEffect(() => {
     setQuiz((prev) => ({
@@ -228,6 +233,11 @@ export default function QuizSetup_naplan({ examType }) {
   ============================ */
   return (
     <div className="quiz-setup-container">
+      <h2 style={{ marginBottom: "20px" }}>
+        NAPLAN – {quiz.subject
+          ? quiz.subject.replace("_", " ").toUpperCase()
+          : "Select Subject"}
+        </h2>
       <form onSubmit={handleSubmit}>
         <label>Class:</label>
         <input value="NAPLAN" readOnly />
@@ -390,6 +400,8 @@ export default function QuizSetup_naplan({ examType }) {
           Create NAPLAN Exam
         </button>
       </form>
+      
+     
     </div>
   );
 }
