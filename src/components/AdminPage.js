@@ -10,6 +10,8 @@ import ExamSelector from "./ExamSelector";
 import UploadWordNaplanLanguageConventions from "./UploadWordNaplanLanguageConventions";
 import UploadWordNaplanNumeracy from "./UploadWordNaplanNumeracy";
 import QuizSetup_naplan from "./QuizSetup_naplan";
+import GenerateExam_naplan_numeracy from "./GenerateExam_naplan_numeracy";
+
 
 
 
@@ -422,7 +424,18 @@ const AdminPanel = () => {
                        >
                          Foundational Exam
                        </button>
+                       {/* ✅ NEW: NAPLAN */}
+                      <button
+                        className="dashboard-button"
+                        onClick={() => {
+                          setGenerateExamCategory("naplan");
+                          setGenerateExamStep("type");
+                        }}
+                      >
+                        NAPLAN
+                      </button>
                      </div>
+                     
                    )}
                
                    {/* STEP 2: SELECTIVE SUBJECT */}
@@ -470,7 +483,51 @@ const AdminPanel = () => {
                          </button>
                        </div>
                      )}
-               
+                   {generateExamStep === "type" &&
+ generateExamCategory === "naplan" && (
+  <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+    <button
+      className="dashboard-button"
+      onClick={() => {
+        setGenerateExamType("naplan_numeracy");
+        setGenerateExamStep("generate");
+      }}
+    >
+      Numeracy
+    </button>
+
+    <button
+      className="dashboard-button"
+      onClick={() => {
+        setGenerateExamType("naplan_language_conventions");
+        setGenerateExamStep("generate");
+      }}
+    >
+      Language Conventions
+    </button>
+
+    <button
+      className="dashboard-button"
+      onClick={() => {
+        setGenerateExamType("naplan_reading");
+        setGenerateExamStep("generate");
+      }}
+    >
+      Reading
+    </button>
+
+    <button
+      className="dashboard-button"
+      onClick={() => {
+        setGenerateExamType("naplan_writing");
+        setGenerateExamStep("generate");
+      }}
+    >
+      Writing
+    </button>
+  </div>
+)}
+
                    {/* STEP 3: GENERATE */}
                    {generateExamStep === "generate" && (
                      <>
@@ -497,8 +554,14 @@ const AdminPanel = () => {
                        {generateExamCategory === "foundational" && (
                          <GenerateExam_foundational />
                        )}
+                     {generateExamCategory === "naplan" &&
+                     generateExamType === "naplan_numeracy" && (
+                     <GenerateExam_naplan_numeracy />
+                     )}
                      </>
                    )}
+                    
+
                
                  </div>
                )}
