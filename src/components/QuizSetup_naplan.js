@@ -17,6 +17,18 @@ export default function QuizSetup_naplan({ examType }) {
     numTopics: 1,
     topics: [],
   });
+  useEffect(() => {
+    if (
+      quiz.subject !== "numeracy" ||
+      !quiz.year ||
+      !quiz.difficulty
+    ) {
+      setAvailableTopics([]);
+      return;
+    }
+  
+    // fetch logic here
+  }, [quiz.subject, quiz.year, quiz.difficulty]);
 
   /* ============================
      Sync subject with examType
@@ -138,7 +150,7 @@ export default function QuizSetup_naplan({ examType }) {
         });
 
         const res = await fetch(
-          `https://web-production-481a5.up.railway.app/api/topics?${params.toString()}`
+          `https://web-production-481a5.up.railway.app/api/topics-naplan-numeracy?${params.toString()}`
         );
 
         if (!res.ok) throw new Error("Failed to fetch topics");
