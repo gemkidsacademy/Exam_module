@@ -8,16 +8,26 @@ export default function QuizSetup_naplan({ examType }) {
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [qbLoading, setQbLoading] = useState(false);
   useEffect(() => {
-  if (examType) {
+    if (examType) {
+      setQuiz((prev) => ({
+        ...prev,
+        subject: examType.replace("naplan_", ""),
+      }));
+      setAvailableTopics([]);
+      setTotalQuestions(0);
+      setShowQuestionBank(false);
+    }
+  }, [examType]);
+  useEffect(() => {
     setQuiz((prev) => ({
       ...prev,
-      subject: examType.replace("naplan_", ""),
+      topics: [],
     }));
     setAvailableTopics([]);
     setTotalQuestions(0);
     setShowQuestionBank(false);
-  }
-}, [examType]);
+  }, [quiz.subject]);
+
 
   const handleViewQuestionBank = async () => {
     try {
