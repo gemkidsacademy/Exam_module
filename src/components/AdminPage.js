@@ -9,6 +9,8 @@ import StudentReportShell_backend from "./StudentReportShell_backend";
 import ExamSelector from "./ExamSelector";
 import UploadWordNaplanLanguageConventions from "./UploadWordNaplanLanguageConventions";
 import UploadWordNaplanNumeracy from "./UploadWordNaplanNumeracy";
+import QuizSetup_naplan from "./QuizSetup_naplan";
+
 
 
 
@@ -274,23 +276,30 @@ const AdminPanel = () => {
          
              {/* STEP 1: CATEGORY */}
              {!createExamCategory && (
-               <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-                 <button
-                    className="dashboard-button"
-                    onClick={() => setCreateExamCategory("selective")}
-                  >
-                    Selective Exam
-                  </button>
-                  
-                  <button
-                    className="dashboard-button"
-                    onClick={() => setCreateExamCategory("foundational")}
-                  >
-                    Foundational Exam
-                  </button>
-         
-               </div>
-             )}
+                 <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+                   <button
+                     className="dashboard-button"
+                     onClick={() => setCreateExamCategory("selective")}
+                   >
+                     Selective Exam
+                   </button>
+               
+                   <button
+                     className="dashboard-button"
+                     onClick={() => setCreateExamCategory("foundational")}
+                   >
+                     Foundational Exam
+                   </button>
+               
+                   <button
+                     className="dashboard-button"
+                     onClick={() => setCreateExamCategory("naplan")}
+                   >
+                     NAPLAN
+                   </button>
+                 </div>
+               )}
+
          
              {/* STEP 2: SELECTIVE OPTIONS */}
              {createExamCategory === "selective" && !createExamType && (
@@ -325,7 +334,39 @@ const AdminPanel = () => {
          
                </div>
              )}
-         
+             
+             {createExamCategory === "naplan" && !createExamType && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+                <button
+                  className="dashboard-button"
+                  onClick={() => setCreateExamType("naplan_numeracy")}
+                >
+                  Numeracy
+                </button>
+            
+                <button
+                  className="dashboard-button"
+                  onClick={() => setCreateExamType("naplan_language_conventions")}
+                >
+                  Language Conventions
+                </button>
+            
+                <button
+                  className="dashboard-button"
+                  onClick={() => setCreateExamType("naplan_reading")}
+                >
+                  Reading
+                </button>
+            
+                <button
+                  className="dashboard-button"
+                  onClick={() => setCreateExamType("naplan_writing")}
+                >
+                  Writing
+                </button>
+              </div>
+            )}
+
              {/* STEP 2B: FOUNDATIONAL */}
              {createExamCategory === "foundational" && !createExamType && (
                <button
@@ -343,6 +384,13 @@ const AdminPanel = () => {
              {createExamType === "foundational" && <QuizSetup_foundational />}
              {createExamType === "reading" && <QuizSetup_reading />}
              {createExamType === "writing" && <QuizSetup_writing />}
+
+             {createExamCategory === "naplan" && createExamType && (
+                 <QuizSetup_naplan examType={createExamType} />
+               )}
+
+             
+             
              
          
            </div>
