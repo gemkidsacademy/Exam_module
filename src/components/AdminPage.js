@@ -382,10 +382,9 @@ const AdminPanel = () => {
              {createExamType === "writing" && <QuizSetup_writing />}
 
              {createExamCategory === "naplan" && createExamType && (
-              <QuizSetup_naplan
-                key={createExamType}
-                examType={createExamType}
-              />
+              <QuizSetup_naplan examType={createExamType} />
+            )}
+
             )}
 
 
