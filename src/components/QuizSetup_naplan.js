@@ -7,15 +7,7 @@ export default function QuizSetup_naplan({ examType }) {
   const [questionBank, setQuestionBank] = useState([]);
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [qbLoading, setQbLoading] = useState(false);
-  useEffect(() => {
-  if (examType) {
-    setQuiz((prev) => ({
-      ...prev,
-      subject: examType.replace("naplan_", ""),
-    }));
-  }
-}, [examType]);
-
+  
   // examType no longer controls subject for NAPLAN
   
 
@@ -62,7 +54,7 @@ export default function QuizSetup_naplan({ examType }) {
 
   const [quiz, setQuiz] = useState({
   className: "naplan",
-  subject: examType?.replace("naplan_", "") || "",
+  subject: "",
   year: "",
   difficulty: "",
   numTopics: 1,
