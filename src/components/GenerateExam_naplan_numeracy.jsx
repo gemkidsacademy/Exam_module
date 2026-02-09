@@ -12,7 +12,7 @@ const GenerateExam_naplan_numeracy = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8000/naplan/numeracy/generate-exam",
+        "https://web-production-481a5.up.railway.app/naplan/numeracy/generate-exam",
         {
           method: "POST",
           headers: {
