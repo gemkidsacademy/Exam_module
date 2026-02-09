@@ -11,14 +11,16 @@ export default function QuizSetup_naplan({ examType }) {
 
   const [quiz, setQuiz] = useState({
     className: "naplan",
-    subject: examType.replace("naplan_", ""), // ✅ SINGLE SOURCE
+    subject: examType.replace("naplan_", ""),
     year: "",
     difficulty: "",
     numTopics: 1,
     topics: [],
   });
 
-  /* keep subject synced with examType */
+  /* ============================
+     Sync subject with examType
+  ============================ */
   useEffect(() => {
     setQuiz((prev) => ({
       ...prev,
@@ -30,9 +32,61 @@ export default function QuizSetup_naplan({ examType }) {
     setShowQuestionBank(false);
   }, [examType]);
 
+  /* ============================
+     Input handlers
+  ============================ */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setQuiz((prev) => ({ ...prev, [name]: value }));
+  };
+
+  /* ============================
+     Generate Topics
+  ============================ */
+  const generateTopics = () => {
+    const num = parseInt(quiz.numTopics) || 1;
+
+    const topicsArray = Array.from({ length: num }, () => ({
+      name: "",
+      ai: 0,
+      db: 0,
+      total: 0,
+    }));
+
+    setQuiz((prev) => ({ ...prev, topics: topicsArray }));
+    setTotalQuestions(0);
+  };
+
+  /* ============================
+     Topic handlers
+  ============================ */
+  const handleTopicNameChange = (index, value) => {
+    setQuiz((prev) => {
+      const topics = [...prev.topics];
+      topics[index].name = value;
+      return { ...prev, topics };
+    });
+  };
+
+  const handleTopicChange = (index, field, value) => {
+    setQuiz((prev) => {
+      const topics = [...prev.topics];
+      const num = Number(value) || 0;
+
+      topics[index][field] = num;
+      topics[index].total =
+        Number(topics[index].ai || 0) +
+        Number(topics[index].db || 0);
+
+      const globalTotal = topics.reduce(
+        (sum, t) => sum + (t.total || 0),
+        0
+      );
+
+      setTotalQuestions(globalTotal);
+
+      return { ...prev, topics };
+    });
   };
 
   /* ============================
@@ -47,9 +101,6 @@ export default function QuizSetup_naplan({ examType }) {
     try {
       setQbLoading(true);
       setShowQuestionBank(false);
-
-      console.log("[QB] subject:", quiz.subject);
-      console.log("[QB] year:", quiz.year);
 
       const res = await fetch(
         `https://web-production-481a5.up.railway.app/api/admin/question-bank/naplan?subject=${quiz.subject}&year=${quiz.year}`
@@ -127,7 +178,7 @@ export default function QuizSetup_naplan({ examType }) {
         <option value="1">Year 1</option>
         <option value="3">Year 3</option>
       </select>
-      
+
       <label>Difficulty:</label>
       <select
         name="difficulty"
@@ -139,15 +190,77 @@ export default function QuizSetup_naplan({ examType }) {
         <option value="medium">Medium</option>
         <option value="hard">Hard</option>
       </select>
-      <label>Number of Topics:</label>
-        <input
-          type="number"
-          name="numTopics"
-          min="1"
-          value={quiz.numTopics}
-          onChange={handleInputChange}
-        />
 
+      <label>Number of Topics:</label>
+      <input
+        type="number"
+        name="numTopics"
+        min="1"
+        value={quiz.numTopics}
+        onChange={handleInputChange}
+      />
+
+      <button
+        type="button"
+        onClick={generateTopics}
+        disabled={!quiz.year || !quiz.difficulty}
+      >
+        Generate Topics
+      </button>
+
+      {/* ============================
+         Topics
+      ============================ */}
+      <div className="topics-container">
+        {quiz.topics.map((topic, index) => (
+          <div className="topic" key={index}>
+            <h4>Topic {index + 1}</h4>
+
+            <label>Topic Name:</label>
+            <select
+              value={topic.name}
+              onChange={(e) =>
+                handleTopicNameChange(index, e.target.value)
+              }
+            >
+              <option value="">Select topic</option>
+              {availableTopics.map((t) => (
+                <option key={t.name} value={t.name}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+
+            <label>AI Questions:</label>
+            <input
+              type="number"
+              min="0"
+              value={topic.ai}
+              onChange={(e) =>
+                handleTopicChange(index, "ai", e.target.value)
+              }
+            />
+
+            <label>DB Questions:</label>
+            <input
+              type="number"
+              min="0"
+              value={topic.db}
+              onChange={(e) =>
+                handleTopicChange(index, "db", e.target.value)
+              }
+            />
+          </div>
+        ))}
+      </div>
+
+      <div className="total-section">
+        <h3>Total Questions: {totalQuestions}</h3>
+      </div>
+
+      {/* ============================
+         Question Bank
+      ============================ */}
       <div style={{ marginTop: "15px" }}>
         <button
           type="button"
@@ -158,9 +271,6 @@ export default function QuizSetup_naplan({ examType }) {
         </button>
       </div>
 
-      {/* ============================
-         Question Bank Table
-      ============================ */}
       {showQuestionBank && (
         <div className="question-bank" style={{ marginTop: "20px" }}>
           <h3>Question Bank Summary</h3>
