@@ -128,7 +128,7 @@ export default function QuizSetup_naplan({ examType }) {
            `https://web-production-481a5.up.railway.app/api/topics?${params.toString()}`
             );
 
-        );
+      
 
         if (!res.ok) throw new Error("Failed to fetch topics");
 
