@@ -8,6 +8,20 @@ export default function QuizSetup_naplan({ examType }) {
   const [questionBank, setQuestionBank] = useState([]);
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [qbLoading, setQbLoading] = useState(false);
+  const getAllowedRange = (year) => {
+    if (year === "3") {
+      return { min: 35, max: 40 };
+    }
+  
+    if (year === "5") {
+      return { min: 40, max: 45 };
+    }
+  
+    return null;
+  };
+  
+
+  
 
   const [quiz, setQuiz] = useState({
     className: "naplan",
@@ -17,19 +31,13 @@ export default function QuizSetup_naplan({ examType }) {
     numTopics: 1,
     topics: [],
   });
-  useEffect(() => {
-    if (
-      quiz.subject !== "numeracy" ||
-      !quiz.year ||
-      !quiz.difficulty
-    ) {
-      setAvailableTopics([]);
-      return;
-    }
-  
-    // fetch logic here
-  }, [quiz.subject, quiz.year, quiz.difficulty]);
+  const allowedRange = getAllowedRange(quiz.year);
+  const isTotalValid =
+    allowedRange &&
+    totalQuestions >= allowedRange.min &&
+    totalQuestions <= allowedRange.max;
 
+  
   /* ============================
      Sync subject with examType
   ============================ */
@@ -81,25 +89,35 @@ export default function QuizSetup_naplan({ examType }) {
   };
 
   const handleTopicChange = (index, field, value) => {
-    setQuiz((prev) => {
-      const topics = [...prev.topics];
-      const num = Number(value) || 0;
+  setQuiz((prev) => {
+    const topics = [...prev.topics];
+    const num = Number(value) || 0;
 
-      topics[index][field] = num;
-      topics[index].total =
-        Number(topics[index].ai || 0) +
-        Number(topics[index].db || 0);
+    topics[index][field] = num;
+    topics[index].total =
+      Number(topics[index].ai || 0) +
+      Number(topics[index].db || 0);
 
-      const globalTotal = topics.reduce(
-        (sum, t) => sum + (t.total || 0),
-        0
+    const globalTotal = topics.reduce(
+      (sum, t) => sum + (t.total || 0),
+      0
+    );
+
+    const range = getAllowedRange(prev.year);
+
+    if (range && globalTotal > range.max) {
+      alert(
+        `Total questions cannot exceed ${range.max} for Year ${prev.year}`
       );
+      return prev; // block the update
+    }
 
-      setTotalQuestions(globalTotal);
+    setTotalQuestions(globalTotal);
 
-      return { ...prev, topics };
-    });
-  };
+    return { ...prev, topics };
+  });
+};
+
 
   /* ============================
      View Question Bank
@@ -143,11 +161,10 @@ export default function QuizSetup_naplan({ examType }) {
     const fetchTopics = async () => {
       try {
         const params = new URLSearchParams({
-          class_name: "naplan",
-          subject: quiz.subject,
           year: quiz.year,
           difficulty: quiz.difficulty,
         });
+
 
         const res = await fetch(
           `https://web-production-481a5.up.railway.app/api/topics-naplan-numeracy?${params.toString()}`
@@ -187,8 +204,8 @@ export default function QuizSetup_naplan({ examType }) {
       <label>Year:</label>
       <select name="year" value={quiz.year} onChange={handleInputChange}>
         <option value="">Select Year</option>
-        <option value="1">Year 1</option>
         <option value="3">Year 3</option>
+        <option value="5">Year 5</option>
       </select>
 
       <label>Difficulty:</label>
@@ -266,9 +283,22 @@ export default function QuizSetup_naplan({ examType }) {
         ))}
       </div>
 
-      <div className="total-section">
-        <h3>Total Questions: {totalQuestions}</h3>
-      </div>
+     <div className="total-section">
+      <h3>Total Questions: {totalQuestions}</h3>
+    
+      {allowedRange && (
+        <p
+          style={{
+            color: isTotalValid ? "green" : "red",
+            fontWeight: "bold",
+          }}
+        >
+          Allowed range for Year {quiz.year}:{" "}
+          {allowedRange.min} to {allowedRange.max}
+        </p>
+      )}
+    </div>
+
 
       {/* ============================
          Question Bank
