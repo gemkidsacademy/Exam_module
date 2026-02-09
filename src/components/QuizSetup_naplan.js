@@ -161,13 +161,13 @@ export default function QuizSetup_naplan({ examType }) {
     const fetchTopics = async () => {
       try {
         const params = new URLSearchParams({
+          subject: quiz.subject,
           year: quiz.year,
           difficulty: quiz.difficulty,
         });
-
-
+        
         const res = await fetch(
-          `https://web-production-481a5.up.railway.app/api/topics-naplan-numeracy?${params.toString()}`
+          `https://web-production-481a5.up.railway.app/api/topics-naplan?${params.toString()}`
         );
 
         if (!res.ok) throw new Error("Failed to fetch topics");
