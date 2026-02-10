@@ -1,0 +1,121 @@
+/* ===============================
+   ROOT SHELL
+=============================== */
+.examShell {
+  min-height: 100vh;
+  background: #f5f7fa;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* ===============================
+   MAIN CONTAINER
+=============================== */
+.examContainer {
+  width: 100%;
+  max-width: 1100px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  padding: 24px 28px 28px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===============================
+   HEADER
+=============================== */
+.examHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* ===============================
+   QUESTION INDEX ROW
+=============================== */
+.indexRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 24px;
+}
+
+/* Base circle */
+.indexCircle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.1s ease, background-color 0.1s ease;
+}
+
+/* States */
+.indexNotVisited {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.indexVisited {
+  background: #93c5fd;
+  color: #1e3a8a;
+}
+
+.indexAnswered {
+  background: #22c55e;
+  color: #ffffff;
+}
+
+/* Review states */
+.indexCorrect {
+  background: #22c55e;
+  color: #ffffff;
+}
+
+.indexIncorrect {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.indexSkipped {
+  background: #9ca3af;
+  color: #ffffff;
+}
+
+.indexCircle:hover {
+  transform: translateY(-1px);
+}
+
+/* ===============================
+   CONTENT HELPERS
+=============================== */
+.counter {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* ===============================
+   RESPONSIVE
+=============================== */
+@media (max-width: 768px) {
+  .examContainer {
+    padding: 18px 16px 20px;
+  }
+
+  .indexCircle {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+  }
+}
