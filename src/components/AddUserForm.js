@@ -9,7 +9,7 @@ export default function AddStudentForm() {
   const [classDay, setClassDay] = useState("");
   const [parentEmail, setParentEmail] = useState("");
   const CLASS_NAME_OPTIONS = [
-  "Kindergarten",
+  "NAPLAN",
   "Selective",
   "Year 1",
   "Year 2",
