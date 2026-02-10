@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback } from "react";
 import "./UploadPDF.css";
 
 export default function UploadWord() {
@@ -61,23 +61,39 @@ export default function UploadWord() {
   };
 
   // --------------------------------------------------
-  // Group BACKEND EVENTS → Block → Unique Questions
+  // Group BACKEND EVENTS → Block → Questions + Block Errors
   // --------------------------------------------------
   const groupByBlock = useCallback((rows) => {
     const blockMap = {};
 
     rows.forEach((row) => {
-      if (!row.block || !row.question) return;
-
       const b = row.block;
-      const q = row.question;
+      if (!b) return;
 
       if (!blockMap[b]) {
         blockMap[b] = {
           block: b,
           questions: {},
+          blockErrors: [],
         };
       }
+
+      // -----------------------------
+      // Block-level error (no question)
+      // -----------------------------
+      if (!row.question) {
+        if (row.status !== "success") {
+          blockMap[b].blockErrors.push(
+            `${row.error_code || "ERROR"}: ${row.details || "Unknown issue"}`
+          );
+        }
+        return;
+      }
+
+      // -----------------------------
+      // Question-level handling
+      // -----------------------------
+      const q = row.question;
 
       if (!blockMap[b].questions[q]) {
         blockMap[b].questions[q] = {
@@ -89,21 +105,19 @@ export default function UploadWord() {
 
       if (row.status !== "success") {
         blockMap[b].questions[q].status = "failed";
-
-        if (row.error_code || row.details) {
-          blockMap[b].questions[q].errors.add(
-            `${row.error_code || "ERROR"}: ${row.details || "Unknown issue"}`
-          );
-        }
+        blockMap[b].questions[q].errors.add(
+          `${row.error_code || "ERROR"}: ${row.details || "Unknown issue"}`
+        );
       }
     });
 
     return Object.values(blockMap)
       .map((block) => ({
         block: block.block,
-        hasError: Object.values(block.questions).some(
-          (q) => q.status !== "success"
-        ),
+        hasError:
+          block.blockErrors.length > 0 ||
+          Object.values(block.questions).some((q) => q.status !== "success"),
+        blockErrors: block.blockErrors,
         questions: Object.values(block.questions).map((q) => ({
           ...q,
           errors: Array.from(q.errors),
@@ -111,17 +125,6 @@ export default function UploadWord() {
       }))
       .sort((a, b) => a.block - b.block);
   }, []);
-
-  // -----------------------------
-  // Accurate total questions (frontend truth)
-  // -----------------------------
-  const totalQuestions = useMemo(() => {
-    const set = new Set();
-    blocks.forEach((b) =>
-      b.questions.forEach((q) => set.add(q.question))
-    );
-    return set.size;
-  }, [blocks]);
 
   // -----------------------------
   // Toggle expand/collapse
@@ -161,7 +164,7 @@ export default function UploadWord() {
 
       {summary && (
         <div className="upload-summary">
-          📘 Total: <strong>{totalQuestions}</strong> &nbsp;|&nbsp;
+          📘 Total: <strong>{summary.total_questions}</strong> &nbsp;|&nbsp;
           ✅ Saved: <strong>{summary.saved}</strong> &nbsp;|&nbsp;
           ⚠️ Skipped: <strong>{summary.skipped}</strong>
         </div>
@@ -197,18 +200,26 @@ export default function UploadWord() {
                     </td>
                     <td>
                       {block.hasError
-                        ? "Click to view question-level issues"
+                        ? "Click to view issues"
                         : "All questions saved"}
                     </td>
                   </tr>
+
+                  {/* Block-level errors */}
+                  {expandedBlocks[block.block] &&
+                    block.blockErrors.map((err, i) => (
+                      <tr key={`be-${i}`}>
+                        <td colSpan="3" style={{ paddingLeft: "32px", color: "#b91c1c" }}>
+                          ⚠️ {err}
+                        </td>
+                      </tr>
+                    ))}
 
                   {/* Question rows */}
                   {expandedBlocks[block.block] &&
                     block.questions.map((q) => (
                       <tr key={q.question}>
-                        <td style={{ paddingLeft: "32px" }}>
-                          {q.question}
-                        </td>
+                        <td style={{ paddingLeft: "32px" }}>{q.question}</td>
                         <td style={{ textAlign: "center" }}>
                           {q.status === "success" ? "✅" : "❌"}
                         </td>
