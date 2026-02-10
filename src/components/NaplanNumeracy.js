@@ -250,43 +250,45 @@ export default function NaplanNumeracy({
         </div>
 
         {/* QUESTION */}
-        <div className="question-card">
-          {currentQ.blocks?.map((block, idx) => {
-            if (block.type === "text") {
-              return (
-                <p key={idx} className="question-text">
-                  {block.content}
-                </p>
-              );
-            }
-            return null;
-          })}
+<div className="question-card">
+  <div className="question-content-centered">
+    {currentQ.blocks?.map((block, idx) => {
+      if (block.type === "text") {
+        return (
+          <p key={idx} className="question-text">
+            {block.content}
+          </p>
+        );
+      }
+      return null;
+    })}
 
-          {/* NUMERIC INPUT */}
-          {currentQ.answer_type === "NUMERIC_INPUT" && (
-            <input
-              type="number"
-              className="numeric-input"
-              value={answers[String(currentQ.q_id)] || ""}
-              onChange={(e) => handleAnswer(e.target.value)}
-              disabled={isReview}
-            />
-          )}
-          {/* Text INPUT */}
-          {currentQ.answer_type === "TEXT_INPUT" && (
-            <textarea
-              className="text-input"
-              rows={2}
-              placeholder="Type your answer here"
-              value={answers[String(currentQ.q_id)] || ""}
-              onChange={(e) => handleAnswer(e.target.value)}
-              disabled={isReview}
-            />
+    {/* NUMERIC INPUT */}
+    {currentQ.answer_type === "NUMERIC_INPUT" && (
+      <input
+        type="number"
+        className="numeric-input"
+        value={answers[String(currentQ.q_id)] || ""}
+        onChange={(e) => handleAnswer(e.target.value)}
+        disabled={isReview}
+      />
+    )}
 
-          )}
+    {/* TEXT INPUT */}
+    {currentQ.answer_type === "TEXT_INPUT" && (
+      <textarea
+        className="text-input"
+        rows={2}
+        placeholder="Type your answer here"
+        value={answers[String(currentQ.q_id)] || ""}
+        onChange={(e) => handleAnswer(e.target.value)}
+        disabled={isReview}
+      />
+    )}
+  </div>
+</div>
 
-                
-        </div>
+
 
         {/* NAVIGATION */}
         <div className="nav-buttons">
