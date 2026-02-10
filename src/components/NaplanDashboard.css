@@ -1,0 +1,124 @@
+/* ===============================
+   ROOT
+=============================== */
+.naplan-dashboard {
+  min-height: 100vh;
+  background: #f5f7fa;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===============================
+   SUBJECT SELECTION WRAPPER
+=============================== */
+.subject-selection-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===============================
+   LOGO
+=============================== */
+.dashboard-logo {
+  display: block;
+  margin: 0 auto 20px;
+  width: 180px;
+}
+
+/* ===============================
+   SELECTION CARD
+=============================== */
+.subject-selection-card {
+  background: #ffffff;
+  padding: 40px 50px;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+}
+
+/* ===============================
+   TITLE
+=============================== */
+.dashboard-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #1f2937;
+}
+
+.title-divider {
+  width: 60px;
+  height: 4px;
+  background: rgb(0, 140, 200);
+  margin: 12px auto 28px;
+  border-radius: 2px;
+}
+
+/* ===============================
+   SUBJECT BUTTONS
+=============================== */
+.subject-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.subject-button {
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: none;
+  background: rgb(0, 140, 200);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease,
+    background-color 0.15s ease;
+}
+
+.subject-button:hover {
+  background: rgb(0, 120, 180);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+.subject-button:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* ===============================
+   CONTENT AREA (EXAM)
+=============================== */
+.content-area {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.exam-root {
+  width: 100%;
+  max-width: 1100px;
+}
+
+/* ===============================
+   RESPONSIVE
+=============================== */
+@media (max-width: 640px) {
+  .subject-selection-card {
+    padding: 30px 24px;
+  }
+
+  .dashboard-title {
+    font-size: 20px;
+  }
+
+  .subject-buttons {
+    grid-template-columns: 1fr;
+  }
+}
