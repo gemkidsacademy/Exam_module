@@ -4,12 +4,12 @@ import "./UploadPDF.css";
 export default function UploadWord() {
   const [wordFile, setWordFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [blockReport, setBlockReport] = useState([]);
+  const [blocks, setBlocks] = useState([]);
   const [summary, setSummary] = useState(null);
 
   const handleFileChange = (e) => {
     setWordFile(e.target.files[0]);
-    setBlockReport([]);
+    setBlocks([]);
     setSummary(null);
   };
 
@@ -38,8 +38,8 @@ export default function UploadWord() {
       if (!res.ok) throw new Error("Upload failed");
 
       const data = await res.json();
-      setBlockReport(data.blocks || []);
       setSummary(data.summary || null);
+      setBlocks(groupBlocks(data.blocks || []));
       setWordFile(null);
     } catch (err) {
       console.error(err);
@@ -49,15 +49,38 @@ export default function UploadWord() {
     }
   };
 
-  // -----------------------------
-  // Frontend-derived counts
-  // -----------------------------
-  const failedBlocks = blockReport.filter(
-    (b) => b.status === "failed"
-  ).length;
+  // --------------------------------------------------
+  // GROUP + DEDUPLICATE BLOCK REPORT (KEY FIX)
+  // --------------------------------------------------
+  const groupBlocks = (rows) => {
+    const map = {};
 
-  const totalSkipped =
-    (summary?.skipped_partial || 0) + failedBlocks;
+    rows.forEach((row) => {
+      const id = row.block;
+
+      if (!map[id]) {
+        map[id] = {
+          block: id,
+          hasError: false,
+          details: new Set(),
+        };
+      }
+
+      if (row.status !== "success") {
+        map[id].hasError = true;
+      }
+
+      if (row.details) {
+        map[id].details.add(row.details);
+      }
+    });
+
+    return Object.values(map).map((b) => ({
+      block: b.block,
+      status: b.hasError ? "partial" : "success",
+      details: Array.from(b.details),
+    }));
+  };
 
   return (
     <div className="upload-pdf-container">
@@ -66,7 +89,7 @@ export default function UploadWord() {
       <form onSubmit={handleUpload}>
         <input
           type="file"
-          accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          accept=".doc,.docx"
           onChange={handleFileChange}
           disabled={uploading}
         />
@@ -76,35 +99,24 @@ export default function UploadWord() {
         </button>
 
         {uploading && (
-          <div
-            style={{
-              marginTop: "14px",
-              padding: "10px",
-              textAlign: "center",
-              fontSize: "14px",
-              fontWeight: 500,
-              background: "#f3f4f6",
-              borderRadius: "6px",
-              color: "#374151",
-            }}
-          >
+          <div className="upload-hint">
             ⏳ Please wait… processing your Word document.
           </div>
         )}
       </form>
 
       {summary && (
-        <div style={{ marginTop: "16px", fontSize: "14px" }}>
+        <div className="upload-summary">
           ✅ Saved: <strong>{summary.saved}</strong> &nbsp;|&nbsp;
-          ⚠️ Skipped: <strong>{totalSkipped}</strong>
+          ⚠️ Skipped: <strong>{summary.skipped}</strong>
         </div>
       )}
 
-      {blockReport.length > 0 && (
+      {blocks.length > 0 && (
         <div style={{ marginTop: "24px" }}>
           <h3>Block Processing Report</h3>
 
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <table className="report-table">
             <thead>
               <tr>
                 <th>Block</th>
@@ -114,15 +126,23 @@ export default function UploadWord() {
             </thead>
 
             <tbody>
-              {blockReport.map((row, idx) => (
-                <tr key={idx}>
+              {blocks.map((row) => (
+                <tr key={row.block}>
                   <td>{row.block}</td>
                   <td style={{ textAlign: "center" }}>
-                    {row.status === "success" && "✅"}
-                    {row.status === "failed" && "❌"}
-                    {row.status === "partial" && "⚠️"}
+                    {row.status === "success" ? "✅" : "⚠️"}
                   </td>
-                  <td>{row.details}</td>
+                  <td>
+                    {row.details.length === 0 ? (
+                      "—"
+                    ) : (
+                      <ul style={{ margin: 0, paddingLeft: "18px" }}>
+                        {row.details.map((d, i) => (
+                          <li key={i}>{d}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
