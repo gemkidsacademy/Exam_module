@@ -28,16 +28,18 @@ const SUBJECTS = [
     key: "language_conventions",
     component: NaplanLanguageConventions,
   },
-  {
-    label: "Reading",
-    key: "reading",
-    component: NaplanReading,
-  },
-  {
-    label: "Writing",
-    key: "writing",
-    component: NaplanWriting,
-  },
+
+  // Temporarily disabled
+  // {
+  //   label: "Reading",
+  //   key: "reading",
+  //   component: NaplanReading,
+  // },
+  // {
+  //   label: "Writing",
+  //   key: "writing",
+  //   component: NaplanWriting,
+  // },
 ];
 
 const NaplanDashboard = () => {
