@@ -16,6 +16,7 @@ import DeleteDoctor from "./components/DeleteDoctor";
 import UsageDashboard from "./components/UsageDashboard";
 import SelectiveDashboard from "./components/SelectiveDashboard";
 import Foundational_dashboard from "./components/Foundational_dashboard";
+import NaplanDashboard from "./components/NaplanDashboard";
 
 
 // --- Login Page ---
@@ -68,6 +69,8 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
 
     if (data?.name === "Admin") {
       navigate("/AdminPanel");
+    } else if (data?.class_name === "NAPLAN") {
+      navigate("/NAPLAN");
     } else if (data?.class_name === "Selective") {
       navigate("/SelectiveDashboard");
     } else {
@@ -193,6 +196,15 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/NAPLAN"
+            element={
+              <PrivateRoute isLoggedIn={isLoggedIn}>
+                <NaplanDashboard />
+              </PrivateRoute>
+            }
+          />
+
           <Route
             path="/adminpanel"
             element={
