@@ -64,6 +64,7 @@ export default function NaplanNumeracy({
     setExamAttemptId(data.exam_attempt_id);
     setMode("report");
   }, [API_BASE, studentId]);
+  
 
   /* ============================================================
      START / RESUME EXAM
@@ -270,6 +271,18 @@ export default function NaplanNumeracy({
               disabled={isReview}
             />
           )}
+          {/* Text INPUT */}
+          {currentQ.answer_type === "TEXT_INPUT" && (
+            <input
+              type="text"
+              className="text-input"
+              value={answers[String(currentQ.q_id)] || ""}
+              onChange={(e) => handleAnswer(e.target.value)}
+              disabled={isReview}
+            />
+          )}
+
+                
         </div>
 
         {/* NAVIGATION */}
