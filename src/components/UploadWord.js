@@ -47,7 +47,7 @@ export default function UploadWord() {
       const data = await res.json();
 
       // -----------------------------
-      // FAIL LOUD HANDLING (422 etc.)
+      // FAIL-LOUD handling (422 etc.)
       // -----------------------------
       if (!res.ok) {
         setError(
@@ -67,6 +67,8 @@ export default function UploadWord() {
       setUploading(false);
     }
   };
+
+  const skippedExams = exams.filter((e) => e.status !== "success");
 
   // -----------------------------
   // Render
@@ -115,7 +117,25 @@ export default function UploadWord() {
       )}
 
       {/* -----------------------------
-          Exam processing report
+          WHY some exams were skipped
+      ----------------------------- */}
+      {skippedExams.length > 0 && (
+        <div className="upload-failures">
+          <h4>⚠️ Why some exams were skipped</h4>
+          <ul>
+            {skippedExams.map((e, idx) => (
+              <li key={idx}>
+                <strong>Exam {e.exam}:</strong>{" "}
+                {e.error_code}
+                {e.details ? ` – ${e.details}` : ""}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* -----------------------------
+          Detailed exam report
       ----------------------------- */}
       {exams.length > 0 && (
         <div style={{ marginTop: "24px" }}>
