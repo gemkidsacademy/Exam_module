@@ -273,13 +273,15 @@ export default function NaplanNumeracy({
           )}
           {/* Text INPUT */}
           {currentQ.answer_type === "TEXT_INPUT" && (
-            <input
-              type="text"
+            <textarea
               className="text-input"
+              rows={2}
+              placeholder="Type your answer here"
               value={answers[String(currentQ.q_id)] || ""}
               onChange={(e) => handleAnswer(e.target.value)}
               disabled={isReview}
             />
+
           )}
 
                 
