@@ -49,9 +49,11 @@ export default function QuizSetup_naplan_language_conventions() {
 
     const topicsArray = Array.from({ length: num }, () => ({
       name: "",
+      ai: 0,
       db: 0,
       total: 0,
     }));
+
 
     setQuiz((prev) => ({ ...prev, topics: topicsArray }));
     setTotalQuestions(0);
@@ -68,31 +70,34 @@ export default function QuizSetup_naplan_language_conventions() {
     });
   };
 
-  const handleTopicChange = (index, value) => {
-    setQuiz((prev) => {
-      const topics = [...prev.topics];
-      const num = Number(value) || 0;
+  const handleTopicChange = (index, field, value) => {
+  setQuiz((prev) => {
+    const topics = [...prev.topics];
+    const num = Number(value) || 0;
 
-      topics[index].db = num;
-      topics[index].total = num;
+    topics[index][field] = num;
+    topics[index].total =
+      Number(topics[index].ai || 0) +
+      Number(topics[index].db || 0);
 
-      const globalTotal = topics.reduce(
-        (sum, t) => sum + (t.total || 0),
-        0
+    const globalTotal = topics.reduce(
+      (sum, t) => sum + (t.total || 0),
+      0
+    );
+
+    const range = getAllowedRange(prev.year);
+    if (range && globalTotal > range.max) {
+      alert(
+        `Total questions cannot exceed ${range.max} for Year ${prev.year}`
       );
+      return prev;
+    }
 
-      const range = getAllowedRange(prev.year);
-      if (range && globalTotal > range.max) {
-        alert(
-          `Total questions cannot exceed ${range.max} for Year ${prev.year}`
-        );
-        return prev;
-      }
+    setTotalQuestions(globalTotal);
+    return { ...prev, topics };
+  });
+};
 
-      setTotalQuestions(globalTotal);
-      return { ...prev, topics };
-    });
-  };
 
   /* ============================
      Fetch Available Topics
@@ -180,9 +185,11 @@ export default function QuizSetup_naplan_language_conventions() {
       num_topics: quiz.topics.length,
       topics: quiz.topics.map((t) => ({
         name: t.name,
+        ai: t.ai,
         db: t.db,
         total: t.total,
       })),
+
       total_questions: totalQuestions,
       };
     console.log("📤 LANGUAGE CONVENTIONS PAYLOAD:", payload);
@@ -270,15 +277,27 @@ export default function QuizSetup_naplan_language_conventions() {
               ))}
             </select>
 
-            <label>Questions:</label>
-            <input
-              type="number"
-              min="0"
-              value={topic.db}
-              onChange={(e) =>
-                handleTopicChange(index, e.target.value)
-              }
-            />
+            <label>AI Questions:</label>
+              <input
+                type="number"
+                min="0"
+                value={topic.ai}
+                onChange={(e) =>
+                  handleTopicChange(index, "ai", e.target.value)
+                }
+              />
+              
+              <label>DB Questions:</label>
+              <input
+                type="number"
+                min="0"
+                value={topic.db}
+                onChange={(e) =>
+                  handleTopicChange(index, "db", e.target.value)
+                }
+              />
+
+
           </div>
         ))}
       </div>
