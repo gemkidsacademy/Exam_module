@@ -75,7 +75,7 @@ export default function UploadWord() {
   // -----------------------------
   return (
     <div className="upload-pdf-container">
-      <h2>Upload Word Document (Exam Format)</h2>
+      <h2>Upload Word Document (Thinking Skills/Mathematical Reasoning)</h2>
 
       <form onSubmit={handleUpload}>
         <input
