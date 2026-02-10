@@ -212,8 +212,8 @@ export default function NaplanNumeracy({
   if (!currentQ) return null;
 
   return (
-    <div className={styles.examShell}>
-      <div className={styles.examContainer}>
+    <div className={`exam-shell ${styles.examShell}`}>
+      <div className={`exam-container ${styles.examContainer}`}>
 
         {/* HEADER */}
         <div className={styles.examHeader}>
