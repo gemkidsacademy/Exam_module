@@ -163,7 +163,8 @@ export default function NaplanNumeracy({
      ANSWERS
   ============================================================ */
   const handleAnswer = (value) => {
-    const qid = String(questions[currentIndex]?.q_id);
+    const qid = String(questions[currentIndex]?.id);
+
     if (!qid) return;
 
     setAnswers(prev => ({
@@ -175,7 +176,7 @@ export default function NaplanNumeracy({
   const goToQuestion = (idx) => {
     if (idx < 0 || idx >= questions.length) return;
 
-    const qid = String(questions[idx].q_id);
+    const qid = String(questions[idx].id);
     if (!isReview) {
       setVisited(prev => ({ ...prev, [qid]: true }));
     }
@@ -245,8 +246,24 @@ export default function NaplanNumeracy({
           </div>
         </div>
 
-        {/* Question blocks identical to Thinking Skills */}
-        {/* Options rendering depends on numeracy type (MCQ / numeric) */}
+        <div className={styles.questionBody}>
+          {currentQ.question_blocks?.map((block, idx) => {
+            if (block.type === "text") {
+              return <p key={idx}>{block.content}</p>;
+            }
+            return null;
+          })}
+        </div>
+        <div className={styles.answerBox}>
+          {(currentQ.question_type === 3 || currentQ.question_type === 4) && (
+            <input
+              type="text"
+              value={answers[String(currentQ.id)] || ""}
+              onChange={(e) => handleAnswer(e.target.value)}
+            />
+          )}
+        </div>
+
 
         {/* Navigation */}
         <div className="nav-buttons">
