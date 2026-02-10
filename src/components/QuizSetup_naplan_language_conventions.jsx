@@ -112,7 +112,7 @@ export default function QuizSetup_naplan_language_conventions() {
     const fetchTopics = async () => {
       try {
         const params = new URLSearchParams({
-          subject: "Language Conventions",
+          subject: "language_conventions",
           year: quiz.year,
           difficulty: quiz.difficulty,
         });
