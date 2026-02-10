@@ -174,7 +174,7 @@ export default function QuizSetup_naplan_language_conventions() {
 
     const payload = {
       class_name: "naplan",
-      subject: "language_conventions",
+      subject: "Language Conventions",
       year: Number(quiz.year),
       difficulty: quiz.difficulty,
       num_topics: quiz.topics.length,
@@ -184,8 +184,7 @@ export default function QuizSetup_naplan_language_conventions() {
         total: t.total,
       })),
       total_questions: totalQuestions,
-    };
-
+      };
     console.log("📤 LANGUAGE CONVENTIONS PAYLOAD:", payload);
 
     try {
