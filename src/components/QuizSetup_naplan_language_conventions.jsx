@@ -295,10 +295,36 @@ export default function QuizSetup_naplan_language_conventions() {
       </button>
 
       {showQuestionBank && (
-        <pre style={{ marginTop: "20px" }}>
-          {JSON.stringify(questionBank, null, 2)}
-        </pre>
+        <div className="question-bank" style={{ marginTop: "20px" }}>
+          <h3>Question Bank Summary</h3>
+      
+          {qbLoading ? (
+            <p>Loading...</p>
+          ) : questionBank.length === 0 ? (
+            <p>No questions found.</p>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>Difficulty</th>
+                  <th>Topic</th>
+                  <th>Total Questions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {questionBank.map((row, idx) => (
+                  <tr key={`${row.difficulty}-${row.topic}-${idx}`}>
+                    <td>{row.difficulty}</td>
+                    <td>{row.topic}</td>
+                    <td>{row.total_questions}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
       )}
+
     </div>
   );
 }
