@@ -1,4 +1,16 @@
 /* ============================================================
+   CENTER QUESTION CONTENT (SHORT QUESTIONS)
+============================================================ */
+.question-content-centered {
+  max-width: 720px;
+  margin: auto;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ============================================================
    EXAM MODE ROOT (FULL VIEWPORT, NO PAGE CONSTRAINTS)
 ============================================================ */
 .exam-shell {
