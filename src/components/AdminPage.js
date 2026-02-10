@@ -11,6 +11,8 @@ import UploadWordNaplanLanguageConventions from "./UploadWordNaplanLanguageConve
 import UploadWordNaplanNumeracy from "./UploadWordNaplanNumeracy";
 import QuizSetup_naplan from "./QuizSetup_naplan";
 import GenerateExam_naplan_numeracy from "./GenerateExam_naplan_numeracy";
+import GenerateExam_naplan_language_conventions from "./GenerateExam_naplan_language_conventions";
+
 import QuizSetup_naplan_language_conventions from "./QuizSetup_naplan_language_conventions";
 
 
@@ -560,6 +562,11 @@ const AdminPanel = () => {
                      generateExamType === "naplan_numeracy" && (
                      <GenerateExam_naplan_numeracy />
                      )}
+                     {generateExamCategory === "naplan" &&
+                     generateExamType === "naplan_language_conventions" && (
+                     <GenerateExam_naplan_language_conventions />
+                     )}
+
                      </>
                    )}
                     
