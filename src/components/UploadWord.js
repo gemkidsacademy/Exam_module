@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import "./UploadPDF.css";
 
 export default function UploadWord() {
@@ -48,6 +48,7 @@ export default function UploadWord() {
       }
 
       const data = await res.json();
+
       setSummary(data.summary || null);
       setBlocks(groupByBlock(data.blocks || []));
       setWordFile(null);
@@ -60,42 +61,70 @@ export default function UploadWord() {
   };
 
   // --------------------------------------------------
-  // Group rows into block → questions
+  // Group BACKEND EVENTS → Block → Unique Questions
   // --------------------------------------------------
   const groupByBlock = useCallback((rows) => {
-    const map = {};
+    const blockMap = {};
 
     rows.forEach((row) => {
-      const blockId = row.block;
+      if (!row.block || !row.question) return;
 
-      if (!map[blockId]) {
-        map[blockId] = {
-          block: blockId,
-          questions: [],
-          hasError: false,
+      const b = row.block;
+      const q = row.question;
+
+      if (!blockMap[b]) {
+        blockMap[b] = {
+          block: b,
+          questions: {},
         };
       }
 
-      // Question-level row
-      if (row.question) {
-        map[blockId].questions.push({
-          question: row.question,
-          status: row.status,
-          error_code: row.error_code,
-          details: row.details,
-        });
+      if (!blockMap[b].questions[q]) {
+        blockMap[b].questions[q] = {
+          question: q,
+          status: "success",
+          errors: new Set(),
+        };
+      }
 
-        if (row.status !== "success") {
-          map[blockId].hasError = true;
+      if (row.status !== "success") {
+        blockMap[b].questions[q].status = "failed";
+
+        if (row.error_code || row.details) {
+          blockMap[b].questions[q].errors.add(
+            `${row.error_code || "ERROR"}: ${row.details || "Unknown issue"}`
+          );
         }
       }
     });
 
-    return Object.values(map).sort((a, b) => a.block - b.block);
+    return Object.values(blockMap)
+      .map((block) => ({
+        block: block.block,
+        hasError: Object.values(block.questions).some(
+          (q) => q.status !== "success"
+        ),
+        questions: Object.values(block.questions).map((q) => ({
+          ...q,
+          errors: Array.from(q.errors),
+        })),
+      }))
+      .sort((a, b) => a.block - b.block);
   }, []);
 
   // -----------------------------
-  // Toggle block expand/collapse
+  // Accurate total questions (frontend truth)
+  // -----------------------------
+  const totalQuestions = useMemo(() => {
+    const set = new Set();
+    blocks.forEach((b) =>
+      b.questions.forEach((q) => set.add(q.question))
+    );
+    return set.size;
+  }, [blocks]);
+
+  // -----------------------------
+  // Toggle expand/collapse
   // -----------------------------
   const toggleBlock = (blockId) => {
     setExpandedBlocks((prev) => ({
@@ -132,7 +161,7 @@ export default function UploadWord() {
 
       {summary && (
         <div className="upload-summary">
-          📘 Total: <strong>{summary.total_questions}</strong> &nbsp;|&nbsp;
+          📘 Total: <strong>{totalQuestions}</strong> &nbsp;|&nbsp;
           ✅ Saved: <strong>{summary.saved}</strong> &nbsp;|&nbsp;
           ⚠️ Skipped: <strong>{summary.skipped}</strong>
         </div>
@@ -173,10 +202,10 @@ export default function UploadWord() {
                     </td>
                   </tr>
 
-                  {/* Expanded question rows */}
+                  {/* Question rows */}
                   {expandedBlocks[block.block] &&
-                    block.questions.map((q, idx) => (
-                      <tr key={idx} style={{ background: "#ffffff" }}>
+                    block.questions.map((q) => (
+                      <tr key={q.question}>
                         <td style={{ paddingLeft: "32px" }}>
                           {q.question}
                         </td>
@@ -186,7 +215,9 @@ export default function UploadWord() {
                         <td>
                           {q.status === "success"
                             ? "Saved"
-                            : `${q.error_code || "ERROR"}: ${q.details}`}
+                            : q.errors.map((e, i) => (
+                                <div key={i}>{e}</div>
+                              ))}
                         </td>
                       </tr>
                     ))}
