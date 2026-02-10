@@ -111,8 +111,7 @@ const NaplanDashboard = () => {
 
       {/* 4️⃣ EXAM */}
       {examPhase === "exam" && (
-        <main className="content-area">
-          <div className="exam-root">
+          <div className="exam-fullscreen-root">
             <ActiveComponent
               key={`naplan-${activeSubject.key}`}
               studentId={studentId}
@@ -122,8 +121,9 @@ const NaplanDashboard = () => {
               onExamFinish={() => setExamInProgress(false)}
             />
           </div>
-        </main>
-      )}
+        )}
+
+        
 
     </div>
   );
