@@ -6,7 +6,7 @@ import React, {
 } from "react";
 
 import "./ExamPage.css";
-import styles from "./ExamPageNaplan.module.css";
+import styles from "./ExamPageThinkingSkills.module.css";
 
 import NaplanNumeracyReview from "./NaplanNumeracyReview";
 import NaplanNumeracyReport from "./NaplanNumeracyReport";
@@ -20,14 +20,10 @@ export default function NaplanNumeracy({
 }) {
   const studentId = sessionStorage.getItem("student_id");
   const API_BASE = process.env.REACT_APP_API_URL;
-  const IMAGE_BASE =
-    "https://storage.googleapis.com/exammoduleimages/";
 
   if (!API_BASE) {
     throw new Error("❌ REACT_APP_API_URL is not defined");
   }
-
-  console.log("🔢 NaplanNumeracy MOUNTED");
 
   const hasSubmittedRef = useRef(false);
 
@@ -57,22 +53,16 @@ export default function NaplanNumeracy({
      LOAD REPORT
   ============================================================ */
   const loadReport = useCallback(async () => {
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/student/exam-report/naplan-numeracy?student_id=${studentId}`
-      );
+    const res = await fetch(
+      `${API_BASE}/api/student/exam-report/naplan-numeracy?student_id=${studentId}`
+    );
 
-      if (!res.ok) return;
+    if (!res.ok) return;
 
-      const data = await res.json();
-      console.log("📊 NAPLAN numeracy report:", data);
-
-      setReport(data);
-      setExamAttemptId(data.exam_attempt_id);
-      setMode("report");
-    } catch (err) {
-      console.error("❌ loadReport error:", err);
-    }
+    const data = await res.json();
+    setReport(data);
+    setExamAttemptId(data.exam_attempt_id);
+    setMode("report");
   }, [API_BASE, studentId]);
 
   /* ============================================================
@@ -111,32 +101,22 @@ export default function NaplanNumeracy({
   /* ============================================================
      FINISH EXAM
   ============================================================ */
-  const finishExam = useCallback(
-    async (reason = "submitted") => {
-      if (hasSubmittedRef.current) return;
-      hasSubmittedRef.current = true;
+  const finishExam = useCallback(async () => {
+    if (hasSubmittedRef.current) return;
+    hasSubmittedRef.current = true;
 
-      try {
-        await fetch(
-          `${API_BASE}/api/student/finish-exam/naplan-numeracy`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              student_id: studentId,
-              answers
-            })
-          }
-        );
-
-        await loadReport();
-        onExamFinish?.();
-      } catch (err) {
-        console.error("❌ finishExam error:", err);
+    await fetch(
+      `${API_BASE}/api/student/finish-exam/naplan-numeracy`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ student_id: studentId, answers })
       }
-    },
-    [API_BASE, studentId, answers, loadReport, onExamFinish]
-  );
+    );
+
+    await loadReport();
+    onExamFinish?.();
+  }, [API_BASE, studentId, answers, loadReport, onExamFinish]);
 
   /* ============================================================
      TIMER
@@ -146,7 +126,7 @@ export default function NaplanNumeracy({
 
     if (timeLeft <= 0) {
       setShowConfirmFinish(false);
-      finishExam("time_expired");
+      finishExam();
       return;
     }
 
@@ -163,24 +143,20 @@ export default function NaplanNumeracy({
      ANSWERS
   ============================================================ */
   const handleAnswer = (value) => {
-    const qid = String(questions[currentIndex]?.id);
-
+    const qid = String(questions[currentIndex]?.q_id);
     if (!qid) return;
 
-    setAnswers(prev => ({
-      ...prev,
-      [qid]: value
-    }));
+    setAnswers(prev => ({ ...prev, [qid]: value }));
+    setVisited(prev => ({ ...prev, [qid]: true }));
   };
 
   const goToQuestion = (idx) => {
     if (idx < 0 || idx >= questions.length) return;
 
-    const qid = String(questions[idx].id);
+    const qid = String(questions[idx].q_id);
     if (!isReview) {
       setVisited(prev => ({ ...prev, [qid]: true }));
     }
-
     setCurrentIndex(idx);
   };
 
@@ -237,35 +213,66 @@ export default function NaplanNumeracy({
     <div className={styles.examShell}>
       <div className={styles.examContainer}>
 
+        {/* HEADER */}
         <div className={styles.examHeader}>
-          {!isReview && (
-            <div className="timer">⏳ {formatTime(timeLeft)}</div>
-          )}
+          {!isReview && <div className="timer">⏳ {formatTime(timeLeft)}</div>}
           <div className="counter">
             Question {currentIndex + 1} / {questions.length}
           </div>
         </div>
 
-        <div className={styles.questionBody}>
-          {currentQ.question_blocks?.map((block, idx) => {
+        {/* QUESTION INDEX (same as Thinking Skills) */}
+        <div className={styles.indexRow}>
+          {questions.map((q, i) => {
+            let cls = styles.indexCircle;
+            const qid = String(q.q_id);
+
+            if (answers[qid]) {
+              cls += ` ${styles.indexAnswered}`;
+            } else if (visited[qid]) {
+              cls += ` ${styles.indexVisited}`;
+            } else {
+              cls += ` ${styles.indexNotVisited}`;
+            }
+
+            return (
+              <div
+                key={q.q_id}
+                className={cls}
+                onClick={() => goToQuestion(i)}
+              >
+                {i + 1}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* QUESTION */}
+        <div className="question-card">
+          {currentQ.blocks?.map((block, idx) => {
             if (block.type === "text") {
-              return <p key={idx}>{block.content}</p>;
+              return (
+                <p key={idx} className="question-text">
+                  {block.content}
+                </p>
+              );
             }
             return null;
           })}
-        </div>
-        <div className={styles.answerBox}>
-          {(currentQ.question_type === 3 || currentQ.question_type === 4) && (
+
+          {/* NUMERIC INPUT */}
+          {currentQ.answer_type === "NUMERIC_INPUT" && (
             <input
-              type="text"
-              value={answers[String(currentQ.id)] || ""}
+              type="number"
+              className="numeric-input"
+              value={answers[String(currentQ.q_id)] || ""}
               onChange={(e) => handleAnswer(e.target.value)}
+              disabled={isReview}
             />
           )}
         </div>
 
-
-        {/* Navigation */}
+        {/* NAVIGATION */}
         <div className="nav-buttons">
           <button
             className="nav-btn prev"
@@ -293,7 +300,6 @@ export default function NaplanNumeracy({
             </button>
           )}
         </div>
-
       </div>
 
       {showConfirmFinish && (
@@ -313,7 +319,7 @@ export default function NaplanNumeracy({
                 className="btn confirm"
                 onClick={() => {
                   setShowConfirmFinish(false);
-                  finishExam("manual_submit");
+                  finishExam();
                 }}
               >
                 Submit
