@@ -13,10 +13,11 @@ export default function QuizSetup_naplan_language_conventions() {
      NAPLAN Rules
   ============================ */
   const getAllowedRange = (year) => {
-    if (year === "3") return { min: 35, max: 40 };
-    if (year === "5") return { min: 40, max: 45 };
+    if (year === "3") return { min: 40, max: 45 };
+    if (year === "5") return { min: 45, max: 50 };
     return null;
   };
+
 
   const [quiz, setQuiz] = useState({
     className: "naplan",
@@ -303,14 +304,31 @@ export default function QuizSetup_naplan_language_conventions() {
       </div>
 
       <h3>Total Questions: {totalQuestions}</h3>
-
+      {allowedRange && !isTotalValid && (
+        <p style={{ color: "red", fontWeight: "bold" }}>
+          For Year {quiz.year}, total questions must be between{" "}
+          {allowedRange.min} and {allowedRange.max}.
+        </p>
+      )}
+      
+      {allowedRange && isTotalValid && (
+        <p style={{ color: "green", fontWeight: "bold" }}>
+          Total questions are within the allowed range.
+        </p>
+      )}
+      
       <button onClick={handleViewQuestionBank}>View Question Bank</button>
       <button
         onClick={handleGenerateExam}
         disabled={!isTotalValid}
+        style={{
+          backgroundColor: isTotalValid ? "#0d6efd" : "#ccc",
+          cursor: isTotalValid ? "pointer" : "not-allowed",
+        }}
       >
         Create Exam
       </button>
+
 
       {showQuestionBank && (
         <div className="question-bank" style={{ marginTop: "20px" }}>
