@@ -4,8 +4,8 @@ import "./NaplanDashboard.css";
 // NAPLAN EXAM COMPONENTS
 import NaplanNumeracy from "./NaplanNumeracy";
 import NaplanLanguageConventions from "./NaplanLanguageConventions";
-import NaplanReading from "./NaplanReading";
-import NaplanWriting from "./NaplanWriting";
+//import NaplanReading from "./NaplanReading";
+//import NaplanWriting from "./NaplanWriting";
 
 // SHARED SCREENS
 import WelcomeScreen from "./WelcomeScreen";
