@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import "./UploadPDF.css";
 
 export default function UploadWord() {
@@ -6,13 +6,21 @@ export default function UploadWord() {
   const [uploading, setUploading] = useState(false);
   const [blocks, setBlocks] = useState([]);
   const [summary, setSummary] = useState(null);
+  const [expandedBlocks, setExpandedBlocks] = useState({});
 
+  // -----------------------------
+  // File selection
+  // -----------------------------
   const handleFileChange = (e) => {
-    setWordFile(e.target.files[0]);
+    setWordFile(e.target.files[0] || null);
     setBlocks([]);
     setSummary(null);
+    setExpandedBlocks({});
   };
 
+  // -----------------------------
+  // Upload handler
+  // -----------------------------
   const handleUpload = async (e) => {
     e.preventDefault();
 
@@ -35,14 +43,16 @@ export default function UploadWord() {
         }
       );
 
-      if (!res.ok) throw new Error("Upload failed");
+      if (!res.ok) {
+        throw new Error(`Upload failed (${res.status})`);
+      }
 
       const data = await res.json();
       setSummary(data.summary || null);
-      setBlocks(groupBlocks(data.blocks || []));
+      setBlocks(groupByBlock(data.blocks || []));
       setWordFile(null);
     } catch (err) {
-      console.error(err);
+      console.error("Upload error:", err);
       alert("Error uploading Word document.");
     } finally {
       setUploading(false);
@@ -50,38 +60,53 @@ export default function UploadWord() {
   };
 
   // --------------------------------------------------
-  // GROUP + DEDUPLICATE BLOCK REPORT (KEY FIX)
+  // Group rows into block → questions
   // --------------------------------------------------
-  const groupBlocks = (rows) => {
+  const groupByBlock = useCallback((rows) => {
     const map = {};
 
     rows.forEach((row) => {
-      const id = row.block;
+      const blockId = row.block;
 
-      if (!map[id]) {
-        map[id] = {
-          block: id,
+      if (!map[blockId]) {
+        map[blockId] = {
+          block: blockId,
+          questions: [],
           hasError: false,
-          details: new Set(),
         };
       }
 
-      if (row.status !== "success") {
-        map[id].hasError = true;
-      }
+      // Question-level row
+      if (row.question) {
+        map[blockId].questions.push({
+          question: row.question,
+          status: row.status,
+          error_code: row.error_code,
+          details: row.details,
+        });
 
-      if (row.details) {
-        map[id].details.add(row.details);
+        if (row.status !== "success") {
+          map[blockId].hasError = true;
+        }
       }
     });
 
-    return Object.values(map).map((b) => ({
-      block: b.block,
-      status: b.hasError ? "partial" : "success",
-      details: Array.from(b.details),
+    return Object.values(map).sort((a, b) => a.block - b.block);
+  }, []);
+
+  // -----------------------------
+  // Toggle block expand/collapse
+  // -----------------------------
+  const toggleBlock = (blockId) => {
+    setExpandedBlocks((prev) => ({
+      ...prev,
+      [blockId]: !prev[blockId],
     }));
   };
 
+  // -----------------------------
+  // Render
+  // -----------------------------
   return (
     <div className="upload-pdf-container">
       <h2>Upload Word Document for Thinking Skills / Mathematical Reasoning</h2>
@@ -107,6 +132,7 @@ export default function UploadWord() {
 
       {summary && (
         <div className="upload-summary">
+          📘 Total: <strong>{summary.total_questions}</strong> &nbsp;|&nbsp;
           ✅ Saved: <strong>{summary.saved}</strong> &nbsp;|&nbsp;
           ⚠️ Skipped: <strong>{summary.skipped}</strong>
         </div>
@@ -126,24 +152,45 @@ export default function UploadWord() {
             </thead>
 
             <tbody>
-              {blocks.map((row) => (
-                <tr key={row.block}>
-                  <td>{row.block}</td>
-                  <td style={{ textAlign: "center" }}>
-                    {row.status === "success" ? "✅" : "⚠️"}
-                  </td>
-                  <td>
-                    {row.details.length === 0 ? (
-                      "—"
-                    ) : (
-                      <ul style={{ margin: 0, paddingLeft: "18px" }}>
-                        {row.details.map((d, i) => (
-                          <li key={i}>{d}</li>
-                        ))}
-                      </ul>
-                    )}
-                  </td>
-                </tr>
+              {blocks.map((block) => (
+                <React.Fragment key={block.block}>
+                  {/* Block row */}
+                  <tr
+                    style={{ cursor: "pointer", background: "#f9fafb" }}
+                    onClick={() => toggleBlock(block.block)}
+                  >
+                    <td>
+                      {expandedBlocks[block.block] ? "▼" : "▶"} Block{" "}
+                      {block.block}
+                    </td>
+                    <td style={{ textAlign: "center" }}>
+                      {block.hasError ? "⚠️ Needs attention" : "✅ OK"}
+                    </td>
+                    <td>
+                      {block.hasError
+                        ? "Click to view question-level issues"
+                        : "All questions saved"}
+                    </td>
+                  </tr>
+
+                  {/* Expanded question rows */}
+                  {expandedBlocks[block.block] &&
+                    block.questions.map((q, idx) => (
+                      <tr key={idx} style={{ background: "#ffffff" }}>
+                        <td style={{ paddingLeft: "32px" }}>
+                          {q.question}
+                        </td>
+                        <td style={{ textAlign: "center" }}>
+                          {q.status === "success" ? "✅" : "❌"}
+                        </td>
+                        <td>
+                          {q.status === "success"
+                            ? "Saved"
+                            : `${q.error_code || "ERROR"}: ${q.details}`}
+                        </td>
+                      </tr>
+                    ))}
+                </React.Fragment>
               ))}
             </tbody>
           </table>
