@@ -4,6 +4,7 @@ import React, {
   useRef,
   useCallback
 } from "react";
+import "./NaplanNumeracyExam.css";
 
 import "./ExamPage.css";
 import styles from "./ExamPageThinkingSkills.module.css";
