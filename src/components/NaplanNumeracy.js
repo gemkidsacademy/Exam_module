@@ -145,17 +145,18 @@ export default function NaplanNumeracy({
      ANSWERS
   ============================================================ */
   const handleAnswer = (value) => {
-    const qid = String(questions[currentIndex]?.q_id);
+    const qid = String(questions[currentIndex]?.id);
     if (!qid) return;
-
+  
     setAnswers(prev => ({ ...prev, [qid]: value }));
     setVisited(prev => ({ ...prev, [qid]: true }));
   };
 
+
   const goToQuestion = (idx) => {
     if (idx < 0 || idx >= questions.length) return;
 
-    const qid = String(questions[idx].q_id);
+    const qid = String(questions[idx].id);
     if (!isReview) {
       setVisited(prev => ({ ...prev, [qid]: true }));
     }
@@ -227,9 +228,15 @@ export default function NaplanNumeracy({
         <div className={styles.indexRow}>
           {questions.map((q, i) => {
             let cls = styles.indexCircle;
-            const qid = String(q.q_id);
-
-            if (answers[qid]) {
+            const qid = String(q.id);
+            
+            if (
+              answers[qid] !== undefined &&
+              (
+                typeof answers[qid] !== "object" ||
+                answers[qid].length > 0
+              )
+            ) {
               cls += ` ${styles.indexAnswered}`;
             } else if (visited[qid]) {
               cls += ` ${styles.indexVisited}`;
@@ -239,7 +246,7 @@ export default function NaplanNumeracy({
 
             return (
               <div
-                key={q.q_id}
+                key={q.id}
                 className={cls}
                 onClick={() => goToQuestion(i)}
               >
@@ -252,7 +259,7 @@ export default function NaplanNumeracy({
         {/* QUESTION */}
 <div className="question-card">
   <div className="question-content-centered">
-    {currentQ.blocks?.map((block, idx) => {
+    {currentQ.question_blocks?.map((block, idx) => {
       if (block.type === "text") {
         return (
           <p key={idx} className="question-text">
@@ -260,31 +267,97 @@ export default function NaplanNumeracy({
           </p>
         );
       }
+    
+      if (block.type === "image") {
+        return (
+          <img
+            key={idx}
+            src={block.src}
+            alt="question visual"
+            className="question-image"
+          />
+        );
+      }
+    
       return null;
     })}
 
+
     {/* NUMERIC INPUT */}
-    {currentQ.answer_type === "NUMERIC_INPUT" && (
+    {/* TYPE 3 — NUMERIC INPUT */}
+    {currentQ.question_type === 3 && (
       <input
         type="number"
         className="numeric-input"
-        value={answers[String(currentQ.q_id)] || ""}
+        value={answers[String(currentQ.id)] || ""}
         onChange={(e) => handleAnswer(e.target.value)}
         disabled={isReview}
       />
     )}
-
-    {/* TEXT INPUT */}
-    {currentQ.answer_type === "TEXT_INPUT" && (
+    
+    {/* TYPE 4 — TEXT INPUT */}
+    {currentQ.question_type === 4 && (
       <textarea
         className="text-input"
         rows={2}
         placeholder="Type your answer here"
-        value={answers[String(currentQ.q_id)] || ""}
+        value={answers[String(currentQ.id)] || ""}
         onChange={(e) => handleAnswer(e.target.value)}
         disabled={isReview}
       />
     )}
+    
+    {/* TYPE 1 — MCQ SINGLE */}
+    {currentQ.question_type === 1 && (
+      <div className="mcq-options">
+        {Object.entries(currentQ.options || {}).map(([key, value]) => (
+          <label key={key} className="mcq-option">
+            <input
+              type="radio"
+              name={`q-${currentQ.id}`}
+              value={key}
+              checked={answers[String(currentQ.id)] === key}
+              onChange={() => handleAnswer(key)}
+              disabled={isReview}
+            />
+            {key}. {value}
+          </label>
+        ))}
+      </div>
+    )}
+    
+    {/* TYPE 2 — MCQ MULTI */}
+    {currentQ.question_type === 2 && (
+      <div className="mcq-options">
+        {Object.entries(currentQ.options || {}).map(([key, value]) => {
+          const selected = answers[String(currentQ.id)] || [];
+    
+          return (
+            <label key={key} className="mcq-option">
+              <input
+                type="checkbox"
+                value={key}
+                checked={selected.includes(key)}
+                onChange={() => {
+                  let updated;
+    
+                  if (selected.includes(key)) {
+                    updated = selected.filter(v => v !== key);
+                  } else {
+                    updated = [...selected, key];
+                  }
+    
+                  handleAnswer(updated);
+                }}
+                disabled={isReview}
+              />
+              {key}. {value}
+            </label>
+          );
+        })}
+      </div>
+    )}
+
   </div>
 </div>
 
