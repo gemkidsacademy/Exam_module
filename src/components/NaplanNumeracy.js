@@ -90,7 +90,7 @@ export default function NaplanNumeracy({
         await loadReport();
         return;
       }
-
+      console.log("NAPLAN QUESTIONS:", data.questions);
       setQuestions(data.questions || []);
       setTimeLeft(data.remaining_time);
       setMode("exam");
@@ -311,7 +311,12 @@ export default function NaplanNumeracy({
     {currentQ.question_type === 1 && (
       <div className="mcq-options">
         {Object.entries(currentQ.options || {}).map(([key, value]) => (
-          <label key={key} className="mcq-option">
+          <label
+            key={key}
+            className={`mcq-option-card ${
+              answers[String(currentQ.id)] === key ? "selected" : ""
+            }`}
+          >
             <input
               type="radio"
               name={`q-${currentQ.id}`}
@@ -320,8 +325,11 @@ export default function NaplanNumeracy({
               onChange={() => handleAnswer(key)}
               disabled={isReview}
             />
-            {key}. {value}
+            <span>{key}. {value}</span>
           </label>
+
+
+
         ))}
       </div>
     )}
@@ -333,7 +341,12 @@ export default function NaplanNumeracy({
           const selected = answers[String(currentQ.id)] || [];
     
           return (
-            <label key={key} className="mcq-option">
+            <label
+              key={key}
+              className={`mcq-option-card ${
+                selected.includes(key) ? "selected" : ""
+              }`}
+            >
               <input
                 type="checkbox"
                 value={key}
@@ -351,12 +364,13 @@ export default function NaplanNumeracy({
                 }}
                 disabled={isReview}
               />
-              {key}. {value}
+              <span>{key}. {value}</span>
             </label>
           );
         })}
       </div>
     )}
+
 
   </div>
 </div>
