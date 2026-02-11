@@ -11,37 +11,22 @@ import styles from "./ExamPageNaplan.module.css";
 import NaplanLanguageConventionsReview from "./NaplanLanguageConventionsReview";
 import NaplanLanguageConventionsReport from "./NaplanLanguageConventionsReport";
 
-/* ============================================================
-   MAIN COMPONENT
-============================================================ */
 export default function NaplanLanguageConventions({
   onExamStart,
   onExamFinish
 }) {
   const studentId = sessionStorage.getItem("student_id");
   const API_BASE = process.env.REACT_APP_API_URL;
-  const IMAGE_BASE =
-    "https://storage.googleapis.com/exammoduleimages/";
 
   if (!API_BASE) {
-    throw new Error("❌ REACT_APP_API_URL is not defined");
+    throw new Error("REACT_APP_API_URL is not defined");
   }
-
-  console.log("📘 NaplanLanguageConventions MOUNTED");
 
   const hasSubmittedRef = useRef(false);
 
-  /**
-   * mode:
-   * - loading
-   * - exam
-   * - report
-   * - review
-   */
   const [mode, setMode] = useState("loading");
   const isReview = mode === "review";
 
-  // ---------------- EXAM STATE ----------------
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -49,35 +34,24 @@ export default function NaplanLanguageConventions({
   const [timeLeft, setTimeLeft] = useState(null);
   const [showConfirmFinish, setShowConfirmFinish] = useState(false);
 
-  // ---------------- REPORT ----------------
   const [report, setReport] = useState(null);
   const [examAttemptId, setExamAttemptId] = useState(null);
 
-  /* ============================================================
-     LOAD REPORT
-  ============================================================ */
+  /* ================= LOAD REPORT ================= */
   const loadReport = useCallback(async () => {
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/student/exam-report/naplan-language-conventions?student_id=${studentId}`
-      );
+    const res = await fetch(
+      `${API_BASE}/api/student/exam-report/naplan-language-conventions?student_id=${studentId}`
+    );
 
-      if (!res.ok) return;
+    if (!res.ok) return;
 
-      const data = await res.json();
-      console.log("📊 NAPLAN language conventions report:", data);
-
-      setReport(data);
-      setExamAttemptId(data.exam_attempt_id);
-      setMode("report");
-    } catch (err) {
-      console.error("❌ loadReport error:", err);
-    }
+    const data = await res.json();
+    setReport(data);
+    setExamAttemptId(data.exam_attempt_id);
+    setMode("report");
   }, [API_BASE, studentId]);
 
-  /* ============================================================
-     START / RESUME EXAM
-  ============================================================ */
+  /* ================= START / RESUME ================= */
   useEffect(() => {
     if (!studentId) return;
     if (mode === "report" || mode === "review") return;
@@ -108,45 +82,31 @@ export default function NaplanLanguageConventions({
     startExam();
   }, [studentId, API_BASE, loadReport, mode, onExamStart]);
 
-  /* ============================================================
-     FINISH EXAM
-  ============================================================ */
-  const finishExam = useCallback(
-    async (reason = "submitted") => {
-      if (hasSubmittedRef.current) return;
-      hasSubmittedRef.current = true;
+  /* ================= FINISH ================= */
+  const finishExam = useCallback(async () => {
+    if (hasSubmittedRef.current) return;
+    hasSubmittedRef.current = true;
 
-      try {
-        await fetch(
-          `${API_BASE}/api/student/finish-exam/naplan-language-conventions`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              student_id: studentId,
-              answers
-            })
-          }
-        );
-
-        await loadReport();
-        onExamFinish?.();
-      } catch (err) {
-        console.error("❌ finishExam error:", err);
+    await fetch(
+      `${API_BASE}/api/student/finish-exam/naplan-language-conventions`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ student_id: studentId, answers })
       }
-    },
-    [API_BASE, studentId, answers, loadReport, onExamFinish]
-  );
+    );
 
-  /* ============================================================
-     TIMER
-  ============================================================ */
+    await loadReport();
+    onExamFinish?.();
+  }, [API_BASE, studentId, answers, loadReport, onExamFinish]);
+
+  /* ================= TIMER ================= */
   useEffect(() => {
     if (mode !== "exam" || timeLeft === null) return;
 
     if (timeLeft <= 0) {
       setShowConfirmFinish(false);
-      finishExam("time_expired");
+      finishExam();
       return;
     }
 
@@ -159,23 +119,19 @@ export default function NaplanLanguageConventions({
     return () => clearInterval(interval);
   }, [timeLeft, mode, showConfirmFinish, finishExam]);
 
-  /* ============================================================
-     ANSWERS
-  ============================================================ */
+  /* ================= ANSWERS ================= */
   const handleAnswer = (value) => {
-    const qid = String(questions[currentIndex]?.q_id);
+    const qid = String(questions[currentIndex]?.id);
     if (!qid) return;
 
-    setAnswers(prev => ({
-      ...prev,
-      [qid]: value
-    }));
+    setAnswers(prev => ({ ...prev, [qid]: value }));
+    setVisited(prev => ({ ...prev, [qid]: true }));
   };
 
   const goToQuestion = (idx) => {
     if (idx < 0 || idx >= questions.length) return;
 
-    const qid = String(questions[idx].q_id);
+    const qid = String(questions[idx].id);
     if (!isReview) {
       setVisited(prev => ({ ...prev, [qid]: true }));
     }
@@ -189,16 +145,9 @@ export default function NaplanLanguageConventions({
     return `${m}:${s}`;
   };
 
-  /* ============================================================
-     RENDER GUARDS
-  ============================================================ */
-  if (mode === "loading") {
+  if (mode === "loading") return <p className="loading">Loading…</p>;
+  if (mode === "exam" && !questions.length)
     return <p className="loading">Loading…</p>;
-  }
-
-  if (mode === "exam" && !questions.length) {
-    return <p className="loading">Loading…</p>;
-  }
 
   if (mode === "report") {
     return (
@@ -230,17 +179,12 @@ export default function NaplanLanguageConventions({
     );
   }
 
-  /* ============================================================
-     EXAM UI
-  ============================================================ */
   const currentQ = questions[currentIndex];
   if (!currentQ) return null;
 
-  const optionEntries = Object.entries(currentQ.options || {});
-
   return (
-    <div className={styles.examShell}>
-      <div className={styles.examContainer}>
+    <div className={`exam-shell ${styles.examShell}`}>
+      <div className={`exam-container ${styles.examContainer}`}>
 
         <div className={styles.examHeader}>
           {!isReview && (
@@ -251,47 +195,142 @@ export default function NaplanLanguageConventions({
           </div>
         </div>
 
-        {/* QUESTION */}
-        <div className="question-card">
-          <p className="question-text">
-            {currentQ.question_text}
-          </p>
+        {/* INDEX ROW */}
+        <div className={styles.indexRow}>
+          {questions.map((q, i) => {
+            let cls = styles.indexCircle;
+            const qid = String(q.id);
 
-          {/* OPTIONS */}
-          {optionEntries.map(([key, value]) => {
-            const studentAnswer = isReview
-              ? currentQ.student_answer
-              : answers[String(currentQ.q_id)];
-            const correctAnswer = isReview
-              ? currentQ.correct_answer
-              : null;
-
-            let optionClass = "option-btn";
-
-            if (isReview) {
-              if (key === correctAnswer) {
-                optionClass += " correct";
-              } else if (
-                studentAnswer &&
-                key === studentAnswer &&
-                studentAnswer !== correctAnswer
-              ) {
-                optionClass += " incorrect";
-              }
-            } else if (studentAnswer === key) {
-              optionClass += " selected";
+            if (answers[qid] !== undefined) {
+              cls += ` ${styles.indexAnswered}`;
+            } else if (visited[qid]) {
+              cls += ` ${styles.indexVisited}`;
+            } else {
+              cls += ` ${styles.indexNotVisited}`;
             }
 
             return (
-              <button
-                key={key}
-                className={optionClass + (isReview ? " review" : "")}
-                onClick={() => !isReview && handleAnswer(key)}
+              <div
+                key={q.id}
+                className={cls}
+                onClick={() => goToQuestion(i)}
               >
-                <strong>{key})</strong> {value}
-              </button>
+                {i + 1}
+              </div>
             );
           })}
+        </div>
+
+        {/* QUESTION */}
+        <div className="question-card">
+          <div className="question-content-centered">
+
+            {currentQ.question_blocks?.map((block, idx) => {
+              if (block.type === "text") {
+                return (
+                  <p key={idx} className="question-text">
+                    {block.content}
+                  </p>
+                );
+              }
+
+              if (block.type === "image") {
+                return (
+                  <img
+                    key={idx}
+                    src={block.src}
+                    alt="question visual"
+                    className="question-image"
+                  />
+                );
+              }
+
+              return null;
+            })}
+
+            {/* TYPE 3 — NUMERIC */}
+            {currentQ.question_type === 3 && (
+              <input
+                type="number"
+                className="numeric-input"
+                value={answers[String(currentQ.id)] || ""}
+                onChange={(e) => handleAnswer(e.target.value)}
+                disabled={isReview}
+              />
+            )}
+
+            {/* TYPE 4 — TEXT */}
+            {currentQ.question_type === 4 && (
+              <textarea
+                className="text-input"
+                rows={2}
+                value={answers[String(currentQ.id)] || ""}
+                onChange={(e) => handleAnswer(e.target.value)}
+                disabled={isReview}
+              />
+            )}
+
+            {/* TYPE 1 — SINGLE MCQ */}
+            {currentQ.question_type === 1 && (
+              <div className="mcq-options">
+                {Object.entries(currentQ.options || {}).map(([key, value]) => (
+                  <label
+                    key={key}
+                    className={`mcq-option-card ${
+                      answers[String(currentQ.id)] === key ? "selected" : ""
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name={`q-${currentQ.id}`}
+                      value={key}
+                      checked={answers[String(currentQ.id)] === key}
+                      onChange={() => handleAnswer(key)}
+                      disabled={isReview}
+                    />
+                    <span>{key}. {value}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+
+            {/* TYPE 2 — MULTI MCQ */}
+            {currentQ.question_type === 2 && (
+              <div className="mcq-options">
+                {Object.entries(currentQ.options || {}).map(([key, value]) => {
+                  const selected = answers[String(currentQ.id)] || [];
+
+                  return (
+                    <label
+                      key={key}
+                      className={`mcq-option-card ${
+                        selected.includes(key) ? "selected" : ""
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selected.includes(key)}
+                        onChange={() => {
+                          let updated;
+
+                          if (selected.includes(key)) {
+                            updated = selected.filter(v => v !== key);
+                          } else {
+                            updated = [...selected, key];
+                          }
+
+                          handleAnswer(updated);
+                        }}
+                        disabled={isReview}
+                      />
+                      <span>{key}. {value}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+
+          </div>
         </div>
 
         {/* NAVIGATION */}
@@ -324,16 +363,11 @@ export default function NaplanLanguageConventions({
         </div>
       </div>
 
-      {/* CONFIRM SUBMIT */}
       {showConfirmFinish && (
         <div className="confirm-overlay">
           <div className="confirm-modal">
             <h3>Finish Exam?</h3>
-            <p>
-              Are you sure you want to submit?
-              <br />
-              You won’t be able to change answers.
-            </p>
+            <p>You won’t be able to change answers.</p>
 
             <div className="confirm-actions">
               <button
@@ -346,10 +380,10 @@ export default function NaplanLanguageConventions({
                 className="btn confirm"
                 onClick={() => {
                   setShowConfirmFinish(false);
-                  finishExam("manual_submit");
+                  finishExam();
                 }}
               >
-                Submit Exam
+                Submit
               </button>
             </div>
           </div>
