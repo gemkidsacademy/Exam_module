@@ -58,7 +58,7 @@ export default function NaplanLanguageConventions({
 
     const startExam = async () => {
       const res = await fetch(
-        `${API_BASE}/api/student/start-exam/naplan-language-convention`,
+        `${API_BASE}/api/student/start-exam/naplan-language-conventions`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
