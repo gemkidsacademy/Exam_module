@@ -366,12 +366,7 @@ const AdminPanel = () => {
                 >
                   Reading
                 </button>
-                <button
-                  className="dashboard-button"
-                  onClick={() => setCreateExamType("naplan_reading")}
-                >
-                  Reading
-                </button>
+                
             
                 <button
                   className="dashboard-button"
