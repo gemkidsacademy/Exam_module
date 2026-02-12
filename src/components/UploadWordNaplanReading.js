@@ -38,7 +38,7 @@ export default function UploadWordNaplanReading() {
 
     try {
       const res = await fetch(
-        "https://web-production-481a5.up.railway.app/upload-word-naplan-reading",
+        "https://web-production-481a5.up.railway.app/upload-word-naplan-reading-new",
         {
           method: "POST",
           body: formData,
