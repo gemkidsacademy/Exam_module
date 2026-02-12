@@ -9,9 +9,14 @@ import StudentReportShell_backend from "./StudentReportShell_backend";
 import ExamSelector from "./ExamSelector";
 import UploadWordNaplanLanguageConventions from "./UploadWordNaplanLanguageConventions";
 import UploadWordNaplanNumeracy from "./UploadWordNaplanNumeracy";
+import UploadWordNaplanReading from "./UploadWordNaplanReading";
+
 import QuizSetup_naplan from "./QuizSetup_naplan";
 import GenerateExam_naplan_numeracy from "./GenerateExam_naplan_numeracy";
 import GenerateExam_naplan_language_conventions from "./GenerateExam_naplan_language_conventions";
+import QuizSetup_naplan_reading from "./QuizSetup_naplan_reading";
+import GenerateExam_naplan_reading from "./GenerateExam_naplan_reading";
+
 
 import QuizSetup_naplan_language_conventions from "./QuizSetup_naplan_language_conventions";
 
@@ -256,6 +261,9 @@ const AdminPanel = () => {
           {createExamType === "naplan_language_conventions" && (
             <UploadWordNaplanLanguageConventions />
           )}
+          {createExamType === "naplan_reading" && (
+            <UploadWordNaplanReading />
+          )}
         </div>
       )}
 
@@ -352,7 +360,12 @@ const AdminPanel = () => {
                 >
                   Language Conventions
                 </button>
-            
+                <button
+                  className="dashboard-button"
+                  onClick={() => setCreateExamType("naplan_reading")}
+                >
+                  Reading
+                </button>
                 <button
                   className="dashboard-button"
                   onClick={() => setCreateExamType("naplan_reading")}
@@ -394,7 +407,11 @@ const AdminPanel = () => {
             {createExamCategory === "naplan" &&
              createExamType === "naplan_language_conventions" && (
               <QuizSetup_naplan_language_conventions />
-            )}         
+            )}        
+            {createExamCategory === "naplan" &&
+             createExamType === "naplan_reading" && (
+              <QuizSetup_naplan_reading examType="naplan_reading" />
+            )}
              
              
          
@@ -566,7 +583,11 @@ const AdminPanel = () => {
                      generateExamType === "naplan_language_conventions" && (
                      <GenerateExam_naplan_language_conventions />
                      )}
-
+                     {generateExamCategory === "naplan" &&
+                     generateExamType === "naplan_reading" && (
+                     <GenerateExam_naplan_reading />
+                     )}
+                     
                      </>
                    )}
                     
