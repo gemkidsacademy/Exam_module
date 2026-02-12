@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import "./UploadPDF.css";
 
 export default function UploadWordNaplanReading() {
@@ -47,13 +47,22 @@ export default function UploadWordNaplanReading() {
 
       const data = await res.json();
 
-      if (!res.ok && !data?.progress) {
-        throw new Error(data.detail || "Upload failed");
+      // 🔥 HARD FAILURE (422)
+      if (!res.ok) {
+        if (data?.detail?.error) {
+          throw new Error(
+            `${data.detail.error}\n` +
+              (data.detail.skipped || [])
+                .map((s) => `Exam ${s[0]}: ${s[1]}`)
+                .join("\n")
+          );
+        }
+        throw new Error("Upload failed");
       }
 
       setResult(data);
 
-      if (data.status === "success") {
+      if (data.saved > 0) {
         setWordFile(null);
       }
     } catch (err) {
@@ -63,14 +72,6 @@ export default function UploadWordNaplanReading() {
       setUploading(false);
     }
   };
-
-  /* -------------------------------
-     NORMALISE PROGRESS PER BLOCK
-  -------------------------------- */
-  const blocks = useMemo(() => {
-    if (!result?.blocks) return [];
-    return result.blocks;
-  }, [result]);
 
   return (
     <div className="upload-pdf-container">
@@ -100,26 +101,21 @@ export default function UploadWordNaplanReading() {
         </button>
       </form>
 
-      {uploading && (
-        <div className="upload-wait-inline">
-          ⏳ Please wait… processing your NAPLAN Reading document.
-        </div>
-      )}
-
       {wordFile && <p>Selected file: {wordFile.name}</p>}
 
       <p className="note">
-        Upload a single Word document containing one or more NAPLAN Reading exams.
+        Upload a Word document containing one or more NAPLAN Reading exams.
       </p>
 
       {/* ---------- ERROR ---------- */}
       {error && (
         <div className="upload-error">
-          <strong>Error:</strong> {error}
+          <strong>Error:</strong>
+          <pre style={{ whiteSpace: "pre-wrap" }}>{error}</pre>
         </div>
       )}
 
-      {/* ---------- SUMMARY ---------- */}
+      {/* ---------- RESULT ---------- */}
       {result && (
         <div className="upload-result">
           <h3>Upload Summary</h3>
@@ -128,35 +124,27 @@ export default function UploadWordNaplanReading() {
             <strong>Status:</strong> {result.status}
           </p>
           <p>
-            <strong>Saved Questions:</strong> {result.summary?.saved ?? 0}
+            <strong>Saved Exams:</strong> {result.saved}
           </p>
           <p>
-            <strong>Skipped (Partial):</strong>{" "}
-            {result.summary?.skipped_partial ?? 0}
+            <strong>Skipped Exams:</strong> {result.skipped.length}
           </p>
 
-          {blocks.length > 0 && (
+          {result.skipped.length > 0 && (
             <>
-              <h3>Block Processing Report</h3>
-
+              <h4>Skipped Details</h4>
               <table className="upload-report">
                 <thead>
                   <tr>
-                    <th>Block</th>
-                    <th>Status</th>
-                    <th>Details</th>
+                    <th>Exam</th>
+                    <th>Reason</th>
                   </tr>
                 </thead>
-
                 <tbody>
-                  {blocks.map((b) => (
-                    <tr key={b.block}>
-                      <td>{b.block}</td>
-                      <td>
-                        {b.status === "success" && "✅ Saved"}
-                        {b.status === "failed" && "❌ Failed"}
-                      </td>
-                      <td>{b.details || "—"}</td>
+                  {result.skipped.map(([exam, reason]) => (
+                    <tr key={`${exam}-${reason}`}>
+                      <td>{exam}</td>
+                      <td>{reason}</td>
                     </tr>
                   ))}
                 </tbody>
