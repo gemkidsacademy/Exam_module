@@ -22,6 +22,13 @@ const ExamTypeSelector_naplan = ({ examType, onSelect }) => {
       >
         Language Conventions
       </button>
+      <button
+        className="dashboard-button"
+        onClick={() => onSelect("naplan_reading")}
+      >
+        Reading
+      </button>
+
     </div>
   );
 };
