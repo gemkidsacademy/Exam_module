@@ -6,16 +6,17 @@
 ============================================================ */
 
 .exam-shell {
-  height: 100%;
-  overflow-y: auto;      /* 🔑 enables scrolling */
+  flex: 1;              /* take available space */
+  min-height: 0;        /* allow shrinking */
+  overflow-y: auto;     /* scroll lives here */
+
   background: #f9fafb;
   padding: 24px;
 
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* important */
+  align-items: flex-start;
 }
-
 
 .exam-container {
   width: 100%;
