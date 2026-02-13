@@ -156,15 +156,7 @@ function App() {
   return (
     <Router>
       {/* 🔥 REAL APP LAYOUT WRAPPER */}
-      <div
-        style={{
-          width: "100%",
-          minHeight: "100vh",
-          margin: 0,
-          padding: 0,
-          display: "block",
-        }}
-      >
+      
         <Routes>
           <Route
             path="/"
@@ -192,10 +184,13 @@ function App() {
             path="/SelectiveDashboard"
             element={
               <PrivateRoute isLoggedIn={isLoggedIn}>
-                <SelectiveDashboard />
+                <FullWidthLayout>
+                  <SelectiveDashboard />
+                </FullWidthLayout>
               </PrivateRoute>
             }
           />
+
           <Route
             path="/NAPLAN"
             element={
@@ -217,7 +212,7 @@ function App() {
   
           {/* other routes unchanged */}
         </Routes>
-      </div>
+      
     </Router>
   );
 
