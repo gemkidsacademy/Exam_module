@@ -3,6 +3,9 @@
    - Owns vertical scrolling
    - Prevents horizontal overflow
 ============================================================ */
+.exam-container {
+  outline: 5px solid red !important;
+}
 
 .exam-shell {
   width: 100%;
