@@ -1,19 +1,11 @@
-/* ============================================================
-   STEP 1: CSS TRUTH SERUM
-   Kill all layout & styling
-============================================================ */
-
-.exam-shell,
-.exam-container,
-.content-area,
-.exam-root,
-.index-row,
-.question-card {
-  all: unset !important;
-  display: block !important;
+.exam-shell {
+  min-height: 100vh;
+  overflow-y: auto;
+  background: #f9fafb;
 }
 
-/* Optional: make content readable */
-body {
-  font-family: sans-serif;
+.exam-container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: white;
 }
