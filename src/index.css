@@ -107,3 +107,17 @@ a {
 /* .debug-outline * {
   outline: 1px solid rgba(0, 128, 255, 0.15);
 } */
+/* ===== FORCE EXAM LAYOUT TO FULL WIDTH ===== */
+
+.selective-dashboard,
+.selective-dashboard main.content-area,
+.selective-dashboard .exam-root {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+/* ===== FORCE QUESTION CARD TO STRETCH ===== */
+
+.question-card {
+  width: 100% !important;
+  max-width: 100% !important;
+}
