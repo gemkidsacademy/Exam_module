@@ -1,4 +1,15 @@
 /* ============================================================
+   ROOT HEIGHT CHAIN (CRITICAL)
+============================================================ */
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+/* ============================================================
    GLOBAL DASHBOARD LAYOUT
 ============================================================ */
 
@@ -109,21 +120,23 @@
    EXAM LAYOUT CONTRACT (CRITICAL)
 ============================================================ */
 
-/* This is the ONLY scroll gateway before the exam shell */
+/* This container owns vertical space but NOT scrolling */
 .content-area {
   flex: 1;
-  min-height: 0;        /* 🔑 required for nested scrolling */
-  overflow: hidden;    /* scroll is delegated to exam-shell */
+  min-height: 0;          /* 🔑 allows children to shrink */
+  overflow: hidden;      /* scroll delegated to exam-shell */
 }
 
-/* Intermediate wrapper must allow shrinking */
+/* Intermediate wrapper must also allow shrinking */
 .exam-root {
   flex: 1;
-  min-height: 0;        /* 🔑 required */
+  min-height: 0;          /* 🔑 required */
+  display: flex;
+  flex-direction: column;
   width: 100%;
 }
 
-/* Generic width safety */
+/* Safety: prevent width clamping */
 .content-area,
 .exam-root,
 .exam-shell,
@@ -141,7 +154,7 @@
   margin-bottom: 24px;
 }
 
-/* Header should never clamp horizontally */
+/* Header should never clip horizontally */
 .exam-header {
   width: 100%;
   max-width: 100%;
