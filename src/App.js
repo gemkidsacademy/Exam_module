@@ -132,10 +132,14 @@ const FullWidthLayout = ({ children }) => {
   return (
     <div
       style={{
+        position: "fixed",
+        inset: 0,              // 🔥 top:0 right:0 bottom:0 left:0
         width: "100vw",
-        minHeight: "100vh",
+        height: "100vh",
         margin: 0,
         padding: 0,
+        overflow: "hidden",
+        background: "#eef1f4",
       }}
     >
       {children}
