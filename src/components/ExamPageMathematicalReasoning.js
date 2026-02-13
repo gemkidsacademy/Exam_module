@@ -219,16 +219,18 @@ const finishExam = useCallback(
    TIMER (AUTO SUBMIT)
 ============================================================ */
 useEffect(() => {
-  if (mode !== "exam" || timeLeft === null) return;
+  if (timeLeft === null) return;
 
-  // ⏱️ TIME UP ALWAYS WINS
+  // ⏱️ TIME UP ALWAYS WINS — NO UI STATE CAN BLOCK THIS
   if (timeLeft <= 0) {
-    setShowConfirmFinish(false); // close modal if open
-    finishExam("time_expired");
+    if (!hasSubmittedRef.current) {
+      setShowConfirmFinish(false);
+      finishExam("time_expired");
+    }
     return;
   }
 
-  // ⏸️ pause timer while confirm modal is open
+  // ⏸️ pause ticking while confirm modal is open
   if (showConfirmFinish) return;
 
   const interval = setInterval(() => {
@@ -236,7 +238,7 @@ useEffect(() => {
   }, 1000);
 
   return () => clearInterval(interval);
-}, [timeLeft, mode, showConfirmFinish, finishExam]);
+}, [timeLeft, showConfirmFinish, finishExam]);
 
 /* ============================================================
    ANSWER HANDLING
