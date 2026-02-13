@@ -208,7 +208,17 @@
   line-height: 1.5;
   white-space: pre-line;
 }
+@media (min-width: 1200px) {
+  .question-card {
+    padding: 32px 48px;
+  }
+}
 
+@media (min-width: 1600px) {
+  .question-card {
+    padding: 40px 64px;
+  }
+}
 
 /* ============================================
    OPTIONS
