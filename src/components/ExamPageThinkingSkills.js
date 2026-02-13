@@ -25,6 +25,26 @@ console.log("🧠 ExamPageThinkingSkills MOUNTED");
 
 
 const hasSubmittedRef = useRef(false);
+const normalizeOption = (optionValue) => {
+  if (typeof optionValue === "string") {
+    // image filename
+    if (optionValue.match(/\.(png|jpg|jpeg|webp)$/i)) {
+      return {
+        type: "image",
+        src: IMAGE_BASE + optionValue,
+      };
+    }
+
+    // plain text
+    return {
+      type: "text",
+      content: optionValue,
+    };
+  }
+
+  return optionValue; // already normalized
+};
+
 
 
 
@@ -392,7 +412,8 @@ return (
 </div>
 
 {/* OPTIONS */}
-{optionEntries.map(([optionKey, optionValue]) => {
+{optionEntries.map(([optionKey, rawValue]) => {
+const optionValue = normalizeOption(rawValue);
 const studentAnswer = isReview
   ? currentQ.student_answer
   : answers[String(currentQ.q_id)];
