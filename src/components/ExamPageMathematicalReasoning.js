@@ -4,7 +4,7 @@ useEffect,
 useRef,
 useCallback
 } from "react";
-import "./ExamPageMathematicalReasoning.css";
+import "./ExamPage.css";
 
 import MathematicalReasoningReview from "./MathematicalReasoningReview";
 import "./ExamOptionStates_mr.css";
