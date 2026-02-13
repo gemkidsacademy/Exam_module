@@ -6,30 +6,30 @@
 ============================================================ */
 
 .exam-shell {
-  flex: 1;              /* take available space */
-  min-height: 0;        /* allow shrinking */
-  overflow-y: auto;     /* scroll lives here */
+  width: 100%;
+  min-height: 100vh;        /* ⬅️ lock height */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 
   background: #f9fafb;
   padding: 24px;
 
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  overflow-x: hidden;      /* 🔑 critical fix */
+  overflow-y: auto;
 }
-
 .exam-container {
   width: 100%;
-  max-width: 900px;
+  max-width: 900px;        /* keep your original width */
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.06);
   padding: 24px;
 
-  /* 🔑 ADD THESE */
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+
+  box-sizing: border-box;  /* 🔑 containment */
 }
 
 /* ============================================================
@@ -112,8 +112,10 @@
 
 .question-image {
   max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 16px auto;
   border-radius: 8px;
-  margin: 12px 0;
 }
 
 /* ============================================================
