@@ -2,6 +2,7 @@
   min-height: 100vh;
   overflow-y: auto;
   background: #f9fafb;
+  padding: 24px 16px;
 }
 
 .exam-container {
@@ -9,6 +10,7 @@
   margin: 0 auto;
   background: white;
   padding: 24px;
+  margin-top: 24px;
 
   display: flex;
   flex-direction: column;
@@ -27,4 +29,9 @@
 .nav-buttons {
   margin-top: auto;   /* 🔑 pins navigation to bottom */
   padding-top: 16px;
+}
+.exam-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
