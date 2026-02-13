@@ -122,25 +122,27 @@ body,
 
 /* This container owns vertical space but NOT scrolling */
 .content-area {
-  flex: 1;                /* 🔑 MISSING CONTRACT */
-  display: flex;          /* ensure children layout correctly */
+  flex: 1;
+  display: flex;
   align-items: stretch;
+
+  min-height: 0;          /* 🔑 CRITICAL */
   width: 100%;
-  max-width: 100%;
   box-sizing: border-box;
   overflow-x: hidden;
-
-  padding: 0;            /* 🔑 IMPORTANT */
+  padding: 0;
 }
 
 /* Intermediate wrapper must also allow shrinking */
 .exam-root {
-  flex: 1;                /* 🔑 allow exam to take full space */
+  flex: 1;
   display: flex;
+
+  min-height: 0;          /* 🔑 CRITICAL */
   width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;   /* 🔑 critical */
+  box-sizing: border-box;
 }
+
 
 /* Safety: prevent width clamping */
 .content-area,
