@@ -347,28 +347,3 @@
    FORCE EXAM PAGE TO SCROLL
 ============================================================ */
 
-html,
-body,
-#root {
-  height: 100%;
-  margin: 0;
-}
-
-.selective-dashboard {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.exam-root {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.content-area {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden; /* scroll belongs to exam-shell */
-}
