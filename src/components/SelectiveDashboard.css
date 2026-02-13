@@ -122,18 +122,17 @@ body,
 
 /* This container owns vertical space but NOT scrolling */
 .content-area {
-  flex: 1;
-  min-height: 0;          /* 🔑 allows children to shrink */
-  overflow: hidden;      /* scroll delegated to exam-shell */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;   /* 🔑 THIS WAS MISSING */
+  overflow-x: hidden;       /* safety net */
 }
 
 /* Intermediate wrapper must also allow shrinking */
 .exam-root {
-  flex: 1;
-  min-height: 0;          /* 🔑 required */
-  display: flex;
-  flex-direction: column;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;   /* 🔑 critical */
 }
 
 /* Safety: prevent width clamping */
