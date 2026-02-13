@@ -4,37 +4,43 @@
 
 .selective-dashboard {
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
+  background: #eef1f4;
 }
 
 /* ============================================================
-   SUBJECT SELECTION
+   SUBJECT SELECTION (FULLSCREEN OVERLAY)
 ============================================================ */
 
 .subject-selection-wrapper {
   position: fixed;
   inset: 0;
+  z-index: 1000;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
   background: #eef1f4;
-  z-index: 1000;
+  overflow: hidden;
 }
 
 .subject-selection-card {
   background: #ffffff;
   padding: 36px 40px 32px;
   width: 420px;
-  max-width: 420px;
+  max-width: 90%;
   text-align: center;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   border-radius: 4px;
 }
 
-/* Title */
+/* ============================================================
+   SUBJECT SELECTION CONTENT
+============================================================ */
 
 .dashboard-title {
   font-size: 28px;
@@ -43,16 +49,12 @@
   margin-bottom: 16px;
 }
 
-/* Divider */
-
 .title-divider {
   height: 2px;
   background: #d32f2f;
   width: 100%;
   margin-bottom: 28px;
 }
-
-/* Subject buttons */
 
 .subject-buttons {
   display: flex;
@@ -63,23 +65,26 @@
 }
 
 .subject-button {
+  width: 100%;
+  max-width: 300px;
+
   background: #002b6b;
   color: #ffffff;
   border: none;
   padding: 16px;
+
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  width: 100%;
-  max-width: 300px;
-  display: block;
 }
 
 .subject-button:hover {
   background: #001f4f;
 }
 
-/* Footer */
+/* ============================================================
+   FOOTER (SUBJECT SELECTION)
+============================================================ */
 
 .footer-text {
   font-size: 14px;
@@ -94,16 +99,31 @@
 }
 
 .footer-link {
-  color: #0b3c6d;
-  font-weight: 600;
-  text-decoration: underline;
   font-size: 14px;
+  font-weight: 600;
+  color: #0b3c6d;
+  text-decoration: underline;
 }
 
 /* ============================================================
-   EXAM LAYOUT
+   EXAM LAYOUT CONTRACT (CRITICAL)
 ============================================================ */
 
+/* This is the ONLY scroll gateway before the exam shell */
+.content-area {
+  flex: 1;
+  min-height: 0;        /* 🔑 required for nested scrolling */
+  overflow: hidden;    /* scroll is delegated to exam-shell */
+}
+
+/* Intermediate wrapper must allow shrinking */
+.exam-root {
+  flex: 1;
+  min-height: 0;        /* 🔑 required */
+  width: 100%;
+}
+
+/* Generic width safety */
 .content-area,
 .exam-root,
 .exam-shell,
@@ -112,37 +132,18 @@
   max-width: 100%;
 }
 
-body {
-  background: #eef1f4;
-}
+/* ============================================================
+   MISC UI
+============================================================ */
 
 .dashboard-logo {
   width: 180px;
   margin-bottom: 24px;
 }
 
-/* ============================================================
-   FIX: EXAM HEADER WIDTH CLAMP
-============================================================ */
-
+/* Header should never clamp horizontally */
 .exam-header {
   width: 100%;
   max-width: 100%;
   overflow-x: visible;
-}
-.content-area {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-}
-.exam-root {
-  height: 100%;
-  overflow: visible;
-}
-
-.exam-shell {
-  min-height: 100%;
-}
-.subject-selection-wrapper {
-  overflow: hidden;
 }
