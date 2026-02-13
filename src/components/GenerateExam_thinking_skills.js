@@ -12,38 +12,41 @@ export default function GenerateExam_thinking_skills() {
      Generate Exam
   =========================== */
   const handleGenerateExam = async () => {
-    setLoading(true);
-    setError("");
-    setGeneratedExam(null);
+  setLoading(true);
+  setError("");
+  setGeneratedExam(null);
 
-    try {
-      const res = await fetch(
-        `${BACKEND_URL}/api/exams/generate-thinking-skills`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            difficulty: "easy"
-          })
-        }
-      );
-
-      const data = await res.json();
-      console.log("Response:", data);
-
-      if (!res.ok) {
-        throw new Error(data.detail || "Exam generation failed");
+  try {
+    const response = await fetch(
+      `${BACKEND_URL}/api/exams/generate-thinking-skills`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: null
       }
+    );
 
-      setGeneratedExam(data);
-      alert("Exam generated successfully!");
-    } catch (err) {
-      console.error("❌ Generate exam failed:", err);
-      setError("Failed to generate exam. Check console for details.");
-    } finally {
-      setLoading(false);
+    // Safely read response (may be empty or non-JSON on error)
+    const responseText = await response.text();
+    const data = responseText ? JSON.parse(responseText) : {};
+
+    console.log("Generate exam response:", data);
+
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to generate Thinking Skills exam");
     }
-  };
+
+    setGeneratedExam(data);
+    alert("Exam generated successfully!");
+  } catch (error) {
+    console.error("❌ Generate exam failed:", error);
+    setError(error.message || "Something went wrong while generating the exam");
+  } finally {
+    setLoading(false);
+  }
+};
 
   /* ===========================
      UI
