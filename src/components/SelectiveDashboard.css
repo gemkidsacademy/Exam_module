@@ -124,13 +124,13 @@ body,
 .content-area {
   flex: 1;
   display: flex;
-  align-items: stretch;
-
+  flex-direction: column;   /* 🔥 MISSING LINE */
   min-height: 0;
+
   width: 100%;
   box-sizing: border-box;
-  overflow-x: hidden;
-  overflow-y: hidden;   /* 🔥 REQUIRED */
+
+  overflow: hidden;         /* 🔥 SINGLE SOURCE OF TRUTH */
   padding: 0;
 }
 
