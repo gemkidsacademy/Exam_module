@@ -5,10 +5,9 @@
   min-height: 100vh;
   background: #f5f7fb;
 
-  display: flex;
-  justify-content: center;
+  /* ❌ REMOVE CENTERING */
+  display: block;
 }
-
 /*
   This is the MAIN fix:
   - allow full width
@@ -16,11 +15,10 @@
 */
 .examContainer {
   width: 100%;
-  max-width: 1400px;   /* ⬅️ increase or remove if you want edge-to-edge */
-  padding: 32px;
+  max-width: none;           /* 🔥 critical */
+  padding: 32px 48px;        /* breathing room */
   box-sizing: border-box;
 }
-
 /* ================= HEADER ================= */
 
 .examHeader {
