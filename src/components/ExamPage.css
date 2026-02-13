@@ -193,15 +193,17 @@
    QUESTION CARD
 ============================================ */
 .question-card {
+  display: flex;              /* 🔥 MISSING LINE */
+  flex-direction: column;     /* 🔥 critical */
+
   background: #ffffff;
   width: 100%;
-  padding: 28px 32px;      /* 🔥 fixed, predictable */
+  padding: 28px 32px;
   border-radius: 14px;
   margin-bottom: 30px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.07);
   box-sizing: border-box;
 }
-
 .question-text {
   font-size: 22px;
   margin-bottom: 20px;
