@@ -126,10 +126,11 @@ body,
   display: flex;
   align-items: stretch;
 
-  min-height: 0;          /* 🔑 CRITICAL */
+  min-height: 0;
   width: 100%;
   box-sizing: border-box;
   overflow-x: hidden;
+  overflow-y: hidden;   /* 🔥 REQUIRED */
   padding: 0;
 }
 
