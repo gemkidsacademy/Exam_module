@@ -130,3 +130,19 @@ body {
   max-width: 100%;
   overflow-x: visible;
 }
+.content-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+.exam-root {
+  height: 100%;
+  overflow: visible;
+}
+
+.exam-shell {
+  min-height: 100%;
+}
+.subject-selection-wrapper {
+  overflow: hidden;
+}
