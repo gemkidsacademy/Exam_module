@@ -122,6 +122,9 @@ body,
 
 /* This container owns vertical space but NOT scrolling */
 .content-area {
+  flex: 1;                /* 🔑 MISSING CONTRACT */
+  display: flex;          /* ensure children layout correctly */
+  align-items: stretch;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -132,6 +135,8 @@ body,
 
 /* Intermediate wrapper must also allow shrinking */
 .exam-root {
+  flex: 1;                /* 🔑 allow exam to take full space */
+  display: flex;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;   /* 🔑 critical */
