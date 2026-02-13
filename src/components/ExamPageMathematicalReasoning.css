@@ -9,11 +9,22 @@
   margin: 0 auto;
   background: white;
   padding: 24px;
+
+  display: flex;
+  flex-direction: column;
 }
 .question-image {
-  max-width: 100%;
-  max-height: 320px;      /* 🔑 THIS is the missing guard */
-  object-fit: contain;
   display: block;
-  margin: 16px auto;
+  max-width: 100%;
+  max-height: 320px;        /* cap vertical dominance */
+  object-fit: contain;
+
+  margin: 16px auto;        /* center horizontally */
+}
+.question-card {
+  flex: 1;
+}
+.nav-buttons {
+  margin-top: auto;   /* 🔑 pins navigation to bottom */
+  padding-top: 16px;
 }
