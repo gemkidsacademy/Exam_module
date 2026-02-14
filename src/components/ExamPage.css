@@ -226,7 +226,7 @@
 ============================================ */
 .option-btn {
   display: flex;
-  flex-direction: column;   /* 🔥 THIS IS THE FIX */
+  flex-direction: row;   /* 🔥 THIS IS THE FIX */
   align-items: flex-start;
   gap: 8px;
 
