@@ -85,7 +85,7 @@ export default function UploadWordNaplanNumeracy() {
         </div>
       )}
 
-      <h2>Upload NAPLAN Numeracy Document (.docx or .txt)</h2>
+      <h2>Upload NAPLAN Numeracy Document </h2>
 
       <form onSubmit={handleUpload}>
         <input
