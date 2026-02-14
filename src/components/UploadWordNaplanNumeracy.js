@@ -8,24 +8,18 @@ export default function UploadWordNaplanNumeracy() {
   const [error, setError] = useState(null);
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+  const file = e.target.files[0];
 
-    const allowedExtensions = [".docx", ".txt"];
+  if (file && !file.name.toLowerCase().endsWith(".docx")) {
+    alert("Please upload a .docx Word file only.");
+    e.target.value = null;
+    return;
+  }
 
-if (
-  file &&
-  !allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext))
-) {
-  alert("Please upload a .docx or .txt file only.");
-  e.target.value = null;
-  return;
-}
-
-
-    setWordFile(file);
-    setResult(null);
-    setError(null);
-  };
+  setWordFile(file);
+  setResult(null);
+  setError(null);
+};
 
   const handleUpload = async (e) => {
     e.preventDefault();
