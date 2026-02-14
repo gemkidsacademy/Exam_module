@@ -10,11 +10,17 @@ export default function UploadWordNaplanNumeracy() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
 
-    if (file && !file.name.endsWith(".docx")) {
-      alert("Please upload a .docx Word file only.");
-      e.target.value = null;
-      return;
-    }
+    const allowedExtensions = [".docx", ".txt"];
+
+if (
+  file &&
+  !allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext))
+) {
+  alert("Please upload a .docx or .txt file only.");
+  e.target.value = null;
+  return;
+}
+
 
     setWordFile(file);
     setResult(null);
@@ -85,12 +91,18 @@ export default function UploadWordNaplanNumeracy() {
         </div>
       )}
 
-      <h2>Upload NAPLAN Numeracy Word Document</h2>
+      <h2>Upload NAPLAN Numeracy Document (.docx or .txt)</h2>
 
       <form onSubmit={handleUpload}>
         <input
           type="file"
-          accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          accept="
+  .docx,
+  application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+  .txt,
+  text/plain
+"
+
           onChange={handleFileChange}
           disabled={uploading}
         />
