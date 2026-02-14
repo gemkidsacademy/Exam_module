@@ -226,6 +226,7 @@
 ============================================ */
 .option-btn {
   display: flex;
+  flex-direction: column;   /* 🔥 THIS IS THE FIX */
   align-items: flex-start;
   gap: 8px;
 
@@ -572,7 +573,9 @@
   z-index: 2;
 }
 .option-image {
+  display: block;          /* helps layout */
   max-width: 100%;
+  max-height: 180px;       /* prevents giant images */
   height: auto;
   margin-top: 8px;
 }
