@@ -130,7 +130,8 @@
 .exam-body {
   display: flex;
   gap: 24px;
-  height: calc(100vh - 140px); /* header + spacing */
+  flex: 1;
+  min-height: 0;       /* 🔑 REQUIRED */
 }
 
 /* =======================================================
@@ -166,6 +167,8 @@
 
 .question-pane {
   width: 380px;
+  min-height: 0;        /* 🔑 REQUIRED */
+  overflow-y: auto;    /* 🔑 ENABLE SCROLL */
 }
 
 .question-card {
