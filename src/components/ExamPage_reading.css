@@ -5,9 +5,11 @@
 .exam-container {
   width: 100%;
   max-width: 100%;
-  min-height: 100vh;
+  height: 100vh;              /* ✅ LOCK HEIGHT */
   padding: 24px;
   box-sizing: border-box;
+  display: flex;              /* ✅ REQUIRED */
+  flex-direction: column;     /* ✅ REQUIRED */
   font-family: "Inter", system-ui, sans-serif;
   background: #f7f8fc;
 }
