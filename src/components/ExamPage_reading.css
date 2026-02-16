@@ -130,6 +130,7 @@
 .exam-body {
   display: flex;
   gap: 24px;
+  height: calc(100vh - 140px); /* header + spacing */
 }
 
 /* =======================================================
@@ -138,11 +139,11 @@
 
 .passage-pane {
   flex: 1;
+  min-height: 0;        /* 🔑 REQUIRED for flex scrolling */
   padding: 24px;
   background: #ffffff;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
-  max-height: 80vh;
   overflow-y: auto;
 }
 
