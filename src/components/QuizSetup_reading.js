@@ -346,42 +346,40 @@ export default function QuizSetup_reading() {
             </div>
           ))}
         </div>
+        {/* QUESTION BANK SUMMARY */}
         {/* ---------------------------- */}
-          {/* QUESTION BANK PREVIEW */}
-          {/* ---------------------------- */}
-          {/* ---------------------------- */}
-{/* QUESTION BANK SUMMARY */}
-{/* ---------------------------- */}
-{showQuestionBank && (
-  <div className="question-bank">
-    <h3>Question Bank Summary</h3>
-
-    {loadingQuestions ? (
-      <p>Loading summary...</p>
-    ) : questionBank.length === 0 ? (
-      <p>No questions found.</p>
-    ) : (
-      <table className="question-bank-table">
-        <thead>
-          <tr>
-            <th>Difficulty</th>
-            <th>Topic</th>
-            <th>Total Questions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {questionBank.map((row, idx) => (
-            <tr key={idx}>
-              <td>{row.difficulty}</td>
-              <td>{row.topic}</td>
-              <td>{row.total_questions}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    )}
-  </div>
-)}
+        {showQuestionBank && (
+          <div className="question-bank">
+            <h3>Question Bank Summary</h3>
+        
+            {loadingQuestions ? (
+              <p>Loading summary...</p>
+            ) : questionBank.length === 0 ? (
+              <p>No questions found.</p>
+            ) : (
+              <table className="question-bank-table">
+                <thead>
+                  <tr>
+                    <th>Difficulty</th>
+                    <th>Topic</th>
+                    <th>Set Size</th>
+                    <th>Sets Available</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {questionBank.map((row, idx) => (
+                    <tr key={idx}>
+                      <td>{row.difficulty}</td>
+                      <td>{row.topic}</td>
+                      <td>{row.set_size}</td>
+                      <td>{row.sets_available}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
 
         <div className="total-section">
           <h3>Total Questions: {totalQuestions}</h3>
