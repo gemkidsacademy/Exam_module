@@ -299,3 +299,10 @@
   border: none;
   color: #333;
 }
+.question-image {
+  max-width: 300px;
+  width: 100%;
+  height: auto;
+  margin: 12px auto;
+  display: block;
+}
