@@ -123,6 +123,7 @@ export default function ReadingComponent({
     const TOPIC_LABELS = {
       main_idea: "Main Idea and Summary",
       main_idea_and_summary: "Main Idea and Summary",
+      literary: "Main Idea and Summary",   // ✅ ADD THIS
       comparative_analysis: "Comparative Analysis",
       gapped_text: "Gapped Text",
     };
