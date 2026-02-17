@@ -373,11 +373,34 @@ export default function NaplanNumeracy({
 
 
       // 🆕 sentence-only blocks (Grammar – Adverbs)
-      if (block.sentence) {
+      // 🆕 SENTENCE blocks (Grammar – Adverbs)
+      if (block.type === "sentence") {
+        const words = block.content.split(" ");
+      
         return (
-          <p key={idx} className="question-text">
-            {block.sentence}
-          </p>
+          <div key={idx} className="sentence-container">
+            {words.map((word, i) => {
+              const cleanWord = word.replace(/[.,!?]/g, "");
+              const selected =
+                answers[String(currentQ.id)] === cleanWord;
+      
+              return (
+                <span
+                  key={i}
+                  className={`sentence-word ${
+                    selected ? "selected" : ""
+                  }`}
+                  onClick={() => {
+                    if (!isReview) {
+                      handleAnswer(cleanWord);
+                    }
+                  }}
+                >
+                  {word + " "}
+                </span>
+              );
+            })}
+          </div>
         );
       }
 
