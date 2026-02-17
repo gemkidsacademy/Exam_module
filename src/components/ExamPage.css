@@ -204,12 +204,15 @@
   box-sizing: border-box;
 }
 .question-text {
-  font-size: 1.25rem;      /* responsive + readable */
-  font-weight: 600;        /* instruction emphasis */
-  margin-bottom: 20px;
-  line-height: 1.5;        /* keep readability */
-  white-space: pre-line;   /* preserve line breaks */
-  text-align: center;      /* exam-style layout */
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-bottom: 14px;
+  line-height: 1.6;
+  white-space: pre-line;
+  text-align: left;          /* ✅ FIX */
+  max-width: 720px;          /* ✅ improves readability */
+  margin-left: auto;
+  margin-right: auto;
 }
 @media (min-width: 1200px) {
   .question-card {
