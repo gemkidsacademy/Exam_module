@@ -374,24 +374,29 @@ export default function NaplanNumeracy({
 
       // 🆕 sentence-only blocks (Grammar – Adverbs)
       // 🆕 SENTENCE blocks (Grammar – Adverbs)
-      if (block.type === "sentence") {
-        const words = block.content.split(" ");
+      // ✅ TYPE 7 — WORD SELECTION (Grammar – Adverbs)
+      if (block.type === "word-selection") {
+        const sentenceWords = block.sentence.split(" ");
       
         return (
           <div key={idx} className="sentence-container">
-            {words.map((word, i) => {
+            {sentenceWords.map((word, i) => {
+              // Strip punctuation for comparison
               const cleanWord = word.replace(/[.,!?]/g, "");
-              const selected =
+      
+              const isSelectable = block.selectable_words.includes(cleanWord);
+              const isSelected =
                 answers[String(currentQ.id)] === cleanWord;
       
               return (
                 <span
                   key={i}
-                  className={`sentence-word ${
-                    selected ? "selected" : ""
-                  }`}
+                  className={`sentence-word
+                    ${isSelectable ? "selectable" : "non-selectable"}
+                    ${isSelected ? "selected" : ""}
+                  `}
                   onClick={() => {
-                    if (!isReview) {
+                    if (!isReview && isSelectable) {
                       handleAnswer(cleanWord);
                     }
                   }}
