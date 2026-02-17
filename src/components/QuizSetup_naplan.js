@@ -149,36 +149,47 @@ export default function QuizSetup_naplan({ examType }) {
     }
   };
   const handleGenerateExam = async () => {
-  if (!isTotalValid) {
-    alert("Total questions do not meet NAPLAN requirements.");
-    return;
-  }
-
-  if (!quiz.topics.length) {
-    alert("Please generate and select topics first.");
-    return;
-  }
-
-  // Build payload exactly as backend expects
-  const payload = {
-    class_name: quiz.className,            // "naplan"
-    subject: quiz.subject,                 // "numeracy"
-    year: Number(quiz.year),               // 3 or 5
-    difficulty: quiz.difficulty,           // "easy" | "medium" | "hard"
-    num_topics: quiz.topics.length,
-    topics: quiz.topics.map((t) => ({
-      name: t.name,
-      ai: t.ai,
-      db: t.db,
-      total: t.total,
-    })),
-    total_questions: totalQuestions,
-  };
-
-  console.log("📤 NAPLAN QUIZ PAYLOAD:", payload);
-
   try {
-    const res = await fetch(
+    // -----------------------------
+    // 1️⃣ Frontend validation
+    // -----------------------------
+    if (!isTotalValid) {
+      alert("Total questions do not meet NAPLAN requirements.");
+      return;
+    }
+
+    if (!quiz.topics || quiz.topics.length === 0) {
+      alert("Please generate and select topics first.");
+      return;
+    }
+
+    // -----------------------------
+    // 2️⃣ Build payload (explicit + safe)
+    // -----------------------------
+    const payload = {
+      class_name: quiz.className,      // "naplan"
+      subject: quiz.subject,           // "numeracy"
+      year: Number(quiz.year),         // 3 or 5
+      difficulty: quiz.difficulty,     // easy | medium | hard
+      total_questions: totalQuestions,
+      num_topics: quiz.topics.length,
+
+      topics: quiz.topics.map((t) => ({
+        name: t.name,
+        ai: Number(t.ai || 0),
+        db: Number(t.db || 0),
+        total: Number(t.total || 0),
+      })),
+    };
+
+    console.log("📤 NAPLAN QUIZ PAYLOAD");
+    console.table(payload.topics);
+    console.log(payload);
+
+    // -----------------------------
+    // 3️⃣ Fetch with strong error visibility
+    // -----------------------------
+    const response = await fetch(
       "https://web-production-481a5.up.railway.app/api/quizzes-naplan-numeracy",
       {
         method: "POST",
@@ -189,18 +200,38 @@ export default function QuizSetup_naplan({ examType }) {
       }
     );
 
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(errText || "Failed to create quiz");
+    // -----------------------------
+    // 4️⃣ Backend responded but failed
+    // -----------------------------
+    if (!response.ok) {
+      const text = await response.text();
+      console.error("🚨 BACKEND ERROR RESPONSE:", text);
+
+      throw new Error(
+        `Backend error (${response.status}): ${text || "Unknown error"}`
+      );
     }
 
-    const data = await res.json();
+    // -----------------------------
+    // 5️⃣ Success
+    // -----------------------------
+    const data = await response.json();
     console.log("✅ QUIZ CREATED:", data);
 
     alert("NAPLAN exam created successfully!");
-  } catch (err) {
-    console.error("❌ ERROR CREATING QUIZ:", err);
-    alert("Failed to create exam. Check console for details.");
+  } catch (error) {
+    // -----------------------------
+    // 6️⃣ Network / CORS / server down
+    // -----------------------------
+    console.error("❌ QUIZ CREATION FAILED:", error);
+
+    if (error.message === "Failed to fetch") {
+      alert(
+        "Network error: API unreachable. Check Railway deployment, CORS, or server logs."
+      );
+    } else {
+      alert(error.message);
+    }
   }
 };
 
