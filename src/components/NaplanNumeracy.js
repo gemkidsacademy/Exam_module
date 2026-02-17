@@ -435,6 +435,57 @@ export default function NaplanNumeracy({
           </div>
         );
       }
+     // ✅ TYPE 2 — IMAGE MULTI SELECT (ADD THIS HERE)
+      if (block.type === "image-multi-select") {
+        const qid = String(currentQ.id);
+        const selected = answers[qid] || [];
+    
+        return (
+          <div key={idx} className="image-multi-select-grid">
+            {block.options.map((opt) => {
+              const isSelected = selected.includes(opt.id);
+    
+              return (
+                <label
+                  key={opt.id}
+                  className={`image-option-card ${
+                    isSelected ? "selected" : ""
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    value={opt.id}
+                    checked={isSelected}
+                    disabled={isReview}
+                    onChange={() => {
+                      let updated;
+    
+                      if (isSelected) {
+                        updated = selected.filter(v => v !== opt.id);
+                      } else {
+                        if (selected.length >= block.maxSelections) return;
+                        updated = [...selected, opt.id];
+                      }
+    
+                      handleAnswer(updated);
+                    }}
+                  />
+    
+                  <img
+                    src={opt.image}
+                    alt={opt.label}
+                    className="image-option-image"
+                  />
+    
+                  <div className="image-option-label">
+                    {opt.label}
+                  </div>
+                </label>
+              );
+            })}
+          </div>
+        );
+      }
 
       return null;
     })}
@@ -522,52 +573,7 @@ export default function NaplanNumeracy({
       </div>
     )}
     
-    {/* TYPE 2 — MCQ MULTI */}
-      {currentQ.question_type === 2 && (() => {
-        const options =
-          currentQ.options && Object.keys(currentQ.options).length > 0
-            ? currentQ.options
-            : (currentQ.question_blocks || [])
-                .filter(b => b.type === "image")
-                .reduce((acc, _, idx) => {
-                  acc[String.fromCharCode(65 + idx)] = `Option ${idx + 1}`;
-                  return acc;
-                }, {});
-
-        const selected = answers[String(currentQ.id)] || [];
-
-        return (
-          <div className="mcq-options">
-            {Object.entries(options).map(([key, value]) => (
-              <label
-                key={key}
-                className={`mcq-option-card ${
-                  selected.includes(key) ? "selected" : ""
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  value={key}
-                  checked={selected.includes(key)}
-                  onChange={() => {
-                    let updated;
-
-                    if (selected.includes(key)) {
-                      updated = selected.filter(v => v !== key);
-                    } else {
-                      updated = [...selected, key];
-                    }
-
-                    handleAnswer(updated);
-                  }}
-                  disabled={isReview}
-                />
-                <span>{key}. {value}</span>
-              </label>
-            ))}
-          </div>
-        );
-      })()}
+    
      {mode === "review" && (
       <div
         className={`review-result ${
