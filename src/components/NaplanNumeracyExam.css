@@ -251,3 +251,22 @@
   border-color: #4f7cff;
   background: #eaf1ff;
 }
+.sentence-container {
+  margin-top: 12px;
+  line-height: 2;
+}
+
+.sentence-word {
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.sentence-word:hover {
+  background-color: #eef3ff;
+}
+
+.sentence-word.selected {
+  background-color: #cfe3ff;
+  font-weight: 600;
+}
