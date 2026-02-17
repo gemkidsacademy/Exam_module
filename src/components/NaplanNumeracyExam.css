@@ -323,3 +323,29 @@
   width: auto;
   height: auto;
 }
+/* ===============================
+   TYPE 2 — IMAGE MULTI SELECT
+================================ */
+
+.image-multi-select-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  justify-items: center;
+}
+
+.image-option-card {
+  width: 180px;
+  padding: 12px;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  background: #fff;
+}
+
+.image-option-image {
+  width: 140px;        /* 👈 THIS fixes the big image */
+  height: auto;
+  object-fit: contain;
+}
