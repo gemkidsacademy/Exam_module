@@ -45,6 +45,54 @@ export default function NaplanNumeracy({
   const [visited, setVisited] = useState({});
   const [timeLeft, setTimeLeft] = useState(null);
   const [showConfirmFinish, setShowConfirmFinish] = useState(false);
+  const normalizeCorrectAnswer = (correctAnswer, questionType) => {
+    if (correctAnswer == null) return null;
+
+    if (typeof correctAnswer === "object" && correctAnswer.value !== undefined) {
+      correctAnswer = correctAnswer.value;
+    }
+
+    if (questionType === 2) {
+      if (Array.isArray(correctAnswer)) return correctAnswer;
+
+      if (typeof correctAnswer === "string") {
+        try {
+          return JSON.parse(correctAnswer.replace(/'/g, '"'));
+        } catch {
+          return [];
+        }
+      }
+
+      return [];
+    }
+
+    return String(correctAnswer);
+  };
+
+  const normalizeStudentAnswer = (answer, questionType) => {
+    if (answer == null) return null;
+
+    // TYPE 2 — MCQ MULTI
+    if (questionType === 2) {
+      if (Array.isArray(answer)) {
+        return [...answer].sort(); // order-independent
+      }
+
+      if (typeof answer === "string") {
+        try {
+          return JSON.parse(answer.replace(/'/g, '"')).sort();
+        } catch {
+          return [];
+        }
+      }
+
+      return [];
+    }
+
+    // All single-answer types (1, 3, 4, 5, 6, 7)
+    return String(answer).trim();
+  };
+
 
   // ---------------- REPORT ----------------
   const [report, setReport] = useState(null);
@@ -212,6 +260,39 @@ export default function NaplanNumeracy({
   const currentQ = questions[currentIndex];
   if (!currentQ) return null;
 
+  const isCorrect =
+    mode === "review"
+      ? (() => {
+          const correct = normalizeCorrectAnswer(
+            currentQ.correct_answer,
+            currentQ.question_type
+          );
+
+          const student = normalizeStudentAnswer(
+            answers[String(currentQ.id)],
+            currentQ.question_type
+          );
+
+          // TYPE 2 — MCQ MULTI
+          if (currentQ.question_type === 2) {
+            return (
+              Array.isArray(student) &&
+              Array.isArray(correct) &&
+              student.length === correct.length &&
+              student.every(v => correct.includes(v))
+            );
+          }
+
+          return student === correct;
+        })()
+      : null;
+
+
+  const normalizedCorrectAnswer = normalizeCorrectAnswer(
+    currentQ.correct_answer,
+    currentQ.question_type
+  );
+
   return (
     <div className={`exam-shell ${styles.examShell}`}>
       <div className={`exam-container ${styles.examContainer}`}>
@@ -260,6 +341,8 @@ export default function NaplanNumeracy({
 <div className="question-card">
   <div className="question-content-centered">
     {currentQ.question_blocks?.map((block, idx) => {
+
+      // TEXT blocks (old + new)
       if (block.type === "text") {
         return (
           <p key={idx} className="question-text">
@@ -267,18 +350,37 @@ export default function NaplanNumeracy({
           </p>
         );
       }
-    
+
+      // IMAGE blocks
       if (block.type === "image") {
+        const src =
+          block.src ||
+          (block.name
+            ? `${process.env.REACT_APP_IMAGE_BASE_URL}/${block.name}`
+            : null);
+
+        if (!src) return null;
+
         return (
           <img
             key={idx}
-            src={block.src}
+            src={src}
             alt="question visual"
             className="question-image"
           />
         );
       }
-    
+
+
+      // 🆕 sentence-only blocks (Grammar – Adverbs)
+      if (block.sentence) {
+        return (
+          <p key={idx} className="question-text">
+            {block.sentence}
+          </p>
+        );
+      }
+
       return null;
     })}
 
@@ -306,6 +408,37 @@ export default function NaplanNumeracy({
         disabled={isReview}
       />
     )}
+    {/* TYPE 6 — IMAGE MCQ (Counting Objects) */}
+    {currentQ.question_type === 6 && (
+      <div className="mcq-options image-options">
+        {Object.entries(currentQ.options || {}).map(([key, imgUrl]) => (
+          <label
+            key={key}
+            className={`mcq-option-card image-option ${
+              answers[String(currentQ.id)] === key ? "selected" : ""
+            }`}
+          >
+            <input
+              type="radio"
+              name={`q-${currentQ.id}`}
+              value={key}
+              checked={answers[String(currentQ.id)] === key}
+              onChange={() => handleAnswer(key)}
+              disabled={isReview}
+            />
+
+            <img
+              src={imgUrl}
+              alt={`Option ${key}`}
+              className="mcq-option-image"
+            />
+
+            <span className="option-label">{key}</span>
+          </label>
+        ))}
+      </div>
+    )}
+
     
     {/* TYPE 1 — MCQ SINGLE */}
     {currentQ.question_type === 1 && (
@@ -335,41 +468,62 @@ export default function NaplanNumeracy({
     )}
     
     {/* TYPE 2 — MCQ MULTI */}
-    {currentQ.question_type === 2 && (
-      <div className="mcq-options">
-        {Object.entries(currentQ.options || {}).map(([key, value]) => {
-          const selected = answers[String(currentQ.id)] || [];
-    
-          return (
-            <label
-              key={key}
-              className={`mcq-option-card ${
-                selected.includes(key) ? "selected" : ""
-              }`}
-            >
-              <input
-                type="checkbox"
-                value={key}
-                checked={selected.includes(key)}
-                onChange={() => {
-                  let updated;
-    
-                  if (selected.includes(key)) {
-                    updated = selected.filter(v => v !== key);
-                  } else {
-                    updated = [...selected, key];
-                  }
-    
-                  handleAnswer(updated);
-                }}
-                disabled={isReview}
-              />
-              <span>{key}. {value}</span>
-            </label>
-          );
-        })}
+      {currentQ.question_type === 2 && (() => {
+        const options =
+          currentQ.options && Object.keys(currentQ.options).length > 0
+            ? currentQ.options
+            : (currentQ.question_blocks || [])
+                .filter(b => b.type === "image")
+                .reduce((acc, _, idx) => {
+                  acc[String.fromCharCode(65 + idx)] = `Option ${idx + 1}`;
+                  return acc;
+                }, {});
+
+        const selected = answers[String(currentQ.id)] || [];
+
+        return (
+          <div className="mcq-options">
+            {Object.entries(options).map(([key, value]) => (
+              <label
+                key={key}
+                className={`mcq-option-card ${
+                  selected.includes(key) ? "selected" : ""
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  value={key}
+                  checked={selected.includes(key)}
+                  onChange={() => {
+                    let updated;
+
+                    if (selected.includes(key)) {
+                      updated = selected.filter(v => v !== key);
+                    } else {
+                      updated = [...selected, key];
+                    }
+
+                    handleAnswer(updated);
+                  }}
+                  disabled={isReview}
+                />
+                <span>{key}. {value}</span>
+              </label>
+            ))}
+          </div>
+        );
+      })()}
+     {mode === "review" && (
+      <div
+        className={`review-result ${
+          isCorrect ? "answer-correct" : "answer-wrong"
+        }`}
+      >
+        {isCorrect ? "✔ Correct" : "✖ Incorrect"}
       </div>
     )}
+
+
 
 
   </div>
