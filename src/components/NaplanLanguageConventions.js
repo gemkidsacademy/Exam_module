@@ -103,7 +103,7 @@ export default function NaplanLanguageConventions({
   ============================================================ */
   const loadReport = useCallback(async () => {
     const res = await fetch(
-      `${API_BASE}/api/student/exam-report/naplan-numeracy?student_id=${studentId}`
+      `${API_BASE}/api/student/exam-report/naplan-language-conventions?student_id=${studentId}`
     );
 
     if (!res.ok) return;
@@ -124,7 +124,7 @@ export default function NaplanLanguageConventions({
 
     const startExam = async () => {
       const res = await fetch(
-        `${API_BASE}/api/student/start-exam/naplan-numeracy`,
+        `${API_BASE}//api/student/start-exam/naplan-language-conventions`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -156,7 +156,7 @@ export default function NaplanLanguageConventions({
     hasSubmittedRef.current = true;
 
     await fetch(
-      `${API_BASE}/api/student/finish-exam/naplan-numeracy`,
+      `${API_BASE}/api/student/finish-exam/naplan-language-conventions`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
