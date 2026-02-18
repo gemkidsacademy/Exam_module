@@ -514,36 +514,34 @@ export default function NaplanLanguageConventions({
         disabled={isReview}
       />
     )}
-    {/* TYPE 6 — IMAGE MCQ (Counting Objects) */}
+    {/* TYPE 6 — IMAGE MCQ (Click Image Only) */}
     {currentQ.question_type === 6 && (
-      <div className="mcq-options image-options">
-        {Object.entries(currentQ.options || {}).map(([key, imgUrl]) => (
-          <label
-            key={key}
-            className={`mcq-option-card image-option ${
-              answers[String(currentQ.id)] === key ? "selected" : ""
-            }`}
-          >
-            <input
-              type="radio"
-              name={`q-${currentQ.id}`}
-              value={key}
-              checked={answers[String(currentQ.id)] === key}
-              onChange={() => handleAnswer(key)}
-              disabled={isReview}
-            />
-
-            <img
-              src={imgUrl}
-              alt={`Option ${key}`}
-              className="mcq-option-image"
-            />
-
-            <span className="option-label">{key}</span>
-          </label>
-        ))}
+      <div className="image-mcq-grid">
+        {Object.entries(currentQ.options || {}).map(([key, imgUrl]) => {
+          const isSelected = answers[String(currentQ.id)] === key;
+    
+          return (
+            <div
+              key={key}
+              className={`image-mcq-card ${isSelected ? "selected" : ""}`}
+              onClick={() => {
+                if (!isReview) {
+                  handleAnswer(key);
+                }
+              }}
+            >
+              <img
+                src={imgUrl}
+                alt={`Option ${key}`}
+                className="image-mcq-image"
+              />
+              <div className="image-mcq-label">{key}</div>
+            </div>
+          );
+        })}
       </div>
     )}
+
 
     
     {/* TYPE 1 — MCQ SINGLE */}
