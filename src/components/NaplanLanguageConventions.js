@@ -199,6 +199,21 @@ export default function NaplanLanguageConventions({
     setAnswers(prev => ({ ...prev, [qid]: value }));
     setVisited(prev => ({ ...prev, [qid]: true }));
   };
+  const handleAnswerForQuestion = (questionId, value) => {
+    const qid = String(questionId);
+    if (!qid) return;
+  
+    setAnswers(prev => ({
+      ...prev,
+      [qid]: value
+    }));
+  
+    setVisited(prev => ({
+      ...prev,
+      [qid]: true
+    }));
+  };
+
 
 
   const goToQuestion = (idx) => {
@@ -530,7 +545,7 @@ export default function NaplanLanguageConventions({
               onClick={() => {
                 console.log("TYPE 6 IMAGE CLICKED:", key);
                 if (!isReview) {
-                  handleAnswer(key);
+                  handleAnswerForQuestion(currentQ.id, key);
                 }
               }}
             >
