@@ -369,3 +369,12 @@
   border-color: #3b82f6;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
 }
+/* ===============================
+   TYPE 6 — IMAGE MCQ (Single)
+================================ */
+
+.image-mcq-image {
+  width: 140px;        /* 👈 match Type 2 size */
+  height: auto;
+  object-fit: contain;
+}
