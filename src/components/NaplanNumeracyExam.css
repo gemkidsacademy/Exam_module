@@ -349,3 +349,19 @@
   height: auto;
   object-fit: contain;
 }
+.image-mcq-card {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.image-mcq-card * {
+  pointer-events: none;
+}
+.type6-image-card {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.type6-image-card * {
+  pointer-events: none;
+}
