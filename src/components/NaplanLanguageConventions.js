@@ -515,6 +515,9 @@ export default function NaplanLanguageConventions({
       />
     )}
     {/* TYPE 6 — IMAGE MCQ (Click Image Only) */}
+    const qid = String(currentQ.id);
+    console.log("CURRENT ANSWER FOR TYPE 6:", answers[qid]);
+
     {currentQ.question_type === 6 && (
       <div className="image-mcq-grid">
         {Object.entries(currentQ.options || {}).map(([key, imgUrl]) => {
