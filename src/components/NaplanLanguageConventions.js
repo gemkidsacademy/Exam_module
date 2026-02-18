@@ -525,11 +525,13 @@ export default function NaplanLanguageConventions({
               key={key}
               className={`image-mcq-card ${isSelected ? "selected" : ""}`}
               onClick={() => {
+                console.log("TYPE 6 IMAGE CLICKED:", key);
                 if (!isReview) {
                   handleAnswer(key);
                 }
               }}
             >
+
               <img
                 src={imgUrl}
                 alt={`Option ${key}`}
