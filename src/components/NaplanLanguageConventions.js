@@ -4,13 +4,17 @@ import React, {
   useRef,
   useCallback
 } from "react";
+import "./NaplanNumeracyExam.css";
 
 import "./ExamPage.css";
-import styles from "./ExamPageNaplan.module.css";
+import styles from "./ExamPageThinkingSkills.module.css";
 
-import NaplanLanguageConventionsReview from "./NaplanLanguageConventionsReview";
-import NaplanLanguageConventionsReport from "./NaplanLanguageConventionsReport";
+import NaplanNumeracyReview from "./NaplanNumeracyReview";
+import NaplanNumeracyReport from "./NaplanNumeracyReport";
 
+/* ============================================================
+   MAIN COMPONENT
+============================================================ */
 export default function NaplanLanguageConventions({
   onExamStart,
   onExamFinish
@@ -19,28 +23,87 @@ export default function NaplanLanguageConventions({
   const API_BASE = process.env.REACT_APP_API_URL;
 
   if (!API_BASE) {
-    throw new Error("REACT_APP_API_URL is not defined");
+    throw new Error("❌ REACT_APP_API_URL is not defined");
   }
 
   const hasSubmittedRef = useRef(false);
 
+  /**
+   * mode:
+   * - loading
+   * - exam
+   * - report
+   * - review
+   */
   const [mode, setMode] = useState("loading");
   const isReview = mode === "review";
 
+  // ---------------- EXAM STATE ----------------
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
   const [timeLeft, setTimeLeft] = useState(null);
   const [showConfirmFinish, setShowConfirmFinish] = useState(false);
+  const normalizeCorrectAnswer = (correctAnswer, questionType) => {
+    if (correctAnswer == null) return null;
 
+    if (typeof correctAnswer === "object" && correctAnswer.value !== undefined) {
+      correctAnswer = correctAnswer.value;
+    }
+
+    if (questionType === 2) {
+      if (Array.isArray(correctAnswer)) return correctAnswer;
+
+      if (typeof correctAnswer === "string") {
+        try {
+          return JSON.parse(correctAnswer.replace(/'/g, '"'));
+        } catch {
+          return [];
+        }
+      }
+
+      return [];
+    }
+
+    return String(correctAnswer);
+  };
+
+  const normalizeStudentAnswer = (answer, questionType) => {
+    if (answer == null) return null;
+
+    // TYPE 2 — MCQ MULTI
+    if (questionType === 2) {
+      if (Array.isArray(answer)) {
+        return [...answer].sort(); // order-independent
+      }
+
+      if (typeof answer === "string") {
+        try {
+          return JSON.parse(answer.replace(/'/g, '"')).sort();
+        } catch {
+          return [];
+        }
+      }
+
+      return [];
+    }
+
+    // All single-answer types (1, 3, 4, 5, 6, 7)
+    return String(answer).trim();
+  };
+
+
+  // ---------------- REPORT ----------------
   const [report, setReport] = useState(null);
   const [examAttemptId, setExamAttemptId] = useState(null);
 
-  /* ================= LOAD REPORT ================= */
+  /* ============================================================
+     LOAD REPORT
+  ============================================================ */
   const loadReport = useCallback(async () => {
     const res = await fetch(
-      `${API_BASE}/api/student/exam-report/naplan-language-conventions?student_id=${studentId}`
+      `${API_BASE}/api/student/exam-report/naplan-numeracy?student_id=${studentId}`
     );
 
     if (!res.ok) return;
@@ -50,15 +113,18 @@ export default function NaplanLanguageConventions({
     setExamAttemptId(data.exam_attempt_id);
     setMode("report");
   }, [API_BASE, studentId]);
+  
 
-  /* ================= START / RESUME ================= */
+  /* ============================================================
+     START / RESUME EXAM
+  ============================================================ */
   useEffect(() => {
     if (!studentId) return;
     if (mode === "report" || mode === "review") return;
 
     const startExam = async () => {
       const res = await fetch(
-        `${API_BASE}/api/student/start-exam/naplan-language-conventions`,
+        `${API_BASE}/api/student/start-exam/naplan-numeracy`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -72,7 +138,7 @@ export default function NaplanLanguageConventions({
         await loadReport();
         return;
       }
-
+      console.log("NAPLAN QUESTIONS:", data.questions);
       setQuestions(data.questions || []);
       setTimeLeft(data.remaining_time);
       setMode("exam");
@@ -82,13 +148,15 @@ export default function NaplanLanguageConventions({
     startExam();
   }, [studentId, API_BASE, loadReport, mode, onExamStart]);
 
-  /* ================= FINISH ================= */
+  /* ============================================================
+     FINISH EXAM
+  ============================================================ */
   const finishExam = useCallback(async () => {
     if (hasSubmittedRef.current) return;
     hasSubmittedRef.current = true;
 
     await fetch(
-      `${API_BASE}/api/student/finish-exam/naplan-language-conventions`,
+      `${API_BASE}/api/student/finish-exam/naplan-numeracy`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -100,7 +168,9 @@ export default function NaplanLanguageConventions({
     onExamFinish?.();
   }, [API_BASE, studentId, answers, loadReport, onExamFinish]);
 
-  /* ================= TIMER ================= */
+  /* ============================================================
+     TIMER
+  ============================================================ */
   useEffect(() => {
     if (mode !== "exam" || timeLeft === null) return;
 
@@ -119,14 +189,17 @@ export default function NaplanLanguageConventions({
     return () => clearInterval(interval);
   }, [timeLeft, mode, showConfirmFinish, finishExam]);
 
-  /* ================= ANSWERS ================= */
+  /* ============================================================
+     ANSWERS
+  ============================================================ */
   const handleAnswer = (value) => {
     const qid = String(questions[currentIndex]?.id);
     if (!qid) return;
-
+  
     setAnswers(prev => ({ ...prev, [qid]: value }));
     setVisited(prev => ({ ...prev, [qid]: true }));
   };
+
 
   const goToQuestion = (idx) => {
     if (idx < 0 || idx >= questions.length) return;
@@ -135,7 +208,6 @@ export default function NaplanLanguageConventions({
     if (!isReview) {
       setVisited(prev => ({ ...prev, [qid]: true }));
     }
-
     setCurrentIndex(idx);
   };
 
@@ -145,13 +217,16 @@ export default function NaplanLanguageConventions({
     return `${m}:${s}`;
   };
 
+  /* ============================================================
+     RENDER GUARDS
+  ============================================================ */
   if (mode === "loading") return <p className="loading">Loading…</p>;
   if (mode === "exam" && !questions.length)
     return <p className="loading">Loading…</p>;
 
   if (mode === "report") {
     return (
-      <NaplanLanguageConventionsReport
+      <NaplanNumeracyReport
         report={report}
         onViewExamDetails={() => {
           setQuestions([]);
@@ -166,7 +241,7 @@ export default function NaplanLanguageConventions({
 
   if (mode === "review" && !questions.length) {
     return (
-      <NaplanLanguageConventionsReview
+      <NaplanNumeracyReview
         studentId={studentId}
         examAttemptId={examAttemptId}
         onLoaded={(qs) => {
@@ -179,29 +254,70 @@ export default function NaplanLanguageConventions({
     );
   }
 
+  /* ============================================================
+     EXAM UI
+  ============================================================ */
   const currentQ = questions[currentIndex];
   if (!currentQ) return null;
+
+  const isCorrect =
+    mode === "review"
+      ? (() => {
+          const correct = normalizeCorrectAnswer(
+            currentQ.correct_answer,
+            currentQ.question_type
+          );
+
+          const student = normalizeStudentAnswer(
+            answers[String(currentQ.id)],
+            currentQ.question_type
+          );
+
+          // TYPE 2 — MCQ MULTI
+          if (currentQ.question_type === 2) {
+            return (
+              Array.isArray(student) &&
+              Array.isArray(correct) &&
+              student.length === correct.length &&
+              student.every(v => correct.includes(v))
+            );
+          }
+
+          return student === correct;
+        })()
+      : null;
+
+
+  const normalizedCorrectAnswer = normalizeCorrectAnswer(
+    currentQ.correct_answer,
+    currentQ.question_type
+  );
 
   return (
     <div className={`exam-shell ${styles.examShell}`}>
       <div className={`exam-container ${styles.examContainer}`}>
 
+        {/* HEADER */}
         <div className={styles.examHeader}>
-          {!isReview && (
-            <div className="timer">⏳ {formatTime(timeLeft)}</div>
-          )}
+          {!isReview && <div className="timer">⏳ {formatTime(timeLeft)}</div>}
           <div className="counter">
             Question {currentIndex + 1} / {questions.length}
           </div>
         </div>
 
-        {/* INDEX ROW */}
+        {/* QUESTION INDEX (same as Thinking Skills) */}
         <div className={styles.indexRow}>
           {questions.map((q, i) => {
             let cls = styles.indexCircle;
             const qid = String(q.id);
-
-            if (answers[qid] !== undefined) {
+            
+            if (
+              answers[qid] !== undefined &&
+              (
+                typeof answers[qid] !== "object" ||
+                answers[qid].length > 0
+              )
+            ) {
               cls += ` ${styles.indexAnswered}`;
             } else if (visited[qid]) {
               cls += ` ${styles.indexVisited}`;
@@ -222,116 +338,259 @@ export default function NaplanLanguageConventions({
         </div>
 
         {/* QUESTION */}
-        <div className="question-card">
-          <div className="question-content-centered">
+<div className="question-card">
+  <div className="question-content-centered">
+    {currentQ.question_blocks?.map((block, idx) => {
 
-            {currentQ.question_blocks?.map((block, idx) => {
-              if (block.type === "text") {
-                return (
-                  <p key={idx} className="question-text">
-                    {block.content}
-                  </p>
-                );
-              }
+      // TEXT blocks (old + new)
+      if (block.type === "text") {
+        return (
+          <p key={idx} className="question-text">
+            {block.content}
+          </p>
+        );
+      }
 
-              if (block.type === "image") {
-                return (
-                  <img
-                    key={idx}
-                    src={block.src}
-                    alt="question visual"
-                    className="question-image"
-                  />
-                );
-              }
+      // IMAGE blocks
+      if (block.type === "image") {
+        const src =
+          block.src ||
+          (block.name
+            ? `${process.env.REACT_APP_IMAGE_BASE_URL}/${block.name}`
+            : null);
 
-              return null;
-            })}
+        if (!src) return null;
 
-            {/* TYPE 3 — NUMERIC */}
-            {currentQ.question_type === 3 && (
-              <input
-                type="number"
-                className="numeric-input"
-                value={answers[String(currentQ.id)] || ""}
-                onChange={(e) => handleAnswer(e.target.value)}
-                disabled={isReview}
-              />
-            )}
+        return (
+          <img
+            key={idx}
+            src={src}
+            alt="question visual"
+            className="question-image"
+          />
+        );
+      }
 
-            {/* TYPE 4 — TEXT */}
-            {currentQ.question_type === 4 && (
-              <textarea
-                className="text-input"
-                rows={2}
-                value={answers[String(currentQ.id)] || ""}
-                onChange={(e) => handleAnswer(e.target.value)}
-                disabled={isReview}
-              />
-            )}
-
-            {/* TYPE 1 — SINGLE MCQ */}
-            {currentQ.question_type === 1 && (
-              <div className="mcq-options">
-                {Object.entries(currentQ.options || {}).map(([key, value]) => (
-                  <label
-                    key={key}
-                    className={`mcq-option-card ${
-                      answers[String(currentQ.id)] === key ? "selected" : ""
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name={`q-${currentQ.id}`}
-                      value={key}
-                      checked={answers[String(currentQ.id)] === key}
-                      onChange={() => handleAnswer(key)}
-                      disabled={isReview}
-                    />
-                    <span>{key}. {value}</span>
-                  </label>
-                ))}
-              </div>
-            )}
-
-            {/* TYPE 2 — MULTI MCQ */}
-            {currentQ.question_type === 2 && (
-              <div className="mcq-options">
-                {Object.entries(currentQ.options || {}).map(([key, value]) => {
-                  const selected = answers[String(currentQ.id)] || [];
-
-                  return (
-                    <label
-                      key={key}
-                      className={`mcq-option-card ${
-                        selected.includes(key) ? "selected" : ""
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selected.includes(key)}
-                        onChange={() => {
-                          let updated;
-
-                          if (selected.includes(key)) {
-                            updated = selected.filter(v => v !== key);
-                          } else {
-                            updated = [...selected, key];
-                          }
-
-                          handleAnswer(updated);
-                        }}
-                        disabled={isReview}
-                      />
-                      <span>{key}. {value}</span>
-                    </label>
-                  );
-                })}
-              </div>
-            )}
-
+      // TYPE 5 — CLOZE DROPDOWN  ✅ ADD THIS
+      if (block.type === "cloze-dropdown") {
+        const parts = block.sentence.split("{{dropdown}}");
+        const qid = String(currentQ.id);
+    
+        return (
+          <div key={idx} className="cloze-sentence">
+            {parts[0]}
+            <select
+              className="cloze-dropdown"
+              value={answers[qid] || ""}
+              onChange={(e) => handleAnswer(e.target.value)}
+              disabled={isReview}
+            >
+              <option value="" disabled>
+                Select
+              </option>
+              {block.options.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
+            {parts[1]}
           </div>
-        </div>
+        );
+      }
+
+      // 🆕 sentence-only blocks (Grammar – Adverbs)
+      // 🆕 SENTENCE blocks (Grammar – Adverbs)
+      // ✅ TYPE 7 — WORD SELECTION (Grammar – Adverbs)
+      if (block.type === "word-selection") {
+        const sentenceWords = block.sentence.split(" ");
+      
+        return (
+          <div key={idx} className="sentence-container">
+            {sentenceWords.map((word, i) => {
+              // Strip punctuation for comparison
+              const cleanWord = word.replace(/[.,!?]/g, "");
+      
+              const isSelectable = block.selectable_words.includes(cleanWord);
+              const isSelected =
+                answers[String(currentQ.id)] === cleanWord;
+      
+              return (
+                <span
+                  key={i}
+                  className={`sentence-word
+                    ${isSelectable ? "selectable" : "non-selectable"}
+                    ${isSelected ? "selected" : ""}
+                  `}
+                  onClick={() => {
+                    if (!isReview && isSelectable) {
+                      handleAnswer(cleanWord);
+                    }
+                  }}
+                >
+                  {word + " "}
+                </span>
+              );
+            })}
+          </div>
+        );
+      }
+     // ✅ TYPE 2 — IMAGE MULTI SELECT (ADD THIS HERE)
+      if (block.type === "image-multi-select") {
+        const qid = String(currentQ.id);
+        const selected = answers[qid] || [];
+    
+        return (
+          <div key={idx} className="image-multi-select-grid">
+            {block.options.map((opt) => {
+              const isSelected = selected.includes(opt.id);
+    
+              return (
+                <label
+                  key={opt.id}
+                  className={`image-option-card ${
+                    isSelected ? "selected" : ""
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    value={opt.id}
+                    checked={isSelected}
+                    disabled={isReview}
+                    onChange={() => {
+                      let updated;
+    
+                      if (isSelected) {
+                        updated = selected.filter(v => v !== opt.id);
+                      } else {
+                        if (selected.length >= block.maxSelections) return;
+                        updated = [...selected, opt.id];
+                      }
+    
+                      handleAnswer(updated);
+                    }}
+                  />
+    
+                  <img
+                    src={opt.image}
+                    alt={opt.label}
+                    className="image-option-image"
+                  />
+    
+                  <div className="image-option-label">
+                    {opt.label}
+                  </div>
+                </label>
+              );
+            })}
+          </div>
+        );
+      }
+
+      return null;
+    })}
+
+
+    {/* NUMERIC INPUT */}
+    {/* TYPE 3 — NUMERIC INPUT */}
+    {currentQ.question_type === 3 && (
+      <input
+        type="number"
+        className="numeric-input"
+        value={answers[String(currentQ.id)] || ""}
+        onChange={(e) => handleAnswer(e.target.value)}
+        disabled={isReview}
+      />
+    )}
+    
+    {/* TYPE 4 — TEXT INPUT */}
+    {currentQ.question_type === 4 && (
+      <textarea
+        className="text-input"
+        rows={2}
+        placeholder="Type your answer here"
+        value={answers[String(currentQ.id)] || ""}
+        onChange={(e) => handleAnswer(e.target.value)}
+        disabled={isReview}
+      />
+    )}
+    {/* TYPE 6 — IMAGE MCQ (Counting Objects) */}
+    {currentQ.question_type === 6 && (
+      <div className="mcq-options image-options">
+        {Object.entries(currentQ.options || {}).map(([key, imgUrl]) => (
+          <label
+            key={key}
+            className={`mcq-option-card image-option ${
+              answers[String(currentQ.id)] === key ? "selected" : ""
+            }`}
+          >
+            <input
+              type="radio"
+              name={`q-${currentQ.id}`}
+              value={key}
+              checked={answers[String(currentQ.id)] === key}
+              onChange={() => handleAnswer(key)}
+              disabled={isReview}
+            />
+
+            <img
+              src={imgUrl}
+              alt={`Option ${key}`}
+              className="mcq-option-image"
+            />
+
+            <span className="option-label">{key}</span>
+          </label>
+        ))}
+      </div>
+    )}
+
+    
+    {/* TYPE 1 — MCQ SINGLE */}
+    {currentQ.question_type === 1 && (
+      <div className="mcq-options">
+        {Object.entries(currentQ.options || {}).map(([key, value]) => (
+          <label
+            key={key}
+            className={`mcq-option-card ${
+              answers[String(currentQ.id)] === key ? "selected" : ""
+            }`}
+          >
+            <input
+              type="radio"
+              name={`q-${currentQ.id}`}
+              value={key}
+              checked={answers[String(currentQ.id)] === key}
+              onChange={() => handleAnswer(key)}
+              disabled={isReview}
+            />
+            <span>{key}. {value}</span>
+          </label>
+
+
+
+        ))}
+      </div>
+    )}
+    
+    
+     {mode === "review" && (
+      <div
+        className={`review-result ${
+          isCorrect ? "answer-correct" : "answer-wrong"
+        }`}
+      >
+        {isCorrect ? "✔ Correct" : "✖ Incorrect"}
+      </div>
+    )}
+
+
+
+
+  </div>
+</div>
+
+
 
         {/* NAVIGATION */}
         <div className="nav-buttons">
