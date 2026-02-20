@@ -199,7 +199,13 @@ export default function NaplanNumeracy({
     setAnswers(prev => ({ ...prev, [qid]: value }));
     setVisited(prev => ({ ...prev, [qid]: true }));
   };
-
+  const handleAnswerForQuestion = (questionId, value) => {
+    const qid = String(questionId);
+    if (!qid) return;
+  
+    setAnswers(prev => ({ ...prev, [qid]: value }));
+    setVisited(prev => ({ ...prev, [qid]: true }));
+  };
 
   const goToQuestion = (idx) => {
     if (idx < 0 || idx >= questions.length) return;
@@ -353,24 +359,35 @@ export default function NaplanNumeracy({
 
       // IMAGE blocks
       if (block.type === "image") {
-        const src =
-          block.src ||
-          (block.name
-            ? `${process.env.REACT_APP_IMAGE_BASE_URL}/${block.name}`
-            : null);
-
-        if (!src) return null;
-
-        return (
-          <img
-            key={idx}
-            src={src}
-            alt="question visual"
-            className="question-image"
-          />
-        );
-      }
-
+          // 🚫 For Type 6, do NOT render option images here
+          if (
+            currentQ.question_type === 6 &&
+            block.role === "option"
+          ) {
+            return null;
+          }
+        
+          const src =
+            block.src ||
+            (block.name
+              ? `${process.env.REACT_APP_IMAGE_BASE_URL}/${block.name}`
+              : null);
+        
+          if (!src) return null;
+        
+          return (
+            <img
+              key={idx}
+              src={src}
+              alt="question visual"
+              className={
+                block.role === "reference"
+                  ? "question-image reference-image"
+                  : "question-image"
+              }
+            />
+          );
+        }
       // TYPE 5 — CLOZE DROPDOWN  ✅ ADD THIS
       if (block.type === "cloze-dropdown") {
         const parts = block.sentence.split("{{dropdown}}");
@@ -526,7 +543,7 @@ export default function NaplanNumeracy({
               className={`image-mcq-card ${isSelected ? "selected" : ""}`}
               onClick={() => {
                 if (!isReview) {
-                  handleAnswer(key);
+                  handleAnswerForQuestion(currentQ.id, key);
                 }
               }}
             >
