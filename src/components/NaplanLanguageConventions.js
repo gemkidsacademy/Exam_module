@@ -369,23 +369,27 @@ export default function NaplanLanguageConventions({
 
       // IMAGE blocks
       if (block.type === "image") {
-        const src =
-          block.src ||
-          (block.name
-            ? `${process.env.REACT_APP_IMAGE_BASE_URL}/${block.name}`
-            : null);
-
-        if (!src) return null;
-
-        return (
-          <img
-            key={idx}
-            src={src}
-            alt="question visual"
-            className="question-image"
-          />
-        );
-      }
+          // 🚫 For Type 6, only render reference images here
+          if (
+            currentQ.question_type === 6 &&
+            block.role === "option"
+          ) {
+            return null;
+          }
+        
+          return (
+            <img
+              key={idx}
+              src={block.src}
+              alt="question visual"
+              className={
+                block.role === "reference"
+                  ? "question-image reference-image"
+                  : "question-image"
+              }
+            />
+          );
+        }
 
       // TYPE 5 — CLOZE DROPDOWN  ✅ ADD THIS
       if (block.type === "cloze-dropdown") {
