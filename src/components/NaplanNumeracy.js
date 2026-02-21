@@ -21,6 +21,7 @@ export default function NaplanNumeracy({
 }) {
   const studentId = sessionStorage.getItem("student_id");
   const API_BASE = process.env.REACT_APP_API_URL;
+  const TYPE_2_MAX_SELECTIONS = 2;
 
   if (!API_BASE) {
     throw new Error("❌ REACT_APP_API_URL is not defined");
@@ -475,14 +476,16 @@ export default function NaplanNumeracy({
                     disabled={isReview}
                     onChange={() => {
                       let updated;
-
+                    
                       if (isSelected) {
-                        updated = selected.filter(v => v !== opt.id);
+                        updated = selected.filter(v => v !== key);
                       } else {
-                        if (selected.length >= block.maxSelections) return;
-                        updated = [...selected, opt.id];
+                        if (!isSelected && selected.length >= TYPE_2_MAX_SELECTIONS) return;
+                        updated = [...selected, key];
                       }
-
+                    
+                      handleAnswer(updated);
+                    }}
                       handleAnswer(updated);
                     }}
                   />
