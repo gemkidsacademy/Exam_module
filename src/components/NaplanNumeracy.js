@@ -266,6 +266,12 @@ export default function NaplanNumeracy({
   const currentQ = questions[currentIndex];
   if (!currentQ) return null;
 
+
+  const hasImageMultiSelect =
+    currentQ.question_blocks?.some(
+      (b) => b.type === "image-multi-select"
+    );
+
   const isCorrect =
     mode === "review"
       ? (() => {
@@ -341,6 +347,7 @@ export default function NaplanNumeracy({
               </div>
             );
           })}
+        
         </div>
 
         {/* QUESTION */}
@@ -348,7 +355,7 @@ export default function NaplanNumeracy({
   <div className="question-content-centered">
     {currentQ.question_blocks?.map((block, idx) => {
 
-      // TEXT blocks (old + new)
+      // TEXT blocks
       if (block.type === "text") {
         return (
           <p key={idx} className="question-text">
@@ -359,40 +366,41 @@ export default function NaplanNumeracy({
 
       // IMAGE blocks
       if (block.type === "image") {
-          // 🚫 For Type 6, do NOT render option images here
-          if (
-            currentQ.question_type === 6 &&
-            block.role === "option"
-          ) {
-            return null;
-          }
-        
-          const src =
-            block.src ||
-            (block.name
-              ? `${process.env.REACT_APP_IMAGE_BASE_URL}/${block.name}`
-              : null);
-        
-          if (!src) return null;
-        
-          return (
-            <img
-              key={idx}
-              src={src}
-              alt="question visual"
-              className={
-                block.role === "reference"
-                  ? "question-image reference-image"
-                  : "question-image"
-              }
-            />
-          );
+        // 🚫 For Type 6, do NOT render option images here
+        if (
+          currentQ.question_type === 6 &&
+          block.role === "option"
+        ) {
+          return null;
         }
-      // TYPE 5 — CLOZE DROPDOWN  ✅ ADD THIS
+
+        const src =
+          block.src ||
+          (block.name
+            ? `${process.env.REACT_APP_IMAGE_BASE_URL}/${block.name}`
+            : null);
+
+        if (!src) return null;
+
+        return (
+          <img
+            key={idx}
+            src={src}
+            alt="question visual"
+            className={
+              block.role === "reference"
+                ? "question-image reference-image"
+                : "question-image"
+            }
+          />
+        );
+      }
+
+      // TYPE 5 — CLOZE DROPDOWN
       if (block.type === "cloze-dropdown") {
         const parts = block.sentence.split("{{dropdown}}");
         const qid = String(currentQ.id);
-    
+
         return (
           <div key={idx} className="cloze-sentence">
             {parts[0]}
@@ -416,22 +424,18 @@ export default function NaplanNumeracy({
         );
       }
 
-      // 🆕 sentence-only blocks (Grammar – Adverbs)
-      // 🆕 SENTENCE blocks (Grammar – Adverbs)
-      // ✅ TYPE 7 — WORD SELECTION (Grammar – Adverbs)
+      // TYPE 7 — WORD SELECTION
       if (block.type === "word-selection") {
         const sentenceWords = block.sentence.split(" ");
-      
+
         return (
           <div key={idx} className="sentence-container">
             {sentenceWords.map((word, i) => {
-              // Strip punctuation for comparison
               const cleanWord = word.replace(/[.,!?]/g, "");
-      
               const isSelectable = block.selectable_words.includes(cleanWord);
               const isSelected =
                 answers[String(currentQ.id)] === cleanWord;
-      
+
               return (
                 <span
                   key={i}
@@ -452,16 +456,17 @@ export default function NaplanNumeracy({
           </div>
         );
       }
-     // ✅ TYPE 2 — IMAGE MULTI SELECT (ADD THIS HERE)
+
+      // TYPE 2 — IMAGE MULTI SELECT
       if (block.type === "image-multi-select") {
         const qid = String(currentQ.id);
         const selected = answers[qid] || [];
-    
+
         return (
           <div key={idx} className="image-multi-select-grid">
             {block.options.map((opt) => {
               const isSelected = selected.includes(opt.id);
-    
+
               return (
                 <label
                   key={opt.id}
@@ -476,24 +481,24 @@ export default function NaplanNumeracy({
                     disabled={isReview}
                     onChange={() => {
                       let updated;
-    
+
                       if (isSelected) {
                         updated = selected.filter(v => v !== opt.id);
                       } else {
                         if (selected.length >= block.maxSelections) return;
                         updated = [...selected, opt.id];
                       }
-    
+
                       handleAnswer(updated);
                     }}
                   />
-    
+
                   <img
                     src={opt.image}
                     alt={opt.label}
                     className="image-option-image"
                   />
-    
+
                   <div className="image-option-label">
                     {opt.label}
                   </div>
@@ -506,6 +511,53 @@ export default function NaplanNumeracy({
 
       return null;
     })}
+
+    {/* ✅ TYPE 2 — TEXT-ONLY MULTI SELECT (FALLBACK) */}
+    {currentQ.question_type === 2 && !hasImageMultiSelect && (
+      <div className="mcq-options">
+        {Object.entries(currentQ.options || {}).map(([key, value]) => {
+          const selected = answers[String(currentQ.id)] || [];
+          const isSelected = selected.includes(key);
+
+          return (
+            <label
+              key={key}
+              className={`mcq-option-card ${
+                isSelected ? "selected" : ""
+              }`}
+            >
+              <input
+                type="checkbox"
+                value={key}
+                checked={isSelected}
+                disabled={isReview}
+                onChange={() => {
+                  let updated;
+
+                  if (isSelected) {
+                    updated = selected.filter(v => v !== key);
+                  } else {
+                    const max =
+                      normalizeCorrectAnswer(
+                        currentQ.correct_answer,
+                        currentQ.question_type
+                      )?.length || Infinity;
+
+                    if (selected.length >= max) return;
+                    updated = [...selected, key];
+                  }
+
+                  handleAnswer(updated);
+                }}
+              />
+              <span>{key}. {value}</span>
+            </label>
+          );
+        })}
+      </div>
+    )}
+  </div>
+</div>
 
 
     {/* NUMERIC INPUT */}
