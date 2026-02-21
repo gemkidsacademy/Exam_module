@@ -478,9 +478,9 @@ export default function NaplanNumeracy({
                       let updated;
                     
                       if (isSelected) {
-                        updated = selected.filter(v => v !== key);
+                        updated = selected.filter(v => v !== opt.id);
                       } else {
-                        if (!isSelected && selected.length >= TYPE_2_MAX_SELECTIONS) return;
+                        if (selected.length >= TYPE_2_MAX_SELECTIONS) return;
                         updated = [...selected, opt.id];
                       }
                     
