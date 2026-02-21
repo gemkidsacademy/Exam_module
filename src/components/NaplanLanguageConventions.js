@@ -273,6 +273,10 @@ export default function NaplanLanguageConventions({
      EXAM UI
   ============================================================ */
   const currentQ = questions[currentIndex];
+  const hasImageMultiSelect =
+    currentQ?.question_blocks?.some(
+      (b) => b.type === "image-multi-select"
+    );
   if (!currentQ) return null;
   const qid = String(currentQ.id);
   console.log("CURRENT ANSWER FOR TYPE 6:", answers[qid]);
