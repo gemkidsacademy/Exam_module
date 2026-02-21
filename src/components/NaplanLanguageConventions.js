@@ -541,10 +541,7 @@ export default function NaplanLanguageConventions({
                   }
                 
                   handleAnswer(updated);
-                }}
-
-                  handleAnswer(updated);
-                }}
+                }}                  
               />
               <span>{key}. {value}</span>
             </label>
