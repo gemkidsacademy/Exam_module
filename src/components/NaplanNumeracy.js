@@ -486,8 +486,7 @@ export default function NaplanNumeracy({
                     
                       handleAnswer(updated);
                     }}
-                      handleAnswer(updated);
-                    }}
+                      
                   />
 
                   <img
