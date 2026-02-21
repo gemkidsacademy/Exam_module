@@ -530,12 +530,7 @@ export default function NaplanNumeracy({
                   if (isSelected) {
                     updated = selected.filter(v => v !== key);
                   } else {
-                    const max =
-                      normalizeCorrectAnswer(
-                        currentQ.correct_answer,
-                        currentQ.question_type
-                      )?.length || Infinity;
-
+                    const max = currentQ.max_selections ?? Infinity;
                     if (selected.length >= max) return;
                     updated = [...selected, key];
                   }
