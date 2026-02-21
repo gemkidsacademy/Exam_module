@@ -355,7 +355,6 @@ export default function NaplanNumeracy({
   <div className="question-content-centered">
     {currentQ.question_blocks?.map((block, idx) => {
 
-      // TEXT blocks
       if (block.type === "text") {
         return (
           <p key={idx} className="question-text">
@@ -364,9 +363,7 @@ export default function NaplanNumeracy({
         );
       }
 
-      // IMAGE blocks
       if (block.type === "image") {
-        // 🚫 For Type 6, do NOT render option images here
         if (
           currentQ.question_type === 6 &&
           block.role === "option"
@@ -396,7 +393,6 @@ export default function NaplanNumeracy({
         );
       }
 
-      // TYPE 5 — CLOZE DROPDOWN
       if (block.type === "cloze-dropdown") {
         const parts = block.sentence.split("{{dropdown}}");
         const qid = String(currentQ.id);
@@ -424,7 +420,6 @@ export default function NaplanNumeracy({
         );
       }
 
-      // TYPE 7 — WORD SELECTION
       if (block.type === "word-selection") {
         const sentenceWords = block.sentence.split(" ");
 
@@ -457,7 +452,6 @@ export default function NaplanNumeracy({
         );
       }
 
-      // TYPE 2 — IMAGE MULTI SELECT
       if (block.type === "image-multi-select") {
         const qid = String(currentQ.id);
         const selected = answers[qid] || [];
@@ -512,7 +506,6 @@ export default function NaplanNumeracy({
       return null;
     })}
 
-    {/* ✅ TYPE 2 — TEXT-ONLY MULTI SELECT (FALLBACK) */}
     {currentQ.question_type === 2 && !hasImageMultiSelect && (
       <div className="mcq-options">
         {Object.entries(currentQ.options || {}).map(([key, value]) => {
@@ -558,7 +551,6 @@ export default function NaplanNumeracy({
     )}
   </div>
 </div>
-
 
     {/* NUMERIC INPUT */}
     {/* TYPE 3 — NUMERIC INPUT */}
