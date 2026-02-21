@@ -645,9 +645,7 @@ export default function NaplanNumeracy({
 
 
 
-  </div>
-</div>
-
+  
 
 
         {/* NAVIGATION */}
