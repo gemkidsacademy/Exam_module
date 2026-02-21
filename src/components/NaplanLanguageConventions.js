@@ -21,6 +21,7 @@ export default function NaplanLanguageConventions({
 }) {
   const studentId = sessionStorage.getItem("student_id");
   const API_BASE = process.env.REACT_APP_API_URL;
+  const TYPE_2_MAX_SELECTIONS = 2;
 
   if (!API_BASE) {
     throw new Error("❌ REACT_APP_API_URL is not defined");
@@ -486,7 +487,7 @@ export default function NaplanLanguageConventions({
                       if (isSelected) {
                         updated = selected.filter(v => v !== opt.id);
                       } else {
-                        if (selected.length >= block.maxSelections) return;
+                        if (!isSelected && selected.length >= TYPE_2_MAX_SELECTIONS) return;
                         updated = [...selected, opt.id];
                       }
 
@@ -531,15 +532,16 @@ export default function NaplanLanguageConventions({
                 disabled={isReview}
                 onChange={() => {
                   let updated;
-
+                
                   if (isSelected) {
                     updated = selected.filter(v => v !== key);
                   } else {
-                    const max = currentQ.max_selections ?? Infinity;
-
-                    if (selected.length >= max) return;
+                    if (!isSelected && selected.length >= TYPE_2_MAX_SELECTIONS) return;
                     updated = [...selected, key];
                   }
+                
+                  handleAnswer(updated);
+                }}
 
                   handleAnswer(updated);
                 }}
