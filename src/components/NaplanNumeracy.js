@@ -473,20 +473,21 @@ export default function NaplanNumeracy({
                     type="checkbox"
                     value={opt.id}
                     checked={isSelected}
-                    disabled={isReview}
+                    disabled={
+                      isReview ||
+                      (!isSelected && selected.length >= TYPE_2_MAX_SELECTIONS)
+                    }
                     onChange={() => {
                       let updated;
-                    
+                  
                       if (isSelected) {
                         updated = selected.filter(v => v !== opt.id);
                       } else {
-                        if (selected.length >= TYPE_2_MAX_SELECTIONS) return;
                         updated = [...selected, opt.id];
                       }
-                    
+                  
                       handleAnswer(updated);
                     }}
-                      
                   />
 
                   <img
@@ -525,18 +526,19 @@ export default function NaplanNumeracy({
                 type="checkbox"
                 value={key}
                 checked={isSelected}
-                disabled={isReview}
+                disabled={
+                  isReview ||
+                  (!isSelected && selected.length >= TYPE_2_MAX_SELECTIONS)
+                }
                 onChange={() => {
                   let updated;
-
+              
                   if (isSelected) {
                     updated = selected.filter(v => v !== key);
                   } else {
-                    const max = currentQ.max_selections ?? Infinity;
-                    if (selected.length >= max) return;
                     updated = [...selected, key];
                   }
-
+              
                   handleAnswer(updated);
                 }}
               />
