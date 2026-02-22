@@ -93,14 +93,17 @@
   background: #f3f4f6;
 }
 .exam-container {
-  display: block;
   width: 100%;
-  max-width: 100%;
-  margin: 0 auto;
+  height: 100%;              /* fills exam-shell */
+  margin: 0;
   padding: 0;
+
+  display: flex;             /* 🔥 critical */
+  flex-direction: column;    /* header → body → nav */
+
+  overflow: hidden;          /* 🔥 nothing leaks out */
   box-sizing: border-box;
 }
-
 
 
 /* ============================================
