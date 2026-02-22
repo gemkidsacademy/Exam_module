@@ -152,7 +152,7 @@ export default function NaplanReading({
   const startExam = async () => {
     try {
       const res = await fetch(
-        `${API_BASE}/api/student/start-exam/naplan-reading`,
+        `${API_BASE}/api/student/start-exam/naplan-reading-new`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
