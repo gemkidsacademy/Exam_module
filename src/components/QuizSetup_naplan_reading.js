@@ -129,7 +129,7 @@ export default function QuizSetup_naplan_reading({ examType }) {
       setShowQuestionBank(false);
 
       const res = await fetch(
-        `https://web-production-481a5.up.railway.app/api/admin/question-bank/naplan?subject=reading&year=${quiz.year}`
+        `https://web-production-481a5.up.railway.app/api/admin/question-bank-reading/naplan?subject=reading&year=${quiz.year}`
       );
 
       if (!res.ok) throw new Error("Failed to load question bank");
@@ -219,7 +219,7 @@ export default function QuizSetup_naplan_reading({ examType }) {
         });
 
         const res = await fetch(
-          `https://web-production-481a5.up.railway.app/api/topics-naplan?${params.toString()}`
+          `https://web-production-481a5.up.railway.app/api/topics-naplan-reading?${params.toString()}`
         );
 
         if (!res.ok) throw new Error("Failed to fetch topics");
