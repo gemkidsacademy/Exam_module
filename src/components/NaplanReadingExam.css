@@ -96,7 +96,7 @@
 ============================================================ */
 .mcq-options {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(4, 1fr); /* 🔥 FORCE 4 */
   gap: 16px;
 }
 .mcq-option-card {
