@@ -329,13 +329,16 @@ export default function NaplanReading({
           </div>
         </div>
 
-        {/* PASSAGE */}
+        <div className="exam-body reading-mode">
+
+        {/* LEFT: PASSAGE(S) */}
         {currentPassage?.reading_block && (
-          <div className="reading-block">
+          <div className="passage-pane">
             {currentPassage.reading_block.extracts.map(ext => (
               <div key={ext.extract_id} className="extract">
                 <h3>{ext.title}</h3>
                 <p>{ext.content}</p>
+
                 {ext.images?.map(img => (
                   <img key={img} src={img} alt="" />
                 ))}
@@ -344,87 +347,94 @@ export default function NaplanReading({
           </div>
         )}
 
-        {/* QUESTION */}
-        <div className="question-card">
-          {currentQ.exam_bundle.question_blocks
-            .filter(b => b.type !== "reading")
-            .map((block, idx) => {
+        {/* RIGHT: SINGLE QUESTION */}
+        <div className="question-pane">
+          <div className="question-card">
+            {currentQ.exam_bundle.question_blocks
+              .filter(b => b.type !== "reading")
+              .map((block, idx) => {
 
-              if (block.type === "text") {
-                return <p key={idx}>{block.content}</p>;
-              }
+                if (block.type === "text") {
+                  return <p key={idx}>{block.content}</p>;
+                }
 
-              if (block.type === "multi_select") {
-                const selected = answers[String(currentQ.id)] || [];
+                if (block.type === "multi_select") {
+                  const selected = answers[String(currentQ.id)] || [];
 
-                return (
-                  <div key={idx} className="mcq-options">
-                    {Object.entries(currentQ.exam_bundle.options).map(([k, v]) => {
-                      const isSelected = selected.includes(k);
+                  return (
+                    <div key={idx} className="mcq-options">
+                      {Object.entries(currentQ.exam_bundle.options).map(([k, v]) => {
+                        const isSelected = selected.includes(k);
 
-                      return (
-                        <label key={k} className={`mcq-option-card ${isSelected ? "selected" : ""}`}>
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
+                        return (
+                          <label
+                            key={k}
+                            className={`mcq-option-card ${isSelected ? "selected" : ""}`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              disabled={isReview}
+                              onChange={() => {
+                                const updated = isSelected
+                                  ? selected.filter(x => x !== k)
+                                  : [...selected, k];
+
+                                handleAnswer(updated);
+                              }}
+                            />
+                            {k}. {v}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  );
+                }
+
+                if (block.type === "gap_fill") {
+                  return (
+                    <input
+                      key={idx}
+                      className="text-input"
+                      value={answers[String(currentQ.id)] || ""}
+                      onChange={(e) => handleAnswer(e.target.value)}
+                      disabled={isReview}
+                    />
+                  );
+                }
+
+                if (block.type === "true_false") {
+                  return (
+                    <div key={idx} className="tf-options">
+                      {block.statements.map((stmt, i) => (
+                        <div key={i} className="tf-row">
+                          <span>{stmt}</span>
+                          <select
+                            value={answers[String(currentQ.id)]?.[i] || ""}
                             disabled={isReview}
-                            onChange={() => {
-                              let updated = isSelected
-                                ? selected.filter(x => x !== k)
-                                : [...selected, k];
-
+                            onChange={(e) => {
+                              const prev = answers[String(currentQ.id)] || [];
+                              const updated = [...prev];
+                              updated[i] = e.target.value;
                               handleAnswer(updated);
                             }}
-                          />
-                          {k}. {v}
-                        </label>
-                      );
-                    })}
-                  </div>
-                );
-              }
+                          >
+                            <option value="">Select</option>
+                            <option value="True">True</option>
+                            <option value="False">False</option>
+                          </select>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                }
 
-              if (block.type === "gap_fill") {
-                return (
-                  <input
-                    key={idx}
-                    className="text-input"
-                    value={answers[String(currentQ.id)] || ""}
-                    onChange={(e) => handleAnswer(e.target.value)}
-                    disabled={isReview}
-                  />
-                );
-              }
-
-              if (block.type === "true_false") {
-                return (
-                  <div key={idx} className="tf-options">
-                    {block.statements.map((stmt, i) => (
-                      <div key={i} className="tf-row">
-                        <span>{stmt}</span>
-                        <select
-                          value={answers[String(currentQ.id)]?.[i] || ""}
-                          disabled={isReview}
-                          onChange={(e) => {
-                            const prev = answers[String(currentQ.id)] || [];
-                            const updated = [...prev];
-                            updated[i] = e.target.value;
-                            handleAnswer(updated);
-                          }}
-                        >
-                          <option value="">Select</option>
-                          <option value="True">True</option>
-                          <option value="False">False</option>
-                        </select>
-                      </div>
-                    ))}
-                  </div>
-                );
-              }
-
-              return null;
-            })}
+                return null;
+              })}
+          </div>
         </div>
+
+      </div>
 
         {mode === "review" && (
           <div className={`review-result ${isCorrect ? "answer-correct" : "answer-wrong"}`}>
