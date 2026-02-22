@@ -107,15 +107,17 @@
    EXAM SHELL — CORRECT FIX
 ============================================ */
 .exam-shell {
-  width: 100%;        /* ✅ respect parent */
-  max-width: none;
-  min-height: 100vh;
+  width: 100%;
+  height: 100vh;          /* lock to viewport */
   margin: 0;
   padding: 0;
+
+  display: block;
+  overflow: hidden;       /* 🔥 prevent page-level scrolling */
+
   background: #f5f7fb;
   box-sizing: border-box;
 }
-
 /* ============================================
    EXAM CONTENT (CARD)
 ============================================ */
