@@ -367,10 +367,14 @@ export default function NaplanReading({
 
                 if (block.type === "multi_select") {
                   const selected = answers[String(currentQ.id)] || [];
+                  const imageOptions = currentQ.exam_bundle.image_options;
+                  const textOptions = currentQ.exam_bundle.options;
+
+                  const optionsSource = imageOptions || textOptions;
 
                   return (
                     <div key={idx} className="mcq-options">
-                      {Object.entries(currentQ.exam_bundle.options).map(([k, v]) => {
+                      {Object.entries(optionsSource).map(([k, v]) => {
                         const isSelected = selected.includes(k);
 
                         return (
@@ -390,7 +394,17 @@ export default function NaplanReading({
                                 handleAnswer(updated);
                               }}
                             />
-                            {k}. {v}
+
+                            {/* 🔥 IMAGE OPTION */}
+                            {imageOptions ? (
+                              <img
+                                src={v}
+                                alt={`Option ${k}`}
+                                className="option-image"
+                              />
+                            ) : (
+                              <span>{k}. {v}</span>
+                            )}
                           </label>
                         );
                       })}
