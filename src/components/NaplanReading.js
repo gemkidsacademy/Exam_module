@@ -357,59 +357,14 @@ export default function NaplanReading({
         {/* RIGHT: SINGLE QUESTION */}
         <div className="question-pane">
           <div className="question-card">
+
+            {/* 1️⃣ QUESTION TEXT / STRUCTURE */}
             {currentQ.exam_bundle.question_blocks
               .filter(b => b.type !== "reading")
               .map((block, idx) => {
 
                 if (block.type === "text") {
                   return <p key={idx}>{block.content}</p>;
-                }
-
-                if (block.type === "multi_select") {
-                  const selected = answers[String(currentQ.id)] || [];
-                  const imageOptions = currentQ.exam_bundle.image_options;
-                  const textOptions = currentQ.exam_bundle.options;
-
-                  const optionsSource = imageOptions || textOptions;
-
-                  return (
-                    <div key={idx} className="mcq-options">
-                      {Object.entries(optionsSource).map(([k, v]) => {
-                        const isSelected = selected.includes(k);
-
-                        return (
-                          <label
-                            key={k}
-                            className={`mcq-option-card ${isSelected ? "selected" : ""}`}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={isSelected}
-                              disabled={isReview}
-                              onChange={() => {
-                                const updated = isSelected
-                                  ? selected.filter(x => x !== k)
-                                  : [...selected, k];
-
-                                handleAnswer(updated);
-                              }}
-                            />
-
-                            {/* 🔥 IMAGE OPTION */}
-                            {imageOptions ? (
-                              <img
-                                src={v}
-                                alt={`Option ${k}`}
-                                className="option-image"
-                              />
-                            ) : (
-                              <span>{k}. {v}</span>
-                            )}
-                          </label>
-                        );
-                      })}
-                    </div>
-                  );
                 }
 
                 if (block.type === "gap_fill") {
@@ -452,6 +407,86 @@ export default function NaplanReading({
 
                 return null;
               })}
+
+            {/* 2️⃣ OPTIONS — RENDER ONCE PER QUESTION */}
+            {(() => {
+              const imageOptions = currentQ.exam_bundle.image_options;
+              const textOptions = currentQ.exam_bundle.options;
+              const optionsSource = imageOptions || textOptions;
+
+              if (!optionsSource) return null;
+
+              // MULTI SELECT
+              if (currentQ.question_type === 2) {
+                const selected = answers[String(currentQ.id)] || [];
+
+                return (
+                  <div className="mcq-options">
+                    {Object.entries(optionsSource).map(([k, v]) => {
+                      const isSelected = selected.includes(k);
+
+                      return (
+                        <label
+                          key={k}
+                          className={`mcq-option-card ${isSelected ? "selected" : ""}`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            disabled={isReview}
+                            onChange={() => {
+                              const updated = isSelected
+                                ? selected.filter(x => x !== k)
+                                : [...selected, k];
+                              handleAnswer(updated);
+                            }}
+                          />
+
+                          {imageOptions ? (
+                            <img src={v} alt={`Option ${k}`} className="option-image" />
+                          ) : (
+                            <span>{k}. {v}</span>
+                          )}
+                        </label>
+                      );
+                    })}
+                  </div>
+                );
+              }
+
+              // SINGLE CHOICE
+              const selected = answers[String(currentQ.id)];
+
+              return (
+                <div className="mcq-options">
+                  {Object.entries(optionsSource).map(([k, v]) => {
+                    const isSelected = selected === k;
+
+                    return (
+                      <label
+                        key={k}
+                        className={`mcq-option-card ${isSelected ? "selected" : ""}`}
+                      >
+                        <input
+                          type="radio"
+                          name={`q-${currentQ.id}`}
+                          checked={isSelected}
+                          disabled={isReview}
+                          onChange={() => handleAnswer(k)}
+                        />
+
+                        {imageOptions ? (
+                          <img src={v} alt={`Option ${k}`} className="option-image" />
+                        ) : (
+                          <span>{k}. {v}</span>
+                        )}
+                      </label>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+
           </div>
         </div>
 
