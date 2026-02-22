@@ -4,7 +4,7 @@ import "./NaplanDashboard.css";
 // NAPLAN EXAM COMPONENTS
 import NaplanNumeracy from "./NaplanNumeracy";
 import NaplanLanguageConventions from "./NaplanLanguageConventions";
-//import NaplanReading from "./NaplanReading";
+import NaplanReading from "./NaplanReading";
 //import NaplanWriting from "./NaplanWriting";
 
 // SHARED SCREENS
@@ -29,12 +29,13 @@ const SUBJECTS = [
     component: NaplanLanguageConventions,
   },
 
+  
+   {
+     label: "Reading",
+     key: "reading",
+     component: NaplanReading,
+   },
   // Temporarily disabled
-  // {
-  //   label: "Reading",
-  //   key: "reading",
-  //   component: NaplanReading,
-  // },
   // {
   //   label: "Writing",
   //   key: "writing",
