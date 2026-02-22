@@ -373,7 +373,7 @@ export default function NaplanReading({
                   // Word-bank gap fill (single choice)
                   if (block.word_bank?.length) {
                     return (
-                      <div key={idx} className="mcq-options">
+                      <div key={idx} className="mcq-options word-bank">
                         {block.word_bank.map(word => {
                           const isSelected = answers[qid] === word;
 
