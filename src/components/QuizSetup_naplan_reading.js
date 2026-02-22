@@ -219,7 +219,7 @@ export default function QuizSetup_naplan_reading({ examType }) {
         });
 
         const res = await fetch(
-          `https://web-production-481a5.up.railway.app/api/topics-naplan-reading?${params.toString()}`
+          `https://web-production-481a5.up.railway.app/topics-naplan-reading?${params.toString()}`
         );
 
         if (!res.ok) throw new Error("Failed to fetch topics");
