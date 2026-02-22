@@ -152,7 +152,7 @@ export default function NaplanReading({
   const startExam = async () => {
     try {
       const res = await fetch(
-        `${API_BASE}/api/student/start-exam/naplan-reading`,
+        `${API_BASE}/api/student/start-exam/naplan-reading-new`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -573,7 +573,7 @@ export default function NaplanReading({
                 const selected = answers[String(currentQ.question_id)] || [];
 
                 return (
-                  <div className="mcq-options">
+                  <div className="mcq-options multi-select">
                     {Object.entries(optionsSource).map(([k, v]) => {
                       const isSelected = selected.includes(k);
 
