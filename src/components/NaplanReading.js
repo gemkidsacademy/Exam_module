@@ -368,11 +368,41 @@ export default function NaplanReading({
                 }
 
                 if (block.type === "gap_fill") {
+                  const qid = String(currentQ.id);
+
+                  // Word-bank gap fill (single choice)
+                  if (block.word_bank?.length) {
+                    return (
+                      <div key={idx} className="mcq-options">
+                        {block.word_bank.map(word => {
+                          const isSelected = answers[qid] === word;
+
+                          return (
+                            <label
+                              key={word}
+                              className={`mcq-option-card ${isSelected ? "selected" : ""}`}
+                            >
+                              <input
+                                type="radio"
+                                name={`gap-${qid}`}
+                                checked={isSelected}
+                                disabled={isReview}
+                                onChange={() => handleAnswer(word)}
+                              />
+                              <span>{word}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    );
+                  }
+
+                  // Free-text gap fill (fallback)
                   return (
                     <input
                       key={idx}
                       className="text-input"
-                      value={answers[String(currentQ.id)] || ""}
+                      value={answers[qid] || ""}
                       onChange={(e) => handleAnswer(e.target.value)}
                       disabled={isReview}
                     />
