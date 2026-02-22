@@ -363,7 +363,10 @@ export default function NaplanReading({
               .filter(b => b.type !== "reading")
               .map((block, idx) => {
 
-                if (block.type === "text") {
+                if (
+                  block.content &&
+                  !["gap_fill", "single_gap"].includes(block.type)
+                ) {
                   return <p key={idx}>{block.content}</p>;
                 }
 
