@@ -95,29 +95,31 @@
    MCQ / MULTI SELECT
 ============================================================ */
 .mcq-options {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
 }
-
 .mcq-option-card {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 6px;
-  border: 1px solid #dcdfe4;
-  cursor: pointer;
-  transition: background 0.15s ease, border 0.15s ease;
-}
 
+  padding: 14px;
+  border-radius: 12px;
+
+  background: #f8fafc;
+  border: 2px solid transparent;
+
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
 .mcq-option-card:hover {
   background: #f3f6fb;
 }
 
 .mcq-option-card.selected {
-  border-color: #0d6efd;
-  background: #e7f0ff;
+  background: #ecfdf5;          /* soft green */
+  border-color: #22c55e;        /* strong green border */
 }
 
 .mcq-option-card input {
@@ -264,4 +266,14 @@
 .confirm-modal button:last-of-type {
   background: #0d6efd;
   color: #ffffff;
+}
+.option-image {
+  width: 100%;
+  max-height: 160px;      /* 🔒 lock vertical growth */
+  object-fit: contain;   /* preserve aspect ratio */
+
+  background: #ffffff;
+  border-radius: 8px;
+
+  margin-top: 10px;
 }
