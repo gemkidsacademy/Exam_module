@@ -1,0 +1,167 @@
+/* ============================================================
+   NAPLAN READING REPORT
+============================================================ */
+
+.reading-report-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 20px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1f2937;
+}
+
+/* ---------------- HEADER ---------------- */
+
+.reading-report-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.reading-report-header h2 {
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.reading-report-header p {
+  color: #6b7280;
+  font-size: 15px;
+}
+
+/* ---------------- SUMMARY CARDS ---------------- */
+
+.reading-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 36px;
+}
+
+.reading-summary-card {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 18px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+
+.reading-summary-card h3 {
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+
+.reading-summary-card span {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* ---------------- PERFORMANCE ---------------- */
+
+.reading-performance {
+  margin-bottom: 36px;
+}
+
+.reading-performance h3 {
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.performance-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.performance-row:last-child {
+  border-bottom: none;
+}
+
+.performance-topic {
+  font-weight: 500;
+}
+
+.performance-score {
+  font-size: 14px;
+  color: #374151;
+}
+
+/* ---------------- IMPROVEMENT AREAS ---------------- */
+
+.reading-improvement {
+  margin-bottom: 40px;
+}
+
+.reading-improvement h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.reading-improvement ul {
+  padding-left: 18px;
+}
+
+.reading-improvement li {
+  margin-bottom: 8px;
+  color: #374151;
+}
+
+/* ---------------- ACTION BUTTONS ---------------- */
+
+.reading-report-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.reading-report-actions button {
+  padding: 12px 22px;
+  font-size: 15px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.reading-report-actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+.btn-review {
+  background: #2563eb;
+  color: white;
+}
+
+.btn-exit {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+
+@media (max-width: 640px) {
+  .reading-report-container {
+    padding: 20px 14px;
+  }
+
+  .reading-report-header h2 {
+    font-size: 22px;
+  }
+
+  .reading-summary-card h3 {
+    font-size: 24px;
+  }
+}
+
+/* ---------------- PRINT ---------------- */
+
+@media print {
+  .reading-report-actions {
+    display: none;
+  }
+
+  body {
+    background: white;
+  }
+}
