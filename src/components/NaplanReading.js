@@ -21,25 +21,28 @@ export default function NaplanReading({
   const studentId = sessionStorage.getItem("student_id");
   const API_BASE = process.env.REACT_APP_API_URL;
   const TYPE_2_MAX_SELECTIONS = 2;
-  const hasAnswered = (qid, questionType) => {
+  function hasAnswered(question, answers) {
+    const qid = question.question_id;
     const value = answers[qid];
   
     if (value == null) return false;
   
-    // Multi-select
-    if (questionType === 2) {
-      return Array.isArray(value) && value.length > 0;
-    }
+    switch (question.question_type) {
+      case 1: // single choice
+      case 3: // gap fill
+      case 6: // single gap
+        return value !== "";
   
-    // True / False (array of answers)
-    if (Array.isArray(value)) {
-      return value.some(v => v === "True" || v === "False");
-    }
+      case 2: // multi select
+        return Array.isArray(value) && value.length > 0;
   
-    // Single choice / gap / single_gap
-    return String(value).trim() !== "";
-  };
-
+      case 5: // true/false
+        return Array.isArray(value) && value.some(v => v !== null);
+  
+      default:
+        return false;
+    }
+  }
   if (!API_BASE) {
     throw new Error("❌ REACT_APP_API_URL is not defined");
   }
@@ -274,7 +277,7 @@ export default function NaplanReading({
      ANSWERS
   ============================================================ */
   const handleAnswer = (value) => {
-    const qid = String(currentQ?.id);
+    const qid = String(currentQ.question_id);
     if (!qid) return;
   
     console.log("✍️ handleAnswer called", { qid, value });
@@ -291,7 +294,7 @@ export default function NaplanReading({
   const goToQuestion = (idx) => {
     if (idx < 0 || idx >= flatQuestions.length) return;
 
-    const qid = String(flatQuestions[idx].id);
+    const qid = String(flatQuestions[idx].question_id);
     setVisited(prev => ({ ...prev, [qid]: true }));
     setCurrentIndex(idx);
   };
@@ -351,7 +354,7 @@ export default function NaplanReading({
           );
 
           const student = normalizeStudentAnswer(
-            answers[String(currentQ.id)],
+            answers[String(currentQ.question_id)],
             currentQ.question_type
           );
 
@@ -372,7 +375,7 @@ export default function NaplanReading({
      CURRENT PASSAGE
   ============================================================ */
   const currentPassage = passages.find(p =>
-    p.questions.some(q => q.id === currentQ.id)
+    p.questions.some(q => q.question_id === currentQ.question_id)
   );
   console.log("🧠 ACTUAL RENDER answers:", answers);
 
@@ -390,23 +393,18 @@ export default function NaplanReading({
          {/* QUESTION INDEX BAR */}
         <div className="question-index-bar">
           {flatQuestions.map((q, idx) => {
-            const qid = String(q.id);
-            const answered = hasAnswered(qid, q.question_type);
+            const isAnswered = hasAnswered(q, answers);
             const isCurrent = idx === currentIndex;
-      
+        
             return (
               <button
-                key={qid}
+                key={q.question_id}
                 className={[
                   "question-index-item",
-                  answered ? "answered" : "unanswered",
+                  isAnswered ? "answered" : "unanswered",
                   isCurrent ? "current" : ""
                 ].join(" ")}
-                onClick={() => {
-                  if (!isReview) {
-                    goToQuestion(idx);
-                  }
-                }}
+                onClick={() => goToQuestion(idx)}
               >
                 {idx + 1}
               </button>
@@ -448,7 +446,7 @@ export default function NaplanReading({
                 }
 
                 if (block.type === "gap_fill") {
-                  const qid = String(currentQ.id);
+                  const qid = String(currentQ.question_id);
 
                   return (
                     <div key={idx} className="gap-fill-block">
@@ -495,7 +493,7 @@ export default function NaplanReading({
                   );
                 }
                 if (block.type === "single_gap") {
-                  const qid = String(currentQ.id);
+                  const qid = String(currentQ.question_id);
 
                   return (
                     <div key={idx} className="gap-fill-block">
@@ -537,10 +535,10 @@ export default function NaplanReading({
                         <div key={i} className="tf-row">
                           <span>{stmt}</span>
                           <select
-                            value={answers[String(currentQ.id)]?.[i] || ""}
+                            value={answers[String(currentQ.question_id)]?.[i] || ""}
                             disabled={isReview}
                             onChange={(e) => {
-                              const prev = answers[String(currentQ.id)] || [];
+                              const prev = answers[String(currentQ.question_id)] || [];
                               const updated = [...prev];
                               updated[i] = e.target.value;
                               handleAnswer(updated);
@@ -572,7 +570,7 @@ export default function NaplanReading({
 
               // MULTI SELECT
               if (currentQ.question_type === 2) {
-                const selected = answers[String(currentQ.id)] || [];
+                const selected = answers[String(currentQ.question_id)] || [];
 
                 return (
                   <div className="mcq-options">
@@ -609,7 +607,7 @@ export default function NaplanReading({
               }
 
               // SINGLE CHOICE
-              const selected = answers[String(currentQ.id)];
+              const selected = answers[String(currentQ.question_id)];
 
               return (
                 <div className="mcq-options">
@@ -623,7 +621,7 @@ export default function NaplanReading({
                       >
                         <input
                           type="radio"
-                          name={`q-${currentQ.id}`}
+                          name={`q-${currentQ.question_id}`}
                           checked={isSelected}
                           disabled={isReview}
                           onChange={() => handleAnswer(k)}
