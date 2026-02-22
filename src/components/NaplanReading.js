@@ -414,6 +414,41 @@ export default function NaplanReading({
                     </div>
                   );
                 }
+                if (block.type === "single_gap") {
+                  const qid = String(currentQ.id);
+
+                  return (
+                    <div key={idx} className="gap-fill-block">
+                      {/* Sentence */}
+                      <p className="gap-fill-text">
+                        {block.content}
+                      </p>
+
+                      {/* Options */}
+                      <div className="mcq-options word-bank">
+                        {Object.entries(block.options).map(([key, label]) => {
+                          const isSelected = answers[qid] === key;
+
+                          return (
+                            <label
+                              key={key}
+                              className={`mcq-option-card ${isSelected ? "selected" : ""}`}
+                            >
+                              <input
+                                type="radio"
+                                name={`single-gap-${qid}`}
+                                checked={isSelected}
+                                disabled={isReview}
+                                onChange={() => handleAnswer(key)}
+                              />
+                              <span>{label}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                }
 
                 if (block.type === "true_false") {
                   return (
@@ -446,6 +481,9 @@ export default function NaplanReading({
 
             {/* 2️⃣ OPTIONS — RENDER ONCE PER QUESTION */}
             {(() => {
+              if ([6].includes(currentQ.question_type)) {
+                return null;
+              }
               const imageOptions = currentQ.exam_bundle.image_options;
               const textOptions = currentQ.exam_bundle.options;
               const optionsSource = imageOptions || textOptions;
