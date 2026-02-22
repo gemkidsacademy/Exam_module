@@ -80,12 +80,16 @@
    QUESTION CARD
 ============================================================ */
 .question-card {
+  flex: 1;                    /* 🔥 take remaining height in question pane */
   padding: 20px;
+
   border: 1px solid #e6e9ed;
   border-radius: 8px;
   background: #ffffff;
-}
 
+  overflow-y: auto;           /* 🔥 ENABLE SCROLLING */
+  box-sizing: border-box;
+}
 .question-card p {
   font-size: 16px;
   margin-bottom: 14px;
@@ -276,4 +280,10 @@
   border-radius: 8px;
 
   margin-top: 10px;
+}
+.question-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;          /* 🔥 lock height */
+  overflow: hidden;      /* 🔥 prevent page scroll */
 }
