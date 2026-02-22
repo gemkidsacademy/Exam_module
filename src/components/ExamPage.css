@@ -339,14 +339,13 @@
 ============================================ */
 @media (min-width: 1400px) {
   .reading-mode .passage-pane {
-    max-width: 40%;
+    max-width: 60%;
   }
 
   .reading-mode .question-pane {
-    max-width: 60%;
+    max-width: 40%;
   }
 }
-
 
 /* ============================================
    WRITING EXAM — FIXED FULL WIDTH
