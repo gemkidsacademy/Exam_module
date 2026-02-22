@@ -21,6 +21,24 @@ export default function NaplanReading({
   const studentId = sessionStorage.getItem("student_id");
   const API_BASE = process.env.REACT_APP_API_URL;
   const TYPE_2_MAX_SELECTIONS = 2;
+  const hasAnswered = (qid, questionType) => {
+    const value = answers[qid];
+  
+    if (value == null) return false;
+  
+    // Multi-select
+    if (questionType === 2) {
+      return Array.isArray(value) && value.length > 0;
+    }
+  
+    // True / False (array of answers)
+    if (Array.isArray(value)) {
+      return value.some(v => v === "True" || v === "False");
+    }
+  
+    // Single choice / gap / single_gap
+    return String(value).trim() !== "";
+  };
 
   if (!API_BASE) {
     throw new Error("❌ REACT_APP_API_URL is not defined");
@@ -335,7 +353,32 @@ export default function NaplanReading({
             Question {currentIndex + 1} / {flatQuestions.length}
           </div>
         </div>
-
+         {/* QUESTION INDEX BAR */}
+        <div className="question-index-bar">
+          {flatQuestions.map((q, idx) => {
+            const qid = String(q.id);
+            const answered = hasAnswered(qid, q.question_type);
+            const isCurrent = idx === currentIndex;
+      
+            return (
+              <button
+                key={qid}
+                className={[
+                  "question-index-item",
+                  answered ? "answered" : "unanswered",
+                  isCurrent ? "current" : ""
+                ].join(" ")}
+                onClick={() => {
+                  if (!isReview) {
+                    goToQuestion(idx);
+                  }
+                }}
+              >
+                {idx + 1}
+              </button>
+            );
+          })}
+        </div>
         <div className="exam-body reading-mode">
 
         {/* LEFT: PASSAGE(S) */}
