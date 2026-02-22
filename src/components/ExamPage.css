@@ -325,15 +325,6 @@
   align-items: flex-start;
 }
 
-.reading-mode .passage-pane {
-  flex: 1;
-  max-width: 45%;
-}
-
-.reading-mode .question-pane {
-  flex: 1;
-  max-width: 55%;
-}
 /* ============================================
    READING MODE — ULTRA WIDE SCREENS
 ============================================ */
@@ -1134,7 +1125,17 @@ progress::-moz-progress-bar {
   display: flex;
   overflow: hidden;        /* stop page scroll */
 }
+.reading-mode .passage-pane {
+  flex: 0 0 60%;
+  width: 60%;
+  max-width: 60%;
+}
 
+.reading-mode .question-pane {
+  flex: 0 0 40%;
+  width: 40%;
+  max-width: 40%;
+}
 
    
 
