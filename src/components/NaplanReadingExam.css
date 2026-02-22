@@ -79,39 +79,50 @@
 /* ============================================================
    QUESTION CARD
 ============================================================ */
-.question-card {
-  flex: 1;                    /* 🔥 take remaining height in question pane */
-  padding: 20px;
+.question-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
 
+.question-card {
+  flex: 1;
+  padding: 20px;
   border: 1px solid #e6e9ed;
   border-radius: 8px;
   background: #ffffff;
-
-  overflow-y: auto;           /* 🔥 ENABLE SCROLLING */
+  overflow-y: auto;
   box-sizing: border-box;
 }
+
 .question-card p {
   font-size: 16px;
   margin-bottom: 14px;
 }
 
 /* ============================================================
-   MCQ / MULTI SELECT
+   MCQ / MULTI SELECT (GRID SYSTEM)
 ============================================================ */
 .mcq-options {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 🔥 FORCE 4 */
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
+
+/* --- default option card (radio / image MCQ) --- */
+.mcq-options:not(.multi-select):not(.word-bank) .mcq-option-card {
+  height: 220px;
+}
+
+/* --- option card base --- */
 .mcq-option-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;   /* 🔥 content spreads evenly */
+  justify-content: space-between;
 
-  height: 220px;                    /* 🔒 fixed tile height */
   padding: 14px;
-
   background: #f8fafc;
   border: 2px solid transparent;
   border-radius: 12px;
@@ -120,21 +131,74 @@
   transition: background 0.15s ease, border-color 0.15s ease;
   box-sizing: border-box;
 }
+
 .mcq-option-card:hover {
   background: #f3f6fb;
 }
 
 .mcq-option-card.selected {
-  background: #ecfdf5;          /* soft green */
-  border-color: #22c55e;        /* strong green border */
+  background: #ecfdf5;
+  border-color: #22c55e;
 }
 
+/* hide native inputs */
 .mcq-option-card input {
-  cursor: pointer;
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* ============================================================
-   GAP FILL / TEXT INPUT
+   MULTI SELECT (CHECKBOXES)
+============================================================ */
+.mcq-options.multi-select {
+  align-items: start; /* ✅ grid-safe */
+}
+
+.mcq-options.multi-select .mcq-option-card {
+  height: auto;
+  padding: 12px 14px;
+}
+
+.mcq-options.multi-select .mcq-option-card.selected {
+  background: #f7fdf9;
+  border: 2px solid #2ecc71;
+}
+
+/* ============================================================
+   IMAGE OPTIONS
+============================================================ */
+.option-image {
+  width: 100%;
+  max-height: 120px;
+  object-fit: contain;
+  display: block;
+  margin-top: 8px;
+  background: #ffffff;
+  border-radius: 6px;
+}
+
+/* ============================================================
+   WORD BANK / GAP FILL
+============================================================ */
+.mcq-options.word-bank {
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.mcq-options.word-bank .mcq-option-card {
+  height: auto;
+  min-height: 56px;
+  padding: 12px 16px;
+  justify-content: center;
+}
+
+.mcq-options.word-bank .mcq-option-card span {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* ============================================================
+   TEXT INPUT
 ============================================================ */
 .text-input {
   width: 100%;
@@ -175,6 +239,41 @@
   padding: 6px;
   border-radius: 6px;
   border: 1px solid #cfd4da;
+}
+
+/* ============================================================
+   QUESTION INDEX BAR
+============================================================ */
+.question-index-bar {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  margin: 10px 0;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.question-index-item {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  background: #e5e7eb;
+  color: #111827;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.question-index-item.answered {
+  background: #22c55e;
+  color: white;
+}
+
+.question-index-item.current {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
 }
 
 /* ============================================================
@@ -273,76 +372,4 @@
 .confirm-modal button:last-of-type {
   background: #0d6efd;
   color: #ffffff;
-}
-.option-image {
-  width: 100%;
-  max-height: 120px;      /* 🔥 thumbnail-sized like reference */
-  object-fit: contain;
-
-  display: block;
-  margin-top: 8px;
-
-  background: #ffffff;
-  border-radius: 6px;
-}
-.question-pane {
-  display: flex;
-  flex-direction: column;
-  height: 100%;          /* 🔥 lock height */
-  overflow: hidden;      /* 🔥 prevent page scroll */
-}
-.mcq-option-card input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-/* Word-bank gap fill options */
-.mcq-options.word-bank .mcq-option-card {
-  height: auto;
-  min-height: 56px;
-  padding: 12px 16px;
-  justify-content: center;
-}
-
-.mcq-options.word-bank .mcq-option-card span {
-  font-size: 16px;
-  font-weight: 500;
-}
-.question-index-bar {
-  display: flex;
-  gap: 8px;
-  padding: 10px 12px;
-  margin: 10px 0;
-
-  overflow-x: auto;
-  white-space: nowrap;
-}
-.question-index-item {
-  width: 32px;
-  height: 32px;
-
-  border-radius: 50%;
-  border: none;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  background: #e5e7eb; /* grey */
-  color: #111827;
-
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.question-index-item.answered {
-  background: #22c55e; /* green */
-  color: white;
-}
-
-.question-index-item.unanswered {
-  background: #e5e7eb;
-  color: #111827;
-}
-.question-index-item.current {
-  outline: 3px solid #2563eb; /* blue ring */
-  outline-offset: 2px;
 }
