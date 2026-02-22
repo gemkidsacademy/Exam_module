@@ -1130,7 +1130,11 @@ progress::-moz-progress-bar {
 .text-input {
   resize: none;
 }
-
+.exam-body {
+  flex: 1;                 /* 🔥 THIS IS THE KEY */
+  display: flex;
+  overflow: hidden;        /* stop page scroll */
+}
 
 
    
