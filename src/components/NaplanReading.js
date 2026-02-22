@@ -135,6 +135,13 @@ export default function NaplanReading({
 
       const data = await res.json();
 
+      // 🔍 LOG FULL EXAM PAYLOAD
+      console.group("📘 NAPLAN READING EXAM PAYLOAD");
+      console.log("Raw response:", data);
+      console.log("Questions:", data.questions);
+      console.log("Remaining time:", data.remaining_time);
+      console.groupEnd();
+
       if (data.completed === true) {
         await loadReport();
         return;
