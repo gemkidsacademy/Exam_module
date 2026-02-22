@@ -302,9 +302,9 @@ export default function QuizSetup_naplan_reading({ examType }) {
               }
             >
               <option value="">Select topic</option>
-              {availableTopics.map((t) => (
-                <option key={t.name} value={t.name}>
-                  {t.name}
+              {availableTopics.map((topic) => (
+                <option key={topic} value={topic}>
+                  {topic}
                 </option>
               ))}
             </select>
