@@ -296,3 +296,15 @@
   opacity: 0;
   pointer-events: none;
 }
+/* Word-bank gap fill options */
+.mcq-options.word-bank .mcq-option-card {
+  height: auto;
+  min-height: 56px;
+  padding: 12px 16px;
+  justify-content: center;
+}
+
+.mcq-options.word-bank .mcq-option-card span {
+  font-size: 16px;
+  font-weight: 500;
+}
