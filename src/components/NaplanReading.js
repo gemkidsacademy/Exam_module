@@ -138,64 +138,68 @@ export default function NaplanReading({
      START / RESUME EXAM
   ============================================================ */
   useEffect(() => {
-    if (!studentId) return;
-    if (mode === "report" || mode === "review") return;
-  
-    const startExam = async () => {
-      try {
-        const res = await fetch(
-          `${API_BASE}/api/student/start-exam/naplan-reading`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ student_id: studentId })
-          }
-        );
-  
-        const data = await res.json();
-  
-        // 🔍 Debug payload
-        console.group("📘 NAPLAN READING EXAM PAYLOAD");
-        console.log("Raw response:", data);
-        console.log("Questions:", data.questions);
-        console.log("Remaining time:", data.remaining_time);
-        console.log("Existing answers:", data.answers);
-        console.groupEnd();
-  
-        // Exam already completed → go straight to report
-        if (data.completed === true) {
-          await loadReport();
-          return;
+  if (!studentId) return;
+  if (mode === "report" || mode === "review") return;
+
+  // 🔒 HARD RESET FIRST (prevents ghost answers)
+  setAnswers({});
+  setVisited({});
+  setCurrentIndex(0);
+
+  const startExam = async () => {
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/student/start-exam/naplan-reading`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ student_id: studentId })
         }
-  
-        // Core exam data
-        setQuestions(data.questions || []);
-        setTimeLeft(data.remaining_time);
-  
-        // 🔑 IMPORTANT: fresh vs resumed attempt
-        if (data.is_resumed) {
-          setAnswers(data.answers || {});
-          setVisited(
-            Object.fromEntries(
-              Object.keys(data.answers || {}).map(qid => [qid, true])
-            )
-          );
-        } else {
-          setAnswers({});
-          setVisited({});
-        }
-  
-        setCurrentIndex(0);
-        setMode("exam");
-        onExamStart?.();
-  
-      } catch (err) {
-        console.error("❌ Failed to start NAPLAN reading exam:", err);
+      );
+
+      const data = await res.json();
+      console.group("🛰️ START-EXAM RESPONSE");
+      console.log("completed:", data.completed);
+      console.log("is_resumed:", data.is_resumed);
+      console.log("answers from API:", data.answers);
+      console.log("questions count:", data.questions?.length);
+      console.groupEnd();
+
+      console.group("📘 NAPLAN READING EXAM PAYLOAD");
+      console.log("Raw response:", data);
+      console.log("Existing answers:", data.answers);
+      console.log("is_resumed:", data.is_resumed);
+      console.groupEnd();
+
+      if (data.completed === true) {
+        await loadReport();
+        console.log("🧠 RENDER answers state:", answers);
+        return;
       }
-    };
-  
-    startExam();
-  }, [studentId, API_BASE, loadReport, mode, onExamStart]);
+
+      setQuestions(data.questions || []);
+      setTimeLeft(data.remaining_time);
+
+      // Resume ONLY if backend explicitly says so
+      if (data.is_resumed === true && data.answers) {
+        setAnswers(data.answers);
+        setVisited(
+          Object.fromEntries(
+            Object.keys(data.answers).map(qid => [qid, true])
+          )
+        );
+      }
+
+      setMode("exam");
+      onExamStart?.();
+
+    } catch (err) {
+      console.error("❌ Failed to start exam:", err);
+    }
+  };
+
+  startExam();
+}, [studentId, API_BASE, loadReport, mode, onExamStart]);
   /* ============================================================
      GROUP QUESTIONS BY PASSAGE
   ============================================================ */
@@ -272,8 +276,15 @@ export default function NaplanReading({
   const handleAnswer = (value) => {
     const qid = String(currentQ?.id);
     if (!qid) return;
-
-    setAnswers(prev => ({ ...prev, [qid]: value }));
+  
+    console.log("✍️ handleAnswer called", { qid, value });
+  
+    setAnswers(prev => {
+      const next = { ...prev, [qid]: value };
+      console.log("➡️ answers updated to:", next);
+      return next;
+    });
+  
     setVisited(prev => ({ ...prev, [qid]: true }));
   };
 
@@ -363,6 +374,7 @@ export default function NaplanReading({
   const currentPassage = passages.find(p =>
     p.questions.some(q => q.id === currentQ.id)
   );
+  console.log("🧠 ACTUAL RENDER answers:", answers);
 
   return (
     <div className="exam-shell">
