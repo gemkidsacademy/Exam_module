@@ -140,40 +140,62 @@ export default function NaplanReading({
   useEffect(() => {
     if (!studentId) return;
     if (mode === "report" || mode === "review") return;
-
+  
     const startExam = async () => {
-      const res = await fetch(
-        `${API_BASE}/api/student/start-exam/naplan-reading`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ student_id: studentId })
+      try {
+        const res = await fetch(
+          `${API_BASE}/api/student/start-exam/naplan-reading`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ student_id: studentId })
+          }
+        );
+  
+        const data = await res.json();
+  
+        // 🔍 Debug payload
+        console.group("📘 NAPLAN READING EXAM PAYLOAD");
+        console.log("Raw response:", data);
+        console.log("Questions:", data.questions);
+        console.log("Remaining time:", data.remaining_time);
+        console.log("Existing answers:", data.answers);
+        console.groupEnd();
+  
+        // Exam already completed → go straight to report
+        if (data.completed === true) {
+          await loadReport();
+          return;
         }
-      );
-
-      const data = await res.json();
-
-      // 🔍 LOG FULL EXAM PAYLOAD
-      console.group("📘 NAPLAN READING EXAM PAYLOAD");
-      console.log("Raw response:", data);
-      console.log("Questions:", data.questions);
-      console.log("Remaining time:", data.remaining_time);
-      console.groupEnd();
-
-      if (data.completed === true) {
-        await loadReport();
-        return;
+  
+        // Core exam data
+        setQuestions(data.questions || []);
+        setTimeLeft(data.remaining_time);
+  
+        // 🔑 IMPORTANT: fresh vs resumed attempt
+        if (data.is_resumed) {
+          setAnswers(data.answers || {});
+          setVisited(
+            Object.fromEntries(
+              Object.keys(data.answers || {}).map(qid => [qid, true])
+            )
+          );
+        } else {
+          setAnswers({});
+          setVisited({});
+        }
+  
+        setCurrentIndex(0);
+        setMode("exam");
+        onExamStart?.();
+  
+      } catch (err) {
+        console.error("❌ Failed to start NAPLAN reading exam:", err);
       }
-
-      setQuestions(data.questions || []);
-      setTimeLeft(data.remaining_time);
-      setMode("exam");
-      onExamStart?.();
     };
-
+  
     startExam();
   }, [studentId, API_BASE, loadReport, mode, onExamStart]);
-
   /* ============================================================
      GROUP QUESTIONS BY PASSAGE
   ============================================================ */
