@@ -291,3 +291,8 @@
   height: 100%;          /* 🔥 lock height */
   overflow: hidden;      /* 🔥 prevent page scroll */
 }
+.mcq-option-card input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
