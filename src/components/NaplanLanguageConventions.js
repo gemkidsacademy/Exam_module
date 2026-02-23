@@ -511,6 +511,32 @@ export default function NaplanLanguageConventions({
 
       return null;
     })}
+    {/* =========================
+      TYPE 3 — SHORT / NUMERIC INPUT
+    ========================= */}
+    {currentQ.question_type === 3 && (
+      <input
+        type="text"
+        className="numeric-input"
+        value={answers[qid] || ""}
+        onChange={(e) => handleAnswer(e.target.value)}
+        disabled={isReview}
+      />
+    )}
+
+    {/* =========================
+      TYPE 4 — TEXT INPUT
+    ========================= */}
+    {currentQ.question_type === 4 && (
+      <textarea
+        className="text-input"
+        rows={2}
+        placeholder="Type your answer here"
+        value={answers[qid] || ""}
+        onChange={(e) => handleAnswer(e.target.value)}
+        disabled={isReview}
+      />
+    )}
 
     {currentQ.question_type === 2 && !hasImageMultiSelect && (
       <div className="mcq-options">
