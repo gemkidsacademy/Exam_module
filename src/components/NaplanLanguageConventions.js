@@ -537,7 +537,65 @@ export default function NaplanLanguageConventions({
         disabled={isReview}
       />
     )}
+    {/* =========================
+      TYPE 1 — SINGLE CHOICE (MCQ)
+    ========================= */}
+    {currentQ.question_type === 1 && currentQ.options && (
+      <div className="mcq-options">
+        {Object.entries(currentQ.options).map(([key, value]) => {
+          const isSelected = answers[qid] === key;
 
+          return (
+            <label
+              key={key}
+              className={`mcq-option-card ${isSelected ? "selected" : ""}`}
+            >
+              <input
+                type="radio"
+                name={`q-${qid}`}
+                checked={isSelected}
+                disabled={isReview}
+                onChange={() => handleAnswer(key)}
+              />
+              <span>{key}. {value}</span>
+            </label>
+          );
+        })}
+      </div>
+    )}
+    
+    {/* =========================
+   TYPE 6 — IMAGE MCQ
+    ========================= */}
+    {currentQ.question_type === 6 && (
+      <div className="image-mcq-grid">
+        {currentQ.question_blocks
+          .filter(b => b.type === "image" && b.role === "option")
+          .map((block, idx) => {
+            const key = block.option_key; // IMPORTANT
+            const src =
+              block.src ||
+              `${process.env.REACT_APP_IMAGE_BASE_URL}/${block.name}`;
+
+            const isSelected = answers[qid] === key;
+
+            return (
+              <div
+                key={idx}
+                className={`image-mcq-card ${isSelected ? "selected" : ""}`}
+                onClick={() => !isReview && handleAnswer(key)}
+              >
+                <img
+                  src={src}
+                  alt={`Option ${key}`}
+                  className="image-mcq-image"
+                />
+                <div className="image-mcq-label">{key}</div>
+              </div>
+            );
+          })}
+      </div>
+    )}
     {currentQ.question_type === 2 && !hasImageMultiSelect && (
       <div className="mcq-options">
         {Object.entries(currentQ.options || {}).map(([key, value]) => {
