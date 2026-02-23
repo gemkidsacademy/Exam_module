@@ -508,6 +508,32 @@ export default function NaplanNumeracy({
 
       return null;
     })}
+    {/* TYPE 1 — MCQ SINGLE */}
+    {currentQ.question_type === 1 && (
+      <div className="mcq-options">
+        {Object.entries(currentQ.options || {}).map(([key, value]) => (
+          <label
+            key={key}
+            className={`mcq-option-card ${
+              answers[String(currentQ.id)] === key ? "selected" : ""
+            }`}
+          >
+            <input
+              type="radio"
+              name={`q-${currentQ.id}`}
+              value={key}
+              checked={answers[String(currentQ.id)] === key}
+              onChange={() => handleAnswer(key)}
+              disabled={isReview}
+            />
+            <span>{key}. {value}</span>
+          </label>
+
+
+
+        ))}
+      </div>
+    )}
     {currentQ.question_type === 6 && (
       <div className="image-mcq-grid">
         {Object.entries(currentQ.options || {}).map(([key, imgUrl]) => {
