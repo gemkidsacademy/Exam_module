@@ -6,7 +6,7 @@ import React, {
 } from "react";
 import "./NaplanNumeracyExam.css";
 
-import "./ExamPage.css";
+//import "./ExamPage.css";
 import styles from "./ExamPageThinkingSkills.module.css";
 
 import NaplanNumeracyReview from "./NaplanNumeracyReview";
