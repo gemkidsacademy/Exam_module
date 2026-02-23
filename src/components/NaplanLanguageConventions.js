@@ -572,25 +572,28 @@ export default function NaplanLanguageConventions({
         {currentQ.question_blocks
           .filter(b => b.type === "image" && b.role === "option")
           .map((block, idx) => {
-            const key = block.option_key; // IMPORTANT
+            const optionKey = String(idx); // ✅ FIX
+
             const src =
               block.src ||
               `${process.env.REACT_APP_IMAGE_BASE_URL}/${block.name}`;
 
-            const isSelected = answers[qid] === key;
+            const isSelected = answers[qid] === optionKey;
 
             return (
               <div
-                key={idx}
+                key={optionKey}
                 className={`image-mcq-card ${isSelected ? "selected" : ""}`}
-                onClick={() => !isReview && handleAnswer(key)}
+                onClick={() => !isReview && handleAnswer(optionKey)}
               >
                 <img
                   src={src}
-                  alt={`Option ${key}`}
+                  alt={`Option ${optionKey}`}
                   className="image-mcq-image"
                 />
-                <div className="image-mcq-label">{key}</div>
+                <div className="image-mcq-label">
+                  {String.fromCharCode(65 + idx)}
+                </div>
               </div>
             );
           })}
