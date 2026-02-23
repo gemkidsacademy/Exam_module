@@ -508,6 +508,17 @@ export default function NaplanNumeracy({
 
       return null;
     })}
+    {/* TYPE 4 — TEXT INPUT */}
+    {currentQ.question_type === 4 && (
+      <textarea
+        className="text-input"
+        rows={2}
+        placeholder="Type your answer here"
+        value={answers[String(currentQ.id)] || ""}
+        onChange={(e) => handleAnswer(e.target.value)}
+        disabled={isReview}
+      />
+    )}
     {/* TYPE 1 — MCQ SINGLE */}
     {currentQ.question_type === 1 && (
       <div className="mcq-options">
@@ -617,45 +628,8 @@ export default function NaplanNumeracy({
     {/* TYPE 3 — NUMERIC INPUT */}
     
     
-    {/* TYPE 4 — TEXT INPUT */}
-    {currentQ.question_type === 4 && (
-      <textarea
-        className="text-input"
-        rows={2}
-        placeholder="Type your answer here"
-        value={answers[String(currentQ.id)] || ""}
-        onChange={(e) => handleAnswer(e.target.value)}
-        disabled={isReview}
-      />
-    )}
     
     
-    {/* TYPE 1 — MCQ SINGLE */}
-    {currentQ.question_type === 1 && (
-      <div className="mcq-options">
-        {Object.entries(currentQ.options || {}).map(([key, value]) => (
-          <label
-            key={key}
-            className={`mcq-option-card ${
-              answers[String(currentQ.id)] === key ? "selected" : ""
-            }`}
-          >
-            <input
-              type="radio"
-              name={`q-${currentQ.id}`}
-              value={key}
-              checked={answers[String(currentQ.id)] === key}
-              onChange={() => handleAnswer(key)}
-              disabled={isReview}
-            />
-            <span>{key}. {value}</span>
-          </label>
-
-
-
-        ))}
-      </div>
-    )}
     
     
      {mode === "review" && (
