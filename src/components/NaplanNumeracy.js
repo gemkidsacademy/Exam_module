@@ -508,6 +508,16 @@ export default function NaplanNumeracy({
 
       return null;
     })}
+    {/* ✅ INPUT GOES HERE — SAME CARD */}
+    {currentQ.question_type === 3 && (
+      <input
+        type="number"
+        className="numeric-input"
+        value={answers[String(currentQ.id)] || ""}
+        onChange={(e) => handleAnswer(e.target.value)}
+        disabled={isReview}
+      />
+    )}
 
     {currentQ.question_type === 2 && !hasImageMultiSelect && (
       <div className="mcq-options">
@@ -553,15 +563,7 @@ export default function NaplanNumeracy({
 
     {/* NUMERIC INPUT */}
     {/* TYPE 3 — NUMERIC INPUT */}
-    {currentQ.question_type === 3 && (
-      <input
-        type="number"
-        className="numeric-input"
-        value={answers[String(currentQ.id)] || ""}
-        onChange={(e) => handleAnswer(e.target.value)}
-        disabled={isReview}
-      />
-    )}
+    
     
     {/* TYPE 4 — TEXT INPUT */}
     {currentQ.question_type === 4 && (
