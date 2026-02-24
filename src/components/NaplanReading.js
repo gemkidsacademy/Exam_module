@@ -233,20 +233,6 @@ export default function NaplanReading({
   const flatQuestions = passages.flatMap(p => p.questions);
   const currentQ = flatQuestions[currentIndex];
 
-  if (!currentQ) return null;
-
-  /* ============================================================
-    QUESTION CONTENT DETECTION (ADD THIS HERE)
-  ============================================================ */
-  const questionBlocks =
-    currentQ.exam_bundle.question_blocks.filter(
-      b => b.type !== "reading"
-    );
-
-  const hasInlineQuestionContent = questionBlocks.some(b =>
-    ["word_select", "gap_fill", "single_gap", "true_false"].includes(b.type)
-  );
-
   /* ============================================================
      FINISH EXAM
   ============================================================ */
@@ -425,265 +411,238 @@ export default function NaplanReading({
             );
           })}
         </div>
-      <div className="exam-body reading-mode">
+        <div className="exam-body reading-mode">
 
-  {/* LEFT: PASSAGE */}
-  {currentPassage?.reading_block && (
-    <div className="passage-pane">
-      {currentPassage.reading_block.extracts.map(ext => (
-        <div key={ext.extract_id} className="extract">
-          <h3>{ext.title}</h3>
-          <p>{ext.content}</p>
+        {/* LEFT: PASSAGE(S) */}
+        {currentPassage?.reading_block && (
+          <div className="passage-pane">
+            {currentPassage.reading_block.extracts.map(ext => (
+              <div key={ext.extract_id} className="extract">
+                <h3>{ext.title}</h3>
+                <p>{ext.content}</p>
 
-          {ext.images?.map(img => (
-            <img key={img} src={img} alt="" />
-          ))}
-        </div>
-      ))}
-    </div>
-  )}
+                {ext.images?.map(img => (
+                  <img key={img} src={img} alt="" />
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
 
-  {/* RIGHT: QUESTION + OPTIONS (SINGLE COLUMN) */}
-  <div className="question-column">
+        {/* RIGHT: SINGLE QUESTION */}
+        <div className="question-pane">
+          <div className="question-card">
 
-    {/* QUESTION */}
-    {hasInlineQuestionContent && (
-      <div className="question-pane">
-        <div className="question-card">
-          {questionBlocks.map((block, idx) => {
-            /* WORD SELECT */
-            if (block.type === "word_select") {
-              const qid = String(currentQ.question_id);
-              const selected = answers[qid] || "";
+            {/* 1️⃣ QUESTION TEXT / STRUCTURE */}
+            {currentQ.exam_bundle.question_blocks
+              .filter(b => b.type !== "reading")
+              .map((block, idx) => {
 
-              return (
-                <div key={idx} className="word-select-block">
-                  <p className="word-select-text">{block.text}</p>
+                if (
+                  block.content &&
+                  !["gap_fill", "single_gap"].includes(block.type)
+                ) {
+                  return <p key={idx}>{block.content}</p>;
+                }
 
-                  <div className="word-select-options">
-                    {block.options.map(option => (
-                      <label key={option} className="word-select-option">
+                if (block.type === "gap_fill") {
+                  const qid = String(currentQ.question_id);
+
+                  return (
+                    <div key={idx} className="gap-fill-block">
+                      {/* Sentence */}
+                      <p className="gap-fill-text">
+                        {block.content}
+                      </p>
+
+                      {/* Word bank (if present) */}
+                      {block.word_bank?.length && (
+                        <div className="mcq-options word-bank">
+                          {block.word_bank.map(word => {
+                            const isSelected = answers[qid] === word;
+
+                            return (
+                              <label
+                                key={word}
+                                className={`mcq-option-card ${isSelected ? "selected" : ""}`}
+                              >
+                                <input
+                                  type="radio"
+                                  name={`gap-${qid}`}
+                                  checked={isSelected}
+                                  disabled={isReview}
+                                  onChange={() => handleAnswer(word)}
+                                />
+                                <span>{word}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* Free-text fallback */}
+                      {!block.word_bank?.length && (
                         <input
-                          type="radio"
-                          name={`word-select-${qid}`}
-                          checked={selected === option}
+                          className="text-input"
+                          value={answers[qid] || ""}
+                          onChange={(e) => handleAnswer(e.target.value)}
                           disabled={isReview}
-                          onChange={() => handleAnswer(option)}
                         />
-                        <span>{option}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              );
-            }
-
-            /* GAP FILL */
-            if (block.type === "gap_fill") {
-              const qid = String(currentQ.question_id);
-              const [before, after] = block.content.split("[BLANK]");
-
-              return (
-                <div key={idx} className="gap-fill-block">
-                  <p className="gap-fill-instruction">
-                    Choose the word that best completes the sentence below.
-                  </p>
-
-                  <p className="gap-fill-text">
-                    {before}
-                    <select
-                      className="gap-dropdown inline"
-                      value={answers[qid] || ""}
-                      disabled={isReview}
-                      onChange={e => handleAnswer(e.target.value)}
-                    >
-                      <option value="">Select</option>
-                      {block.word_bank.map(word => (
-                        <option key={word} value={word}>{word}</option>
-                      ))}
-                    </select>
-                    {after}
-                  </p>
-                </div>
-              );
-            }
-
-            /* SINGLE GAP */
-            if (block.type === "single_gap") {
-              const qid = String(currentQ.question_id);
-              const [before, after] = block.content.split("[BLANK]");
-
-              return (
-                <div key={idx} className="gap-fill-block">
-                  <p className="gap-fill-text">
-                    {before}
-                    <select
-                      className="gap-dropdown inline"
-                      value={answers[qid] || ""}
-                      disabled={isReview}
-                      onChange={e => handleAnswer(e.target.value)}
-                    >
-                      <option value="">Select</option>
-                      {Object.entries(block.options).map(([key, label]) => (
-                        <option key={key} value={key}>{label}</option>
-                      ))}
-                    </select>
-                    {after}
-                  </p>
-                </div>
-              );
-            }
-
-            /* TRUE / FALSE */
-            if (block.type === "true_false") {
-              const qid = String(currentQ.question_id);
-              const selectedAnswers = answers[qid] || [];
-
-              return (
-                <div key={idx} className="tf-question">
-                  <p className="tf-instruction">
-                    Which of these statements are true and which are false?
-                  </p>
-
-                  <div className="tf-grid">
-                    <div className="tf-grid-header">
-                      <span />
-                      <span>True</span>
-                      <span>False</span>
+                      )}
                     </div>
+                  );
+                }
+                if (block.type === "single_gap") {
+                  const qid = String(currentQ.question_id);
 
-                    {block.statements.map((stmt, i) => {
-                      const value = selectedAnswers[i] ?? null;
+                  return (
+                    <div key={idx} className="gap-fill-block">
+                      {/* Sentence */}
+                      <p className="gap-fill-text">
+                        {block.content}
+                      </p>
+
+                      {/* Options */}
+                      <div className="mcq-options word-bank">
+                        {Object.entries(block.options).map(([key, label]) => {
+                          const isSelected = answers[qid] === key;
+
+                          return (
+                            <label
+                              key={key}
+                              className={`mcq-option-card ${isSelected ? "selected" : ""}`}
+                            >
+                              <input
+                                type="radio"
+                                name={`single-gap-${qid}`}
+                                checked={isSelected}
+                                disabled={isReview}
+                                onChange={() => handleAnswer(key)}
+                              />
+                              <span>{label}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                }
+
+                if (block.type === "true_false") {
+                  return (
+                    <div key={idx} className="tf-options">
+                      {block.statements.map((stmt, i) => (
+                        <div key={i} className="tf-row">
+                          <span>{stmt}</span>
+                          <select
+                            value={answers[String(currentQ.question_id)]?.[i] || ""}
+                            disabled={isReview}
+                            onChange={(e) => {
+                              const prev = answers[String(currentQ.question_id)] || [];
+                              const updated = [...prev];
+                              updated[i] = e.target.value;
+                              handleAnswer(updated);
+                            }}
+                          >
+                            <option value="">Select</option>
+                            <option value="True">True</option>
+                            <option value="False">False</option>
+                          </select>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                }
+
+                return null;
+              })}
+
+            {/* 2️⃣ OPTIONS — RENDER ONCE PER QUESTION */}
+            {(() => {
+              if ([6].includes(currentQ.question_type)) {
+                return null;
+              }
+              const imageOptions = currentQ.exam_bundle.image_options;
+              const textOptions = currentQ.exam_bundle.options;
+              const optionsSource = imageOptions || textOptions;
+
+              if (!optionsSource) return null;
+
+              // MULTI SELECT
+              if (currentQ.question_type === 2) {
+                const selected = answers[String(currentQ.question_id)] || [];
+
+                return (
+                  <div className="mcq-options multi-select">
+                    {Object.entries(optionsSource).map(([k, v]) => {
+                      const isSelected = selected.includes(k);
 
                       return (
-                        <div key={i} className="tf-grid-row">
-                          <span className="tf-statement">{stmt}</span>
-
+                        <label
+                          key={k}
+                          className={`mcq-option-card ${isSelected ? "selected" : ""}`}
+                        >
                           <input
-                            type="radio"
-                            checked={value === "True"}
+                            type="checkbox"
+                            checked={isSelected}
                             disabled={isReview}
                             onChange={() => {
-                              const updated = [...selectedAnswers];
-                              updated[i] = "True";
+                              const updated = isSelected
+                                ? selected.filter(x => x !== k)
+                                : [...selected, k];
                               handleAnswer(updated);
                             }}
                           />
 
-                          <input
-                            type="radio"
-                            checked={value === "False"}
-                            disabled={isReview}
-                            onChange={() => {
-                              const updated = [...selectedAnswers];
-                              updated[i] = "False";
-                              handleAnswer(updated);
-                            }}
-                          />
-                        </div>
+                          {imageOptions ? (
+                            <img src={v} alt={`Option ${k}`} className="option-image" />
+                          ) : (
+                            <span>{k}. {v}</span>
+                          )}
+                        </label>
                       );
                     })}
                   </div>
-                </div>
-              );
-            }
+                );
+              }
 
-            return null;
-          })}
-      </div>
-    </div>
-    )} 
-    
-
-    {/* OPTIONS */}
-    {(() => {
-      if (currentQ.question_type === 6) return null;
-
-      const imageOptions = currentQ.exam_bundle.image_options;
-      const textOptions = currentQ.exam_bundle.options;
-      const optionsSource = imageOptions || textOptions;
-      if (!optionsSource) return null;
-
-      /* MULTI SELECT */
-      if (currentQ.question_type === 2) {
-        const selected = answers[String(currentQ.question_id)] || [];
-
-        return (
-          <div className="mcq-options list">
-            {Object.entries(optionsSource).map(([k, v]) => {
-              const isSelected = selected.includes(k);
+              // SINGLE CHOICE
+              const selected = answers[String(currentQ.question_id)];
 
               return (
-                <label key={k} className="mcq-option-row">
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    disabled={isReview}
-                    onChange={() => {
-                      if (isSelected) {
-                        handleAnswer(selected.filter(x => x !== k));
-                      } else if (selected.length < TYPE_2_MAX_SELECTIONS) {
-                        handleAnswer([...selected, k]);
-                      }
-                    }}
-                  />
-                  <span className="option-text">{k}. {v}</span>
-                </label>
+                <div className="mcq-options">
+                  {Object.entries(optionsSource).map(([k, v]) => {
+                    const isSelected = selected === k;
+
+                    return (
+                      <label
+                        key={k}
+                        className={`mcq-option-card ${isSelected ? "selected" : ""}`}
+                      >
+                        <input
+                          type="radio"
+                          name={`q-${currentQ.question_id}`}
+                          checked={isSelected}
+                          disabled={isReview}
+                          onChange={() => handleAnswer(k)}
+                        />
+
+                        {imageOptions ? (
+                          <img src={v} alt={`Option ${k}`} className="option-image" />
+                        ) : (
+                          <span>{k}. {v}</span>
+                        )}
+                      </label>
+                    );
+                  })}
+                </div>
               );
-            })}
+            })()}
+
           </div>
-        );
-      }
-
-      /* IMAGE OPTIONS */
-      if (imageOptions) {
-        const selected = answers[String(currentQ.question_id)];
-
-        return (
-          <div className="mcq-options image-list">
-            {Object.entries(imageOptions).map(([k, v]) => (
-              <label
-                key={k}
-                className={`mcq-option-card ${selected === k ? "selected" : ""}`}
-              >
-                <input
-                  type="radio"
-                  name={`q-${currentQ.question_id}`}
-                  checked={selected === k}
-                  disabled={isReview}
-                  onChange={() => handleAnswer(k)}
-                />
-                <img src={v} alt={`Option ${k}`} />
-              </label>
-            ))}
-          </div>
-        );
-      }
-
-      /* TEXT OPTIONS */
-      const selected = answers[String(currentQ.question_id)];
-
-      return (
-        <div className="mcq-options list">
-          {Object.entries(textOptions).map(([k, v]) => (
-            <label key={k} className="mcq-option-row">
-              <input
-                type="radio"
-                name={`q-${currentQ.question_id}`}
-                checked={selected === k}
-                disabled={isReview}
-                onChange={() => handleAnswer(k)}
-              />
-              <span className="option-text">{k}. {v}</span>
-            </label>
-          ))}
         </div>
-      );
-    })()}
 
-  </div>
-</div>
-      
+      </div>
 
         {mode === "review" && (
           <div className={`review-result ${isCorrect ? "answer-correct" : "answer-wrong"}`}>
