@@ -570,19 +570,17 @@ export default function NaplanReading({
               if (!optionsSource) return null;
 
               // MULTI SELECT
+              // MULTI SELECT — checkbox list (vertical)
               if (currentQ.question_type === 2) {
                 const selected = answers[String(currentQ.question_id)] || [];
 
                 return (
-                  <div className="mcq-options multi-select">
+                  <div className="mcq-options list">
                     {Object.entries(optionsSource).map(([k, v]) => {
                       const isSelected = selected.includes(k);
 
                       return (
-                        <label
-                          key={k}
-                          className={`mcq-option-card ${isSelected ? "selected" : ""}`}
-                        >
+                        <label key={k} className="mcq-option-row">
                           <input
                             type="checkbox"
                             checked={isSelected}
@@ -594,11 +592,9 @@ export default function NaplanReading({
                               handleAnswer(updated);
                             }}
                           />
-                          {imageOptions ? (
-                            <img src={v} alt={`Option ${k}`} className="option-image" />
-                          ) : (
-                            <span>{k}. {v}</span>
-                          )}
+                          <span className="option-text">
+                            {k}. {v}
+                          </span>
                         </label>
                       );
                     })}
