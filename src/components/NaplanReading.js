@@ -592,6 +592,8 @@ export default function NaplanReading({
           })}
       </div>
     </div>
+    )} 
+    
 
     {/* OPTIONS */}
     {(() => {
