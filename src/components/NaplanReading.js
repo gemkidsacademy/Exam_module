@@ -494,9 +494,7 @@ export default function NaplanReading({
                     <div key={idx} className="gap-fill-block">
 
                       {/* Instruction */}
-                      <p className="gap-fill-instruction">
-                        Choose the word that best completes the sentence below.
-                      </p>
+                      
 
                       {/* Inline sentence */}
                       <p className="gap-fill-text">
