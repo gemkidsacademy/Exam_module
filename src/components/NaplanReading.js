@@ -586,9 +586,19 @@ export default function NaplanReading({
                             checked={isSelected}
                             disabled={isReview}
                             onChange={() => {
-                              const updated = isSelected
-                                ? selected.filter(x => x !== k)
-                                : [...selected, k];
+                              let updated;
+                            
+                              if (isSelected) {
+                                // always allow unselect
+                                updated = selected.filter(x => x !== k);
+                              } else {
+                                // block if max reached
+                                if (selected.length >= TYPE_2_MAX_SELECTIONS) {
+                                  return; // 🚫 do nothing
+                                }
+                                updated = [...selected, k];
+                              }
+                            
                               handleAnswer(updated);
                             }}
                           />
