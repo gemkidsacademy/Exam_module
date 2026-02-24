@@ -1,4 +1,30 @@
 /* ============================================================
+   MAIN EXAM BODY LAYOUT (READING MODE)
+============================================================ */
+.exam-body {
+  display: flex;
+  gap: 24px;
+  align-items: stretch;
+}
+
+/* LEFT: PASSAGE */
+.passage-pane {
+  flex: 2;
+  min-width: 0;           /* CRITICAL for flex scrolling */
+  overflow-y: auto;
+}
+
+/* RIGHT: QUESTION + OPTIONS */
+.question-column {
+  flex: 1;
+  min-width: 320px;
+  max-width: 420px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+/* ============================================================
    ROOT WRAPPER
 ============================================================ */
 .exam-shell {
