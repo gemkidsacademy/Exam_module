@@ -599,7 +599,7 @@ export default function NaplanReading({
                 }
 
                 return null;
-              })}
+              })
 
             {/* 2️⃣ OPTIONS — RENDER ONCE PER QUESTION */}
             {(() => {
