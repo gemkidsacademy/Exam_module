@@ -608,7 +608,7 @@ export default function NaplanReading({
               // 🖼️ IMAGE OPTIONS → cards
               if (imageOptions) {
                 return (
-                  <div className="mcq-options">
+                  <div className="mcq-options image-list">
                     {Object.entries(imageOptions).map(([k, v]) => {
                       const isSelected = selected === k;
 
