@@ -38,6 +38,8 @@ export default function NaplanReading({
   
       case 5: // true/false
         return Array.isArray(value) && value.some(v => v !== null);
+      case 7: // word_select
+        return value !== "";
   
       default:
         return false;
@@ -91,6 +93,12 @@ export default function NaplanReading({
         } catch {
           return [];
         }
+      }
+      if (questionType === 7) {
+        if (Array.isArray(correctAnswer)) {
+          return correctAnswer[0];
+        }
+        return String(correctAnswer).trim();
       }
 
       return [];
@@ -437,6 +445,14 @@ export default function NaplanReading({
             {currentQ.exam_bundle.question_blocks
               .filter(b => b.type !== "reading")
               .map((block, idx) => {
+                 // ✅ ADD THIS FIRST
+                if (block.type === "instruction") {
+                  return (
+                    <p key={idx} className="question-instruction">
+                      {block.text}
+                    </p>
+                  );
+                }
 
                 if (
                   block.content &&
@@ -512,6 +528,30 @@ export default function NaplanReading({
                     </div>
                   );
                 }
+                if (block.type === "word_select") {
+                  const qid = String(currentQ.question_id);
+                  const [before, after] = block.text.split("[BLANK]");
+
+                  return (
+                    <p key={idx} className="gap-fill-text inline-gap">
+                      {before}
+                      <select
+                        className="gap-dropdown inline"
+                        value={answers[qid] || ""}
+                        disabled={isReview}
+                        onChange={(e) => handleAnswer(e.target.value)}
+                      >
+                        <option value="">Select an answer</option>
+                        {block.options.map(opt => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+                      {after}
+                    </p>
+                  );
+                }
 
                 if (block.type === "true_false") {
   const qid = String(currentQ.question_id);
@@ -577,7 +617,7 @@ export default function NaplanReading({
 
             {/* 2️⃣ OPTIONS — RENDER ONCE PER QUESTION */}
             {(() => {
-              if ([6].includes(currentQ.question_type)) {
+              if ([6, 7].includes(currentQ.question_type)) {
                 return null;
               }
 
