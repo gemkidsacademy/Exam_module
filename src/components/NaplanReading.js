@@ -495,84 +495,83 @@ export default function NaplanReading({
                         {block.content}
                       </p>
 
-                      {/* Options */}
-                      <div className="mcq-options word-bank">
-                        {Object.entries(block.options).map(([key, label]) => {
-                          const isSelected = answers[qid] === key;
+                      {/* Dropdown */}
+                      <select
+                        className="gap-dropdown"
+                        value={answers[qid] || ""}
+                        disabled={isReview}
+                        onChange={(e) => handleAnswer(e.target.value)}
+                      >
+                        <option value="">Select an answer</option>
 
-                          return (
-                            <label
-                              key={key}
-                              className={`mcq-option-card ${isSelected ? "selected" : ""}`}
-                            >
-                              <input
-                                type="radio"
-                                name={`single-gap-${qid}`}
-                                checked={isSelected}
-                                disabled={isReview}
-                                onChange={() => handleAnswer(key)}
-                              />
-                              <span>{label}</span>
-                            </label>
-                          );
-                        })}
-                      </div>
+                        {Object.entries(block.options).map(([key, label]) => (
+                          <option key={key} value={key}>
+                            {label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   );
                 }
 
                 if (block.type === "true_false") {
-                  const qid = String(currentQ.question_id);
-                  const selectedAnswers = answers[qid] || [];
+  const qid = String(currentQ.question_id);
+  const selectedAnswers = answers[qid] || [];
 
-                  return (
-                    <div key={idx} className="tf-grid">
-                      {/* Header row */}
-                      <div className="tf-grid-header">
-                        <span></span>
-                        <span>True</span>
-                        <span>False</span>
-                      </div>
+  return (
+    <div key={idx} className="tf-question">
 
-                      {/* Statement rows */}
-                      {block.statements.map((stmt, i) => {
-                        const currentValue = selectedAnswers[i] || null;
+      {/* ✅ Instruction text */}
+      <p className="tf-instruction">
+        Which of these statements are true and which are false?
+      </p>
 
-                        return (
-                          <div key={i} className="tf-grid-row">
-                            <span className="tf-statement">{stmt}</span>
+      {/* Grid */}
+      <div className="tf-grid">
+        {/* Header */}
+        <div className="tf-grid-header">
+          <span></span>
+          <span>True</span>
+          <span>False</span>
+        </div>
 
-                            {/* TRUE */}
-                            <input
-                              type="radio"
-                              name={`tf-${qid}-${i}`}
-                              checked={currentValue === "True"}
-                              disabled={isReview}
-                              onChange={() => {
-                                const updated = [...selectedAnswers];
-                                updated[i] = "True";
-                                handleAnswer(updated);
-                              }}
-                            />
+        {block.statements.map((stmt, i) => {
+          const currentValue = selectedAnswers[i] || null;
 
-                            {/* FALSE */}
-                            <input
-                              type="radio"
-                              name={`tf-${qid}-${i}`}
-                              checked={currentValue === "False"}
-                              disabled={isReview}
-                              onChange={() => {
-                                const updated = [...selectedAnswers];
-                                updated[i] = "False";
-                                handleAnswer(updated);
-                              }}
-                            />
-                          </div>
-                        );
-                      })}
-                    </div>
-                  );
-                }
+          return (
+            <div key={i} className="tf-grid-row">
+              <span className="tf-statement">{stmt}</span>
+
+              <input
+                type="radio"
+                name={`tf-${qid}-${i}`}
+                checked={currentValue === "True"}
+                disabled={isReview}
+                onChange={() => {
+                  const updated = [...selectedAnswers];
+                  updated[i] = "True";
+                  handleAnswer(updated);
+                }}
+              />
+
+              <input
+                type="radio"
+                name={`tf-${qid}-${i}`}
+                checked={currentValue === "False"}
+                disabled={isReview}
+                onChange={() => {
+                  const updated = [...selectedAnswers];
+                  updated[i] = "False";
+                  handleAnswer(updated);
+                }}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
                 return null;
               })}
