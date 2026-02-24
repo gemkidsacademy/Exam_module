@@ -470,3 +470,50 @@
   font-size: 16px;
   line-height: 1.5;
 }
+/* ============================================================
+   TRUE / FALSE GRID (NAPLAN STYLE)
+============================================================ */
+.tf-grid {
+  display: grid;
+  grid-template-columns: 1fr 100px 100px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.tf-grid-header {
+  display: contents;
+  background: #eef2f7;
+  font-weight: 600;
+}
+
+.tf-grid-header span {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tf-grid-row {
+  display: contents;
+}
+
+.tf-statement {
+  padding: 12px;
+  font-size: 15px;
+  line-height: 1.4;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tf-grid-row input[type="radio"] {
+  margin: auto;
+  width: 22px;
+  height: 22px;
+  accent-color: #2563eb;
+}
+
+/* row borders */
+.tf-grid-row:last-child .tf-statement,
+.tf-grid-row:last-child input {
+  border-bottom: none;
+}
