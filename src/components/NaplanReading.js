@@ -233,6 +233,20 @@ export default function NaplanReading({
   const flatQuestions = passages.flatMap(p => p.questions);
   const currentQ = flatQuestions[currentIndex];
 
+  if (!currentQ) return null;
+
+  /* ============================================================
+    QUESTION CONTENT DETECTION (ADD THIS HERE)
+  ============================================================ */
+  const questionBlocks =
+    currentQ.exam_bundle.question_blocks.filter(
+      b => b.type !== "reading"
+    );
+
+  const hasInlineQuestionContent = questionBlocks.some(b =>
+    ["word_select", "gap_fill", "single_gap", "true_false"].includes(b.type)
+  );
+
   /* ============================================================
      FINISH EXAM
   ============================================================ */
@@ -433,12 +447,10 @@ export default function NaplanReading({
   <div className="question-column">
 
     {/* QUESTION */}
-    <div className="question-pane">
-      <div className="question-card">
-        {currentQ.exam_bundle.question_blocks
-          .filter(block => block.type !== "reading")
-          .map((block, idx) => {
-
+    {hasInlineQuestionContent && (
+      <div className="question-pane">
+        <div className="question-card">
+          {questionBlocks.map((block, idx) => {
             /* WORD SELECT */
             if (block.type === "word_select") {
               const qid = String(currentQ.question_id);
