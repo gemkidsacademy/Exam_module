@@ -562,6 +562,7 @@ export default function NaplanReading({
               if ([6].includes(currentQ.question_type)) {
                 return null;
               }
+
               const imageOptions = currentQ.exam_bundle.image_options;
               const textOptions = currentQ.exam_bundle.options;
               const optionsSource = imageOptions || textOptions;
@@ -593,7 +594,6 @@ export default function NaplanReading({
                               handleAnswer(updated);
                             }}
                           />
-
                           {imageOptions ? (
                             <img src={v} alt={`Option ${k}`} className="option-image" />
                           ) : (
@@ -609,16 +609,41 @@ export default function NaplanReading({
               // SINGLE CHOICE
               const selected = answers[String(currentQ.question_id)];
 
+              // 🖼️ IMAGE OPTIONS → cards
+              if (imageOptions) {
+                return (
+                  <div className="mcq-options">
+                    {Object.entries(imageOptions).map(([k, v]) => {
+                      const isSelected = selected === k;
+
+                      return (
+                        <label
+                          key={k}
+                          className={`mcq-option-card ${isSelected ? "selected" : ""}`}
+                        >
+                          <input
+                            type="radio"
+                            name={`q-${currentQ.question_id}`}
+                            checked={isSelected}
+                            disabled={isReview}
+                            onChange={() => handleAnswer(k)}
+                          />
+                          <img src={v} alt={`Option ${k}`} className="option-image" />
+                        </label>
+                      );
+                    })}
+                  </div>
+                );
+              }
+
+              // 📝 TEXT OPTIONS → radio list
               return (
-                <div className="mcq-options">
-                  {Object.entries(optionsSource).map(([k, v]) => {
+                <div className="mcq-options list">
+                  {Object.entries(textOptions).map(([k, v]) => {
                     const isSelected = selected === k;
 
                     return (
-                      <label
-                        key={k}
-                        className={`mcq-option-card ${isSelected ? "selected" : ""}`}
-                      >
+                      <label key={k} className="mcq-option-row">
                         <input
                           type="radio"
                           name={`q-${currentQ.question_id}`}
@@ -626,12 +651,9 @@ export default function NaplanReading({
                           disabled={isReview}
                           onChange={() => handleAnswer(k)}
                         />
-
-                        {imageOptions ? (
-                          <img src={v} alt={`Option ${k}`} className="option-image" />
-                        ) : (
-                          <span>{k}. {v}</span>
-                        )}
+                        <span className="option-text">
+                          {k}. {v}
+                        </span>
                       </label>
                     );
                   })}
