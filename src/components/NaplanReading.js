@@ -411,7 +411,7 @@ export default function NaplanReading({
             );
           })}
         </div>
-        <div className="exam-body reading-mode">
+      <div className="exam-body reading-mode">
 
         {/* LEFT: PASSAGE(S) */}
         {currentPassage?.reading_block && (
@@ -691,7 +691,7 @@ export default function NaplanReading({
           </div>
         </div>
 
-      </div>
+      
 
         {mode === "review" && (
           <div className={`review-result ${isCorrect ? "answer-correct" : "answer-wrong"}`}>
