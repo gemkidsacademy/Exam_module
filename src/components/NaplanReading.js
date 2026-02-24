@@ -457,27 +457,20 @@ export default function NaplanReading({
 
                       {/* Word bank (if present) */}
                       {block.word_bank?.length && (
-                        <div className="mcq-options word-bank">
-                          {block.word_bank.map(word => {
-                            const isSelected = answers[qid] === word;
+                        <select
+                          className="gap-dropdown"
+                          value={answers[qid] || ""}
+                          disabled={isReview}
+                          onChange={(e) => handleAnswer(e.target.value)}
+                        >
+                          <option value="">Select an answer</option>
 
-                            return (
-                              <label
-                                key={word}
-                                className={`mcq-option-card ${isSelected ? "selected" : ""}`}
-                              >
-                                <input
-                                  type="radio"
-                                  name={`gap-${qid}`}
-                                  checked={isSelected}
-                                  disabled={isReview}
-                                  onChange={() => handleAnswer(word)}
-                                />
-                                <span>{word}</span>
-                              </label>
-                            );
-                          })}
-                        </div>
+                          {block.word_bank.map(word => (
+                            <option key={word} value={word}>
+                              {word}
+                            </option>
+                          ))}
+                        </select>
                       )}
 
                       {/* Free-text fallback */}
