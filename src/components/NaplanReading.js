@@ -526,50 +526,56 @@ export default function NaplanReading({
                   const selectedAnswers = answers[qid] || [];
 
                   return (
-                    <div key={idx} className="tf-grid">
-                      {/* Header row */}
-                      <div className="tf-grid-header">
-                        <span></span>
-                        <span>True</span>
-                        <span>False</span>
+                    <div key={idx} className="tf-question">
+
+                      {/* ✅ Instruction text */}
+                      <p className="tf-instruction">
+                        Which of these statements are true and which are false?
+                      </p>
+
+                      {/* Grid */}
+                      <div className="tf-grid">
+                        {/* Header */}
+                        <div className="tf-grid-header">
+                          <span></span>
+                          <span>True</span>
+                          <span>False</span>
+                        </div>
+
+                        {block.statements.map((stmt, i) => {
+                          const currentValue = selectedAnswers[i] || null;
+
+                          return (
+                            <div key={i} className="tf-grid-row">
+                              <span className="tf-statement">{stmt}</span>
+
+                              <input
+                                type="radio"
+                                name={`tf-${qid}-${i}`}
+                                checked={currentValue === "True"}
+                                disabled={isReview}
+                                onChange={() => {
+                                  const updated = [...selectedAnswers];
+                                  updated[i] = "True";
+                                  handleAnswer(updated);
+                                }}
+                              />
+
+                              <input
+                                type="radio"
+                                name={`tf-${qid}-${i}`}
+                                checked={currentValue === "False"}
+                                disabled={isReview}
+                                onChange={() => {
+                                  const updated = [...selectedAnswers];
+                                  updated[i] = "False";
+                                  handleAnswer(updated);
+                                }}
+                              />
+                            </div>
+                          );
+                        })}
                       </div>
-
-                      {/* Statement rows */}
-                      {block.statements.map((stmt, i) => {
-                        const currentValue = selectedAnswers[i] || null;
-
-                        return (
-                          <div key={i} className="tf-grid-row">
-                            <span className="tf-statement">{stmt}</span>
-
-                            {/* TRUE */}
-                            <input
-                              type="radio"
-                              name={`tf-${qid}-${i}`}
-                              checked={currentValue === "True"}
-                              disabled={isReview}
-                              onChange={() => {
-                                const updated = [...selectedAnswers];
-                                updated[i] = "True";
-                                handleAnswer(updated);
-                              }}
-                            />
-
-                            {/* FALSE */}
-                            <input
-                              type="radio"
-                              name={`tf-${qid}-${i}`}
-                              checked={currentValue === "False"}
-                              disabled={isReview}
-                              onChange={() => {
-                                const updated = [...selectedAnswers];
-                                updated[i] = "False";
-                                handleAnswer(updated);
-                              }}
-                            />
-                          </div>
-                        );
-                      })}
                     </div>
                   );
                 }
