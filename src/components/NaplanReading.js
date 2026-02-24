@@ -430,58 +430,53 @@ export default function NaplanReading({
         )}
 
         {/* RIGHT: SINGLE QUESTION */}
-          <div className="question-pane">
-            <div className="question-card">
-          
-              {currentQ.exam_bundle.question_blocks
-                .filter(b => b.type !== "reading")
-                .map((block, idx) => {
-          
-                  // ✅ TYPE 7: WORD SELECT
-                  if (block.type === "word_select") {
-                    const qid = String(currentQ.question_id);
-                    const selected = answers[qid] || "";
-          
-                    return (
-                      <div key={idx} className="word-select-block">
-                        <p className="word-select-text">{block.text}</p>
-          
-                        <div className="word-select-options">
-                          {block.options.map(option => (
-                            <label key={option} className="word-select-option">
-                              <input
-                                type="radio"
-                                name={`word-select-${qid}`}
-                                value={option}
-                                checked={selected === option}
-                                disabled={isReview}
-                                onChange={() => handleAnswer(option)}
-                              />
-                              <span>{option}</span>
-                            </label>
-                          ))}
-                        </div>
+        <div className="question-pane">
+          <div className="question-card">
+
+            {currentQ.exam_bundle.question_blocks
+              .filter(b => b.type !== "reading")
+              .map((block, idx) => {
+
+                // ✅ TYPE 7: WORD SELECT
+                if (block.type === "word_select") {
+                  const qid = String(currentQ.question_id);
+                  const selected = answers[qid] || "";
+
+                  return (
+                    <div key={idx} className="word-select-block">
+                      <p className="word-select-text">{block.text}</p>
+
+                      <div className="word-select-options">
+                        {block.options.map(option => (
+                          <label key={option} className="word-select-option">
+                            <input
+                              type="radio"
+                              name={`word-select-${qid}`}
+                              value={option}
+                              checked={selected === option}
+                              disabled={isReview}
+                              onChange={() => handleAnswer(option)}
+                            />
+                            <span>{option}</span>
+                          </label>
+                        ))}
                       </div>
-                    );
-                  }
+                    </div>
+                  );
+                }
+
                 if (block.type === "gap_fill") {
                   const qid = String(currentQ.question_id);
-
-                  // Split sentence on [BLANK]
                   const [before, after] = block.content.split("[BLANK]");
 
                   return (
                     <div key={idx} className="gap-fill-block">
-
-                      {/* Instruction */}
                       <p className="gap-fill-instruction">
                         Choose the word that best completes the sentence below.
                       </p>
 
-                      {/* ✅ Inline sentence */}
                       <p className="gap-fill-text">
                         {before}
-
                         <select
                           className="gap-dropdown inline"
                           value={answers[qid] || ""}
@@ -490,35 +485,23 @@ export default function NaplanReading({
                         >
                           <option value="">Select</option>
                           {block.word_bank.map(word => (
-                            <option key={word} value={word}>
-                              {word}
-                            </option>
+                            <option key={word} value={word}>{word}</option>
                           ))}
                         </select>
-
                         {after}
                       </p>
                     </div>
                   );
                 }
+
                 if (block.type === "single_gap") {
                   const qid = String(currentQ.question_id);
-
-                  // Split on [BLANK]
-                  const parts = block.content.split("[BLANK]");
-                  const before = parts[0] ?? "";
-                  const after = parts[1] ?? "";
+                  const [before, after] = block.content.split("[BLANK]");
 
                   return (
                     <div key={idx} className="gap-fill-block">
-
-                      {/* Instruction */}
-                      
-
-                      {/* Inline sentence */}
                       <p className="gap-fill-text">
                         {before}
-
                         <select
                           className="gap-dropdown inline"
                           value={answers[qid] || ""}
@@ -527,12 +510,9 @@ export default function NaplanReading({
                         >
                           <option value="">Select</option>
                           {Object.entries(block.options).map(([key, label]) => (
-                            <option key={key} value={key}>
-                              {label}
-                            </option>
+                            <option key={key} value={key}>{label}</option>
                           ))}
                         </select>
-
                         {after}
                       </p>
                     </div>
@@ -545,15 +525,11 @@ export default function NaplanReading({
 
                   return (
                     <div key={idx} className="tf-question">
-
-                      {/* ✅ Instruction text */}
                       <p className="tf-instruction">
                         Which of these statements are true and which are false?
                       </p>
 
-                      {/* Grid */}
                       <div className="tf-grid">
-                        {/* Header */}
                         <div className="tf-grid-header">
                           <span></span>
                           <span>True</span>
@@ -569,7 +545,6 @@ export default function NaplanReading({
 
                               <input
                                 type="radio"
-                                name={`tf-${qid}-${i}`}
                                 checked={currentValue === "True"}
                                 disabled={isReview}
                                 onChange={() => {
@@ -581,7 +556,6 @@ export default function NaplanReading({
 
                               <input
                                 type="radio"
-                                name={`tf-${qid}-${i}`}
                                 checked={currentValue === "False"}
                                 disabled={isReview}
                                 onChange={() => {
@@ -599,7 +573,10 @@ export default function NaplanReading({
                 }
 
                 return null;
-              })
+              })}
+
+          </div>
+        </div>
 
             {/* 2️⃣ OPTIONS — RENDER ONCE PER QUESTION */}
             {(() => {
