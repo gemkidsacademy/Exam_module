@@ -448,40 +448,37 @@ export default function NaplanReading({
                 if (block.type === "gap_fill") {
                   const qid = String(currentQ.question_id);
 
+                  // Split sentence on [BLANK]
+                  const [before, after] = block.content.split("[BLANK]");
+
                   return (
                     <div key={idx} className="gap-fill-block">
-                      {/* Sentence */}
-                      <p className="gap-fill-text">
-                        {block.content}
+
+                      {/* Instruction */}
+                      <p className="gap-fill-instruction">
+                        Choose the word that best completes the sentence below.
                       </p>
 
-                      {/* Word bank (if present) */}
-                      {block.word_bank?.length && (
+                      {/* ✅ Inline sentence */}
+                      <p className="gap-fill-text">
+                        {before}
+
                         <select
-                          className="gap-dropdown"
+                          className="gap-dropdown inline"
                           value={answers[qid] || ""}
                           disabled={isReview}
                           onChange={(e) => handleAnswer(e.target.value)}
                         >
-                          <option value="">Select an answer</option>
-
+                          <option value="">Select</option>
                           {block.word_bank.map(word => (
                             <option key={word} value={word}>
                               {word}
                             </option>
                           ))}
                         </select>
-                      )}
 
-                      {/* Free-text fallback */}
-                      {!block.word_bank?.length && (
-                        <input
-                          className="text-input"
-                          value={answers[qid] || ""}
-                          onChange={(e) => handleAnswer(e.target.value)}
-                          disabled={isReview}
-                        />
-                      )}
+                        {after}
+                      </p>
                     </div>
                   );
                 }
