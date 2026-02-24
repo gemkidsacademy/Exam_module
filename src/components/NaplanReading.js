@@ -429,17 +429,17 @@ export default function NaplanReading({
     </div>
   )}
 
-  {/* RIGHT COLUMN */}
+  {/* RIGHT: QUESTION + OPTIONS (SINGLE COLUMN) */}
   <div className="question-column">
 
     {/* QUESTION */}
     <div className="question-pane">
       <div className="question-card">
         {currentQ.exam_bundle.question_blocks
-          .filter(b => b.type !== "reading")
+          .filter(block => block.type !== "reading")
           .map((block, idx) => {
 
-            // TYPE 7: WORD SELECT
+            /* WORD SELECT */
             if (block.type === "word_select") {
               const qid = String(currentQ.question_id);
               const selected = answers[qid] || "";
@@ -466,7 +466,7 @@ export default function NaplanReading({
               );
             }
 
-            // GAP FILL
+            /* GAP FILL */
             if (block.type === "gap_fill") {
               const qid = String(currentQ.question_id);
               const [before, after] = block.content.split("[BLANK]");
@@ -483,7 +483,7 @@ export default function NaplanReading({
                       className="gap-dropdown inline"
                       value={answers[qid] || ""}
                       disabled={isReview}
-                      onChange={(e) => handleAnswer(e.target.value)}
+                      onChange={e => handleAnswer(e.target.value)}
                     >
                       <option value="">Select</option>
                       {block.word_bank.map(word => (
@@ -496,7 +496,7 @@ export default function NaplanReading({
               );
             }
 
-            // SINGLE GAP
+            /* SINGLE GAP */
             if (block.type === "single_gap") {
               const qid = String(currentQ.question_id);
               const [before, after] = block.content.split("[BLANK]");
@@ -509,7 +509,7 @@ export default function NaplanReading({
                       className="gap-dropdown inline"
                       value={answers[qid] || ""}
                       disabled={isReview}
-                      onChange={(e) => handleAnswer(e.target.value)}
+                      onChange={e => handleAnswer(e.target.value)}
                     >
                       <option value="">Select</option>
                       {Object.entries(block.options).map(([key, label]) => (
@@ -522,7 +522,7 @@ export default function NaplanReading({
               );
             }
 
-            // TRUE / FALSE
+            /* TRUE / FALSE */
             if (block.type === "true_false") {
               const qid = String(currentQ.question_id);
               const selectedAnswers = answers[qid] || [];
@@ -535,13 +535,13 @@ export default function NaplanReading({
 
                   <div className="tf-grid">
                     <div className="tf-grid-header">
-                      <span></span>
+                      <span />
                       <span>True</span>
                       <span>False</span>
                     </div>
 
                     {block.statements.map((stmt, i) => {
-                      const value = selectedAnswers[i] || null;
+                      const value = selectedAnswers[i] ?? null;
 
                       return (
                         <div key={i} className="tf-grid-row">
@@ -590,7 +590,7 @@ export default function NaplanReading({
       const optionsSource = imageOptions || textOptions;
       if (!optionsSource) return null;
 
-      // MULTI SELECT
+      /* MULTI SELECT */
       if (currentQ.question_type === 2) {
         const selected = answers[String(currentQ.question_id)] || [];
 
@@ -621,7 +621,7 @@ export default function NaplanReading({
         );
       }
 
-      // IMAGE OPTIONS
+      /* IMAGE OPTIONS */
       if (imageOptions) {
         const selected = answers[String(currentQ.question_id)];
 
@@ -646,7 +646,7 @@ export default function NaplanReading({
         );
       }
 
-      // TEXT OPTIONS
+      /* TEXT OPTIONS */
       const selected = answers[String(currentQ.question_id)];
 
       return (
