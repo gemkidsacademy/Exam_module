@@ -430,21 +430,40 @@ export default function NaplanReading({
         )}
 
         {/* RIGHT: SINGLE QUESTION */}
-        <div className="question-pane">
-          <div className="question-card">
-
-            {/* 1️⃣ QUESTION TEXT / STRUCTURE */}
-            {currentQ.exam_bundle.question_blocks
-              .filter(b => b.type !== "reading")
-              .map((block, idx) => {
-
-                if (
-                  block.content &&
-                  !["gap_fill", "single_gap"].includes(block.type)
-                ) {
-                  return <p key={idx}>{block.content}</p>;
-                }
-
+          <div className="question-pane">
+            <div className="question-card">
+          
+              {currentQ.exam_bundle.question_blocks
+                .filter(b => b.type !== "reading")
+                .map((block, idx) => {
+          
+                  // ✅ TYPE 7: WORD SELECT
+                  if (block.type === "word_select") {
+                    const qid = String(currentQ.question_id);
+                    const selected = answers[qid] || "";
+          
+                    return (
+                      <div key={idx} className="word-select-block">
+                        <p className="word-select-text">{block.text}</p>
+          
+                        <div className="word-select-options">
+                          {block.options.map(option => (
+                            <label key={option} className="word-select-option">
+                              <input
+                                type="radio"
+                                name={`word-select-${qid}`}
+                                value={option}
+                                checked={selected === option}
+                                disabled={isReview}
+                                onChange={() => handleAnswer(option)}
+                              />
+                              <span>{option}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  }
                 if (block.type === "gap_fill") {
                   const qid = String(currentQ.question_id);
 
