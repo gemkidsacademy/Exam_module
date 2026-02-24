@@ -543,3 +543,32 @@
 .tf-grid-row:last-child input {
   border-bottom: none;
 }
+/* ============================================================
+   INLINE GAP FILL (SINGLE GAP)
+============================================================ */
+
+.gap-fill-text.inline-gap {
+  display: inline;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.gap-dropdown.inline {
+  display: inline-block;
+  vertical-align: baseline;
+
+  margin: 0 6px;
+  padding: 4px 8px;
+
+  font-size: 15px;
+  line-height: 1.2;
+
+  border-radius: 6px;
+  border: 1px solid #cfd4da;
+  background: #ffffff;
+}
+
+.gap-dropdown.inline:focus {
+  outline: none;
+  border-color: #2563eb;
+}
