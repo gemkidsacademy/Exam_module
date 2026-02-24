@@ -485,35 +485,39 @@ export default function NaplanReading({
                 if (block.type === "single_gap") {
                   const qid = String(currentQ.question_id);
 
+                  // Split on [BLANK]
+                  const parts = block.content.split("[BLANK]");
+                  const before = parts[0] ?? "";
+                  const after = parts[1] ?? "";
+
                   return (
                     <div key={idx} className="gap-fill-block">
-                      {/* Sentence */}
-                      <p className="gap-fill-text">
-                        {block.content}
+
+                      {/* Instruction */}
+                      <p className="gap-fill-instruction">
+                        Choose the word that best completes the sentence below.
                       </p>
 
-                      {/* Options */}
-                      <div className="mcq-options word-bank">
-                        {Object.entries(block.options).map(([key, label]) => {
-                          const isSelected = answers[qid] === key;
+                      {/* Inline sentence */}
+                      <p className="gap-fill-text">
+                        {before}
 
-                          return (
-                            <label
-                              key={key}
-                              className={`mcq-option-card ${isSelected ? "selected" : ""}`}
-                            >
-                              <input
-                                type="radio"
-                                name={`single-gap-${qid}`}
-                                checked={isSelected}
-                                disabled={isReview}
-                                onChange={() => handleAnswer(key)}
-                              />
-                              <span>{label}</span>
-                            </label>
-                          );
-                        })}
-                      </div>
+                        <select
+                          className="gap-dropdown inline"
+                          value={answers[qid] || ""}
+                          disabled={isReview}
+                          onChange={(e) => handleAnswer(e.target.value)}
+                        >
+                          <option value="">Select</option>
+                          {Object.entries(block.options).map(([key, label]) => (
+                            <option key={key} value={key}>
+                              {label}
+                            </option>
+                          ))}
+                        </select>
+
+                        {after}
+                      </p>
                     </div>
                   );
                 }
