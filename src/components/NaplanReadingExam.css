@@ -376,10 +376,31 @@
 /* ============================================================
    TEXT SINGLE-CHOICE (VERTICAL STACK)
 ============================================================ */
+/* ============================================================
+   SCROLLABLE TEXT OPTIONS (VERTICAL)
+============================================================ */
 .mcq-options.list {
-  display: flex;              /* override grid */
-  flex-direction: column;     /* 👈 vertical stacking */
+  display: flex;
+  flex-direction: column;
   gap: 12px;
+
+  max-height: 260px;      /* 👈 adjust as needed */
+  overflow-y: auto;       /* 👈 enables vertical scroll */
+  padding-right: 6px;     /* space for scrollbar */
+}
+
+/* Optional: nicer scrollbar (Chrome / Edge) */
+.mcq-options.list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.mcq-options.list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.mcq-options.list::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 /* one option per row */
