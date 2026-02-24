@@ -572,3 +572,24 @@
   outline: none;
   border-color: #2563eb;
 }
+.word-select-text {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.word-select-option {
+  background: #e5e7eb;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0 2px;
+}
+
+.word-select-option:hover {
+  background: #dbeafe;
+}
+
+.word-select-option.selected {
+  background: #2563eb;
+  color: white;
+}
