@@ -404,14 +404,48 @@
 }
 
 /* one option per row */
+/* ============================================================
+   BIG CLICKABLE OPTION ROW (RADIO / CHECKBOX)
+============================================================ */
 .mcq-option-row {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 6px 4px;
+  align-items: center;
+  gap: 14px;
+
+  padding: 14px 16px;
+  background: #f8fafc;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+
   cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
+.mcq-option-row:hover {
+  background: #f3f6fb;
+}
+
+/* input size */
+.mcq-option-row input[type="radio"],
+.mcq-option-row input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  accent-color: #2563eb;
+}
+
+/* text */
+.mcq-option-row .option-text {
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* selected state */
+.mcq-option-row:has(input:checked) {
+  background: #ecfdf5;
+  border-color: #22c55e;
+}
 /* radio size & alignment */
 .mcq-option-row input[type="radio"] {
   margin-top: 3px;
