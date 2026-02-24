@@ -109,7 +109,18 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
+/* ============================================================
+   IMAGE OPTIONS — VERTICAL STACK
+============================================================ */
+.mcq-options.image-list {
+  display: flex;              /* override grid */
+  flex-direction: column;
+  gap: 16px;
 
+  max-height: 320px;          /* optional scroll */
+  overflow-y: auto;
+  padding-right: 6px;
+}
 /* --- default option card (radio / image MCQ) --- */
 .mcq-options:not(.multi-select):not(.word-bank) .mcq-option-card {
   height: 220px;
