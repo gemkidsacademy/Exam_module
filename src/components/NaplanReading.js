@@ -529,29 +529,45 @@ export default function NaplanReading({
                   );
                 }
                 if (block.type === "word_select") {
-                  const qid = String(currentQ.question_id);
-                  const [before, after] = block.text.split("[BLANK]");
+  const qid = String(currentQ.question_id);
+  const selected = answers[qid] || null;
 
-                  return (
-                    <p key={idx} className="gap-fill-text inline-gap">
-                      {before}
-                      <select
-                        className="gap-dropdown inline"
-                        value={answers[qid] || ""}
-                        disabled={isReview}
-                        onChange={(e) => handleAnswer(e.target.value)}
-                      >
-                        <option value="">Select an answer</option>
-                        {block.options.map(opt => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </select>
-                      {after}
-                    </p>
-                  );
-                }
+  // Clean up text issues from backend
+  const text = block.text
+    .replace("/n", "\n")
+    .replace("eat pies,plums", "eats pies, plums")
+    .replace("off bug", "odd bug");
+
+  const tokens = text.split(/(\s+)/); // keep spaces
+
+  return (
+    <p key={idx} className="word-select-text">
+      {tokens.map((token, i) => {
+        const clean = token.replace(/[.,]/g, "");
+        const isOption = block.options.includes(clean);
+        const isSelected = selected === clean;
+
+        if (!isOption) {
+          return <span key={i}>{token}</span>;
+        }
+
+        return (
+          <span
+            key={i}
+            className={`word-select-option ${isSelected ? "selected" : ""}`}
+            onClick={() => {
+              if (!isReview) {
+                handleAnswer(clean);
+              }
+            }}
+          >
+            {token}
+          </span>
+        );
+      })}
+    </p>
+  );
+}
 
                 if (block.type === "true_false") {
   const qid = String(currentQ.question_id);
