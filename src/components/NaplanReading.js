@@ -488,28 +488,27 @@ export default function NaplanReading({
                 if (block.type === "single_gap") {
                   const qid = String(currentQ.question_id);
 
+                  const [before, after] = block.content.split("[BLANK]");
+
                   return (
                     <div key={idx} className="gap-fill-block">
-                      {/* Sentence */}
-                      <p className="gap-fill-text">
-                        {block.content}
+                      <p className="gap-fill-text inline-gap">
+                        {before}
+                        <select
+                          className="gap-dropdown inline"
+                          value={answers[qid] || ""}
+                          disabled={isReview}
+                          onChange={(e) => handleAnswer(e.target.value)}
+                        >
+                          <option value="">Select an answer</option>
+                          {Object.entries(block.options).map(([key, label]) => (
+                            <option key={key} value={key}>
+                              {label}
+                            </option>
+                          ))}
+                        </select>
+                        {after}
                       </p>
-
-                      {/* Dropdown */}
-                      <select
-                        className="gap-dropdown"
-                        value={answers[qid] || ""}
-                        disabled={isReview}
-                        onChange={(e) => handleAnswer(e.target.value)}
-                      >
-                        <option value="">Select an answer</option>
-
-                        {Object.entries(block.options).map(([key, label]) => (
-                          <option key={key} value={key}>
-                            {label}
-                          </option>
-                        ))}
-                      </select>
                     </div>
                   );
                 }
