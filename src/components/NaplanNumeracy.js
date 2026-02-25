@@ -155,20 +155,26 @@ export default function NaplanNumeracy({
   const finishExam = useCallback(async () => {
     if (hasSubmittedRef.current) return;
     hasSubmittedRef.current = true;
-
-    await fetch(
-      `${API_BASE}/api/student/finish-exam/naplan-numeracy`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ student_id: studentId, answers })
-      }
-    );
-
-    await loadReport();
-    onExamFinish?.();
+  
+    // ✅ Blank screen immediately
+    setMode("submitting");
+  
+    try {
+      await fetch(
+        `${API_BASE}/api/student/finish-exam/naplan-numeracy`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ student_id: studentId, answers })
+        }
+      );
+  
+      await loadReport();
+      onExamFinish?.();
+    } catch (err) {
+      console.error("Finish exam failed", err);
+    }
   }, [API_BASE, studentId, answers, loadReport, onExamFinish]);
-
   /* ============================================================
      TIMER
   ============================================================ */
@@ -225,12 +231,28 @@ export default function NaplanNumeracy({
   };
 
   /* ============================================================
-     RENDER GUARDS
+   RENDER GUARDS
   ============================================================ */
-  if (mode === "loading") return <p className="loading">Loading…</p>;
-  if (mode === "exam" && !questions.length)
+  if (mode === "loading") {
     return <p className="loading">Loading…</p>;
-
+  }
+  
+  if (mode === "submitting") {
+    return (
+      <div className="loading-screen">
+        <div className="loading-card">
+          <h3>Submitting your exam…</h3>
+          <p>Please wait. Do not refresh.</p>
+          <div className="spinner" />
+        </div>
+      </div>
+    );
+  }
+  
+  if (mode === "exam" && !questions.length) {
+    return <p className="loading">Loading…</p>;
+  }
+  
   if (mode === "report") {
     return (
       <NaplanNumeracyReport
@@ -245,7 +267,7 @@ export default function NaplanNumeracy({
       />
     );
   }
-
+  
   if (mode === "review" && !questions.length) {
     return (
       <NaplanNumeracyReview
@@ -694,6 +716,8 @@ export default function NaplanNumeracy({
                 className="btn confirm"
                 onClick={() => {
                   setShowConfirmFinish(false);
+              
+                  // ✅ Immediately transition away from exam UI
                   finishExam();
                 }}
               >
