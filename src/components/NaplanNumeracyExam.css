@@ -373,3 +373,42 @@
 .option-text {
   line-height: 1.4;
 }
+/* ============================================================
+   CLOZE DROPDOWN (TYPE — DROPDOWN)
+============================================================ */
+
+.cloze-dropdown {
+  min-width: 260px;
+  height: 56px;
+
+  font-size: 18px;
+  font-weight: 500;
+
+  padding: 10px 44px 10px 16px;
+
+  border-radius: 12px;
+  border: 2px solid #cbd5e1;
+  background-color: #ffffff;
+
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%23475669' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 20px;
+}
+
+.cloze-dropdown:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
+  outline: none;
+}
+
+.cloze-dropdown:disabled {
+  background-color: #f1f5f9;
+  cursor: not-allowed;
+}
