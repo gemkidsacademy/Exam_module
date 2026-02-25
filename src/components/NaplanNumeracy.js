@@ -270,7 +270,10 @@ export default function NaplanNumeracy({
 
   const hasImageMultiSelect =
     currentQ.question_blocks?.some(
-      (b) => b.type === "image-multi-select"
+      (b) =>
+        b.type === "image-multi-select" &&
+        Array.isArray(b.options) &&
+        b.options.some(opt => opt.image && opt.image.trim() !== "")
     );
 
   const isCorrect =
@@ -583,7 +586,7 @@ export default function NaplanNumeracy({
     )}
 
     {currentQ.question_type === 2 && !hasImageMultiSelect && (
-      <div className="mcq-options">
+      <div className="text-multi-select-grid">
         {Object.entries(currentQ.options || {}).map(([key, value]) => {
           const selected = answers[String(currentQ.id)] || [];
           const isSelected = selected.includes(key);
@@ -591,31 +594,27 @@ export default function NaplanNumeracy({
           return (
             <label
               key={key}
-              className={`mcq-option-card ${
-                isSelected ? "selected" : ""
-              }`}
+              className={`text-option-card ${isSelected ? "selected" : ""}`}
             >
               <input
                 type="checkbox"
-                value={key}
                 checked={isSelected}
                 disabled={
                   isReview ||
                   (!isSelected && selected.length >= TYPE_2_MAX_SELECTIONS)
                 }
                 onChange={() => {
-                  let updated;
-              
-                  if (isSelected) {
-                    updated = selected.filter(v => v !== key);
-                  } else {
-                    updated = [...selected, key];
-                  }
-              
+                  const updated = isSelected
+                    ? selected.filter(v => v !== key)
+                    : [...selected, key];
                   handleAnswer(updated);
                 }}
               />
-              <span>{key}. {value}</span>
+
+              <div className="text-option-content">
+                <span className="option-key">{key}</span>
+                <span className="option-text">{value}</span>
+              </div>
             </label>
           );
         })}
