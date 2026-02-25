@@ -15,7 +15,7 @@
   margin: 0 !important;
   overflow: hidden;
 }
- 
+
 /* ============================================================
    EXAM CONTAINER
 ============================================================ */
@@ -350,14 +350,20 @@
 .text-option-card input {
   position: absolute;
   top: 10px;
-  right: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   pointer-events: none;
 }
 
 .text-option-content {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
+  margin-top: 28px; /* space below checkbox */
+  text-align: center;
+}
+
+.option-text {
+  display: block;
+  font-size: 16px;
+  line-height: 1.4;
 }
 
 .option-key {
