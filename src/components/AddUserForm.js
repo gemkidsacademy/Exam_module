@@ -8,6 +8,12 @@ export default function AddStudentForm() {
   const [className, setClassName] = useState("");
   const [classDay, setClassDay] = useState("");
   const [parentEmail, setParentEmail] = useState("");
+  const [studentYear, setStudentYear] = useState("");
+  const STUDENT_YEAR_OPTIONS = [
+        "Year 3",
+        "Year 5",
+        "N/A",  
+      ];
   const CLASS_NAME_OPTIONS = [
   "NAPLAN",
   "Selective",
@@ -50,9 +56,10 @@ const CLASS_DAY_OPTIONS = [
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
-      id,               // Backend-suggested ID
+      id,                    // Backend-suggested ID
       student_id: studentId, // Admin-entered student ID
       name,
+      student_year: studentYear, // ✅ NEW
       class_name: className,
       class_day: classDay,
       parent_email: parentEmail,
@@ -76,6 +83,7 @@ const CLASS_DAY_OPTIONS = [
       setClassName("");
       setClassDay("");
       setParentEmail("");
+      setStudentYear("");
     } catch (err) {
       console.error(err);
       alert("Error adding student");
@@ -120,7 +128,19 @@ const CLASS_DAY_OPTIONS = [
               </option>
             ))}
           </select>
-
+        <label>Student Year</label>
+          <select
+            value={studentYear}
+            onChange={(e) => setStudentYear(e.target.value)}
+            required
+          >
+            <option value="">Select year</option>
+            {STUDENT_YEAR_OPTIONS.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
 
         <label>Class Day</label>
           <select
