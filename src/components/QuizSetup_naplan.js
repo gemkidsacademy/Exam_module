@@ -16,7 +16,12 @@ export default function QuizSetup_naplan({ examType }) {
     if (year === "5") {
       return { min: 40, max: 45 };
     }
-  
+    if (year === "7") {
+      return { min: 40, max: 45 };
+    }
+    if (year === "9") {
+      return { min: 40, max: 45 };
+    }
     return null;
   };
   
@@ -293,6 +298,9 @@ export default function QuizSetup_naplan({ examType }) {
         <option value="">Select Year</option>
         <option value="3">Year 3</option>
         <option value="5">Year 5</option>
+        <option value="5">Year 7</option>
+        <option value="5">Year 9</option>  
+          
       </select>
 
       <label>Difficulty:</label>
