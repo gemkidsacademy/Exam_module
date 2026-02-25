@@ -121,8 +121,15 @@ export default function NaplanNumeracy({
   ============================================================ */
   useEffect(() => {
     if (!studentId) return;
-    if (mode === "report" || mode === "review") return;
-
+  
+    // ✅ HARD STOP: never restart exam after submit
+    if (hasSubmittedRef.current) return;
+  
+    // 🚦 Do not start exam in these modes
+    if (mode === "report" || mode === "review" || mode === "submitting") {
+      return;
+    }
+  
     const startExam = async () => {
       const res = await fetch(
         `${API_BASE}/api/student/start-exam/naplan-numeracy`,
@@ -132,23 +139,22 @@ export default function NaplanNumeracy({
           body: JSON.stringify({ student_id: studentId })
         }
       );
-
+  
       const data = await res.json();
-
+  
       if (data.completed === true) {
         await loadReport();
         return;
       }
-      console.log("NAPLAN QUESTIONS:", data.questions);
+  
       setQuestions(data.questions || []);
       setTimeLeft(data.remaining_time);
       setMode("exam");
       onExamStart?.();
     };
-
+  
     startExam();
   }, [studentId, API_BASE, loadReport, mode, onExamStart]);
-
   /* ============================================================
      FINISH EXAM
   ============================================================ */
