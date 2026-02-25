@@ -11,6 +11,8 @@ import NaplanReading from "./NaplanReading";
 import WelcomeScreen from "./WelcomeScreen";
 import InstructionsScreen_naplan from "./InstructionsScreen_naplan";
 
+import InstructionsScreen from "./InstructionsScreen";
+
 /*
   NAPLAN SUBJECT CONFIG
   - UI label
