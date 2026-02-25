@@ -11,7 +11,7 @@ import NaplanReading from "./NaplanReading";
 import WelcomeScreen from "./WelcomeScreen";
 import InstructionsScreen_naplan from "./InstructionsScreen_naplan";
 
-import InstructionsScreen from "./InstructionsScreen";
+
 
 /*
   NAPLAN SUBJECT CONFIG
@@ -106,7 +106,7 @@ const NaplanDashboard = () => {
 
       {/* 3️⃣ INSTRUCTIONS SCREEN */}
       {examPhase === "instructions" && (
-        <InstructionsScreen
+        <InstructionsScreen_naplan
           subject={activeSubject.key}
           onNext={() => setExamPhase("exam")}
         />
