@@ -314,3 +314,56 @@
   height: auto;
   object-fit: contain;
 }
+/* ===============================
+   TYPE 2 — TEXT MULTI SELECT
+================================ */
+
+.text-multi-select-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.text-option-card {
+  position: relative;
+  padding: 16px 18px;
+  border: 2px solid #d9d9d9;
+  border-radius: 10px;
+  background: #ffffff;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.text-option-card:hover {
+  border-color: #4f7cff;
+  background: #f4f8ff;
+}
+
+.text-option-card.selected {
+  border-color: #4f7cff;
+  background: #eaf1ff;
+}
+
+/* hide native checkbox but keep it accessible */
+.text-option-card input {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  pointer-events: none;
+}
+
+.text-option-content {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.option-key {
+  font-weight: 700;
+}
+
+.option-text {
+  line-height: 1.4;
+}
