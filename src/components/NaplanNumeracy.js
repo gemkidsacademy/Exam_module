@@ -104,7 +104,7 @@ export default function NaplanNumeracy({
   ============================================================ */
   const loadReport = useCallback(async () => {
     const res = await fetch(
-      `${API_BASE}/api/student/exam-report/naplan-numeracy?student_id=${studentId}`
+      `${API_BASE}/api/student/exam-report/naplan-numeracy-new?student_id=${studentId}`
     );
 
     if (!res.ok) return;
