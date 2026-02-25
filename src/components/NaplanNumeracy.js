@@ -612,7 +612,7 @@ export default function NaplanNumeracy({
               />
 
               <div className="text-option-content">
-                <span className="option-key">{key}</span>
+                
                 <span className="option-text">{value}</span>
               </div>
             </label>
