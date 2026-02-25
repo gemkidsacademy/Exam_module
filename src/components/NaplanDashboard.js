@@ -9,7 +9,7 @@ import NaplanReading from "./NaplanReading";
 
 // SHARED SCREENS
 import WelcomeScreen from "./WelcomeScreen";
-import InstructionsScreen from "./InstructionsScreen";
+import InstructionsScreen_naplan from "./InstructionsScreen_naplan";
 
 /*
   NAPLAN SUBJECT CONFIG
