@@ -1,7 +1,5 @@
 export default function NaplanReadingReport({ report, onViewExamDetails }) {
-  if (!report) {
-    return <p className="loading">Generating your report…</p>;
-  }
+  if (!report) return null;
 
   const {
     overall,
@@ -10,69 +8,77 @@ export default function NaplanReadingReport({ report, onViewExamDetails }) {
   } = report;
 
   return (
-    <div className="reading-report-container">
+    <div className="report-dashboard">
 
       {/* HEADER */}
-      <div className="reading-report-header">
-        <h2>NAPLAN Reading Report</h2>
-        <p>Here’s a summary of your performance</p>
+      <div className="report-header">
+        <button className="btn-primary" onClick={onViewExamDetails}>
+          View Exam Details
+        </button>
       </div>
 
-      {/* SUMMARY */}
-      <div className="reading-summary-grid">
-        <div className="reading-summary-card">
-          <h3>{overall.correct} / {overall.total_questions}</h3>
-          <span>Score</span>
+      {/* TOP ROW */}
+      <div className="report-grid-2">
+
+        {/* OVERALL ACCURACY */}
+        <div className="report-card">
+          <h3>Overall Accuracy</h3>
+
+          <div className="donut-wrapper">
+            <div className="donut">
+              <span>{overall.accuracy_percent}%</span>
+            </div>
+          </div>
+
+          <div className="stats">
+            <div>Total Questions: {overall.total_questions}</div>
+            <div>Attempted: {overall.attempted}</div>
+            <div>Correct: {overall.correct}</div>
+            <div>Incorrect: {overall.incorrect}</div>
+            <div>Not Attempted: {overall.not_attempted}</div>
+            <div>Score: {overall.score_percent}%</div>
+          </div>
         </div>
 
-        <div className="reading-summary-card">
-          <h3>{overall.accuracy_percent}%</h3>
-          <span>Accuracy</span>
-        </div>
+        {/* TOPIC PERFORMANCE */}
+        <div className="report-card">
+          <h3>Topic-wise Performance</h3>
 
-        <div className="reading-summary-card">
-          <h3>{overall.time_taken_minutes ?? "--"} min</h3>
-          <span>Time Taken</span>
+          {topic_wise_performance.map((t, idx) => (
+            <div key={idx} className="topic-row">
+              <div className="topic-title">{t.topic}</div>
+
+              <div className="pill-group">
+                <span className="pill neutral">Attempted: {t.attempted}</span>
+                <span className="pill success">Correct: {t.correct}</span>
+                <span className="pill danger">Incorrect: {t.incorrect}</span>
+                <span className="pill muted">
+                  Not Attempted: {t.not_attempted}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* PERFORMANCE BY TOPIC */}
-      <div className="reading-performance">
-        <h3>Performance by Topic</h3>
+      {/* IMPROVEMENT AREAS */}
+      <div className="report-card">
+        <h3>Improvement Areas</h3>
 
-        {topic_wise_performance.map((row, idx) => (
-          <div key={idx} className="performance-row">
-            <span className="performance-topic">{row.topic}</span>
-            <span className="performance-score">
-              {row.correct} / {row.total} ({row.accuracy_percent}%)
-            </span>
+        {improvement_areas.map((i, idx) => (
+          <div key={idx} className="improvement-row">
+            <div className="label">{i.topic}</div>
+            <div className="bar">
+              <div
+                className="fill"
+                style={{ width: `${i.accuracy_percent}%` }}
+              />
+            </div>
+            <div className="percent">{i.accuracy_percent}%</div>
           </div>
         ))}
       </div>
 
-      {/* IMPROVEMENT */}
-      <div className="reading-improvement">
-        <h3>Areas to Improve</h3>
-
-        {improvement_areas.length === 0 ? (
-          <p>🎉 Great work! No weak areas detected.</p>
-        ) : (
-          <ul>
-            {improvement_areas.map((area, idx) => (
-              <li key={idx}>
-                {area.topic} — {area.accuracy_percent}%
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      {/* ACTIONS */}
-      <div className="reading-report-actions">
-        <button className="btn-review" onClick={onViewExamDetails}>
-          Review Exam
-        </button>
-      </div>
     </div>
   );
 }
