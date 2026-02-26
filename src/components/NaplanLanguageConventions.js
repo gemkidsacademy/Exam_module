@@ -121,8 +121,10 @@ export default function NaplanLanguageConventions({
   ============================================================ */
   useEffect(() => {
     if (!studentId) return;
-    if (mode === "report" || mode === "review") return;
-
+  
+    // 🔑 only run ONCE from loading
+    if (mode !== "loading") return;
+  
     const startExam = async () => {
       const res = await fetch(
         `${API_BASE}/api/student/start-exam/naplan-language-conventions`,
@@ -132,23 +134,22 @@ export default function NaplanLanguageConventions({
           body: JSON.stringify({ student_id: studentId })
         }
       );
-
+  
       const data = await res.json();
-
+  
       if (data.completed === true) {
         await loadReport();
         return;
       }
-      console.log("NAPLAN QUESTIONS:", data.questions);
+  
       setQuestions(data.questions || []);
       setTimeLeft(data.remaining_time);
       setMode("exam");
       onExamStart?.();
     };
-
+  
     startExam();
   }, [studentId, API_BASE, loadReport, mode, onExamStart]);
-
   /* ============================================================
      FINISH EXAM
   ============================================================ */
