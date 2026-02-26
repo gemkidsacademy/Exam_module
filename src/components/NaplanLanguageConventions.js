@@ -104,7 +104,7 @@ export default function NaplanLanguageConventions({
   ============================================================ */
   const loadReport = useCallback(async () => {
     const res = await fetch(
-      `${API_BASE}/api/student/exam-report/naplan-language-conventions?student_id=${studentId}`
+      `${API_BASE}/api/student/exam-report/naplan-language-conventions-new?student_id=${studentId}`
     );
 
     if (!res.ok) return;
