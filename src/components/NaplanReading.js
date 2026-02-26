@@ -171,7 +171,8 @@ export default function NaplanReading({
         );
   
         const data = await res.json();
-  
+        // 🔍 LOG BACKEND PAYLOAD
+        console.log("📦 start-exam response:", data);
         if (data.completed === true) {
           await loadReport();
           return;
