@@ -139,14 +139,18 @@ export default function NaplanNumeracy({
           body: JSON.stringify({ student_id: studentId })
         }
       );
-  
+    
       const data = await res.json();
-  
+    
+      // 🔍 DEBUG: print full exam payload
+      console.log("📘 START-EXAM RESPONSE:", data);
+      console.log("📘 QUESTIONS:", data.questions);
+    
       if (data.completed === true) {
         await loadReport();
         return;
       }
-  
+    
       setQuestions(data.questions || []);
       setTimeLeft(data.remaining_time);
       setMode("exam");
