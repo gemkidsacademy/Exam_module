@@ -389,6 +389,13 @@ export default function NaplanNumeracy({
         {/* QUESTION */}
 <div className="question-card">
   <div className="question-content-centered">
+  {/* ✅ FALLBACK: render question_text if no text blocks exist */}
+    {!currentQ.question_blocks?.some(b => b.type === "text") &&
+     currentQ.question_text && (
+      <p className="question-text">
+        {currentQ.question_text}
+      </p>
+    )}
     {currentQ.question_blocks?.map((block, idx) => {
 
       if (block.type === "text") {
