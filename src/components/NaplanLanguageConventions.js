@@ -156,9 +156,6 @@ export default function NaplanLanguageConventions({
     if (hasSubmittedRef.current) return;
     hasSubmittedRef.current = true;
   
-    // 🔑 IMMEDIATELY BLANK SCREEN
-    setMode("submitting");
-  
     await fetch(
       `${API_BASE}/api/student/finish-exam/naplan-language-conventions`,
       {
@@ -168,7 +165,6 @@ export default function NaplanLanguageConventions({
       }
     );
   
-    // wait for report AFTER finish completes
     await loadReport();
     onExamFinish?.();
   }, [API_BASE, studentId, answers, loadReport, onExamFinish]);
