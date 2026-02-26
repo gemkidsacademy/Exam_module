@@ -134,7 +134,7 @@ export default function NaplanReading({
   ============================================================ */
   const loadReport = useCallback(async () => {
     const res = await fetch(
-      `${API_BASE}/api/student/exam-report/naplan-reading?student_id=${studentId}`
+      `${API_BASE}/api/student/exam-report/naplan-reading-new?student_id=${studentId}`
     );
 
     if (!res.ok) return;
