@@ -10,33 +10,33 @@ export default function NaplanReadingReport({ report, onViewExamDetails }) {
   return (
     <div className="report-dashboard">
 
-      {/* HEADER */}
+      {/* ACTION */}
       <div className="report-header">
         <button className="btn-primary" onClick={onViewExamDetails}>
           View Exam Details
         </button>
       </div>
 
-      {/* TOP ROW */}
-      <div className="report-grid-2">
+      {/* TOP GRID */}
+      <div className="report-grid">
 
         {/* OVERALL ACCURACY */}
-        <div className="report-card">
+        <div className="report-card overall-card">
           <h3>Overall Accuracy</h3>
 
-          <div className="donut-wrapper">
+          <div className="overall-content">
             <div className="donut">
               <span>{overall.accuracy_percent}%</span>
             </div>
-          </div>
 
-          <div className="stats">
-            <div>Total Questions: {overall.total_questions}</div>
-            <div>Attempted: {overall.attempted}</div>
-            <div>Correct: {overall.correct}</div>
-            <div>Incorrect: {overall.incorrect}</div>
-            <div>Not Attempted: {overall.not_attempted}</div>
-            <div>Score: {overall.score_percent}%</div>
+            <div className="overall-stats">
+              <div>Total Questions: {overall.total_questions}</div>
+              <div>Attempted: {overall.attempted}</div>
+              <div>Correct: {overall.correct}</div>
+              <div>Incorrect: {overall.incorrect}</div>
+              <div>Not Attempted: {overall.not_attempted}</div>
+              <div><strong>Score:</strong> {overall.score_percent}%</div>
+            </div>
           </div>
         </div>
 
@@ -44,16 +44,16 @@ export default function NaplanReadingReport({ report, onViewExamDetails }) {
         <div className="report-card">
           <h3>Topic-wise Performance</h3>
 
-          {topic_wise_performance.map((t, idx) => (
-            <div key={idx} className="topic-row">
-              <div className="topic-title">{t.topic}</div>
+          {topic_wise_performance.map((t, i) => (
+            <div key={i} className="topic-row">
+              <div className="topic-name">{t.topic}</div>
 
-              <div className="pill-group">
-                <span className="pill neutral">Attempted: {t.attempted}</span>
-                <span className="pill success">Correct: {t.correct}</span>
-                <span className="pill danger">Incorrect: {t.incorrect}</span>
+              <div className="pill-row">
+                <span className="pill neutral">Attempted {t.attempted}</span>
+                <span className="pill success">Correct {t.correct}</span>
+                <span className="pill danger">Incorrect {t.incorrect}</span>
                 <span className="pill muted">
-                  Not Attempted: {t.not_attempted}
+                  Not Attempted {t.not_attempted}
                 </span>
               </div>
             </div>
@@ -67,18 +67,19 @@ export default function NaplanReadingReport({ report, onViewExamDetails }) {
 
         {improvement_areas.map((i, idx) => (
           <div key={idx} className="improvement-row">
-            <div className="label">{i.topic}</div>
-            <div className="bar">
+            <span className="improve-label">{i.topic}</span>
+
+            <div className="progress">
               <div
-                className="fill"
+                className="progress-fill"
                 style={{ width: `${i.accuracy_percent}%` }}
               />
             </div>
-            <div className="percent">{i.accuracy_percent}%</div>
+
+            <span className="percent">{i.accuracy_percent}%</span>
           </div>
         ))}
       </div>
-
     </div>
   );
 }
