@@ -700,6 +700,10 @@ export default function NaplanLanguageConventions({
                 className="btn confirm"
                 onClick={() => {
                   setShowConfirmFinish(false);
+              
+                  // 🔑 BLANK SCREEN STARTS HERE
+                  setMode("submitting");
+              
                   finishExam();
                 }}
               >
