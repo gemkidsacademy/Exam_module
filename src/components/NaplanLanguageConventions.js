@@ -155,7 +155,10 @@ export default function NaplanLanguageConventions({
   const finishExam = useCallback(async () => {
     if (hasSubmittedRef.current) return;
     hasSubmittedRef.current = true;
-
+  
+    // 🔑 IMMEDIATELY BLANK SCREEN
+    setMode("submitting");
+  
     await fetch(
       `${API_BASE}/api/student/finish-exam/naplan-language-conventions`,
       {
@@ -164,11 +167,11 @@ export default function NaplanLanguageConventions({
         body: JSON.stringify({ student_id: studentId, answers })
       }
     );
-
+  
+    // wait for report AFTER finish completes
     await loadReport();
     onExamFinish?.();
   }, [API_BASE, studentId, answers, loadReport, onExamFinish]);
-
   /* ============================================================
      TIMER
   ============================================================ */
@@ -239,7 +242,13 @@ export default function NaplanLanguageConventions({
   if (mode === "loading") return <p className="loading">Loading…</p>;
   if (mode === "exam" && !questions.length)
     return <p className="loading">Loading…</p>;
-
+  if (mode === "submitting") {
+    return (
+      <div className="loading-screen">
+        <p className="loading">Submitting exam…</p>
+      </div>
+    );
+  }
   if (mode === "report") {
     return (
       <NaplanNumeracyReport
@@ -665,6 +674,7 @@ export default function NaplanLanguageConventions({
           {currentIndex === questions.length - 1 && !isReview && (
             <button
               className="nav-btn finish"
+              disabled={mode === "submitting"}
               onClick={() => setShowConfirmFinish(true)}
             >
               Finish Exam
