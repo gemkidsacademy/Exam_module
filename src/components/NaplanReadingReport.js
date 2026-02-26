@@ -1,13 +1,4 @@
-import React from "react";
-import "./NaplanReadingReport.css";
-
-/* ============================================================
-   NAPLAN READING REPORT
-============================================================ */
-export default function NaplanReadingReport({
-  report,
-  onViewExamDetails
-}) {
+export default function NaplanReadingReport({ report, onViewExamDetails }) {
   if (!report) {
     return <p className="loading">Generating your report…</p>;
   }
@@ -19,100 +10,66 @@ export default function NaplanReadingReport({
   } = report;
 
   return (
-    <div className="report-container">
-      <h2 className="report-title">NAPLAN Reading Report</h2>
+    <div className="reading-report-container">
 
-      {/* =============================
-          OVERALL SUMMARY
-      ============================== */}
-      <div className="report-card summary">
-        <h3>Overall Performance</h3>
+      {/* HEADER */}
+      <div className="reading-report-header">
+        <h2>NAPLAN Reading Report</h2>
+        <p>Here’s a summary of your performance</p>
+      </div>
 
-        <div className="summary-grid">
-          <div>
-            <span className="label">Score</span>
-            <span className="value">
-              {overall.correct} / {overall.total}
-            </span>
-          </div>
+      {/* SUMMARY */}
+      <div className="reading-summary-grid">
+        <div className="reading-summary-card">
+          <h3>{overall.correct} / {overall.total_questions}</h3>
+          <span>Score</span>
+        </div>
 
-          <div>
-            <span className="label">Accuracy</span>
-            <span className="value">
-              {overall.percentage}%
-            </span>
-          </div>
+        <div className="reading-summary-card">
+          <h3>{overall.accuracy_percent}%</h3>
+          <span>Accuracy</span>
+        </div>
 
-          <div>
-            <span className="label">Time Taken</span>
-            <span className="value">
-              {overall.time_taken_minutes} min
-            </span>
-          </div>
+        <div className="reading-summary-card">
+          <h3>{overall.time_taken_minutes ?? "--"} min</h3>
+          <span>Time Taken</span>
         </div>
       </div>
 
-      {/* =============================
-          TOPIC PERFORMANCE
-      ============================== */}
-      <div className="report-card">
+      {/* PERFORMANCE BY TOPIC */}
+      <div className="reading-performance">
         <h3>Performance by Topic</h3>
 
-        {topic_wise_performance.length === 0 ? (
-          <p>No topic breakdown available.</p>
-        ) : (
-          <table className="report-table">
-            <thead>
-              <tr>
-                <th>Topic</th>
-                <th>Correct</th>
-                <th>Total</th>
-                <th>Accuracy</th>
-              </tr>
-            </thead>
-            <tbody>
-              {topic_wise_performance.map((row, idx) => (
-                <tr key={idx}>
-                  <td>{row.topic}</td>
-                  <td>{row.correct}</td>
-                  <td>{row.total}</td>
-                  <td>{row.percentage}%</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+        {topic_wise_performance.map((row, idx) => (
+          <div key={idx} className="performance-row">
+            <span className="performance-topic">{row.topic}</span>
+            <span className="performance-score">
+              {row.correct} / {row.total} ({row.accuracy_percent}%)
+            </span>
+          </div>
+        ))}
       </div>
 
-      {/* =============================
-          IMPROVEMENT AREAS
-      ============================== */}
-      <div className="report-card">
+      {/* IMPROVEMENT */}
+      <div className="reading-improvement">
         <h3>Areas to Improve</h3>
 
         {improvement_areas.length === 0 ? (
-          <p className="positive">
-            🎉 Great work! No major weak areas detected.
-          </p>
+          <p>🎉 Great work! No weak areas detected.</p>
         ) : (
-          <ul className="improvement-list">
+          <ul>
             {improvement_areas.map((area, idx) => (
               <li key={idx}>
-                <strong>{area.topic}</strong> — accuracy {area.percentage}%
+                {area.topic} — {area.accuracy_percent}%
               </li>
             ))}
           </ul>
         )}
       </div>
 
-      {/* =============================
-          ACTIONS
-      ============================== */}
-      <div className="report-actions">
-        <button
-          className="btn-primary"
-          onClick={onViewExamDetails}
-        >
+      {/* ACTIONS */}
+      <div className="reading-report-actions">
+        <button className="btn-review" onClick={onViewExamDetails}>
           Review Exam
         </button>
       </div>
