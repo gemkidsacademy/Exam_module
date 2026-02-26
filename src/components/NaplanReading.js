@@ -149,68 +149,56 @@ export default function NaplanReading({
      START / RESUME EXAM
   ============================================================ */
   useEffect(() => {
-  if (!studentId) return;
-  if (mode === "report" || mode === "review") return;
-
-  // 🔒 HARD RESET FIRST (prevents ghost answers)
-  setAnswers({});
-  setVisited({});
-  setCurrentIndex(0);
-
-  const startExam = async () => {
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/student/start-exam/naplan-reading`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ student_id: studentId })
-        }
-      );
-
-      const data = await res.json();
-      console.group("🛰️ START-EXAM RESPONSE");
-      console.log("completed:", data.completed);
-      console.log("is_resumed:", data.is_resumed);
-      console.log("answers from API:", data.answers);
-      console.log("questions count:", data.questions?.length);
-      console.groupEnd();
-
-      console.group("📘 NAPLAN READING EXAM PAYLOAD");
-      console.log("Raw response:", data);
-      console.log("Existing answers:", data.answers);
-      console.log("is_resumed:", data.is_resumed);
-      console.groupEnd();
-
-      if (data.completed === true) {
-        await loadReport();
-        console.log("🧠 RENDER answers state:", answers);
-        return;
-      }
-
-      setQuestions(data.questions || []);
-      setTimeLeft(data.remaining_time);
-
-      // Resume ONLY if backend explicitly says so
-      if (data.is_resumed === true && data.answers) {
-        setAnswers(data.answers);
-        setVisited(
-          Object.fromEntries(
-            Object.keys(data.answers).map(qid => [qid, true])
-          )
+    if (!studentId) return;
+  
+    // 🔒 start-exam must run ONCE only
+    if (mode !== "loading") return;
+  
+    // hard reset (safe here)
+    setAnswers({});
+    setVisited({});
+    setCurrentIndex(0);
+  
+    const startExam = async () => {
+      try {
+        const res = await fetch(
+          `${API_BASE}/api/student/start-exam/naplan-reading`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ student_id: studentId })
+          }
         );
+  
+        const data = await res.json();
+  
+        if (data.completed === true) {
+          await loadReport();
+          return;
+        }
+  
+        setQuestions(data.questions || []);
+        setTimeLeft(data.remaining_time);
+  
+        if (data.is_resumed === true && data.answers) {
+          setAnswers(data.answers);
+          setVisited(
+            Object.fromEntries(
+              Object.keys(data.answers).map(qid => [qid, true])
+            )
+          );
+        }
+  
+        setMode("exam");
+        onExamStart?.();
+  
+      } catch (err) {
+        console.error("❌ Failed to start exam:", err);
       }
-
-      setMode("exam");
-      onExamStart?.();
-
-    } catch (err) {
-      console.error("❌ Failed to start exam:", err);
-    }
-  };
-
-  startExam();
-}, [studentId, API_BASE, loadReport, mode, onExamStart]);
+    };
+  
+    startExam();
+  }, [studentId, API_BASE, loadReport, mode, onExamStart]);
   /* ============================================================
      GROUP QUESTIONS BY PASSAGE
   ============================================================ */
@@ -265,7 +253,7 @@ export default function NaplanReading({
      TIMER
   ============================================================ */
   useEffect(() => {
-    if (mode !== "exam" || timeLeft == null) return;
+    if (mode !== "exam" || timeLeft == null || hasSubmittedRef.current) return;
 
     if (timeLeft <= 0) {
       finishExam();
@@ -317,7 +305,13 @@ export default function NaplanReading({
      RENDER GUARDS
   ============================================================ */
   if (mode === "loading") return <p className="loading">Loading…</p>;
-
+  if (mode === "submitting") {
+    return (
+      <div className="loading-screen">
+        <p className="loading">Submitting exam…</p>
+      </div>
+    );
+  }
   if (mode === "report") {
     return (
       <NaplanReadingReport
@@ -776,7 +770,15 @@ export default function NaplanReading({
             <h3>Finish Exam?</h3>
             <p>You won’t be able to change answers.</p>
             <button onClick={() => setShowConfirmFinish(false)}>Cancel</button>
-            <button onClick={finishExam}>Submit</button>
+            <button
+              onClick={() => {
+                setShowConfirmFinish(false);
+                setMode("submitting");   // 🔑 UI LOCK
+                finishExam();
+              }}
+            >
+              Submit
+            </button>
           </div>
         </div>
       )}
