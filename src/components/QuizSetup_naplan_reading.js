@@ -15,7 +15,7 @@ export default function QuizSetup_naplan_reading({ examType }) {
     }
 
     if (year === "5") {
-      return { min: 40, max: 45 };
+      return { min: 30, max: 45 };
     }
 
     return null;
