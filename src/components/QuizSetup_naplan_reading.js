@@ -11,7 +11,7 @@ export default function QuizSetup_naplan_reading({ examType }) {
 
   const getAllowedRange = (year) => {
     if (year === "3") {
-      return { min: 35, max: 40 };
+      return { min: 30, max: 40 };
     }
 
     if (year === "5") {
