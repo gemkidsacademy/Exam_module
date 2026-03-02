@@ -288,45 +288,47 @@ export default function NaplanNumeracy({
 
 
   const hasImageMultiSelect =
-    currentQ.question_blocks?.some(
-      (b) =>
-        b.type === "image-multi-select" &&
-        Array.isArray(b.options) &&
-        b.options.some(opt => opt.image && opt.image.trim() !== "")
-    );
+  !!currentQ &&
+  currentQ.question_blocks?.some(
+    (b) =>
+      b.type === "image-multi-select" &&
+      Array.isArray(b.options) &&
+      b.options.some(opt => opt.image && opt.image.trim() !== "")
+  );
 
   const isCorrect =
-    mode === "review"
-      ? (() => {
-          const correct = normalizeCorrectAnswer(
-            currentQ.correct_answer,
-            currentQ.question_type
+  mode === "review" && currentQ
+    ? (() => {
+        const correct = normalizeCorrectAnswer(
+          currentQ.correct_answer,
+          currentQ.question_type
+        );
+
+        const student = normalizeStudentAnswer(
+          answers[String(currentQ.id)],
+          currentQ.question_type
+        );
+
+        if (currentQ.question_type === 2) {
+          return (
+            Array.isArray(student) &&
+            Array.isArray(correct) &&
+            student.length === correct.length &&
+            student.every(v => correct.includes(v))
           );
+        }
 
-          const student = normalizeStudentAnswer(
-            answers[String(currentQ.id)],
-            currentQ.question_type
-          );
+        return student === correct;
+      })()
+    : null;
 
-          // TYPE 2 — MCQ MULTI
-          if (currentQ.question_type === 2) {
-            return (
-              Array.isArray(student) &&
-              Array.isArray(correct) &&
-              student.length === correct.length &&
-              student.every(v => correct.includes(v))
-            );
-          }
-
-          return student === correct;
-        })()
-      : null;
-
-
-  const normalizedCorrectAnswer = normalizeCorrectAnswer(
-    currentQ.correct_answer,
-    currentQ.question_type
-  );
+  const normalizedCorrectAnswer =
+  currentQ
+    ? normalizeCorrectAnswer(
+        currentQ.correct_answer,
+        currentQ.question_type
+      )
+    : null;
 
   return (
   <div className={`exam-shell ${styles.examShell}`}>
