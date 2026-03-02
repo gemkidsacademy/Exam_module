@@ -263,22 +263,7 @@ export default function NaplanNumeracy({
     return <p className="loading">Loading…</p>;
   }
   
-  if (mode === "report") {
-      return (
-        <div className="naplan-report-scroll">
-          <NaplanNumeracyReport
-            report={report}
-            onViewExamDetails={() => {
-              setQuestions([]);
-              setCurrentIndex(0);
-              setVisited({});
-              setAnswers({});
-              setMode("review");
-            }}
-          />
-        </div>
-      );
-    }
+  
   
   if (mode === "review" && !questions.length) {
     return (
@@ -344,9 +329,24 @@ export default function NaplanNumeracy({
   );
 
   return (
-    <div className={`exam-shell ${styles.examShell}`}>
-      <div className={`exam-container ${styles.examContainer}`}>
-
+      <div className={`exam-shell ${styles.examShell}`}>
+        <div className={`exam-container ${styles.examContainer}`}>
+    
+          {mode === "report" ? (
+            <div className="naplan-report-scroll">
+              <NaplanNumeracyReport
+                report={report}
+                onViewExamDetails={() => {
+                  setQuestions([]);
+                  setCurrentIndex(0);
+                  setVisited({});
+                  setAnswers({});
+                  setMode("review");
+                }}
+              />
+            </div>
+          ) : (
+            <>
         {/* HEADER */}
         <div className={styles.examHeader}>
           {!isReview && <div className="timer">⏳ {formatTime(timeLeft)}</div>}
