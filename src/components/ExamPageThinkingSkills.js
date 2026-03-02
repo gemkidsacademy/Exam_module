@@ -17,6 +17,7 @@ export default function ExamPageThinkingSkills({
   onExamFinish
 }) {
 const studentId = sessionStorage.getItem("student_id");
+const hasStartedRef = useRef(false);
 const IMAGE_BASE =
 "https://storage.googleapis.com/exammoduleimages/";
 console.log("🧠 ExamPageThinkingSkills MOUNTED");
@@ -125,6 +126,11 @@ useEffect(() => {
   console.log("🔄 MODE CHANGED:", mode);
 }, [mode]);
 
+useEffect(() => {
+  if (!studentId) return;
+
+  setMode("exam");
+}, [studentId]);
 
  // 🔑 only what actually matters
 
@@ -133,12 +139,10 @@ useEffect(() => {
 ============================================================ */
 useEffect(() => {
   if (!studentId) return;
+  if (mode !== "exam") return;
+  if (hasStartedRef.current) return;   // 🔒 prevent double call
 
-  
-  if (mode === "report" || mode === "review") {
-    console.log("⛔ startExam skipped, mode =", mode);
-    return;
-  }
+  hasStartedRef.current = true;
 
   const startExam = async () => {
     const res = await fetch(
@@ -160,13 +164,16 @@ useEffect(() => {
 
     setQuestions(data.questions || []);
     setTimeLeft(data.remaining_time);
-    setMode("exam");
     onExamStart?.();
   };
 
   startExam();
-}, [studentId]);
-
+}, [studentId, mode]);
+useEffect(() => {
+  if (mode !== "exam") {
+    hasStartedRef.current = false;
+  }
+}, [mode]);
 /* ============================================================
    FINISH EXAM (SUBMIT ONLY — NO UI DECISIONS)
 ============================================================ */
