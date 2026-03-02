@@ -682,13 +682,6 @@ export default function NaplanNumeracy({
       </div>
     )}
     </>
-
-
-
-
-  
-
-
         {/* NAVIGATION */}
         <div className="nav-buttons">
           <button
