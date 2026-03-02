@@ -283,8 +283,8 @@ export default function NaplanNumeracy({
   /* ============================================================
      EXAM UI
   ============================================================ */
-  const currentQ = questions[currentIndex];
-  if (!currentQ) return null;
+  const currentQ =
+  mode === "report" ? null : questions[currentIndex];
 
 
   const hasImageMultiSelect =
