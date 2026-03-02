@@ -264,19 +264,21 @@ export default function NaplanNumeracy({
   }
   
   if (mode === "report") {
-    return (
-      <NaplanNumeracyReport
-        report={report}
-        onViewExamDetails={() => {
-          setQuestions([]);
-          setCurrentIndex(0);
-          setVisited({});
-          setAnswers({});
-          setMode("review");
-        }}
-      />
-    );
-  }
+      return (
+        <div className="naplan-report-scroll">
+          <NaplanNumeracyReport
+            report={report}
+            onViewExamDetails={() => {
+              setQuestions([]);
+              setCurrentIndex(0);
+              setVisited({});
+              setAnswers({});
+              setMode("review");
+            }}
+          />
+        </div>
+      );
+    }
   
   if (mode === "review" && !questions.length) {
     return (
