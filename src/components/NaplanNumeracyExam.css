@@ -65,6 +65,8 @@
 ============================================================ */
 .question-card {
   flex: 1;
+  width: 100%;
+  max-width: none;
 
   display: flex;
   flex-direction: column;
@@ -77,8 +79,8 @@
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
 
   overflow-y: auto;
+  box-sizing: border-box;
 }
-
 /* ============================================================
    CENTERED QUESTION CONTENT
 ============================================================ */
