@@ -26,9 +26,7 @@
   gap: 16px;
 
   padding: 24px 32px;
-  max-width: none !important;
-  margin: 0 !important;
-  overflow: hidden;
+  overflow: visible; /* or remove line entirely */
 }
 
 /* ============================================================
@@ -411,4 +409,9 @@
 .cloze-dropdown:disabled {
   background-color: #f1f5f9;
   cursor: not-allowed;
+}
+.naplan-report-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 8px;
 }
