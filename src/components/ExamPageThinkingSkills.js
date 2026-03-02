@@ -155,6 +155,13 @@ useEffect(() => {
     );
 
     const data = await res.json();
+    // 🔥 ADD THESE LOGS
+    console.log("🧪 RAW start-exam response:", data);
+    console.log("🧪 QUESTIONS PAYLOAD:", data.questions);
+    console.log(
+      "🧪 FIRST QUESTION OPTIONS:",
+      data.questions?.[0]?.options
+    );
 
     if (data.completed === true) {
       sessionStorage.setItem("thinking_skills_completed", "true");
@@ -357,14 +364,7 @@ return (
         }
         // 🔍 DEBUG LOG (temporary)
         const qid = String(q.q_id);
-        console.log(
-          "INDEX CHECK",
-          qid,
-          "visited:", visited[qid],
-          "answer:", answers[qid],
-          "answers obj:", answers
-        );
-
+        
 
         return (
           <div
