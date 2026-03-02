@@ -15,9 +15,14 @@
 */
 .examContainer {
   width: 100%;
-  max-width: none;           /* 🔥 critical */
-  padding: 32px 48px;        /* breathing room */
+  max-width: none;
+  padding: 32px 48px;
   box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  flex: 1;              /* 🔑 THIS is the missing piece */
+  overflow: visible;    /* 🔑 allow children to scroll */
 }
 /* ================= HEADER ================= */
 
