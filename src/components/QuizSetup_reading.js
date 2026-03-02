@@ -181,9 +181,9 @@ export default function QuizSetup_reading() {
     }
 
     // ✅ QUESTION COUNT ENFORCEMENT (RESTORED)
-    if (totalQuestions < 30 || totalQuestions > 38) {
+    if (totalQuestions < 29 || totalQuestions > 38) {
       alert(
-        `Reading exam must contain between 30 and 38 questions. Currently selected: ${totalQuestions}.`
+        `Reading exam must contain between 29 and 38 questions. Currently selected: ${totalQuestions}.`
       );
       return;
     }
@@ -384,9 +384,9 @@ export default function QuizSetup_reading() {
         <div className="total-section">
           <h3>Total Questions: {totalQuestions}</h3>
 
-          {(totalQuestions < 30 || totalQuestions > 38) && (
+          {(totalQuestions < 29 || totalQuestions > 38) && (
             <div className="warning">
-              Total must be between 30 and 38 questions.
+              Total must be between 29 and 38 questions.
             </div>
           )}
         </div>
@@ -394,7 +394,7 @@ export default function QuizSetup_reading() {
         <button
           type="submit"
           disabled={
-            loading || totalQuestions < 30 || totalQuestions > 38
+            loading || totalQuestions < 29 || totalQuestions > 38
           }
         >
           {loading ? "Saving..." : "Create Reading Exam"}
