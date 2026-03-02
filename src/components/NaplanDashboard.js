@@ -113,18 +113,18 @@ const NaplanDashboard = () => {
       )}
 
       {/* 4️⃣ EXAM */}
-      {examPhase === "exam" && (
-          <div className="exam-fullscreen-root">
-            <ActiveComponent
-              key={`naplan-${activeSubject.key}`}
-              studentId={studentId}
-              subject={activeSubject.key}
-              difficulty="naplan"
-              onExamStart={() => setExamInProgress(true)}
-              onExamFinish={() => setExamInProgress(false)}
-            />
-          </div>
-        )}
+        {examPhase === "exam" && (
+        <div className="exam-fullscreen-root exam-mode">
+          <ActiveComponent
+            key={`naplan-${activeSubject.key}`}
+            studentId={studentId}
+            subject={activeSubject.key}
+            difficulty="naplan"
+            onExamStart={() => setExamInProgress(true)}
+            onExamFinish={() => setExamInProgress(false)}
+          />
+        </div>
+      )}
 
         
 
