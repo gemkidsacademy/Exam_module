@@ -136,3 +136,20 @@
     grid-template-columns: 1fr;
   }
 }
+/* ===============================
+   EXAM MODE OVERRIDES
+=============================== */
+
+.exam-mode {
+  padding: 0 !important;
+}
+
+.exam-mode .content-area {
+  padding: 0 !important;
+  justify-content: stretch;
+}
+
+.exam-mode .exam-root {
+  max-width: none !important;
+  width: 100%;
+}
