@@ -329,417 +329,227 @@ export default function NaplanNumeracy({
   );
 
   return (
-      <div className={`exam-shell ${styles.examShell}`}>
-        <div className={`exam-container ${styles.examContainer}`}>
-    
-          {mode === "report" ? (
-            <div className="naplan-report-scroll">
-              <NaplanNumeracyReport
-                report={report}
-                onViewExamDetails={() => {
-                  setQuestions([]);
-                  setCurrentIndex(0);
-                  setVisited({});
-                  setAnswers({});
-                  setMode("review");
-                }}
-              />
-            </div>
-          ) : (
-            <>
-        {/* HEADER */}
-        <div className={styles.examHeader}>
-          {!isReview && <div className="timer">⏳ {formatTime(timeLeft)}</div>}
-          <div className="counter">
-            Question {currentIndex + 1} / {questions.length}
-          </div>
-        </div>
+  <div className={`exam-shell ${styles.examShell}`}>
+    <div className={`exam-container ${styles.examContainer}`}>
 
-        {/* QUESTION INDEX (same as Thinking Skills) */}
-        <div className={styles.indexRow}>
-          {questions.map((q, i) => {
-            let cls = styles.indexCircle;
-            const qid = String(q.id);
-            
-            if (
-              answers[qid] !== undefined &&
-              (
-                typeof answers[qid] !== "object" ||
-                answers[qid].length > 0
-              )
-            ) {
-              cls += ` ${styles.indexAnswered}`;
-            } else if (visited[qid]) {
-              cls += ` ${styles.indexVisited}`;
-            } else {
-              cls += ` ${styles.indexNotVisited}`;
-            }
-
-            return (
-              <div
-                key={q.id}
-                className={cls}
-                onClick={() => goToQuestion(i)}
-              >
-                {i + 1}
-              </div>
-            );
-          })}
-        
-        </div>
-
-        {/* QUESTION */}
-<div className="question-card">
-  <div className="question-content-centered">
-  {/* ✅ FALLBACK: render question_text if no text blocks exist */}
-    {!currentQ.question_blocks?.some(b => b.type === "text") &&
-     currentQ.question_text && (
-      <p className="question-text">
-        {currentQ.question_text}
-      </p>
-    )}
-    {currentQ.question_blocks?.map((block, idx) => {
-
-      if (block.type === "text") {
-        return (
-          <p key={idx} className="question-text">
-            {block.content}
-          </p>
-        );
-      }
-
-      if (block.type === "image") {
-        if (
-          currentQ.question_type === 6 &&
-          block.role === "option"
-        ) {
-          return null;
-        }
-
-        const src =
-          block.src ||
-          (block.name
-            ? `${process.env.REACT_APP_IMAGE_BASE_URL}/${block.name}`
-            : null);
-
-        if (!src) return null;
-
-        return (
-          <img
-            key={idx}
-            src={src}
-            alt="question visual"
-            className={
-              block.role === "reference"
-                ? "question-image reference-image"
-                : "question-image"
-            }
+      {mode === "report" ? (
+        <div className="naplan-report-scroll">
+          <NaplanNumeracyReport
+            report={report}
+            onViewExamDetails={() => {
+              setQuestions([]);
+              setCurrentIndex(0);
+              setVisited({});
+              setAnswers({});
+              setMode("review");
+            }}
           />
-        );
-      }
-
-      if (block.type === "cloze-dropdown") {
-        const parts = block.sentence.split("{{dropdown}}");
-        const qid = String(currentQ.id);
-
-        return (
-          <div key={idx} className="cloze-sentence">
-            {parts[0]}
-            <select
-              className="cloze-dropdown"
-              value={answers[qid] || ""}
-              onChange={(e) => handleAnswer(e.target.value)}
-              disabled={isReview}
-            >
-              <option value="" disabled>
-                Select
-              </option>
-              {block.options.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
-            {parts[1]}
-          </div>
-        );
-      }
-
-      if (block.type === "word-selection") {
-        const sentenceWords = block.sentence.split(" ");
-
-        return (
-          <div key={idx} className="sentence-container">
-            {sentenceWords.map((word, i) => {
-              const cleanWord = word.replace(/[.,!?]/g, "");
-              const isSelectable = block.selectable_words.includes(cleanWord);
-              const isSelected =
-                answers[String(currentQ.id)] === cleanWord;
-
-              return (
-                <span
-                  key={i}
-                  className={`sentence-word
-                    ${isSelectable ? "selectable" : "non-selectable"}
-                    ${isSelected ? "selected" : ""}
-                  `}
-                  onClick={() => {
-                    if (!isReview && isSelectable) {
-                      handleAnswer(cleanWord);
-                    }
-                  }}
-                >
-                  {word + " "}
-                </span>
-              );
-            })}
-          </div>
-        );
-      }
-
-      if (block.type === "image-multi-select") {
-        const qid = String(currentQ.id);
-        const selected = answers[qid] || [];
-
-        return (
-          <div key={idx} className="image-multi-select-grid">
-            {block.options.map((opt) => {
-              const isSelected = selected.includes(opt.id);
-
-              return (
-                <label
-                  key={opt.id}
-                  className={`image-option-card ${
-                    isSelected ? "selected" : ""
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    value={opt.id}
-                    checked={isSelected}
-                    disabled={
-                      isReview ||
-                      (!isSelected && selected.length >= TYPE_2_MAX_SELECTIONS)
-                    }
-                    onChange={() => {
-                      let updated;
-                  
-                      if (isSelected) {
-                        updated = selected.filter(v => v !== opt.id);
-                      } else {
-                        updated = [...selected, opt.id];
-                      }
-                  
-                      handleAnswer(updated);
-                    }}
-                  />
-
-                  <img
-                    src={opt.image}
-                    alt={opt.label}
-                    className="image-option-image"
-                  />
-
-                  <div className="image-option-label">
-                    {opt.label}
-                  </div>
-                </label>
-              );
-            })}
-          </div>
-        );
-      }
-
-      return null;
-    })}
-    {/* TYPE 4 — TEXT INPUT */}
-    {currentQ.question_type === 4 && (
-      <textarea
-        className="text-input"
-        rows={2}
-        placeholder="Type your answer here"
-        value={answers[String(currentQ.id)] || ""}
-        onChange={(e) => handleAnswer(e.target.value)}
-        disabled={isReview}
-      />
-    )}
-    {/* TYPE 1 — MCQ SINGLE */}
-    {currentQ.question_type === 1 && (
-      <div className="mcq-options">
-        {Object.entries(currentQ.options || {}).map(([key, value]) => (
-          <label
-            key={key}
-            className={`mcq-option-card ${
-              answers[String(currentQ.id)] === key ? "selected" : ""
-            }`}
-          >
-            <input
-              type="radio"
-              name={`q-${currentQ.id}`}
-              value={key}
-              checked={answers[String(currentQ.id)] === key}
-              onChange={() => handleAnswer(key)}
-              disabled={isReview}
-            />
-            <span>{key}. {value}</span>
-          </label>
-
-
-
-        ))}
-      </div>
-    )}
-    {currentQ.question_type === 6 && (
-      <div className="image-mcq-grid">
-        {Object.entries(currentQ.options || {}).map(([key, imgUrl]) => {
-          const isSelected = answers[String(currentQ.id)] === key;
-
-          return (
-            <div
-              key={key}
-              className={`image-mcq-card ${isSelected ? "selected" : ""}`}
-              onClick={() => {
-                if (!isReview) {
-                  handleAnswerForQuestion(currentQ.id, key);
-                }
-              }}
-            >
-              <img
-                src={imgUrl}
-                alt={`Option ${key}`}
-                className="image-mcq-image"
-              />
-              <div className="image-mcq-label">{key}</div>
-            </div>
-          );
-        })}
-      </div>
-    )}
-    {/* ✅ INPUT GOES HERE — SAME CARD */}
-    {currentQ.question_type === 3 && (
-      <input
-        type="number"
-        className="numeric-input"
-        value={answers[String(currentQ.id)] || ""}
-        onChange={(e) => handleAnswer(e.target.value)}
-        disabled={isReview}
-      />
-    )}
-
-    {currentQ.question_type === 2 && !hasImageMultiSelect && (
-      <div className="text-multi-select-grid">
-        {Object.entries(currentQ.options || {}).map(([key, value]) => {
-          const selected = answers[String(currentQ.id)] || [];
-          const isSelected = selected.includes(key);
-
-          return (
-            <label
-              key={key}
-              className={`text-option-card ${isSelected ? "selected" : ""}`}
-            >
-              <input
-                type="checkbox"
-                checked={isSelected}
-                disabled={
-                  isReview ||
-                  (!isSelected && selected.length >= TYPE_2_MAX_SELECTIONS)
-                }
-                onChange={() => {
-                  const updated = isSelected
-                    ? selected.filter(v => v !== key)
-                    : [...selected, key];
-                  handleAnswer(updated);
-                }}
-              />
-
-              <div className="text-option-content">
-                
-                <span className="option-text">{value}</span>
-              </div>
-            </label>
-          );
-        })}
-      </div>
-    )}
-  </div>
-</div>
-
-    {/* NUMERIC INPUT */}
-    {/* TYPE 3 — NUMERIC INPUT */}
-    
-    
-    
-    
-    
-    
-     {mode === "review" && (
-      <div
-        className={`review-result ${
-          isCorrect ? "answer-correct" : "answer-wrong"
-        }`}
-      >
-        {isCorrect ? "✔ Correct" : "✖ Incorrect"}
-      </div>
-    )}
-    </>
-        {/* NAVIGATION */}
-        <div className="nav-buttons">
-          <button
-            className="nav-btn prev"
-            disabled={currentIndex === 0}
-            onClick={() => goToQuestion(currentIndex - 1)}
-          >
-            Previous
-          </button>
-
-          {currentIndex < questions.length - 1 && (
-            <button
-              className="nav-btn next"
-              onClick={() => goToQuestion(currentIndex + 1)}
-            >
-              Next
-            </button>
-          )}
-
-          {currentIndex === questions.length - 1 && !isReview && (
-            <button
-              className="nav-btn finish"
-              onClick={() => setShowConfirmFinish(true)}
-            >
-              Finish Exam
-            </button>
-          )}
         </div>
-      </div>
+      ) : (
+        <div className="exam-content">
 
-      {showConfirmFinish && (
-        <div className="confirm-overlay">
-          <div className="confirm-modal">
-            <h3>Finish Exam?</h3>
-            <p>You won’t be able to change answers.</p>
-
-            <div className="confirm-actions">
-              <button
-                className="btn cancel"
-                onClick={() => setShowConfirmFinish(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="btn confirm"
-                onClick={() => {
-                  setShowConfirmFinish(false);
-              
-                  // ✅ Immediately transition away from exam UI
-                  finishExam();
-                }}
-              >
-                Submit
-              </button>
+          {/* HEADER */}
+          <div className={styles.examHeader}>
+            {!isReview && (
+              <div className="timer">⏳ {formatTime(timeLeft)}</div>
+            )}
+            <div className="counter">
+              Question {currentIndex + 1} / {questions.length}
             </div>
           </div>
+
+          {/* QUESTION INDEX */}
+          <div className={styles.indexRow}>
+            {questions.map((q, i) => {
+              let cls = styles.indexCircle;
+              const qid = String(q.id);
+
+              if (
+                answers[qid] !== undefined &&
+                (typeof answers[qid] !== "object" || answers[qid].length > 0)
+              ) {
+                cls += ` ${styles.indexAnswered}`;
+              } else if (visited[qid]) {
+                cls += ` ${styles.indexVisited}`;
+              } else {
+                cls += ` ${styles.indexNotVisited}`;
+              }
+
+              return (
+                <div
+                  key={q.id}
+                  className={cls}
+                  onClick={() => goToQuestion(i)}
+                >
+                  {i + 1}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* QUESTION CARD */}
+          <div className="question-card">
+            <div className="question-content-centered">
+
+              {/* FALLBACK QUESTION TEXT */}
+              {!currentQ.question_blocks?.some(b => b.type === "text") &&
+                currentQ.question_text && (
+                  <p className="question-text">
+                    {currentQ.question_text}
+                  </p>
+                )}
+
+              {currentQ.question_blocks?.map((block, idx) => {
+                if (block.type === "text") {
+                  return (
+                    <p key={idx} className="question-text">
+                      {block.content}
+                    </p>
+                  );
+                }
+
+                if (block.type === "image") {
+                  const src =
+                    block.src ||
+                    (block.name
+                      ? `${process.env.REACT_APP_IMAGE_BASE_URL}/${block.name}`
+                      : null);
+
+                  if (!src) return null;
+
+                  return (
+                    <img
+                      key={idx}
+                      src={src}
+                      alt="question visual"
+                      className="question-image"
+                    />
+                  );
+                }
+
+                return null;
+              })}
+
+              {/* TYPE 4 — TEXT INPUT */}
+              {currentQ.question_type === 4 && (
+                <textarea
+                  className="text-input"
+                  rows={2}
+                  value={answers[String(currentQ.id)] || ""}
+                  onChange={(e) => handleAnswer(e.target.value)}
+                  disabled={isReview}
+                />
+              )}
+
+              {/* TYPE 3 — NUMERIC INPUT */}
+              {currentQ.question_type === 3 && (
+                <input
+                  type="number"
+                  className="numeric-input"
+                  value={answers[String(currentQ.id)] || ""}
+                  onChange={(e) => handleAnswer(e.target.value)}
+                  disabled={isReview}
+                />
+              )}
+
+              {/* TYPE 1 — MCQ SINGLE */}
+              {currentQ.question_type === 1 && (
+                <div className="mcq-options">
+                  {Object.entries(currentQ.options || {}).map(([key, value]) => (
+                    <label
+                      key={key}
+                      className={`mcq-option-card ${
+                        answers[String(currentQ.id)] === key ? "selected" : ""
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name={`q-${currentQ.id}`}
+                        checked={answers[String(currentQ.id)] === key}
+                        onChange={() => handleAnswer(key)}
+                        disabled={isReview}
+                      />
+                      <span>{key}. {value}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+
+            </div>
+          </div>
+
+          {/* REVIEW RESULT */}
+          {mode === "review" && (
+            <div
+              className={`review-result ${
+                isCorrect ? "answer-correct" : "answer-wrong"
+              }`}
+            >
+              {isCorrect ? "✔ Correct" : "✖ Incorrect"}
+            </div>
+          )}
+
+          {/* NAVIGATION */}
+          <div className="nav-buttons">
+            <button
+              className="nav-btn prev"
+              disabled={currentIndex === 0}
+              onClick={() => goToQuestion(currentIndex - 1)}
+            >
+              Previous
+            </button>
+
+            {currentIndex < questions.length - 1 && (
+              <button
+                className="nav-btn next"
+                onClick={() => goToQuestion(currentIndex + 1)}
+              >
+                Next
+              </button>
+            )}
+
+            {currentIndex === questions.length - 1 && !isReview && (
+              <button
+                className="nav-btn finish"
+                onClick={() => setShowConfirmFinish(true)}
+              >
+                Finish Exam
+              </button>
+            )}
+          </div>
+
         </div>
       )}
+
     </div>
-  );
+
+    {showConfirmFinish && (
+      <div className="confirm-overlay">
+        <div className="confirm-modal">
+          <h3>Finish Exam?</h3>
+          <p>You won’t be able to change answers.</p>
+
+          <div className="confirm-actions">
+            <button
+              className="btn cancel"
+              onClick={() => setShowConfirmFinish(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className="btn confirm"
+              onClick={() => {
+                setShowConfirmFinish(false);
+                finishExam();
+              }}
+            >
+              Submit
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+  </div>
+);
 }
