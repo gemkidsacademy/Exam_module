@@ -13,9 +13,10 @@
 
   max-width: none !important;
   margin: 0 !important;
-  overflow: hidden;
-}
 
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 /* ============================================================
    EXAM CONTAINER
 ============================================================ */
