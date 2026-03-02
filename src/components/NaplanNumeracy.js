@@ -681,6 +681,7 @@ export default function NaplanNumeracy({
         {isCorrect ? "✔ Correct" : "✖ Incorrect"}
       </div>
     )}
+    </>
 
 
 
