@@ -378,19 +378,56 @@
             {questions.map((q, i) => {
               let cls = styles.indexCircle;
               const qid = String(q.id);
-  
-              if (
-                answers[qid] !== undefined &&
-                (typeof answers[qid] !== "object" ||
-                  answers[qid].length > 0)
-              ) {
-                cls += ` ${styles.indexAnswered}`;
-              } else if (visited[qid]) {
-                cls += ` ${styles.indexVisited}`;
+
+              const studentAnswer = answers[qid];
+
+              const correctAnswer = normalizeCorrectAnswer(
+                q.correct_answer,
+                q.question_type
+              );
+
+              const normalizedStudentAnswer = normalizeStudentAnswer(
+                studentAnswer,
+                q.question_type
+              );
+
+              let isCorrect = false;
+
+              if (mode === "review") {
+                if (q.question_type === 2) {
+                  if (
+                    Array.isArray(normalizedStudentAnswer) &&
+                    Array.isArray(correctAnswer)
+                  ) {
+                    isCorrect =
+                      normalizedStudentAnswer.length === correctAnswer.length &&
+                      normalizedStudentAnswer.every((v) =>
+                        correctAnswer.includes(v)
+                      );
+                  }
+                } else {
+                  isCorrect = normalizedStudentAnswer === correctAnswer;
+                }
+
+                if (isCorrect) {
+                  cls += ` ${styles.indexCorrect}`;
+                } else {
+                  cls += ` ${styles.indexWrong}`;
+                }
               } else {
-                cls += ` ${styles.indexNotVisited}`;
+                if (
+                  studentAnswer !== undefined &&
+                  (typeof studentAnswer !== "object" ||
+                    studentAnswer.length > 0)
+                ) {
+                  cls += ` ${styles.indexAnswered}`;
+                } else if (visited[qid]) {
+                  cls += ` ${styles.indexVisited}`;
+                } else {
+                  cls += ` ${styles.indexNotVisited}`;
+                }
               }
-  
+
               return (
                 <div
                   key={q.id}
