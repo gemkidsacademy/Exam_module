@@ -442,3 +442,11 @@
   color: white;
   border-color: #dc2626;
 }
+.numeric-review-feedback {
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.correct-answer-text {
+  color: #16a34a; /* green */
+}
