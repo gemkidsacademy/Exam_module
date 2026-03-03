@@ -154,3 +154,15 @@
   background: #ef4444;
   color: #ffffff;
 }
+
+.indexCorrect {
+  background-color: #16a34a;
+  color: white;
+  border-color: #16a34a;
+}
+
+.indexWrong {
+  background-color: #dc2626;
+  color: white;
+  border-color: #dc2626;
+}
