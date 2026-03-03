@@ -897,30 +897,36 @@
               
   
               
-{currentQ.question_type === 2 && !hasImageMultiSelect && (
-  <div className="text-multi-select-grid">
-    {Object.entries(currentQ.options || {}).map(([key, value]) => {
-      const qid = String(currentQ.id);
+{currentQ.question_type === 2 && !hasImageMultiSelect && (() => {
 
-      const selectedAnswers = Array.isArray(answers[qid])
-        ? answers[qid]
-        : [];
+  const qid = String(currentQ.id);
 
-      const isSelected = selectedAnswers.map(String).includes(String(key));
+  const selectedAnswers = Array.isArray(answers[qid])
+    ? answers[qid]
+    : [];
 
-      const correctAnswers = normalizeCorrectAnswer(
-        currentQ.correct_answer,
-        currentQ.question_type
-      );
-      console.log("QUESTION ID:", qid);
-      console.log("Correct Answers:", correctAnswers);
-      console.log("Student Answers:", selectedAnswers);
-      console.log("Current option key:", key);
-      const isCorrectOption =
-        Array.isArray(correctAnswers) &&
-        correctAnswers.map(String).includes(String(key));
+  const correctAnswers = normalizeCorrectAnswer(
+    currentQ.correct_answer,
+    currentQ.question_type
+  );
 
-      let reviewClass = "";
+  const isFullyCorrect =
+    Array.isArray(correctAnswers) &&
+    selectedAnswers.length === correctAnswers.length &&
+    selectedAnswers.every(v => correctAnswers.includes(v));
+
+  return (
+    <div className="text-multi-select-grid">
+
+      {Object.entries(currentQ.options || {}).map(([key, value]) => {
+
+        const isSelected = selectedAnswers.map(String).includes(String(key));
+
+        const isCorrectOption =
+          Array.isArray(correctAnswers) &&
+          correctAnswers.map(String).includes(String(key));
+
+        let reviewClass = "";
 
         if (mode === "review") {
           if (isCorrectOption) {
@@ -931,37 +937,53 @@
           }
         }
 
-      return (
-        <label
-          key={key}
-          className={`text-option-card ${
-            isSelected ? "selected" : ""
-          } ${reviewClass}`}
-        >
-          <input
-            type="checkbox"
-            checked={isSelected}
-            disabled={
-              isReview ||
-              (!isSelected &&
-                selectedAnswers.length >= TYPE_2_MAX_SELECTIONS)
-            }
-            onChange={() => {
-              if (isReview) return;
+        return (
+          <label
+            key={key}
+            className={`text-option-card ${
+              isSelected ? "selected" : ""
+            } ${reviewClass}`}
+          >
+            <input
+              type="checkbox"
+              checked={isSelected}
+              disabled={
+                isReview ||
+                (!isSelected &&
+                  selectedAnswers.length >= TYPE_2_MAX_SELECTIONS)
+              }
+              onChange={() => {
+                if (isReview) return;
 
-              const updatedAnswers = isSelected
-                ? selectedAnswers.filter((v) => v !== key)
-                : [...selectedAnswers, key];
+                const updatedAnswers = isSelected
+                  ? selectedAnswers.filter((v) => v !== key)
+                  : [...selectedAnswers, key];
 
-              handleAnswer(updatedAnswers);
-            }}
-          />
-          <span className="option-text">{value}</span>
-        </label>
-      );
-    })}
-  </div>
-)}
+                handleAnswer(updatedAnswers);
+              }}
+            />
+            <span className="option-text">{value}</span>
+          </label>
+        );
+      })}
+
+      {/* ✅ Explicit Correct Answer Display */}
+      {mode === "review" && !isFullyCorrect && (
+        <div className="correct-answer-text" style={{ marginTop: "12px" }}>
+          Correct answer: {
+            Array.isArray(correctAnswers)
+              ? correctAnswers
+                  .map(key => currentQ.options?.[key])
+                  .join(", ")
+              : ""
+          }
+        </div>
+      )}
+
+    </div>
+  );
+})()}
+
 
         </div> {/* closes question-content-centered */}
         </div> {/* closes question-card */}
