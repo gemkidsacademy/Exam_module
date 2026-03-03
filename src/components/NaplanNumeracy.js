@@ -564,6 +564,10 @@
                   return (
                     <div key={idx} className="image-multi-select-grid">
                       {block.options.map((opt) => {
+                        console.log("QUESTION ID:", qid);
+                        console.log("Correct Answers:", correctAnswers);
+                        console.log("Student Answers:", selectedAnswers);
+                        console.log("Current option id:", opt.id);
                         const isSelected = selectedAnswers.map(String).includes(String(opt.id));
 
                         const isCorrectOption =
@@ -764,7 +768,10 @@
         currentQ.correct_answer,
         currentQ.question_type
       );
-
+      console.log("QUESTION ID:", qid);
+      console.log("Correct Answers:", correctAnswers);
+      console.log("Student Answers:", selectedAnswers);
+      console.log("Current option key:", key);
       const isCorrectOption =
         Array.isArray(correctAnswers) &&
         correctAnswers.map(String).includes(String(key));
