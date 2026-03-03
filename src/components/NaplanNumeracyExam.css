@@ -22,9 +22,11 @@
   flex-direction: column;
   gap: 16px;
 
-  padding: 24px 32px;
-
+  width: 100%;
+  align-self: stretch;
   box-sizing: border-box;
+
+  padding: 24px 32px;
 }
 /* ============================================================
    HEADER (TIMER + COUNTER)
