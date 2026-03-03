@@ -684,27 +684,58 @@ export default function NaplanNumeracy({
             {currentQ.question_type === 2 && !hasImageMultiSelect && (
   <div className="text-multi-select-grid">
     {Object.entries(currentQ.options || {}).map(([key, value]) => {
-      const selected = answers[String(currentQ.id)] || [];
-      const isSelected = selected.includes(key);
+      const qid = String(currentQ.id);
+
+      // Student selected answers
+      const selectedAnswers = Array.isArray(answers[qid])
+        ? answers[qid]
+        : [];
+
+      const isSelected = selectedAnswers.includes(key);
+
+      // Correct answers (only meaningful in review mode)
+      const correctAnswers = normalizeCorrectAnswer(
+        currentQ.correct_answer,
+        currentQ.question_type
+      );
+
+      const isCorrectOption =
+        Array.isArray(correctAnswers) &&
+        correctAnswers.includes(key);
+
+      let reviewClass = "";
+
+      if (mode === "review") {
+        if (isCorrectOption) {
+          reviewClass = "review-correct";
+        } else if (isSelected && !isCorrectOption) {
+          reviewClass = "review-wrong";
+        }
+      }
 
       return (
         <label
           key={key}
-          className={`text-option-card ${isSelected ? "selected" : ""}`}
+          className={`text-option-card ${
+            isSelected ? "selected" : ""
+          } ${reviewClass}`}
         >
           <input
             type="checkbox"
             checked={isSelected}
             disabled={
               isReview ||
-              (!isSelected && selected.length >= TYPE_2_MAX_SELECTIONS)
+              (!isSelected &&
+                selectedAnswers.length >= TYPE_2_MAX_SELECTIONS)
             }
             onChange={() => {
-              const updated = isSelected
-                ? selected.filter((v) => v !== key)
-                : [...selected, key];
+              if (isReview) return;
 
-              handleAnswer(updated);
+              const updatedAnswers = isSelected
+                ? selectedAnswers.filter((v) => v !== key)
+                : [...selectedAnswers, key];
+
+              handleAnswer(updatedAnswers);
             }}
           />
 
