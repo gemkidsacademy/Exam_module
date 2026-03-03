@@ -2,14 +2,18 @@
    FULLSCREEN EXAM MODE
 ============================================================ */
 .exam-fullscreen-root {
-  position: fixed;
-  inset: 0;
+  position: fixed !important;
+  inset: 0 !important;
 
-  width: 100vw;
-  height: 100vh;
+  width: 100vw !important;
+  height: 100vh !important;
+
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
 
   background: #f8fafc;
-  z-index: 999;
+  z-index: 9999;
 
   display: flex;
   flex-direction: column;
