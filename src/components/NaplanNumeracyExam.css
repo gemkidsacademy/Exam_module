@@ -23,9 +23,9 @@
   gap: 16px;
 
   padding: 24px 32px;
-  overflow: visible; /* or remove line entirely */
-}
 
+  box-sizing: border-box;
+}
 /* ============================================================
    HEADER (TIMER + COUNTER)
 ============================================================ */
