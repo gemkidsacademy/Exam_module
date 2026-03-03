@@ -758,7 +758,7 @@
         ? answers[qid]
         : [];
 
-      const isSelected = selectedAnswers.includes(key);
+      const isSelected = selectedAnswers.map(String).includes(String(key));
 
       const correctAnswers = normalizeCorrectAnswer(
         currentQ.correct_answer,
@@ -767,7 +767,7 @@
 
       const isCorrectOption =
         Array.isArray(correctAnswers) &&
-        correctAnswers.map(String).includes(String(opt.id));
+        correctAnswers.map(String).includes(String(key));
 
       let reviewClass = "";
 
