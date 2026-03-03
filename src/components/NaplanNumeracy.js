@@ -685,16 +685,35 @@ export default function NaplanNumeracy({
               <div className="text-multi-select-grid">
                 {Object.entries(currentQ.options || {}).map(
                   ([key, value]) => {
-                    const selected =
-                      answers[String(currentQ.id)] || [];
+                    const qid = String(currentQ.id);
+                    const selected = answers[qid] || [];
+            
+                    const correctAnswers = normalizeCorrectAnswer(
+                      currentQ.correct_answer,
+                      currentQ.question_type
+                    );
+            
                     const isSelected = selected.includes(key);
-
+                    const isCorrectOption =
+                      Array.isArray(correctAnswers) &&
+                      correctAnswers.includes(key);
+            
+                    let reviewClass = "";
+            
+                    if (mode === "review") {
+                      if (isCorrectOption) {
+                        reviewClass = "review-correct";
+                      } else if (isSelected && !isCorrectOption) {
+                        reviewClass = "review-wrong";
+                      }
+                    }
+            
                     return (
                       <label
                         key={key}
                         className={`text-option-card ${
                           isSelected ? "selected" : ""
-                        }`}
+                        } ${reviewClass}`}
                       >
                         <input
                           type="checkbox"
@@ -708,6 +727,7 @@ export default function NaplanNumeracy({
                             const updated = isSelected
                               ? selected.filter(v => v !== key)
                               : [...selected, key];
+            
                             handleAnswer(updated);
                           }}
                         />
@@ -718,9 +738,6 @@ export default function NaplanNumeracy({
                 )}
               </div>
             )}
-          </div>
-        </div>
-
         {mode === "review" && (
           <div
             className={`review-result ${
