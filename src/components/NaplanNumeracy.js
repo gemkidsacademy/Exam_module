@@ -681,8 +681,9 @@
                   disabled={isReview}
                 />
               )}
+              
   
-              {/*
+              
 {currentQ.question_type === 2 && !hasImageMultiSelect && (
   <div className="text-multi-select-grid">
     {Object.entries(currentQ.options || {}).map(([key, value]) => {
@@ -744,7 +745,7 @@
     })}
   </div>
 )}
-*/}
+
         </div> {/* closes question-content-centered */}
         </div> {/* closes question-card */}
   
@@ -775,7 +776,9 @@
           </div>
         )}
   
-      </div> {/* closes exam-container */}
-    </div> {/* closes exam-shell */}
+          </div> {/* closes exam-container */}
+  </div>
   );
 }
+  
+
