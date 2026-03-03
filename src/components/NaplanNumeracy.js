@@ -968,17 +968,48 @@
       })}
 
       {/* ✅ Explicit Correct Answer Display */}
-      {mode === "review" && !isFullyCorrect && (
-        <div className="correct-answer-text" style={{ marginTop: "12px" }}>
-          Correct answer: {
-            Array.isArray(correctAnswers)
-              ? correctAnswers
-                  .map(key => currentQ.options?.[key])
-                  .join(", ")
-              : ""
-          }
-        </div>
+     {/* ✅ Explicit Correct Answer Display */}
+      {mode === "review" && (
+        <>
+          {/* Show correct answer only if not fully correct */}
+          {!isFullyCorrect && (
+            <div
+              className="correct-answer-text"
+              style={{ marginTop: "12px", gridColumn: "1 / -1" }}
+            >
+              <strong>Correct answer: </strong>
+              {Array.isArray(correctAnswers)
+                ? correctAnswers
+                    .map(key => currentQ.options?.[key])
+                    .join(", ")
+                : ""}
+            </div>
+          )}
+      
+          {/* Always show what student selected */}
+          <div
+            style={{
+              marginTop: "8px",
+              gridColumn: "1 / -1"
+            }}
+          >
+            <strong>Your answer: </strong>
+            <span
+              style={{
+                color: isFullyCorrect ? "#16a34a" : "#dc2626",
+                fontWeight: 600
+              }}
+            >
+              {selectedAnswers.length > 0
+                ? selectedAnswers
+                    .map(key => currentQ.options?.[key])
+                    .join(", ")
+                : "No answer selected"}
+            </span>
+          </div>
+        </>
       )}
+      
 
     </div>
   );
