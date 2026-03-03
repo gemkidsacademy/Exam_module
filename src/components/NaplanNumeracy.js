@@ -133,7 +133,34 @@
       setExamAttemptId(data.exam_attempt_id);
       setMode("report");
     }, [API_BASE, studentId]);
-  
+    function normalizeNumericValue(raw) {
+      if (raw === null || raw === undefined) return null;
+    
+      // If DB sent object like { value: "5" }
+      if (typeof raw === "object" && raw.value !== undefined) {
+        raw = raw.value;
+      }
+    
+      // Trim strings
+      if (typeof raw === "string") {
+        raw = raw.trim();
+        if (raw === "") return null;
+      }
+    
+      const number = Number(raw);
+    
+      if (isNaN(number)) return null;
+    
+      return number;
+    }
+    function areNumbersEqual(a, b) {
+      const numA = normalizeNumericValue(a);
+      const numB = normalizeNumericValue(b);
+    
+      if (numA === null || numB === null) return false;
+    
+      return numA === numB;
+    }
     /* ============================================================
        START / RESUME EXAM
     ============================================================ */
@@ -344,25 +371,45 @@
     const isCorrect =
       mode === "review"
         ? (() => {
-            const correct = normalizeCorrectAnswer(
-              currentQ.correct_answer,
-              currentQ.question_type
-            );
-  
-            const student = normalizeStudentAnswer(
-              answers[String(currentQ.id)],
-              currentQ.question_type
-            );
-  
+            const correctRaw = currentQ.correct_answer;
+            const studentRaw = answers[String(currentQ.id)];
+    
+            // ✅ Type 2 (multi-select)
             if (currentQ.question_type === 2) {
+              const correct = normalizeCorrectAnswer(
+                correctRaw,
+                currentQ.question_type
+              );
+    
+              const student = normalizeStudentAnswer(
+                studentRaw,
+                currentQ.question_type
+              );
+    
               return (
                 Array.isArray(student) &&
                 Array.isArray(correct) &&
                 student.length === correct.length &&
-                student.every(v => correct.includes(v))
+                student.every((v) => correct.includes(v))
               );
             }
-  
+    
+            // ✅ Type 3 (numeric)
+            if (currentQ.question_type === 3) {
+              return areNumbersEqual(studentRaw, correctRaw);
+            }
+    
+            // ✅ Default (Type 1, 4, 6)
+            const correct = normalizeCorrectAnswer(
+              correctRaw,
+              currentQ.question_type
+            );
+    
+            const student = normalizeStudentAnswer(
+              studentRaw,
+              currentQ.question_type
+            );
+    
             return student === correct;
           })()
         : null;
@@ -410,7 +457,15 @@
                         correctAnswer.includes(v)
                       );
                   }
-                } else {
+                }
+                
+                // ✅ ADD THIS BLOCK
+                else if (q.question_type === 3) {
+                  isCorrect = areNumbersEqual(studentAnswer, q.correct_answer);
+                }
+                
+                // Default for Type 1, 4, 6
+                else {
                   isCorrect = normalizedStudentAnswer === correctAnswer;
                 }
 
