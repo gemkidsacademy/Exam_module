@@ -745,6 +745,8 @@ export default function NaplanNumeracy({
     })}
   </div>
 )}
+</div>   {/* closes question-content-centered */}
+</div> 
       {showConfirmFinish && (
         <div className="confirm-overlay">
           <div className="confirm-modal">
