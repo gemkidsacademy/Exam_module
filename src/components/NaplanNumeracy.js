@@ -682,102 +682,38 @@ export default function NaplanNumeracy({
             )}
 
             {currentQ.question_type === 2 && !hasImageMultiSelect && (
-              <div className="text-multi-select-grid">
-                {Object.entries(currentQ.options || {}).map(
-                  ([key, value]) => {
-                    const qid = String(currentQ.id);
-                    const selected = answers[qid] || [];
-            
-                    const correctAnswers = normalizeCorrectAnswer(
-                      currentQ.correct_answer,
-                      currentQ.question_type
-                    );
-            
-                    const isSelected = selected.includes(key);
-                    const isCorrectOption =
-                      Array.isArray(correctAnswers) &&
-                      correctAnswers.includes(key);
-            
-                    let reviewClass = "";
-            
-                    if (mode === "review") {
-                      if (isCorrectOption) {
-                        reviewClass = "review-correct";
-                      } else if (isSelected && !isCorrectOption) {
-                        reviewClass = "review-wrong";
-                      }
-                    }
-            
-                    return (
-                      <label
-                        key={key}
-                        className={`text-option-card ${
-                          isSelected ? "selected" : ""
-                        } ${reviewClass}`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          disabled={
-                            isReview ||
-                            (!isSelected &&
-                              selected.length >= TYPE_2_MAX_SELECTIONS)
-                          }
-                          onChange={() => {
-                            const updated = isSelected
-                              ? selected.filter(v => v !== key)
-                              : [...selected, key];
-            
-                            handleAnswer(updated);
-                          }}
-                        />
-                        <span className="option-text">{value}</span>
-                      </label>
-                    );
-                  }
-                )}
-              </div>
-            )}
-        {mode === "review" && (
-          <div
-            className={`review-result ${
-              isCorrect ? "answer-correct" : "answer-wrong"
-            }`}
-          >
-            {isCorrect ? "✔ Correct" : "✖ Incorrect"}
-          </div>
-        )}
+  <div className="text-multi-select-grid">
+    {Object.entries(currentQ.options || {}).map(([key, value]) => {
+      const selected = answers[String(currentQ.id)] || [];
+      const isSelected = selected.includes(key);
 
-        {/* NAVIGATION */}
-        <div className="nav-buttons">
-          <button
-            className="nav-btn prev"
-            disabled={currentIndex === 0}
-            onClick={() => goToQuestion(currentIndex - 1)}
-          >
-            Previous
-          </button>
+      return (
+        <label
+          key={key}
+          className={`text-option-card ${isSelected ? "selected" : ""}`}
+        >
+          <input
+            type="checkbox"
+            checked={isSelected}
+            disabled={
+              isReview ||
+              (!isSelected && selected.length >= TYPE_2_MAX_SELECTIONS)
+            }
+            onChange={() => {
+              const updated = isSelected
+                ? selected.filter((v) => v !== key)
+                : [...selected, key];
 
-          {currentIndex < questions.length - 1 && (
-            <button
-              className="nav-btn next"
-              onClick={() => goToQuestion(currentIndex + 1)}
-            >
-              Next
-            </button>
-          )}
+              handleAnswer(updated);
+            }}
+          />
 
-          {currentIndex === questions.length - 1 && !isReview && (
-            <button
-              className="nav-btn finish"
-              onClick={() => setShowConfirmFinish(true)}
-            >
-              Finish Exam
-            </button>
-          )}
-        </div>
-      </div>
-
+          <span className="option-text">{value}</span>
+        </label>
+      );
+    })}
+  </div>
+)}
       {showConfirmFinish && (
         <div className="confirm-overlay">
           <div className="confirm-modal">
