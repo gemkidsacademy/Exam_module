@@ -461,6 +461,11 @@
                 
                 // ✅ ADD THIS BLOCK
                 else if (q.question_type === 3) {
+                   console.log("TYPE 3 CHECK");
+                    console.log("Student:", studentAnswer);
+                    console.log("Correct:", q.correct_answer);
+                    console.log("Equal?:", areNumbersEqual(studentAnswer, q.correct_answer));
+
                   isCorrect = areNumbersEqual(studentAnswer, q.correct_answer);
                 }
                 
