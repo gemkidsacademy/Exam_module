@@ -49,32 +49,49 @@ export default function NaplanNumeracy({
   const [showConfirmFinish, setShowConfirmFinish] = useState(false);
 
   const normalizeCorrectAnswer = (correctAnswer, questionType) => {
-    if (correctAnswer == null) return null;
+  if (correctAnswer == null) return null;
 
-    if (
-      typeof correctAnswer === "object" &&
-      correctAnswer.value !== undefined
-    ) {
-      correctAnswer = correctAnswer.value;
-    }
+  // Handle stringified objects like "{'value': 'B'}"
+  if (typeof correctAnswer === "string") {
+    try {
+      const parsed = JSON.parse(correctAnswer.replace(/'/g, '"'));
 
-    if (questionType === 2) {
-      if (Array.isArray(correctAnswer)) return correctAnswer;
-
-      if (typeof correctAnswer === "string") {
-        try {
-          return JSON.parse(correctAnswer.replace(/'/g, '"'));
-        } catch {
-          return [];
-        }
+      if (parsed && parsed.value !== undefined) {
+        correctAnswer = parsed.value;
+      } else {
+        correctAnswer = parsed;
       }
+    } catch {
+      // Not JSON, leave as string
+    }
+  }
 
-      return [];
+  // Handle actual object
+  if (
+    typeof correctAnswer === "object" &&
+    correctAnswer !== null &&
+    correctAnswer.value !== undefined
+  ) {
+    correctAnswer = correctAnswer.value;
+  }
+
+  // Multi-select
+  if (questionType === 2) {
+    if (Array.isArray(correctAnswer)) return correctAnswer;
+
+    if (typeof correctAnswer === "string") {
+      try {
+        return JSON.parse(correctAnswer.replace(/'/g, '"'));
+      } catch {
+        return [];
+      }
     }
 
-    return String(correctAnswer);
-  };
+    return [];
+  }
 
+  return String(correctAnswer).trim();
+};
   const normalizeStudentAnswer = (answer, questionType) => {
     if (answer == null) return null;
 
@@ -557,30 +574,50 @@ export default function NaplanNumeracy({
             )}
 
             {currentQ.question_type === 1 && (
-              <div className="mcq-options">
-                {Object.entries(currentQ.options || {}).map(
-                  ([key, value]) => (
+            <div className="mcq-options">
+              {Object.entries(currentQ.options || {}).map(
+                ([key, value]) => {
+                  const qid = String(currentQ.id);
+                  const studentAnswer = answers[qid];
+                  const correctAnswer = normalizeCorrectAnswer(
+                    currentQ.correct_answer,
+                    currentQ.question_type
+                  );
+          
+                  const isSelected = studentAnswer === key;
+                  const isCorrectOption = key === correctAnswer;
+          
+                  let reviewClass = "";
+          
+                  if (mode === "review") {
+                    if (isCorrectOption) {
+                      reviewClass = "review-correct";
+                    } else if (isSelected && studentAnswer !== correctAnswer) {
+                      reviewClass = "review-wrong";
+                    }
+                  }
+          
+                  return (
                     <label
                       key={key}
                       className={`mcq-option-card ${
-                        answers[String(currentQ.id)] === key
-                          ? "selected"
-                          : ""
-                      }`}
+                        isSelected ? "selected" : ""
+                      } ${reviewClass}`}
                     >
                       <input
                         type="radio"
                         name={`q-${currentQ.id}`}
-                        checked={answers[String(currentQ.id)] === key}
+                        checked={isSelected}
                         onChange={() => handleAnswer(key)}
                         disabled={isReview}
                       />
                       <span>{key}. {value}</span>
                     </label>
-                  )
-                )}
-              </div>
-            )}
+                  );
+                }
+              )}
+            </div>
+          )}
 
             {currentQ.question_type === 6 && (
               <div className="image-mcq-grid">
