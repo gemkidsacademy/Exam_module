@@ -807,14 +807,36 @@
               )}
   
               {currentQ.question_type === 3 && (
+              <>
                 <input
                   type="number"
-                  className="numeric-input"
+                  className={`numeric-input ${
+                    isReview
+                      ? isCorrect
+                        ? "review-correct"
+                        : "review-wrong"
+                      : ""
+                  }`}
                   value={answers[String(currentQ.id)] || ""}
                   onChange={(e) => handleAnswer(e.target.value)}
                   disabled={isReview}
                 />
-              )}
+            
+                {/* ✅ Show correct answer in review mode */}
+                {isReview && (
+                  <div className="numeric-review-feedback">
+                    {!isCorrect && (
+                      <div className="correct-answer-text">
+                        Correct answer: {normalizeCorrectAnswer(
+                          currentQ.correct_answer,
+                          currentQ.question_type
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
               
   
               
