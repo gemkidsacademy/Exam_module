@@ -922,17 +922,14 @@
 
       let reviewClass = "";
 
-      if (mode === "review") {
-        if (isCorrectOption && isSelected) {
-          reviewClass = "review-correct";
-        } 
-        else if (isCorrectOption && !isSelected) {
-          reviewClass = "review-wrong"; // missed correct
-        } 
-        else if (!isCorrectOption && isSelected) {
-          reviewClass = "review-wrong"; // wrongly selected
+        if (mode === "review") {
+          if (isCorrectOption) {
+            reviewClass = "review-correct";
+          } 
+          else if (isSelected && !isCorrectOption) {
+            reviewClass = "review-wrong";
+          }
         }
-      }
 
       return (
         <label
