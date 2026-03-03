@@ -285,14 +285,22 @@ export default function NaplanNumeracy({
     <NaplanNumeracyReview
       studentId={studentId}
       onLoaded={(qs, studentAnswers) => {
-        console.log("PARENT RECEIVED QUESTIONS:", qs);
-        console.log("PARENT RECEIVED ANSWERS:", studentAnswers);
-
-        setQuestions(qs || []);
-        setAnswers(studentAnswers || {});
-        setCurrentIndex(0);
-        setVisited({});
-      }}
+      console.log("PARENT RECEIVED QUESTIONS:", qs);
+      console.log("PARENT RECEIVED ANSWERS:", studentAnswers);
+    
+      const cleanedAnswers = {};
+    
+      Object.entries(studentAnswers || {}).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          cleanedAnswers[String(key)] = value;
+        }
+      });
+    
+      setQuestions(qs || []);
+      setAnswers(cleanedAnswers);
+      setCurrentIndex(0);
+      setVisited({});
+    }}
     />
   );
 }
