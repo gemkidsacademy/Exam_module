@@ -610,23 +610,46 @@
   
                 if (block.type === "word-selection") {
                   const sentenceWords = block.sentence.split(" ");
-  
+                  const qid = String(currentQ.id);
+
+                  const correctAnswer = normalizeCorrectAnswer(
+                    currentQ.correct_answer,
+                    currentQ.question_type
+                  );
+
+                  const studentAnswer = normalizeStudentAnswer(
+                    answers[qid],
+                    currentQ.question_type
+                  );
+
                   return (
                     <div key={idx} className="sentence-container">
                       {sentenceWords.map((word, i) => {
                         const cleanWord = word.replace(/[.,!?]/g, "");
                         const isSelectable =
                           block.selectable_words.includes(cleanWord);
-                        const isSelected =
-                          answers[String(currentQ.id)] === cleanWord;
-  
+
+                        const isSelected = studentAnswer === cleanWord;
+                        const isCorrectWord = correctAnswer === cleanWord;
+
+                        let reviewClass = "";
+
+                        if (isReview) {
+                          if (isCorrectWord) {
+                            reviewClass = "review-correct";
+                          } else if (isSelected && !isCorrectWord) {
+                            reviewClass = "review-wrong";
+                          }
+                        }
+
                         return (
                           <span
                             key={i}
                             className={[
                               "sentence-word",
                               isSelectable ? "selectable" : "non-selectable",
-                              isSelected ? "selected" : ""
+                              isSelected ? "selected" : "",
+                              reviewClass
                             ].join(" ")}
                             onClick={() => {
                               if (!isReview && isSelectable) {
@@ -638,6 +661,13 @@
                           </span>
                         );
                       })}
+
+                      {/* Show correct answer if wrong */}
+                      {isReview && studentAnswer !== correctAnswer && (
+                        <div className="correct-answer-text">
+                          Correct answer: {correctAnswer}
+                        </div>
+                      )}
                     </div>
                   );
                 }
