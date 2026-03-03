@@ -682,69 +682,70 @@
                 />
               )}
   
-              {currentQ.question_type === 2 && !hasImageMultiSelect && (
-    <div className="text-multi-select-grid">
-      {Object.entries(currentQ.options || {}).map(([key, value]) => {
-        const qid = String(currentQ.id);
-  
-        const selectedAnswers = Array.isArray(answers[qid])
-          ? answers[qid]
-          : [];
-  
-        const isSelected = selectedAnswers.includes(key);
-  
-        const correctAnswers = normalizeCorrectAnswer(
-          currentQ.correct_answer,
-          currentQ.question_type
-        );
-  
-        const isCorrectOption =
-          Array.isArray(correctAnswers) &&
-          correctAnswers.includes(key);
-  
-        let reviewClass = "";
-  
-        if (mode === "review") {
-          if (isCorrectOption) {
-            reviewClass = "review-correct";
-          } else if (isSelected && !isCorrectOption) {
-            reviewClass = "review-wrong";
-          }
+              {/*
+{currentQ.question_type === 2 && !hasImageMultiSelect && (
+  <div className="text-multi-select-grid">
+    {Object.entries(currentQ.options || {}).map(([key, value]) => {
+      const qid = String(currentQ.id);
+
+      const selectedAnswers = Array.isArray(answers[qid])
+        ? answers[qid]
+        : [];
+
+      const isSelected = selectedAnswers.includes(key);
+
+      const correctAnswers = normalizeCorrectAnswer(
+        currentQ.correct_answer,
+        currentQ.question_type
+      );
+
+      const isCorrectOption =
+        Array.isArray(correctAnswers) &&
+        correctAnswers.includes(key);
+
+      let reviewClass = "";
+
+      if (mode === "review") {
+        if (isCorrectOption) {
+          reviewClass = "review-correct";
+        } else if (isSelected && !isCorrectOption) {
+          reviewClass = "review-wrong";
         }
-  
-        return (
-          <label
-            key={key}
-            className={`text-option-card ${
-              isSelected ? "selected" : ""
-            } ${reviewClass}`}
-          >
-            <input
-              type="checkbox"
-              checked={isSelected}
-              disabled={
-                isReview ||
-                (!isSelected &&
-                  selectedAnswers.length >= TYPE_2_MAX_SELECTIONS)
-              }
-              onChange={() => {
-                if (isReview) return;
-  
-                const updatedAnswers = isSelected
-                  ? selectedAnswers.filter((v) => v !== key)
-                  : [...selectedAnswers, key];
-  
-                handleAnswer(updatedAnswers);
-              }}
-            />
-            <span className="option-text">{value}</span>
-          </label>
-        );
-      })}
-    </div>
-  )}
-  
-          </div> {/* closes question-content-centered */}
+      }
+
+      return (
+        <label
+          key={key}
+          className={`text-option-card ${
+            isSelected ? "selected" : ""
+          } ${reviewClass}`}
+        >
+          <input
+            type="checkbox"
+            checked={isSelected}
+            disabled={
+              isReview ||
+              (!isSelected &&
+                selectedAnswers.length >= TYPE_2_MAX_SELECTIONS)
+            }
+            onChange={() => {
+              if (isReview) return;
+
+              const updatedAnswers = isSelected
+                ? selectedAnswers.filter((v) => v !== key)
+                : [...selectedAnswers, key];
+
+              handleAnswer(updatedAnswers);
+            }}
+          />
+          <span className="option-text">{value}</span>
+        </label>
+      );
+    })}
+  </div>
+)}
+*/}
+        </div> {/* closes question-content-centered */}
         </div> {/* closes question-card */}
   
         {showConfirmFinish && (
