@@ -285,8 +285,11 @@ export default function NaplanNumeracy({
     <NaplanNumeracyReview
       studentId={studentId}
       onLoaded={(qs, studentAnswers) => {
-        setQuestions(qs);
-        setAnswers(studentAnswers);
+        console.log("PARENT RECEIVED QUESTIONS:", qs);
+        console.log("PARENT RECEIVED ANSWERS:", studentAnswers);
+
+        setQuestions(qs || []);
+        setAnswers(studentAnswers || {});
         setCurrentIndex(0);
         setVisited({});
       }}
