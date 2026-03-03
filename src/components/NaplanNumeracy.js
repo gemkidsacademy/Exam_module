@@ -686,14 +686,12 @@ export default function NaplanNumeracy({
     {Object.entries(currentQ.options || {}).map(([key, value]) => {
       const qid = String(currentQ.id);
 
-      // Student selected answers
       const selectedAnswers = Array.isArray(answers[qid])
         ? answers[qid]
         : [];
 
       const isSelected = selectedAnswers.includes(key);
 
-      // Correct answers (only meaningful in review mode)
       const correctAnswers = normalizeCorrectAnswer(
         currentQ.correct_answer,
         currentQ.question_type
@@ -738,15 +736,16 @@ export default function NaplanNumeracy({
               handleAnswer(updatedAnswers);
             }}
           />
-
           <span className="option-text">{value}</span>
         </label>
       );
     })}
   </div>
 )}
-</div>   {/* closes question-content-centered */}
-</div> 
+
+        </div> {/* closes question-content-centered */}
+      </div> {/* closes question-card */}
+
       {showConfirmFinish && (
         <div className="confirm-overlay">
           <div className="confirm-modal">
@@ -773,6 +772,7 @@ export default function NaplanNumeracy({
           </div>
         </div>
       )}
-    </div>
-  );
-}
+
+    </div> {/* closes exam-container */}
+  </div> {/* closes exam-shell */}
+);
