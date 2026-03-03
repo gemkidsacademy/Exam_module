@@ -281,19 +281,18 @@ export default function NaplanNumeracy({
   }
 
   if (mode === "review" && !questions.length) {
-    return (
-      <NaplanNumeracyReview
-        studentId={studentId}
-        examAttemptId={examAttemptId}
-        onLoaded={(qs) => {
-          setQuestions(qs);
-          setCurrentIndex(0);
-          setVisited({});
-          setAnswers({});
-        }}
-      />
-    );
-  }
+  return (
+    <NaplanNumeracyReview
+      studentId={studentId}
+      onLoaded={(qs, studentAnswers) => {
+        setQuestions(qs);
+        setAnswers(studentAnswers);
+        setCurrentIndex(0);
+        setVisited({});
+      }}
+    />
+  );
+}
 
   /* ============================================================
      EXAM UI
