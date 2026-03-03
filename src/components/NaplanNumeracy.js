@@ -625,15 +625,33 @@ export default function NaplanNumeracy({
               <div className="image-mcq-grid">
                 {Object.entries(currentQ.options || {}).map(
                   ([key, imgUrl]) => {
-                    const isSelected =
-                      answers[String(currentQ.id)] === key;
-
+                    const qid = String(currentQ.id);
+                    const studentAnswer = answers[qid];
+            
+                    const correctAnswer = normalizeCorrectAnswer(
+                      currentQ.correct_answer,
+                      currentQ.question_type
+                    );
+            
+                    const isSelected = studentAnswer === key;
+                    const isCorrectOption = key === correctAnswer;
+            
+                    let reviewClass = "";
+            
+                    if (mode === "review") {
+                      if (isCorrectOption) {
+                        reviewClass = "review-correct";
+                      } else if (isSelected && studentAnswer !== correctAnswer) {
+                        reviewClass = "review-wrong";
+                      }
+                    }
+            
                     return (
                       <div
                         key={key}
                         className={`image-mcq-card ${
                           isSelected ? "selected" : ""
-                        }`}
+                        } ${reviewClass}`}
                         onClick={() => {
                           if (!isReview) {
                             handleAnswerForQuestion(currentQ.id, key);
