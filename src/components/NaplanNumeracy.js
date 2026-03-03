@@ -564,11 +564,11 @@
                   return (
                     <div key={idx} className="image-multi-select-grid">
                       {block.options.map((opt) => {
-                        const isSelected = selectedAnswers.includes(opt.id);
+                        const isSelected = selectedAnswers.map(String).includes(String(opt.id));
 
                         const isCorrectOption =
                           Array.isArray(correctAnswers) &&
-                          correctAnswers.includes(opt.id);
+                          correctAnswers.map(String).includes(String(opt.id));
 
                         let reviewClass = "";
 
@@ -767,7 +767,7 @@
 
       const isCorrectOption =
         Array.isArray(correctAnswers) &&
-        correctAnswers.includes(key);
+        correctAnswers.map(String).includes(String(opt.id));
 
       let reviewClass = "";
 
