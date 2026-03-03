@@ -23,10 +23,11 @@
   gap: 16px;
 
   width: 100%;
-  align-self: stretch;
   box-sizing: border-box;
 
   padding: 24px 32px;
+
+  margin: 0;   /* 👈 IMPORTANT */
 }
 /* ============================================================
    HEADER (TIMER + COUNTER)
