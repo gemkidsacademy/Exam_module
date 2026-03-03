@@ -515,19 +515,40 @@
   
                 if (block.type === "image-multi-select") {
                   const qid = String(currentQ.id);
-                  const selected = answers[qid] || [];
-  
+                  const selectedAnswers = Array.isArray(answers[qid])
+                    ? answers[qid]
+                    : [];
+
+                  const correctAnswers = normalizeCorrectAnswer(
+                    currentQ.correct_answer,
+                    currentQ.question_type
+                  );
+
                   return (
                     <div key={idx} className="image-multi-select-grid">
-                      {block.options.map(opt => {
-                        const isSelected = selected.includes(opt.id);
-  
+                      {block.options.map((opt) => {
+                        const isSelected = selectedAnswers.includes(opt.id);
+
+                        const isCorrectOption =
+                          Array.isArray(correctAnswers) &&
+                          correctAnswers.includes(opt.id);
+
+                        let reviewClass = "";
+
+                        if (mode === "review") {
+                          if (isCorrectOption) {
+                            reviewClass = "review-correct";
+                          } else if (isSelected && !isCorrectOption) {
+                            reviewClass = "review-wrong";
+                          }
+                        }
+
                         return (
                           <label
                             key={opt.id}
                             className={`image-option-card ${
                               isSelected ? "selected" : ""
-                            }`}
+                            } ${reviewClass}`}
                           >
                             <input
                               type="checkbox"
@@ -535,22 +556,25 @@
                               disabled={
                                 isReview ||
                                 (!isSelected &&
-                                  selected.length >= TYPE_2_MAX_SELECTIONS)
+                                  selectedAnswers.length >= TYPE_2_MAX_SELECTIONS)
                               }
                               onChange={() => {
+                                if (isReview) return;
+
                                 const updated = isSelected
-                                  ? selected.filter(v => v !== opt.id)
-                                  : [...selected, opt.id];
+                                  ? selectedAnswers.filter((v) => v !== opt.id)
+                                  : [...selectedAnswers, opt.id];
+
                                 handleAnswer(updated);
                               }}
                             />
-  
+
                             <img
                               src={opt.image}
                               alt={opt.label}
                               className="image-option-image"
                             />
-  
+
                             <div className="image-option-label">
                               {opt.label}
                             </div>
