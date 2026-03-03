@@ -601,7 +601,7 @@
                       {/* Review feedback */}
                       {isReview && !isCorrectCloze && (
                         <div className="correct-answer-text">
-                          Correct answer: {correctAnswer}
+                          Correct answer: {currentQ.options?.[correctAnswer] || correctAnswer}
                         </div>
                       )}
                     </div>
