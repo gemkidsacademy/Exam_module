@@ -302,22 +302,27 @@
       <NaplanNumeracyReview
         studentId={studentId}
         onLoaded={(qs, studentAnswers) => {
-        console.log("PARENT RECEIVED QUESTIONS:", qs);
-        console.log("PARENT RECEIVED ANSWERS:", studentAnswers);
-      
-        const cleanedAnswers = {};
-      
-        Object.entries(studentAnswers || {}).forEach(([key, value]) => {
-          if (value !== null && value !== undefined) {
-            cleanedAnswers[String(key)] = value;
-          }
-        });
-      
-        setQuestions(qs || []);
-        setAnswers(cleanedAnswers);
-        setCurrentIndex(0);
-        setVisited({});
-      }}
+          const normalizedAnswers = {};
+        
+          Object.entries(studentAnswers || {}).forEach(([key, value]) => {
+            if (typeof value === "string") {
+              // convert "['E']" into ["E"]
+              try {
+                const parsed = JSON.parse(value.replace(/'/g, '"'));
+                normalizedAnswers[String(key)] = parsed;
+              } catch {
+                normalizedAnswers[String(key)] = value;
+              }
+            } else {
+              normalizedAnswers[String(key)] = value;
+            }
+          });
+        
+          setQuestions(qs || []);
+          setAnswers(normalizedAnswers);
+          setCurrentIndex(0);
+          setVisited({});
+        }}
       />
     );
   }
