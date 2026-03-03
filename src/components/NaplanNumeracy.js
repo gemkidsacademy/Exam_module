@@ -557,12 +557,31 @@
                 if (block.type === "cloze-dropdown") {
                   const parts = block.sentence.split("{{dropdown}}");
                   const qid = String(currentQ.id);
-  
+
+                  const correctAnswer = normalizeCorrectAnswer(
+                    currentQ.correct_answer,
+                    currentQ.question_type
+                  );
+
+                  const studentAnswer = normalizeStudentAnswer(
+                    answers[qid],
+                    currentQ.question_type
+                  );
+
+                  const isCorrectCloze = studentAnswer === correctAnswer;
+
                   return (
                     <div key={idx} className="cloze-sentence">
                       {parts[0]}
+
                       <select
-                        className="cloze-dropdown"
+                        className={`cloze-dropdown ${
+                          isReview
+                            ? isCorrectCloze
+                              ? "review-correct"
+                              : "review-wrong"
+                            : ""
+                        }`}
                         value={answers[qid] || ""}
                         onChange={(e) => handleAnswer(e.target.value)}
                         disabled={isReview}
@@ -570,13 +589,21 @@
                         <option value="" disabled>
                           Select
                         </option>
-                        {block.options.map(opt => (
+                        {block.options.map((opt) => (
                           <option key={opt} value={opt}>
                             {opt}
                           </option>
                         ))}
                       </select>
+
                       {parts[1]}
+
+                      {/* Review feedback */}
+                      {isReview && !isCorrectCloze && (
+                        <div className="correct-answer-text">
+                          Correct answer: {correctAnswer}
+                        </div>
+                      )}
                     </div>
                   );
                 }
