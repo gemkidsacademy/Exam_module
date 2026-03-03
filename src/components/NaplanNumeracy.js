@@ -579,6 +579,8 @@ export default function NaplanNumeracy({
                 ([key, value]) => {
                   const qid = String(currentQ.id);
                   const studentAnswer = answers[qid];
+                  console.log("QUESTION ID:", currentQ.id);
+                  console.log("RAW correct_answer:", currentQ.correct_answer);
                   const correctAnswer = normalizeCorrectAnswer(
                     currentQ.correct_answer,
                     currentQ.question_type
