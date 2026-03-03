@@ -573,10 +573,14 @@
                         let reviewClass = "";
 
                         if (mode === "review") {
-                          if (isCorrectOption) {
+                          if (isCorrectOption && isSelected) {
                             reviewClass = "review-correct";
-                          } else if (isSelected && !isCorrectOption) {
-                            reviewClass = "review-wrong";
+                          } 
+                          else if (isCorrectOption && !isSelected) {
+                            reviewClass = "review-wrong"; // missed correct
+                          } 
+                          else if (!isCorrectOption && isSelected) {
+                            reviewClass = "review-wrong"; // wrongly selected
                           }
                         }
 
@@ -768,10 +772,14 @@
       let reviewClass = "";
 
       if (mode === "review") {
-        if (isCorrectOption) {
+        if (isCorrectOption && isSelected) {
           reviewClass = "review-correct";
-        } else if (isSelected && !isCorrectOption) {
-          reviewClass = "review-wrong";
+        } 
+        else if (isCorrectOption && !isSelected) {
+          reviewClass = "review-wrong"; // missed correct
+        } 
+        else if (!isCorrectOption && isSelected) {
+          reviewClass = "review-wrong"; // wrongly selected
         }
       }
 
