@@ -3,17 +3,16 @@ import styles from "./NaplanNumeracyReview.module.css";
 
 export default function NaplanNumeracyReview({
   studentId,
-  examAttemptId,
   onLoaded
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
-    if (!studentId) {
+    if (!studentId || !API_BASE) {
       return;
     }
 
-    const loadReview = async () => {
+    const loadNaplanNumeracyReview = async () => {
       try {
         const response = await fetch(
           `${API_BASE}/api/student/exam-review/naplan-numeracy?student_id=${studentId}`
@@ -21,7 +20,7 @@ export default function NaplanNumeracyReview({
 
         if (!response.ok) {
           throw new Error(
-            `NAPLAN numeracy review fetch failed with status ${response.status}`
+            `Review fetch failed with status ${response.status}`
           );
         }
 
@@ -31,22 +30,33 @@ export default function NaplanNumeracyReview({
           ? data.questions
           : [];
 
-        onLoaded?.(questions);
+        const studentAnswers =
+          typeof data.student_answers === "object" &&
+          data.student_answers !== null
+            ? data.student_answers
+            : {};
+
+        onLoaded?.(questions, studentAnswers);
+
       } catch (error) {
         console.error(
-          "Failed to load NAPLAN numeracy review",
+          "Failed to load NAPLAN Numeracy review:",
           error
         );
-        onLoaded?.([]);
+
+        onLoaded?.([], {});
       }
     };
 
-    loadReview();
-  }, [studentId, examAttemptId, API_BASE, onLoaded]);
+    loadNaplanNumeracyReview();
+
+  }, [studentId, API_BASE, onLoaded]);
 
   return (
-    <p className={styles.loading}>
-      Loading NAPLAN Numeracy review…
-    </p>
+    <div className={styles.reviewLoadingContainer}>
+      <p className={styles.loadingText}>
+        Loading NAPLAN Numeracy review…
+      </p>
+    </div>
   );
 }
