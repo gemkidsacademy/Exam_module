@@ -450,3 +450,9 @@
 .correct-answer-text {
   color: #16a34a; /* green */
 }
+.correct-answer-text {
+  grid-column: 1 / -1;
+  margin-top: 16px;
+  font-weight: 600;
+  color: #16a34a;
+}
