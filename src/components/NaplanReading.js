@@ -685,14 +685,15 @@ export default function NaplanReading({
               if (currentQ.question_type === 2) {
                 const selected = answers[String(currentQ.question_id)] || [];
 
+                const correct = normalizeCorrectAnswer(
+                  currentQ.exam_bundle.correct_answer,
+                  currentQ.question_type
+                );
+
                 return (
                   <div className="mcq-options list">
                     {Object.entries(optionsSource).map(([k, v]) => {
                       const isSelected = selected.includes(k);
-                      const correct = normalizeCorrectAnswer(
-                        currentQ.exam_bundle.correct_answer,
-                        currentQ.question_type
-                      );
 
                       let isCorrectOption = false;
                       let isWrongSelection = false;
@@ -703,13 +704,17 @@ export default function NaplanReading({
                         isCorrectOption = correctArray.includes(k);
                         isWrongSelection = isSelected && !correctArray.includes(k);
                       }
+
                       return (
                         <label
                           key={k}
                           className={[
                             "mcq-option-row",
-                            isCorrectOption ? "option-correct" : "",
-                            isWrongSelection ? "option-wrong" : ""
+                            isWrongSelection
+                              ? "option-wrong"
+                              : isCorrectOption
+                              ? "option-correct"
+                              : ""
                           ].join(" ")}
                         >
                           <input
@@ -718,21 +723,18 @@ export default function NaplanReading({
                             disabled={isReview}
                             onChange={() => {
                               let updated;
-                            
+
                               if (isSelected) {
-                                // always allow unselect
                                 updated = selected.filter(x => x !== k);
                               } else {
-                                // block if max reached
-                                if (selected.length >= TYPE_2_MAX_SELECTIONS) {
-                                  return; // 🚫 do nothing
-                                }
+                                if (selected.length >= TYPE_2_MAX_SELECTIONS) return;
                                 updated = [...selected, k];
                               }
-                            
+
                               handleAnswer(updated);
                             }}
                           />
+
                           <span className="option-text">
                             {k}. {v}
                           </span>
