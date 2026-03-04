@@ -808,8 +808,19 @@ export default function NaplanReading({
           const displayCorrect =
             currentQ.exam_bundle.options?.[correct] || correct;
         
-          const displayStudent =
-            currentQ.exam_bundle.options?.[student] || student;
+          let displayStudent = "—";
+
+          if (student != null) {
+          
+            if (Array.isArray(student)) {
+              displayStudent = student
+                .map(k => currentQ.exam_bundle.options?.[k] || k)
+                .join(", ");
+            } else {
+              displayStudent = currentQ.exam_bundle.options?.[student] || student;
+            }
+          
+          }
         
           return (
             <div className={`review-result ${isCorrect ? "answer-correct" : "answer-wrong"}`}>
