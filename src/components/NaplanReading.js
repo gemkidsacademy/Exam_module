@@ -409,7 +409,10 @@ export default function NaplanReading({
                 q.question_type
               );
             
-              const student = answers[String(q.question_id)];
+              const student = normalizeStudentAnswer(
+                answers[String(q.question_id)],
+                q.question_type
+              );
             
               let correctFlag = false;
             
