@@ -602,3 +602,12 @@
   background-color: #ef4444 !important;
   color: white !important;
 }
+.review-details {
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+.review-status {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
