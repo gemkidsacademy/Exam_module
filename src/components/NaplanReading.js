@@ -818,15 +818,31 @@ export default function NaplanReading({
           let displayCorrect = "—";
           let displayStudent = "—";
           
+          /* ------------------------------------------------
+             Resolve option source (normal or single_gap)
+          ------------------------------------------------ */
+          
+          let optionMap = currentQ.exam_bundle.options;
+          
+          if (!optionMap) {
+            const gapBlock = currentQ.exam_bundle.question_blocks?.find(
+              b => b.type === "single_gap"
+            );
+            if (gapBlock?.options) {
+              optionMap = gapBlock.options;
+            }
+          }
+          
           /* ---------- Correct Answer ---------- */
+          
           if (correct != null) {
           
             if (Array.isArray(correct)) {
               displayCorrect = correct
-                .map(k => currentQ.exam_bundle.options?.[k] || k)
+                .map(k => optionMap?.[k] || k)
                 .join(", ");
             } else {
-              displayCorrect = currentQ.exam_bundle.options?.[correct] || correct;
+              displayCorrect = optionMap?.[correct] || correct;
             }
           
           }
