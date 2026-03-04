@@ -84,6 +84,7 @@ export default function NaplanReading({
       correctAnswer = correctAnswer.value;
     }
 
+    // MULTI SELECT
     if (questionType === 2) {
       if (Array.isArray(correctAnswer)) return correctAnswer;
 
@@ -94,14 +95,25 @@ export default function NaplanReading({
           return [];
         }
       }
-      if (questionType === 7) {
-        if (Array.isArray(correctAnswer)) {
-          return correctAnswer[0];
-        }
-        return String(correctAnswer).trim();
-      }
 
       return [];
+    }
+
+    // TRUE / FALSE GRID
+    if (questionType === 5) {
+      if (Array.isArray(correctAnswer)) return correctAnswer;
+
+      if (typeof correctAnswer === "string") {
+        return correctAnswer.split(",");
+      }
+    }
+
+    // WORD SELECT
+    if (questionType === 7) {
+      if (Array.isArray(correctAnswer)) {
+        return correctAnswer[0];
+      }
+      return String(correctAnswer).trim();
     }
 
     return String(correctAnswer).trim();
