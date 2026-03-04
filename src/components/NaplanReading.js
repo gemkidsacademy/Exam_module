@@ -694,16 +694,15 @@ export default function NaplanReading({
                         currentQ.question_type
                       );
 
-                      const isCorrectOption =
-                        mode === "review" &&
-                        Array.isArray(correct) &&
-                        correct.includes(k);
+                      let isCorrectOption = false;
+                      let isWrongSelection = false;
 
-                      const isWrongSelection =
-                        mode === "review" &&
-                        isSelected &&
-                        (!Array.isArray(correct) || !correct.includes(k));
+                      if (mode === "review") {
+                        const correctArray = Array.isArray(correct) ? correct : [];
 
+                        isCorrectOption = correctArray.includes(k);
+                        isWrongSelection = isSelected && !correctArray.includes(k);
+                      }
                       return (
                         <label
                           key={k}
