@@ -1022,7 +1022,7 @@
         <div className="exam-navigation">
         
           <button
-            className="nav-btn prev-btn"
+            className="nav-btn prev"
             disabled={currentIndex === 0}
             onClick={() => goToQuestion(currentIndex - 1)}
           >
@@ -1031,7 +1031,7 @@
         
           {currentIndex < questions.length - 1 && (
             <button
-              className="nav-btn next-btn"
+              className="nav-btn next"
               onClick={() => goToQuestion(currentIndex + 1)}
             >
               Next
@@ -1040,7 +1040,7 @@
         
           {currentIndex === questions.length - 1 && !isReview && (
             <button
-              className="nav-btn finish-btn"
+              className="nav-btn finish"
               onClick={() => setShowConfirmFinish(true)}
             >
               Finish Exam
