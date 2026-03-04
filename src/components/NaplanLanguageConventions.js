@@ -649,14 +649,20 @@ export default function NaplanLanguageConventions({
       <div className="correct-answer-text">
         <strong>Correct answer:</strong>{" "}
         {(() => {
-          if (
-            typeof normalizedCorrectAnswer === "object" &&
-            normalizedCorrectAnswer?.value !== undefined
-          ) {
-            return normalizedCorrectAnswer.value;
+          let answer = normalizedCorrectAnswer;
+
+          // case: "{'value': 'brilliantly'}"
+          if (typeof answer === "string" && answer.includes("value")) {
+            try {
+              const parsed = JSON.parse(answer.replace(/'/g, '"'));
+              return parsed.value;
+            } catch {
+              return answer;
+            }
           }
 
-          return currentQ.options?.[normalizedCorrectAnswer] || normalizedCorrectAnswer;
+          // case: MCQ keys (A,B,C,D)
+          return currentQ.options?.[answer] || answer;
         })()}
       </div>
     )}
