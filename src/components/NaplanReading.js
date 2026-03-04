@@ -755,17 +755,26 @@ export default function NaplanReading({
                       currentQ.question_type
                     );
 
-                    const isCorrectOption = mode === "review" && k === correct;
+                    const isCorrectOption =
+                      mode === "review" && k === correct;
+                    
                     const isWrongSelection =
-                      mode === "review" && k === student && student !== correct;
-
+                      mode === "review" &&
+                      student === k &&
+                      student !== correct;
+                    
+                    const optionClass =
+                      isCorrectOption
+                        ? "option-correct"
+                        : isWrongSelection
+                        ? "option-wrong"
+                        : "";
                     return (
                       <label
                         key={k}
                         className={[
                           "mcq-option-row",
-                          isCorrectOption ? "option-correct" : "",
-                          isWrongSelection ? "option-wrong" : ""
+                          optionClass
                         ].join(" ")}
                       >
                         <input
