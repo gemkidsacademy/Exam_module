@@ -424,15 +424,27 @@ export default function NaplanReading({
             
               if (!isEmpty) {
 
+                // MULTI SELECT
                 if (q.question_type === 2) {
+              
+                  const studentArr =
+                    typeof student === "string" ? JSON.parse(student) : student;
+              
+                  const correctArr =
+                    typeof correct === "string"
+                      ? JSON.parse(correct.replace(/'/g,'"'))
+                      : correct;
+              
                   correctFlag =
-                    Array.isArray(student) &&
-                    Array.isArray(correct) &&
-                    student.length === correct.length &&
-                    student.every(v => correct.includes(v));
+                    Array.isArray(studentArr) &&
+                    Array.isArray(correctArr) &&
+                    studentArr.length === correctArr.length &&
+                    studentArr.every(v => correctArr.includes(v));
                 }
               
+                // TRUE / FALSE GRID
                 else if (q.question_type === 5) {
+              
                   const correctArr =
                     typeof correct === "string" ? correct.split(",") : correct;
               
@@ -440,15 +452,15 @@ export default function NaplanReading({
                     Array.isArray(student) &&
                     Array.isArray(correctArr) &&
                     student.length === correctArr.length &&
-                    student.every((v, i) => v === correctArr[i]);
+                    student.every((v,i) => v === correctArr[i]);
                 }
               
+                // NORMAL QUESTIONS
                 else {
                   correctFlag = student === correct;
                 }
               
-              }
-            
+              }            
               reviewClass = correctFlag ? "correct" : "incorrect";
             }        
             return (
