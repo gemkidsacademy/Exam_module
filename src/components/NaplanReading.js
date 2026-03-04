@@ -805,11 +805,23 @@ export default function NaplanReading({
             currentQ.question_type
           );
         
-          const displayCorrect =
-            currentQ.exam_bundle.options?.[correct] || correct;
-        
+          let displayCorrect = "—";
           let displayStudent = "—";
-
+          
+          /* ---------- Correct Answer ---------- */
+          if (correct != null) {
+          
+            if (Array.isArray(correct)) {
+              displayCorrect = correct
+                .map(k => currentQ.exam_bundle.options?.[k] || k)
+                .join(", ");
+            } else {
+              displayCorrect = currentQ.exam_bundle.options?.[correct] || correct;
+            }
+          
+          }
+          
+          /* ---------- Student Answer ---------- */
           if (student != null) {
           
             if (Array.isArray(student)) {
@@ -821,7 +833,6 @@ export default function NaplanReading({
             }
           
           }
-        
           return (
             <div className={`review-result ${isCorrect ? "answer-correct" : "answer-wrong"}`}>
               <div className="review-status">
