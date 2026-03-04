@@ -1018,6 +1018,36 @@
 
         </div> {/* closes question-content-centered */}
         </div> {/* closes question-card */}
+        /* NAVIGATION BUTTONS */
+        <div className="exam-navigation">
+        
+          <button
+            className="nav-btn prev-btn"
+            disabled={currentIndex === 0}
+            onClick={() => goToQuestion(currentIndex - 1)}
+          >
+            Previous
+          </button>
+        
+          {currentIndex < questions.length - 1 && (
+            <button
+              className="nav-btn next-btn"
+              onClick={() => goToQuestion(currentIndex + 1)}
+            >
+              Next
+            </button>
+          )}
+        
+          {currentIndex === questions.length - 1 && !isReview && (
+            <button
+              className="nav-btn finish-btn"
+              onClick={() => setShowConfirmFinish(true)}
+            >
+              Finish Exam
+            </button>
+          )}
+        
+        </div>
   
         {showConfirmFinish && (
           <div className="confirm-overlay">
