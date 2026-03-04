@@ -648,7 +648,16 @@ export default function NaplanLanguageConventions({
     {isReview && !isCorrect && (
       <div className="correct-answer-text">
         <strong>Correct answer:</strong>{" "}
-        {currentQ.options?.[normalizedCorrectAnswer] || normalizedCorrectAnswer}
+        {(() => {
+          if (
+            typeof normalizedCorrectAnswer === "object" &&
+            normalizedCorrectAnswer?.value !== undefined
+          ) {
+            return normalizedCorrectAnswer.value;
+          }
+
+          return currentQ.options?.[normalizedCorrectAnswer] || normalizedCorrectAnswer;
+        })()}
       </div>
     )}
     
