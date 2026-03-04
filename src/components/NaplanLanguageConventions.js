@@ -49,8 +49,24 @@ export default function NaplanLanguageConventions({
   const normalizeCorrectAnswer = (correctAnswer, questionType) => {
     if (correctAnswer == null) return null;
 
-    if (typeof correctAnswer === "object" && correctAnswer.value !== undefined) {
-      correctAnswer = correctAnswer.value;
+    // handle stringified objects like "{'value':'brilliantly'}"
+    if (
+      typeof correctAnswer === "string" &&
+      correctAnswer.includes("value")
+    ) {
+      try {
+        const parsed = JSON.parse(correctAnswer.replace(/'/g, '"'));
+        return parsed.value;
+      } catch {
+        return correctAnswer;
+      }
+    }
+
+    if (
+      typeof correctAnswer === "object" &&
+      correctAnswer.value !== undefined
+    ) {
+      return correctAnswer.value;
     }
 
     if (questionType === 2) {
