@@ -30,8 +30,16 @@ export default function NaplanLanguageConventionsReview({
         const questions = Array.isArray(data.questions)
           ? data.questions
           : [];
-
-        onLoaded?.(questions);
+        
+        const studentAnswers =
+          data.student_answers && typeof data.student_answers === "object"
+            ? data.student_answers
+            : {};
+        
+        console.log("LANGUAGE QUESTIONS:", questions);
+        console.log("LANGUAGE STUDENT ANSWERS:", studentAnswers);
+        
+        onLoaded?.(questions, studentAnswers);
       } catch (error) {
         console.error(
           "Failed to load NAPLAN Language Conventions review",
