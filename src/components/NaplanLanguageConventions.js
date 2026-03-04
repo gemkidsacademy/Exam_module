@@ -282,11 +282,11 @@ export default function NaplanLanguageConventions({
       <NaplanLanguageConventionsReview
         studentId={studentId}
         examAttemptId={examAttemptId}
-        onLoaded={(qs) => {
+        onLoaded={(qs, studentAnswers) => {
           setQuestions(qs);
           setCurrentIndex(0);
           setVisited({});
-          setAnswers({});
+          setAnswers(studentAnswers || {});
         }}
       />
     );
