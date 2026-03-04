@@ -848,14 +848,15 @@ export default function NaplanReading({
           }
           
           /* ---------- Student Answer ---------- */
+
           if (student != null) {
           
             if (Array.isArray(student)) {
               displayStudent = student
-                .map(k => currentQ.exam_bundle.options?.[k] || k)
+                .map(k => optionMap?.[k] || k)
                 .join(", ");
             } else {
-              displayStudent = currentQ.exam_bundle.options?.[student] || student;
+              displayStudent = optionMap?.[student] || student;
             }
           
           }
