@@ -78,35 +78,37 @@ export default function NaplanReading({
      NORMALIZATION HELPERS (REUSED FROM NUMERACY)
   ============================================================ */
   const normalizeCorrectAnswer = (correctAnswer, questionType) => {
-    if (correctAnswer == null) return null;
+  if (correctAnswer == null) return null;
 
-    if (typeof correctAnswer === "object" && correctAnswer.value !== undefined) {
-      correctAnswer = correctAnswer.value;
+  if (typeof correctAnswer === "object" && correctAnswer.value !== undefined) {
+    correctAnswer = correctAnswer.value;
+  }
+
+  // multi select
+  if (questionType === 2) {
+    if (Array.isArray(correctAnswer)) return correctAnswer;
+
+    if (typeof correctAnswer === "string") {
+      try {
+        return JSON.parse(correctAnswer.replace(/'/g, '"'));
+      } catch {
+        return [];
+      }
     }
 
-    if (questionType === 2) {
-      if (Array.isArray(correctAnswer)) return correctAnswer;
+    return [];
+  }
 
-      if (typeof correctAnswer === "string") {
-        try {
-          return JSON.parse(correctAnswer.replace(/'/g, '"'));
-        } catch {
-          return [];
-        }
-      }
-      if (questionType === 7) {
-        if (Array.isArray(correctAnswer)) {
-          return correctAnswer[0];
-        }
-        return String(correctAnswer).trim();
-      }
-
-      return [];
+  // word select
+  if (questionType === 7) {
+    if (Array.isArray(correctAnswer)) {
+      return correctAnswer[0];
     }
-
     return String(correctAnswer).trim();
-  };
+  }
 
+  return String(correctAnswer).trim();
+};
   const normalizeStudentAnswer = (answer, questionType) => {
     if (answer == null) return null;
 
