@@ -384,7 +384,11 @@ export default function NaplanLanguageConventions({
               } else if (q.question_type === 3) {
                 questionCorrect = areNumbersEqual(answers[qid], q.correct_answer);
 
-              } else {
+              } else if (q.question_type === 5) {
+                const correctText = q.options?.[correct];
+                questionCorrect = student === correctText;
+              }
+              else {
                 questionCorrect = student === correct;
               }
 
