@@ -593,3 +593,12 @@
   background: #2563eb;
   color: white;
 }
+.question-index-item.correct {
+  background-color: #22c55e !important;
+  color: white !important;
+}
+
+.question-index-item.incorrect {
+  background-color: #ef4444 !important;
+  color: white !important;
+}
