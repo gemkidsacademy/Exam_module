@@ -748,8 +748,29 @@ export default function NaplanReading({
                   {Object.entries(textOptions).map(([k, v]) => {
                     const isSelected = selected === k;
 
+                    const correct = normalizeCorrectAnswer(
+                      currentQ.exam_bundle.correct_answer,
+                      currentQ.question_type
+                    );
+
+                    const student = normalizeStudentAnswer(
+                      answers[String(currentQ.question_id)],
+                      currentQ.question_type
+                    );
+
+                    const isCorrectOption = mode === "review" && k === correct;
+                    const isWrongSelection =
+                      mode === "review" && k === student && student !== correct;
+
                     return (
-                      <label key={k} className="mcq-option-row">
+                      <label
+                        key={k}
+                        className={[
+                          "mcq-option-row",
+                          isCorrectOption ? "option-correct" : "",
+                          isWrongSelection ? "option-wrong" : ""
+                        ].join(" ")}
+                      >
                         <input
                           type="radio"
                           name={`q-${currentQ.question_id}`}
@@ -757,6 +778,7 @@ export default function NaplanReading({
                           disabled={isReview}
                           onChange={() => handleAnswer(k)}
                         />
+
                         <span className="option-text">
                           {k}. {v}
                         </span>
