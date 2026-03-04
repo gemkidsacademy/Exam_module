@@ -333,11 +333,11 @@ export default function NaplanReading({
       <NaplanReadingReview
         studentId={studentId}
         examAttemptId={examAttemptId}
-        onLoaded={(qs) => {
+        onLoaded={(qs, ans) => {
           setQuestions(qs);
           setCurrentIndex(0);
           setVisited({});
-          setAnswers({});
+          setAnswers(ans || {});
         }}
       />
     );
