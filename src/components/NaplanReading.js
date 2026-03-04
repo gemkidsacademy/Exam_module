@@ -84,7 +84,6 @@ export default function NaplanReading({
       correctAnswer = correctAnswer.value;
     }
 
-    // MULTI SELECT
     if (questionType === 2) {
       if (Array.isArray(correctAnswer)) return correctAnswer;
 
@@ -95,25 +94,14 @@ export default function NaplanReading({
           return [];
         }
       }
+      if (questionType === 7) {
+        if (Array.isArray(correctAnswer)) {
+          return correctAnswer[0];
+        }
+        return String(correctAnswer).trim();
+      }
 
       return [];
-    }
-
-    // TRUE / FALSE GRID
-    if (questionType === 5) {
-      if (Array.isArray(correctAnswer)) return correctAnswer;
-
-      if (typeof correctAnswer === "string") {
-        return correctAnswer.split(",");
-      }
-    }
-
-    // WORD SELECT
-    if (questionType === 7) {
-      if (Array.isArray(correctAnswer)) {
-        return correctAnswer[0];
-      }
-      return String(correctAnswer).trim();
     }
 
     return String(correctAnswer).trim();
@@ -372,9 +360,7 @@ export default function NaplanReading({
             answers[String(currentQ.question_id)],
             currentQ.question_type
           );
-          if (!student || student === "" || (Array.isArray(student) && student.length === 0)) {
-            return false;
-          }
+
           if (currentQ.question_type === 2) {
             return (
               Array.isArray(student) &&
@@ -383,7 +369,7 @@ export default function NaplanReading({
               student.every(v => correct.includes(v))
             );
           }
-          
+
           return student === correct;
         })()
       : null;
@@ -397,7 +383,7 @@ export default function NaplanReading({
   console.log("🧠 ACTUAL RENDER answers:", answers);
 
   return (
-    <div className={`exam-shell ${isReview ? "review-mode" : ""}`}>
+    <div className="exam-shell">
       <div className="exam-container">
 
         {/* HEADER */}
@@ -420,31 +406,24 @@ export default function NaplanReading({
                 q.exam_bundle.correct_answer,
                 q.question_type
               );
-            
+        
               const student = normalizeStudentAnswer(
                 answers[String(q.question_id)],
                 q.question_type
               );
-            
+        
               let correctFlag = false;
-            
-              const isEmpty =
-                student === undefined ||
-                student === null ||
-                student === "" ||
-                (Array.isArray(student) && student.length === 0);
-            
-              if (!isEmpty) {
-                if (q.question_type === 2) {
-                  correctFlag =
-                    Array.isArray(student) &&
-                    Array.isArray(correct) &&
-                    student.length === correct.length &&
-                    student.every(v => correct.includes(v));
-                } else {
-                  correctFlag = student === correct;
-                }
-              }            
+        
+              if (q.question_type === 2) {
+                correctFlag =
+                  Array.isArray(student) &&
+                  Array.isArray(correct) &&
+                  student.length === correct.length &&
+                  student.every(v => correct.includes(v));
+              } else {
+                correctFlag = student === correct;
+              }
+        
               reviewClass = correctFlag ? "correct" : "incorrect";
             }        
             return (
@@ -767,35 +746,29 @@ export default function NaplanReading({
               return (
                 <div className="mcq-options list">
                   {Object.entries(textOptions).map(([k, v]) => {
-                    const isSelected = !isReview && selected === k;
+                    const isSelected = selected === k;
 
                     const correct = normalizeCorrectAnswer(
                       currentQ.exam_bundle.correct_answer,
                       currentQ.question_type
                     );
 
-                    const student = answers[String(currentQ.question_id)];
+                    const student = normalizeStudentAnswer(
+                      answers[String(currentQ.question_id)],
+                      currentQ.question_type
+                    );
 
-                    const isCorrectOption =
-                      mode === "review" && k === correct;
-                    
+                    const isCorrectOption = mode === "review" && k === correct;
                     const isWrongSelection =
-                      mode === "review" &&
-                      student === k &&
-                      student !== correct;
-                    
-                    const optionClass =
-                      isCorrectOption
-                        ? "option-correct"
-                        : isWrongSelection
-                        ? "option-wrong"
-                        : "";
+                      mode === "review" && k === student && student !== correct;
+
                     return (
                       <label
                         key={k}
                         className={[
                           "mcq-option-row",
-                          optionClass
+                          isCorrectOption ? "option-correct" : "",
+                          isWrongSelection ? "option-wrong" : ""
                         ].join(" ")}
                       >
                         <input
@@ -822,42 +795,22 @@ export default function NaplanReading({
       </div>
 
         {mode === "review" && (() => {
-          let correct = normalizeCorrectAnswer(
+          const correct = normalizeCorrectAnswer(
             currentQ.exam_bundle.correct_answer,
             currentQ.question_type
           );
-          
-          // word_select fix
-          if (currentQ.question_type === 7) {
-            const block = currentQ.exam_bundle.question_blocks.find(
-              b => b.type === "word_select"
-            );
-          
-            if (block?.options?.length) {
-              correct = block.options[0];
-            }
-          }
         
-        const student = normalizeStudentAnswer(
-          answers[String(currentQ.question_id)],
-          currentQ.question_type
-        );
+          const student = normalizeStudentAnswer(
+            answers[String(currentQ.question_id)],
+            currentQ.question_type
+          );
         
-        let displayCorrect = Array.isArray(correct) ? correct[0] : correct;
+          const displayCorrect =
+            currentQ.exam_bundle.options?.[correct] || correct;
         
-        // normal MCQ
-        if (currentQ.exam_bundle.options) {
-          displayCorrect =
-            currentQ.exam_bundle.options[displayCorrect] || displayCorrect;
-        }
+          const displayStudent =
+            currentQ.exam_bundle.options?.[student] || student;
         
-        // word_select fallback
-        if (currentQ.question_type === 7) {
-          displayCorrect = Array.isArray(correct) ? correct[0] : correct;
-        }
-        
-        const displayStudent =
-          currentQ.exam_bundle.options?.[student] || student;        
           return (
             <div className={`review-result ${isCorrect ? "answer-correct" : "answer-wrong"}`}>
               <div className="review-status">
