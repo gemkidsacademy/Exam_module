@@ -1018,7 +1018,7 @@
 
         </div> {/* closes question-content-centered */}
         </div> {/* closes question-card */}
-        /* NAVIGATION BUTTONS */
+        
         <div className="exam-navigation">
         
           <button
