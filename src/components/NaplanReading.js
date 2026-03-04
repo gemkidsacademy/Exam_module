@@ -408,21 +408,29 @@ export default function NaplanReading({
                 q.exam_bundle.correct_answer,
                 q.question_type
               );
-        
+            
               const student = answers[String(q.question_id)];
-        
+            
               let correctFlag = false;
-        
-              if (q.question_type === 2) {
-                correctFlag =
-                  Array.isArray(student) &&
-                  Array.isArray(correct) &&
-                  student.length === correct.length &&
-                  student.every(v => correct.includes(v));
-              } else {
-                correctFlag = student === correct;
+            
+              const isEmpty =
+                student === undefined ||
+                student === null ||
+                student === "" ||
+                (Array.isArray(student) && student.length === 0);
+            
+              if (!isEmpty) {
+                if (q.question_type === 2) {
+                  correctFlag =
+                    Array.isArray(student) &&
+                    Array.isArray(correct) &&
+                    student.length === correct.length &&
+                    student.every(v => correct.includes(v));
+                } else {
+                  correctFlag = student === correct;
+                }
               }
-        
+            
               reviewClass = correctFlag ? "correct" : "incorrect";
             }        
             return (
