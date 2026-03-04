@@ -743,17 +743,14 @@ export default function NaplanReading({
               return (
                 <div className="mcq-options list">
                   {Object.entries(textOptions).map(([k, v]) => {
-                    const isSelected = selected === k;
+                    const isSelected = !isReview && selected === k;
 
                     const correct = normalizeCorrectAnswer(
                       currentQ.exam_bundle.correct_answer,
                       currentQ.question_type
                     );
 
-                    const student = normalizeStudentAnswer(
-                      answers[String(currentQ.question_id)],
-                      currentQ.question_type
-                    );
+                    const student = answers[String(currentQ.question_id)];
 
                     const isCorrectOption =
                       mode === "review" && k === correct;
