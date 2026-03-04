@@ -360,7 +360,9 @@ export default function NaplanReading({
             answers[String(currentQ.question_id)],
             currentQ.question_type
           );
-
+          if (!student || student === "" || (Array.isArray(student) && student.length === 0)) {
+            return false;
+          }
           if (currentQ.question_type === 2) {
             return (
               Array.isArray(student) &&
@@ -369,7 +371,7 @@ export default function NaplanReading({
               student.every(v => correct.includes(v))
             );
           }
-
+          
           return student === correct;
         })()
       : null;
