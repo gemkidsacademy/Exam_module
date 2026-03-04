@@ -1,3 +1,4 @@
+
 import React, {
   useState,
   useEffect,
@@ -680,7 +681,7 @@ export default function NaplanReading({
               if (!optionsSource) return null;
 
               // MULTI SELECT
-              // MULTI SELECT — checkbox list (vertical)
+              // MULTI SELECT — checkbox list (vertical) #here
               if (currentQ.question_type === 2) {
                 const selected = answers[String(currentQ.question_id)] || [];
 
@@ -688,9 +689,30 @@ export default function NaplanReading({
                   <div className="mcq-options list">
                     {Object.entries(optionsSource).map(([k, v]) => {
                       const isSelected = selected.includes(k);
+                      const correct = normalizeCorrectAnswer(
+                        currentQ.exam_bundle.correct_answer,
+                        currentQ.question_type
+                      );
+
+                      const isCorrectOption =
+                        mode === "review" &&
+                        Array.isArray(correct) &&
+                        correct.includes(k);
+
+                      const isWrongSelection =
+                        mode === "review" &&
+                        isSelected &&
+                        (!Array.isArray(correct) || !correct.includes(k));
 
                       return (
-                        <label key={k} className="mcq-option-row">
+                        <label
+                          key={k}
+                          className={[
+                            "mcq-option-row",
+                            isCorrectOption ? "option-correct" : "",
+                            isWrongSelection ? "option-wrong" : ""
+                          ].join(" ")}
+                        >
                           <input
                             type="checkbox"
                             checked={isSelected}
