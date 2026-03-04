@@ -399,14 +399,45 @@ export default function NaplanReading({
             const isAnswered = hasAnswered(q, answers);
             const isCurrent = idx === currentIndex;
         
+            let reviewClass = "";
+        
+            if (mode === "review") {
+              const correct = normalizeCorrectAnswer(
+                q.exam_bundle.correct_answer,
+                q.question_type
+              );
+        
+              const student = normalizeStudentAnswer(
+                answers[String(q.question_id)],
+                q.question_type
+              );
+        
+              let correctFlag = false;
+        
+              if (q.question_type === 2) {
+                correctFlag =
+                  Array.isArray(student) &&
+                  Array.isArray(correct) &&
+                  student.length === correct.length &&
+                  student.every(v => correct.includes(v));
+              } else {
+                correctFlag = student === correct;
+              }
+        
+              reviewClass = correctFlag ? "correct" : "incorrect";
+            }        
             return (
               <button
                 key={q.question_id}
                 className={[
-                  "question-index-item",
-                  isAnswered ? "answered" : "unanswered",
-                  isCurrent ? "current" : ""
-                ].join(" ")}
+                "question-index-item",
+                mode === "review"
+                  ? reviewClass
+                  : isAnswered
+                  ? "answered"
+                  : "unanswered",
+                isCurrent ? "current" : ""
+              ].join(" ")}
                 onClick={() => goToQuestion(idx)}
               >
                 {idx + 1}
