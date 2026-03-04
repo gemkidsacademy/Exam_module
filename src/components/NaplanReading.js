@@ -383,7 +383,7 @@ export default function NaplanReading({
   console.log("🧠 ACTUAL RENDER answers:", answers);
 
   return (
-    <div className="exam-shell">
+    <div className={`exam-shell ${isReview ? "review-mode" : ""}`}>
       <div className="exam-container">
 
         {/* HEADER */}
