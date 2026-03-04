@@ -611,3 +611,12 @@
   font-weight: 600;
   margin-bottom: 4px;
 }
+.option-correct {
+  background-color: #dcfce7;
+  border: 2px solid #22c55e;
+}
+
+.option-wrong {
+  background-color: #fee2e2;
+  border: 2px solid #ef4444;
+}
