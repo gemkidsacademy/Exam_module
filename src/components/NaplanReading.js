@@ -808,10 +808,21 @@ export default function NaplanReading({
       </div>
 
         {mode === "review" && (() => {
-          const correct = normalizeCorrectAnswer(
-          currentQ.exam_bundle.correct_answer,
-          currentQ.question_type
-        );
+          let correct = normalizeCorrectAnswer(
+            currentQ.exam_bundle.correct_answer,
+            currentQ.question_type
+          );
+          
+          // fix for word_select
+          if (currentQ.question_type === 7) {
+            const wordBlock = currentQ.exam_bundle.question_blocks.find(
+              b => b.type === "word_select"
+            );
+          
+            if (wordBlock?.correct_answer) {
+              correct = wordBlock.correct_answer;
+            }
+          }
         
         const student = normalizeStudentAnswer(
           answers[String(currentQ.question_id)],
