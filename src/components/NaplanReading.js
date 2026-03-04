@@ -362,7 +362,15 @@ export default function NaplanReading({
             answers[String(currentQ.question_id)],
             currentQ.question_type
           );
-
+          console.log("----- REVIEW DEBUG -----");
+          console.log("Question ID:", currentQ.question_id);
+          console.log("Question Type:", currentQ.question_type);
+          console.log("Raw correct_answer:", currentQ.exam_bundle.correct_answer);
+          console.log("Normalized correct:", correct);
+          console.log("Raw student answer:", answers[String(currentQ.question_id)]);
+          console.log("Normalized student:", student);
+          console.log("Options:", currentQ.exam_bundle.options);
+          console.log("------------------------");
           if (currentQ.question_type === 2) {
             return (
               Array.isArray(student) &&
