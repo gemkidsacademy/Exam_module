@@ -620,3 +620,8 @@
   background-color: #fee2e2;
   border: 2px solid #ef4444;
 }
+/* Disable exam selection styling during review */
+.exam-shell.review-mode .mcq-option-row:has(input:checked) {
+  background: inherit;
+  border-color: inherit;
+}
