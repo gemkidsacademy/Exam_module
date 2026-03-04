@@ -93,7 +93,23 @@ export default function NaplanLanguageConventions({
     // All single-answer types (1, 3, 4, 5, 6, 7)
     return String(answer).trim();
   };
+  function areNumbersEqual(a, b) {
+    if (a == null || b == null) return false;
 
+    const numA = Number(
+      typeof a === "object" && a.value !== undefined ? a.value : a
+    );
+
+    const numB = Number(
+      typeof b === "object" && b.value !== undefined ? b.value : b
+    );
+
+    if (Number.isNaN(numA) || Number.isNaN(numB)) {
+      return false;
+    }
+
+    return numA === numB;
+  }
 
   // ---------------- REPORT ----------------
   const [report, setReport] = useState(null);
