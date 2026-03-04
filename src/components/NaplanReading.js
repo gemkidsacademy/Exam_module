@@ -772,11 +772,45 @@ export default function NaplanReading({
 
       </div>
 
-        {mode === "review" && (
-          <div className={`review-result ${isCorrect ? "answer-correct" : "answer-wrong"}`}>
-            {isCorrect ? "✔ Correct" : "✖ Incorrect"}
-          </div>
-        )}
+        {mode === "review" && (() => {
+          const correct = normalizeCorrectAnswer(
+            currentQ.exam_bundle.correct_answer,
+            currentQ.question_type
+          );
+        
+          const student = normalizeStudentAnswer(
+            answers[String(currentQ.question_id)],
+            currentQ.question_type
+          );
+        
+          const displayCorrect =
+            currentQ.exam_bundle.options?.[correct] || correct;
+        
+          const displayStudent =
+            currentQ.exam_bundle.options?.[student] || student;
+        
+          return (
+            <div className={`review-result ${isCorrect ? "answer-correct" : "answer-wrong"}`}>
+              <div className="review-status">
+                {isCorrect ? "✔ Correct" : "✖ Incorrect"}
+              </div>
+        
+              <div className="review-details">
+                <div>
+                  <strong>Your answer:</strong>{" "}
+                  {displayStudent || "—"}
+                </div>
+        
+                {!isCorrect && (
+                  <div>
+                    <strong>Correct answer:</strong>{" "}
+                    {displayCorrect}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* NAVIGATION */}
         <div className="nav-buttons">
