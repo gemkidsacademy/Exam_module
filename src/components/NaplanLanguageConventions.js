@@ -9,8 +9,8 @@ import "./NaplanNumeracyExam.css";
 import "./ExamPage.css";
 import styles from "./ExamPageThinkingSkills.module.css";
 
-import NaplanNumeracyReview from "./NaplanNumeracyReview";
-import NaplanNumeracyReport from "./NaplanNumeracyReport";
+import NaplanLanguageConventionsReview from "./NaplanLanguageConventionsReview";
+import NaplanLanguageConventionsReport from "./NaplanLanguageConventionsReport";
 
 /* ============================================================
    MAIN COMPONENT
@@ -248,7 +248,7 @@ export default function NaplanLanguageConventions({
   }
   if (mode === "report") {
     return (
-      <NaplanNumeracyReport
+      <NaplanLanguageConventionsReport
         report={report}
         onViewExamDetails={() => {
           setQuestions([]);
@@ -263,7 +263,7 @@ export default function NaplanLanguageConventions({
 
   if (mode === "review" && !questions.length) {
     return (
-      <NaplanNumeracyReview
+      <NaplanLanguageConventionsReview
         studentId={studentId}
         examAttemptId={examAttemptId}
         onLoaded={(qs) => {
@@ -320,6 +320,10 @@ export default function NaplanLanguageConventions({
 
   const normalizedCorrectAnswer = normalizeCorrectAnswer(
     currentQ.correct_answer,
+    currentQ.question_type
+  );
+  const normalizedStudentAnswer = normalizeStudentAnswer(
+    answers[String(currentQ.id)],
     currentQ.question_type
   );
 
@@ -552,12 +556,19 @@ export default function NaplanLanguageConventions({
     {currentQ.question_type === 1 && currentQ.options && (
       <div className="mcq-options">
         {Object.entries(currentQ.options).map(([key, value]) => {
-          const isSelected = answers[qid] === key;
+          const isSelected = normalizedStudentAnswer === key;
+          const isCorrectOption = normalizedCorrectAnswer === key;
+          const isWrongSelected = isReview && isSelected && !isCorrectOption;
+          const isCorrectHighlight = isReview && isCorrectOption;
 
           return (
             <label
               key={key}
-              className={`mcq-option-card ${isSelected ? "selected" : ""}`}
+              className={`mcq-option-card
+                ${isSelected ? "selected" : ""}
+                ${isCorrectHighlight ? "review-correct" : ""}
+                ${isWrongSelected ? "review-wrong" : ""}
+              `}
             >
               <input
                 type="radio"
@@ -570,6 +581,19 @@ export default function NaplanLanguageConventions({
             </label>
           );
         })}
+      </div>
+    )}
+    {isReview && (
+      <div className={`your-answer-text ${isCorrect ? "correct" : "wrong"}`}>
+        <strong>Your answer:</strong>{" "}
+        {normalizedStudentAnswer || "No answer"}
+      </div>
+    )}
+
+    {isReview && !isCorrect && (
+      <div className="correct-answer-text">
+        <strong>Correct answer:</strong>{" "}
+        {normalizedCorrectAnswer}
       </div>
     )}
     
