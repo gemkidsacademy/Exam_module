@@ -813,14 +813,14 @@ export default function NaplanReading({
             currentQ.question_type
           );
           
-          // fix for word_select
+          // word_select fix
           if (currentQ.question_type === 7) {
-            const wordBlock = currentQ.exam_bundle.question_blocks.find(
+            const block = currentQ.exam_bundle.question_blocks.find(
               b => b.type === "word_select"
             );
           
-            if (wordBlock?.correct_answer) {
-              correct = wordBlock.correct_answer;
+            if (block?.options?.length) {
+              correct = block.options[0];
             }
           }
         
