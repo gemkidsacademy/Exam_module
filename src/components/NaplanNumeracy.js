@@ -445,7 +445,7 @@
 
               let isCorrect = false;
 
-              if (mode === "review") {
+              if (isReview) {
                 if (q.question_type === 2) {
                   if (
                     Array.isArray(normalizedStudentAnswer) &&
