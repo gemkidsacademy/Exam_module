@@ -344,19 +344,54 @@ export default function NaplanLanguageConventions({
           {questions.map((q, i) => {
             let cls = styles.indexCircle;
             const qid = String(q.id);
-            
-            if (
-              answers[qid] !== undefined &&
-              (
-                typeof answers[qid] !== "object" ||
-                answers[qid].length > 0
-              )
-            ) {
-              cls += ` ${styles.indexAnswered}`;
-            } else if (visited[qid]) {
-              cls += ` ${styles.indexVisited}`;
+
+            if (isReview) {
+              const correct = normalizeCorrectAnswer(
+                q.correct_answer,
+                q.question_type
+              );
+
+              const student = normalizeStudentAnswer(
+                answers[qid],
+                q.question_type
+              );
+
+              let questionCorrect = false;
+
+              if (q.question_type === 2) {
+                questionCorrect =
+                  Array.isArray(student) &&
+                  Array.isArray(correct) &&
+                  student.length === correct.length &&
+                  student.every(v => correct.includes(v));
+
+              } else if (q.question_type === 3) {
+                questionCorrect = areNumbersEqual(answers[qid], q.correct_answer);
+
+              } else {
+                questionCorrect = student === correct;
+              }
+
+              cls += questionCorrect
+                ? ` ${styles.indexCorrect}`
+                : ` ${styles.indexWrong}`;
+
             } else {
-              cls += ` ${styles.indexNotVisited}`;
+
+              if (
+                answers[qid] !== undefined &&
+                (
+                  typeof answers[qid] !== "object" ||
+                  answers[qid].length > 0
+                )
+              ) {
+                cls += ` ${styles.indexAnswered}`;
+              } else if (visited[qid]) {
+                cls += ` ${styles.indexVisited}`;
+              } else {
+                cls += ` ${styles.indexNotVisited}`;
+              }
+
             }
 
             return (
