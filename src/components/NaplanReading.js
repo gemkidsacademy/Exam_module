@@ -423,15 +423,30 @@ export default function NaplanReading({
                 (Array.isArray(student) && student.length === 0);
             
               if (!isEmpty) {
+
                 if (q.question_type === 2) {
                   correctFlag =
                     Array.isArray(student) &&
                     Array.isArray(correct) &&
                     student.length === correct.length &&
                     student.every(v => correct.includes(v));
-                } else {
+                }
+              
+                else if (q.question_type === 5) {
+                  const correctArr =
+                    typeof correct === "string" ? correct.split(",") : correct;
+              
+                  correctFlag =
+                    Array.isArray(student) &&
+                    Array.isArray(correctArr) &&
+                    student.length === correctArr.length &&
+                    student.every((v, i) => v === correctArr[i]);
+                }
+              
+                else {
                   correctFlag = student === correct;
                 }
+              
               }
             
               reviewClass = correctFlag ? "correct" : "incorrect";
