@@ -809,21 +809,30 @@ export default function NaplanReading({
 
         {mode === "review" && (() => {
           const correct = normalizeCorrectAnswer(
-            currentQ.exam_bundle.correct_answer,
-            currentQ.question_type
-          );
+          currentQ.exam_bundle.correct_answer,
+          currentQ.question_type
+        );
         
-          const student = normalizeStudentAnswer(
-            answers[String(currentQ.question_id)],
-            currentQ.question_type
-          );
+        const student = normalizeStudentAnswer(
+          answers[String(currentQ.question_id)],
+          currentQ.question_type
+        );
         
-          const displayCorrect =
-            currentQ.exam_bundle.options?.[correct] || correct;
+        let displayCorrect = Array.isArray(correct) ? correct[0] : correct;
         
-          const displayStudent =
-            currentQ.exam_bundle.options?.[student] || student;
+        // normal MCQ
+        if (currentQ.exam_bundle.options) {
+          displayCorrect =
+            currentQ.exam_bundle.options[displayCorrect] || displayCorrect;
+        }
         
+        // word_select fallback
+        if (currentQ.question_type === 7) {
+          displayCorrect = Array.isArray(correct) ? correct[0] : correct;
+        }
+        
+        const displayStudent =
+          currentQ.exam_bundle.options?.[student] || student;        
           return (
             <div className={`review-result ${isCorrect ? "answer-correct" : "answer-wrong"}`}>
               <div className="review-status">
