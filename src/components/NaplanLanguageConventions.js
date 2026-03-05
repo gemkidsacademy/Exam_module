@@ -154,33 +154,46 @@ export default function NaplanLanguageConventions({
   useEffect(() => {
     if (!studentId) return;
   
-    // 🔑 only run ONCE from loading
+    // Only run once while loading
     if (mode !== "loading") return;
   
-    const startExam = async () => {
-      const res = await fetch(
-        `${API_BASE}/api/student/start-exam/naplan-language-conventions`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ student_id: studentId })
+    const startExamNaplanLanguageConventions = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE}/api/student/start-exam/naplan-language-conventions`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ student_id: studentId })
+          }
+        );
+  
+        const examPayload = await response.json();
+  
+        // 🔎 Print everything received from backend
+        console.log("NAPLAN Language Conventions Exam Payload:", examPayload);
+  
+        if (examPayload.completed === true) {
+          await loadReport();
+          return;
         }
-      );
   
-      const data = await res.json();
+        console.log("Questions received:", examPayload.questions);
+        console.log("Remaining time:", examPayload.remaining_time);
   
-      if (data.completed === true) {
-        await loadReport();
-        return;
+        setQuestions(examPayload.questions || []);
+        setTimeLeft(examPayload.remaining_time);
+        setMode("exam");
+  
+        onExamStart?.();
+  
+      } catch (error) {
+        console.error("Failed to start NAPLAN Language Conventions exam:", error);
       }
-  
-      setQuestions(data.questions || []);
-      setTimeLeft(data.remaining_time);
-      setMode("exam");
-      onExamStart?.();
     };
   
-    startExam();
+    startExamNaplanLanguageConventions();
+  
   }, [studentId, API_BASE, loadReport, mode, onExamStart]);
   /* ============================================================
      FINISH EXAM
