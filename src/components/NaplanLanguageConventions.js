@@ -634,6 +634,7 @@ export default function NaplanLanguageConventions({
         disabled={isReview}
         spellCheck={false}
         autoComplete="off"
+        onContextMenu={(e) => e.preventDefault()}
       />
     )}
     {/* =========================
