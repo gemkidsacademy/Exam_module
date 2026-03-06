@@ -78,12 +78,58 @@ export default function NaplanReading({
   /* ============================================================
      NORMALIZATION HELPERS (REUSED FROM NUMERACY)
   ============================================================ */
+  function isAnswerCorrect(question, answers) {
+  const correct = normalizeCorrectAnswer(
+    question.exam_bundle.correct_answer,
+    question.question_type
+  );
+
+  const student = normalizeStudentAnswer(
+    answers[String(question.question_id)],
+    question.question_type
+  );
+
+  // Multi select
+  if (question.question_type === 2) {
+    if (!Array.isArray(student) || !Array.isArray(correct)) return false;
+
+    if (student.length !== correct.length) return false;
+
+    return student.every(v => correct.includes(v));
+  }
+
+  // True / False matrix
+  if (question.question_type === 5) {
+    if (!Array.isArray(student) || !Array.isArray(correct)) return false;
+
+    if (student.length !== correct.length) return false;
+
+    return student.every((v, i) => v === correct[i]);
+  }
+
+  // All other types
+  return student === correct;
+}
   const normalizeCorrectAnswer = (correctAnswer, questionType) => {
   if (correctAnswer == null) return null;
 
   if (typeof correctAnswer === "object" && correctAnswer.value !== undefined) {
     correctAnswer = correctAnswer.value;
   }
+  // true false
+if (questionType === 5) {
+  if (Array.isArray(correctAnswer)) return correctAnswer;
+
+  if (typeof correctAnswer === "string") {
+    try {
+      return JSON.parse(correctAnswer.replace(/'/g, '"'));
+    } catch {
+      return [];
+    }
+  }
+
+  return [];
+}
 
   // multi select
   if (questionType === 2) {
@@ -101,13 +147,14 @@ export default function NaplanReading({
   }
 
   // word select
+  // word select
   if (questionType === 7) {
     if (Array.isArray(correctAnswer)) {
-      return correctAnswer[0];
+      return String(correctAnswer[0]).trim();
     }
+  
     return String(correctAnswer).trim();
   }
-
   return String(correctAnswer).trim();
 };
   const normalizeStudentAnswer = (answer, questionType) => {
@@ -352,39 +399,9 @@ export default function NaplanReading({
      REVIEW CORRECTNESS
   ============================================================ */
   const isCorrect =
-    mode === "review"
-      ? (() => {
-          const correct = normalizeCorrectAnswer(
-            currentQ.exam_bundle.correct_answer,
-            currentQ.question_type
-          );
-
-          const student = normalizeStudentAnswer(
-            answers[String(currentQ.question_id)],
-            currentQ.question_type
-          );
-          console.log("----- REVIEW DEBUG -----");
-          console.log("Question ID:", currentQ.question_id);
-          console.log("Question Type:", currentQ.question_type);
-          console.log("Raw correct_answer:", currentQ.exam_bundle.correct_answer);
-          console.log("Normalized correct:", correct);
-          console.log("Raw student answer:", answers[String(currentQ.question_id)]);
-          console.log("Normalized student:", student);
-          console.log("Options:", currentQ.exam_bundle.options);
-          console.log("------------------------");
-          if (currentQ.question_type === 2) {
-            return (
-              Array.isArray(student) &&
-              Array.isArray(correct) &&
-              student.length === correct.length &&
-              student.every(v => correct.includes(v))
-            );
-          }
-
-          return student === correct;
-        })()
-      : null;
-
+  mode === "review"
+    ? isAnswerCorrect(currentQ, answers)
+    : null;
   /* ============================================================
      CURRENT PASSAGE
   ============================================================ */
@@ -413,28 +430,7 @@ export default function NaplanReading({
             let reviewClass = "";
         
             if (mode === "review") {
-              const correct = normalizeCorrectAnswer(
-                q.exam_bundle.correct_answer,
-                q.question_type
-              );
-        
-              const student = normalizeStudentAnswer(
-                answers[String(q.question_id)],
-                q.question_type
-              );
-        
-              let correctFlag = false;
-        
-              if (q.question_type === 2) {
-                correctFlag =
-                  Array.isArray(student) &&
-                  Array.isArray(correct) &&
-                  student.length === correct.length &&
-                  student.every(v => correct.includes(v));
-              } else {
-                correctFlag = student === correct;
-              }
-        
+              const correctFlag = isAnswerCorrect(q, answers);
               reviewClass = correctFlag ? "correct" : "incorrect";
             }        
             return (
@@ -509,7 +505,7 @@ export default function NaplanReading({
                       </p>
 
                       {/* Word bank (if present) */}
-                      {block.word_bank?.length && (
+                      {block.word_bank?.length > 0 && (
                         <select
                           className="gap-dropdown"
                           value={answers[qid] || ""}
