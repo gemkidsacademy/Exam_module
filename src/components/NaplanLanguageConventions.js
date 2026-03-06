@@ -632,6 +632,8 @@ export default function NaplanLanguageConventions({
         value={answers[qid] || ""}
         onChange={(e) => handleAnswer(e.target.value)}
         disabled={isReview}
+        spellCheck={false}
+        autoComplete="off"
       />
     )}
     {/* =========================
