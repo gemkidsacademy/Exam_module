@@ -169,10 +169,10 @@
 
 .question-pane {
   width: 380px;
-  min-height: 0;        /* 🔑 REQUIRED */
-  overflow-y: auto;    /* 🔑 ENABLE SCROLL */
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
-
 .question-card {
   background: #ffffff;
   border-radius: 12px;
@@ -416,5 +416,12 @@
 .overall-stats div {
   margin: 4px 0;
 }
-
+.options {
+  flex: 1;                 /* takes remaining vertical space */
+  overflow-y: auto;        /* enables vertical scroll */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 6px;      /* small space for scrollbar */
+}
 
