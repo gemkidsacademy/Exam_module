@@ -6,8 +6,7 @@
   flex: 1;
   width: 100%;
   min-width: 100%;
-
-  height: 100%;
+  height: 100vh;   /* 🔑 critical */
   padding: 24px;
   box-sizing: border-box;
 
@@ -135,11 +134,12 @@
 .exam-body {
   display: flex;
   gap: 24px;
+
   flex: 1;
   min-height: 0;
 
   width: 100%;
-  max-width: 100%;
+  height: 0;      /* 🔑 critical trick for flex scrolling */
 }
 /* =======================================================
    PASSAGE PANE
