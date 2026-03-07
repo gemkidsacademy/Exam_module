@@ -1123,10 +1123,15 @@ progress::-moz-progress-bar {
   resize: none;
 }
 .exam-body {
-  flex: 1;                 /* 🔥 THIS IS THE KEY */
+  flex: 1;
   display: flex;
-  overflow: hidden;        /* stop page scroll */
+
+  min-height: 0;      /* ✅ critical for flex scrolling */
+  overflow-y: auto;
+  overflow-x: hidden;
 }
+
+
 .reading-mode .passage-pane {
   flex: 0 0 60%;
   width: 60%;
