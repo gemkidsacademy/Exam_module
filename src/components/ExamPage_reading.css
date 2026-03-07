@@ -155,7 +155,7 @@
   border-radius: 12px;
   border: 1px solid #e5e7eb;
 
-  overflow: auto;   /* 🔑 allows both vertical and horizontal scroll */
+  overflow-y: auto;   /* vertical scroll */
 }
 .passage-pane h3 {
   font-size: 18px;
@@ -175,9 +175,11 @@
 ======================================================= */
 
 .question-pane {
-  flex: 0 0 420px;   /* preferred width */
-  max-width: 520px;  /* prevent it becoming huge on big screens */
+  flex: 0 0 420px;
+  max-width: 520px;
+
   min-height: 0;
+  overflow: hidden;   /* prevents parent expansion */
 
   display: flex;
   flex-direction: column;
@@ -429,7 +431,7 @@
   flex: 1;
   min-height: 0;
 
-  overflow: auto;   /* 🔑 allow scroll again */
+  overflow-y: auto;   /* vertical scroll */
 
   display: flex;
   flex-direction: column;
