@@ -1143,7 +1143,16 @@ progress::-moz-progress-bar {
   width: 40%;
   max-width: 40%;
 }
+.options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 
+  max-height: 420px;
+  overflow-y: auto;
+
+  padding-right: 6px;
+}
    
 
 
