@@ -7,9 +7,10 @@
 
   display: block;
 
-  overflow-y: auto;   /* ✅ allow vertical scrolling */
-  overflow-x: hidden;
-}/*
+  overflow-y: visible;   /* allow page to grow */
+}
+
+/*
   This is the MAIN fix:
   - allow full width
   - control readability with max-width
