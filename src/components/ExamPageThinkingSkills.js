@@ -383,39 +383,57 @@ return (
 <div className="question-card">
 
 {/* QUESTION BLOCKS */}
-<div className="question-blocks">
-{currentQ.blocks?.map((block, idx) => {
-  if (block.type === "text") {
-    return (
-      <p key={idx} className="question-text">
-        {block.content}
-      </p>
-    );
-  }
+<div
+  style={{
+    flex: 1,
+    overflowY: "auto",
+    minHeight: 0,
+    paddingRight: "8px"
+  }}
+>
+  {currentQ.blocks?.map((block, idx) => {
+    if (block.type === "text") {
+      return (
+        <p
+          key={idx}
+          style={{
+            fontSize: "16px",
+            lineHeight: "1.6",
+            marginBottom: "12px"
+          }}
+        >
+          {block.content}
+        </p>
+      );
+    }
 
-  if (block.type === "image") {
-    const cleanSrc = block.src?.trim();
-    if (!cleanSrc) return null;
-  
-    const src = cleanSrc.startsWith("http")
-      ? cleanSrc
-      : IMAGE_BASE + cleanSrc;
-  
-    return (
-      <img
-        key={idx}
-        src={src}
-        alt={`Question visual ${idx + 1}`}
-        className="question-image"
-        loading="lazy"
-      />
-    );
-  }
+    if (block.type === "image") {
+      const cleanSrc = block.src?.trim();
+      if (!cleanSrc) return null;
 
+      const src = cleanSrc.startsWith("http")
+        ? cleanSrc
+        : IMAGE_BASE + cleanSrc;
 
+      return (
+        <img
+          key={idx}
+          src={src}
+          alt={`Question visual ${idx + 1}`}
+          loading="lazy"
+          style={{
+            maxWidth: "100%",
+            height: "auto",
+            display: "block",
+            marginBottom: "16px",
+            borderRadius: "6px"
+          }}
+        />
+      );
+    }
 
-  return null;
-})}
+    return null;
+  })}
 </div>
 
 {/* OPTIONS */}
