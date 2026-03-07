@@ -419,59 +419,70 @@ return (
 </div>
 
 {/* OPTIONS */}
-{optionEntries.map(([optionKey, rawValue]) => {
-const optionValue = normalizeOption(rawValue);
-const studentAnswer = isReview
-  ? currentQ.student_answer
-  : answers[String(currentQ.q_id)];
-const correctAnswer = isReview
-  ? currentQ.correct_answer
-  : null;
-let optionClass = "option-btn";
+{/* OPTIONS */}
+<div className="options-container">
 
-if (isReview) {
-  // ✅ review mode logic
-  if (optionKey === correctAnswer) {
-    optionClass += " correct";
-  } else if (
-    studentAnswer &&
-    optionKey === studentAnswer &&
-    studentAnswer !== correctAnswer
-  ) {
-    optionClass += " incorrect";
-  }
-} else {
-  // ✅ normal exam mode
-  if (studentAnswer === optionKey) {
-    optionClass += " selected";
-  }
-}
+  {optionEntries.map(([optionKey, rawValue]) => {
 
+    const optionValue = normalizeOption(rawValue);
 
-return (
-    <button
-      className={optionClass + (isReview ? " review" : "")}
-      onClick={() => !isReview && handleAnswer(optionKey)}
-    >
+    const studentAnswer = isReview
+      ? currentQ.student_answer
+      : answers[String(currentQ.q_id)];
 
-      <strong>{optionKey})</strong>
+    const correctAnswer = isReview
+      ? currentQ.correct_answer
+      : null;
 
-      {optionValue.type === "text" && (
-        <span className="option-text">
-          {optionValue.content}
-        </span>
-      )}
+    let optionClass = "option-btn";
 
-      {optionValue.type === "image" && (
-        <img
-          src={optionValue.src}
-          alt={`Option ${optionKey}`}
-          className="option-image"
-        />
-      )}
-    </button>
-  );
-})}
+    if (isReview) {
+      // review mode styling
+      if (optionKey === correctAnswer) {
+        optionClass += " correct";
+      }
+      else if (
+        studentAnswer &&
+        optionKey === studentAnswer &&
+        studentAnswer !== correctAnswer
+      ) {
+        optionClass += " incorrect";
+      }
+    } 
+    else {
+      // exam mode styling
+      if (studentAnswer === optionKey) {
+        optionClass += " selected";
+      }
+    }
+
+    return (
+      <button
+        key={optionKey}
+        className={optionClass + (isReview ? " review" : "")}
+        onClick={() => !isReview && handleAnswer(optionKey)}
+      >
+        <strong>{optionKey})</strong>
+
+        {optionValue.type === "text" && (
+          <span className="option-text">
+            {optionValue.content}
+          </span>
+        )}
+
+        {optionValue.type === "image" && (
+          <img
+            src={optionValue.src}
+            alt={`Option ${optionKey}`}
+            className="option-image"
+          />
+        )}
+      </button>
+    );
+
+  })}
+
+</div>
 
 
 </div>
