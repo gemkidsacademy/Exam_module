@@ -147,15 +147,15 @@
 
 .passage-pane {
   flex: 1;
-  min-width: 0;          /* prevents flex overflow issues */
-  min-height: 0;         /* required for vertical scrolling inside flex */
+  min-width: 0;
+  min-height: 0;
 
   padding: 24px;
   background: #ffffff;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
 
-  overflow-y: auto;      /* enables vertical scroll for passage */
+  overflow: auto;   /* 🔑 allows both vertical and horizontal scroll */
 }
 .passage-pane h3 {
   font-size: 18px;
@@ -426,11 +426,14 @@
   margin: 4px 0;
 }
 .options {
-  flex: 1;                 /* takes remaining vertical space */
-  overflow-y: auto;        /* enables vertical scroll */
+  flex: 1;
+  min-height: 0;
+
+  overflow: auto;   /* 🔑 allow scroll again */
+
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding-right: 6px;      /* small space for scrollbar */
-}
 
+  padding-right: 6px;
+}
