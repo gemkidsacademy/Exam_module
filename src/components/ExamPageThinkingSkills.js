@@ -380,17 +380,14 @@ return (
 
 
     {/* QUESTION CARD */}
-<div className="question-card">
-
-{/* QUESTION BLOCKS */}
 <div
+  className="question-card"
   style={{
-    flex: 1,
-    overflowY: "auto",
-    minHeight: 0,
-    paddingRight: "8px"
+    maxHeight: "70vh",
+    overflowY: "auto"
   }}
 >
+
   {currentQ.blocks?.map((block, idx) => {
     if (block.type === "text") {
       return (
