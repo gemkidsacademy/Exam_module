@@ -320,60 +320,57 @@ if (mode === "review" && !questions.length) {
 // ---------------- EXAM UI ----------------
 const currentQ = activeQuestions[currentIndex];
 if (!currentQ) return null;
-
 const optionEntries = Object.entries(currentQ.options || {});
 
 return (
-<div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-
-  <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "32px 48px" }}>
+<div className={styles.examShell}>
+  <div className={styles.examContainer}>
 
     {/* HEADER */}
-    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
+    <div className={styles.examHeader}>
       {!isReview && (
-        <div style={{ fontWeight: "bold" }}>
-          ⏳ {formatTime(timeLeft)}
-        </div>
+        <div className="timer">⏳ {formatTime(timeLeft)}</div>
       )}
 
-      <div>
+      <div className="counter">
         Question {currentIndex + 1} / {activeQuestions.length}
       </div>
     </div>
 
     {/* QUESTION INDEX */}
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "16px" }}>
+    <div className={styles.indexRow}>
       {activeQuestions.map((q, i) => {
-
-        let bg = "#e5e7eb";
+        let cls = styles.indexCircle;
 
         if (isReview) {
-          if (!q.student_answer) bg = "#9ca3af";
-          else if (q.student_answer === q.correct_answer) bg = "#22c55e";
-          else bg = "#ef4444";
+          if (!q.student_answer) {
+            cls += ` ${styles.indexSkipped}`;
+          } else if (q.student_answer === q.correct_answer) {
+            cls += ` ${styles.indexCorrect}`;
+          } else {
+            cls += ` ${styles.indexIncorrect}`;
+          }
         } else {
           const qid = String(q.q_id);
 
-          if (answers[qid]) bg = "#2563eb";
-          else if (visited[qid]) bg = "#f59e0b";
+          if (answers[qid]) {
+            cls += ` ${styles.indexAnswered}`;
+          } else if (visited[qid]) {
+            cls += ` ${styles.indexVisited}`;
+          } else {
+            cls += ` ${styles.indexNotVisited}`;
+          }
+
         }
+        // 🔍 DEBUG LOG (temporary)
+        const qid = String(q.q_id);
+        
 
         return (
           <div
             key={q.q_id}
+            className={cls}
             onClick={() => goToQuestion(i)}
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: "50%",
-              background: bg,
-              color: "white",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              fontSize: 14
-            }}
           >
             {i + 1}
           </div>
@@ -381,133 +378,108 @@ return (
       })}
     </div>
 
-    {/* SCROLLABLE QUESTION AREA */}
-    <div
-      style={{
-        flex: 1,
-        overflowY: "auto",
-        border: "1px solid #e5e7eb",
-        borderRadius: "12px",
-        padding: "24px",
-        background: "#ffffff",
-        minHeight: 0
-      }}
+
+    {/* QUESTION CARD */}
+<div className="question-card">
+
+{/* QUESTION BLOCKS */}
+<div className="question-blocks">
+{currentQ.blocks?.map((block, idx) => {
+  if (block.type === "text") {
+    return (
+      <p key={idx} className="question-text">
+        {block.content}
+      </p>
+    );
+  }
+
+  if (block.type === "image") {
+    const cleanSrc = block.src?.trim();
+    if (!cleanSrc) return null;
+  
+    const src = cleanSrc.startsWith("http")
+      ? cleanSrc
+      : IMAGE_BASE + cleanSrc;
+  
+    return (
+      <img
+        key={idx}
+        src={src}
+        alt={`Question visual ${idx + 1}`}
+        className="question-image"
+        loading="lazy"
+      />
+    );
+  }
+
+
+
+  return null;
+})}
+</div>
+
+{/* OPTIONS */}
+{optionEntries.map(([optionKey, rawValue]) => {
+const optionValue = normalizeOption(rawValue);
+const studentAnswer = isReview
+  ? currentQ.student_answer
+  : answers[String(currentQ.q_id)];
+const correctAnswer = isReview
+  ? currentQ.correct_answer
+  : null;
+let optionClass = "option-btn";
+
+if (isReview) {
+  // ✅ review mode logic
+  if (optionKey === correctAnswer) {
+    optionClass += " correct";
+  } else if (
+    studentAnswer &&
+    optionKey === studentAnswer &&
+    studentAnswer !== correctAnswer
+  ) {
+    optionClass += " incorrect";
+  }
+} else {
+  // ✅ normal exam mode
+  if (studentAnswer === optionKey) {
+    optionClass += " selected";
+  }
+}
+
+
+return (
+    <button
+      className={optionClass + (isReview ? " review" : "")}
+      onClick={() => !isReview && handleAnswer(optionKey)}
     >
 
-      {/* QUESTION BLOCKS */}
-      {currentQ.blocks?.map((block, idx) => {
+      <strong>{optionKey})</strong>
 
-        if (block.type === "text") {
-          return (
-            <p
-              key={idx}
-              style={{
-                fontSize: "16px",
-                lineHeight: "1.6",
-                marginBottom: "12px"
-              }}
-            >
-              {block.content}
-            </p>
-          );
-        }
+      {optionValue.type === "text" && (
+        <span className="option-text">
+          {optionValue.content}
+        </span>
+      )}
 
-        if (block.type === "image") {
+      {optionValue.type === "image" && (
+        <img
+          src={optionValue.src}
+          alt={`Option ${optionKey}`}
+          className="option-image"
+        />
+      )}
+    </button>
+  );
+})}
 
-          const cleanSrc = block.src?.trim();
-          if (!cleanSrc) return null;
 
-          const src = cleanSrc.startsWith("http")
-            ? cleanSrc
-            : IMAGE_BASE + cleanSrc;
-
-          return (
-            <img
-              key={idx}
-              src={src}
-              alt={`Question visual ${idx + 1}`}
-              loading="lazy"
-              style={{
-                maxWidth: "100%",
-                height: "auto",
-                display: "block",
-                marginBottom: "16px",
-                borderRadius: "6px"
-              }}
-            />
-          );
-        }
-
-        return null;
-
-      })}
-
-      {/* OPTIONS */}
-      {optionEntries.map(([optionKey, rawValue]) => {
-
-        const optionValue = normalizeOption(rawValue);
-
-        const studentAnswer = isReview
-          ? currentQ.student_answer
-          : answers[String(currentQ.q_id)];
-
-        const correctAnswer = isReview
-          ? currentQ.correct_answer
-          : null;
-
-        let background = "#f3f4f6";
-
-        if (isReview) {
-          if (optionKey === correctAnswer) background = "#bbf7d0";
-          else if (studentAnswer === optionKey && studentAnswer !== correctAnswer)
-            background = "#fecaca";
-        } else {
-          if (studentAnswer === optionKey) background = "#bfdbfe";
-        }
-
-        return (
-          <button
-            key={optionKey}
-            onClick={() => !isReview && handleAnswer(optionKey)}
-            style={{
-              width: "100%",
-              padding: "12px",
-              marginBottom: "10px",
-              borderRadius: "8px",
-              border: "1px solid #d1d5db",
-              background,
-              cursor: isReview ? "default" : "pointer",
-              textAlign: "left"
-            }}
-          >
-
-            <strong>{optionKey})</strong>{" "}
-
-            {optionValue.type === "text" && (
-              <span>{optionValue.content}</span>
-            )}
-
-            {optionValue.type === "image" && (
-              <img
-                src={optionValue.src}
-                alt={`Option ${optionKey}`}
-                style={{
-                  maxWidth: "100%",
-                  marginTop: "8px"
-                }}
-              />
-            )}
-
-          </button>
-        );
-      })}
-
-    </div>
+</div>
 
     {/* NAVIGATION */}
-    <div style={{ display: "flex", justifyContent: "space-between", marginTop: "16px" }}>
-
+    <div className="nav-buttons">
       <button
+        className="nav-btn prev"
         onClick={() => goToQuestion(currentIndex - 1)}
         disabled={currentIndex === 0}
       >
@@ -515,22 +487,27 @@ return (
       </button>
 
       {currentIndex < activeQuestions.length - 1 && (
-        <button onClick={() => goToQuestion(currentIndex + 1)}>
-          Next
-        </button>
-      )}
+       <button
+         className="nav-btn next"
+         onClick={() => goToQuestion(currentIndex + 1)}
+       >
+         Next
+       </button>
+     )}
+     
+     {currentIndex === activeQuestions.length - 1 && !isReview && (
+       <button
+        className="nav-btn finish"
+        onClick={() => setShowConfirmFinish(true)}
+      >
+        Finish Exam
+      </button>
 
-      {currentIndex === activeQuestions.length - 1 && !isReview && (
-        <button onClick={() => setShowConfirmFinish(true)}>
-          Finish Exam
-        </button>
-      )}
+     )}
 
     </div>
 
   </div>
-
-
   {showConfirmFinish && (
   <div className="confirm-overlay">
     <div className="confirm-modal">
