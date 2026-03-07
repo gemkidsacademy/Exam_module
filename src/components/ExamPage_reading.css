@@ -135,22 +135,26 @@
   gap: 24px;
   flex: 1;
   min-height: 0;
+
   width: 100%;
+  max-width: 100%;
 }
 /* =======================================================
    PASSAGE PANE
 ======================================================= */
 
 .passage-pane {
-  flex: 1 1 auto;
-  min-height: 0;        /* 🔑 REQUIRED for flex scrolling */
+  flex: 1;
+  min-width: 0;          /* prevents flex overflow issues */
+  min-height: 0;         /* required for vertical scrolling inside flex */
+
   padding: 24px;
   background: #ffffff;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
-  overflow-y: auto;
-}
 
+  overflow-y: auto;      /* enables vertical scroll for passage */
+}
 .passage-pane h3 {
   font-size: 18px;
   font-weight: 600;
@@ -169,8 +173,10 @@
 ======================================================= */
 
 .question-pane {
-  width: 380px;
+  flex: 0 0 420px;   /* preferred width */
+  max-width: 520px;  /* prevent it becoming huge on big screens */
   min-height: 0;
+
   display: flex;
   flex-direction: column;
 }
