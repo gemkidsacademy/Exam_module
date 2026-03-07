@@ -434,8 +434,3 @@
   padding-right: 6px;      /* small space for scrollbar */
 }
 
-.selective-dashboard { outline: 3px solid red; }
-.content-area { outline: 3px solid blue; }
-.exam-root { outline: 3px solid green; }
-.exam-container { outline: 3px solid purple; }
-.exam-body { outline: 3px solid orange; }
