@@ -1,6 +1,7 @@
   import React, { useState, useEffect } from "react";
-  import "./ExamPage.css";
-  
+  import "./WritingComponent.css";
+
+
   const API_BASE = process.env.REACT_APP_API_URL;
   console.log("🧪 API_BASE:", API_BASE);
 
