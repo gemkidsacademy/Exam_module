@@ -7,9 +7,8 @@
 
   display: block;
 
-  overflow-y: visible;   /* allow page to grow */
+  overflow-y: auto;   /* enable vertical scroll */
 }
-
 /*
   This is the MAIN fix:
   - allow full width
