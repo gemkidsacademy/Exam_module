@@ -544,9 +544,11 @@ const currentQuestion = questions[index];
     </div>
 
     <div className="exam-body">
-      <div className={`passage-pane ${passageStyle}`}>
-
-        {/* LITERARY PASSAGE */}
+      <div
+       className={`passage-pane ${passageStyle}`}
+       onContextMenu={(e) => e.preventDefault()}
+       onDoubleClick={(e) => e.preventDefault()}
+     >        {/* LITERARY PASSAGE */}
         {/* LITERARY PASSAGE (Main Idea & Summary) */}
         {passageStyle === "literary" && rm && typeof rm === "object" && (
           <div className="literary-passage">
