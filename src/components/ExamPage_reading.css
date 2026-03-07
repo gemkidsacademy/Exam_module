@@ -156,6 +156,9 @@
   border: 1px solid #e5e7eb;
 
   overflow-y: auto;   /* vertical scroll */
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 .passage-pane h3 {
   font-size: 18px;
