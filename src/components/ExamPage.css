@@ -92,31 +92,32 @@
   color: #6b7280;
   background: #f3f4f6;
 }
+
 .exam-container {
   width: 100%;
-  height: 100%;              /* fills exam-shell */
+  min-height: 100%;        /* allow content expansion */
   margin: 0;
   padding: 0;
 
-  display: flex;             /* 🔥 critical */
-  flex-direction: column;    /* header → body → nav */
+  display: flex;
+  flex-direction: column;  /* header → body → nav */
 
-  overflow: hidden;          /* 🔥 nothing leaks out */
+  overflow: visible;       /* allow children to extend */
   box-sizing: border-box;
 }
-
-
 /* ============================================
    EXAM SHELL — CORRECT FIX
 ============================================ */
 .exam-shell {
   width: 100%;
-  height: 100vh;          /* lock to viewport */
+  min-height: 100vh;      /* allow page to grow beyond viewport */
   margin: 0;
   padding: 0;
 
   display: block;
-  overflow: hidden;       /* 🔥 prevent page-level scrolling */
+
+  overflow-y: auto;       /* enable vertical scrolling */
+  overflow-x: hidden;
 
   background: #f5f7fb;
   box-sizing: border-box;
