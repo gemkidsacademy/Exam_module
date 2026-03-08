@@ -4,6 +4,7 @@ import "./QuizSetup.css";
 export default function QuizSetup_naplan({ examType }) {
   const [availableTopics, setAvailableTopics] = useState([]);
   const [totalQuestions, setTotalQuestions] = useState(0);
+  const [availableYears, setAvailableYears] = useState([]);
 
   const [questionBank, setQuestionBank] = useState([]);
   const [showQuestionBank, setShowQuestionBank] = useState(false);
@@ -56,7 +57,28 @@ export default function QuizSetup_naplan({ examType }) {
     setTotalQuestions(0);
     setShowQuestionBank(false);
   }, [examType]);
+  /* ============================
+   Fetch available years
+============================ */
+useEffect(() => {
+  const fetchYears = async () => {
+    try {
+      const res = await fetch(
+        "https://web-production-481a5.up.railway.app/api/naplan-years"
+      );
 
+      if (!res.ok) throw new Error("Failed to fetch years");
+
+      const data = await res.json();
+      setAvailableYears(data);
+    } catch (err) {
+      console.error("❌ Failed to load years:", err);
+      setAvailableYears([]);
+    }
+  };
+
+  fetchYears();
+}, []);
   /* ============================
      Input handlers
   ============================ */
@@ -296,13 +318,17 @@ export default function QuizSetup_naplan({ examType }) {
       <label>Year:</label>
       <select name="year" value={quiz.year} onChange={handleInputChange}>
         <option value="">Select Year</option>
-        <option value="3">Year 3</option>
-        <option value="5">Year 5</option>
-        <option value="5">Year 7</option>
-        <option value="5">Year 9</option>  
-          
+      
+        {availableYears.map((y, index) => {
+          const yearValue = typeof y === "object" ? y.year : y;
+      
+          return (
+            <option key={index} value={yearValue}>
+              Year {yearValue}
+            </option>
+          );
+        })}
       </select>
-
       <label>Difficulty:</label>
       <select
         name="difficulty"
