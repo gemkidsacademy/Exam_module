@@ -1,12 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const GenerateExam_naplan_language_conventions = () => {
-  const [loading, setLoading] = useState(false);
+  const [years, setYears] = useState([]);
+  const [selectedYear, setSelectedYear] = useState("");
+
+  const [loadingYears, setLoadingYears] = useState(true);
+  const [loadingExam, setLoadingExam] = useState(false);
+
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
 
+  /* ----------------------------------------------------
+     Fetch available years from backend
+  ---------------------------------------------------- */
+  useEffect(() => {
+    const fetchYears = async () => {
+      try {
+        const response = await fetch(
+          "https://web-production-481a5.up.railway.app/naplan/language-conventions/available-years"
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.detail || "Failed to load years");
+        }
+
+        setYears(data.years);
+
+        if (data.years.length > 0) {
+          setSelectedYear(data.years[0]);
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoadingYears(false);
+      }
+    };
+
+    fetchYears();
+  }, []);
+
+  /* ----------------------------------------------------
+     Generate exam
+  ---------------------------------------------------- */
   const handleGenerate = async () => {
-    setLoading(true);
+    if (!selectedYear) {
+      setError("Please select a year");
+      return;
+    }
+
+    setLoadingExam(true);
     setMessage(null);
     setError(null);
 
@@ -18,6 +62,9 @@ const GenerateExam_naplan_language_conventions = () => {
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            year: selectedYear,
+          }),
         }
       );
 
@@ -28,12 +75,12 @@ const GenerateExam_naplan_language_conventions = () => {
       }
 
       setMessage(
-        `✅ Exam generated successfully (Exam ID: ${data.exam_id}, ${data.total_questions} questions)`
+        `✅ Exam generated successfully (Year: ${selectedYear}, Exam ID: ${data.exam_id}, ${data.total_questions} questions)`
       );
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      setLoadingExam(false);
     }
   };
 
@@ -41,21 +88,53 @@ const GenerateExam_naplan_language_conventions = () => {
     <div style={{ maxWidth: 400, margin: "0 auto" }}>
       <h3>Generate NAPLAN Language Conventions Exam</h3>
 
+      {/* YEAR DROPDOWN */}
+      <div style={{ marginBottom: "12px" }}>
+        <label>Select Year</label>
+
+        {loadingYears ? (
+          <p>Loading years...</p>
+        ) : (
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            style={{
+              width: "100%",
+              padding: "8px",
+              marginTop: "6px"
+            }}
+          >
+            {years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
+
+      {/* GENERATE BUTTON */}
       <button
         className="dashboard-button"
         onClick={handleGenerate}
-        disabled={loading}
+        disabled={loadingExam || loadingYears}
         style={{ width: "100%" }}
       >
-        {loading ? "Generating..." : "Generate Exam"}
+        {loadingExam ? "Generating..." : "Generate Exam"}
       </button>
 
+      {/* SUCCESS */}
       {message && (
-        <p style={{ color: "green", marginTop: "12px" }}>{message}</p>
+        <p style={{ color: "green", marginTop: "12px" }}>
+          {message}
+        </p>
       )}
 
+      {/* ERROR */}
       {error && (
-        <p style={{ color: "red", marginTop: "12px" }}>{error}</p>
+        <p style={{ color: "red", marginTop: "12px" }}>
+          {error}
+        </p>
       )}
     </div>
   );
