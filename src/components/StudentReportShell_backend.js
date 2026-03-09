@@ -648,7 +648,7 @@
         </div>
   
         {/* Date (non-cumulative only) */}
-        {reportType !== "cumulative" && (
+        {reportType !== "cumulative" && reportType !== "topic" && (
   <div className="field">
     <label>Date</label>
     <select
