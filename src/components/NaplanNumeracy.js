@@ -515,7 +515,16 @@
                   </p>
                 )}
   
-              {currentQ.question_blocks?.map((block, idx) => {
+              {Array.from(
+                new Map(
+                  (currentQ.question_blocks || []).map(block => {
+                    if (block.type === "text") {
+                      return [block.content.trim(), block]; // key = text content
+                    }
+                    return [Math.random(), block]; // keep non-text blocks unique
+                  })
+                ).values()
+              ).map((block, idx) => {
                 if (block.type === "text") {
                   return (
                     <p key={idx} className="question-text">
