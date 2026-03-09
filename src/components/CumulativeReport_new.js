@@ -25,10 +25,18 @@ export default function CumulativeReport_new({
   if (!exam) return;
 
   const fetchTopics = async () => {
-    const res = await fetch(`${API_BASE}/api/exams/${exam}/topics`);
-    const data = await res.json();
-    setTopicList(data);
-  };
+  const res = await fetch(`${API_BASE}/api/exams/${exam}/topics`);
+  const data = await res.json();
+
+  const topicsArray =
+    Array.isArray(data)
+      ? data
+      : Array.isArray(data?.topics)
+      ? data.topics
+      : [];
+
+  setTopicList(topicsArray);
+};
 
   fetchTopics();
 
@@ -210,7 +218,8 @@ export default function CumulativeReport_new({
     >
       <option value="">Choose a topic...</option>
 
-      {topicList.map((t) => (
+      {Array.isArray(topicList) &&
+        topicList.map((t) => (
         <option key={t} value={t}>
           {t}
         </option>
@@ -284,12 +293,14 @@ const accuracies = safeAttempts.map((a) => {
   const yScale = val =>
     height - padding - (val / maxY) * (height - padding * 2);
 
-  const points = (values = []) => {
-  console.log("POINTS INPUT:", values, Array.isArray(values));
+  const points = (values) => {
 
-  const safeValues = Array.isArray(values) ? values : [];
+  if (!Array.isArray(values)) {
+    console.warn("POINTS received non-array:", values);
+    return "";
+  }
 
-  return safeValues
+  return values
     .map((v, i) => {
       const x = padding + i * xStep;
       const y = yScale(Number(v) || 0);
@@ -343,7 +354,8 @@ const accuracies = safeAttempts.map((a) => {
 
       {/* Lines */}
 
-      {scores.length > 1 && accuracies.length > 1 && (
+      {Array.isArray(scores) && Array.isArray(accuracies) &&
+       scores.length > 1 && accuracies.length > 1 && (
         <>
           <polyline
             fill="none"
@@ -362,7 +374,7 @@ const accuracies = safeAttempts.map((a) => {
       )}
       {/* Score points */}
 
-      {scores.map((s, i) => {
+      {Array.isArray(scores) && scores.map((s, i) => {
         const x = padding + i * xStep;
         const y = yScale(s);
       
@@ -379,7 +391,7 @@ const accuracies = safeAttempts.map((a) => {
       
       {/* Accuracy points */}
       
-      {accuracies.map((a, i) => {
+      {Array.isArray(accuracies) && accuracies.map((a, i) => {
         const x = padding + i * xStep;
         const y = yScale(a);
       
