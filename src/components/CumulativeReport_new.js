@@ -245,7 +245,10 @@ export default function CumulativeReport_new({
 function SimpleLineChart({ attempts = [] }) {
   console.log("CHART ATTEMPTS:", attempts);
   console.log("CHART ATTEMPTS ARRAY?", Array.isArray(attempts));
-  attempts = Array.isArray(attempts) ? attempts : [];
+  
+  const safeAttempts = Array.isArray(attempts) ? attempts : [];
+
+  console.log("ATTEMPT OBJECTS:", JSON.stringify(safeAttempts, null, 2));
   console.log("REPORT CARD ATTEMPTS:", attempts);
   console.log("ATTEMPTS TYPE:", typeof attempts, Array.isArray(attempts));
 
@@ -254,20 +257,27 @@ function SimpleLineChart({ attempts = [] }) {
   const padding = 50;
   const maxY = 100;
 
-  const scores = attempts.map(a => Number(a?.score ?? 0));
-  const accuracies = attempts.map(a => Number(a?.accuracy ?? 0));
+  const scores = safeAttempts.map((a) => {
+  if (typeof a === "object") return Number(a.score ?? 0);
+  return Number(a ?? 0);
+});
+
+const accuracies = safeAttempts.map((a) => {
+  if (typeof a === "object") return Number(a.accuracy ?? 0);
+  return Number(a ?? 0);
+});
   console.log("SCORES:", scores);
   console.log("ACCURACIES:", accuracies);
 
   const xStep =
-    attempts.length > 1
-      ? (width - padding * 2) / (attempts.length - 1)
+    safeAttempts.length > 1
+      ? (width - padding * 2) / (safeAttempts.length - 1)
       : 0;
-
+  
   const yScale = val =>
     height - padding - (val / maxY) * (height - padding * 2);
 
-  const points = (values) => {
+  const points = (values = []) => {
   console.log("POINTS INPUT:", values, Array.isArray(values));
 
   const safeValues = Array.isArray(values) ? values : [];
@@ -275,7 +285,7 @@ function SimpleLineChart({ attempts = [] }) {
   return safeValues
     .map((v, i) => {
       const x = padding + i * xStep;
-      const y = yScale(v);
+      const y = yScale(Number(v) || 0);
       return `${x},${y}`;
     })
     .join(" ");
@@ -326,7 +336,7 @@ function SimpleLineChart({ attempts = [] }) {
 
       {/* Lines */}
 
-      {attempts.length > 1 && (
+      {scores.length > 1 && accuracies.length > 1 && (
         <>
           <polyline
             fill="none"
