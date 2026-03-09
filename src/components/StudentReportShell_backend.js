@@ -684,7 +684,7 @@
       </div>
   
       {/* Topics (cumulative only) */}
-      {(reportType === "cumulative" || reportType === "topic") && (
+      {reportType === "cumulative" && (
         <div className="field">
           <label>Topics</label>
       
@@ -719,33 +719,34 @@
   
     {/* ================= ACTIONS ================= */}
     <div className="actions-group">
-      <button
-        className="secondary-btn"
-        disabled={
-          (reportType === "student" && !studentId) ||
-          (reportType === "class" && !exam) ||
-          (reportType === "cumulative" &&
-            (!studentId || !topic || selectedAttemptDates.length === 0))
-  
-        }
-        onClick={() => {
-
-          if (reportType === "topic") {
-            // new component handles generation
-            return;
+      {reportType !== "topic" && (
+        <button
+          className="secondary-btn"
+          disabled={
+            (reportType === "student" && !studentId) ||
+            (reportType === "class" && !exam) ||
+            (reportType === "cumulative" &&
+              (!studentId || selectedAttemptDates.length === 0))
           }
-        
-          if (reportType === "student" && !date) {
-            setDateWarning("Please select a date before generating the report.");
-            return;
-          }
-        
-          setDateWarning("");
-          setShouldGenerate(true);
-        }}
-      >
-        Generate
-      </button>
+          onClick={() => {
+      
+            if (reportType === "cumulative") {
+              // handled inside component
+              return;
+            }
+      
+            if (reportType === "student" && !date) {
+              setDateWarning("Please select a date before generating the report.");
+              return;
+            }
+      
+            setDateWarning("");
+            setShouldGenerate(true);
+          }}
+        >
+          Generate
+        </button>
+      )}
   
       {shouldGenerate && (
         <button
