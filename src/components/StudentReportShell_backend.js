@@ -5,7 +5,7 @@
   
   import PDFPreviewMock from "./PDFPreviewMock";
   import ClassCurrentExamReport from "./ClassCurrentExamReport";
-  
+  import CumulativeReport_new from "./CumulativeReport_new";
   import "./Reports.css";
   
   export default function StudentReportShell_backend() {
@@ -156,7 +156,7 @@
     return;
   }
 
-  if (reportType !== "cumulative") {
+  if (reportType !== "cumulative" && reportType !== "topic") {
     console.log("⛔ Aborted: reportType is not cumulative");
     setShouldGenerate(false);
     return;
@@ -372,7 +372,7 @@
       });
     
       // Only relevant for cumulative reports
-      if (reportType !== "cumulative") {
+      if (reportType !== "cumulative" && reportType !== "topic") {
         console.log("⛔ Skipping topics fetch (not cumulative)");
         return;
       }
@@ -421,7 +421,7 @@
       });
     
       if (
-        reportType !== "cumulative" ||
+        (reportType !== "cumulative" && reportType !== "topic") ||
         !studentId ||
         !exam
       ) {
@@ -505,12 +505,13 @@
           <option value="student">Per Student Report</option>
           <option value="class">Per Class Report</option>
           <option value="cumulative">Cumulative Progress</option>
+          <option value="topic">Cumulative Progress (new)</option>
         </select>
       </div>
   
       {/* Student + Attempts */}
   
-      {(reportType === "student" || reportType === "cumulative") && (
+      {(reportType === "student" || reportType === "cumulative" || reportType === "topic") && (
         <div className="filter-group wide">
           <label>Student</label>
           <select
@@ -532,7 +533,7 @@
             </select>
   
   
-          {reportType === "cumulative" && (
+          {(reportType === "cumulative" || reportType === "topic") && (
             <div className="attempt-group">
               <div className="attempt-selector">
                 <select
@@ -681,7 +682,7 @@
       </div>
   
       {/* Topics (cumulative only) */}
-      {reportType === "cumulative" && (
+      {(reportType === "cumulative" || reportType === "topic") && (
         <div className="field">
           <label>Topics</label>
       
@@ -767,7 +768,7 @@
   {reportData && reportType === "student" && (
     <StudentCurrentExamReport data={reportData} />
   )}
-  {loadingCumulative && !cumulativeError && reportType === "cumulative" && (
+  {loadingCumulative && !cumulativeError && (reportType === "cumulative" || reportType === "topic") && (
     <p>Loading cumulative progress…</p>
   )}
   {cumulativeError && reportType === "cumulative" && (
@@ -826,6 +827,9 @@
   
   {reportType === "cumulative" && cumulativeReportData && (
     <CumulativeReport data={cumulativeReportData} />
+  )}
+  {reportType === "topic" && cumulativeReportData && (
+    <CumulativeReport_new data={cumulativeReportData} />
   )}
   {/* ================= PDF PREVIEW ================= */}
   
