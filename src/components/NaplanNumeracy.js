@@ -515,16 +515,20 @@
                   </p>
                 )}
   
-              {Array.from(
-                new Map(
-                  (currentQ.question_blocks || []).map(block => {
-                    if (block.type === "text") {
-                      return [block.content.trim(), block]; // key = text content
-                    }
-                    return [Math.random(), block]; // keep non-text blocks unique
-                  })
-                ).values()
-              ).map((block, idx) => {
+              {(currentQ.question_blocks || [])
+                .filter((block, idx) => {
+                  // Skip the first combined text block (contains two paragraphs)
+                  if (
+                    idx === 0 &&
+                    block.type === "text" &&
+                    block.content?.includes("\n\n") &&
+                    currentQ.question_blocks?.some(b => b.type === "image")
+                  ) {
+                    return false;
+                  }
+                  return true;
+                })
+                .map((block, idx) => {
                 if (block.type === "text") {
                   return (
                     <p key={idx} className="question-text">
