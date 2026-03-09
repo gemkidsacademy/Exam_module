@@ -105,17 +105,19 @@ export default function CumulativeReport_new({
         }
 
         const endpoint = topic
-          ? "/api/reports/student/cumulative-topic"
+          ? "/api/reports/student/cumulative"
           : "/api/reports/student/cumulative-overall";
-
         try {
-
+          console.log(
+            "FETCHING:",
+            `${API_BASE}${endpoint}?${params.toString()}`
+          );
           const res = await fetch(
             `${API_BASE}${endpoint}?${params.toString()}`
           );
 
           const result = await res.json();
-          console.log("CUMULATIVE OVERALL RESULT:", result); 
+          console.log("CUMULATIVE REPORT RESULT:", result);
 
           setData(result);
 
@@ -155,7 +157,7 @@ export default function CumulativeReport_new({
     ? data.attempts
     : [];
 
-    const label = topic ?? "Overall Performance";
+    const label = topic ? topic : "Overall Performance";
 
     if (!attempts.length) {
       return (
@@ -246,7 +248,7 @@ export default function CumulativeReport_new({
           reports.map((r) => (
           
           <ReportCard
-            key={r.topic ?? "overall-report"}
+            key={`report-${r.topic ?? "overall"}`}
             topic={r.topic}
           />
 
