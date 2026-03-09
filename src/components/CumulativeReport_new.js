@@ -25,10 +25,10 @@ export default function CumulativeReport_new({
   if (!exam) return;
 
   const fetchTopics = async () => {
-  console.log("TOPICS API RESPONSE:", data);
+  
   const res = await fetch(`${API_BASE}/api/exams/${exam}/topics`);
   const data = await res.json();
-
+  console.log("TOPICS API RESPONSE:", data);
   const topicsArray =
     Array.isArray(data)
       ? data
