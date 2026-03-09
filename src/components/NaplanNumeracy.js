@@ -517,9 +517,8 @@
   
               
 
-              {(currentQ.question_blocks || [])
-                .slice(0, Math.ceil((currentQ.question_blocks || []).length / 2))
-                .map((block, idx) => {
+              {(currentQ.question_blocks || []).map((block, idx) => {
+
                 if (block.type === "text") {
                   return (
                     <p key={idx} className="question-text">
