@@ -11,7 +11,7 @@ export default function CumulativeReport_new({
 
   const [reports, setReports] = useState([]);
   const [showTopics, setShowTopics] = useState(false);
-
+  const [topicList, setTopicList] = useState([]);
 
 
   /* ================= RESET WHEN INPUTS CHANGE ================= */
@@ -20,7 +20,19 @@ export default function CumulativeReport_new({
     setReports([]);
     setShowTopics(false);
   }, [studentId, exam, attemptDates]);
+ useEffect(() => {
 
+  if (!exam) return;
+
+  const fetchTopics = async () => {
+    const res = await fetch(`${API_BASE}/api/exams/${exam}/topics`);
+    const data = await res.json();
+    setTopicList(data);
+  };
+
+  fetchTopics();
+
+}, [exam, API_BASE]);
 
 
   /* ================= GENERATE OVERALL REPORT ================= */
@@ -193,7 +205,7 @@ export default function CumulativeReport_new({
     >
       <option value="">Choose a topic...</option>
 
-      {topics.map((t) => (
+      {topicList.map((t) => (
         <option key={t} value={t}>
           {t}
         </option>
@@ -278,20 +290,19 @@ function SimpleLineChart({ attempts }) {
 
       {/* Y axis label */}
       <text
-        x={15}
+        x={25}
         y={height / 2}
-        transform={`rotate(-90 15 ${height / 2})`}
+        transform={`rotate(-90 25 ${height / 2})`}
         textAnchor="middle"
         fontSize="12"
         fill="#444"
       >
         Score / Accuracy (%)
       </text>
-
       {/* X axis label */}
       <text
         x={width / 2}
-        y={height - 5}
+        y={height - 15}
         textAnchor="middle"
         fontSize="12"
         fill="#444"
