@@ -249,8 +249,8 @@ function SimpleLineChart({ attempts }) {
   const padding = 50;
   const maxY = 100;
 
-  const scores = attempts.map(a => a.score);
-  const accuracies = attempts.map(a => a.accuracy);
+  const scores = attempts.map(a => Number(a?.score ?? 0));
+  const accuracies = attempts.map(a => Number(a?.accuracy ?? 0));
 
   const xStep =
     attempts.length > 1
@@ -261,7 +261,7 @@ function SimpleLineChart({ attempts }) {
     height - padding - (val / maxY) * (height - padding * 2);
 
   const points = values =>
-    values
+    (Array.isArray(values) ? values : [])
       .map((v, i) => {
         const x = padding + i * xStep;
         const y = yScale(v);
