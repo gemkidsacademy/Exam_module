@@ -9,7 +9,7 @@ import "./CumulativeReport.css";
  *
  * Data is fully aggregated by backend.
  */
-export default function CumulativeReport({ data }) {
+export default function CumulativeReport_new({ data }) {
   if (!data) return null;
 
   const {
