@@ -244,17 +244,27 @@ export default function CumulativeReport_new({
 
       <div className="reports-container">
 
-        {Array.isArray(reports) &&
-          reports.map((r) => (
-          
+      {/* Overall report */}
+      {reports
+        .filter(r => r.topic === null)
+        .map(r => (
           <ReportCard
-            key={`report-${r.topic ?? "overall"}`}
+            key="overall-report"
+            topic={null}
+          />
+      ))}
+    
+      {/* Topic reports */}
+      {reports
+        .filter(r => r.topic !== null)
+        .map(r => (
+          <ReportCard
+            key={`topic-${r.topic}`}
             topic={r.topic}
           />
-
-        ))}
-
-      </div>
+      ))}
+    
+    </div>
 
     </div>
   );
