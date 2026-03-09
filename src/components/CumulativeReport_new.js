@@ -137,9 +137,10 @@ export default function CumulativeReport_new({
     const {
       student_id,
       student_name,
-      exam: examName,
-      attempts = []
+      exam: examName
     } = data;
+    
+    const attempts = Array.isArray(data.attempts) ? data.attempts : [];
 
     const label = topic ?? "Overall Performance";
 
