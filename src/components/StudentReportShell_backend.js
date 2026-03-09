@@ -157,7 +157,7 @@
     return;
   }
 
-  if (reportType !== "cumulative" && reportType !== "topic") {
+  if (reportType !== "cumulative") {
     console.log("⛔ Aborted: reportType is not cumulative");
     setShouldGenerate(false);
     return;
@@ -373,7 +373,7 @@
       });
     
       // Only relevant for cumulative reports
-      if (reportType !== "cumulative" && reportType !== "topic") {
+      if (reportType !== "cumulative") {
         console.log("⛔ Skipping topics fetch (not cumulative)");
         return;
       }
@@ -729,11 +729,17 @@
   
         }
         onClick={() => {
+
+          if (reportType === "topic") {
+            // new component handles generation
+            return;
+          }
+        
           if (reportType === "student" && !date) {
             setDateWarning("Please select a date before generating the report.");
             return;
           }
-  
+        
           setDateWarning("");
           setShouldGenerate(true);
         }}
@@ -830,9 +836,15 @@
   {reportType === "cumulative" && cumulativeReportData && (
     <CumulativeReport data={cumulativeReportData} />
   )}
-  {reportType === "topic" && cumulativeReportData && (
-    <CumulativeReport_new data={cumulativeReportData} />
-  )}
+  {reportType === "topic" && (
+  <CumulativeReport_new
+    studentId={studentId}
+    exam={exam}
+    attemptDates={selectedAttemptDates}
+    topics={availableTopics}
+    API_BASE={API_BASE}
+  />
+)}
   {/* ================= PDF PREVIEW ================= */}
   
   {showPDF && (
