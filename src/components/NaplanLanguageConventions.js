@@ -46,6 +46,7 @@ export default function NaplanLanguageConventions({
   const [visited, setVisited] = useState({});
   const [timeLeft, setTimeLeft] = useState(null);
   const [showConfirmFinish, setShowConfirmFinish] = useState(false);
+  
   const normalizeCorrectAnswer = (correctAnswer, questionType) => {
     if (correctAnswer == null) return null;
 
@@ -109,6 +110,24 @@ export default function NaplanLanguageConventions({
     // All single-answer types (1, 3, 4, 5, 6, 7)
     return String(answer).trim();
   };
+  function renderHighlightedText(content) {
+    if (!content) return content;
+  
+    const parts = content.split(/(\*\*.*?\*\*)/g);
+  
+    return parts.map((part, i) => {
+      if (part.startsWith("**") && part.endsWith("**")) {
+        const word = part.slice(2, -2);
+        return (
+          <span key={i} className="highlight-word">
+            {word}
+          </span>
+        );
+      }
+  
+      return part;
+    });
+  }
   function areNumbersEqual(a, b) {
     if (a == null || b == null) return false;
 
@@ -463,7 +482,7 @@ export default function NaplanLanguageConventions({
       if (block.type === "text") {
         return (
           <p key={idx} className="question-text">
-            {block.content}
+            {renderHighlightedText(block.content)}
           </p>
         );
       }
