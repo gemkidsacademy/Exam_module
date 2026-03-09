@@ -518,19 +518,7 @@
               
 
               {(currentQ.question_blocks || [])
-                .filter((block) => {
-                  if (block.type === "text") {
-                    const text = block.content?.trim();
-              
-                    if (seenTextBlocks.has(text)) {
-                      return false; // remove duplicate text block
-                    }
-              
-                    seenTextBlocks.add(text);
-                  }
-              
-                  return true;
-                })
+                .slice(0, Math.ceil((currentQ.question_blocks || []).length / 2))
                 .map((block, idx) => {
                 if (block.type === "text") {
                   return (
