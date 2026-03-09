@@ -1,192 +1,172 @@
 import React, { useState, useEffect } from "react";
-import "./CumulativeReport.css";
-
-/**
- * CumulativeReport_new
- * --------------------
- * Self-contained topic progress report.
- * Fetches its own data from backend.
- */
+import "./CumulativeReport_new.css";
 
 export default function CumulativeReport_new({
   studentId,
   exam,
-  topic,
   attemptDates,
-  API_BASE,
-  shouldGenerate,
-  setShouldGenerate
+  topics = [],
+  API_BASE
 }) {
 
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [reports, setReports] = useState([]);
+  const [showTopics, setShowTopics] = useState(false);
+  const [loadingReports, setLoadingReports] = useState({});
 
-  useEffect(() => {
 
-    if (!shouldGenerate) return;
+  /* ================= GENERATE OVERALL ================= */
 
-    if (!studentId || !exam || !topic || attemptDates.length === 0) {
-      setShouldGenerate(false);
+  const handleGenerate = () => {
+
+    if (!studentId || !exam || attemptDates.length === 0) {
+      alert("Please select student, exam and attempts.");
       return;
     }
 
-    setLoading(true);
-    setError(null);
-    setData(null);
+    setReports([{ topic: null }]);
+    setShowTopics(true);
+  };
 
-    const params = new URLSearchParams();
 
-    params.append("student_id", studentId);
-    params.append("exam", exam);
-    params.append("topic", topic);
+  /* ================= ADD TOPIC REPORT ================= */
 
-    attemptDates.forEach(d =>
-      params.append("attempt_dates", d)
-    );
+  const handleTopicSelect = (e) => {
 
-    fetch(`${API_BASE}/api/reports/student/cumulative?${params}`)
-      .then(res => res.json())
-      .then(d => setData(d))
-      .catch(err => setError(err.message))
-      .finally(() => {
+    const topic = e.target.value;
+    if (!topic) return;
+
+    const exists = reports.some(r => r.topic === topic);
+    if (exists) return;
+
+    setReports(prev => [...prev, { topic }]);
+  };
+
+
+  /* ================= REPORT COMPONENT ================= */
+
+  const ReportCard = ({ topic }) => {
+
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+
+      const fetchData = async () => {
+
+        setLoading(true);
+
+        const params = new URLSearchParams();
+
+        params.append("student_id", studentId);
+        params.append("exam", exam);
+
+        attemptDates.forEach(d =>
+          params.append("attempt_dates", d)
+        );
+
+        if (topic) {
+          params.append("topic", topic);
+        }
+
+        const endpoint = topic
+          ? "/api/reports/student/cumulative-topic"
+          : "/api/reports/student/cumulative-overall";
+
+        try {
+
+          const res = await fetch(
+            `${API_BASE}${endpoint}?${params.toString()}`
+          );
+
+          const result = await res.json();
+
+          setData(result);
+
+        } catch (err) {
+          console.error(err);
+        }
+
         setLoading(false);
-        setShouldGenerate(false);
-      });
 
-  }, [shouldGenerate, studentId, exam, topic, attemptDates, API_BASE]);
+      };
 
-  if (loading) {
-    return <p>Loading topic progress…</p>;
-  }
+      fetchData();
 
-  if (error) {
-    return <p className="error">{error}</p>;
-  }
+    }, [topic]);
 
-  if (!data) return null;
 
-  const {
-    student_id,
-    student_name,
-    exam: examName,
-    topic: topicData,
-    attempts = [],
-    summary
-  } = data;
+    if (loading) {
+      return <div className="cumulative-report">Loading...</div>;
+    }
 
-  const topicLabel = topicData?.label ?? "Unknown topic";
+    if (!data) return null;
 
-  if (attempts.length === 0) {
+
+    const {
+      student_id,
+      student_name,
+      exam: examName,
+      attempts = []
+    } = data;
+
+    const label = topic ?? "Overall Performance";
+
+
     return (
       <div className="cumulative-report">
-        <p>No data available for this topic.</p>
+
+        <div className="report-header">
+          <h2>{label}</h2>
+
+          <p className="subtext">
+            {student_name} ({student_id}) · {examName}
+          </p>
+        </div>
+
+        <div className="chart-container">
+          <SimpleLineChart attempts={attempts} />
+        </div>
+
       </div>
     );
-  }
+  };
 
-  const narrative = buildProgressNarrative(summary, attempts.length);
+
+  /* ================= MAIN UI ================= */
 
   return (
-    <div className="cumulative-report">
+    <div className="cumulative-dashboard">
 
-      {/* ================= HEADER ================= */}
-      <div className="report-header">
-        <h2>Topic Progress Over Time</h2>
-        <p className="subtext">
-          {student_name} ({student_id}) · {examName} · Topic:{" "}
-          <strong>{topicLabel}</strong>
-        </p>
-      </div>
+      <button className="generate-btn" onClick={handleGenerate}>
+        Generate Report
+      </button>
 
-      {/* ================= CHART ================= */}
-      <div className="chart-container">
-        <SimpleLineChart attempts={attempts} />
-      </div>
 
-      {/* ================= SUMMARY ================= */}
-      {summary && (
-        <div className="progress-summary">
+      {showTopics && (
+        <div className="topic-select">
 
-          <h3>Progress Summary</h3>
+          <label>Select Topic:</label>
 
-          {narrative && (
-            <p className="progress-narrative">
-              {narrative}
-            </p>
-          )}
+          <select onChange={handleTopicSelect}>
+            <option value="">Select topic</option>
 
-          <div className="summary-metrics">
+            {topics.map(t => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
 
-            <Metric
-              label="Start Score"
-              value={`${summary.first_attempt_score}%`}
-            />
+          </select>
 
-            <Metric
-              label="Latest Score"
-              value={`${summary.latest_attempt_score}%`}
-            />
-
-            <Metric
-              label="Score Change"
-              value={`${summary.score_change > 0 ? "+" : ""}${summary.score_change}%`}
-            />
-
-            <Metric
-              label="Start Accuracy"
-              value={`${summary.first_attempt_accuracy}%`}
-            />
-
-            <Metric
-              label="Latest Accuracy"
-              value={`${summary.latest_attempt_accuracy}%`}
-            />
-
-            <Metric
-              label="Accuracy Change"
-              value={`${summary.accuracy_change > 0 ? "+" : ""}${summary.accuracy_change}%`}
-            />
-
-            <Metric
-              label="Trend"
-              value={summary.trend}
-            />
-
-          </div>
         </div>
       )}
 
-      {/* ================= ATTEMPT TABLE ================= */}
 
-      <div className="attempt-table">
+      <div className="reports-container">
 
-        <h3>Attempt Breakdown</h3>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Score (%)</th>
-              <th>Accuracy (%)</th>
-              <th>Questions</th>
-              <th>Correct</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {attempts.map(a => (
-              <tr key={a.date}>
-                <td>{new Date(a.date).toLocaleDateString()}</td>
-                <td>{a.score}%</td>
-                <td>{a.accuracy}%</td>
-                <td>{a.questions_attempted}</td>
-                <td>{a.correct_answers}</td>
-              </tr>
-            ))}
-          </tbody>
-
-        </table>
+        {reports.map((r, i) => (
+          <ReportCard key={i} topic={r.topic} />
+        ))}
 
       </div>
 
@@ -194,50 +174,9 @@ export default function CumulativeReport_new({
   );
 }
 
-/* ================= HELPERS ================= */
 
-function buildProgressNarrative(summary, attemptsCount) {
 
-  if (!summary || attemptsCount < 2) return null;
-
-  const {
-    first_attempt_score,
-    latest_attempt_score,
-    score_change,
-    trend
-  } = summary;
-
-  const direction =
-    trend === "improving"
-      ? "steady improvement"
-      : trend === "declining"
-      ? "decline"
-      : "stable performance";
-
-  return (
-    `The student’s score changed from ${first_attempt_score}% to ` +
-    `${latest_attempt_score}% over ${attemptsCount} attempts.\n\n` +
-    `This indicates a ${direction} of ${Math.abs(score_change)} percentage points, ` +
-    `suggesting that practice and feedback are having a positive impact.`
-  );
-}
-
-/* ================= SUB COMPONENTS ================= */
-
-function Metric({ label, value }) {
-
-  return (
-    <div className="metric">
-      <span className="metric-label">{label}</span>
-      <span className="metric-value">{value}</span>
-    </div>
-  );
-
-}
-
-/**
- * Minimal SVG chart (PDF-safe)
- */
+/* ================= CHART ================= */
 
 function SimpleLineChart({ attempts }) {
 
@@ -269,8 +208,6 @@ function SimpleLineChart({ attempts }) {
   return (
     <svg width={width} height={height} className="line-chart">
 
-      {/* axes */}
-
       <line
         x1={padding}
         y1={padding}
@@ -286,8 +223,6 @@ function SimpleLineChart({ attempts }) {
         y2={height - padding}
         stroke="#ccc"
       />
-
-      {/* score line */}
 
       {attempts.length > 1 && (
         <>
