@@ -158,27 +158,42 @@ if (questionType === 5) {
   return String(correctAnswer).trim();
 };
   const normalizeStudentAnswer = (answer, questionType) => {
-    if (answer == null) return null;
+  if (answer == null) return null;
 
-    if (questionType === 2) {
-      if (Array.isArray(answer)) {
-        return [...answer].sort();
-      }
-
-      if (typeof answer === "string") {
-        try {
-          return JSON.parse(answer.replace(/'/g, '"')).sort();
-        } catch {
-          return [];
-        }
-      }
-
-      return [];
+  // MULTI SELECT
+  if (questionType === 2) {
+    if (Array.isArray(answer)) {
+      return [...answer].sort();
     }
 
-    return String(answer).trim();
-  };
+    if (typeof answer === "string") {
+      try {
+        return JSON.parse(answer.replace(/'/g, '"')).sort();
+      } catch {
+        return [];
+      }
+    }
 
+    return [];
+  }
+
+  // TRUE / FALSE MATRIX
+  if (questionType === 5) {
+    if (Array.isArray(answer)) return answer;
+
+    if (typeof answer === "string") {
+      try {
+        return JSON.parse(answer.replace(/'/g, '"'));
+      } catch {
+        return [];
+      }
+    }
+
+    return [];
+  }
+
+  return String(answer).trim();
+};
   /* ============================================================
      LOAD REPORT
   ============================================================ */
