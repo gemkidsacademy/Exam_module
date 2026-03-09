@@ -242,7 +242,12 @@ export default function CumulativeReport_new({
 
 /* ================= SIMPLE SVG CHART ================= */
 
-function SimpleLineChart({ attempts }) {
+function SimpleLineChart({ attempts = [] }) {
+  console.log("CHART ATTEMPTS:", attempts);
+  console.log("CHART ATTEMPTS ARRAY?", Array.isArray(attempts));
+  attempts = Array.isArray(attempts) ? attempts : [];
+  console.log("REPORT CARD ATTEMPTS:", attempts);
+  console.log("ATTEMPTS TYPE:", typeof attempts, Array.isArray(attempts));
 
   const width = 800;
   const height = 220;
@@ -251,6 +256,8 @@ function SimpleLineChart({ attempts }) {
 
   const scores = attempts.map(a => Number(a?.score ?? 0));
   const accuracies = attempts.map(a => Number(a?.accuracy ?? 0));
+  console.log("SCORES:", scores);
+  console.log("ACCURACIES:", accuracies);
 
   const xStep =
     attempts.length > 1
@@ -261,6 +268,7 @@ function SimpleLineChart({ attempts }) {
     height - padding - (val / maxY) * (height - padding * 2);
 
   const points = values =>
+    console.log("POINTS INPUT:", values, Array.isArray(values));
     (Array.isArray(values) ? values : [])
       .map((v, i) => {
         const x = padding + i * xStep;
