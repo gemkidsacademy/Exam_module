@@ -6,6 +6,7 @@
   import PDFPreviewMock from "./PDFPreviewMock";
   import ClassCurrentExamReport from "./ClassCurrentExamReport";
   import CumulativeReport_new from "./CumulativeReport_new";
+         
   import "./Reports.css";
   
   export default function StudentReportShell_backend() {
@@ -492,6 +493,7 @@
             setAvailableAttemptDates([]);
             setPendingAttemptDate("");
             setSelectedAttemptDates([]);
+            setCumulativeReportData(null);
           
             if (next !== "cumulative") {
               setAvailableTopics([]);
