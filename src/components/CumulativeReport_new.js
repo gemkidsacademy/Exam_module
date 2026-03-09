@@ -221,17 +221,16 @@ export default function CumulativeReport_new({
 
       {Array.isArray(topicList) &&
   topicList.map((t, i) => {
-    const topicValue =
-      typeof t === "string"
-        ? t
-        : t?.topic ?? JSON.stringify(t);
+  const key = typeof t === "object" ? t.key : t;
+  const label = typeof t === "object" ? t.label : t;
 
-    return (
-      <option key={i} value={topicValue}>
-        {topicValue}
-      </option>
-    );
-  })}
+  return (
+    <option key={i} value={key}>
+      {label}
+    </option>
+  );
+})
+  }
 
     </select>
 
