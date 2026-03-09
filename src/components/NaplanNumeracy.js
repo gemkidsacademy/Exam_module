@@ -413,7 +413,7 @@
             return student === correct;
           })()
         : null;
-  
+    const seenTextBlocks = new Set();
     return (
       <div className={`exam-shell ${styles.examShell}`}>
         <div className={`exam-container ${styles.examContainer}`}>
@@ -515,17 +515,20 @@
                   </p>
                 )}
   
+              
+
               {(currentQ.question_blocks || [])
-                .filter((block, idx) => {
-                  // Skip the first combined text block (contains two paragraphs)
-                  if (
-                    idx === 0 &&
-                    block.type === "text" &&
-                    block.content?.includes("\n\n") &&
-                    currentQ.question_blocks?.some(b => b.type === "image")
-                  ) {
-                    return false;
+                .filter((block) => {
+                  if (block.type === "text") {
+                    const text = block.content?.trim();
+              
+                    if (seenTextBlocks.has(text)) {
+                      return false; // remove duplicate text block
+                    }
+              
+                    seenTextBlocks.add(text);
                   }
+              
                   return true;
                 })
                 .map((block, idx) => {
