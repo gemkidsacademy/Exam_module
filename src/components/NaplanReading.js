@@ -23,29 +23,50 @@ export default function NaplanReading({
   const API_BASE = process.env.REACT_APP_API_URL;
   const TYPE_2_MAX_SELECTIONS = 2;
   function hasAnswered(question, answers) {
-    const qid = String(question.question_id);
-    const value = answers[qid];
-  
-    if (value == null) return false;
-  
-    switch (question.question_type) {
-      case 1: // single choice
-      case 3: // gap fill
-      case 6: // single gap
-        return value !== "";
-  
-      case 2: // multi select
-        return Array.isArray(value) && value.length > 0;
-  
-      case 5: // true/false
-        return Array.isArray(value) && value.some(v => v !== null);
-      case 7: // word_select
-        return value !== "";
-  
-      default:
-        return false;
-    }
+  if (!question || !answers) return false;
+
+  const qid = String(question.question_id);
+
+  const value =
+    answers[qid] ??
+    answers[question.question_id];
+
+  if (value === undefined || value === null) {
+    return false;
   }
+
+  switch (question.question_type) {
+
+    // single choice (text or image)
+    case 1:
+    case 4:
+      return String(value).trim() !== "";
+
+    // gap fill
+    case 3:
+    case 6:
+      return String(value).trim() !== "";
+
+    // word select
+    case 7:
+      return String(value).trim() !== "";
+
+    // multi select
+    case 2:
+      return Array.isArray(value) && value.length > 0;
+
+    // true / false matrix
+    case 5:
+      return (
+        Array.isArray(value) &&
+        value.length > 0 &&
+        value.some(v => v !== null && v !== undefined)
+      );
+
+    default:
+      return false;
+  }
+}
   if (!API_BASE) {
     throw new Error("❌ REACT_APP_API_URL is not defined");
   }
