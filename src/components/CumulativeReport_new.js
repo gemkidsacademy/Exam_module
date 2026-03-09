@@ -25,6 +25,7 @@ export default function CumulativeReport_new({
   if (!exam) return;
 
   const fetchTopics = async () => {
+  console.log("TOPICS API RESPONSE:", data);
   const res = await fetch(`${API_BASE}/api/exams/${exam}/topics`);
   const data = await res.json();
 
@@ -62,7 +63,7 @@ export default function CumulativeReport_new({
 
   const handleTopicSelect = (e) => {
 
-    const topic = e.target.value;
+    const topic = String(e.target.value);
     if (!topic) return;
 
     const exists = reports.some(r => r.topic === topic);
@@ -219,11 +220,18 @@ export default function CumulativeReport_new({
       <option value="">Choose a topic...</option>
 
       {Array.isArray(topicList) &&
-        topicList.map((t) => (
-        <option key={t} value={t}>
-          {t}
-        </option>
-      ))}
+  topicList.map((t, i) => {
+    const topicValue =
+      typeof t === "string"
+        ? t
+        : t?.topic ?? JSON.stringify(t);
+
+    return (
+      <option key={i} value={topicValue}>
+        {topicValue}
+      </option>
+    );
+  })}
 
     </select>
 
