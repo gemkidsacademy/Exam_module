@@ -181,24 +181,28 @@ export default function CumulativeReport_new({
       {/* Topic selector appears AFTER overall report loads */}
 
       {showTopics && (
-        <div className="topic-select">
+  <div className="topic-bar">
 
-          <label>Select Topic:</label>
+    <div className="topic-label">
+      Add Topic Report
+    </div>
 
-          <select onChange={handleTopicSelect}>
-            <option value="">Select topic</option>
+    <select
+      className="topic-dropdown"
+      onChange={handleTopicSelect}
+    >
+      <option value="">Choose a topic...</option>
 
-            {topics.map(t => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
+      {topics.map((t) => (
+        <option key={t} value={t}>
+          {t}
+        </option>
+      ))}
 
-          </select>
+    </select>
 
-        </div>
-      )}
-
+  </div>
+)}
 
 
       {/* Reports */}
@@ -226,9 +230,9 @@ export default function CumulativeReport_new({
 
 function SimpleLineChart({ attempts }) {
 
-  const width = 600;
+  const width = 800;
   const height = 220;
-  const padding = 30;
+  const padding = 50;
   const maxY = 100;
 
   const scores = attempts.map(a => a.score);
@@ -254,6 +258,7 @@ function SimpleLineChart({ attempts }) {
   return (
     <svg width={width} height={height} className="line-chart">
 
+      {/* Y axis */}
       <line
         x1={padding}
         y1={padding}
@@ -262,6 +267,7 @@ function SimpleLineChart({ attempts }) {
         stroke="#ccc"
       />
 
+      {/* X axis */}
       <line
         x1={padding}
         y1={height - padding}
@@ -269,6 +275,31 @@ function SimpleLineChart({ attempts }) {
         y2={height - padding}
         stroke="#ccc"
       />
+
+      {/* Y axis label */}
+      <text
+        x={15}
+        y={height / 2}
+        transform={`rotate(-90 15 ${height / 2})`}
+        textAnchor="middle"
+        fontSize="12"
+        fill="#444"
+      >
+        Score / Accuracy (%)
+      </text>
+
+      {/* X axis label */}
+      <text
+        x={width / 2}
+        y={height - 5}
+        textAnchor="middle"
+        fontSize="12"
+        fill="#444"
+      >
+        Attempts Over Time
+      </text>
+
+      {/* Lines */}
 
       {attempts.length > 1 && (
         <>
@@ -287,6 +318,39 @@ function SimpleLineChart({ attempts }) {
           />
         </>
       )}
+      {/* Score points */}
+
+      {scores.map((s, i) => {
+        const x = padding + i * xStep;
+        const y = yScale(s);
+      
+        return (
+          <circle
+            key={`score-${i}`}
+            cx={x}
+            cy={y}
+            r="4"
+            fill="#2563eb"
+          />
+        );
+      })}
+      
+      {/* Accuracy points */}
+      
+      {accuracies.map((a, i) => {
+        const x = padding + i * xStep;
+        const y = yScale(a);
+      
+        return (
+          <circle
+            key={`acc-${i}`}
+            cx={x}
+            cy={y}
+            r="4"
+            fill="#16a34a"
+          />
+        );
+      })}
 
     </svg>
   );
