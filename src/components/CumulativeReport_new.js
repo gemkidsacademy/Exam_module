@@ -267,15 +267,19 @@ function SimpleLineChart({ attempts = [] }) {
   const yScale = val =>
     height - padding - (val / maxY) * (height - padding * 2);
 
-  const points = values =>
-    console.log("POINTS INPUT:", values, Array.isArray(values));
-    (Array.isArray(values) ? values : [])
-      .map((v, i) => {
-        const x = padding + i * xStep;
-        const y = yScale(v);
-        return `${x},${y}`;
-      })
-      .join(" ");
+  const points = (values) => {
+  console.log("POINTS INPUT:", values, Array.isArray(values));
+
+  const safeValues = Array.isArray(values) ? values : [];
+
+  return safeValues
+    .map((v, i) => {
+      const x = padding + i * xStep;
+      const y = yScale(v);
+      return `${x},${y}`;
+    })
+    .join(" ");
+};
 
   return (
     <svg width={width} height={height} className="line-chart">
