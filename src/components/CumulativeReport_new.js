@@ -11,7 +11,7 @@ export default function CumulativeReport_new({
 
   const [reports, setReports] = useState([]);
   const [showTopics, setShowTopics] = useState(false);
-  const [loadingReports, setLoadingReports] = useState({});
+  
 
 
   /* ================= GENERATE OVERALL ================= */
@@ -29,18 +29,24 @@ export default function CumulativeReport_new({
 
 
   /* ================= ADD TOPIC REPORT ================= */
+  
 
   const handleTopicSelect = (e) => {
 
-    const topic = e.target.value;
-    if (!topic) return;
+  const topic = e.target.value;
+  if (!topic) return;
 
-    const exists = reports.some(r => r.topic === topic);
-    if (exists) return;
+  const exists = reports.some(r => r.topic === topic);
+  if (exists) return;
 
-    setReports(prev => [...prev, { topic }]);
-  };
+  setReports(prev => [...prev, { topic }]);
 
+  e.target.value = "";   // reset dropdown
+};
+useEffect(() => {
+  setReports([]);
+  setShowTopics(false);
+}, [studentId, exam, attemptDates]);
 
   /* ================= REPORT COMPONENT ================= */
 
@@ -51,48 +57,48 @@ export default function CumulativeReport_new({
 
     useEffect(() => {
 
-      const fetchData = async () => {
+  const fetchData = async () => {
 
-        setLoading(true);
+    setLoading(true);
 
-        const params = new URLSearchParams();
+    const params = new URLSearchParams();
 
-        params.append("student_id", studentId);
-        params.append("exam", exam);
+    params.append("student_id", studentId);
+    params.append("exam", exam);
 
-        attemptDates.forEach(d =>
-          params.append("attempt_dates", d)
-        );
+    attemptDates.forEach(d =>
+      params.append("attempt_dates", d)
+    );
 
-        if (topic) {
-          params.append("topic", topic);
-        }
+    if (topic) {
+      params.append("topic", topic);
+    }
 
-        const endpoint = topic
-          ? "/api/reports/student/cumulative-topic"
-          : "/api/reports/student/cumulative-overall";
+    const endpoint = topic
+      ? "/api/reports/student/cumulative-topic"
+      : "/api/reports/student/cumulative-overall";
 
-        try {
+    try {
 
-          const res = await fetch(
-            `${API_BASE}${endpoint}?${params.toString()}`
-          );
+      const res = await fetch(
+        `${API_BASE}${endpoint}?${params.toString()}`
+      );
 
-          const result = await res.json();
+      const result = await res.json();
 
-          setData(result);
+      setData(result);
 
-        } catch (err) {
-          console.error(err);
-        }
+    } catch (err) {
+      console.error(err);
+    }
 
-        setLoading(false);
+    setLoading(false);
 
-      };
+  };
 
-      fetchData();
+  fetchData();
 
-    }, [topic]);
+}, [topic, studentId, exam, attemptDates, API_BASE]);
 
 
     if (loading) {
@@ -110,6 +116,13 @@ export default function CumulativeReport_new({
     } = data;
 
     const label = topic ?? "Overall Performance";
+    if (!attempts.length) {
+      return (
+        <div className="cumulative-report">
+          <p>No data available.</p>
+        </div>
+      );
+    }
 
 
     return (
@@ -165,7 +178,7 @@ export default function CumulativeReport_new({
       <div className="reports-container">
 
         {reports.map((r, i) => (
-          <ReportCard key={i} topic={r.topic} />
+          <ReportCard key={r.topic ?? "overall"} topic={r.topic} />
         ))}
 
       </div>
