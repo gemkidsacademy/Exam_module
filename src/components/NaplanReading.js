@@ -23,7 +23,7 @@ export default function NaplanReading({
   const API_BASE = process.env.REACT_APP_API_URL;
   const TYPE_2_MAX_SELECTIONS = 2;
   function hasAnswered(question, answers) {
-    const qid = question.question_id;
+    const qid = String(question.question_id);
     const value = answers[qid];
   
     if (value == null) return false;
