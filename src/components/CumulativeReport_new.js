@@ -1,27 +1,81 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./CumulativeReport.css";
 
 /**
- * CumulativeReport
- * ----------------
- * Renders topic-level cumulative progress over time
- * for a single student and a single exam.
- *
- * Data is fully aggregated by backend.
+ * CumulativeReport_new
+ * --------------------
+ * Self-contained topic progress report.
+ * Fetches its own data from backend.
  */
-export default function CumulativeReport_new({ data }) {
+
+export default function CumulativeReport_new({
+  studentId,
+  exam,
+  topic,
+  attemptDates,
+  API_BASE,
+  shouldGenerate,
+  setShouldGenerate
+}) {
+
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+
+    if (!shouldGenerate) return;
+
+    if (!studentId || !exam || !topic || attemptDates.length === 0) {
+      setShouldGenerate(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setData(null);
+
+    const params = new URLSearchParams();
+
+    params.append("student_id", studentId);
+    params.append("exam", exam);
+    params.append("topic", topic);
+
+    attemptDates.forEach(d =>
+      params.append("attempt_dates", d)
+    );
+
+    fetch(`${API_BASE}/api/reports/student/cumulative?${params}`)
+      .then(res => res.json())
+      .then(d => setData(d))
+      .catch(err => setError(err.message))
+      .finally(() => {
+        setLoading(false);
+        setShouldGenerate(false);
+      });
+
+  }, [shouldGenerate, studentId, exam, topic, attemptDates, API_BASE]);
+
+  if (loading) {
+    return <p>Loading topic progress…</p>;
+  }
+
+  if (error) {
+    return <p className="error">{error}</p>;
+  }
+
   if (!data) return null;
 
   const {
     student_id,
     student_name,
-    exam,
-    topic,
+    exam: examName,
+    topic: topicData,
     attempts = [],
     summary
   } = data;
 
-  const topicLabel = topic?.label ?? "Unknown topic";
+  const topicLabel = topicData?.label ?? "Unknown topic";
 
   if (attempts.length === 0) {
     return (
@@ -35,11 +89,12 @@ export default function CumulativeReport_new({ data }) {
 
   return (
     <div className="cumulative-report">
+
       {/* ================= HEADER ================= */}
       <div className="report-header">
         <h2>Topic Progress Over Time</h2>
         <p className="subtext">
-          {student_name} ({student_id}) · {exam} · Topic:{" "}
+          {student_name} ({student_id}) · {examName} · Topic:{" "}
           <strong>{topicLabel}</strong>
         </p>
       </div>
@@ -52,9 +107,9 @@ export default function CumulativeReport_new({ data }) {
       {/* ================= SUMMARY ================= */}
       {summary && (
         <div className="progress-summary">
+
           <h3>Progress Summary</h3>
 
-          {/* Narrative line (matches original UI) */}
           {narrative && (
             <p className="progress-narrative">
               {narrative}
@@ -62,41 +117,52 @@ export default function CumulativeReport_new({ data }) {
           )}
 
           <div className="summary-metrics">
+
             <Metric
               label="Start Score"
               value={`${summary.first_attempt_score}%`}
             />
+
             <Metric
               label="Latest Score"
               value={`${summary.latest_attempt_score}%`}
             />
+
             <Metric
               label="Score Change"
               value={`${summary.score_change > 0 ? "+" : ""}${summary.score_change}%`}
             />
+
             <Metric
               label="Start Accuracy"
               value={`${summary.first_attempt_accuracy}%`}
             />
+
             <Metric
               label="Latest Accuracy"
               value={`${summary.latest_attempt_accuracy}%`}
             />
+
             <Metric
               label="Accuracy Change"
               value={`${summary.accuracy_change > 0 ? "+" : ""}${summary.accuracy_change}%`}
             />
+
             <Metric
               label="Trend"
               value={summary.trend}
             />
+
           </div>
         </div>
       )}
 
       {/* ================= ATTEMPT TABLE ================= */}
+
       <div className="attempt-table">
+
         <h3>Attempt Breakdown</h3>
+
         <table>
           <thead>
             <tr>
@@ -107,6 +173,7 @@ export default function CumulativeReport_new({ data }) {
               <th>Correct</th>
             </tr>
           </thead>
+
           <tbody>
             {attempts.map(a => (
               <tr key={a.date}>
@@ -118,19 +185,19 @@ export default function CumulativeReport_new({ data }) {
               </tr>
             ))}
           </tbody>
+
         </table>
+
       </div>
+
     </div>
   );
 }
 
 /* ================= HELPERS ================= */
 
-/**
- * Builds the narrative summary shown above metrics.
- * Pure presentation logic — backend remains data-only.
- */
 function buildProgressNarrative(summary, attemptsCount) {
+
   if (!summary || attemptsCount < 2) return null;
 
   const {
@@ -155,24 +222,25 @@ function buildProgressNarrative(summary, attemptsCount) {
   );
 }
 
-/* ================= SUB-COMPONENTS ================= */
+/* ================= SUB COMPONENTS ================= */
 
 function Metric({ label, value }) {
+
   return (
     <div className="metric">
       <span className="metric-label">{label}</span>
       <span className="metric-value">{value}</span>
     </div>
   );
+
 }
 
 /**
- * SimpleLineChart
- * ---------------
- * Minimal SVG-based chart to stay PDF-safe.
- * Renders dots for a single attempt and lines for multiple attempts.
+ * Minimal SVG chart (PDF-safe)
  */
+
 function SimpleLineChart({ attempts }) {
+
   const width = 600;
   const height = 220;
   const padding = 30;
@@ -200,7 +268,9 @@ function SimpleLineChart({ attempts }) {
 
   return (
     <svg width={width} height={height} className="line-chart">
-      {/* Axes */}
+
+      {/* axes */}
+
       <line
         x1={padding}
         y1={padding}
@@ -208,6 +278,7 @@ function SimpleLineChart({ attempts }) {
         y2={height - padding}
         stroke="#ccc"
       />
+
       <line
         x1={padding}
         y1={height - padding}
@@ -215,30 +286,9 @@ function SimpleLineChart({ attempts }) {
         y2={height - padding}
         stroke="#ccc"
       />
-          {/* Y-axis label */}
-    <text
-      x={-height / 2}
-      y={16}
-      transform="rotate(-90)"
-      textAnchor="middle"
-      fontSize="12"
-      fill="#6b7280"
-    >
-      Score / Accuracy (%)
-    </text>
 
-    {/* X-axis label */}
-    <text
-      x={width / 2}
-      y={height - 6}
-      textAnchor="middle"
-      fontSize="12"
-      fill="#6b7280"
-    >
-      Attempts Over Time
-    </text>
+      {/* score line */}
 
-      {/* Lines (only if 2+ attempts) */}
       {attempts.length > 1 && (
         <>
           <polyline
@@ -247,6 +297,7 @@ function SimpleLineChart({ attempts }) {
             strokeWidth="2"
             points={points(scores)}
           />
+
           <polyline
             fill="none"
             stroke="#16a34a"
@@ -256,23 +307,6 @@ function SimpleLineChart({ attempts }) {
         </>
       )}
 
-      {/* Single-attempt dots */}
-      {attempts.length === 1 && (
-        <>
-          <circle
-            cx={padding}
-            cy={yScale(scores[0])}
-            r="4"
-            fill="#2563eb"
-          />
-          <circle
-            cx={padding}
-            cy={yScale(accuracies[0])}
-            r="4"
-            fill="#16a34a"
-          />
-        </>
-      )}
     </svg>
   );
 }
