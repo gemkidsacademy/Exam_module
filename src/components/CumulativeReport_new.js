@@ -141,7 +141,10 @@ export default function CumulativeReport_new({
       exam: examName
     } = data;
     
-    const attempts = Array.isArray(data.attempts) ? data.attempts : [];
+    const attempts =
+  Array.isArray(data?.attempts)
+    ? data.attempts
+    : [];
 
     const label = topic ?? "Overall Performance";
 
@@ -176,7 +179,7 @@ export default function CumulativeReport_new({
 
 
   /* ================= UI ================= */
-
+  console.log("REPORTS STATE:", reports, Array.isArray(reports));
   return (
 
     <div className="cumulative-dashboard">
@@ -223,8 +226,9 @@ export default function CumulativeReport_new({
 
       <div className="reports-container">
 
-        {reports.map((r) => (
-
+        {Array.isArray(reports) &&
+          reports.map((r) => (
+          
           <ReportCard
             key={r.topic ?? "overall-report"}
             topic={r.topic}
@@ -246,7 +250,10 @@ function SimpleLineChart({ attempts = [] }) {
   console.log("CHART ATTEMPTS:", attempts);
   console.log("CHART ATTEMPTS ARRAY?", Array.isArray(attempts));
   
-  const safeAttempts = Array.isArray(attempts) ? attempts : [];
+  const safeAttempts =
+  Array.isArray(attempts)
+    ? attempts
+    : [];
 
   console.log("ATTEMPT OBJECTS:", JSON.stringify(safeAttempts, null, 2));
   console.log("REPORT CARD ATTEMPTS:", attempts);
