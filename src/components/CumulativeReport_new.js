@@ -106,7 +106,7 @@ export default function CumulativeReport_new({
           );
 
           const result = await res.json();
-          console.log("CUMULATIVE OVERALL RESULT:", result);
+          console.log("CUMULATIVE OVERALL RESULT:", result); 
 
           setData(result);
 
