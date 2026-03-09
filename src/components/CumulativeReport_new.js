@@ -11,94 +11,108 @@ export default function CumulativeReport_new({
 
   const [reports, setReports] = useState([]);
   const [showTopics, setShowTopics] = useState(false);
-  
 
 
-  /* ================= GENERATE OVERALL ================= */
+
+  /* ================= RESET WHEN INPUTS CHANGE ================= */
+
+  useEffect(() => {
+    setReports([]);
+    setShowTopics(false);
+  }, [studentId, exam, attemptDates]);
+
+
+
+  /* ================= GENERATE OVERALL REPORT ================= */
 
   const handleGenerate = () => {
 
-    if (!studentId || !exam || attemptDates.length === 0) {
-      alert("Please select student, exam and attempts.");
+    if (!studentId || !exam || !attemptDates.length) {
+      alert("Please select student, exam and attempt dates.");
       return;
     }
 
+    // Only overall report initially
     setReports([{ topic: null }]);
-    setShowTopics(true);
   };
 
 
+
   /* ================= ADD TOPIC REPORT ================= */
-  
 
   const handleTopicSelect = (e) => {
 
-  const topic = e.target.value;
-  if (!topic) return;
+    const topic = e.target.value;
+    if (!topic) return;
 
-  const exists = reports.some(r => r.topic === topic);
-  if (exists) return;
+    const exists = reports.some(r => r.topic === topic);
+    if (exists) return;
 
-  setReports(prev => [...prev, { topic }]);
+    setReports(prev => [...prev, { topic }]);
 
-  e.target.value = "";   // reset dropdown
-};
-useEffect(() => {
-  setReports([]);
-  setShowTopics(false);
-}, [studentId, exam, attemptDates]);
+    e.target.value = "";
+  };
 
-  /* ================= REPORT COMPONENT ================= */
 
-  const ReportCard = ({ topic }) => {
+
+  /* ================= REPORT CARD ================= */
+
+  const ReportCard = ({ topic, isOverall }) => {
 
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
 
-  const fetchData = async () => {
+      if (!studentId || !exam || !attemptDates.length) return;
 
-    setLoading(true);
+      const fetchData = async () => {
 
-    const params = new URLSearchParams();
+        setLoading(true);
 
-    params.append("student_id", studentId);
-    params.append("exam", exam);
+        const params = new URLSearchParams();
 
-    attemptDates.forEach(d =>
-      params.append("attempt_dates", d)
-    );
+        params.append("student_id", studentId);
+        params.append("exam", exam);
 
-    if (topic) {
-      params.append("topic", topic);
-    }
+        attemptDates.forEach(d =>
+          params.append("attempt_dates", d)
+        );
 
-    const endpoint = topic
-      ? "/api/reports/student/cumulative-topic"
-      : "/api/reports/student/cumulative-overall";
+        if (topic) {
+          params.append("topic", topic);
+        }
 
-    try {
+        const endpoint = topic
+          ? "/api/reports/student/cumulative-topic"
+          : "/api/reports/student/cumulative-overall";
 
-      const res = await fetch(
-        `${API_BASE}${endpoint}?${params.toString()}`
-      );
+        try {
 
-      const result = await res.json();
+          const res = await fetch(
+            `${API_BASE}${endpoint}?${params.toString()}`
+          );
 
-      setData(result);
+          const result = await res.json();
 
-    } catch (err) {
-      console.error(err);
-    }
+          setData(result);
 
-    setLoading(false);
+          // Only after overall report loads do we show topic dropdown
+          if (!topic) {
+            setShowTopics(true);
+          }
 
-  };
+        } catch (err) {
+          console.error(err);
+        }
 
-  fetchData();
+        setLoading(false);
 
-}, [topic, studentId, exam, attemptDates, API_BASE]);
+      };
+
+      fetchData();
+
+    }, [topic, studentId, exam, attemptDates, API_BASE]);
 
 
     if (loading) {
@@ -116,6 +130,7 @@ useEffect(() => {
     } = data;
 
     const label = topic ?? "Overall Performance";
+
     if (!attempts.length) {
       return (
         <div className="cumulative-report">
@@ -145,15 +160,25 @@ useEffect(() => {
   };
 
 
-  /* ================= MAIN UI ================= */
+
+  /* ================= UI ================= */
 
   return (
+
     <div className="cumulative-dashboard">
 
-      <button className="generate-btn" onClick={handleGenerate}>
+      {/* Generate button */}
+
+      <button
+        className="generate-btn"
+        onClick={handleGenerate}
+      >
         Generate Report
       </button>
 
+
+
+      {/* Topic selector appears AFTER overall report loads */}
 
       {showTopics && (
         <div className="topic-select">
@@ -175,10 +200,18 @@ useEffect(() => {
       )}
 
 
+
+      {/* Reports */}
+
       <div className="reports-container">
 
-        {reports.map((r, i) => (
-          <ReportCard key={r.topic ?? "overall"} topic={r.topic} />
+        {reports.map((r) => (
+
+          <ReportCard
+            key={r.topic ?? "overall-report"}
+            topic={r.topic}
+          />
+
         ))}
 
       </div>
@@ -189,7 +222,7 @@ useEffect(() => {
 
 
 
-/* ================= CHART ================= */
+/* ================= SIMPLE SVG CHART ================= */
 
 function SimpleLineChart({ attempts }) {
 
