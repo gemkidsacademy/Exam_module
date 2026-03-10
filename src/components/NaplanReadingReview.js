@@ -85,12 +85,11 @@ export default function NaplanReadingReview({
 
         const qid = String(q.question_id);
          console.warn("TRACE", {
-          index: idx,
-          questionId: q.question_id,
-          lookup: answers[q.question_id],
-          isCorrect: answers[q.question_id]?.is_correct
-        });
-         
+        index: idx,
+        questionId: qid,
+        lookup: answers[qid],
+        isCorrect: answers[qid]?.is_correct
+      });         
          const answerObj = answers[qid] || {};
          
          const studentAnswer = answerObj.answer;
