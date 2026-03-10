@@ -82,6 +82,16 @@ export default function NaplanReadingReview({
 
         const studentNorm = normalizeAnswer(studentAnswer);
         const correctNorm = normalizeAnswer(correctAnswer);
+        console.log(
+           "REVIEW CHECK",
+           q.question_id,
+           "student:",
+           studentNorm,
+           "correct:",
+           correctNorm,
+           "result:",
+           JSON.stringify(studentNorm) === JSON.stringify(correctNorm)
+         );
       
         const isCorrect =
           JSON.stringify(studentNorm) === JSON.stringify(correctNorm);
