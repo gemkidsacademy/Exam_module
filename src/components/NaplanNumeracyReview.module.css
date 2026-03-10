@@ -10,3 +10,12 @@
   font-weight: 500;
   color: #4b5563;
 }
+.reviewContainer {
+  height: 100vh;        /* or any height you want */
+  overflow-y: auto;     /* enables vertical scrolling */
+  padding: 16px;
+}
+
+.loading {
+  font-size: 16px;
+}
