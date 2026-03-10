@@ -84,20 +84,18 @@ export default function NaplanReadingReview({
       {questions.map((q, idx) => {
 
         const qid = String(q.question_id);
+         console.warn("TRACE", {
+          index: idx,
+          questionId: q.question_id,
+          lookup: answers[q.question_id],
+          isCorrect: answers[q.question_id]?.is_correct
+        });
          
          const answerObj = answers[qid] || {};
          
          const studentAnswer = answerObj.answer;
          const isCorrect = answerObj.is_correct ?? false;
-         console.log("------------- REVIEW TRACE -------------");
-         console.log("Question index:", idx);
-         console.log("Question ID:", qid);
-         console.log("Available answer keys:", Object.keys(answers));
-         console.log("Answer lookup:", answers[qid]);
-         console.log("Answer object:", answerObj);
-         console.log("is_correct value:", answerObj.is_correct);
-         console.log("Computed isCorrect:", isCorrect);
-         
+                  
          const correctAnswer = q.exam_bundle?.correct_answer;
         
         return (
