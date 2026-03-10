@@ -28,7 +28,10 @@ export default function NaplanLanguageConventionsReview({
         const data = await response.json();
 
         const questions = Array.isArray(data.questions)
-          ? data.questions
+          ? data.questions.map((q) => ({
+              ...q,
+              is_correct: Boolean(q.is_correct)
+            }))
           : [];
         
         const studentAnswers =
@@ -39,6 +42,8 @@ export default function NaplanLanguageConventionsReview({
         console.log("LANGUAGE QUESTIONS:", questions);
         console.log("LANGUAGE STUDENT ANSWERS:", studentAnswers);
         
+        const correctCount = questions.filter((q) => q.is_correct).length;
+        console.log("REVIEW CORRECT COUNT:", correctCount);        
         onLoaded?.(questions, studentAnswers);
       } catch (error) {
         console.error(
