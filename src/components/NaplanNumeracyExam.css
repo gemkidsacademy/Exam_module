@@ -6,6 +6,9 @@
   width: 100% !important;
   max-width: none !important;
 
+  height: 100vh;
+  overflow: hidden;
+
   margin: 0 !important;
   padding: 20px !important;
 
@@ -13,7 +16,6 @@
   flex-direction: column;
 
   box-sizing: border-box;
-
   background-color: #f6f7f9;
 }
 /* ============================================================
