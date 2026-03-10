@@ -287,6 +287,7 @@ useEffect(() => {
         if (!res.ok) throw new Error("Failed to fetch topics");
 
         const data = await res.json();
+        console.log("TOPICS FROM API:", data);
         setAvailableTopics(data);
       } catch (err) {
         console.error(err);
