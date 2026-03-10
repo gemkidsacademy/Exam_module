@@ -81,20 +81,28 @@ export default function NaplanReadingReview({
         const correctAnswer = q.exam_bundle?.correct_answer;
 
         const studentNorm = normalizeAnswer(studentAnswer);
-        const correctNorm = normalizeAnswer(correctAnswer);
-        console.log(
-           "REVIEW CHECK",
-           q.question_id,
-           "student:",
-           studentNorm,
-           "correct:",
-           correctNorm,
-           "result:",
-           JSON.stringify(studentNorm) === JSON.stringify(correctNorm)
-         );
-      
-        const isCorrect =
-          JSON.stringify(studentNorm) === JSON.stringify(correctNorm);
+         const correctNorm = normalizeAnswer(correctAnswer);
+         
+         let isCorrect = false;
+         
+         const tfValues = ["True", "False"];
+         
+         // True/False sequence → order matters
+         if (correctNorm.every(v => tfValues.includes(v))) {
+           isCorrect = JSON.stringify(studentNorm) === JSON.stringify(correctNorm);
+         }
+         
+         // Multi-select → order does NOT matter
+         else if (studentNorm.length > 1) {
+           isCorrect =
+             JSON.stringify([...studentNorm].sort()) ===
+             JSON.stringify([...correctNorm].sort());
+         }
+         
+         // Single answer
+         else {
+           isCorrect = studentNorm[0] === correctNorm[0];
+         }
         return (
           <div
             key={q.question_id}
