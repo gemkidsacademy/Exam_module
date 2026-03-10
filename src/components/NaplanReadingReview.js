@@ -29,12 +29,18 @@ export default function NaplanReadingReview({
         if (!res.ok) throw new Error("Failed to load review");
 
         const data = await res.json();
+        console.log("========== REVIEW API RESPONSE ==========");
+         console.log("Full response:", data);
+         console.log("Questions:", data.questions);
+         console.log("Student answers:", data.student_answers);
 
         const qs = data.questions || [];
         const ans = data.student_answers || {};
 
         setQuestions(qs);
         setAnswers(ans);
+        console.log("Answers object keys:", Object.keys(ans));
+        console.log("Answers object:", ans);
 
         onLoaded?.(qs, ans);
 
@@ -83,18 +89,31 @@ export default function NaplanReadingReview({
          
          const studentAnswer = answerObj.answer;
          const isCorrect = answerObj.is_correct ?? false;
+         console.log("------------- REVIEW TRACE -------------");
+         console.log("Question index:", idx);
+         console.log("Question ID:", qid);
+         console.log("Available answer keys:", Object.keys(answers));
+         console.log("Answer lookup:", answers[qid]);
+         console.log("Answer object:", answerObj);
+         console.log("is_correct value:", answerObj.is_correct);
+         console.log("Computed isCorrect:", isCorrect);
          
          const correctAnswer = q.exam_bundle?.correct_answer;
         
         return (
           <div
-            key={q.question_id}
-            className={`review-card ${isCorrect ? "correct" : "wrong"}`}
-          >
-            <div className="review-header">
-              <span>Question {idx + 1}</span>
-              <span>{isCorrect ? "✔ Correct" : "✖ Incorrect"}</span>
-            </div>
+           key={q.question_id}
+           className={`review-card ${isCorrect ? "correct" : "wrong"}`}
+         >
+           <div className="review-header">
+             <span>Question {idx + 1}</span>
+             <span>{isCorrect ? "✔ Correct" : "✖ Incorrect"}</span>
+           </div>
+         
+           {/* 🔎 DEBUG: show question id */}
+           <div style={{ fontSize: "12px", color: "gray" }}>
+             qid: {qid}
+           </div>
 
             {/* ============================
                 PASSAGE / QUESTION
