@@ -90,6 +90,7 @@ export default function NaplanReading({
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
   const [timeLeft, setTimeLeft] = useState(null);
+  const [correctness, setCorrectness] = useState({});
   const [showConfirmFinish, setShowConfirmFinish] = useState(false);
 
   // ---------------- REPORT ----------------
@@ -424,12 +425,15 @@ if (questionType === 5) {
           setCurrentIndex(0);
           setVisited({});
           const cleanedAnswers = {};
-
+          const correctnessMap = {};
+          
           Object.entries(ans || {}).forEach(([qid, obj]) => {
             cleanedAnswers[qid] = obj.answer;
+            correctnessMap[qid] = obj.is_correct;
           });
           
           setAnswers(cleanedAnswers);
+          setCorrectness(correctnessMap);
         }}
       />
     );
@@ -442,7 +446,7 @@ if (questionType === 5) {
   ============================================================ */
   const isCorrect =
   mode === "review"
-    ? isAnswerCorrect(currentQ, answers)
+    ? correctness[String(currentQ.question_id)]
     : null;
   /* ============================================================
      CURRENT PASSAGE
@@ -472,7 +476,7 @@ if (questionType === 5) {
             let reviewClass = "";
         
             if (mode === "review") {
-              const correctFlag = isAnswerCorrect(q, answers);
+              const correctFlag = correctness[String(q.question_id)];
               reviewClass = correctFlag ? "correct" : "incorrect";
             }        
             return (
