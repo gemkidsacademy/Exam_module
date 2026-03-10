@@ -355,31 +355,9 @@ export default function NaplanLanguageConventions({
   const qid = String(currentQ.id);
   console.log("CURRENT ANSWER FOR TYPE 6:", answers[qid]);
   const isCorrect =
-    mode === "review"
-      ? (() => {
-          const correct = normalizeCorrectAnswer(
-            currentQ.correct_answer,
-            currentQ.question_type
-          );
-
-          const student = normalizeStudentAnswer(
-            answers[String(currentQ.id)],
-            currentQ.question_type
-          );
-
-          // TYPE 2 — MCQ MULTI
-          if (currentQ.question_type === 2) {
-            return (
-              Array.isArray(student) &&
-              Array.isArray(correct) &&
-              student.length === correct.length &&
-              student.every(v => correct.includes(v))
-            );
-          }
-
-          return student === correct;
-        })()
-      : null;
+  mode === "review"
+    ? Boolean(currentQ.is_correct)
+    : null;
 
 
   const normalizedCorrectAnswer = normalizeCorrectAnswer(
@@ -410,40 +388,11 @@ export default function NaplanLanguageConventions({
             const qid = String(q.id);
 
             if (isReview) {
-              const correct = normalizeCorrectAnswer(
-                q.correct_answer,
-                q.question_type
-              );
-
-              const student = normalizeStudentAnswer(
-                answers[qid],
-                q.question_type
-              );
-
-              let questionCorrect = false;
-
-              if (q.question_type === 2) {
-                questionCorrect =
-                  Array.isArray(student) &&
-                  Array.isArray(correct) &&
-                  student.length === correct.length &&
-                  student.every(v => correct.includes(v));
-
-              } else if (q.question_type === 3) {
-                questionCorrect = areNumbersEqual(answers[qid], q.correct_answer);
-
-              } else if (q.question_type === 5) {
-                const correctText = q.options?.[correct];
-                questionCorrect = student === correctText;
-              }
-              else {
-                questionCorrect = student === correct;
-              }
-
+              const questionCorrect = Boolean(q.is_correct);
+            
               cls += questionCorrect
                 ? ` ${styles.indexCorrect}`
                 : ` ${styles.indexWrong}`;
-
             } else {
 
               if (
