@@ -47,8 +47,10 @@ export default function NaplanNumeracyReview({
   }, [studentId, API_BASE, onLoaded]);
 
   return (
-    <p className={styles.loading}>
-      Loading NAPLAN Numeracy review…
-    </p>
+    <div className={styles.reviewContainer}>
+      <p className={styles.loading}>
+        Loading NAPLAN Numeracy review…
+      </p>
+    </div>
   );
 }
