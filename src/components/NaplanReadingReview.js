@@ -30,7 +30,7 @@ export default function NaplanReadingReview({
 
         const data = await res.json();
 
-        const qs = data.questions || {};
+        const qs = data.questions || [];
         const ans = data.student_answers || {};
 
         setQuestions(qs);
@@ -77,38 +77,13 @@ export default function NaplanReadingReview({
 
       {questions.map((q, idx) => {
 
-        const studentAnswer = answers[String(q.question_id)];
+        const answerObj = answers[String(q.question_id)];
+
+      const studentAnswer = answerObj?.answer;
+      const isCorrect = answerObj?.is_correct;
         const correctAnswer = q.exam_bundle?.correct_answer;
 
-        const studentNorm = normalizeAnswer(studentAnswer);
-         const correctNorm = normalizeAnswer(correctAnswer);
-         
-         let isCorrect = false;
-         
-         const tfValues = ["True", "False"];
-         
-         // No defined correct answer (text/open questions)
-         if (correctNorm.length === 0) {
-           isCorrect = false;
-         }
-         
-         // True/False sequence → order matters
-         else if (correctNorm.every(v => tfValues.includes(v))) {
-           isCorrect =
-             JSON.stringify(studentNorm) === JSON.stringify(correctNorm);
-         }
-         
-         // Multi-select → order does NOT matter
-         else if (correctNorm.length > 1) {
-           isCorrect =
-             JSON.stringify([...studentNorm].sort()) ===
-             JSON.stringify([...correctNorm].sort());
-         }
-         
-         // Single answer
-         else {
-           isCorrect = studentNorm[0] === correctNorm[0];
-         }
+        
         return (
           <div
             key={q.question_id}
