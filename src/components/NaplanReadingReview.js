@@ -56,7 +56,15 @@ export default function NaplanReadingReview({
     if (Array.isArray(val)) return val.join(", ");
     return String(val);
   };
+  const normalizeAnswer = (val) => {
+  if (val == null) return [];
 
+  if (Array.isArray(val)) {
+    return val.map(v => String(v).trim());
+  }
+
+  return [String(val).trim()];
+};
   /* ============================================================
      RENDER
   ============================================================ */
@@ -72,10 +80,11 @@ export default function NaplanReadingReview({
         const studentAnswer = answers[String(q.question_id)];
         const correctAnswer = q.exam_bundle?.correct_answer;
 
+        const studentNorm = normalizeAnswer(studentAnswer);
+        const correctNorm = normalizeAnswer(correctAnswer);
+      
         const isCorrect =
-          JSON.stringify(studentAnswer) ===
-          JSON.stringify(correctAnswer);
-
+          JSON.stringify(studentNorm) === JSON.stringify(correctNorm);
         return (
           <div
             key={q.question_id}
