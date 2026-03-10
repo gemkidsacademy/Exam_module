@@ -31,8 +31,9 @@
   box-sizing: border-box;
 
   padding: 24px 32px;
+  margin: 0;
 
-  margin: 0;   /* 👈 IMPORTANT */
+  min-height: 0;   /* ⭐ ADD THIS */
 }
 /* ============================================================
    HEADER (TIMER + COUNTER)
@@ -69,6 +70,7 @@
 ============================================================ */
 .question-card {
   flex: 1;
+  min-height: 0;   /* ⭐ ADD THIS */
 
   display: flex;
   flex-direction: column;
