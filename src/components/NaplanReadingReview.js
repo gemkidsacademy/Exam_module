@@ -77,8 +77,8 @@ export default function NaplanReadingReview({
 
       {questions.map((q, idx) => {
 
-        const qid = String(q.question_id ?? q.id);
-
+        const qid = String(q.question_id);
+         
          const answerObj = answers[qid] || {};
          
          const studentAnswer = answerObj.answer;
