@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import styles from "./NaplanNumeracyReview.module.css";
 
 export default function NaplanNumeracyReview({
   studentId,
@@ -47,8 +46,25 @@ export default function NaplanNumeracyReview({
   }, [studentId, API_BASE, onLoaded]);
 
   return (
-    <div className={styles.reviewWrapper}>
-      <p className={styles.loading}>
+    <div
+      style={{
+        height: "100vh",
+        overflowY: "auto",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "40px",
+        boxSizing: "border-box",
+        background: "#f6f7f9"
+      }}
+    >
+      <p
+        style={{
+          fontSize: "16px",
+          color: "#475569",
+          textAlign: "center"
+        }}
+      >
         Loading NAPLAN Numeracy review…
       </p>
     </div>
