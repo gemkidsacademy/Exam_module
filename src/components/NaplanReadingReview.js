@@ -93,7 +93,8 @@ export default function NaplanReadingReview({
          }
          
          // Multi-select → order does NOT matter
-         else if (studentNorm.length > 1) {
+         // Multi-select → order does NOT matter
+         else if (correctNorm.length > 1) {
            isCorrect =
              JSON.stringify([...studentNorm].sort()) ===
              JSON.stringify([...correctNorm].sort());
