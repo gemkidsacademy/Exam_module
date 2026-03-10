@@ -869,7 +869,7 @@
               {currentQ.question_type === 3 && (
               <>
                 <input
-                  type="number"
+                  type="text"
                   className={`numeric-input ${
                     isReview
                       ? isCorrect
@@ -878,7 +878,14 @@
                       : ""
                   }`}
                   value={answers[String(currentQ.id)] || ""}
-                  onChange={(e) => handleAnswer(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                
+                    // allow only digits, ".", "/", ":"
+                    if (/^[0-9./:]*$/.test(value)) {
+                      handleAnswer(value);
+                    }
+                  }}
                   disabled={isReview}
                 />
             
