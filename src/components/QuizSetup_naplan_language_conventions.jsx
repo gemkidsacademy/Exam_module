@@ -134,6 +134,12 @@ export default function QuizSetup_naplan_language_conventions() {
     fetchTopics();
   }, [quiz.year, quiz.difficulty]);
 
+/* ============================
+   Selected Topics
+============================ */
+const selectedTopicNames = quiz.topics
+  .map((t) => t.name)
+  .filter((name) => name !== "");
   /* ============================
      View Question Bank
   ============================ */
@@ -271,11 +277,15 @@ export default function QuizSetup_naplan_language_conventions() {
               }
             >
               <option value="">Select topic</option>
-              {availableTopics.map((t) => (
-                <option key={t.name} value={t.name}>
-                  {t.name}
-                </option>
-              ))}
+              {availableTopics
+                .filter((t) =>
+                  !selectedTopicNames.includes(t.name) || t.name === topic.name
+                )
+                .map((t) => (
+                  <option key={t.name} value={t.name}>
+                    {t.name}
+                  </option>
+                ))}
             </select>
 
             <label>AI Questions:</label>
