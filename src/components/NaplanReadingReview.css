@@ -189,3 +189,12 @@
     font-size: 15px;
   }
 }
+.review-question-card.correct {
+  border-left: 6px solid #16a34a;
+  background: #ecfdf5;
+}
+
+.review-question-card.incorrect {
+  border-left: 6px solid #dc2626;
+  background: #fef2f2;
+}
