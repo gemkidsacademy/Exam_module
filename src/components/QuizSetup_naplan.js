@@ -296,6 +296,12 @@ useEffect(() => {
 
     fetchTopics();
   }, [quiz.subject, quiz.year, quiz.difficulty]);
+  /* ============================
+   Selected Topics (ADD HERE)
+  ============================ */
+  const selectedTopicNames = quiz.topics
+    .map((t) => t.name)
+    .filter((name) => name !== "");
 
   /* ============================
      Render
@@ -374,11 +380,15 @@ useEffect(() => {
               }
             >
               <option value="">Select topic</option>
-              {availableTopics.map((t) => (
-                <option key={t.name} value={t.name}>
-                  {t.name}
-                </option>
-              ))}
+              {availableTopics
+                .filter((t) =>
+                  !selectedTopicNames.includes(t.name) || t.name === topic.name
+                )
+                .map((t) => (
+                  <option key={t.name} value={t.name}>
+                    {t.name}
+                  </option>
+                ))}
             </select>
 
             <label>AI Questions:</label>
