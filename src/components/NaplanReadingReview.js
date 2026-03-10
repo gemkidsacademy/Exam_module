@@ -106,7 +106,9 @@ export default function NaplanReadingReview({
              <span>Question {idx + 1}</span>
              <span>{isCorrect ? "✔ Correct" : "✖ Incorrect"}</span>
            </div>
-         
+          <div style={{ fontSize: "12px", color: "blue" }}>
+             raw is_correct: {String(answerObj.is_correct)}
+           </div>
            {/* 🔎 DEBUG: show question id */}
            <div style={{ fontSize: "12px", color: "gray" }}>
              qid: {qid}
