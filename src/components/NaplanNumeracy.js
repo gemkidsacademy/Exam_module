@@ -134,17 +134,20 @@
       setMode("report");
     }, [API_BASE, studentId]);
     function normalizeNumericValue(raw) {
-      if (raw === null || raw === undefined) return null;
+      if (raw == null) return null;
     
-      // If DB sent object like { value: "5" }
-      if (typeof raw === "object" && raw.value !== undefined) {
-        raw = raw.value;
+      raw = String(raw).trim();
+    
+      // fraction support
+      if (raw.includes("/")) {
+        const [a, b] = raw.split("/");
+        return Number(a) / Number(b);
       }
     
-      // Trim strings
-      if (typeof raw === "string") {
-        raw = raw.trim();
-        if (raw === "") return null;
+      // time support mm:ss
+      if (raw.includes(":")) {
+        const [m, s] = raw.split(":");
+        return Number(m) * 60 + Number(s);
       }
     
       const number = Number(raw);
@@ -153,6 +156,8 @@
     
       return number;
     }
+
+    
     function areNumbersEqual(a, b) {
       const numA = normalizeNumericValue(a);
       const numB = normalizeNumericValue(b);
