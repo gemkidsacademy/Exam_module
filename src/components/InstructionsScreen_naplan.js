@@ -74,7 +74,7 @@ const InstructionsScreen = ({ subject, onNext }) => {
 
     <div className="instructions-card">
       <h1 className="instructions-title">
-        Naplan High School Placement Practice Test
+        Naplan Practice Test
       </h1>
 
       <h2 className="instructions-subject">{subjectLabel}</h2>
