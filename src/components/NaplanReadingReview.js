@@ -77,12 +77,14 @@ export default function NaplanReadingReview({
 
       {questions.map((q, idx) => {
 
-        const answerObj = answers[String(q.question_id)];
+        const qid = String(q.question_id ?? q.id);
 
-      const studentAnswer = answerObj?.answer;
-      const isCorrect = answerObj?.is_correct;
-        const correctAnswer = q.exam_bundle?.correct_answer;
-
+         const answerObj = answers[qid] || {};
+         
+         const studentAnswer = answerObj.answer;
+         const isCorrect = answerObj.is_correct ?? false;
+         
+         const correctAnswer = q.exam_bundle?.correct_answer;
         
         return (
           <div
