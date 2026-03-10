@@ -234,6 +234,12 @@ export default function QuizSetup_naplan_reading({ examType }) {
 
     fetchTopics();
   }, [quiz.year, quiz.difficulty]);
+  /* ============================
+   Selected Topics
+============================ */
+const selectedTopicNames = quiz.topics
+  .map((t) => t.name)
+  .filter((name) => name !== "");
 
   /* ============================
      Render
@@ -302,12 +308,17 @@ export default function QuizSetup_naplan_reading({ examType }) {
               }
             >
               <option value="">Select topic</option>
-              {availableTopics.map((topic) => (
-                <option key={topic} value={topic}>
-                  {topic}
-                </option>
-              ))}
-            </select>
+              {availableTopics
+                .filter(
+                  (topicName) =>
+                    !selectedTopicNames.includes(topicName) ||
+                    topicName === topic.name
+                )
+                .map((topicName) => (
+                  <option key={topicName} value={topicName}>
+                    {topicName}
+                  </option>
+                ))}            </select>
 
             <label>AI Questions:</label>
             <input
