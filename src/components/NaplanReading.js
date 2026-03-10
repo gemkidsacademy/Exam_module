@@ -423,7 +423,13 @@ if (questionType === 5) {
           setQuestions(qs);
           setCurrentIndex(0);
           setVisited({});
-          setAnswers(ans || {});
+          const cleanedAnswers = {};
+
+          Object.entries(ans || {}).forEach(([qid, obj]) => {
+            cleanedAnswers[qid] = obj.answer;
+          });
+          
+          setAnswers(cleanedAnswers);
         }}
       />
     );
