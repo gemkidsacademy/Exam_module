@@ -103,7 +103,7 @@ export default function NaplanReadingReview({
         return (
           <div
            key={q.question_id}
-           className={`review-card ${isCorrect ? "correct" : "wrong"}`}
+           className={`review-question-card ${isCorrect ? "correct" : "incorrect"}`}
          >
            <div className="review-header">
              <span>Question {idx + 1}</span>
