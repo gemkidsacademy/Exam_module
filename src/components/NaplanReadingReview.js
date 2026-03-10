@@ -87,12 +87,17 @@ export default function NaplanReadingReview({
          
          const tfValues = ["True", "False"];
          
-         // True/False sequence → order matters
-         if (correctNorm.every(v => tfValues.includes(v))) {
-           isCorrect = JSON.stringify(studentNorm) === JSON.stringify(correctNorm);
+         // No defined correct answer (text/open questions)
+         if (correctNorm.length === 0) {
+           isCorrect = false;
          }
          
-         // Multi-select → order does NOT matter
+         // True/False sequence → order matters
+         else if (correctNorm.every(v => tfValues.includes(v))) {
+           isCorrect =
+             JSON.stringify(studentNorm) === JSON.stringify(correctNorm);
+         }
+         
          // Multi-select → order does NOT matter
          else if (correctNorm.length > 1) {
            isCorrect =
