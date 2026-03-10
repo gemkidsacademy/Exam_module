@@ -78,7 +78,7 @@ export default function NaplanReadingReview({
   if (!questions.length) return <p>No questions to review.</p>;
 
   return (
-    <div className="review-container">
+    <div className="reading-review-container">
       <h2>NAPLAN Reading – Review</h2>
 
       {questions.map((q, idx) => {
