@@ -98,9 +98,10 @@ export default function CumulativeReport_new({
           params.append("exam", exam);
         }
 
-        attemptDates.forEach(d =>
-          params.append("attempt_dates", d)
-        );
+        attemptDates.forEach(date => {
+          params.append("attempt_dates", date);
+        });
+        console.log("DATES SENT TO BACKEND:", attemptDates);
 
         if (topic) {
           params.append("topic", topic);
