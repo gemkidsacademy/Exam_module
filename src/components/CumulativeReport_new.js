@@ -190,6 +190,34 @@ export default function CumulativeReport_new({
 
         <div className="chart-container">
           <SimpleLineChart attempts={attempts} />
+        
+          <div style={{
+            display: "flex",
+            gap: "20px",
+            marginTop: "10px",
+            justifyContent: "center",
+            fontSize: "13px"
+          }}>
+            <div style={{display:"flex", alignItems:"center", gap:"6px"}}>
+              <span style={{
+                width:"10px",
+                height:"10px",
+                background:"#2563eb",
+                display:"inline-block"
+              }}></span>
+              Score
+            </div>
+        
+            <div style={{display:"flex", alignItems:"center", gap:"6px"}}>
+              <span style={{
+                width:"10px",
+                height:"10px",
+                background:"#16a34a",
+                display:"inline-block"
+              }}></span>
+              Accuracy
+            </div>
+          </div>
         </div>
 
       </div>
@@ -367,8 +395,21 @@ const accuracies = safeAttempts.map((a) => {
         fontSize="12"
         fill="#444"
       >
-        Score / Accuracy (%)
+        Performance (%)
       </text>
+      {/* Y axis tick labels */}
+      {[60, 70, 80, 90, 100].map(val => (
+        <text
+          key={val}
+          x={padding - 8}
+          y={yScale(val)}
+          textAnchor="end"
+          fontSize="11"
+          fill="#555"
+        >
+          {val}
+        </text>
+      ))}
       {/* X axis label */}
       <text
         x={width / 2}
@@ -402,7 +443,7 @@ const accuracies = safeAttempts.map((a) => {
       {/* Score points */}
 
       {Array.isArray(scores) && scores.map((s, i) => {
-        const x = padding + i * xStep;
+        const x = padding + (i + 1) * xStep;
         const y = yScale(s);
       
         return (
@@ -419,7 +460,7 @@ const accuracies = safeAttempts.map((a) => {
       {/* Accuracy points */}
       
       {Array.isArray(accuracies) && accuracies.map((a, i) => {
-        const x = padding + i * xStep;
+        const x = padding + (i + 1) * xStep;
         const y = yScale(a);
       
         return (
@@ -430,6 +471,28 @@ const accuracies = safeAttempts.map((a) => {
             r="4"
             fill="#16a34a"
           />
+        );
+      })}
+      {/* X axis date labels */}
+      {safeAttempts.map((a, i) => {
+        const x = padding + (i + 1) * xStep;
+      
+        const label = new Date(a.date).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric"
+        });
+      
+        return (
+          <text
+            key={`date-${i}`}
+            x={x}
+            y={height - padding + 18}
+            textAnchor="middle"
+            fontSize="11"
+            fill="#555"
+          >
+            {label}
+          </text>
         );
       })}
 
