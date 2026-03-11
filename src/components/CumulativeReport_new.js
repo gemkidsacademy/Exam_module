@@ -193,9 +193,8 @@ export default function CumulativeReport_new({
         
           <div style={{
             display: "flex",
-            gap: "20px",
-            marginTop: "10px",
             justifyContent: "center",
+            marginTop: "10px",
             fontSize: "13px"
           }}>
             <div style={{display:"flex", alignItems:"center", gap:"6px"}}>
@@ -205,17 +204,7 @@ export default function CumulativeReport_new({
                 background:"#2563eb",
                 display:"inline-block"
               }}></span>
-              Score
-            </div>
-        
-            <div style={{display:"flex", alignItems:"center", gap:"6px"}}>
-              <span style={{
-                width:"10px",
-                height:"10px",
-                background:"#16a34a",
-                display:"inline-block"
-              }}></span>
-              Accuracy
+              Writing Score
             </div>
           </div>
         </div>
@@ -327,19 +316,13 @@ function SimpleLineChart({ attempts = [] }) {
   const width = 800;
   const height = 220;
   const padding = 50;
-  const maxY = 100;
+  const maxY = 25;
 
   const scores = safeAttempts.map((a) => {
   if (typeof a === "object") return Number(a.score ?? 0);
   return Number(a ?? 0);
 });
 
-const accuracies = safeAttempts.map((a) => {
-  if (typeof a === "object") return Number(a.accuracy ?? 0);
-  return Number(a ?? 0);
-});
-  console.log("SCORES:", scores);
-  console.log("ACCURACIES:", accuracies);
 
   const xStep =
     safeAttempts.length > 1
@@ -395,10 +378,10 @@ const accuracies = safeAttempts.map((a) => {
         fontSize="12"
         fill="#444"
       >
-        Performance (%)
+        Writing Score (0–25)
       </text>
       {/* Y axis tick labels */}
-      {[60, 70, 80, 90, 100].map(val => (
+      {[15, 17, 20, 22, 25].map(val => (
         <text
           key={val}
           x={padding - 8}
@@ -423,7 +406,7 @@ const accuracies = safeAttempts.map((a) => {
 
       {/* Lines */}
 
-      {Array.isArray(scores) && Array.isArray(accuracies) && (
+      {Array.isArray(scores) && scores.length > 0 && (
         <>
           <polyline
             fill="none"
@@ -432,12 +415,7 @@ const accuracies = safeAttempts.map((a) => {
             points={points(scores)}
           />
 
-          <polyline
-            fill="none"
-            stroke="#16a34a"
-            strokeWidth="2"
-            points={points(accuracies)}
-          />
+          
         </>
       )}
       {/* Score points */}
@@ -459,20 +437,7 @@ const accuracies = safeAttempts.map((a) => {
       
       {/* Accuracy points */}
       
-      {Array.isArray(accuracies) && accuracies.map((a, i) => {
-        const x = padding + (i + 1) * xStep;
-        const y = yScale(a);
       
-        return (
-          <circle
-            key={`acc-${i}`}
-            cx={x}
-            cy={y}
-            r="4"
-            fill="#16a34a"
-          />
-        );
-      })}
       {/* X axis date labels */}
       {safeAttempts.map((a, i) => {
         const x = padding + (i + 1) * xStep;
