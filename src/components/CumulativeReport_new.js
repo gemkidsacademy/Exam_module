@@ -314,7 +314,7 @@ const accuracies = safeAttempts.map((a) => {
 
   const xStep =
     safeAttempts.length > 1
-      ? (width - padding * 2) / (safeAttempts.length - 1)
+      ? (width - padding * 2) / safeAttempts.length
       : 0;
   
   const yScale = val =>
@@ -329,7 +329,7 @@ const accuracies = safeAttempts.map((a) => {
 
   return values
     .map((v, i) => {
-      const x = padding + i * xStep;
+      const x = padding + (i + 1) * xStep;
       const y = yScale(Number(v) || 0);
       return `${x},${y}`;
     })
