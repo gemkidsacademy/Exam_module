@@ -380,11 +380,23 @@ function SimpleLineChart({ attempts = [] }) {
       >
         Writing Score (0–25)
       </text>
+      {/* Horizontal grid lines */}
+      {[15, 17, 20, 22, 25].map(val => (
+        <line
+          key={`grid-${val}`}
+          x1={padding}
+          y1={yScale(val)}
+          x2={width - padding}
+          y2={yScale(val)}
+          stroke="#e5e7eb"
+          strokeDasharray="3,3"
+        />
+      ))}
       {/* Y axis tick labels */}
       {[15, 17, 20, 22, 25].map(val => (
         <text
           key={val}
-          x={padding - 8}
+          x={padding - 12}
           y={yScale(val)}
           textAnchor="end"
           fontSize="11"
@@ -411,10 +423,11 @@ function SimpleLineChart({ attempts = [] }) {
           <polyline
             fill="none"
             stroke="#2563eb"
-            strokeWidth="2"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
             points={points(scores)}
           />
-
           
         </>
       )}
@@ -429,8 +442,10 @@ function SimpleLineChart({ attempts = [] }) {
             key={`score-${i}`}
             cx={x}
             cy={y}
-            r="4"
+            r="5"
             fill="#2563eb"
+            stroke="white"
+            strokeWidth="2"
           />
         );
       })}
