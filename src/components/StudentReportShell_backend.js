@@ -838,9 +838,10 @@
     <CumulativeReport data={cumulativeReportData} />
   )}
   {reportType === "topic" && (
-  <CumulativeReport_new
+    <CumulativeReport_new
     studentId={studentId}
     exam={exam}
+    topic={topic}
     attemptDates={selectedAttemptDates}
     topics={availableTopics}
     API_BASE={API_BASE}
