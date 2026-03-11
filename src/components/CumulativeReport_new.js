@@ -94,7 +94,9 @@ export default function CumulativeReport_new({
         const params = new URLSearchParams();
 
         params.append("student_id", studentId);
-        params.append("exam", exam);
+        if (exam !== "writing") {
+          params.append("exam", exam);
+        }
 
         attemptDates.forEach(d =>
           params.append("attempt_dates", d)
@@ -104,9 +106,15 @@ export default function CumulativeReport_new({
           params.append("topic", topic);
         }
 
-        const endpoint = topic
-          ? "/api/reports/student/cumulative"
-          : "/api/reports/student/cumulative-overall";
+        let endpoint;
+
+          if (exam === "writing") {
+            endpoint = "/api/reports/student/writing/cumulative";
+          } else {
+            endpoint = topic
+              ? "/api/reports/student/cumulative"
+              : "/api/reports/student/cumulative-overall";
+          }
         try {
           console.log(
             "FETCHING:",
