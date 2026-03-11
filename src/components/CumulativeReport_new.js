@@ -381,8 +381,7 @@ const accuracies = safeAttempts.map((a) => {
 
       {/* Lines */}
 
-      {Array.isArray(scores) && Array.isArray(accuracies) &&
-       scores.length > 1 && accuracies.length > 1 && (
+      {Array.isArray(scores) && Array.isArray(accuracies) && (
         <>
           <polyline
             fill="none"
