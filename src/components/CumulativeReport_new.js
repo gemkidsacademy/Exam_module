@@ -205,7 +205,13 @@ export default function CumulativeReport_new({
                 background:"#2563eb",
                 display:"inline-block"
               }}></span>
-              {exam === "writing" ? "Writing Score" : "Thinking Skills Score"}
+              {exam === "writing"
+                ? "Writing Score"
+                : exam === "mathematical_reasoning"
+                ? "Mathematical Reasoning Score"
+                : exam === "reading"
+                ? "Reading Score"
+                : "Thinking Skills Score"}
             </div>
           </div>
         </div>
@@ -383,9 +389,15 @@ function SimpleLineChart({ attempts = [], exam }) {
         fontSize="12"
         fill="#444"
       >
-        {exam === "writing"
-          ? "Writing Score (0–25)"
-          : "Thinking Skills Score (%)"}
+        {
+            exam === "writing"
+              ? "Writing Score (0–25)"
+              : exam === "mathematical_reasoning"
+              ? "Mathematical Reasoning Score (%)"
+              : exam === "reading"
+              ? "Reading Score (%)"
+              : "Thinking Skills Score (%)"
+          }
       </text>
       {/* Horizontal grid lines */}
       {gridValues.map(val => (
