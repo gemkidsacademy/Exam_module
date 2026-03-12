@@ -483,9 +483,10 @@ export default function NaplanLanguageConventions({
                 Select
               </option>
               {block.options.map((opt, i) => {
-                const key = String.fromCharCode(65 + i); // A,B,C,D
+                const key = String.fromCharCode(65 + i); // still used for display if needed
+              
                 return (
-                  <option key={key} value={key}>
+                  <option key={key} value={opt}>
                     {opt}
                   </option>
                 );
