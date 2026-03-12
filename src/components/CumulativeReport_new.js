@@ -99,7 +99,8 @@ export default function CumulativeReport_new({
         }
 
         attemptDates.forEach(date => {
-          params.append("attempt_dates", date);
+          const iso = new Date(date).toISOString().split("T")[0];
+          params.append("attempt_dates", iso);
         });
         console.log("DATES SENT TO BACKEND:", attemptDates);
 
