@@ -614,11 +614,11 @@ export default function NaplanLanguageConventions({
     {currentQ.question_type === 1 && currentQ.options && (
       <div className="mcq-options">
         {Object.entries(currentQ.options).map(([key, value]) => {
-          const isSelected = normalizedStudentAnswer === key;
-          const isCorrectOption = normalizedCorrectAnswer === key;
+          const isSelected = normalizedStudentAnswer === value;
+          const isCorrectOption = normalizedCorrectAnswer === value;
           const isWrongSelected = isReview && isSelected && !isCorrectOption;
           const isCorrectHighlight = isReview && isCorrectOption;
-
+        
           return (
             <label
               key={key}
@@ -633,7 +633,7 @@ export default function NaplanLanguageConventions({
                 name={`q-${qid}`}
                 checked={isSelected}
                 disabled={isReview}
-                onChange={() => handleAnswer(key)}
+                onChange={() => handleAnswer(value)}
               />
               <span>{key}. {value}</span>
             </label>
