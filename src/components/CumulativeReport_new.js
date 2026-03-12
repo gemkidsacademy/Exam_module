@@ -190,7 +190,7 @@ export default function CumulativeReport_new({
         </div>
 
         <div className="chart-container">
-          <SimpleLineChart attempts={attempts} />
+          <SimpleLineChart attempts={attempts} exam={exam} />
         
           <div style={{
             display: "flex",
@@ -205,7 +205,7 @@ export default function CumulativeReport_new({
                 background:"#2563eb",
                 display:"inline-block"
               }}></span>
-              Writing Score
+              {exam === "writing" ? "Writing Score" : "Thinking Skills Score"}
             </div>
           </div>
         </div>
@@ -301,7 +301,7 @@ export default function CumulativeReport_new({
 
 /* ================= SIMPLE SVG CHART ================= */
 
-function SimpleLineChart({ attempts = [] }) {
+function SimpleLineChart({ attempts = [], exam }) {
   console.log("CHART ATTEMPTS:", attempts);
   console.log("CHART ATTEMPTS ARRAY?", Array.isArray(attempts));
   
@@ -317,7 +317,11 @@ function SimpleLineChart({ attempts = [] }) {
   const width = 800;
   const height = 220;
   const padding = 50;
-  const maxY = 25;
+  const maxY = exam === "writing" ? 25 : 100;
+  const gridValues =
+  exam === "writing"
+    ? [15, 17, 20, 22, 25]
+    : [20, 40, 60, 80, 100];
 
   const scores = safeAttempts.map((a) => {
   if (typeof a === "object") return Number(a.score ?? 0);
@@ -379,10 +383,12 @@ function SimpleLineChart({ attempts = [] }) {
         fontSize="12"
         fill="#444"
       >
-        Writing Score (0–25)
+        {exam === "writing"
+          ? "Writing Score (0–25)"
+          : "Thinking Skills Score (%)"}
       </text>
       {/* Horizontal grid lines */}
-      {[15, 17, 20, 22, 25].map(val => (
+      {gridValues.map(val => (
         <line
           key={`grid-${val}`}
           x1={padding}
@@ -394,7 +400,7 @@ function SimpleLineChart({ attempts = [] }) {
         />
       ))}
       {/* Y axis tick labels */}
-      {[15, 17, 20, 22, 25].map(val => (
+      {gridValues.map(val => (
         <text
           key={val}
           x={padding - 12}
