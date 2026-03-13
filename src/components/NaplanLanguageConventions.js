@@ -602,7 +602,13 @@ export default function NaplanLanguageConventions({
         rows={2}
         placeholder="Type your answer here"
         value={answers[qid] || ""}
-        onChange={(e) => handleAnswer(e.target.value)}
+        onChange={(e) => {
+          const cleanedValue = e.target.value
+            .replace(/[^a-zA-Z]/g, "")
+            .toLowerCase();
+    
+          handleAnswer(cleanedValue);
+        }}
         disabled={isReview}
         spellCheck={false}
         autoComplete="off"
