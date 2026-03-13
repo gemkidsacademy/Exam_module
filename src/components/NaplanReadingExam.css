@@ -627,3 +627,6 @@
   background: inherit;
   border-color: inherit;
 }
+.tf-dim {
+  opacity: 0.35;
+}
