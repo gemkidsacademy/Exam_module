@@ -627,6 +627,12 @@
   background: inherit;
   border-color: inherit;
 }
-.tf-dim {
+.tf-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tf-cell.tf-dim {
   opacity: 0.35;
 }
