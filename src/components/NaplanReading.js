@@ -457,7 +457,7 @@ if (questionType === 5) {
   console.log("🧠 ACTUAL RENDER answers:", answers);
 
   return (
-    <div className="exam-shell">
+    <div className={`exam-shell ${mode === "review" ? "review-mode" : ""}`}>
       <div className="exam-container">
 
         {/* HEADER */}
