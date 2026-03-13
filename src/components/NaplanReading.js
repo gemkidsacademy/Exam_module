@@ -737,27 +737,24 @@ if (questionType === 5) {
                     {Object.entries(optionsSource).map(([k, v]) => {
                       const isSelected = selected.includes(k);
 
-                      let isCorrectOption = false;
-                      let isWrongSelection = false;
-
+                      const correctArray = Array.isArray(correct) ? correct : [];
+                      const isCorrectOption = correctArray.includes(k);
+                      
+                      let optionClass = "";
+                      
                       if (mode === "review") {
-                        const correctArray = Array.isArray(correct) ? correct : [];
-
-                        isCorrectOption = correctArray.includes(k);
-                        isWrongSelection = isSelected && !correctArray.includes(k);
+                        if (isSelected && isCorrectOption) {
+                          optionClass = "option-correct";
+                        } else if (isSelected && !isCorrectOption) {
+                          optionClass = "option-wrong";
+                        } else if (!isSelected && isCorrectOption) {
+                          optionClass = "option-correct";
+                        }
                       }
-
                       return (
                         <label
                           key={k}
-                          className={[
-                            "mcq-option-row",
-                            isWrongSelection
-                              ? "option-wrong"
-                              : isCorrectOption
-                              ? "option-correct"
-                              : ""
-                          ].join(" ")}
+                          className={`mcq-option-row ${optionClass}`}
                         >
                           <input
                             type="checkbox"
