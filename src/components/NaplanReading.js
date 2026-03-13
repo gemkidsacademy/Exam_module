@@ -676,31 +676,33 @@ if (questionType === 5) {
             <div key={i} className="tf-grid-row">
               <span className="tf-statement">{stmt}</span>
 
-              <input
-                type="radio"
-                name={`tf-${qid}-${i}`}
-                checked={currentValue === "True"}
-                className={currentValue === "False" ? "tf-dim" : ""}
-                disabled={isReview}
-                onChange={() => {
-                  const updated = [...selectedAnswers];
-                  updated[i] = "True";
-                  handleAnswer(updated);
-                }}
-              />
+              <div className={`tf-cell ${currentValue === "False" ? "tf-dim" : ""}`}>
+                <input
+                  type="radio"
+                  name={`tf-${qid}-${i}`}
+                  checked={currentValue === "True"}
+                  disabled={isReview}
+                  onChange={() => {
+                    const updated = [...selectedAnswers];
+                    updated[i] = "True";
+                    handleAnswer(updated);
+                  }}
+                />
+              </div>
               
-              <input
-                type="radio"
-                name={`tf-${qid}-${i}`}
-                checked={currentValue === "False"}
-                className={currentValue === "True" ? "tf-dim" : ""}
-                disabled={isReview}
-                onChange={() => {
-                  const updated = [...selectedAnswers];
-                  updated[i] = "False";
-                  handleAnswer(updated);
-                }}
-              />
+              <div className={`tf-cell ${currentValue === "True" ? "tf-dim" : ""}`}>
+                <input
+                  type="radio"
+                  name={`tf-${qid}-${i}`}
+                  checked={currentValue === "False"}
+                  disabled={isReview}
+                  onChange={() => {
+                    const updated = [...selectedAnswers];
+                    updated[i] = "False";
+                    handleAnswer(updated);
+                  }}
+                />
+              </div>
             </div>
           );
         })}
