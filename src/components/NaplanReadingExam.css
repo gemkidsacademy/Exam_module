@@ -108,16 +108,19 @@
 .question-pane {
   display: flex;
   flex-direction: column;
+  flex: 1;
   height: 100%;
-  overflow: hidden;
 }
-
 .question-card {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+
   padding: 20px;
   border: 1px solid #e6e9ed;
   border-radius: 8px;
   background: #ffffff;
+
   overflow-y: auto;
   box-sizing: border-box;
 }
@@ -134,7 +137,10 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+  flex: 1;
+  align-content: start;
 }
+
 /* ============================================================
    IMAGE OPTIONS — VERTICAL STACK
 ============================================================ */
@@ -206,14 +212,19 @@
    IMAGE OPTIONS
 ============================================================ */
 .option-image {
-  width: 100%;
-  max-height: 120px;
-  object-fit: contain;
   display: block;
+  width: 100%;
+  height: auto;
+  max-height: 120px;
+
+  object-fit: contain;
+
   margin-top: 8px;
-  background: #ffffff;
+
+  background-color: #ffffff;
   border-radius: 6px;
 }
+
 
 /* ============================================================
    WORD BANK / GAP FILL
@@ -603,7 +614,7 @@
   color: white !important;
 }
 .review-details {
-  margin-top: 6px;
+  margin-top: 6px;a
   font-size: 14px;
 }
 
