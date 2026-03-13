@@ -155,7 +155,7 @@
 }
 /* --- default option card (radio / image MCQ) --- */
 .mcq-options:not(.multi-select):not(.word-bank) .mcq-option-card {
-  height: 220px;
+  min-height: 160px;
 }
 
 /* --- option card base --- */
@@ -163,7 +163,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 
   padding: 14px;
   background: #f8fafc;
@@ -215,16 +215,13 @@
   display: block;
   width: 100%;
   height: auto;
-  max-height: 120px;
+  max-height: 180px;
 
   object-fit: contain;
-
-  margin-top: 8px;
 
   background-color: #ffffff;
   border-radius: 6px;
 }
-
 
 /* ============================================================
    WORD BANK / GAP FILL
