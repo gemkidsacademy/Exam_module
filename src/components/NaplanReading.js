@@ -680,6 +680,7 @@ if (questionType === 5) {
                 type="radio"
                 name={`tf-${qid}-${i}`}
                 checked={currentValue === "True"}
+                className={currentValue === "False" ? "tf-dim" : ""}
                 disabled={isReview}
                 onChange={() => {
                   const updated = [...selectedAnswers];
@@ -687,11 +688,12 @@ if (questionType === 5) {
                   handleAnswer(updated);
                 }}
               />
-
+              
               <input
                 type="radio"
                 name={`tf-${qid}-${i}`}
                 checked={currentValue === "False"}
+                className={currentValue === "True" ? "tf-dim" : ""}
                 disabled={isReview}
                 onChange={() => {
                   const updated = [...selectedAnswers];
