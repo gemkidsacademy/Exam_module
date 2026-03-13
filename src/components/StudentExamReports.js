@@ -232,9 +232,11 @@ export default function StudentExamReports() {
               {report.exam_type === "thinking_skills" && (
                 <p className="thinking-score">
                   <strong>Overall Thinking Skills Accuracy:</strong> {report.overall_score}%
+                  {report.obtained_marks !== undefined && report.total_marks !== undefined && (
+                    <> ({report.obtained_marks} / {report.total_marks})</>
+                  )}
                 </p>
               )}
-
             
             {report.exam_type === "reading" && report.sections?.length > 0 && (
                  <>
