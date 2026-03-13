@@ -611,14 +611,13 @@
   font-weight: 600;
   margin-bottom: 4px;
 }
-.option-correct {
-  background-color: #dcfce7;
-  border: 2px solid #22c55e;
+.mcq-option-row.option-correct {
+  background-color: #dcfce7 !important;
+  border-color: #22c55e !important;
 }
-
-.option-wrong {
-  background-color: #fee2e2;
-  border: 2px solid #ef4444;
+.mcq-option-row.option-wrong {
+  background-color: #fee2e2 !important;
+  border-color: #ef4444 !important;
 }
 /* Disable exam selection styling during review */
 .exam-shell.review-mode .mcq-option-row:has(input:checked) {
