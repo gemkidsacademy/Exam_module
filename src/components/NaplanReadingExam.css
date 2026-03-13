@@ -479,7 +479,7 @@
 }
 
 /* selected state */
-.mcq-option-row:has(input:checked) {
+.exam-shell:not(.review-mode) .mcq-option-row:has(input:checked) {
   background: #ecfdf5;
   border-color: #22c55e;
 }
