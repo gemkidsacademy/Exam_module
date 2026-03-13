@@ -719,10 +719,19 @@ export default function NaplanLanguageConventions({
           const selected = answers[qid] || [];
           const isSelected = selected.includes(key);
 
+          const correctAnswers = normalizedCorrectAnswer || [];
+          const isCorrectOption = correctAnswers.includes(key);
+          const isWrongSelected = isReview && isSelected && !isCorrectOption;
+          const isCorrectHighlight = isReview && isCorrectOption;
+
           return (
             <label
               key={key}
-              className={`text-option-card ${isSelected ? "selected" : ""}`}
+              className={`text-option-card
+                ${isSelected ? "selected" : ""}
+                ${isCorrectHighlight ? "review-correct" : ""}
+                ${isWrongSelected ? "review-wrong" : ""}
+              `}
             >
               <input
                 type="checkbox"
