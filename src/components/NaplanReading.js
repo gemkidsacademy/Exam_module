@@ -741,8 +741,8 @@ if (questionType === 5) {
                       const isCorrectOption = correctArray.includes(k);
                       
                       let optionClass = "";
-                      
-                      if (mode === "review") {
+
+                      if (isReview) {
                         if (isSelected && isCorrectOption) {
                           optionClass = "option-correct";
                         } else if (isSelected && !isCorrectOption) {
