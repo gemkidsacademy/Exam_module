@@ -169,6 +169,7 @@ export default function StudentExamReports() {
       {reportsLoading && <p>Loading reports…</p>}
 
       {reports.map(report => {
+        console.log("REPORT OBJECT:", report);
         const sectionChartData = report.sections.map(s => ({
           section: s.section_name,
           score: SECTION_GRADE_MAP[s.performance_band] || 0
@@ -218,6 +219,9 @@ export default function StudentExamReports() {
             {report.exam_type === "reading" && (
               <p className="reading-score">
                 <strong>Overall Reading Score:</strong> {report.overall_score}%
+                {report.obtained_marks !== undefined && report.total_marks !== undefined && (
+                  <> ({report.obtained_marks} / {report.total_marks})</>
+                )}
               </p>
             )}
 
@@ -226,6 +230,9 @@ export default function StudentExamReports() {
               {report.exam_type === "mathematical_reasoning" && (
                 <p className="math-score">
                   <strong>Overall Mathematical Reasoning Accuracy:</strong> {report.overall_score}%
+                  {report.obtained_marks !== undefined && report.total_marks !== undefined && (
+                    <> ({report.obtained_marks} / {report.total_marks})</>
+                  )}
                 </p>
               )}
               {/* Thinking Skills */}
