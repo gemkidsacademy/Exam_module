@@ -36,8 +36,8 @@
 }
 
 .timer-box {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 18px;
+  font-weight: 600;
   color: #ef4444;
 }
 
@@ -161,7 +161,7 @@
   -ms-user-select: none;
 }
 .passage-pane h3 {
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 600;
   margin-bottom: 16px;
   color: #111827;
@@ -195,7 +195,7 @@
 }
 
 .question-text {
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 500;
   margin-bottom: 18px;
   color: #111827;
@@ -385,7 +385,7 @@
   word-wrap: break-word;
   overflow-x: hidden;     /* prevent horizontal scroll */
   font-family: "Georgia", serif;
-  font-size: 15px;
+  font-size: 18px;
   line-height: 1.6;
   max-width: 100%;
 }
@@ -494,4 +494,9 @@
   padding: 12px 22px;
   border-radius: 8px;
   cursor: pointer;
+}
+.reading-paragraph {
+  font-size: 18px;
+  line-height: 1.7;
+  color: #374151;
 }
