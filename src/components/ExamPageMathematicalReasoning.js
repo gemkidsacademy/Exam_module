@@ -81,7 +81,11 @@ const loadReport = useCallback(async () => {
 useEffect(() => {
   console.log("🔄 MODE CHANGED:", mode);
 }, [mode]);
-
+useEffect(() => {
+  document.addEventListener("contextmenu", e => e.preventDefault());
+  document.addEventListener("copy", e => e.preventDefault());
+  document.addEventListener("cut", e => e.preventDefault());
+}, []);
 /* ============================================================
    START / RESUME EXAM (SINGLE SOURCE OF TRUTH)
 ============================================================ */
