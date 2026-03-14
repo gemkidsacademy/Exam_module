@@ -561,15 +561,17 @@ function MathematicalReasoningReport({ report, onViewExamDetails }) {
   const percentage = Math.round(greyPercent);
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        overflowY: "auto",
-        padding: "32px",
-        boxSizing: "border-box",
-        background: "#f9fafb"
-      }}
-    >
+     <div
+       style={{
+         position: "fixed",
+         inset: 0,
+         overflowY: "auto",
+         background: "#f3f4f6",
+         padding: "32px",
+         boxSizing: "border-box",
+         zIndex: 1
+       }}
+     >
 
       {/* HEADER */}
       <h2
