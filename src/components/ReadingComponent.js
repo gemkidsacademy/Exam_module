@@ -148,6 +148,12 @@ export default function ReadingComponent({
   });
 }, [exam, questions]);
   useEffect(() => {
+  document.addEventListener("contextmenu", e => e.preventDefault());
+  document.addEventListener("copy", e => e.preventDefault());
+  document.addEventListener("cut", e => e.preventDefault());
+}, []);
+    
+  useEffect(() => {
   if (!studentId) return;
 
   const loadExam = async () => {
