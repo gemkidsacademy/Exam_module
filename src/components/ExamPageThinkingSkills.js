@@ -26,26 +26,35 @@ console.log("🧠 ExamPageThinkingSkills MOUNTED");
 
 
 const hasSubmittedRef = useRef(false);
-const normalizeOption = (optionValue) => {
-  if (typeof optionValue === "string") {
-    // image filename
-    if (optionValue.match(/\.(png|jpg|jpeg|webp)$/i)) {
+const normalizeOption = (value) => {
+
+  // already normalized by backend
+  if (value && typeof value === "object") {
+    return value;
+  }
+
+  if (typeof value === "string") {
+
+    if (value.match(/\.(png|jpg|jpeg|webp)$/i)) {
       return {
         type: "image",
-        src: IMAGE_BASE + optionValue,
+        src: value.startsWith("http")
+          ? value
+          : IMAGE_BASE + value
       };
     }
 
-    // plain text
     return {
       type: "text",
-      content: optionValue,
+      content: value
     };
   }
 
-  return optionValue; // already normalized
+  return {
+    type: "text",
+    content: String(value ?? "")
+  };
 };
-
 
 
 
@@ -423,6 +432,7 @@ return (
 <div className="options-container">
 
   {optionEntries.map(([optionKey, rawValue]) => {
+   console.log("OPTION DEBUG", optionKey, rawValue, normalizeOption(rawValue));
 
     const optionValue = normalizeOption(rawValue);
 
