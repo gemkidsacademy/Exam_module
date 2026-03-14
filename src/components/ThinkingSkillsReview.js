@@ -25,9 +25,23 @@ export default function ThinkingSkillsReview({
 
         const data = await response.json();
 
+        console.log("===== REVIEW API RAW RESPONSE =====");
+        console.log(data);
+        
         const questions = Array.isArray(data.questions)
           ? data.questions
           : [];
+        
+        questions.forEach((q, i) => {
+          console.log(`REVIEW QUESTION ${i + 1}`, {
+            q_id: q.q_id,
+            options: q.options,
+            choices: q.choices,
+            answer_options: q.answer_options
+          });
+        });
+        
+        console.log("===================================");
 
         onLoaded?.(questions);
       } catch (error) {
