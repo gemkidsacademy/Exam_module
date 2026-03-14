@@ -4,13 +4,14 @@
 
 .writing-container {
   width: 100%;
-  max-width: none;
-  margin: 0;
-  padding: 24px;
+  max-width: 1100px;           /* keeps content readable instead of full stretch */
+  margin: 0 auto;
+  padding: 28px;
   font-family: Arial, Helvetica, sans-serif;
-  height: 100vh;
+  min-height: 100vh;
   overflow-y: auto;
 }
+
 .writing-header {
   display: flex;
   justify-content: flex-end;
@@ -48,10 +49,10 @@
 }
 
 .writing-text {
-  padding: 16px;
-  line-height: 1.6;
+  padding: 18px 20px;
+  line-height: 1.65;
+  font-size: 15px;
 }
-
 .writing-title {
   margin-top: 0;
   margin-bottom: 12px;
@@ -76,22 +77,24 @@
 
 .writing-answer-box {
   width: 100%;
-  min-height: 260px;
+  min-height: 520px;                 /* MUCH larger writing space */
   resize: vertical;
-  padding: 14px;
-  border-radius: 6px;
+  padding: 20px 22px;
+  border-radius: 8px;
   border: 1px solid #ccc;
-  font-size: 15px;
-  line-height: 1.6;
-  margin-bottom: 18px;
+  font-size: 18px;                   /* bigger text for writing */
+  line-height: 1.75;
+  font-family: "Georgia", "Times New Roman", serif;  /* better for long writing */
+  margin-bottom: 20px;
   box-sizing: border-box;
+  background: #fff;
 }
 
 .writing-answer-box:focus {
   outline: none;
   border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74,144,226,0.15);
 }
-
 /* =========================================
    Submit Button
 ========================================= */
