@@ -349,7 +349,17 @@
   const evalData = result.evaluation;
 
   return (
-    <div className="completed-screen">
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        overflowY: "auto",
+        background: "#f9fafb",
+        padding: "32px",
+        boxSizing: "border-box",
+        zIndex: 1
+      }}
+    >
       <h1>Writing Report</h1>
 
       <p>
