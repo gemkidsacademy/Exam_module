@@ -544,163 +544,255 @@ return (
 ============================================================ */
 
 function MathematicalReasoningReport({ report, onViewExamDetails }) {
-if (!report?.overall) {
-  return <p className="loading">Generating your report…</p>;
-}
+  if (!report?.overall) {
+    return <p className="loading">Generating your report…</p>;
+  }
 
+  const {
+    overall,
+    topic_wise_performance,
+    topic_accuracy,
+    improvement_areas
+  } = report;
 
-const {
-  overall,
-  topic_wise_performance,
-  topic_accuracy,
-  improvement_areas
-} = report;
-const greyPercent =
- (overall.correct / overall.total_questions) * 100;
-const percentage = Math.round(greyPercent);
-return (
-  <div className="report-page">
+  const greyPercent =
+    (overall.correct / overall.total_questions) * 100;
 
-    {/* ===============================
-       HEADER (Overall Result – B)
-    =============================== */}
-    <h2 className="report-title">
-      You scored {overall.correct} out of {overall.total_questions} in NSW
-      Selective Mathematical Reasoning Test 
-    </h2>
-    <button
-      className="view-exam-btn"
-      onClick={() => {
-        console.log("🟢 Review Exam button clicked");
-        onViewExamDetails();
+  const percentage = Math.round(greyPercent);
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        overflowY: "auto",
+        padding: "32px",
+        boxSizing: "border-box",
+        background: "#f9fafb"
       }}
     >
-      View Exam Details
-    </button>
 
-    <div className="report-grid">
+      {/* HEADER */}
+      <h2
+        style={{
+          fontSize: "26px",
+          fontWeight: "600",
+          marginBottom: "16px"
+        }}
+      >
+        You scored {overall.correct} out of {overall.total_questions} in NSW
+        Selective Mathematical Reasoning Test
+      </h2>
 
-      {/* ===============================
-         OVERALL ACCURACY (B)
-      =============================== */}
-      <div className="report-card">
-        <h3>Overall Accuracy</h3>
+      <button
+        onClick={() => {
+          console.log("🟢 Review Exam button clicked");
+          onViewExamDetails();
+        }}
+        style={{
+          padding: "10px 18px",
+          background: "#2563eb",
+          color: "white",
+          border: "none",
+          borderRadius: "6px",
+          cursor: "pointer",
+          marginBottom: "28px"
+        }}
+      >
+        View Exam Details
+      </button>
 
-        <div style={{ display: "flex", justifyContent: "center", margin: "24px 0" }}>
-          <svg width="160" height="160" viewBox="0 0 160 160">
-            {/* Background ring */}
-            <circle
-              cx="80"
-              cy="80"
-              r="70"
-              stroke="#e5e7eb"
-              strokeWidth="14"
-              fill="none"
-            />
-        
-            {/* Progress ring (GREEN = correct) */}
-            <circle
-              cx="80"
-              cy="80"
-              r="70"
-              stroke="#22c55e"
-              strokeWidth="14"
-              fill="none"
-              strokeDasharray={`${percentage * 4.4} 999`}
-              strokeLinecap="round"
-              transform="rotate(-90 80 80)"
-            />
-        
-            {/* Center percentage */}
-            <text
-              x="80"
-              y="88"
-              textAnchor="middle"
-              fontSize="24"
-              fontWeight="600"
-              fill="#111827"
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gap: "24px",
+          width: "100%",
+          maxWidth: "1200px"
+        }}
+      >
+
+        {/* OVERALL ACCURACY */}
+        <div
+          style={{
+            background: "white",
+            padding: "24px",
+            borderRadius: "10px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
+          }}
+        >
+          <h3>Overall Accuracy</h3>
+
+          <div style={{ display: "flex", justifyContent: "center", margin: "24px 0" }}>
+            <svg width="160" height="160" viewBox="0 0 160 160">
+
+              <circle
+                cx="80"
+                cy="80"
+                r="70"
+                stroke="#e5e7eb"
+                strokeWidth="14"
+                fill="none"
+              />
+
+              <circle
+                cx="80"
+                cy="80"
+                r="70"
+                stroke="#22c55e"
+                strokeWidth="14"
+                fill="none"
+                strokeDasharray={`${percentage * 4.4} 999`}
+                strokeLinecap="round"
+                transform="rotate(-90 80 80)"
+              />
+
+              <text
+                x="80"
+                y="88"
+                textAnchor="middle"
+                fontSize="24"
+                fontWeight="600"
+                fill="#111827"
+              >
+                {percentage}%
+              </text>
+
+            </svg>
+          </div>
+
+          <div style={{ lineHeight: "1.8" }}>
+            <p>Total Questions: {overall.total_questions}</p>
+            <p>Attempted: {overall.attempted}</p>
+            <p>Correct: {overall.correct}</p>
+            <p>Incorrect: {overall.incorrect}</p>
+            <p>Not Attempted: {overall.not_attempted}</p>
+            <p>Score: {overall.score_percent}%</p>
+          </div>
+        </div>
+
+        {/* TOPIC PERFORMANCE */}
+        <div
+          style={{
+            background: "white",
+            padding: "24px",
+            borderRadius: "10px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
+          }}
+        >
+          <h3>Topic-wise Performance</h3>
+
+          {topic_wise_performance.map(t => (
+            <div
+              key={t.topic}
+              style={{ marginBottom: "18px" }}
             >
-              {percentage}%
-            </text>
-          </svg>
+              <div style={{ marginBottom: "6px", fontWeight: "500" }}>
+                {t.topic}
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  height: "10px",
+                  borderRadius: "6px",
+                  overflow: "hidden",
+                  background: "#e5e7eb"
+                }}
+              >
+                <div
+                  style={{
+                    width: `${(t.correct / t.total) * 100}%`,
+                    background: "#22c55e"
+                  }}
+                />
+
+                <div
+                  style={{
+                    width: `${(t.incorrect / t.total) * 100}%`,
+                    background: "#ef4444"
+                  }}
+                />
+
+                <div
+                  style={{
+                    width: `${(t.not_attempted / t.total) * 100}%`,
+                    background: "#9ca3af"
+                  }}
+                />
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  gap: "12px",
+                  marginTop: "6px",
+                  fontSize: "14px"
+                }}
+              >
+                <span>Attempted: {t.attempted}</span>
+                <span style={{ color: "#22c55e" }}>Correct: {t.correct}</span>
+                <span style={{ color: "#ef4444" }}>Incorrect: {t.incorrect}</span>
+                <span style={{ color: "#6b7280" }}>
+                  Not Attempted: {t.not_attempted}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
 
+        {/* IMPROVEMENT AREAS */}
+        <div
+          style={{
+            background: "white",
+            padding: "24px",
+            borderRadius: "10px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
+          }}
+        >
+          <h3>Improvement Areas</h3>
 
+          {improvement_areas.map(t => (
+            <div
+              key={t.topic}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                marginBottom: "14px"
+              }}
+            >
+              <span style={{ width: "120px" }}>{t.topic}</span>
 
-        <div className="stats">
-          <p>Total Questions: {overall.total_questions}</p>
-          <p>Attempted: {overall.attempted}</p>
-          <p>Correct: {overall.correct}</p>
-          <p>Incorrect: {overall.incorrect}</p>
-          <p>Not Attempted: {overall.not_attempted}</p>
-          <p>Score: {overall.score_percent}%</p>
+              <div
+                style={{
+                  flex: 1,
+                  height: "10px",
+                  background: "#e5e7eb",
+                  borderRadius: "6px",
+                  overflow: "hidden"
+                }}
+              >
+                <div
+                  style={{
+                    width: `${t.accuracy_percent}%`,
+                    background: "#2563eb",
+                    height: "100%"
+                  }}
+                />
+              </div>
+
+              <span>{t.accuracy_percent}%</span>
+
+              {t.limited_data && (
+                <small style={{ color: "#ef4444" }}>
+                  Limited data
+                </small>
+              )}
+            </div>
+          ))}
         </div>
+
       </div>
-
-      {/* ===============================
-         TOPIC-WISE PERFORMANCE (A)
-      =============================== */}
-      <div className="topic-performance-card">
-        <h3>Topic-wise Performance</h3>
-      
-        {topic_wise_performance.map(t => (
-          <div key={t.topic} className="topic-row">
-            <div className="topic-title">{t.topic}</div>
-      
-            <div className="stack-bar">
-              <div
-                className="stack correct"
-                style={{ width: `${(t.correct / t.total) * 100}%` }}
-              />
-              <div
-                className="stack incorrect"
-                style={{ width: `${(t.incorrect / t.total) * 100}%` }}
-              />
-              <div
-                className="stack not-attempted"
-                style={{ width: `${(t.not_attempted / t.total) * 100}%` }}
-              />
-            </div>
-      
-            <div className="topic-metrics">
-              <span>Attempted: {t.attempted}</span>
-              <span className="correct">Correct: {t.correct}</span>
-              <span className="incorrect">Incorrect: {t.incorrect}</span>
-              <span className="not-attempted">
-                Not Attempted: {t.not_attempted}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* ===============================
-         IMPROVEMENT AREAS (D)
-      =============================== */}
-      <div className="report-card">
-        <h3>Improvement Areas</h3>
-
-        {improvement_areas.map(t => (
-          <div key={t.topic} className="topic-bar">
-            <span>{t.topic}</span>
-
-            <div className="bar">
-              <div
-                className="bar-fill"
-                style={{ width: `${t.accuracy_percent}%` }}
-              />
-            </div>
-
-            <span>{t.accuracy_percent}%</span>
-
-            {t.limited_data && (
-              <small className="warning">Limited data</small>
-            )}
-          </div>
-        ))}
-      </div>
-
     </div>
-  </div>
-);
+  );
 }
