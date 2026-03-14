@@ -10,6 +10,7 @@ export default function ReadingComponent({
     onExamFinish
   }) {
   const API_BASE = process.env.REACT_APP_API_URL;
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   console.log("🔗 API_BASE:", API_BASE);
   if (!API_BASE) {
    console.error("❌ REACT_APP_API_URL is not defined");
@@ -643,7 +644,7 @@ const currentQuestion = questions[index];
               type="button"
               onClick={(e) => {
                 e.preventDefault();
-                autoSubmit();
+                setShowSubmitConfirm(true);
               }}
             >
               Finish
