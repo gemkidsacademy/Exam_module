@@ -500,8 +500,9 @@ return (
         {optionValue.type === "image" && (
         <img
           src={
-            optionValue.src ||
-            IMAGE_BASE + optionValue.value
+            optionValue.src
+              ? optionValue.src
+              : IMAGE_BASE + optionValue.value
           }
           alt={`Option ${optionKey}`}
           className="option-image"
