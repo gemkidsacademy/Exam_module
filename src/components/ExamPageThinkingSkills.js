@@ -320,7 +320,7 @@ if (mode === "report") {
   );
 }
  
-if (mode === "review" && !questions.length) {
+if (mode === "review" && questions.length === 0) {
   return (
     <ThinkingSkillsReview
       studentId={studentId}
@@ -331,11 +331,9 @@ if (mode === "review" && !questions.length) {
         setVisited({});
         setAnswers({});
       }}
-
     />
   );
 }
-
 
 // ---------------- EXAM UI ----------------
 const currentQ = activeQuestions[currentIndex];
