@@ -302,7 +302,10 @@
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ answer_text: answerText })
+            body: JSON.stringify({
+              answer_text: answerText,
+              writing_type: exam?.writing_type
+            })
           }
         );
     
