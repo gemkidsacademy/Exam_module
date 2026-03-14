@@ -114,6 +114,7 @@ const loadReport = useCallback(async () => {
     }
 
     const data = await res.json();
+    console.log("REVIEW API RESPONSE", data);
     console.log("📊 report loaded:", data);
 
     setReport(data);
