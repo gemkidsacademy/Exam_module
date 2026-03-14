@@ -61,8 +61,8 @@
 
 /* Topic title */
 .topic-title {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   margin-bottom: 6px;
   color: #111827;
   white-space: nowrap;
@@ -150,15 +150,28 @@
   min-width: 0;
   min-height: 0;
 
-  padding: 24px;
+  padding: 28px;
   background: #ffffff;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
 
-  overflow-y: auto;   /* vertical scroll */
+  overflow-y: auto;
+  scroll-behavior: smooth;
+
+  max-width: 900px;
+  margin: 0 auto;
+
   user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
+}
+.passage-pane::-webkit-scrollbar {
+  width: 8px;
+}
+
+.passage-pane::-webkit-scrollbar-thumb {
+  background: #cbd5f5;
+  border-radius: 999px;
 }
 .passage-pane h3 {
   font-size: 24px;
@@ -168,7 +181,7 @@
 }
 
 .reading-text {
-  font-size: 15px;
+  font-size: 18px;
   line-height: 1.7;
   color: #374151;
 }
@@ -178,14 +191,17 @@
 ======================================================= */
 
 .question-pane {
-  flex: 0 0 420px;
+  flex: 0 0 440px;
   max-width: 520px;
 
   min-height: 0;
-  overflow: hidden;   /* prevents parent expansion */
+  overflow: hidden;
 
   display: flex;
   flex-direction: column;
+
+  position: sticky;
+  top: 0;
 }
 .question-card {
   background: #ffffff;
@@ -206,15 +222,19 @@
 ======================================================= */
 
 .option-btn {
-  padding: 12px 14px;
+  padding: 14px 16px;
   border-radius: 8px;
   border: 1px solid #d1d5db;
-  background: #f9fafb;
-  font-size: 15px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
 
+  background: #f9fafb;
+  font-size: 17px;
+  line-height: 1.5;
+
+  cursor: pointer;
+  transition: all 0.18s ease;
+
+  text-align: left;
+}
 .option-btn:hover {
   background: #eef2ff;
 }
