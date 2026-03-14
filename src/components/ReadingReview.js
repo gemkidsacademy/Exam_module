@@ -54,10 +54,17 @@ export default function ReadingReview({ questions = [], onExit }) {
       ? currentQuestion.answer_options
       : currentQuestion.reading_material?.options || {};
 
-  const rm =
-    currentQuestion.reading_material ||
-    currentQuestion.section_ref?.reading_material ||
-    {};
+  let rm =
+  currentQuestion.reading_material ||
+  currentQuestion.section_ref?.reading_material ||
+  {};
+
+// 🔧 normalize string passages
+if (typeof rm === "string") {
+  rm = {
+    content: rm
+  };
+}
 
   const passageStyle = currentQuestion.passage_style || "informational";
 
