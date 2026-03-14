@@ -371,7 +371,17 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
     }
 
     return (
-  <div className="report-container">
+  <div
+  style={{
+    position: "fixed",
+    inset: 0,
+    overflowY: "auto",
+    background: "#f3f4f6",
+    padding: "32px",
+    boxSizing: "border-box",
+    zIndex: 1
+  }}
+>
     <h1>
       You scored {normalizedReport.correct} out of {normalizedReport.total}
     </h1>
