@@ -182,6 +182,11 @@
 
   return () => clearInterval(timer);
 }, [timeLeft, loading, completed, submitting, showConfirmFinish]);
+    useEffect(() => {
+  document.addEventListener("contextmenu", e => e.preventDefault());
+  document.addEventListener("copy", e => e.preventDefault());
+  document.addEventListener("cut", e => e.preventDefault());
+}, []);
 
     useEffect(() => {
   if (
