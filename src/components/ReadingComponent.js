@@ -642,19 +642,54 @@ const currentQuestion = questions[index];
           ) : (
             <button
               type="button"
-              onClick={(e) => {
-                e.preventDefault();
+              onClick={() => {
+                console.log("Finish clicked");
                 setShowSubmitConfirm(true);
               }}
             >
               Finish
             </button>
 
-
           )}
         </div>
       </div>
     </div>
+    {showSubmitConfirm && (
+  <div className="submit-modal-overlay">
+    <div className="submit-modal">
+
+      <h2>Finish Exam?</h2>
+
+      <p>
+        Are you sure you want to submit your exam?
+        <br />
+        You won't be able to change your answers after this.
+      </p>
+
+      <div className="submit-modal-buttons">
+
+        <button
+          className="cancel-btn"
+          onClick={() => setShowSubmitConfirm(false)}
+        >
+          Cancel
+        </button>
+
+        <button
+          className="submit-btn"
+          onClick={() => {
+            setShowSubmitConfirm(false);
+            autoSubmit();
+          }}
+        >
+          Yes, Submit Exam
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+)}
   </div>
 );
 
