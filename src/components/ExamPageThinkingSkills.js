@@ -588,7 +588,17 @@ const {
 } = report;
 
 return (
-  <div className="report-page">
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      overflowY: "auto",
+      background: "#f3f4f6",
+      padding: "32px",
+      boxSizing: "border-box",
+      zIndex: 1
+    }}
+  >
 
     {/* ===============================
        HEADER (Overall Result – B)
