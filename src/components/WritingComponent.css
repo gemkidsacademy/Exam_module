@@ -75,19 +75,20 @@
 
 .writing-answer-box {
   width: 100%;
-  min-height: 520px;          /* large writing space */
+  min-height: 520px;
+  padding: 20px;
   resize: vertical;
-  padding: 20px 22px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
 
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+
+  font-family: Georgia, "Times New Roman", serif;
   font-size: 18px;
   line-height: 1.75;
-  font-family: "Georgia", "Times New Roman", serif;
 
   margin-bottom: 20px;
   box-sizing: border-box;
-  background: #ffffff;
 }
 .writing-answer-box:focus {
   outline: none;
