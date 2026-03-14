@@ -66,8 +66,11 @@
       return parseWritingPrompt(exam.question_text);
     }, [exam]);
 
-    
-    
+    useEffect(() => {
+      document.documentElement.style.height = "auto";
+      document.body.style.height = "auto";
+      document.body.style.overflowY = "auto";
+    }, []);    
       
   
     /* -----------------------------------------------------------
