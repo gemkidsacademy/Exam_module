@@ -32,15 +32,15 @@ const normalizeOption = (value) => {
   if (value && typeof value === "object") {
 
     if (value.type === "image") {
-      const src = value.src || value.value;
-
-      return {
-        type: "image",
-        src: src.startsWith("http")
-          ? src
-          : IMAGE_BASE + src
-      };
-    }
+     const src = value.src || value.value || "";
+   
+     return {
+       type: "image",
+       src: src.startsWith("http")
+         ? src
+         : IMAGE_BASE + src
+     };
+   }
 
     return value;
   }
@@ -497,14 +497,10 @@ return (
 
         {optionValue.type === "image" && (
         <img
-          src={
-            optionValue.src
-              ? optionValue.src
-              : IMAGE_BASE + optionValue.value
-          }
-          alt={`Option ${optionKey}`}
-          className="option-image"
-        />
+         src={optionValue.src}
+         alt={`Option ${optionKey}`}
+         className="option-image"
+       />
       )}
              
       </button>
