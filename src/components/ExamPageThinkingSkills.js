@@ -340,7 +340,13 @@ if (mode === "review" && !questions.length) {
 // ---------------- EXAM UI ----------------
 const currentQ = activeQuestions[currentIndex];
 if (!currentQ) return null;
-const optionEntries = Object.entries(currentQ.options || {});
+console.log("REVIEW QUESTION", currentQ);
+const optionEntries = Object.entries(
+  currentQ.options ||
+  currentQ.choices ||
+  currentQ.answer_options ||
+  {}
+);
 
 return (
 <div className={styles.examShell}>
