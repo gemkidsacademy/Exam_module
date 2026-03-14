@@ -28,8 +28,20 @@ console.log("🧠 ExamPageThinkingSkills MOUNTED");
 const hasSubmittedRef = useRef(false);
 const normalizeOption = (value) => {
 
-  // already normalized by backend
+  // backend object
   if (value && typeof value === "object") {
+
+    if (value.type === "image") {
+      const src = value.src || value.value;
+
+      return {
+        type: "image",
+        src: src.startsWith("http")
+          ? src
+          : IMAGE_BASE + src
+      };
+    }
+
     return value;
   }
 
@@ -55,7 +67,6 @@ const normalizeOption = (value) => {
     content: String(value ?? "")
   };
 };
-
 
 
 const API_BASE = process.env.REACT_APP_API_URL;
