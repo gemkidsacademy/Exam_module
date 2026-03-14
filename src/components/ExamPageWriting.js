@@ -450,16 +450,14 @@
   
     return (
       <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        overflowY: "auto",
-        background: "#f9fafb",
-        padding: "20px",
-        boxSizing: "border-box",
-        zIndex: 1
-      }}
-    >
+        style={{
+          minHeight: "100vh",
+          overflowY: "auto",
+          background: "#f9fafb",
+          padding: "32px",
+          boxSizing: "border-box"
+        }}
+      >
     <div className="writing-header">
       <div className="timer">Time Left: {formatTime(timeLeft)}</div>
     </div>
