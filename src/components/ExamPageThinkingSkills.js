@@ -28,47 +28,29 @@ console.log("🧠 ExamPageThinkingSkills MOUNTED");
 const hasSubmittedRef = useRef(false);
 const normalizeOption = (value) => {
 
-  // backend object
-  if (value && typeof value === "object") {
+  if (!value) return null;
 
-    if (value.type === "image") {
-     const src = value.src || value.value || "";
-   
-     return {
-       type: "image",
-       src: src.startsWith("http")
-         ? src
-         : IMAGE_BASE + src
-     };
-   }
-
+  // already normalized by backend
+  if (typeof value === "object") {
     return value;
   }
 
-  if (typeof value === "string") {
-
-    if (value.match(/\.(png|jpg|jpeg|webp)$/i)) {
-      return {
-        type: "image",
-        src: value.startsWith("http")
-          ? value
-          : IMAGE_BASE + value
-      };
-    }
-
+  // string image filename
+  if (typeof value === "string" && value.match(/\.(png|jpg|jpeg|webp)$/i)) {
     return {
-      type: "text",
-      content: value
+      type: "image",
+      src: value.startsWith("http")
+        ? value
+        : IMAGE_BASE + value
     };
   }
 
+  // text
   return {
     type: "text",
-    content: String(value ?? "")
+    content: String(value)
   };
 };
-
-
 const API_BASE = process.env.REACT_APP_API_URL;
 
 if (!API_BASE) {
@@ -495,13 +477,13 @@ return (
           </span>
         )}
 
-        {optionValue.type === "image" && (
-        <img
-         src={optionValue.src}
-         alt={`Option ${optionKey}`}
-         className="option-image"
-       />
-      )}
+        {optionValue?.type === "image" && (
+         <img
+           src={optionValue.src}
+           alt={`Option ${optionKey}`}
+           className="option-image"
+         />
+       )}
              
       </button>
     );
