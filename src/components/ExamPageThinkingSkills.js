@@ -129,6 +129,30 @@ useEffect(() => {
   console.log("🔄 MODE CHANGED:", mode);
 }, [mode]);
 
+ 
+useEffect(() => {
+  if (mode !== "exam") return;
+
+  const handlePopState = (e) => {
+    e.preventDefault();
+
+    // show the same confirmation modal
+    setShowConfirmFinish(true);
+
+    // push state back so browser doesn't leave
+    window.history.pushState(null, "", window.location.href);
+  };
+
+  // create history entry so swipe/back triggers popstate
+  window.history.pushState(null, "", window.location.href);
+
+  window.addEventListener("popstate", handlePopState);
+
+  return () => {
+    window.removeEventListener("popstate", handlePopState);
+  };
+}, [mode]);
+ 
 useEffect(() => {
   if (!studentId) return;
 
