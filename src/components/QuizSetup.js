@@ -75,7 +75,27 @@ export default function QuizSetup() {
 };
 
 
+  const handleDeletePreviousQuestions = () => {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete all previous questions?"
+  );
 
+  if (!confirmDelete) return;
+
+  // call backend API
+  fetch("/api/admin/delete-previous-questions-TS", {
+    method: "DELETE",
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      alert("Previous questions deleted successfully.");
+      console.log(data);
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("Error deleting questions.");
+    });
+};
   const handleTopicChange = (index, field, value) => {
     setQuiz((prev) => {
       const topics = [...prev.topics];
@@ -254,6 +274,13 @@ export default function QuizSetup() {
           >
             View Question Bank
        </button>
+       <button
+       type="button"
+       onClick={handleDeletePreviousQuestions}
+       style={{ marginLeft: "10px" }}
+     >
+       Delete Previous Questions
+     </button>
        {showQuestionBank && (
             <div className="question-bank">
               <h3>Question Bank (Thinking Skills)</h3>
