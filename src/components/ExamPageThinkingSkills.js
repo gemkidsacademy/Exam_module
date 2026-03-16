@@ -573,15 +573,25 @@ return (
 
 </div>
 {/* AI EXPLANATION BUTTON */}
+{/* AI EXPLANATION SECTION */}
 {isReview && (
-  <div style={{ marginTop: "20px" }}>
+  <div className="ai-explanation-section">
+
     <button
       className="generate-explanation-btn"
       onClick={handleGenerateExplanation}
       disabled={loadingExplanation}
     >
-      {loadingExplanation ? "Generating..." : "Generate Explanation"}
+      {loadingExplanation ? "Generating Explanation..." : "✨ Generate AI Explanation"}
     </button>
+
+    {explanation && (
+      <div className="ai-explanation-box">
+        <h4>AI Explanation</h4>
+        <p>{explanation}</p>
+      </div>
+    )}
+
   </div>
 )}
 
