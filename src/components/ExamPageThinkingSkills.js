@@ -136,14 +136,15 @@ useEffect(() => {
   const handlePopState = (e) => {
     e.preventDefault();
 
-    // show the same confirmation modal
+    // show confirmation modal
     setShowConfirmFinish(true);
 
-    // push state back so browser doesn't leave
+    // push state again so browser can't leave
     window.history.pushState(null, "", window.location.href);
   };
 
-  // create history entry so swipe/back triggers popstate
+  // push TWO states to defeat swipe navigation
+  window.history.pushState(null, "", window.location.href);
   window.history.pushState(null, "", window.location.href);
 
   window.addEventListener("popstate", handlePopState);
