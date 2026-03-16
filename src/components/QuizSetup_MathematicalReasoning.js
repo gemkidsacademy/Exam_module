@@ -27,6 +27,32 @@
     /* ============================
        HANDLERS
     ============================ */
+    const handleDeleteAllQuestions = async () => {
+  const confirmed = window.confirm(
+    "Are you sure you want to delete ALL questions? This cannot be undone."
+  );
+
+  if (!confirmed) return;
+
+  try {
+    const response = await fetch("/api/admin/delete-all-questions-MR", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete questions");
+    }
+
+    const data = await response.json();
+    alert(data.message || "All questions deleted successfully.");
+  } catch (error) {
+    console.error("Error deleting questions:", error);
+    alert("Something went wrong while deleting the questions.");
+  }
+};
     const handleViewQuestionBank = async () => {
   try {
     setQbLoading(true);
@@ -238,6 +264,13 @@
             style={{ marginLeft: "10px" }}
           >
             View Question Bank
+          </button>
+          <button
+            type="button"
+            onClick={handleDeleteAllQuestions}
+            style={{ marginLeft: "10px" }}
+          >
+            Delete All Questions
           </button>
           {showQuestionBank && (
             <div className="question-bank">
