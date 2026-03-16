@@ -62,7 +62,7 @@ export default function QuizSetup_naplan_reading({ examType }) {
 
   try {
     const response = await fetch(
-      "https://web-production-481a5.up.railway.app/api/admin/delete-all-questions-selective-reading",
+      "https://web-production-481a5.up.railway.app/api/admin/delete-all-questions-naplan-reading",
       {
         method: "DELETE",
       }
