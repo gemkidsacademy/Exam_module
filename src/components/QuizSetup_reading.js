@@ -42,7 +42,7 @@ export default function QuizSetup_reading() {
   if (!confirmed) return;
 
   try {
-    const response = await fetch("/api/admin/delete-all-questions-selective-reading", {
+    const response = await fetch("https://web-production-481a5.up.railway.app/api/admin/delete-all-questions-selective-reading", {
       method: "DELETE",
     });
 
