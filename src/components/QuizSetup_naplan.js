@@ -473,8 +473,7 @@ useEffect(() => {
         </button>
         <button
           type="button"
-          onClick={handleDeleteAllQuestions}
-          disabled={!quiz.year}
+          onClick={handleDeleteAllQuestions}          
         >
           Delete All Questions
         </button>
