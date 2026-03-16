@@ -17,6 +17,11 @@ export default function ExamPageThinkingSkills({
   onExamFinish
 }) {
 const studentId = sessionStorage.getItem("student_id");
+const formatExplanation = (text) => {
+  if (!text) return "";
+
+  return text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+};
 const hasStartedRef = useRef(false);
 const IMAGE_BASE =
 "https://storage.googleapis.com/exammoduleimages/";
@@ -594,7 +599,11 @@ return (
     {explanation && (
       <div className="ai-explanation-box">
         <h4>AI Explanation</h4>
-        <p>{explanation}</p>
+        <p
+         dangerouslySetInnerHTML={{
+           __html: formatExplanation(explanation)
+         }}
+       />
       </div>
     )}
 
