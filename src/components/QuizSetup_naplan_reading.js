@@ -53,6 +53,33 @@ export default function QuizSetup_naplan_reading({ examType }) {
   /* ============================
      Input handlers
   ============================ */
+  const handleDeleteAllQuestions = async () => {
+  const confirmed = window.confirm(
+    "Are you sure you want to delete ALL Reading questions?"
+  );
+
+  if (!confirmed) return;
+
+  try {
+    const response = await fetch(
+      "https://web-production-481a5.up.railway.app/api/admin/delete-all-questions-selective-reading",
+      {
+        method: "DELETE",
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to delete Reading questions");
+    }
+
+    alert(data.message || "All Reading questions deleted successfully.");
+  } catch (error) {
+    console.error("Error deleting Reading questions:", error);
+    alert("Something went wrong while deleting the questions.");
+  }
+};
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setQuiz((prev) => ({ ...prev, [name]: value }));
@@ -370,7 +397,13 @@ const selectedTopicNames = quiz.topics
         >
           View Question Bank
         </button>
-
+        <button
+          type="button"
+          onClick={handleDeleteAllQuestions}
+          
+        >
+          Delete All Questions
+        </button>
         <button
           type="button"
           onClick={handleGenerateExam}
