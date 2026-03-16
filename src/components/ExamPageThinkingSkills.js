@@ -21,6 +21,9 @@ const hasStartedRef = useRef(false);
 const IMAGE_BASE =
 "https://storage.googleapis.com/exammoduleimages/";
 console.log("🧠 ExamPageThinkingSkills MOUNTED");
+const [explanation, setExplanation] = useState(null);
+const [loadingExplanation, setLoadingExplanation] = useState(false);
+ 
 
 
 
@@ -57,7 +60,44 @@ if (!API_BASE) {
   throw new Error("❌ REACT_APP_API_URL is not defined");
 }
 const [examAttemptId, setExamAttemptId] = useState(null);
-const handleViewExamDetails = () => {
+const handleGenerateExplanation = async () => {
+  if (!currentQ) return;
+
+  setLoadingExplanation(true);
+  setExplanation(null);
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/api/ai/explain-question-TS`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          question: currentQ.blocks,
+          options: currentQ.options,
+          correct_answer: currentQ.correct_answer
+        })
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to generate explanation");
+    }
+
+    const data = await response.json();
+
+    setExplanation(data.explanation || "No explanation returned.");
+
+  } catch (err) {
+    console.error("Explanation error:", err);
+    setExplanation("Failed to generate explanation.");
+  } finally {
+    setLoadingExplanation(false);
+  }
+};
+ const handleViewExamDetails = () => {
   console.log("🟢 View Exam Details button clicked");
 
   // 🔥 force clean transition
@@ -124,7 +164,9 @@ const loadReport = useCallback(async () => {
     console.error("❌ loadReport error:", err);
   }
 }, [studentId]);
-
+useEffect(() => {
+  setExplanation(null);
+}, [currentIndex]);
 useEffect(() => {
   console.log("🔄 MODE CHANGED:", mode);
 }, [mode]);
@@ -530,6 +572,26 @@ return (
 
 
 </div>
+{/* AI EXPLANATION BUTTON */}
+{isReview && (
+  <div style={{ marginTop: "20px" }}>
+    <button
+      className="generate-explanation-btn"
+      onClick={handleGenerateExplanation}
+      disabled={loadingExplanation}
+    >
+      {loadingExplanation ? "Generating..." : "Generate Explanation"}
+    </button>
+  </div>
+)}
+
+{/* AI EXPLANATION RESULT */}
+{explanation && (
+  <div className="ai-explanation">
+    <h4>AI Explanation</h4>
+    <p>{explanation}</p>
+  </div>
+)}
 
     {/* NAVIGATION */}
     <div className="nav-buttons">
