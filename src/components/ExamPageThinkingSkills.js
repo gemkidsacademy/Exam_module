@@ -595,13 +595,7 @@ return (
   </div>
 )}
 
-{/* AI EXPLANATION RESULT */}
-{explanation && (
-  <div className="ai-explanation">
-    <h4>AI Explanation</h4>
-    <p>{explanation}</p>
-  </div>
-)}
+
 
     {/* NAVIGATION */}
     <div className="nav-buttons">
