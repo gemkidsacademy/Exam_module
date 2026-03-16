@@ -35,7 +35,7 @@
   if (!confirmed) return;
 
   try {
-    const response = await fetch("/api/admin/delete-all-questions-MR", {
+    const response = await fetch("https://web-production-481a5.up.railway.app/api/admin/delete-all-questions-MR", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
