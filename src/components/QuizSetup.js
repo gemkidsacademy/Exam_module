@@ -83,7 +83,7 @@ export default function QuizSetup() {
   if (!confirmDelete) return;
 
   // call backend API
-  fetch("/api/admin/delete-previous-questions-TS", {
+  fetch("https://web-production-481a5.up.railway.app/api/admin/delete-previous-questions-TS", {
     method: "DELETE",
   })
     .then((res) => res.json())
@@ -151,6 +151,7 @@ export default function QuizSetup() {
 
       const res = await fetch(
         `https://web-production-481a5.up.railway.app/api/topics?${params.toString()}`
+        
       );
 
       if (!res.ok) {
