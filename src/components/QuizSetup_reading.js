@@ -34,6 +34,30 @@ export default function QuizSetup_reading() {
   const [loadingQuestions, setLoadingQuestions] = useState(false);
   
 
+  const handleDeleteAllQuestions = async () => {
+  const confirmed = window.confirm(
+    "Are you sure you want to delete all reading questions?"
+  );
+
+  if (!confirmed) return;
+
+  try {
+    const response = await fetch("/api/admin/delete-all-questions-selective-reading", {
+      method: "DELETE",
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to delete questions");
+    }
+
+    alert(data.message || "All Mathematical Reasoning questions deleted.");
+  } catch (error) {
+    console.error("Error deleting questions:", error);
+    alert("Something went wrong while deleting the questions.");
+  }
+};
   const handleViewQuestionBank = async () => {
   try {
     setLoadingQuestions(true);
@@ -272,7 +296,13 @@ export default function QuizSetup_reading() {
         >
           View Question Bank
         </button>
-
+        <button
+          type="button"
+          onClick={handleDeleteAllQuestions}
+          disabled={!quiz.difficulty}
+        >
+          Delete All Questions
+        </button>
         <div className="topics-container">
           {quiz.topics.map((topic, index) => (
             <div className="topic" key={index}>
