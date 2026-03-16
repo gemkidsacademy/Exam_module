@@ -299,7 +299,7 @@ export default function QuizSetup_reading() {
         <button
           type="button"
           onClick={handleDeleteAllQuestions}
-          disabled={!quiz.difficulty}
+          
         >
           Delete All Questions
         </button>
