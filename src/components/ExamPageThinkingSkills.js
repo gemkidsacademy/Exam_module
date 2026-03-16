@@ -407,7 +407,13 @@ const optionEntries = Object.entries(
 );
 
 return (
-<div className={styles.examShell}>
+<div
+  className={styles.examShell}
+  style={{
+    height: "100vh",
+    overflowY: "auto"
+  }}
+>
   <div className={styles.examContainer}>
 
     {/* HEADER */}
