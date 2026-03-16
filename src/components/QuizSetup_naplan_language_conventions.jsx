@@ -143,6 +143,33 @@ const selectedTopicNames = quiz.topics
   /* ============================
      View Question Bank
   ============================ */
+  const handleDeleteAllQuestions = async () => {
+  const confirmed = window.confirm(
+    "Are you sure you want to delete all Language Conventions questions?"
+  );
+
+  if (!confirmed) return;
+
+  try {
+    const response = await fetch(
+      "https://web-production-481a5.up.railway.app/api/admin/delete-all-questions-naplan-lc",
+      {
+        method: "DELETE",
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to delete questions");
+    }
+
+    alert(data.message || "All Language Conventions questions deleted successfully.");
+  } catch (error) {
+    console.error("Error deleting questions:", error);
+    alert("Something went wrong while deleting the questions.");
+  }
+};
   const handleViewQuestionBank = async () => {
     if (!quiz.year) {
       alert("Please select year first.");
@@ -328,6 +355,9 @@ const selectedTopicNames = quiz.topics
       )}
       
       <button onClick={handleViewQuestionBank}>View Question Bank</button>
+      <button onClick={handleDeleteAllQuestions}>
+        Delete All Questions
+      </button>
       <button
         onClick={handleGenerateExam}
         disabled={!isTotalValid}
