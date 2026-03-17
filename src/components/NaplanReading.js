@@ -43,7 +43,7 @@ export default function NaplanReading({
     );
 
     const res = await fetch(
-      `${API_BASE}/api/ai/explain-question-selective-reading`,
+      `${API_BASE}/api/ai/explain-question-naplan-reading`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
