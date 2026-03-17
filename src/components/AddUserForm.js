@@ -17,6 +17,7 @@ export default function AddStudentForm() {
   const CLASS_NAME_OPTIONS = [
   "NAPLAN",
   "Selective",
+  "OC",
   "Year 1",
   "Year 2",
   "Year 3",
