@@ -504,8 +504,6 @@ return (
     </button>
   );
 })}
-
-</div>
 {/* AI EXPLANATION SECTION */}
 {isReview && (
   <div style={{ marginTop: "20px" }}>
@@ -550,6 +548,8 @@ return (
 
   </div>
 )}
+
+</div>
 
 
     {/* NAVIGATION */}
