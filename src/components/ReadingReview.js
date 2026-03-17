@@ -32,6 +32,7 @@ export default function ReadingReview({ questions = [], onExit }) {
 
 
   const currentQuestion = questions[index];
+  const qid = String(currentQuestion.question_id);
   const [explanations, setExplanations] = useState({});
   const [loadingExplanation, setLoadingExplanation] = useState(null);
   
@@ -255,46 +256,31 @@ if (typeof rm === "string") {
             </>
           )}
         </div>
-        {/* ================= AI EXPLANATION ================= */}
-<div style={{ marginTop: "16px" }}>
-  
-  {!explanations[currentQuestion.question_id] && (
-    <button
-      className="ai-explain-btn"
-      onClick={() => handleGenerateExplanation(currentQuestion)}
-      disabled={loadingExplanation === String(currentQuestion.question_id)}
-    >
-      {loadingExplanation === String(currentQuestion.question_id)
-        ? "Generating..."
-        : "Generate AI Explanation"}
-    </button>
-  )}
-
-  {explanations[currentQuestion.question_id] && (
-    <div className="ai-explanation-box">
-      <h4>Explanation</h4>
-      <div
-        dangerouslySetInnerHTML={{
-          __html: formatExplanation(
-            explanations[currentQuestion.question_id]
-          )
-        }}
-      />
-    </div>
-  )}
-</div>
+      
         {/* =============================
            QUESTION + OPTIONS
         ============================= */}
         <div className="question-pane">
-          <p className="question-text">
-            Q{currentQuestion.question_number}.{" "}
-            {currentQuestion.question_text}
-          </p>
 
-          {/* =============================
-             OPTIONS (FIXED)
-          ============================= */}
+          {/* ✅ HEADER FIRST */}
+          <div className="question-header-row">
+            <p className="question-text">
+              Q{currentQuestion.question_number}.{" "}
+              {currentQuestion.question_text}
+            </p>
+
+            {!explanations[qid] && (
+              <button
+                className="ai-explain-btn-inline"
+                onClick={() => handleGenerateExplanation(currentQuestion)}
+                disabled={loadingExplanation === qid}
+              >
+                {loadingExplanation === qid ? "..." : "💡 Explain"}
+              </button>
+            )}
+          </div>
+
+          {/* ✅ OPTIONS SECOND */}
           <div className="options">
             {Object.keys(options).length === 0 && (
               <div className="no-options-warning">
@@ -319,9 +305,19 @@ if (typeof rm === "string") {
             })}
           </div>
 
-          {/* =============================
-             NAV
-          ============================= */}
+          {/* ✅ EXPLANATION THIRD */}
+          {explanations[qid] && (
+            <div className="ai-explanation-box" style={{ marginTop: "16px" }}>
+              <h4>Explanation</h4>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: formatExplanation(explanations[qid])
+                }}
+              />
+            </div>
+          )}
+
+          {/* ✅ NAV LAST */}
           <div className="nav-buttons">
             <button
               disabled={index === 0}
@@ -337,6 +333,7 @@ if (typeof rm === "string") {
               Next
             </button>
           </div>
+
         </div>
       </div>
     </div>
