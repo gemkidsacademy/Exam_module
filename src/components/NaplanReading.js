@@ -828,10 +828,16 @@ if (questionType === 5) {
               }
 
               const imageOptions = currentQ.exam_bundle.image_options;
-              const textOptions = currentQ.exam_bundle.options;
+              const textOptions =
+                currentQ.exam_bundle.options ||
+                currentQ.options ||
+                {};
               const optionsSource = imageOptions || textOptions;
 
-              if (!optionsSource) return null;
+              if (!optionsSource || Object.keys(optionsSource).length === 0) {
+                console.warn("⚠️ No options found for question:", currentQ);
+                return null;
+              }
 
               // MULTI SELECT
               // MULTI SELECT — checkbox list (vertical) #here
