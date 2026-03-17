@@ -565,3 +565,8 @@
 .ai-explain-btn-inline:hover {
   background: #e0e7ff;
 }
+.ai-explanation-box {
+  max-height: 220px;   /* adjust as needed */
+  overflow-y: auto;
+  padding-right: 8px;  /* space for scrollbar */
+}
