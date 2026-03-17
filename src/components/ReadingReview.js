@@ -260,7 +260,24 @@ if (typeof rm === "string") {
         {/* =============================
            QUESTION + OPTIONS
         ============================= */}
-        <div className="question-pane">
+        <div
+          className="question-pane"
+          style={{
+            flex: "0 0 440px",
+            maxWidth: "520px",
+        
+            height: "100vh",          // full viewport height
+            overflowY: "auto",        // ✅ enables single scroll
+        
+            display: "flex",
+            flexDirection: "column",
+        
+            position: "sticky",
+            top: 0,
+        
+            paddingRight: "8px"       // space for scrollbar
+          }}
+        >
 
           {/* ✅ HEADER FIRST */}
           <div className="question-header-row">
