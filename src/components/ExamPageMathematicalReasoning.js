@@ -1,4 +1,4 @@
-import React, {
+"import React, {
 useState,
 useEffect,
 useRef,
@@ -120,7 +120,30 @@ useEffect(() => {
       }
 
       // ✅ NORMALIZE QUESTIONS (CRITICAL FIX)
-      const normalizedQuestions = data.questions || [];
+      const normalizedQuestions = (data.questions || []).map(q => {
+      const rawBlocks = Array.isArray(q.question_blocks)
+        ? q.question_blocks
+        : Array.isArray(q.blocks)
+        ? q.blocks
+        : [];
+    
+      return {
+        ...q,
+        blocks: rawBlocks.map(block => {
+          if (
+            block?.type === "image" &&
+            block?.src &&
+            !block.src.startsWith("http")
+          ) {
+            return {
+              ...block,
+              src: `https://storage.googleapis.com/exammoduleimages/${block.src}`
+            };
+          }
+          return block;
+        })
+      };
+    });
 
 
 
@@ -312,7 +335,31 @@ if (mode === "review" && reviewQuestions.length === 0) {
       onLoaded={(questions) => {
         console.log("✅ Review questions received:", questions.length);
 
-        const normalized = questions;
+        const normalized = questions.map(q => {
+          const rawBlocks = Array.isArray(q.question_blocks)
+            ? q.question_blocks
+            : Array.isArray(q.blocks)
+            ? q.blocks
+            : [];
+
+          return {
+            ...q,
+            blocks: rawBlocks.map(block => {
+              if (
+                block?.type === "image" &&
+                block?.src &&
+                !block.src.startsWith("http")
+              ) {
+                return {
+                  ...block,
+                  src: `https://storage.googleapis.com/exammoduleimages/${block.src}`
+                };
+              }
+              return block;
+            })
+          };
+        });
+
         console.log("🧪 REVIEW QUESTION SAMPLE (normalized)", {
           q_id: normalized[0]?.q_id,
           student_answer: normalized[0]?.student_answer,
@@ -427,18 +474,18 @@ return (
   })}
 
 {/* OPTIONS */}
-{optionEntries.map(([key, blocks], i) => {
+{optionEntries.map(([key, opt], i) => {
   const optionKey = key.toUpperCase();
   const student = currentQ.student_answer?.trim().toUpperCase();
   const correct = currentQ.correct_answer?.trim().toUpperCase();
-
+  
   let statusClass = "";
-
+  
   if (isReview) {
     if (optionKey === correct) {
-      statusClass = "option-correct";
+      statusClass = "option-correct";     // green
     } else if (optionKey === student) {
-      statusClass = "option-wrong";
+      statusClass = "option-wrong";       // red
     }
   } else {
     if (answers[currentQ.q_id] === optionKey) {
@@ -453,24 +500,7 @@ return (
       className={`option-btn ${statusClass}`}
       onClick={() => !isReview && handleAnswer(optionKey)}
     >
-      {blocks.map((block, idx) => {
-        if (block.type === "text") {
-          return <span key={idx}>{block.content}</span>;
-        }
-
-        if (block.type === "image") {
-          return (
-            <img
-              key={idx}
-              src={block.src}
-              alt={`Option ${optionKey}`}
-              className="option-image"
-            />
-          );
-        }
-
-        return null;
-      })}
+      {opt?.content || opt}
     </button>
   );
 })}
