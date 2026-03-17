@@ -21,69 +21,7 @@ export default function NaplanReading({
 }) {
   const studentId = sessionStorage.getItem("student_id");
   const API_BASE = process.env.REACT_APP_API_URL;
-  const [explanations, setExplanations] = useState({});
-  const [loadingExplanation, setLoadingExplanation] = useState(null);
   const TYPE_2_MAX_SELECTIONS = 2;
-  const formatExplanation = (text) => {
-    if (!text) return "";
-
-    return text
-      .replace(/\*\*(.*?)\*\*/g, "<strong style='display:block; margin-top:10px;'>$1</strong>")
-      .replace(/\n\n/g, "<br/><br/>")
-      .replace(/\n/g, "<br/>");
-  };
-  const handleGenerateExplanation = async (q) => {
-    const qid = String(q.question_id);
-  
-    if (explanations[qid]) return;
-  
-    setLoadingExplanation(qid);
-  
-    try {
-      const questionText = q.exam_bundle?.question_blocks
-        ?.filter(b => b.type !== "reading")
-        ?.map(b => b.content || b.text || "")
-        ?.join(" ");
-  
-      const passageBlock = q.exam_bundle?.question_blocks?.find(
-        b => b.type === "reading"
-      );
-  
-      const res = await fetch(
-        `${API_BASE}/api/ai/explain-question-selective-reading`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            question_text: questionText,
-            options:
-              q.exam_bundle?.options ||
-              q.exam_bundle?.image_options ||
-              {},
-            correct_answer: q.exam_bundle?.correct_answer,
-            passage: passageBlock || null
-          })
-        }
-      );
-  
-      const data = await res.json();
-  
-      setExplanations(prev => ({
-        ...prev,
-        [qid]: data.explanation || "⚠️ Failed to generate explanation."
-      }));
-  
-    } catch (err) {
-      console.error(err);
-  
-      setExplanations(prev => ({
-        ...prev,
-        [qid]: "⚠️ Failed to generate explanation."
-      }));
-    } finally {
-      setLoadingExplanation(null);
-    }
-  };
   function hasAnswered(question, answers) {
   if (!question || !answers) return false;
 
@@ -383,7 +321,6 @@ if (questionType === 5) {
 
   const flatQuestions = passages.flatMap(p => p.questions);
   const currentQ = flatQuestions[currentIndex];
-  const qid = String(currentQ.question_id);
 
   /* ============================================================
      FINISH EXAM
@@ -526,7 +463,6 @@ if (questionType === 5) {
 
   return (
     <div className={`exam-shell ${mode === "review" ? "review-mode" : ""}`}>
-      
       <div className="exam-container">
 
         {/* HEADER */}
@@ -686,123 +622,112 @@ if (questionType === 5) {
                   );
                 }
                 if (block.type === "word_select") {
-                  const qid = String(currentQ.question_id);
-                  const selected = answers[qid] || null;
+  const qid = String(currentQ.question_id);
+  const selected = answers[qid] || null;
 
-                  // Clean up text issues from backend
-                  const text = block.text
-                    .replace("/n", "\n")
-                    .replace("eat pies,plums", "eats pies, plums")
-                    .replace("off bug", "odd bug");
+  // Clean up text issues from backend
+  const text = block.text
+    .replace("/n", "\n")
+    .replace("eat pies,plums", "eats pies, plums")
+    .replace("off bug", "odd bug");
 
-                  const tokens = text.split(/(\s+)/); // keep spaces
+  const tokens = text.split(/(\s+)/); // keep spaces
 
-                  return (
-                    <p key={idx} className="word-select-text">
-                      {tokens.map((token, i) => {
-                        const clean = token.replace(/[.,]/g, "");
-                        const isOption = block.options.includes(clean);
-                        const isSelected = selected === clean;
+  return (
+    <p key={idx} className="word-select-text">
+      {tokens.map((token, i) => {
+        const clean = token.replace(/[.,]/g, "");
+        const isOption = block.options.includes(clean);
+        const isSelected = selected === clean;
 
-                        if (!isOption) {
-                          return <span key={i}>{token}</span>;
-                        }
+        if (!isOption) {
+          return <span key={i}>{token}</span>;
+        }
 
-                        return (
-                          <span
-                            key={i}
-                            className={`word-select-option ${isSelected ? "selected" : ""}`}
-                            onClick={() => {
-                              if (!isReview) {
-                                handleAnswer(clean);
-                              }
-                            }}
-                          >
-                            {token}
-                          </span>
-                        );
-                      })}
-                    </p>
-                  );
-                }
+        return (
+          <span
+            key={i}
+            className={`word-select-option ${isSelected ? "selected" : ""}`}
+            onClick={() => {
+              if (!isReview) {
+                handleAnswer(clean);
+              }
+            }}
+          >
+            {token}
+          </span>
+        );
+      })}
+    </p>
+  );
+}
 
                 if (block.type === "true_false") {
-                  const qid = String(currentQ.question_id);
-                  const selectedAnswers = answers[qid] || [];
-                
-                  return (
-                    <div key={idx} className="tf-question">
-                
-                      {/* ✅ Instruction text */}
-                      <p className="tf-instruction">
-                        Which of these statements are true and which are false?
-                      </p>
-                
-                      {/* Grid */}
-                      <div className="tf-grid">
-                        {/* Header */}
-                        <div className="tf-grid-header">
-                          <span></span>
-                          <span>True</span>
-                          <span>False</span>
-                        </div>
-                
-                        {block.statements.map((stmt, i) => {
-                          const currentValue = selectedAnswers[i] || null;
-                
-                          return (
-                            <div key={i} className="tf-grid-row">
-                              <span className="tf-statement">{stmt}</span>
-                
-                              <div className={`tf-cell ${currentValue === "False" ? "tf-dim" : ""}`}>
-                                <input
-                                  type="radio"
-                                  name={`tf-${qid}-${i}`}
-                                  checked={currentValue === "True"}
-                                  disabled={isReview}
-                                  onChange={() => {
-                                    const updated = [...selectedAnswers];
-                                    updated[i] = "True";
-                                    handleAnswer(updated);
-                                  }}
-                                />
-                              </div>
-                              
-                              <div className={`tf-cell ${currentValue === "True" ? "tf-dim" : ""}`}>
-                                <input
-                                  type="radio"
-                                  name={`tf-${qid}-${i}`}
-                                  checked={currentValue === "False"}
-                                  disabled={isReview}
-                                  onChange={() => {
-                                    const updated = [...selectedAnswers];
-                                    updated[i] = "False";
-                                    handleAnswer(updated);
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                }
+  const qid = String(currentQ.question_id);
+  const selectedAnswers = answers[qid] || [];
+
+  return (
+    <div key={idx} className="tf-question">
+
+      {/* ✅ Instruction text */}
+      <p className="tf-instruction">
+        Which of these statements are true and which are false?
+      </p>
+
+      {/* Grid */}
+      <div className="tf-grid">
+        {/* Header */}
+        <div className="tf-grid-header">
+          <span></span>
+          <span>True</span>
+          <span>False</span>
+        </div>
+
+        {block.statements.map((stmt, i) => {
+          const currentValue = selectedAnswers[i] || null;
+
+          return (
+            <div key={i} className="tf-grid-row">
+              <span className="tf-statement">{stmt}</span>
+
+              <div className={`tf-cell ${currentValue === "False" ? "tf-dim" : ""}`}>
+                <input
+                  type="radio"
+                  name={`tf-${qid}-${i}`}
+                  checked={currentValue === "True"}
+                  disabled={isReview}
+                  onChange={() => {
+                    const updated = [...selectedAnswers];
+                    updated[i] = "True";
+                    handleAnswer(updated);
+                  }}
+                />
+              </div>
+              
+              <div className={`tf-cell ${currentValue === "True" ? "tf-dim" : ""}`}>
+                <input
+                  type="radio"
+                  name={`tf-${qid}-${i}`}
+                  checked={currentValue === "False"}
+                  disabled={isReview}
+                  onChange={() => {
+                    const updated = [...selectedAnswers];
+                    updated[i] = "False";
+                    handleAnswer(updated);
+                  }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
                 return null;
               })}
-            
-              
-              {/* ✅ ADD BUTTON HERE */}
-              {mode === "review" && !explanations[qid] && (
-                <button
-                  className="ai-explain-btn-inline"
-                  onClick={() => handleGenerateExplanation(currentQ)}
-                  disabled={loadingExplanation === qid}
-                >
-                  {loadingExplanation === qid ? "..." : "💡 Explain"}
-                </button>
-              )}
+
             {/* 2️⃣ OPTIONS — RENDER ONCE PER QUESTION */}
             {(() => {
               if ([6, 7].includes(currentQ.question_type)) {
@@ -953,18 +878,6 @@ if (questionType === 5) {
                 </div>
               );
             })()}
-            {mode === "review" && explanations[qid] && (
-              <div className="ai-explanation-box">
-                <h4>Explanation</h4>
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: formatExplanation(
-                      explanations[qid]
-                    )
-                  }}
-                />
-              </div>
-            )}
 
           </div>
         </div>
