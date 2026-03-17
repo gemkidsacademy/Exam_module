@@ -20,8 +20,18 @@ const studentId = sessionStorage.getItem("student_id");
 const formatExplanation = (text) => {
   if (!text) return "";
 
-  return text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  return text
+    // Bold headings + spacing
+    .replace(
+      /\*\*(.*?)\*\*/g,
+      "<strong style='display:block; margin-top:10px;'>$1</strong>"
+    )
+    // Paragraph spacing
+    .replace(/\n\n/g, "<br/><br/>")
+    // Line breaks
+    .replace(/\n/g, "<br/>");
 };
+ 
 const hasStartedRef = useRef(false);
 const IMAGE_BASE =
 "https://storage.googleapis.com/exammoduleimages/";
@@ -599,7 +609,7 @@ return (
     {explanation && (
       <div className="ai-explanation-box">
         <h4>AI Explanation</h4>
-        <p
+        <div
          dangerouslySetInnerHTML={{
            __html: formatExplanation(explanation)
          }}
