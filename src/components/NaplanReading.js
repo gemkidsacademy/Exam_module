@@ -23,6 +23,7 @@ export default function NaplanReading({
   const API_BASE = process.env.REACT_APP_API_URL;
   const TYPE_2_MAX_SELECTIONS = 2;
   const [explanations, setExplanations] = useState({});
+  const explanationRef = useRef(null);
   
   const [loadingExplanation, setLoadingExplanation] = useState(null);
   const handleGenerateExplanationForReading = async (q) => {
@@ -66,6 +67,14 @@ export default function NaplanReading({
       ...prev,
       [qid]: data.explanation || "⚠️ Failed to generate explanation."
     }));
+    
+    // ✅ scroll AFTER render
+    setTimeout(() => {
+      explanationRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }, 100);
 
   } catch (err) {
     console.error(err);
@@ -963,7 +972,10 @@ if (questionType === 5) {
               );
             })()}
             {explanations[qid] && (
-              <div className="ai-explanation-inline">
+              <div
+                className="ai-explanation-inline"
+                ref={explanationRef}
+              >
                 <div className="ai-explanation-title">
                   Explanation
                 </div>
