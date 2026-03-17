@@ -590,9 +590,9 @@ if (questionType === 5) {
         <div
           className="question-pane"
           style={{
+            flex: 1,
             paddingRight: "8px",
-            display: "flex",
-            flexDirection: "column"
+            overflowY: "auto"
           }}
         >
           
