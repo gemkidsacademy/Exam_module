@@ -42,6 +42,8 @@
    import GenerateExam_reading from "./GenerateExam_reading";
    import GenerateExam_writing from "./GenerateExam_writing";
    import GenerateExam_thinking_skills from "./GenerateExam_thinking_skills";
+   import GenerateExam_oc_thinking_skills from "./GenerateExam_oc_thinking_skills";
+   
    
    
    
@@ -451,6 +453,15 @@
                           >
                             Selective Exam
                           </button>
+                          <button
+                             className="dashboard-button"
+                             onClick={() => {
+                               setGenerateExamCategory("oc");
+                               setGenerateExamStep("type");
+                             }}
+                           >
+                             OC Exam
+                           </button>
                   
                           <button
                             className="dashboard-button"
@@ -521,49 +532,63 @@
                           </div>
                         )}
                       {generateExamStep === "type" &&
-    generateExamCategory === "naplan" && (
-     <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-       <button
-         className="dashboard-button"
-         onClick={() => {
-           setGenerateExamType("naplan_numeracy");
-           setGenerateExamStep("generate");
-         }}
-       >
-         Numeracy
-       </button>
-   
-       <button
-         className="dashboard-button"
-         onClick={() => {
-           setGenerateExamType("naplan_language_conventions");
-           setGenerateExamStep("generate");
-         }}
-       >
-         Language Conventions
-       </button>
-   
-       <button
-         className="dashboard-button"
-         onClick={() => {
-           setGenerateExamType("naplan_reading");
-           setGenerateExamStep("generate");
-         }}
-       >
-         Reading
-       </button>
-   
-       <button
-         className="dashboard-button"
-         onClick={() => {
-           setGenerateExamType("naplan_writing");
-           setGenerateExamStep("generate");
-         }}
-       >
-         Writing
-       </button>
-     </div>
-   )}
+                         generateExamCategory === "oc" && (
+                          <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+                            <button
+                              className="dashboard-button"
+                              onClick={() => {
+                                setGenerateExamType("oc_thinking_skills");
+                                setGenerateExamStep("generate");
+                              }}
+                            >
+                              Thinking Skills
+                            </button>
+                          </div>
+                        )}
+                      {generateExamStep === "type" &&
+                      generateExamCategory === "naplan" && (
+                       <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+                         <button
+                           className="dashboard-button"
+                           onClick={() => {
+                             setGenerateExamType("naplan_numeracy");
+                             setGenerateExamStep("generate");
+                           }}
+                         >
+                           Numeracy
+                         </button>
+                     
+                         <button
+                           className="dashboard-button"
+                           onClick={() => {
+                             setGenerateExamType("naplan_language_conventions");
+                             setGenerateExamStep("generate");
+                           }}
+                         >
+                           Language Conventions
+                         </button>
+                     
+                         <button
+                           className="dashboard-button"
+                           onClick={() => {
+                             setGenerateExamType("naplan_reading");
+                             setGenerateExamStep("generate");
+                           }}
+                         >
+                           Reading
+                         </button>
+                     
+                         <button
+                           className="dashboard-button"
+                           onClick={() => {
+                             setGenerateExamType("naplan_writing");
+                             setGenerateExamStep("generate");
+                           }}
+                         >
+                           Writing
+                         </button>
+                       </div>
+                     )}
    
                       {/* STEP 3: GENERATE */}
                       {generateExamStep === "generate" && (
@@ -587,7 +612,10 @@
                             generateExamType === "writing" && (
                               <GenerateExam_writing />
                           )}
-                  
+                          {generateExamCategory === "oc" &&
+                            generateExamType === "oc_thinking_skills" && (
+                             <GenerateExam_oc_thinking_skills />
+                           )}
                           {generateExamCategory === "foundational" && (
                             <GenerateExam_foundational />
                           )}
