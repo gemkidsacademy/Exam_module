@@ -15,6 +15,8 @@ import ViewDoctors from "./components/ViewDoctors";
 import DeleteDoctor from "./components/DeleteDoctor";
 import UsageDashboard from "./components/UsageDashboard";
 import SelectiveDashboard from "./components/SelectiveDashboard";
+import OCDashboard from "./components/OCDashboard";
+
 import Foundational_dashboard from "./components/Foundational_dashboard";
 import NaplanDashboard from "./components/NaplanDashboard";
 
@@ -73,6 +75,8 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
       navigate("/NAPLAN");
     } else if (data?.class_name === "Selective") {
       navigate("/SelectiveDashboard");
+    }else if (data?.class_name === "OC") {
+      navigate("/OCDashboard");
     } else {
       navigate("/selectiveFoundational");
     }
@@ -190,6 +194,16 @@ function App() {
               <PrivateRoute isLoggedIn={isLoggedIn}>
                 <FullWidthLayout>
                   <SelectiveDashboard />
+                </FullWidthLayout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/OCDashboard"
+            element={
+              <PrivateRoute isLoggedIn={isLoggedIn}>
+                <FullWidthLayout>
+                  <OCDashboard />
                 </FullWidthLayout>
               </PrivateRoute>
             }
