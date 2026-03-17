@@ -26,11 +26,67 @@ export default function ReadingComponent({
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
   const [finished, setFinished] = useState(false);
+  const [explanations, setExplanations] = useState({});
+  const [loadingExplanation, setLoadingExplanation] = useState(null);
 
   const [attemptId, setAttemptId] = useState(null);
   const [mode, setMode] = useState("exam");
   const [reviewQuestions, setReviewQuestions] = useState([]);
+  const formatExplanation = (text) => {
+      if (!text) return "";
     
+      return text
+        .replace(/\*\*(.*?)\*\*/g, "<strong style='display:block; margin-top:10px;'>$1</strong>")
+        .replace(/\n\n/g, "<br/><br/>")
+        .replace(/\n/g, "<br/>");
+    };  
+  const handleGenerateExplanation = async (question) => {
+      const qid = String(question.question_id);
+    
+      if (explanations[qid]) return;
+    
+      setLoadingExplanation(qid);
+    
+      try {
+        const res = await fetch(
+          `${API_BASE}/api/ai/explain-question-selective-reading`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              question: [
+                { type: "text", content: question.question_text }
+              ],
+              options: question.answer_options || {},
+              correct_answer: question.correct_answer
+            })
+          }
+        );
+    
+        if (!res.ok) {
+          throw new Error("API failed");
+        }
+    
+        const data = await res.json();
+    
+        setExplanations(prev => ({
+          ...prev,
+          [qid]: data.explanation || "⚠️ Failed to generate explanation."
+        }));
+    
+      } catch (err) {
+        console.error("Explanation failed", err);
+    
+        setExplanations(prev => ({
+          ...prev,
+          [qid]: "⚠️ Failed to generate explanation."
+        }));
+      } finally {
+        setLoadingExplanation(null);
+      }
+    };
   const handleReviewExam = async () => {
   if (!attemptId) {
     console.error("❌ No session_id available for review");
@@ -673,6 +729,37 @@ const currentQuestion = questions[index];
 
           )}
         </div>
+        {/* ================= AI EXPLANATION ================= */}
+{mode === "review" && (
+  <div style={{ marginTop: "16px" }}>
+
+    {!explanations[currentQuestion.question_id] && (
+      <button
+        className="ai-explain-btn"
+        onClick={() => handleGenerateExplanation(currentQuestion)}
+        disabled={loadingExplanation === String(currentQuestion.question_id)}
+      >
+        {loadingExplanation === String(currentQuestion.question_id)
+          ? "Generating..."
+          : "Generate AI Explanation"}
+      </button>
+    )}
+
+    {explanations[currentQuestion.question_id] && (
+      <div className="ai-explanation-box">
+        <h4>Explanation</h4>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: formatExplanation(
+              explanations[currentQuestion.question_id]
+            )
+          }}
+        />
+      </div>
+    )}
+
+  </div>
+)}
       </div>
     </div>
     {showSubmitConfirm && (
