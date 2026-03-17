@@ -14,7 +14,7 @@ const ExamSelector = ({ examType, onSelect }) => {
             className="dashboard-button"
             onClick={() => setSelectedCategory("selective")}
           >
-            Selective Exam
+            Selective / OC 
           </button>
 
           <button
