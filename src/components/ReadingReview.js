@@ -55,7 +55,7 @@ const handleGenerateExplanation = async (question) => {
 
   try {
     const res = await fetch(
-      `${API_BASE}/api/ai/explain-question-selective-reading-new`,
+      `${API_BASE}/api/ai/explain-question-selective-reading`,
       {
         method: "POST",
         headers: {
