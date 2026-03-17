@@ -522,7 +522,16 @@ if (questionType === 5) {
         )}
 
         {/* RIGHT: SINGLE QUESTION */}
-        <div className="question-pane">
+        <div
+          className="question-pane"
+          style={{
+            height: "100vh",
+            overflowY: "auto",
+            paddingRight: "8px",
+            display: "flex",
+            flexDirection: "column"
+          }}
+        >
           <div className="question-card">
 
             {/* 1️⃣ QUESTION TEXT / STRUCTURE */}
