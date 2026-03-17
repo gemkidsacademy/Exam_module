@@ -72,7 +72,7 @@ export default function NaplanReading({
     setTimeout(() => {
       explanationRef.current?.scrollIntoView({
         behavior: "smooth",
-        block: "start"
+        block: "center"
       });
     }, 100);
 
