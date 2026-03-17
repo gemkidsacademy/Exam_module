@@ -30,6 +30,23 @@ const [loadingExplanation, setLoadingExplanation] = useState(false);
  * - report  → completed attempt
  */
 const [mode, setMode] = useState("loading");
+const normalizeOptionContent = (content) => {
+  if (!content) return { type: "text", content };
+
+  // match "A) filename.png"
+  const match = content.match(/\)\s*(.*\.png)$/i);
+
+  if (!match) {
+    return { type: "text", content };
+  }
+
+  const filename = match[1].trim();
+
+  return {
+    type: "image",
+    src: `https://storage.googleapis.com/exammoduleimages/${filename}`
+  };
+};
 
 
 // ---------------- EXAM STATE ----------------
@@ -495,7 +512,15 @@ return (
       className={`option-btn ${statusClass}`}
       onClick={() => !isReview && handleAnswer(optionKey)}
     >
-      {opt?.content || opt}
+      {opt?.type === "image" ? (
+       <img
+         src={opt.src}
+         alt={`Option ${optionKey}`}
+         className="option-image"
+       />
+     ) : (
+       <span>{opt?.content}</span>
+     )}
     </button>
   );
 })}
