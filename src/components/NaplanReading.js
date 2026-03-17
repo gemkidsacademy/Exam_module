@@ -962,6 +962,20 @@ if (questionType === 5) {
                 </div>
               );
             })()}
+            {explanations[qid] && (
+              <div className="ai-explanation-inline">
+                <div className="ai-explanation-title">
+                  Explanation
+                </div>
+
+                <div
+                  className="ai-explanation-content"
+                  dangerouslySetInnerHTML={{
+                    __html: formatExplanationHtml(explanations[qid])
+                  }}
+                />
+              </div>
+            )}
             
           </div>
         </div>
@@ -1026,21 +1040,7 @@ if (questionType === 5) {
           }
           return (
             <>
-              {/* 🔥 EXPLANATION FIRST */}
-                {explanations[qid] && (
-                  <div className="ai-explanation-inline">
-                    <div className="ai-explanation-title">
-                      Explanation
-                    </div>
-
-                    <div
-                      className="ai-explanation-content"
-                      dangerouslySetInnerHTML={{
-                        __html: formatExplanationHtml(explanations[qid])
-                      }}
-                    />
-                  </div>
-                )}
+              
               {/* EXISTING RESULT BOX */}
               <div className={`review-result ${isCorrect ? "answer-correct" : "answer-wrong"}`}>
                 
