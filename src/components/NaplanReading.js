@@ -420,29 +420,13 @@ if (questionType === 5) {
     );
   }
 
-  if (mode === "review" && !questions.length) {
-    return (
-      <NaplanReadingReview
-        studentId={studentId}
-        examAttemptId={examAttemptId}
-        onLoaded={(qs, ans) => {
-          setQuestions(qs);
-          setCurrentIndex(0);
-          setVisited({});
-          const cleanedAnswers = {};
-          const correctnessMap = {};
-          
-          Object.entries(ans || {}).forEach(([qid, obj]) => {
-            cleanedAnswers[qid] = obj.answer;
-            correctnessMap[qid] = obj.is_correct;
-          });
-          
-          setAnswers(cleanedAnswers);
-          setCorrectness(correctnessMap);
-        }}
-      />
-    );
-  }
+  if (mode === "review") {
+  return (
+    <NaplanReadingReview
+      studentId={studentId}
+    />
+  );
+}
 
   if (!currentQ) return null;
 
