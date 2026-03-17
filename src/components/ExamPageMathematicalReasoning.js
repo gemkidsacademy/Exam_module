@@ -20,6 +20,8 @@ const studentId = sessionStorage.getItem("student_id");
 
 const hasSubmittedRef = useRef(false);
 const prevIndexRef = useRef(null);
+const [explanation, setExplanation] = useState(null);
+const [loadingExplanation, setLoadingExplanation] = useState(false);
 
 /**
  * mode:
@@ -78,6 +80,9 @@ const loadReport = useCallback(async () => {
     console.error("❌ loadReport error:", err);
   }
 }, [studentId]);
+useEffect(() => {
+  setExplanation(null);
+}, [currentIndex]);
 useEffect(() => {
   console.log("🔄 MODE CHANGED:", mode);
 }, [mode]);
@@ -247,6 +252,39 @@ useEffect(() => {
 /* ============================================================
    ANSWER HANDLING
 ============================================================ */
+const handleGenerateExplanation = async () => {
+  if (!currentQ) return;
+
+  setLoadingExplanation(true);
+  setExplanation(null);
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/api/ai/explain-question-TS`, // reuse same endpoint
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          question: currentQ.blocks,
+          options: currentQ.options,
+          correct_answer: currentQ.correct_answer
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    setExplanation(data.explanation);
+
+  } catch (err) {
+    console.error("Explanation error", err);
+    setExplanation("Failed to generate explanation.");
+  }
+
+  setLoadingExplanation(false);
+};
 const handleAnswer = (optionKey) => {
   if (mode === "review") return;
   const qid = activeQuestions[currentIndex]?.q_id;
@@ -468,7 +506,50 @@ return (
 })}
 
 </div>
+{/* AI EXPLANATION SECTION */}
+{isReview && (
+  <div style={{ marginTop: "20px" }}>
 
+    <button
+      onClick={handleGenerateExplanation}
+      disabled={loadingExplanation}
+      style={{
+        padding: "10px 16px",
+        background: "#2563eb",
+        color: "white",
+        border: "none",
+        borderRadius: "6px",
+        cursor: "pointer"
+      }}
+    >
+      {loadingExplanation ? "Generating..." : "✨ Generate AI Explanation"}
+    </button>
+
+    {explanation && (
+      <div
+        style={{
+          marginTop: "15px",
+          padding: "15px",
+          background: "#f9fafb",
+          borderRadius: "8px",
+          border: "1px solid #e5e7eb",
+          lineHeight: "1.6"
+        }}
+      >
+        <h4 style={{ marginBottom: "10px" }}>AI Explanation</h4>
+
+        <p
+          dangerouslySetInnerHTML={{
+            __html: explanation
+              .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+              .replace(/\n/g, "<br/>")
+          }}
+        />
+      </div>
+    )}
+
+  </div>
+)}
 
 
     {/* NAVIGATION */}
