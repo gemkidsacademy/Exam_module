@@ -234,7 +234,7 @@ useEffect(() => {
 
   const startExam = async () => {
     const res = await fetch(
-      `${API_BASE}/api/student/start-exam-oc-thinking-skills`,
+      `${API_BASE}/api/student/start-exam-oc-thinking-skills-new`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
