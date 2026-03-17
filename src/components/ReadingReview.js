@@ -32,8 +32,65 @@ export default function ReadingReview({ questions = [], onExit }) {
 
 
   const currentQuestion = questions[index];
+  const [explanations, setExplanations] = useState({});
+  const [loadingExplanation, setLoadingExplanation] = useState(null);
   
+  const formatExplanation = (text) => {
+    if (!text) return "";
+  
+    return text
+      .replace(/\*\*(.*?)\*\*/g, "<strong style='display:block; margin-top:10px;'>$1</strong>")
+      .replace(/\n\n/g, "<br/><br/>")
+      .replace(/\n/g, "<br/>");
+  };
+  const API_BASE = process.env.REACT_APP_API_URL;
 
+const handleGenerateExplanation = async (question) => {
+  const qid = String(question.question_id);
+
+  if (explanations[qid]) return;
+
+  setLoadingExplanation(qid);
+
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/ai/explain-question-selective-reading`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          question_text: question.question_text,
+          options: question.answer_options || {},
+          correct_answer: question.correct_answer,
+          passage:
+            question.reading_material ||
+            question.section_ref?.reading_material
+        })
+      }
+    );
+
+    if (!res.ok) throw new Error("API failed");
+
+    const data = await res.json();
+
+    setExplanations(prev => ({
+      ...prev,
+      [qid]: data.explanation || "⚠️ Failed to generate explanation."
+    }));
+
+  } catch (err) {
+    console.error("Explanation failed", err);
+
+    setExplanations(prev => ({
+      ...prev,
+      [qid]: "⚠️ Failed to generate explanation."
+    }));
+  } finally {
+    setLoadingExplanation(null);
+  }
+};
   if (!currentQuestion) {
     return <div>No review data available.</div>;
   }
@@ -198,7 +255,34 @@ if (typeof rm === "string") {
             </>
           )}
         </div>
+        {/* ================= AI EXPLANATION ================= */}
+<div style={{ marginTop: "16px" }}>
+  
+  {!explanations[currentQuestion.question_id] && (
+    <button
+      className="ai-explain-btn"
+      onClick={() => handleGenerateExplanation(currentQuestion)}
+      disabled={loadingExplanation === String(currentQuestion.question_id)}
+    >
+      {loadingExplanation === String(currentQuestion.question_id)
+        ? "Generating..."
+        : "Generate AI Explanation"}
+    </button>
+  )}
 
+  {explanations[currentQuestion.question_id] && (
+    <div className="ai-explanation-box">
+      <h4>Explanation</h4>
+      <div
+        dangerouslySetInnerHTML={{
+          __html: formatExplanation(
+            explanations[currentQuestion.question_id]
+          )
+        }}
+      />
+    </div>
+  )}
+</div>
         {/* =============================
            QUESTION + OPTIONS
         ============================= */}
