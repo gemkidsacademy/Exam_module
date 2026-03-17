@@ -298,9 +298,3 @@ body {
     font-size: 12px;
   }
 }
-.question-text,
-.option-text {
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-}
