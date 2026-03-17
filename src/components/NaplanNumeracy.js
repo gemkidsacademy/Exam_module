@@ -47,6 +47,8 @@
     const [visited, setVisited] = useState({});
     const [timeLeft, setTimeLeft] = useState(null);
     const [showConfirmFinish, setShowConfirmFinish] = useState(false);
+    const [explanations, setExplanations] = useState({});
+    const [loadingExplanation, setLoadingExplanation] = useState(null);
   
     const normalizeCorrectAnswer = (correctAnswer, questionType) => {
     if (correctAnswer == null) return null;
@@ -213,9 +215,18 @@
   document.addEventListener("copy", e => e.preventDefault());
   document.addEventListener("cut", e => e.preventDefault());
 }, []);
+    const formatExplanation = (text) => {
+      if (!text) return "";
+    
+      return text
+        .replace(/\*\*(.*?)\*\*/g, "<strong style='display:block; margin-top:10px;'>$1</strong>")
+        .replace(/\n\n/g, "<br/><br/>")
+        .replace(/\n/g, "<br/>");
+    };
     /* ============================================================
        FINISH EXAM
     ============================================================ */
+    
     const finishExam = useCallback(async () => {
       if (hasSubmittedRef.current) return;
       hasSubmittedRef.current = true;
@@ -259,7 +270,45 @@
   
       return () => clearInterval(interval);
     }, [timeLeft, mode, showConfirmFinish, finishExam]);
-  
+  //generate explanation in exam review  
+  const handleGenerateExplanation = async (question) => {
+  const qid = String(question.id);
+
+  // prevent duplicate calls
+  if (explanations[qid]) return;
+
+  setLoadingExplanation(qid);
+
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/ai/explain-question-naplan-numeracy`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          question_blocks: question.question_blocks,
+          question_text: question.question_text,
+          options: question.options,
+          correct_answer: question.correct_answer
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    setExplanations(prev => ({
+      ...prev,
+      [qid]: data.explanation
+    }));
+
+  } catch (err) {
+    console.error("Explanation failed", err);
+  } finally {
+    setLoadingExplanation(null);
+  }
+};
     /* ============================================================
        ANSWERS
     ============================================================ */
@@ -1034,7 +1083,37 @@
   );
 })()}
 
+        {/* ================= AI EXPLANATION ================= */}
+{isReview && (
+  <div style={{ marginTop: "16px" }}>
+    
+    {!explanations[String(currentQ.id)] && (
+      <button
+        className="ai-explain-btn"
+        onClick={() => handleGenerateExplanation(currentQ)}
+        disabled={loadingExplanation === String(currentQ.id)}
+      >
+        {loadingExplanation === String(currentQ.id)
+          ? "Generating..."
+          : "Generate AI Explanation"}
+      </button>
+    )}
 
+    {explanations[String(currentQ.id)] && (
+      <div className="ai-explanation-box">
+        <h4>Explanation</h4>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: formatExplanation(
+              explanations[String(currentQ.id)]
+            )
+          }}
+        />
+      </div>
+    )}
+
+  </div>
+)}
         </div> {/* closes question-content-centered */}
         </div> {/* closes question-card */}
         
