@@ -288,8 +288,7 @@
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          question_blocks: question.question_blocks,
-          question_text: question.question_text,
+          question: question.question_blocks,  // ✅ FIX
           options: question.options,
           correct_answer: question.correct_answer
         })
