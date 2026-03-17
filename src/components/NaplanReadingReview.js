@@ -14,6 +14,10 @@ export default function NaplanReadingReview({
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(true);
 
+  // ✅ AI STATE
+  const [explanations, setExplanations] = useState({});
+  const [loadingExplanation, setLoadingExplanation] = useState(null);
+
   /* ============================================================
      LOAD REVIEW DATA
   ============================================================ */
@@ -29,18 +33,12 @@ export default function NaplanReadingReview({
         if (!res.ok) throw new Error("Failed to load review");
 
         const data = await res.json();
-        console.log("========== REVIEW API RESPONSE ==========");
-         console.log("Full response:", data);
-         console.log("Questions:", data.questions);
-         console.log("Student answers:", data.student_answers);
 
         const qs = data.questions || [];
         const ans = data.student_answers || {};
 
         setQuestions(qs);
         setAnswers(ans);
-        console.log("Answers object keys:", Object.keys(ans));
-        console.log("Answers object:", ans);
 
         onLoaded?.(qs, ans);
 
@@ -55,6 +53,74 @@ export default function NaplanReadingReview({
   }, [API_BASE, studentId, onLoaded]);
 
   /* ============================================================
+     AI EXPLANATION HANDLER
+  ============================================================ */
+  const handleGenerateExplanation = async (q) => {
+    const qid = String(q.question_id);
+
+    if (explanations[qid]) return;
+
+    setLoadingExplanation(qid);
+
+    try {
+      const questionText = q.exam_bundle?.question_blocks
+        ?.filter(b => b.type !== "reading")
+        ?.map(b => b.content || b.text || "")
+        ?.join(" ");
+
+      const passageBlock = q.exam_bundle?.question_blocks?.find(
+        b => b.type === "reading"
+      );
+
+      const res = await fetch(
+        `${API_BASE}/api/ai/explain-question-selective-reading`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            question_text: questionText,
+            options:
+              q.exam_bundle?.options ||
+              q.exam_bundle?.image_options ||
+              {},
+            correct_answer: q.exam_bundle?.correct_answer,
+            passage: passageBlock || null
+          })
+        }
+      );
+
+      const data = await res.json();
+
+      setExplanations(prev => ({
+        ...prev,
+        [qid]: data.explanation || "⚠️ Failed to generate explanation."
+      }));
+
+    } catch (err) {
+      console.error(err);
+
+      setExplanations(prev => ({
+        ...prev,
+        [qid]: "⚠️ Failed to generate explanation."
+      }));
+    } finally {
+      setLoadingExplanation(null);
+    }
+  };
+
+  /* ============================================================
+     FORMAT EXPLANATION
+  ============================================================ */
+  const formatExplanation = (text) => {
+    if (!text) return "";
+
+    return text
+      .replace(/\*\*(.*?)\*\*/g, "<strong style='display:block; margin-top:10px;'>$1</strong>")
+      .replace(/\n\n/g, "<br/><br/>")
+      .replace(/\n/g, "<br/>");
+  };
+
+  /* ============================================================
      HELPERS
   ============================================================ */
   const normalize = (val) => {
@@ -62,15 +128,7 @@ export default function NaplanReadingReview({
     if (Array.isArray(val)) return val.join(", ");
     return String(val);
   };
-  const normalizeAnswer = (val) => {
-  if (val == null) return [];
 
-  if (Array.isArray(val)) {
-    return val.map(v => String(v).trim());
-  }
-
-  return [String(val).trim()];
-};
   /* ============================================================
      RENDER
   ============================================================ */
@@ -82,41 +140,26 @@ export default function NaplanReadingReview({
       <h2>NAPLAN Reading – Review</h2>
 
       {questions.map((q, idx) => {
-
         const qid = String(q.question_id);
-         console.warn("TRACE", {
-        index: idx,
-        questionId: qid,
-        lookup: answers[qid],
-        isCorrect: answers[qid]?.is_correct
-      });         
-         const answerObj = answers[qid] || {};
-         
-         const studentAnswer = answerObj.answer;
-         const isCorrect = answerObj.is_correct ?? false;
-                  
-         const correctAnswer = q.exam_bundle?.correct_answer;
-        
+
+        const answerObj = answers[qid] || {};
+        const studentAnswer = answerObj.answer;
+        const isCorrect = answerObj.is_correct ?? false;
+        const correctAnswer = q.exam_bundle?.correct_answer;
+
         return (
           <div
-           key={q.question_id}
-           className={`review-question-card ${isCorrect ? "correct" : "incorrect"}`}
-         >
-           <div className="review-header">
-             <span>Question {idx + 1}</span>
-             <span>{isCorrect ? "✔ Correct" : "✖ Incorrect"}</span>
-           </div>
-          <div style={{ fontSize: "12px", color: "blue" }}>
-             raw is_correct: {String(answerObj.is_correct)}
-           </div>
-           {/* 🔎 DEBUG: show question id */}
-           <div style={{ fontSize: "12px", color: "gray" }}>
-             qid: {qid}
-           </div>
+            key={q.question_id}
+            className={`review-question-card ${isCorrect ? "correct" : "incorrect"}`}
+          >
 
-            {/* ============================
-                PASSAGE / QUESTION
-            ============================ */}
+            {/* ================= HEADER ================= */}
+            <div className="review-header">
+              <span>Question {idx + 1}</span>
+              <span>{isCorrect ? "✔ Correct" : "✖ Incorrect"}</span>
+            </div>
+
+            {/* ================= QUESTION ================= */}
             {q.exam_bundle?.question_blocks?.map((block, i) => {
 
               if (block.type === "reading") {
@@ -126,14 +169,6 @@ export default function NaplanReadingReview({
                       <div key={ex.extract_id} className="extract">
                         <h4>{ex.title}</h4>
                         <pre>{ex.content}</pre>
-
-                        {ex.images?.map((img, idx) => (
-                          <img
-                            key={idx}
-                            src={img}
-                            alt="Reading visual"
-                          />
-                        ))}
                       </div>
                     ))}
                   </div>
@@ -159,11 +194,8 @@ export default function NaplanReadingReview({
               return null;
             })}
 
-            {/* ============================
-                ANSWERS
-            ============================ */}
+            {/* ================= ANSWERS ================= */}
             <div className="answer-section">
-
               <div>
                 <strong>Your answer:</strong>{" "}
                 {normalize(studentAnswer) || "—"}
@@ -173,8 +205,32 @@ export default function NaplanReadingReview({
                 <strong>Correct answer:</strong>{" "}
                 {normalize(correctAnswer)}
               </div>
-
             </div>
+
+            {/* ================= AI BUTTON ================= */}
+            {!explanations[qid] && (
+              <button
+                className="ai-explain-btn"
+                onClick={() => handleGenerateExplanation(q)}
+                disabled={loadingExplanation === qid}
+              >
+                {loadingExplanation === qid
+                  ? "Generating..."
+                  : "💡 Generate AI Explanation"}
+              </button>
+            )}
+
+            {/* ================= AI EXPLANATION ================= */}
+            {explanations[qid] && (
+              <div className="ai-explanation-box">
+                <h4>Explanation</h4>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: formatExplanation(explanations[qid])
+                  }}
+                />
+              </div>
+            )}
 
           </div>
         );
