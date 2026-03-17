@@ -22,6 +22,69 @@ export default function NaplanReading({
   const studentId = sessionStorage.getItem("student_id");
   const API_BASE = process.env.REACT_APP_API_URL;
   const TYPE_2_MAX_SELECTIONS = 2;
+  const [explanations, setExplanations] = useState({});
+  
+  const [loadingExplanation, setLoadingExplanation] = useState(null);
+  const handleGenerateExplanationForReading = async (q) => {
+  const qid = String(q.question_id);
+
+  if (explanations[qid]) return;
+
+  setLoadingExplanation(qid);
+
+  try {
+    const questionText = q.exam_bundle?.question_blocks
+      ?.filter(b => b.type !== "reading")
+      ?.map(b => b.content || b.text || "")
+      ?.join(" ");
+
+    const passageBlock = q.exam_bundle?.question_blocks?.find(
+      b => b.type === "reading"
+    );
+
+    const res = await fetch(
+      `${API_BASE}/api/ai/explain-question-selective-reading`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question_text: questionText,
+          options:
+            q.exam_bundle?.options ||
+            q.exam_bundle?.image_options ||
+            {},
+          correct_answer: q.exam_bundle?.correct_answer,
+          passage: passageBlock || null
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    setExplanations(prev => ({
+      ...prev,
+      [qid]: data.explanation || "⚠️ Failed to generate explanation."
+    }));
+
+  } catch (err) {
+    console.error(err);
+
+    setExplanations(prev => ({
+      ...prev,
+      [qid]: "⚠️ Failed to generate explanation."
+    }));
+  } finally {
+    setLoadingExplanation(null);
+  }
+};
+  const formatExplanationHtml = (text) => {
+  if (!text) return "";
+
+  return text
+    .replace(/\*\*(.*?)\*\*/g, "<strong style='display:block; margin-top:10px;'>$1</strong>")
+    .replace(/\n\n/g, "<br/><br/>")
+    .replace(/\n/g, "<br/>");
+};
   function hasAnswered(question, answers) {
   if (!question || !answers) return false;
 
@@ -941,26 +1004,56 @@ if (questionType === 5) {
           
           }
           return (
-            <div className={`review-result ${isCorrect ? "answer-correct" : "answer-wrong"}`}>
-              <div className="review-status">
-                {isCorrect ? "✔ Correct" : "✖ Incorrect"}
-              </div>
-        
-              <div className="review-details">
-                <div>
-                  <strong>Your answer:</strong>{" "}
-                  {displayStudent || "—"}
+            <>
+              {/* EXISTING RESULT BOX */}
+              <div className={`review-result ${isCorrect ? "answer-correct" : "answer-wrong"}`}>
+                
+                <div className="review-status">
+                  {isCorrect ? "✔ Correct" : "✖ Incorrect"}
                 </div>
-        
-                {!isCorrect && (
+          
+                <div className="review-details">
                   <div>
-                    <strong>Correct answer:</strong>{" "}
-                    {displayCorrect}
+                    <strong>Your answer:</strong> {displayStudent || "—"}
                   </div>
-                )}
+          
+                  {!isCorrect && (
+                    <div>
+                      <strong>Correct answer:</strong> {displayCorrect}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+          
+              {/* 🔥 ADD HERE — AI BUTTON */}
+              {!explanations[String(currentQ.question_id)] && (
+                <button
+                  className="ai-explain-btn"
+                  onClick={() => handleGenerateExplanationForReading(currentQ)}
+                  disabled={loadingExplanation === String(currentQ.question_id)}
+                >
+                  {loadingExplanation === String(currentQ.question_id)
+                    ? "Generating..."
+                    : "💡 Generate AI Explanation"}
+                </button>
+              )}
+          
+              {/* 🔥 AI EXPLANATION OUTPUT */}
+              {explanations[String(currentQ.question_id)] && (
+                <div className="ai-explanation-box">
+                  <h4>Explanation</h4>
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: formatExplanationHtml(
+                        explanations[String(currentQ.question_id)]
+                      )
+                    }}
+                  />
+                </div>
+              )}
+            </>
           );
+         
         })()}
 
         {/* NAVIGATION */}
