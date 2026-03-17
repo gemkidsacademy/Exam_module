@@ -46,7 +46,61 @@ export default function NaplanLanguageConventions({
   const [visited, setVisited] = useState({});
   const [timeLeft, setTimeLeft] = useState(null);
   const [showConfirmFinish, setShowConfirmFinish] = useState(false);
+  const [explanations, setExplanations] = useState({});
+  const [loadingExplanation, setLoadingExplanation] = useState(null);
+  const formatExplanation = (text) => {
+    if (!text) return "";
   
+    return text
+      .replace(/\*\*(.*?)\*\*/g, "<strong style='display:block; margin-top:10px;'>$1</strong>")
+      .replace(/\n\n/g, "<br/><br/>")
+      .replace(/\n/g, "<br/>");
+  };
+  const handleGenerateExplanation = async (question) => {
+    const qid = String(question.id);
+  
+    if (explanations[qid]) return;
+  
+    setLoadingExplanation(qid);
+  
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/ai/explain-question-TS`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            question: question.question_blocks, // ✅ important
+            options: question.options || {},
+            correct_answer: question.correct_answer
+          })
+        }
+      );
+  
+      if (!res.ok) {
+        throw new Error("API failed");
+      }
+  
+      const data = await res.json();
+  
+      setExplanations(prev => ({
+        ...prev,
+        [qid]: data.explanation || "⚠️ Failed to generate explanation."
+      }));
+  
+    } catch (err) {
+      console.error("Explanation failed", err);
+  
+      setExplanations(prev => ({
+        ...prev,
+        [qid]: "⚠️ Failed to generate explanation."
+      }));
+    } finally {
+      setLoadingExplanation(null);
+    }
+  };
   const normalizeCorrectAnswer = (correctAnswer, questionType) => {
     if (correctAnswer == null) return null;
 
@@ -340,6 +394,7 @@ export default function NaplanLanguageConventions({
           setCurrentIndex(0);
           setVisited({});
           setAnswers(studentAnswers || {});
+          setExplanations({});
         }}
       />
     );
@@ -764,6 +819,34 @@ export default function NaplanLanguageConventions({
         })}
       </div>
     )}
+  {/* ================= AI EXPLANATION ================= */}
+{isReview && (
+  <div style={{ marginTop: "16px" }}>
+    
+    {!explanations[qid] && (
+      <button
+        className="ai-explain-btn"
+        onClick={() => handleGenerateExplanation(currentQ)}
+        disabled={loadingExplanation === qid}
+      >
+        {loadingExplanation === qid
+          ? "Generating..."
+          : "Generate AI Explanation"}
+      </button>
+    )}
+
+    {explanations[qid] && (
+      <div className="ai-explanation-box">
+        <h4>Explanation</h4>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: formatExplanation(explanations[qid])
+          }}
+        />
+      </div>
+    )}
+  </div>
+)}
   </div>
 </div>
 
