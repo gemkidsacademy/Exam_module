@@ -543,3 +543,25 @@
   border-radius: 8px;
   line-height: 1.6;
 }
+.question-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.ai-explain-btn-inline {
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  color: #3730a3;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.ai-explain-btn-inline:hover {
+  background: #e0e7ff;
+}
