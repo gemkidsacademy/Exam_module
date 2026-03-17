@@ -536,13 +536,7 @@
   cursor: pointer;
 }
 
-.ai-explanation-box {
-  margin-top: 12px;
-  padding: 12px;
-  background: #f8fafc;
-  border-radius: 8px;
-  line-height: 1.6;
-}
+
 .question-header-row {
   display: flex;
   justify-content: space-between;
