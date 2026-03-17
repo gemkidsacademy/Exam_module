@@ -500,7 +500,24 @@ return (
       className={`option-btn ${statusClass}`}
       onClick={() => !isReview && handleAnswer(optionKey)}
     >
-      {opt?.content || opt}
+      {blocks.map((block, idx) => {
+      if (block.type === "text") {
+        return <span key={idx}>{block.content}</span>;
+      }
+    
+      if (block.type === "image") {
+        return (
+          <img
+            key={idx}
+            src={block.src}
+            alt="option"
+            className="option-image"
+          />
+        );
+      }
+    
+      return null;
+    })}
     </button>
   );
 })}
