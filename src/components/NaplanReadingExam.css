@@ -636,3 +636,43 @@
 .tf-cell.tf-dim {
   opacity: 0.35;
 }
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.explain-btn-inline {
+  background: #eef3ff;
+  color: #2f5cff;
+  border: 1px solid #c7d2fe;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.explain-btn-inline:hover {
+  background: #e0e7ff;
+}
+
+.explain-btn-inline:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.ai-explanation-inline {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 10px;
+  background: #f5f7fb;
+  border-left: 4px solid #4f46e5;
+}
+.ai-explanation-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.ai-explanation-content {
+  font-size: 14px;
+  line-height: 1.6;
+}
