@@ -56,11 +56,10 @@ export default function ReadingComponent({
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
-              question: [
-                { type: "text", content: question.question_text }
-              ],
+              question_text: question.question_text,
               options: question.answer_options || {},
-              correct_answer: question.correct_answer
+              correct_answer: question.correct_answer,
+              passage: question.section_ref?.reading_material
             })
           }
         );
@@ -729,37 +728,7 @@ const currentQuestion = questions[index];
 
           )}
         </div>
-        {/* ================= AI EXPLANATION ================= */}
-{mode === "review" && (
-  <div style={{ marginTop: "16px" }}>
-
-    {!explanations[currentQuestion.question_id] && (
-      <button
-        className="ai-explain-btn"
-        onClick={() => handleGenerateExplanation(currentQuestion)}
-        disabled={loadingExplanation === String(currentQuestion.question_id)}
-      >
-        {loadingExplanation === String(currentQuestion.question_id)
-          ? "Generating..."
-          : "Generate AI Explanation"}
-      </button>
-    )}
-
-    {explanations[currentQuestion.question_id] && (
-      <div className="ai-explanation-box">
-        <h4>Explanation</h4>
-        <div
-          dangerouslySetInnerHTML={{
-            __html: formatExplanation(
-              explanations[currentQuestion.question_id]
-            )
-          }}
-        />
-      </div>
-    )}
-
-  </div>
-)}
+  
       </div>
     </div>
     {showSubmitConfirm && (
