@@ -281,7 +281,7 @@
 
   try {
     const res = await fetch(
-      `${API_BASE}/api/ai/explain-question-naplan-numeracy`,
+      `${API_BASE}/api/ai/explain-question-TS`,
       {
         method: "POST",
         headers: {
