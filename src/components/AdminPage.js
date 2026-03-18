@@ -366,14 +366,13 @@
                    >
                      Thinking Skills
                    </button>
+               
                    <button
-                    className="dashboard-button"
-                    style={{ backgroundColor: "red" }}
-                    onClick={() => setCreateExamType("oc_mathematical_reasoning")}
-                  >
-                    MR TEST
-                  </button>
-                   
+                     className="dashboard-button"
+                     onClick={() => setCreateExamType("oc_mathematical_reasoning")}
+                   >
+                     Mathematical Reasoning
+                   </button>
                  </div>
                )}
                 
