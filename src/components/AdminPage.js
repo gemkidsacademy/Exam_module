@@ -368,9 +368,10 @@
                    </button>
                    <button
                     className="dashboard-button"
+                    style={{ backgroundColor: "red" }}
                     onClick={() => setCreateExamType("oc_mathematical_reasoning")}
                   >
-                    Mathematical Reasoning
+                    MR TEST
                   </button>
                    
                  </div>
