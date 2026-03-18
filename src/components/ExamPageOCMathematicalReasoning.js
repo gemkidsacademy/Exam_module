@@ -219,7 +219,7 @@ const finishExam = useCallback(
 
     try {
       await fetch(
-        `${API_BASE}/api/student/finish-exam`,
+        `${API_BASE}/api/student/finish-exam-oc-mathematical-reasoning`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
