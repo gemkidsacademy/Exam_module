@@ -22,7 +22,7 @@ const SUBJECTS = [
   {
     label: "Mathematical Reasoning",
     key: "mathematical_reasoning",
-    component: ExamPageOCMathematicalReasoning.js,
+    component: ExamPageOCMathematicalReasoning,
   },
   //{
    // label: "Reading",
