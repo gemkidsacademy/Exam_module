@@ -13,12 +13,16 @@
    
    import QuizSetup_naplan from "./QuizSetup_naplan";
    import GenerateExam_naplan_numeracy from "./GenerateExam_naplan_numeracy";
+   import GenerateExam_oc_mathematical_reasoning from "./GenerateExam_oc_mathematical_reasoning";
+   
    import GenerateExam_naplan_language_conventions from "./GenerateExam_naplan_language_conventions";
    import QuizSetup_naplan_reading from "./QuizSetup_naplan_reading";
    import GenerateExam_naplan_reading from "./GenerateExam_naplan_reading";
    
    
    import QuizSetup_naplan_language_conventions from "./QuizSetup_naplan_language_conventions";
+   import QuizSetup_OC_MathematicalReasoning from "./QuizSetup_OC_MathematicalReasoning";
+   
    
    
    
@@ -362,6 +366,13 @@
                    >
                      Thinking Skills
                    </button>
+                   <button
+                    className="dashboard-button"
+                    onClick={() => setCreateExamType("oc_mathematical_reasoning")}
+                  >
+                    Mathematical Reasoning
+                  </button>
+                   
                  </div>
                )}
                 
@@ -413,6 +424,9 @@
                 {createExamType === "oc_thinking_skills" && (
                     <QuizSetupOCThinkingSkills />
                   )}
+                {createExamType === "oc_mathematical_reasoning" && (
+                 <QuizSetup_OC_MathematicalReasoning />
+               )}
                 {createExamType === "mathematical_reasoning" && <QuizSetup_MathematicalReasoning />}
                 {createExamType === "foundational" && <QuizSetup_foundational />}
                 {createExamType === "reading" && <QuizSetup_reading />}
@@ -543,6 +557,15 @@
                             >
                               Thinking Skills
                             </button>
+                            <button
+                             className="dashboard-button"
+                             onClick={() => {
+                               setGenerateExamType("oc_mathematical_reasoning");
+                               setGenerateExamStep("generate");
+                             }}
+                           >
+                             Mathematical Reasoning
+                           </button>
                           </div>
                         )}
                       {generateExamStep === "type" &&
@@ -615,6 +638,10 @@
                           {generateExamCategory === "oc" &&
                             generateExamType === "oc_thinking_skills" && (
                              <GenerateExam_oc_thinking_skills />
+                           )}
+                           {generateExamCategory === "oc" &&
+                             generateExamType === "oc_mathematical_reasoning" && (
+                               <GenerateExam_oc_mathematical_reasoning examType="oc_mathematical_reasoning" />
                            )}
                           {generateExamCategory === "foundational" && (
                             <GenerateExam_foundational />
