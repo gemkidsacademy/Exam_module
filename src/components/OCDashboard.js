@@ -3,7 +3,8 @@ import "./SelectiveDashboard.css"; // you can reuse same CSS
 
 // EXAM COMPONENTS
 import ExamPageOcThinkingSkills from "./ExamPageOcThinkingSkills";
-//import ExamPageMathematicalReasoning from "./ExamPageMathematicalReasoning";
+import ExamPageOCMathematicalReasoning from "./ExamPageOCMathematicalReasoning";
+
 //import ReadingComponent from "./ReadingComponent";
 
 import WelcomeScreenOC from "./WelcomeScreenOC";
@@ -18,11 +19,11 @@ const SUBJECTS = [
     key: "oc_thinking_skills",
     component: ExamPageOcThinkingSkills,
   },
-  //{
-   // label: "Mathematical Reasoning",
-    //key: "mathematical_reasoning",
-    //component: ExamPageMathematicalReasoning,
-  //},
+  {
+    label: "Mathematical Reasoning",
+    key: "mathematical_reasoning",
+    component: ExamPageOCMathematicalReasoning.js,
+  },
   //{
    // label: "Reading",
    // key: "reading",
