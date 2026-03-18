@@ -344,7 +344,7 @@ return (
 }
 if (mode === "review" && reviewQuestions.length === 0) {
   return (
-    <OC_MathematicalReasoningReview.js
+    <OC_MathematicalReasoningReview
       studentId={studentId}
       onLoaded={(questions) => {
         console.log("✅ Review questions received:", questions.length);
