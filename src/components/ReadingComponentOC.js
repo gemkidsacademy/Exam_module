@@ -363,7 +363,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
 
   try {
     const res = await fetch(
-      `${API_BASE}/api/exams/submit-reading`,
+      `${API_BASE}/api/exams/submit-oc-reading`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
