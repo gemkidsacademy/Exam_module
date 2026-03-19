@@ -219,7 +219,7 @@ export default function ReadingComponentOC({
   const loadExam = async () => {
     // 1️⃣ Start / resume attempt
     const res = await fetch(
-      `${API_BASE}/api/exams/start-reading`,
+      `${API_BASE}/api/exams/start-oc-reading`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
