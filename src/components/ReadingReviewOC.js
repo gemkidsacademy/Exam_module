@@ -105,7 +105,7 @@ export default function ReadingReviewOC({ questions = [], onExit }) {
 
     try {
       const res = await fetch(
-        `${API_BASE}/api/ai/explain-question-oc-reading`,
+        `${API_BASE}/api/ai/explain-question-selective-reading`,
         {
           method: "POST",
           headers: {
