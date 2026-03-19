@@ -183,7 +183,7 @@ export default function QuizSetup_oc_reading() {
       });
 
       const res = await fetch(
-        `https://web-production-481a5.up.railway.app/api/reading/question-bank?${params}`
+        `https://web-production-481a5.up.railway.app/api/reading/question-bank-oc?${params}`
       );
 
       if (!res.ok) throw new Error("Failed");
