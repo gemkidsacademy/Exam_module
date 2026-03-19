@@ -38,6 +38,30 @@ export default function QuizSetup_oc_reading() {
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
 
+  const handleDeleteAllQuestions = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete all reading questions?"
+    );
+  
+    if (!confirmed) return;
+  
+    try {
+      const response = await fetch("https://web-production-481a5.up.railway.app/api/admin/delete-all-questions-oc-reading", {
+        method: "DELETE",
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.detail || "Failed to delete questions");
+      }
+  
+      alert(data.message || "All Mathematical Reasoning questions deleted.");
+    } catch (error) {
+      console.error("Error deleting questions:", error);
+      alert("Something went wrong while deleting the questions.");
+    }
+  };
   // ---------------------------------------
   // HELPERS
   // ---------------------------------------
@@ -282,6 +306,13 @@ export default function QuizSetup_oc_reading() {
           disabled={!quiz.difficulty}
         >
           View Question Bank
+        </button>
+        <button
+          type="button"
+          onClick={handleDeleteAllQuestions}
+          
+        >
+          Delete All Questions
         </button>
 
         {/* Topics */}
