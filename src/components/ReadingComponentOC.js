@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./ExamPage_reading.css";
-import ReadingReview from "./ReadingReview";
+import ReadingReviewOC from "./ReadingReviewOC";
 
 
 
