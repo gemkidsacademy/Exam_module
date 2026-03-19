@@ -1,14 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
+const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
 const GenerateExam_oc_reading = () => {
   const [className, setClassName] = useState("");
   const [difficulty, setDifficulty] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  /* ---------------------------
+     LOAD QUIZ CONFIGS
+  --------------------------- */
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/quizzes-reading`);
+        if (!res.ok) throw new Error("Failed to load quizzes");
+
+        const data = await res.json();
+
+        if (data.length > 0) {
+          const latest = data[data.length - 1];
+
+          setClassName(latest.class_name);
+          setDifficulty(latest.difficulty);
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load quizzes.");
+      }
+    };
+
+    load();
+  }, []);
 
   const handleGenerateExam = async () => {
     if (!className || !difficulty) {
-      setMessage("Please enter class name and difficulty");
+      setMessage("Config not loaded yet...");
       return;
     }
 
@@ -17,7 +46,7 @@ const GenerateExam_oc_reading = () => {
       setMessage("");
 
       const response = await fetch(
-        "https://web-production-481a5.up.railway.app/api/exams/generate-oc-reading",
+        `${BACKEND_URL}/api/exams/generate-oc-reading`,
         {
           method: "POST",
           headers: {
@@ -49,26 +78,12 @@ const GenerateExam_oc_reading = () => {
     <div style={{ maxWidth: "400px", margin: "0 auto" }}>
       <h2>Generate OC Reading Exam</h2>
 
-      <input
-        type="text"
-        placeholder="Enter Class Name (e.g. OC)"
-        value={className}
-        onChange={(e) => setClassName(e.target.value)}
-        style={{ width: "100%", padding: "10px", marginBottom: "15px" }}
-      />
-
-      <input
-        type="text"
-        placeholder="Enter Difficulty (e.g. medium)"
-        value={difficulty}
-        onChange={(e) => setDifficulty(e.target.value)}
-        style={{ width: "100%", padding: "10px", marginBottom: "15px" }}
-      />
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
       <button
         className="dashboard-button"
         onClick={handleGenerateExam}
-        disabled={loading}
+        disabled={loading || !className}
       >
         {loading ? "Generating..." : "Generate Exam"}
       </button>
