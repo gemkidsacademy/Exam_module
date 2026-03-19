@@ -205,11 +205,21 @@ export default function ReadingReviewOC({ questions = [], onExit }) {
         {/* PASSAGE */}
         <div className={`passage-pane ${passageStyle}`}>
           {rm?.title && <h3>{rm.title}</h3>}
-
+        
+          {rm?.extracts && Object.keys(rm.extracts).length > 0 && (
+            <div className="extracts">
+              {Object.entries(rm.extracts).map(([key, text]) => (
+                <div key={key} className="extract">
+                  <strong>{key}.</strong> {text}
+                </div>
+              ))}
+            </div>
+          )}
+        
           {rm?.content && (
             <p className="reading-content">{rm.content}</p>
           )}
-
+        
           {rm?.paragraphs &&
             Object.entries(rm.paragraphs).map(([k, v]) => (
               <p key={k} className="reading-paragraph">
