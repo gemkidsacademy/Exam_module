@@ -202,12 +202,7 @@ export default function ReadingComponentOC({
     questionsCount: questions.length
   });
 }, [exam, questions]);
-    useEffect(() => {
-  document.addEventListener("contextmenu", e => e.preventDefault());
-  document.addEventListener("copy", e => e.preventDefault());
-  document.addEventListener("cut", e => e.preventDefault());
-}, []);
-  //useEffect(() => {
+      //useEffect(() => {
   //document.addEventListener("contextmenu", e => e.preventDefault());
   //document.addEventListener("copy", e => e.preventDefault());
   //document.addEventListener("cut", e => e.preventDefault());
@@ -565,6 +560,9 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
 }
 
 const currentQuestion = questions[index];
+console.log("CURRENT QUESTION:", currentQuestion);
+console.log("RM:", currentQuestion?.reading_material);
+console.log("EXTRACTS:", currentQuestion?.reading_material?.extracts);
 
 
   const options = currentQuestion.answer_options || {};
