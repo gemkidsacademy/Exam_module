@@ -15,12 +15,12 @@ export default function QuizSetup_oc_reading() {
   // ---------------------------------------
 
   const FIXED_TOPIC_QUESTION_RULES_OC = {
-    "Main Idea and Summary": 5,
-    "Gapped Text": 5,
+    "Main Idea and Summary": 6,
+    "Gapped Text": 6,
   };
 
   const CHOICE_TOPIC_QUESTION_RULES_OC = {
-    "Comparative Analysis": [6, 8],
+    "Comparative Analysis": [8, 10],
   };
 
   const MAX_TOPIC_USAGE_OC = {
@@ -175,7 +175,7 @@ export default function QuizSetup_oc_reading() {
   const handleViewQuestionBank_oc = async () => {
     try {
       setLoadingQuestions(true);
-      setShowQuestionBank(false);
+      setShowQuestionBank(true);
 
       const params = new URLSearchParams({
         subject: quiz.subject,
