@@ -131,7 +131,7 @@ export default function ReadingComponentOC({
     setLoadingReport(true);
 
     const res = await fetch(
-      `${API_BASE}/api/exams/reading-report?session_id=${sessionId}`
+      `${API_BASE}/api/exams/oc-reading-report?session_id=${sessionId}`
     );
 
     if (!res.ok) {
