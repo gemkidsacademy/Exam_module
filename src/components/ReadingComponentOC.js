@@ -570,7 +570,10 @@ const currentQuestion = questions[index];
   const options = currentQuestion.answer_options || {};
   const hasOptions = Object.keys(options).length > 0;
 
-  const rm = currentQuestion.section_ref?.reading_material || {};
+  const rm =
+  currentQuestion.reading_material ||
+  currentQuestion.section_ref?.reading_material ||
+  {};
 
   
   const passageStyle =
