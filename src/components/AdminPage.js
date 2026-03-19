@@ -22,6 +22,7 @@
    
    import QuizSetup_naplan_language_conventions from "./QuizSetup_naplan_language_conventions";
    import QuizSetup_OC_MathematicalReasoning from "./QuizSetup_OC_MathematicalReasoning";
+   import QuizSetup_oc_reading from "./QuizSetup_oc_reading";
    
    
    
@@ -373,6 +374,12 @@
                    >
                      Mathematical Reasoning
                    </button>
+                   <button
+                    className="dashboard-button"
+                    onClick={() => setCreateExamType("oc_reading")}
+                  >
+                    Reading
+                  </button>
                  </div>
                )}
                 
@@ -426,6 +433,9 @@
                   )}
                 {createExamType === "oc_mathematical_reasoning" && (
                  <QuizSetup_OC_MathematicalReasoning />
+               )}
+               {createExamType === "oc_reading" && (
+                 <QuizSetup_oc_reading />
                )}
                 {createExamType === "mathematical_reasoning" && <QuizSetup_MathematicalReasoning />}
                 {createExamType === "foundational" && <QuizSetup_foundational />}
