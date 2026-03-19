@@ -15,7 +15,7 @@ const GenerateExam_oc_reading = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/quizzes-reading`);
+        const res = await fetch(`${BACKEND_URL}/api/quizzes-reading-oc`);
         if (!res.ok) throw new Error("Failed to load quizzes");
 
         const data = await res.json();
