@@ -412,7 +412,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
   // 🔴 1. REVIEW MODE — HIGHEST PRIORITY
     if (mode === "review") {
       return (
-        <ReadingReview
+        <ReadingReviewOC
           questions={reviewQuestions}
           onExit={() => {
               setReviewQuestions([]);
