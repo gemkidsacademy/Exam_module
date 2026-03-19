@@ -373,6 +373,39 @@ export default function QuizSetup_oc_reading() {
             </div>
           ))}
         </div>
+          {/* QUESTION BANK */}
+          {showQuestionBank && (
+            <div className="question-bank">
+              <h3>Question Bank Summary</h3>
+          
+              {loadingQuestions ? (
+                <p>Loading...</p>
+              ) : questionBank.length === 0 ? (
+                <p>No questions found.</p>
+              ) : (
+                <table className="question-bank-table">
+                  <thead>
+                    <tr>
+                      <th>Difficulty</th>
+                      <th>Topic</th>
+                      <th>Set Size</th>
+                      <th>Sets Available</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {questionBank.map((row, idx) => (
+                      <tr key={idx}>
+                        <td>{row.difficulty}</td>
+                        <td>{row.topic}</td>
+                        <td>{row.set_size}</td>
+                        <td>{row.sets_available}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}  
 
         <h3>Total Questions: {totalQuestions}</h3>
 
