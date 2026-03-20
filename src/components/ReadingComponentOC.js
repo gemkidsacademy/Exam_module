@@ -93,7 +93,7 @@ export default function ReadingComponentOC({
 
   try {
     const res = await fetch(
-      `${API_BASE}/api/exams/review-oc-reading-new?session_id=${attemptId}`
+      `${API_BASE}/api/exams/review-oc-reading?session_id=${attemptId}`
     );
 
     if (!res.ok) {
