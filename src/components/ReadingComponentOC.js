@@ -214,7 +214,7 @@ export default function ReadingComponentOC({
   const loadExam = async () => {
     // 1️⃣ Start / resume attempt
     const res = await fetch(
-      `${API_BASE}/api/exams/start-oc-reading-new`,
+      `${API_BASE}/api/exams/start-oc-reading`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -358,7 +358,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
 
   try {
     const res = await fetch(
-      `${API_BASE}/api/exams/submit-oc-reading`,
+      `${API_BASE}/api/exams/submit-oc-reading-new`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
