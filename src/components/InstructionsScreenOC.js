@@ -74,7 +74,7 @@ const InstructionsScreenOC = ({ subject, onNext }) => {
 
     <div className="instructions-card">
       <h1 className="instructions-title">
-        Selective High School Placement Practice Test
+        Opportunity Class Placement Test
       </h1>
 
       <h2 className="instructions-subject">{subjectLabel}</h2>
