@@ -19,6 +19,7 @@ export default function ExamPageOCMathematicalReasoning({
   onExamFinish
 }) {
 const studentId = sessionStorage.getItem("student_id");
+const isPopNavigationRef = useRef(false);
 
 const hasSubmittedRef = useRef(false);
 const prevIndexRef = useRef(null);
@@ -99,6 +100,72 @@ const loadReport = useCallback(async () => {
     console.error("❌ loadReport error:", err);
   }
 }, [studentId]);
+useEffect(() => {
+  if (mode !== "exam" || questions.length === 0) return;
+
+  window.history.replaceState(
+    { questionIndex: 0 },
+    "",
+    window.location.href
+  );
+
+  window.history.pushState(
+    { questionIndex: 0 },
+    "",
+    window.location.href
+  );
+}, [mode, questions.length]);
+useEffect(() => {
+  if (mode !== "exam") return;
+
+  if (isPopNavigationRef.current) {
+    isPopNavigationRef.current = false;
+    return;
+  }
+
+  window.history.pushState(
+    { questionIndex: currentIndex },
+    "",
+    window.location.href
+  );
+}, [currentIndex, mode]);
+useEffect(() => {
+  if (mode !== "exam") return;
+
+  const handlePopState = (e) => {
+    const state = e.state;
+
+    // 🔥 CASE 1: On Q1 → block exit
+    if (currentIndex === 0) {
+      if (!showConfirmFinish) {
+        setShowConfirmFinish(true);
+      }
+
+      window.history.replaceState(
+        { questionIndex: 0 },
+        "",
+        window.location.href
+      );
+
+      return;
+    }
+
+    // 🔥 CASE 2: Normal navigation
+    if (!state || typeof state.questionIndex !== "number") {
+      return;
+    }
+
+    isPopNavigationRef.current = true;
+    setCurrentIndex(state.questionIndex);
+  };
+
+  window.addEventListener("popstate", handlePopState);
+
+  return () => {
+    window.removeEventListener("popstate", handlePopState);
+  };
+}, [mode, currentIndex, showConfirmFinish]);
+
 useEffect(() => {
   setExplanation(null);
 }, [currentIndex]);
