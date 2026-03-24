@@ -258,16 +258,16 @@ useEffect(() => {
   const handlePopState = (e) => {
     const state = e.state;
 
-    console.log("LANGUAGE POPSTATE:", state);
+    console.log("POPSTATE:", state);
 
-    // 🔥 User trying to exit (no valid state)
-    if (!state || typeof state.questionIndex !== "number") {
+    // 🔥 CASE 1: User is at Question 1 → block exit
+    if (currentIndex === 0) {
       if (!showConfirmFinish) {
         setShowConfirmFinish(true);
       }
 
-      // restore history so user stays inside
-      window.history.pushState(
+      // 🔥 Keep user inside exam (important)
+      window.history.replaceState(
         { questionIndex: 0 },
         "",
         window.location.href
@@ -276,7 +276,11 @@ useEffect(() => {
       return;
     }
 
-    // 🔥 Normal navigation
+    // 🔥 CASE 2: Normal navigation
+    if (!state || typeof state.questionIndex !== "number") {
+      return;
+    }
+
     isPopNavigationRef.current = true;
     setCurrentIndex(state.questionIndex);
   };
@@ -286,7 +290,7 @@ useEffect(() => {
   return () => {
     window.removeEventListener("popstate", handlePopState);
   };
-}, [mode, showConfirmFinish]);
+}, [mode, currentIndex, showConfirmFinish]);
   
     /* ============================================================
      START / RESUME EXAM
