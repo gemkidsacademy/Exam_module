@@ -39,7 +39,8 @@
      */
     const [mode, setMode] = useState("loading");
     const isReview = mode === "review";
-  
+    
+    const isPopNavigationRef = useRef(false);
     // ---------------- EXAM STATE ----------------
     const [questions, setQuestions] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -168,6 +169,73 @@
     
       return numA === numB;
     }
+    useEffect(() => {
+  if (mode !== "exam" || questions.length === 0) return;
+
+  // 🔥 Step 1: initial state
+  window.history.replaceState(
+    { questionIndex: 0 },
+    "",
+    window.location.href
+  );
+
+  // 🔥 Step 2: buffer state (prevents exit)
+  window.history.pushState(
+    { questionIndex: 0 },
+    "",
+    window.location.href
+  );
+}, [mode, questions.length]);
+useEffect(() => {
+  if (mode !== "exam") return;
+
+  if (isPopNavigationRef.current) {
+    isPopNavigationRef.current = false;
+    return;
+  }
+
+  window.history.pushState(
+    { questionIndex: currentIndex },
+    "",
+    window.location.href
+  );
+}, [currentIndex, mode]);
+useEffect(() => {
+  if (mode !== "exam") return;
+
+  const handlePopState = (e) => {
+    const state = e.state;
+
+    console.log("NUMERACY POPSTATE:", state);
+
+    // 🔥 CASE 1: user tries to exit (no valid state)
+    if (!state || typeof state.questionIndex !== "number") {
+      if (!showConfirmFinish) {
+        setShowConfirmFinish(true);
+      }
+
+      // restore history so user stays
+      window.history.pushState(
+        { questionIndex: 0 },
+        "",
+        window.location.href
+      );
+
+      return;
+    }
+
+    // 🔥 CASE 2: normal navigation
+    isPopNavigationRef.current = true;
+    setCurrentIndex(state.questionIndex);
+  };
+
+  window.addEventListener("popstate", handlePopState);
+
+  return () => {
+    window.removeEventListener("popstate", handlePopState);
+  };
+}, [mode, showConfirmFinish]);
+    
     /* ============================================================
        START / RESUME EXAM
     ============================================================ */
