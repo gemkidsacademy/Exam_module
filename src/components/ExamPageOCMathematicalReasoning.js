@@ -116,8 +116,7 @@ useEffect(() => {
   );
 }, [mode, questions.length]);
 useEffect(() => {
-  if (mode !== "exam") return;
-
+  if (mode !== "exam" || questions.length === 0) return;
   if (isPopNavigationRef.current) {
     isPopNavigationRef.current = false;
     return;
@@ -128,9 +127,9 @@ useEffect(() => {
     "",
     window.location.href
   );
-}, [currentIndex, mode]);
+}, [currentIndex, mode, questions.length]);
 useEffect(() => {
-  if (mode !== "exam") return;
+  if (mode !== "exam" || questions.length === 0) return;
 
   const handlePopState = (e) => {
     const state = e.state;
