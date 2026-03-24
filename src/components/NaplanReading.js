@@ -308,83 +308,7 @@ if (questionType === 5) {
     setMode("report");
   }, [API_BASE, studentId]);
   
-  useEffect(() => {
-  if (mode !== "exam" || flatQuestions.length === 0) return;
-
-  // Replace initial state
-  window.history.replaceState(
-    { questionIndex: 0 },
-    "",
-    window.location.href
-  );
-
-  // Push buffer state
-  window.history.pushState(
-    { questionIndex: 0 },
-    "",
-    window.location.href
-  );
-
-}, [mode, flatQuestions.length]);
-useEffect(() => {
-  if (mode !== "exam") return;
-
-  if (isPopNavigationRef.current) {
-    isPopNavigationRef.current = false;
-    return;
-  }
-
-  window.history.pushState(
-    { questionIndex: currentIndex },
-    "",
-    window.location.href
-  );
-
-}, [currentIndex, mode]);
-useEffect(() => {
-  if (mode !== "exam") return;
-
-  const handlePopState = (e) => {
-    const state = e.state;
-
-    // 🔥 CASE 1: On Q1 → show submit modal
-    if (currentIndex === 0) {
-      if (!showConfirmFinish) {
-        setShowConfirmFinish(true);
-      }
-
-      // Stay on Q1
-      window.history.replaceState(
-        { questionIndex: 0 },
-        "",
-        window.location.href
-      );
-
-      // 🔥 CRITICAL: re-add buffer so user can't escape
-      window.history.pushState(
-        { questionIndex: 0 },
-        "",
-        window.location.href
-      );
-
-      return;
-    }
-
-    // 🔥 CASE 2: Normal navigation
-    if (!state || typeof state.questionIndex !== "number") {
-      return;
-    }
-
-    isPopNavigationRef.current = true;
-    setCurrentIndex(state.questionIndex);
-  };
-
-  window.addEventListener("popstate", handlePopState);
-
-  return () => {
-    window.removeEventListener("popstate", handlePopState);
-  };
-}, [mode, currentIndex, showConfirmFinish]);
+  
   
   /* ============================================================
      START / RESUME EXAM
@@ -495,7 +419,86 @@ useEffect(() => {
     await loadReport();
     onExamFinish?.();
   }, [API_BASE, studentId, answers, loadReport, onExamFinish]);
+  useEffect(() => {
+  if (mode !== "exam" || flatQuestions.length === 0) return;
 
+  // Replace initial state
+  window.history.replaceState(
+    { questionIndex: 0 },
+    "",
+    window.location.href
+  );
+
+  // Push buffer state
+  window.history.pushState(
+    { questionIndex: 0 },
+    "",
+    window.location.href
+  );
+
+}, [mode, flatQuestions.length]);
+
+useEffect(() => {
+  if (mode !== "exam") return;
+
+  if (isPopNavigationRef.current) {
+    isPopNavigationRef.current = false;
+    return;
+  }
+
+  window.history.pushState(
+    { questionIndex: currentIndex },
+    "",
+    window.location.href
+  );
+
+}, [currentIndex, mode]);
+useEffect(() => {
+  if (mode !== "exam") return;
+
+  const handlePopState = (e) => {
+    const state = e.state;
+
+    // 🔥 CASE 1: On Q1 → show submit modal
+    if (currentIndex === 0) {
+      if (!showConfirmFinish) {
+        setShowConfirmFinish(true);
+      }
+
+      // Stay on Q1
+      window.history.replaceState(
+        { questionIndex: 0 },
+        "",
+        window.location.href
+      );
+
+      // 🔥 CRITICAL: re-add buffer so user can't escape
+      window.history.pushState(
+        { questionIndex: 0 },
+        "",
+        window.location.href
+      );
+
+      return;
+    }
+
+    // 🔥 CASE 2: Normal navigation
+    if (!state || typeof state.questionIndex !== "number") {
+      return;
+    }
+
+    isPopNavigationRef.current = true;
+    setCurrentIndex(state.questionIndex);
+  };
+
+  window.addEventListener("popstate", handlePopState);
+
+  return () => {
+    window.removeEventListener("popstate", handlePopState);
+  };
+}, [mode, currentIndex, showConfirmFinish]);
+
+// here123  
   /* ============================================================
      TIMER
   ============================================================ */
