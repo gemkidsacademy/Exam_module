@@ -199,12 +199,21 @@ export default function ReadingComponent({
   useEffect(() => {
   if (!exam || questions.length === 0) return;
 
+  // 🔥 Step 1: set initial state
   window.history.replaceState(
-    { questionIndex: index },
+    { questionIndex: 0 },
+    "",
+    window.location.href
+  );
+
+  // 🔥 Step 2: push buffer state
+  window.history.pushState(
+    { questionIndex: 0 },
     "",
     window.location.href
   );
 }, [exam]);
+    
 useEffect(() => {
   if (!exam || questions.length === 0) return;
 
