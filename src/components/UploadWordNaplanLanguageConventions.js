@@ -6,6 +6,47 @@ export default function UploadWordNaplanLanguageConventions() {
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [deletingDuplicates, setDeletingDuplicates] = useState(false);
+  const handleDeleteDuplicates = async () => {
+  if (uploading) {
+    alert("Upload in progress. Please wait.");
+    return;
+  }
+
+  if (!window.confirm("Are you sure you want to delete duplicate Language Conventions questions?")) {
+    return;
+  }
+
+  setDeletingDuplicates(true);
+  setError(null);
+
+  try {
+    const res = await fetch(
+      "https://web-production-481a5.up.railway.app/delete-all-naplan-numeracy-questions",
+      {
+        method: "POST",
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(
+        data?.detail?.message ||
+        data?.detail ||
+        "Failed to delete duplicates."
+      );
+      return;
+    }
+
+    alert(`✅ ${data.deleted_count || 0} duplicate questions removed.`);
+  } catch (err) {
+    console.error(err);
+    setError("Unexpected error while deleting duplicates.");
+  } finally {
+    setDeletingDuplicates(false);
+  }
+};
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -95,8 +136,20 @@ export default function UploadWordNaplanLanguageConventions() {
           disabled={uploading}
         />
 
-        <button type="submit" disabled={uploading}>
+        
+        <button type="submit" disabled={uploading || deletingDuplicates}>
           {uploading ? "Uploading…" : "Upload Word File"}
+        </button>
+        
+        <button
+          type="button"
+          onClick={handleDeleteDuplicates}
+          disabled={deletingDuplicates || uploading}
+          style={{ marginTop: "10px", background: "#ff4d4f", color: "white" }}
+        >
+          {deletingDuplicates
+            ? "Deleting..."
+            : "Delete Duplicate Questions"}
         </button>
       </form>
 
