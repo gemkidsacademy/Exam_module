@@ -180,6 +180,25 @@ const loadReport = useCallback(async () => {
   }
 }, [studentId]);
 useEffect(() => {
+  if (mode !== "exam") return;
+
+  window.history.replaceState(
+    { questionIndex: 0 },
+    "",
+    ""
+  );
+}, [mode]);
+useEffect(() => {
+  if (mode !== "exam") return;
+
+  window.history.pushState(
+    { questionIndex: currentIndex },
+    "",
+    ""
+  );
+}, [currentIndex, mode]);
+ 
+useEffect(() => {
   setExplanation(null);
 }, [currentIndex]);
 useEffect(() => {
@@ -191,18 +210,15 @@ useEffect(() => {
   if (mode !== "exam") return;
 
   const handlePopState = (e) => {
-    e.preventDefault();
+    const state = e.state;
 
-    // show confirmation modal
-    setShowConfirmFinish(true);
-
-    // push state again so browser can't leave
-    window.history.pushState(null, "", window.location.href);
+    if (state && typeof state.questionIndex === "number") {
+      setCurrentIndex(state.questionIndex);
+    } else {
+      // fallback: go back manually
+      setCurrentIndex((prev) => Math.max(prev - 1, 0));
+    }
   };
-
-  // push TWO states to defeat swipe navigation
-  window.history.pushState(null, "", window.location.href);
-  window.history.pushState(null, "", window.location.href);
 
   window.addEventListener("popstate", handlePopState);
 
