@@ -4,7 +4,8 @@ import styles from "./ThinkingSkillsReview.module.css";
 export default function ThinkingSkillsReview({
   studentId,
   examAttemptId,
-  onLoaded
+  onLoaded,
+  onExit
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
 
