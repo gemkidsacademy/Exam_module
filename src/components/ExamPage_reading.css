@@ -561,3 +561,7 @@
 .reading-content {
   white-space: pre-line;
 }
+
+.stanza {
+  margin-bottom: 14px;
+}
