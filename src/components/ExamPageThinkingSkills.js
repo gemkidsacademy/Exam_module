@@ -17,6 +17,7 @@
    onExamFinish
  }) {
  const studentId = sessionStorage.getItem("student_id");
+ const isPopNavigationRef = useRef(false);
  const formatExplanation = (text) => {
    if (!text) return "";
  
@@ -189,14 +190,19 @@
    );
  }, [mode]);
  useEffect(() => {
-   if (mode !== "exam") return;
- 
-   window.history.pushState(
-     { questionIndex: currentIndex },
-     "",
-     ""
-   );
- }, [currentIndex, mode]);
+  if (mode !== "exam") return;
+
+  if (isPopNavigationRef.current) {
+    isPopNavigationRef.current = false;
+    return;
+  }
+
+  window.history.pushState(
+    { questionIndex: currentIndex },
+    "",
+    ""
+  );
+}, [currentIndex, mode]);
   
  useEffect(() => {
    setExplanation(null);
@@ -217,7 +223,7 @@
     if (!state || typeof state.questionIndex !== "number") {
       return;
     }
-
+    isPopNavigationRef.current = true;
     setCurrentIndex(state.questionIndex);
   };
 
