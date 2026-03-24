@@ -26,9 +26,10 @@ export default function NaplanReading({
   const explanationRef = useRef(null);
   
   const [loadingExplanation, setLoadingExplanation] = useState(null);
+  const isPopNavigationRef = useRef(false);
+  
   const handleGenerateExplanationForReading = async (q) => {
   const qid = String(q.question_id);
-  const isPopNavigationRef = useRef(false);
     
 
   // allow regenerate
