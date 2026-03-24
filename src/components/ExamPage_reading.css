@@ -558,3 +558,6 @@
   overflow-y: auto;
   padding-right: 8px;  /* space for scrollbar */
 }
+.reading-content {
+  white-space: pre-line;
+}
