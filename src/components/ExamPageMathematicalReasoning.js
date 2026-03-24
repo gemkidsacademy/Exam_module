@@ -30,6 +30,16 @@ const [loadingExplanation, setLoadingExplanation] = useState(false);
  * - report  → completed attempt
  */
 const [mode, setMode] = useState("loading");
+const handleExitReview = () => {
+  console.log("🔙 Exit Review clicked (MR)");
+
+  setReviewQuestions([]);
+  setCurrentIndex(0);
+  setVisited({});
+  setAnswers({});
+
+  setMode("report");
+};
 const normalizeOptionContent = (content) => {
   if (!content) return { type: "text", content };
 
@@ -372,16 +382,12 @@ if (mode === "review" && reviewQuestions.length === 0) {
           };
         });
 
-        console.log("🧪 REVIEW QUESTION SAMPLE (normalized)", {
-          q_id: normalized[0]?.q_id,
-          student_answer: normalized[0]?.student_answer,
-          correct_answer: normalized[0]?.correct_answer,
-          blocks: normalized[0]?.blocks
-        });
-
         setReviewQuestions(normalized);
         setCurrentIndex(0);
       }}
+
+      onExit={handleExitReview}   // 🔥 ADD THIS LINE
+
     />
   );
 }
@@ -402,15 +408,23 @@ return (
 
     {/* HEADER */}
     <div className="exam-header">
-      {mode === "exam" && (
-        <div className="timer">⏳ {formatTime(timeLeft)}</div>
-      )}
-
-      <div className="counter">
-        Question {currentIndex + 1} / {activeQuestions.length}
-
-      </div>
-    </div>
+     {mode === "exam" && (
+       <div className="timer">⏳ {formatTime(timeLeft)}</div>
+     )}
+   
+     <div className="counter">
+       Question {currentIndex + 1} / {activeQuestions.length}
+     </div>
+   
+     {mode === "review" && (
+       <button
+         className="exit-review-btn"
+         onClick={handleExitReview}
+       >
+         Exit Review
+       </button>
+     )}
+   </div>
 
     {/* QUESTION INDEX */}
     <div className="index-row">
