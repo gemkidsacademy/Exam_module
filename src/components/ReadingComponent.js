@@ -663,7 +663,11 @@ const currentQuestion = questions[index];
             )}
 
             {rm.content && (
-              <p className="reading-content">{rm.content}</p>
+              <div className="reading-content">
+                {rm.content.split("\n").map((line, i) => (
+                  <p key={i}>{line}</p>
+                ))}
+              </div>
             )}
 
             {rm.paragraphs &&
