@@ -2,7 +2,8 @@ import { useEffect } from "react";
 
 export default function MathematicalReasoningReview({
   studentId,
-  onLoaded
+  onLoaded,
+  onExit
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
 
