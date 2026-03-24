@@ -7,6 +7,7 @@ export default function UploadWord() {
   const [summary, setSummary] = useState(null);
   const [exams, setExams] = useState([]);
   const [error, setError] = useState(null);
+  const [deletingDuplicates, setDeletingDuplicates] = useState(false);
 
   // -----------------------------
   // File selection
@@ -17,6 +18,37 @@ export default function UploadWord() {
     setExams([]);
     setError(null);
   };
+  const handleDeleteDuplicates = async () => {
+  if (!window.confirm("Are you sure you want to delete duplicate questions?")) {
+    return;
+  }
+
+  setDeletingDuplicates(true);
+  setError(null);
+
+  try {
+    const res = await fetch(
+      "https://web-production-481a5.up.railway.app/delete-duplicate-questions",
+      {
+        method: "POST",
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(data?.detail || "Failed to delete duplicates.");
+      return;
+    }
+
+    alert(`✅ ${data.deleted_count || 0} duplicate questions removed.`);
+  } catch (err) {
+    console.error(err);
+    setError("Unexpected error while deleting duplicates.");
+  } finally {
+    setDeletingDuplicates(false);
+  }
+};
 
   // -----------------------------
   // Upload handler
@@ -88,7 +120,16 @@ export default function UploadWord() {
         <button type="submit" disabled={uploading}>
           {uploading ? "Uploading..." : "Upload Word File"}
         </button>
-
+        <button
+        type="button"
+        onClick={handleDeleteDuplicates}
+        disabled={deletingDuplicates}
+        style={{ marginTop: "10px", background: "#ff4d4f", color: "white" }}
+      >
+        {deletingDuplicates
+          ? "Deleting..."
+          : "Delete Duplicate Questions"}
+      </button>
         {uploading && (
           <div className="upload-hint">
             ⏳ Please wait… validating and processing your document.
