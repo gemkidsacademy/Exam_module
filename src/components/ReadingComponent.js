@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import "./ExamPage_reading.css";
 import ReadingReview from "./ReadingReview";
 
@@ -22,7 +22,7 @@ export default function ReadingComponent({
   const [exam, setExam] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
-
+  const isPopNavigationRef = useRef(false);
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
   const [finished, setFinished] = useState(false);
@@ -196,6 +196,67 @@ export default function ReadingComponent({
   /* =============================
      LOAD EXAM
   ============================= */
+  useEffect(() => {
+  if (!exam || questions.length === 0) return;
+
+  window.history.replaceState(
+    { questionIndex: index },
+    "",
+    window.location.href
+  );
+}, [exam]);
+useEffect(() => {
+  if (!exam || questions.length === 0) return;
+
+  if (isPopNavigationRef.current) {
+    isPopNavigationRef.current = false;
+    return;
+  }
+
+  window.history.pushState(
+    { questionIndex: index },
+    "",
+    window.location.href
+  );
+}, [index]);
+useEffect(() => {
+  if (!exam || questions.length === 0) return;
+
+  const handlePopState = (e) => {
+    const state = e.state;
+
+    console.log("READING POPSTATE:", state);
+
+    // 🔥 First question → show modal
+    if (index === 0) {
+      if (!showSubmitConfirm) {
+        setShowSubmitConfirm(true);
+      }
+
+      window.history.replaceState(
+        { questionIndex: 0 },
+        "",
+        window.location.href
+      );
+
+      return;
+    }
+
+    // 🔥 Normal navigation
+    if (!state || typeof state.questionIndex !== "number") {
+      return;
+    }
+
+    isPopNavigationRef.current = true;
+    setIndex(state.questionIndex);
+  };
+
+  window.addEventListener("popstate", handlePopState);
+
+  return () => {
+    window.removeEventListener("popstate", handlePopState);
+  };
+}, [index, showSubmitConfirm, exam]);
   useEffect(() => {
   console.log("🧠 STATE UPDATED", {
     exam,
