@@ -222,9 +222,25 @@
 
     console.log("POPSTATE:", state);
 
+    // 🔥 CASE 1: user tries to go back from Q1 → block + show modal
+    if (currentIndex === 0) {
+      setShowConfirmFinish(true);
+
+      // restore history so user stays on page
+      window.history.pushState(
+        { questionIndex: 0 },
+        "",
+        window.location.href
+      );
+
+      return;
+    }
+
+    // 🔥 CASE 2: normal navigation
     if (!state || typeof state.questionIndex !== "number") {
       return;
     }
+
     isPopNavigationRef.current = true;
     setCurrentIndex(state.questionIndex);
   };
@@ -234,7 +250,7 @@
   return () => {
     window.removeEventListener("popstate", handlePopState);
   };
-}, [mode]);
+}, [mode, currentIndex]);
   
  useEffect(() => {
    if (!studentId) return;
