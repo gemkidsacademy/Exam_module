@@ -17,6 +17,7 @@ export default function ExamPageOcThinkingSkills({
   onExamFinish
 }) {
 const studentId = sessionStorage.getItem("student_id");
+const isPopNavigationRef = useRef(false);
 const formatExplanation = (text) => {
   if (!text) return "";
 
@@ -188,29 +189,70 @@ useEffect(() => {
 
  
 useEffect(() => {
+  if (mode !== "exam" || questions.length === 0) return;
+
+  window.history.replaceState(
+    { questionIndex: 0 },
+    "",
+    window.location.href
+  );
+
+  window.history.pushState(
+    { questionIndex: 0 },
+    "",
+    window.location.href
+  );
+}, [mode, questions.length]);
+ useEffect(() => {
+  if (mode !== "exam") return;
+
+  if (isPopNavigationRef.current) {
+    isPopNavigationRef.current = false;
+    return;
+  }
+
+  window.history.pushState(
+    { questionIndex: currentIndex },
+    "",
+    window.location.href
+  );
+}, [currentIndex, mode]);
+ useEffect(() => {
   if (mode !== "exam") return;
 
   const handlePopState = (e) => {
-    e.preventDefault();
+    const state = e.state;
 
-    // show confirmation modal
-    setShowConfirmFinish(true);
+    // 🔥 CASE 1: On Q1 → block exit
+    if (currentIndex === 0) {
+      if (!showConfirmFinish) {
+        setShowConfirmFinish(true);
+      }
 
-    // push state again so browser can't leave
-    window.history.pushState(null, "", window.location.href);
+      window.history.replaceState(
+        { questionIndex: 0 },
+        "",
+        window.location.href
+      );
+
+      return;
+    }
+
+    // 🔥 CASE 2: Normal navigation
+    if (!state || typeof state.questionIndex !== "number") {
+      return;
+    }
+
+    isPopNavigationRef.current = true;
+    setCurrentIndex(state.questionIndex);
   };
-
-  // push TWO states to defeat swipe navigation
-  window.history.pushState(null, "", window.location.href);
-  window.history.pushState(null, "", window.location.href);
 
   window.addEventListener("popstate", handlePopState);
 
   return () => {
     window.removeEventListener("popstate", handlePopState);
   };
-}, [mode]);
- 
+}, [mode, currentIndex, showConfirmFinish]);
 useEffect(() => {
   if (!studentId) return;
 
@@ -851,3 +893,4 @@ return (
   </div>
 );
 }
+
