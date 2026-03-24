@@ -6,6 +6,47 @@ export default function UploadWordNaplanNumeracy() {
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [deletingAll, setDeletingAll] = useState(false);
+  const handleDeleteAllQuestions = async () => {
+  if (uploading) {
+    alert("Upload in progress. Please wait.");
+    return;
+  }
+
+  if (!window.confirm("Are you sure you want to delete ALL numeracy questions? This cannot be undone.")) {
+    return;
+  }
+
+  setDeletingAll(true);
+  setError(null);
+
+  try {
+    const res = await fetch(
+      "https://web-production-481a5.up.railway.app/delete-all-naplan-numeracy-questions",
+      {
+        method: "POST",
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(
+        data?.detail?.message ||
+        data?.detail ||
+        "Failed to delete questions."
+      );
+      return;
+    }
+
+    alert(`✅ ${data.deleted_count || 0} questions deleted.`);
+  } catch (err) {
+    console.error(err);
+    setError("Unexpected error while deleting questions.");
+  } finally {
+    setDeletingAll(false);
+  }
+};
 
   const handleFileChange = (e) => {
   const file = e.target.files[0];
@@ -101,8 +142,16 @@ export default function UploadWordNaplanNumeracy() {
           disabled={uploading}
         />
 
-        <button type="submit" disabled={uploading}>
+        <button type="submit" disabled={uploading || deletingAll}>
           {uploading ? "Uploading…" : "Upload Word File"}
+        </button>
+        <button
+          type="button"
+          onClick={handleDeleteAllQuestions}
+          disabled={deletingAll || uploading}
+          style={{ marginTop: "10px", background: "#d32f2f", color: "white" }}
+        >
+          {deletingAll ? "Deleting..." : "Delete All Questions"}
         </button>
       </form>
 
@@ -134,9 +183,7 @@ export default function UploadWordNaplanNumeracy() {
           <p>
             <strong>Status:</strong> {result.status}
           </p>
-          <p>
-            <strong>Status:</strong> {result.status}
-          </p>
+          
           <p>
             <strong>Saved Questions:</strong> {result.summary?.saved ?? 0}
           </p>
