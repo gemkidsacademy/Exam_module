@@ -1213,3 +1213,13 @@ progress::-moz-progress-bar {
   font-size: 15px;
   font-weight: 600;
 }
+.examHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rightHeader {
+  display: flex;
+  align-items: center;
+}
