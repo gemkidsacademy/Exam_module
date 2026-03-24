@@ -151,7 +151,7 @@ export default function UploadWordNaplanNumeracy() {
           disabled={deletingAll || uploading}
           style={{ marginTop: "10px", background: "#d32f2f", color: "white" }}
         >
-          {deletingAll ? "Deleting..." : "Delete All Questions"}
+          {deletingAll ? "Deleting..." : "Delete duplicate Questions"}
         </button>
       </form>
 
