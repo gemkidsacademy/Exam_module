@@ -662,14 +662,24 @@ const currentQuestion = questions[index];
               </div>
             )}
 
-            {rm.content && (
+            {rm.content && typeof rm.content === "string" && (
               <div className="reading-content">
-                {rm.content.split("\n").map((line, i) => (
-                  <p key={i}>{line}</p>
-                ))}
+                {rm.content.split("\n\n").map((block, i) => {
+                  const lines = block.split("\n");
+            
+                  return (
+                    <p key={i}>
+                      {lines.map((line, j) => (
+                        <React.Fragment key={j}>
+                          {line}
+                          {j < lines.length - 1 && <br />}
+                        </React.Fragment>
+                      ))}
+                    </p>
+                  );
+                })}
               </div>
             )}
-
             {rm.paragraphs &&
               Object.entries(rm.paragraphs).map(([num, text]) => (
                 <p key={num} className="reading-paragraph">
