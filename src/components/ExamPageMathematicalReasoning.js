@@ -22,7 +22,7 @@ const hasSubmittedRef = useRef(false);
 const prevIndexRef = useRef(null);
 const [explanation, setExplanation] = useState(null);
 const [loadingExplanation, setLoadingExplanation] = useState(false);
-
+const isPopNavigationRef = useRef(false);
 /**
  * mode:
  * - loading → deciding what to show
@@ -107,6 +107,68 @@ const loadReport = useCallback(async () => {
     console.error("❌ loadReport error:", err);
   }
 }, [studentId]);
+useEffect(() => {
+  if (mode !== "exam") return;
+
+  window.history.replaceState(
+    { questionIndex: currentIndex },
+    "",
+    window.location.href
+  );
+}, [mode]);
+useEffect(() => {
+  if (mode !== "exam") return;
+
+  if (isPopNavigationRef.current) {
+    isPopNavigationRef.current = false;
+    return;
+  }
+
+  window.history.pushState(
+    { questionIndex: currentIndex },
+    "",
+    window.location.href
+  );
+}, [currentIndex, mode]);
+useEffect(() => {
+  if (mode !== "exam") return;
+
+  const handlePopState = (e) => {
+    const state = e.state;
+
+    console.log("POPSTATE:", state);
+
+    // 🔥 Block exit on first question
+    if (currentIndex === 0) {
+      if (!showConfirmFinish) {
+        setShowConfirmFinish(true);
+      }
+
+      window.history.replaceState(
+        { questionIndex: 0 },
+        "",
+        window.location.href
+      );
+
+      return;
+    }
+
+    // 🔥 Normal navigation
+    if (!state || typeof state.questionIndex !== "number") {
+      return;
+    }
+
+    isPopNavigationRef.current = true;
+    setCurrentIndex(state.questionIndex);
+  };
+
+  window.addEventListener("popstate", handlePopState);
+
+  return () => {
+    window.removeEventListener("popstate", handlePopState);
+  };
+}, [mode, currentIndex, showConfirmFinish]);
+ 
 useEffect(() => {
   setExplanation(null);
 }, [currentIndex]);
