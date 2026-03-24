@@ -184,10 +184,10 @@
    if (mode !== "exam") return;
  
    window.history.replaceState(
-     { questionIndex: 0 },
-     "",
-     ""
-   );
+    { questionIndex: 0 },
+    "",
+    window.location.href
+  );
  }, [mode]);
  useEffect(() => {
   if (mode !== "exam") return;
@@ -200,9 +200,11 @@
   window.history.pushState(
     { questionIndex: currentIndex },
     "",
-    ""
+    window.location.href
   );
 }, [currentIndex, mode]);
+ 
+ 
   
  useEffect(() => {
    setExplanation(null);
