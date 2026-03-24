@@ -208,14 +208,14 @@ useEffect(() => {
 
     console.log("NUMERACY POPSTATE:", state);
 
-    // 🔥 CASE 1: user tries to exit (no valid state)
-    if (!state || typeof state.questionIndex !== "number") {
+    // 🔥 CASE 1: User is at Q1 → block exit
+    if (currentIndex === 0) {
       if (!showConfirmFinish) {
         setShowConfirmFinish(true);
       }
 
-      // restore history so user stays
-      window.history.pushState(
+      // keep user inside exam
+      window.history.replaceState(
         { questionIndex: 0 },
         "",
         window.location.href
@@ -224,7 +224,11 @@ useEffect(() => {
       return;
     }
 
-    // 🔥 CASE 2: normal navigation
+    // 🔥 CASE 2: Normal navigation
+    if (!state || typeof state.questionIndex !== "number") {
+      return;
+    }
+
     isPopNavigationRef.current = true;
     setCurrentIndex(state.questionIndex);
   };
@@ -234,7 +238,8 @@ useEffect(() => {
   return () => {
     window.removeEventListener("popstate", handlePopState);
   };
-}, [mode, showConfirmFinish]);
+}, [mode, currentIndex, showConfirmFinish]);
+    
     
     /* ============================================================
        START / RESUME EXAM
