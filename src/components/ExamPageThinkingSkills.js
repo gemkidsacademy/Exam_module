@@ -430,26 +430,29 @@
  }
   
  if (mode === "review" && questions.length === 0) {
-   return (
-     <ThinkingSkillsReview
-       studentId={studentId}
-       examAttemptId={examAttemptId}
-       onLoaded={(qs) => {
- 
-        console.log("REVIEW QUESTIONS RECEIVED IN PARENT", qs);
-      
-        if (qs.length > 0) {
-          console.log("FIRST REVIEW QUESTION OPTIONS", qs[0].options);
-        }
-      
+  return (
+    <ThinkingSkillsReview
+      studentId={studentId}
+      examAttemptId={examAttemptId}
+      onLoaded={(qs) => {
         setQuestions(qs);
         setCurrentIndex(0);
         setVisited({});
         setAnswers({});
       }}
-     />
-   );
- }
+      onExit={() => {
+        // 🔥 reset review state
+        setQuestions([]);
+        setCurrentIndex(0);
+        setVisited({});
+        setAnswers({});
+
+        // 🔥 go back to report
+        setMode("report");
+      }}
+    />
+  );
+}
  
  // ---------------- EXAM UI ----------------
  const currentQ = activeQuestions[currentIndex];
@@ -474,13 +477,30 @@
  
      {/* HEADER */}
      <div className={styles.examHeader}>
-       {!isReview && (
-         <div className="timer">⏳ {formatTime(timeLeft)}</div>
-       )}
- 
-       <div className="counter">
-         Question {currentIndex + 1} / {activeQuestions.length}
-       </div>
+           {!isReview && (
+             <div className="timer">⏳ {formatTime(timeLeft)}</div>
+           )}
+     
+           <div className="counter">
+             Question {currentIndex + 1} / {activeQuestions.length}
+           </div>
+           {isReview && (
+        <button
+          className="exit-review-btn"
+          onClick={() => {
+            console.log("🔙 Exit Review clicked");
+    
+            setQuestions([]);
+            setCurrentIndex(0);
+            setVisited({});
+            setAnswers({});
+    
+            setMode("report");
+          }}
+        >
+          Exit Review
+        </button>
+      )}
      </div>
  
      {/* QUESTION INDEX */}
