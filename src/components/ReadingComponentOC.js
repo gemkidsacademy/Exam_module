@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import "./ExamPage_reading.css";   
 import ReadingReviewOC from "./ReadingReviewOC";   
 
@@ -8,6 +8,7 @@ export default function ReadingComponentOC({
     onExamFinish
   }) {
   const API_BASE = process.env.REACT_APP_API_URL;
+  const isPopNavigationRef = useRef(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   console.log("🔗 API_BASE:", API_BASE);
   if (!API_BASE) {
@@ -314,7 +315,73 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
   return () => clearInterval(t);
 }, [timeLeft, finished]);
 
+  useEffect(() => {
+  if (mode !== "exam" || questions.length === 0) return;
 
+  window.history.replaceState(
+    { questionIndex: 0 },
+    "",
+    window.location.href
+  );
+
+  window.history.pushState(
+    { questionIndex: 0 },
+    "",
+    window.location.href
+  );
+}, [mode, questions.length]);
+    useEffect(() => {
+  if (mode !== "exam" || questions.length === 0) return;
+
+  if (isPopNavigationRef.current) {
+    isPopNavigationRef.current = false;
+    return;
+  }
+
+  window.history.pushState(
+    { questionIndex: index },
+    "",
+    window.location.href
+  );
+}, [index, mode, questions.length]);
+
+    useEffect(() => {
+  if (mode !== "exam" || questions.length === 0) return;
+
+  const handlePopState = (e) => {
+    const state = e.state;
+
+    // 🔥 CASE 1: On Q1 → block exit
+    if (index === 0) {
+      if (!showSubmitConfirm) {
+        setShowSubmitConfirm(true);
+      }
+
+      window.history.replaceState(
+        { questionIndex: 0 },
+        "",
+        window.location.href
+      );
+
+      return;
+    }
+
+    // 🔥 CASE 2: Normal navigation
+    if (!state || typeof state.questionIndex !== "number") {
+      return;
+    }
+
+    isPopNavigationRef.current = true;
+    setIndex(state.questionIndex);
+  };
+
+  window.addEventListener("popstate", handlePopState);
+
+  return () => {
+    window.removeEventListener("popstate", handlePopState);
+  };
+}, [mode, index, showSubmitConfirm, questions.length]);
+    
   /* =============================
      GROUP QUESTIONS BY TOPIC
   ============================= */
