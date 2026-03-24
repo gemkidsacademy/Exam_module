@@ -5,7 +5,43 @@ export default function UploadWordReadingUnified() {
   const [wordFile, setWordFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState(null);
+  const [deletingDuplicates, setDeletingDuplicates] = useState(false);
   const [error, setError] = useState(null);
+  const handleDeleteDuplicates_readingUnified = async () => {
+  if (!window.confirm("Are you sure you want to delete duplicate questions?")) {
+    return;
+  }
+
+  setDeletingDuplicates(true);
+  setError(null); // assuming you already have error state
+
+  try {
+    const res = await fetch(
+      "https://web-production-481a5.up.railway.app/delete-duplicate-questions-selective-reading",
+      {
+        method: "POST",
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(
+        data?.detail?.message ||
+        data?.detail ||
+        "Failed to delete duplicates."
+      );
+      return;
+    }
+
+    alert(`✅ ${data.deleted_count || 0} duplicate questions removed.`);
+  } catch (err) {
+    console.error(err);
+    setError("Unexpected error while deleting duplicates.");
+  } finally {
+    setDeletingDuplicates(false);
+  }
+};
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -114,6 +150,16 @@ export default function UploadWordReadingUnified() {
 
         <button type="submit" disabled={uploading}>
           {uploading ? "Uploading…" : "Upload Word File"}
+        </button>
+        <button
+          type="button"
+          onClick={handleDeleteDuplicates_readingUnified}
+          disabled={deletingDuplicates}
+          style={{ marginTop: "10px", background: "#ff4d4f", color: "white" }}
+        >
+          {deletingDuplicates
+            ? "Deleting..."
+            : "Delete Duplicate Questions"}
         </button>
       </form>
       {uploading && (
