@@ -22,6 +22,7 @@ export default function NaplanLanguageConventions({
   const studentId = sessionStorage.getItem("student_id");
   const API_BASE = process.env.REACT_APP_API_URL;
   const TYPE_2_MAX_SELECTIONS = 2;
+  const isPopNavigationRef = useRef(false);
 
   if (!API_BASE) {
     throw new Error("❌ REACT_APP_API_URL is not defined");
@@ -220,8 +221,74 @@ export default function NaplanLanguageConventions({
     setMode("report");
   }, [API_BASE, studentId]);
   
+  useEffect(() => {
+  if (mode !== "exam" || questions.length === 0) return;
 
-  /* ============================================================
+  // 🔥 Step 1: initial state
+  window.history.replaceState(
+    { questionIndex: 0 },
+    "",
+    window.location.href
+  );
+
+  // 🔥 Step 2: buffer (prevents exit on back)
+  window.history.pushState(
+    { questionIndex: 0 },
+    "",
+    window.location.href
+  );
+}, [mode, questions.length]);
+useEffect(() => {
+  if (mode !== "exam") return;
+
+  if (isPopNavigationRef.current) {
+    isPopNavigationRef.current = false;
+    return;
+  }
+
+  window.history.pushState(
+    { questionIndex: currentIndex },
+    "",
+    window.location.href
+  );
+}, [currentIndex, mode]);
+useEffect(() => {
+  if (mode !== "exam") return;
+
+  const handlePopState = (e) => {
+    const state = e.state;
+
+    console.log("LANGUAGE POPSTATE:", state);
+
+    // 🔥 User trying to exit (no valid state)
+    if (!state || typeof state.questionIndex !== "number") {
+      if (!showConfirmFinish) {
+        setShowConfirmFinish(true);
+      }
+
+      // restore history so user stays inside
+      window.history.pushState(
+        { questionIndex: 0 },
+        "",
+        window.location.href
+      );
+
+      return;
+    }
+
+    // 🔥 Normal navigation
+    isPopNavigationRef.current = true;
+    setCurrentIndex(state.questionIndex);
+  };
+
+  window.addEventListener("popstate", handlePopState);
+
+  return () => {
+    window.removeEventListener("popstate", handlePopState);
+  };
+}, [mode, showConfirmFinish]);
+  
+    /* ============================================================
      START / RESUME EXAM
   ============================================================ */
   useEffect(() => {
