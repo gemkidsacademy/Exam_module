@@ -215,11 +215,12 @@
 
       // 🔴 No ACTIVE exam → exam is completed → load result
       if (res.status === 404) {
-      console.log("🟡 No active exam → checking for result");
-    
-      const resultRes = await fetch(
-        `${API_BASE}/api/exams/writing/result?student_id=${studentId}`
-      );
+        console.log("No active exam → starting new exam");
+      
+        await startExam();
+      
+        return init();  // reload flow
+      }
     
       // 🔴 Completed exam exists
       if (resultRes.ok) {
