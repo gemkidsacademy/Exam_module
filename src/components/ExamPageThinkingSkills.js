@@ -473,6 +473,11 @@ if (mode === "review" && questions.length === 0) {
    <ThinkingSkillsReview
      studentId={studentId}
      examAttemptId={examAttemptId}
+     attempts={attempts}
+     onAttemptChange={(id) => {
+       setExamAttemptId(id);
+       setQuestions([]); // 🔥 force reload
+     }}
      onLoaded={(qs) => {
        setQuestions(qs);
        setCurrentIndex(0);
