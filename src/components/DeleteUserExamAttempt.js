@@ -5,7 +5,7 @@ const DeleteUserExamAttempt = ({ onClose }) => {
   const [studentsList, setStudentsList] = useState([]);
 
   const [selectedStudentId, setSelectedStudentId] = useState("");
-  const [selectedStudentName, setSelectedStudentName] = useState("");
+  
 
   const [selectedClassType, setSelectedClassType] = useState("");
   const [examOptionsList, setExamOptionsList] = useState([]);
@@ -16,7 +16,7 @@ const DeleteUserExamAttempt = ({ onClose }) => {
   ============================ */
   const fetchStudentsFromBackend = async () => {
     try {
-      const response = await fetch("https://web-production-481a5.up.railway.app/api/admin/students"); // adjust later
+      const response = await fetch("https://web-production-481a5.up.railway.app/api/students/basic"); // adjust later
       const data = await response.json();
 
       setStudentsList(data);
@@ -36,14 +36,15 @@ const DeleteUserExamAttempt = ({ onClose }) => {
     const studentId = event.target.value;
 
     const matchedStudent = studentsList.find(
-      (studentItem) => String(studentItem.id) === String(studentId)
+      (studentItem) => String(studentItem.student_id) === String(studentId)
     );
 
     setSelectedStudentId(studentId);
-    setSelectedStudentName(matchedStudent?.name || "");
-    setSelectedClassType(matchedStudent?.class_type || "");
+    setSelectedExamType("");
+    
+    setSelectedClassType(matchedStudent?.class_name || "");
 
-    updateExamOptionsBasedOnClass(matchedStudent?.class_type);
+    updateExamOptionsBasedOnClass(matchedStudent?.class_name);
   };
 
   /* ============================
@@ -106,7 +107,7 @@ const DeleteUserExamAttempt = ({ onClose }) => {
       <select value={selectedStudentId} onChange={handleStudentChange}>
         <option value="">Select Student</option>
         {studentsList.map((studentItem) => (
-          <option key={studentItem.id} value={studentItem.id}>
+          <option key={studentItem.id} value={studentItem.student_id}>
             {studentItem.name}
           </option>
         ))}
