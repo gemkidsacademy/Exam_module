@@ -856,10 +856,11 @@ return (
       Selective Thinking Skills Test 
     </h2>
     <select
+      className="attempt-dropdown"
       value={report.exam_attempt_id}
       onChange={(e) => {
         const id = Number(e.target.value);
-        onAttemptChange(id);   // 👈 we’ll define this
+        onAttemptChange(id);
       }}
     >
       {attempts.map((a) => (
