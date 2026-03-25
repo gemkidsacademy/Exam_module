@@ -1,0 +1,95 @@
+/* ===== Modal Container ===== */
+.modal {
+  width: 500px;
+  margin: 60px auto;
+  padding: 30px 35px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ===== Title ===== */
+.modal h2 {
+  margin-bottom: 25px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  color: #222;
+}
+
+/* ===== Form Layout ===== */
+.modal label {
+  display: block;
+  margin-bottom: 6px;
+  margin-top: 15px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #444;
+}
+
+/* ===== Inputs & Dropdowns ===== */
+.modal input,
+.modal select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #dcdcdc;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background-color: #fafafa;
+}
+
+/* Focus effect */
+.modal input:focus,
+.modal select:focus {
+  outline: none;
+  border-color: #4a90e2;
+  background-color: #fff;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.15);
+}
+
+/* Readonly field style */
+.modal input[readonly] {
+  background-color: #f1f1f1;
+  color: #666;
+  cursor: not-allowed;
+}
+
+/* ===== Button Container ===== */
+.modal .button-group {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 25px;
+  gap: 10px;
+}
+
+/* ===== Buttons ===== */
+.modal button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Delete Button */
+.modal button:first-child {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.modal button:first-child:hover {
+  background-color: #c0392b;
+}
+
+/* Cancel Button */
+.modal button:last-child {
+  background-color: #ecf0f1;
+  color: #333;
+}
+
+.modal button:last-child:hover {
+  background-color: #d0d7de;
+}
