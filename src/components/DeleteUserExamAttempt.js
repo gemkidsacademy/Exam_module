@@ -84,7 +84,7 @@ const DeleteUserExamAttempt = ({ onClose }) => {
   ============================ */
   const handleDeleteExamAttemptClick = async () => {
     try {
-      await fetch("/api/delete-exam-attempt", {
+      await fetch("https://web-production-481a5.up.railway.app/api/delete-exam-attempt", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
