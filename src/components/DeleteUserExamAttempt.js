@@ -143,12 +143,12 @@ const DeleteUserExamAttempt = ({ onClose }) => {
       {/* ============================
           ACTION BUTTONS
       ============================ */}
-      <div style={{ marginTop: "20px" }}>
+      <div className="button-group">
         <button onClick={handleDeleteExamAttemptClick}>
           Delete Exam Attempt
         </button>
-
-        <button onClick={onClose} style={{ marginLeft: "10px" }}>
+      
+        <button onClick={onClose}>
           Cancel
         </button>
       </div>
