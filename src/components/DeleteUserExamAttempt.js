@@ -16,7 +16,7 @@ const DeleteUserExamAttempt = ({ onClose }) => {
   ============================ */
   const fetchStudentsFromBackend = async () => {
     try {
-      const response = await fetch("/api/students"); // adjust later
+      const response = await fetch("https://web-production-481a5.up.railway.app/api/admin/students"); // adjust later
       const data = await response.json();
 
       setStudentsList(data);
