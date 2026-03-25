@@ -8,7 +8,10 @@ export default function ThinkingSkillsReview({
   onExit
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
-
+  
+useEffect(() => {
+  console.log("🧠 Review received examAttemptId:", examAttemptId);
+}, [examAttemptId]);  
   useEffect(() => {
     if (!studentId || !examAttemptId) return;
 
