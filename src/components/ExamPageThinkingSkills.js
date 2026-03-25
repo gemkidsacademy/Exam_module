@@ -326,39 +326,57 @@ useEffect(() => {
    FINISH EXAM (SUBMIT ONLY — NO UI DECISIONS)
 ============================================================ */
 const finishExam = useCallback(
-async (reason = "submitted") => {
-  if (hasSubmittedRef.current) return;
-  hasSubmittedRef.current = true;
-  if (!examAttemptId) {
-     console.error("❌ Missing examAttemptId");
-     return;
-   }
-  const payload = {
-    student_id: studentId,
-    exam_attempt_id: examAttemptId,   // 👈 ADD THIS
-    answers
-  };
+  async (reason = "submitted") => {
+    console.log("🚀 finishExam called", {
+      reason,
+      examAttemptId,
+      studentId
+    });
 
-  try {
-    await fetch(
-      `${API_BASE}/api/student/finish-exam/thinking-skills`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      }
-    );
+    if (hasSubmittedRef.current) return;
+    hasSubmittedRef.current = true;
 
-    await loadReport();
+    if (!examAttemptId) {
+      console.error("❌ Missing examAttemptId");
+      return;
+    }
 
-    // ✅ notify parent
-    onExamFinish?.();
+    console.log("📦 Preparing payload...");
 
-  } catch (err) {
-    console.error("❌ finish-exam error:", err);
-  }
-},
-[studentId, answers, loadReport, onExamFinish,examAttemptId]
+    const payload = {
+      student_id: studentId,
+      exam_attempt_id: examAttemptId,
+      answers
+    };
+
+    console.log("📤 Payload:", payload);
+
+    try {
+      console.log("🌐 Calling finish-exam API...");
+
+      const response = await fetch(
+        `${API_BASE}/api/student/finish-exam/thinking-skills`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }
+      );
+
+      console.log("✅ finish-exam response status:", response.status);
+
+      console.log("📊 Loading report after submission...");
+      await loadReport();
+
+      console.log("✅ Report loaded");
+
+      onExamFinish?.();
+
+    } catch (err) {
+      console.error("❌ finish-exam error:", err);
+    }
+  },
+  [studentId, answers, loadReport, onExamFinish, examAttemptId]
 );
 
 /* ============================================================
