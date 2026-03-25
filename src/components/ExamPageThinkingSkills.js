@@ -20,6 +20,17 @@ export default function ExamPageThinkingSkills({
 const studentId = sessionStorage.getItem("student_id");
 const [attempts, setAttempts] = useState([]);
 const isPopNavigationRef = useRef(false);
+const loadAttempts = useCallback(async () => {
+  const res = await fetch(
+    `${API_BASE}/api/student/exam-attempts/thinking-skills?student_id=${studentId}`
+  );
+
+  const data = await res.json();
+
+  console.log("ATTEMPTS API RESPONSE:", data);
+
+  setAttempts(Array.isArray(data) ? data : []);
+}, [studentId]);
 const formatExplanation = (text) => {
   if (!text) return "";
 
@@ -185,16 +196,8 @@ const loadReport = useCallback(async (attemptId = null) => {
  }
 }, [studentId]);
 useEffect(() => {
- const loadAttempts = async () => {
-   const res = await fetch(
-     `${API_BASE}/api/student/exam-attempts/thinking-skills?student_id=${studentId}`
-   );
-   const data = await res.json();
-   setAttempts(data);
- };
-
- loadAttempts();
-}, []);
+  loadAttempts();
+}, [loadAttempts]);
  
 useEffect(() => {
   if (mode !== "exam") return;
@@ -367,7 +370,7 @@ const finishExam = useCallback(
 
       console.log("📊 Loading report after submission...");
       await loadReport();
-
+      await loadAttempts();
       console.log("✅ Report loaded");
 
       onExamFinish?.();
