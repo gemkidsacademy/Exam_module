@@ -65,7 +65,11 @@
       if (!exam?.question_text) return {};
       return parseWritingPrompt(exam.question_text);
     }, [exam]);
-
+    useEffect(() => {
+      document.addEventListener("contextmenu", e => e.preventDefault());
+      document.addEventListener("copy", e => e.preventDefault());
+      document.addEventListener("cut", e => e.preventDefault());
+    }, []);
     useEffect(() => {
       document.documentElement.style.height = "auto";
       document.body.style.height = "auto";
