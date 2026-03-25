@@ -545,9 +545,10 @@ return (
     >
       {attempts.map((a, index) => (
         <option key={a.exam_attempt_id} value={a.exam_attempt_id}>
-          Attempt {index + 1} — {new Date(a.completed_at).toLocaleString()}
+          {new Date(a.completed_at).toLocaleDateString()}
         </option>
       ))}
+
     </select>
 
     {/* 🔙 EXIT BUTTON */}
