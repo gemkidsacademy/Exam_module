@@ -529,22 +529,46 @@ return (
             Question {currentIndex + 1} / {activeQuestions.length}
           </div>
           {isReview && (
-       <button
-         className="exit-review-btn"
-         onClick={() => {
-           console.log("🔙 Exit Review clicked");
-   
-           setQuestions([]);
-           setCurrentIndex(0);
-           setVisited({});
-           setAnswers({});
-   
-           setMode("report");
-         }}
-       >
-         Exit Review
-       </button>
-     )}
+  <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+    
+    {/* 🔽 ATTEMPT DROPDOWN */}
+    <select
+      value={examAttemptId}
+      onChange={(e) => {
+        const id = Number(e.target.value);
+
+        console.log("🔄 Switching to attempt:", id);
+
+        setExamAttemptId(id);
+        setQuestions([]); // 🔥 triggers reload
+      }}
+    >
+      {attempts.map((a, index) => (
+        <option key={a.exam_attempt_id} value={a.exam_attempt_id}>
+          Attempt {index + 1} — {new Date(a.completed_at).toLocaleString()}
+        </option>
+      ))}
+    </select>
+
+    {/* 🔙 EXIT BUTTON */}
+    <button
+      className="exit-review-btn"
+      onClick={() => {
+        console.log("🔙 Exit Review clicked");
+
+        setQuestions([]);
+        setCurrentIndex(0);
+        setVisited({});
+        setAnswers({});
+
+        setMode("report");
+      }}
+    >
+      Exit Review
+    </button>
+
+  </div>
+)}
     </div>
 
     {/* QUESTION INDEX */}
