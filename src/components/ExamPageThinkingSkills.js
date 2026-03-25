@@ -533,14 +533,12 @@ return (
     
     {/* 🔽 ATTEMPT DROPDOWN */}
     <select
+      className="attempt-dropdown"
       value={examAttemptId}
       onChange={(e) => {
         const id = Number(e.target.value);
-
-        console.log("🔄 Switching to attempt:", id);
-
         setExamAttemptId(id);
-        setQuestions([]); // 🔥 triggers reload
+        setQuestions([]);
       }}
     >
       {attempts.map((a, index) => (
