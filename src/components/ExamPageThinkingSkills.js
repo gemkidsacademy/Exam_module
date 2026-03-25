@@ -284,6 +284,7 @@
      );
  
      const data = await res.json();
+     setExamAttemptId(data.exam_attempt_id);
      // 🔥 ADD THESE LOGS
      console.log("🧪 RAW start-exam response:", data);
      console.log("🧪 QUESTIONS PAYLOAD:", data.questions);
@@ -317,9 +318,13 @@
  async (reason = "submitted") => {
    if (hasSubmittedRef.current) return;
    hasSubmittedRef.current = true;
- 
+   if (!examAttemptId) {
+      console.error("❌ Missing examAttemptId");
+      return;
+    }
    const payload = {
      student_id: studentId,
+     exam_attempt_id: examAttemptId,   // 👈 ADD THIS
      answers
    };
  
@@ -342,7 +347,7 @@
      console.error("❌ finish-exam error:", err);
    }
  },
- [studentId, answers, loadReport, onExamFinish]
+ [studentId, answers, loadReport, onExamFinish,examAttemptId]
  );
  
  /* ============================================================
