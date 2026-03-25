@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+import "./DeleteUserExamAttempt.css";
 const DeleteUserExamAttempt = ({ onClose }) => {
   const [studentsList, setStudentsList] = useState([]);
 
