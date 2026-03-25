@@ -1,6 +1,6 @@
    import React, { useState, useEffect } from "react";
    import { useNavigate } from "react-router-dom";
-   import DeleteUserExamAttempt from "./DeleteUserExamAttempt";
+   import DeleteUserExamAttempt from "./DeleteUserExamAttempt"; 
    
    import StudentExamReports from "./StudentExamReports";
    import SelectiveReadinessOverall from "./SelectiveReadinessOverall";
