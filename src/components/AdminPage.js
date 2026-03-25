@@ -1,5 +1,6 @@
    import React, { useState, useEffect } from "react";
    import { useNavigate } from "react-router-dom";
+   import DeleteUserExamAttempt from "./DeleteUserExamAttempt";
    
    import StudentExamReports from "./StudentExamReports";
    import SelectiveReadinessOverall from "./SelectiveReadinessOverall";
@@ -214,6 +215,13 @@
                    <h3>Delete User</h3>
                    <p>Remove a student account</p>
                  </div>
+                 <div
+                   className="action-card danger"
+                   onClick={() => setUserMode("delete-exam-attempt")}
+                 >
+                   <h3>Delete User Exam Attempt</h3>
+                   <p>Remove a student's exam attempt</p>
+                 </div>
                </div>
              )}
    
@@ -240,6 +248,9 @@
              {userMode === "delete" && (
                <DeleteUserModal onClose={() => setUserMode("menu")} />
              )}
+             {userMode === "delete-exam-attempt" && (
+              <DeleteUserExamAttempt onClose={() => setUserMode("menu")} />
+            )}
          
            </div>
          )}
