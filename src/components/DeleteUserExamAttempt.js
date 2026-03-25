@@ -1,0 +1,158 @@
+import React, { useEffect, useState } from "react";
+
+const DeleteUserExamAttempt = ({ onClose }) => {
+  const [studentsList, setStudentsList] = useState([]);
+
+  const [selectedStudentId, setSelectedStudentId] = useState("");
+  const [selectedStudentName, setSelectedStudentName] = useState("");
+
+  const [selectedClassType, setSelectedClassType] = useState("");
+  const [examOptionsList, setExamOptionsList] = useState([]);
+  const [selectedExamType, setSelectedExamType] = useState("");
+
+  /* ============================
+     FETCH STUDENTS
+  ============================ */
+  const fetchStudentsFromBackend = async () => {
+    try {
+      const response = await fetch("/api/students"); // adjust later
+      const data = await response.json();
+
+      setStudentsList(data);
+    } catch (error) {
+      console.error("❌ Failed to fetch students", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStudentsFromBackend();
+  }, []);
+
+  /* ============================
+     HANDLE STUDENT CHANGE
+  ============================ */
+  const handleStudentChange = (event) => {
+    const studentId = event.target.value;
+
+    const matchedStudent = studentsList.find(
+      (studentItem) => String(studentItem.id) === String(studentId)
+    );
+
+    setSelectedStudentId(studentId);
+    setSelectedStudentName(matchedStudent?.name || "");
+    setSelectedClassType(matchedStudent?.class_type || "");
+
+    updateExamOptionsBasedOnClass(matchedStudent?.class_type);
+  };
+
+  /* ============================
+     SET EXAM OPTIONS
+  ============================ */
+  const updateExamOptionsBasedOnClass = (classType) => {
+    if (classType === "selective" || classType === "oc") {
+      setExamOptionsList([
+        "thinking_skills",
+        "mathematical_reasoning",
+        "reading",
+        "writing",
+      ]);
+    } else if (classType === "naplan") {
+      setExamOptionsList([
+        "numeracy",
+        "language_conventions",
+        "reading",
+        "writing",
+      ]);
+    } else {
+      setExamOptionsList([]);
+    }
+
+    setSelectedExamType("");
+  };
+
+  /* ============================
+     DELETE HANDLER
+  ============================ */
+  const handleDeleteExamAttemptClick = async () => {
+    try {
+      await fetch("/api/delete-exam-attempt", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          student_id: selectedStudentId,
+          exam_type: selectedExamType,
+        }),
+      });
+
+      alert("✅ Exam attempt deleted");
+      onClose();
+    } catch (error) {
+      console.error("❌ Delete failed", error);
+      alert("❌ Failed to delete exam attempt");
+    }
+  };
+
+  return (
+    <div className="modal">
+      <h2>Delete User Exam Attempt</h2>
+
+      {/* ============================
+          STUDENT DROPDOWN
+      ============================ */}
+      <label>Student</label>
+      <select value={selectedStudentId} onChange={handleStudentChange}>
+        <option value="">Select Student</option>
+        {studentsList.map((studentItem) => (
+          <option key={studentItem.id} value={studentItem.id}>
+            {studentItem.name}
+          </option>
+        ))}
+      </select>
+
+      {/* ============================
+          STUDENT ID FIELD (AUTO FILLED)
+      ============================ */}
+      <label>Student ID</label>
+      <input type="text" value={selectedStudentId} readOnly />
+
+      {/* ============================
+          CLASS TYPE (AUTO)
+      ============================ */}
+      <label>Class</label>
+      <input type="text" value={selectedClassType} readOnly />
+
+      {/* ============================
+          EXAM DROPDOWN
+      ============================ */}
+      <label>Exam</label>
+      <select
+        value={selectedExamType}
+        onChange={(e) => setSelectedExamType(e.target.value)}
+      >
+        <option value="">Select Exam</option>
+        {examOptionsList.map((examItem) => (
+          <option key={examItem} value={examItem}>
+            {examItem}
+          </option>
+        ))}
+      </select>
+
+      {/* ============================
+          ACTION BUTTONS
+      ============================ */}
+      <div style={{ marginTop: "20px" }}>
+        <button onClick={handleDeleteExamAttemptClick}>
+          Delete Exam Attempt
+        </button>
+
+        <button onClick={onClose} style={{ marginLeft: "10px" }}>
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default DeleteUserExamAttempt;
