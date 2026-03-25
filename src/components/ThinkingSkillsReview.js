@@ -4,8 +4,6 @@ import styles from "./ThinkingSkillsReview.module.css";
 export default function ThinkingSkillsReview({
   studentId,
   examAttemptId,
-  attempts = [],
-  onAttemptChange,
   onLoaded,
   onExit
 }) {
@@ -59,40 +57,13 @@ export default function ThinkingSkillsReview({
   return (
     <div className={styles.reviewWrapper}>
       
-      {/* 🔽 ATTEMPT DROPDOWN */}
-      {attempts.length > 0 && (
-        <select
-          className={styles.attemptDropdown}
-          value={examAttemptId}
-          onChange={(e) =>
-            onAttemptChange?.(Number(e.target.value))
-          }
-        >
-          {attempts.map((a) => (
-            <option
-              key={a.exam_attempt_id}
-              value={a.exam_attempt_id}
-            >
-              {new Date(a.completed_at).toLocaleString()}
-            </option>
-          ))}
-        </select>
-      )}
-
+      
       {/* ⏳ LOADING */}
       <p className={styles.loading}>
         Loading review…
       </p>
 
-      {/* 🔙 EXIT BUTTON (optional placement) */}
-      {onExit && (
-        <button
-          className={styles.exitButton}
-          onClick={onExit}
-        >
-          Back to Report
-        </button>
-      )}
+      
     </div>
   );
 }
