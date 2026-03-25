@@ -10,6 +10,11 @@ const DeleteUserExamAttempt = ({ onClose }) => {
   const [selectedClassType, setSelectedClassType] = useState("");
   const [examOptionsList, setExamOptionsList] = useState([]);
   const [selectedExamType, setSelectedExamType] = useState("");
+  const formatExamLabel = (exam) => {
+    return exam
+      .replaceAll("_", " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  };
 
   /* ============================
      FETCH STUDENTS
@@ -51,14 +56,16 @@ const DeleteUserExamAttempt = ({ onClose }) => {
      SET EXAM OPTIONS
   ============================ */
   const updateExamOptionsBasedOnClass = (classType) => {
-    if (classType === "selective" || classType === "oc") {
+    const normalizedClassType = classType?.toLowerCase();
+
+    if (normalizedClassType === "selective" || normalizedClassType === "oc") {
       setExamOptionsList([
         "thinking_skills",
         "mathematical_reasoning",
         "reading",
         "writing",
       ]);
-    } else if (classType === "naplan") {
+    } else if (normalizedClassType === "naplan") {
       setExamOptionsList([
         "numeracy",
         "language_conventions",
@@ -136,7 +143,7 @@ const DeleteUserExamAttempt = ({ onClose }) => {
         <option value="">Select Exam</option>
         {examOptionsList.map((examItem) => (
           <option key={examItem} value={examItem}>
-            {examItem}
+            {formatExamLabel(examItem)}
           </option>
         ))}
       </select>
