@@ -660,6 +660,10 @@
             <select
               value={exam}
               onChange={e => {
+                const selectedExam = e.target.value;   // ✅ define it first
+
+                console.log("Selected exam:", selectedExam);
+                
                 setExam(e.target.value);
                 setDate("");
                 setDateWarning("");
