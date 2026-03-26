@@ -71,6 +71,37 @@
   
     const [shouldGenerate, setShouldGenerate] = useState(false);
     useEffect(() => {
+  // Guard conditions
+      if (!date || !studentId) return;
+    
+      const fetchClassNameForStudent = async () => {
+        try {
+          console.log("📡 Fetching class for:", studentId, "on date:", date);
+    
+          const res = await fetch(
+            `${API_BASE}/api/students/class?student_id=${studentId}`
+          );
+    
+          if (!res.ok) {
+            throw new Error("Failed to fetch class name");
+          }
+    
+          const data = await res.json();
+    
+          console.log("✅ Class received:", data.class_name);
+    
+          setClassName(data.class_name);  // 🔥 update state
+    
+        } catch (err) {
+          console.error("❌ Error fetching class:", err);
+          setClassName("");
+        }
+      };
+    
+      fetchClassNameForStudent();
+    
+    }, [date, studentId]);
+    useEffect(() => {
       if (!studentId) {
         setExamOptions([]);
         return;
@@ -351,8 +382,8 @@
     // 🔑 Route writing and MCQ to correct endpoints
     const url =
       exam === "writing"
-        ? `${API_BASE}/api/reports/student/writing?student_id=${studentId}&date=${date}`
-        : `${API_BASE}/api/reports/student?student_id=${studentId}&exam=${exam}&date=${date}`;
+        ? `${API_BASE}/api/reports/student/writing?student_id=${studentId}&date=${date}&class_name=${className}`
+        : `${API_BASE}/api/reports/student?student_id=${studentId}&exam=${exam}&date=${date}&class_name=${className}`;
   
     fetch(url)
       .then(res => {
