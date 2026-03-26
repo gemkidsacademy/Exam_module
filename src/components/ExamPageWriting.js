@@ -457,7 +457,6 @@
       <div
         style={{
           minHeight: "100vh",
-          overflowY: "auto",
           background: "#f9fafb",
           padding: "32px",
           boxSizing: "border-box"
