@@ -75,7 +75,7 @@
 
 .writing-answer-box {
   width: 100%;
-  min-height: 520px;
+  height: 400px;              /* fixed height for controlled layout */
   padding: 20px;
   resize: vertical;
 
@@ -87,32 +87,41 @@
   font-size: 18px;
   line-height: 1.75;
 
-  margin-bottom: 20px;
+  overflow-y: auto;           /* enables internal scrolling */
+  margin-bottom: 24px;        /* improved spacing */
   box-sizing: border-box;
 }
+
 .writing-answer-box:focus {
   outline: none;
   border-color: #4a90e2;
   box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.15);
 }
+
+
 /* =========================================
    Submit Button
 ========================================= */
 
 .submit-writing-btn {
   background: #4a90e2;
-  color: white;
+  color: #fff;
   border: none;
+
   padding: 12px 18px;
   border-radius: 6px;
+
   font-size: 15px;
   cursor: pointer;
+
+  margin-top: 10px;
+  margin-bottom: 40px;       /* ensures button is always reachable */
+  transition: background 0.2s ease;
 }
 
 .submit-writing-btn:hover {
-  background: #357bd8;
+  background: #3a78c2;
 }
-
 .submit-writing-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -284,4 +293,8 @@
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+}
+html, body {
+  height: auto;
+  overflow-y: auto;
 }
