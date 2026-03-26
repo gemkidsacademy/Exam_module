@@ -18,6 +18,8 @@
     const [reportError, setReportError] = useState(null);
     const [selectedClassDay, setSelectedClassDay] = useState("");
     const [availableClassDates, setAvailableClassDates] = useState([]);
+    const [examOptions, setExamOptions] = useState([]);
+    const [loadingExams, setLoadingExams] = useState(false);
     const API_BASE = process.env.REACT_APP_API_URL;
 
 
@@ -68,6 +70,33 @@
   
   
     const [shouldGenerate, setShouldGenerate] = useState(false);
+    useEffect(() => {
+      if (!studentId) {
+        setExamOptions([]);
+        return;
+      }
+    
+      setLoadingExams(true);
+    
+      fetch(`${API_BASE}/api/exams/available?student_id=${studentId}`)
+        .then(res => {
+          if (!res.ok) {
+            throw new Error("Failed to fetch exams");
+          }
+          return res.json();
+        })
+        .then(data => {
+          setExamOptions(data.exams || []);
+        })
+        .catch(err => {
+          console.error("Exam fetch error:", err);
+          setExamOptions([]);
+        })
+        .finally(() => {
+          setLoadingExams(false);
+        });
+    
+    }, [studentId]);
     useEffect(() => {
       console.log("🟢 STUDENT EXAM DATES EFFECT", {
         reportType,
@@ -635,8 +664,17 @@
                 setDate("");
                 setDateWarning("");
               }}
+              disabled={!studentId || loadingExams}
             >
-              <option value="">Select exam</option>
+              <option value="">
+                {loadingExams ? "Loading exams..." : "Select exam"}
+              </option>
+            
+              {examOptions.map(e => (
+                <option key={e.key} value={e.key}>
+                  {e.label}
+                </option>
+              ))}
             </select>
         </div>
   
