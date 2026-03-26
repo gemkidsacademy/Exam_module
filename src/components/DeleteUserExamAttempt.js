@@ -92,6 +92,7 @@ const DeleteUserExamAttempt = ({ onClose }) => {
         body: JSON.stringify({
           student_id: selectedStudentId,
           exam_type: selectedExamType,
+          class_name: selectedClassType,
         }),
       });
 
