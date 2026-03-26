@@ -456,7 +456,9 @@
     return (
       <div
         style={{
-          minHeight: "100vh",
+          position: "fixed",     // 👈 detach from parent
+          inset: 0,              // 👈 full screen
+          overflowY: "auto",     // 👈 enable vertical scroll
           background: "#f9fafb",
           padding: "32px",
           boxSizing: "border-box"
