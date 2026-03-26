@@ -128,39 +128,47 @@
         });
     
     }, [studentId]);
+
     useEffect(() => {
-      console.log("🟢 STUDENT EXAM DATES EFFECT", {
-        reportType,
-        studentId,
-        exam
-      });
-    
-      if (
-        reportType !== "student" ||
-        !studentId ||
-        !exam
-      ) {
-        setAvailableExamDates([]);
-        return;
+  console.log("🟢 STUDENT EXAM DATES EFFECT", {
+    reportType,
+    studentId,
+    exam
+  });
+
+  if (
+    reportType !== "student" ||
+    !studentId ||
+    !exam
+  ) {
+    setAvailableExamDates([]);
+    return;
+  }
+
+  const url =
+    exam === "naplan_numeracy"
+      ? `${API_BASE}/api/exams/dates/naplan?exam=${exam}&student_id=${studentId}`
+      : `${API_BASE}/api/exams/dates?exam=${exam}&student_id=${studentId}`;
+
+  console.log("📡 Fetching student exam dates from:", url);
+
+  fetch(url)
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch student exam dates");
       }
-    
-      fetch(
-        `${API_BASE}/api/exams/dates?exam=${exam}&student_id=${studentId}`
-      )
-        .then(res => {
-          if (!res.ok) {
-            throw new Error("Failed to fetch student exam dates");
-          }
-          return res.json();
-        })
-        .then(data => {
-          setAvailableExamDates(data.dates || []);
-        })
-        .catch(err => {
-          console.error("Student exam dates error:", err);
-          setAvailableExamDates([]);
-        });
-    }, [studentId, exam, reportType]);
+      return res.json();
+    })
+    .then(data => {
+      console.log("📅 Dates received:", data.dates);
+      setAvailableExamDates(data.dates || []);
+    })
+    .catch(err => {
+      console.error("Student exam dates error:", err);
+      setAvailableExamDates([]);
+    });
+
+}, [studentId, exam, reportType]);
 
     useEffect(() => {
   console.log("🏫 CLASS SESSION DATES EFFECT FIRED", {
@@ -490,9 +498,12 @@
         return;
       }
     
-      fetch(
-        `${API_BASE}/api/exams/dates?exam=${exam}&student_id=${studentId}`
-      )
+      const url =
+      exam === "naplan_numeracy"
+        ? `${API_BASE}/api/exams/dates/naplan?exam=${exam}&student_id=${studentId}`
+        : `${API_BASE}/api/exams/dates?exam=${exam}&student_id=${studentId}`;
+    
+      fetch(url)
         .then(res => {
           if (!res.ok) {
             throw new Error("Failed to fetch exam dates");
