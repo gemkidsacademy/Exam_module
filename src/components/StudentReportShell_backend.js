@@ -628,23 +628,16 @@
         {/* Exam */}
         <div className="field">
           <label>Exam</label>
-          <select
-            value={exam}
-            onChange={e => {
-              setExam(e.target.value);
-              setDate("");
-              setDateWarning("");
-            }}
-          >
-            <option value="">Select exam</option>
-            <option value="thinking_skills">Thinking Skills</option>
-            <option value="reading">Reading</option>
-            <option value="mathematical_reasoning">
-              Mathematical Reasoning
-            </option>
-            <option value="writing">Writing</option>
-            <option value="foundational">Foundational</option>
-          </select>
+            <select
+              value={exam}
+              onChange={e => {
+                setExam(e.target.value);
+                setDate("");
+                setDateWarning("");
+              }}
+            >
+              <option value="">Select exam</option>
+            </select>
         </div>
   
         {/* Date (non-cumulative only) */}
