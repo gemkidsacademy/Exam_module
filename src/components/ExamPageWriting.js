@@ -212,62 +212,79 @@
   console.log("🔵 WritingComponent mounted");
 
   const init = async () => {
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/exams/writing/current?student_id=${studentId}`
-      );
+  try {
+    // STEP 1: Try current exam
+    const res = await fetch(
+      `${API_BASE}/api/exams/writing/current?student_id=${studentId}`
+    );
 
-      // 🟡 No active attempt → start exam
-      if (res.status === 404) {
-        console.log("🟢 No active exam → starting new exam");
-
-        await startExam();
-
-        return init(); // reload flow
-      }
-
-      if (!res.ok) {
-        throw new Error("Failed to load writing exam");
-      }
-
+    // ✅ CASE 1: ACTIVE exam exists
+    if (res.status === 200) {
       const data = await res.json();
 
-      // 🔴 COMPLETED
       if (data.completed === true) {
         setCompleted(true);
         await loadResult();
-
-        if (typeof onExamFinish === "function") {
-          onExamFinish();
-        }
+        onExamFinish?.();
         return;
       }
 
-      // 🟢 ACTIVE EXAM
       if (data.exam) {
         setExam(data.exam);
         setTimeLeft(data.remaining_seconds);
         setExamActive(true);
-
-        if (typeof onExamStart === "function") {
-          onExamStart();
-        }
+        onExamStart?.();
         return;
       }
-
-      // 🟡 Fallback → start exam
-      console.log("🟡 No exam in response → starting new exam");
-
-      await startExam();
-      return init();
-
-    } catch (err) {
-      console.error("❌ init error:", err);
-    } finally {
-      setLoading(false);
     }
-  };
 
+    // ❗ STEP 2: NO ACTIVE EXAM → CHECK RESULT
+    console.log("🟡 No active exam → checking result");
+
+    const resultRes = await fetch(
+      `${API_BASE}/api/exams/writing/result?student_id=${studentId}`
+    );
+
+    if (resultRes.status === 200) {
+      console.log("🟢 Found completed exam → showing report");
+
+      const data = await resultRes.json();
+      setResult(data);
+      setCompleted(true);
+      onExamFinish?.();
+      return;
+    }
+
+    // 🟢 STEP 3: NO RESULT → START NEW EXAM
+    console.log("🟢 No result → starting fresh exam");
+
+    await startExam();
+
+    const retryRes = await fetch(
+      `${API_BASE}/api/exams/writing/current?student_id=${studentId}`
+    );
+    
+    if (retryRes.status === 200) {
+      const data = await retryRes.json();
+    
+      if (data.exam) {
+        setExam(data.exam);
+        setTimeLeft(data.remaining_seconds);
+        setExamActive(true);
+        onExamStart?.();
+      } else {
+        console.warn("⚠️ Exam started but no exam returned");
+      }
+    } else {
+      console.error("❌ Failed to fetch exam after start");
+    }
+
+  } catch (err) {
+    console.error("❌ init error:", err);
+  } finally {
+    setLoading(false);
+  }
+};
   init();
 }, [studentId]);
 
