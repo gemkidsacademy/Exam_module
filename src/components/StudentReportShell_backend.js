@@ -145,20 +145,23 @@
     return;
   }
 
-  const isNaplanExam = exam?.startsWith("naplan");
-  const isOCExam = exam?.startsWith("oc");
+  const examKey = exam?.toLowerCase().trim();
+  
+  const isNaplanExam = examKey?.startsWith("naplan");
+  const isOCExam = examKey?.startsWith("oc");
   
   let url = "";
   
   if (isNaplanExam) {
-    url = `${API_BASE}/api/exams/dates/naplan?exam=${exam}&student_id=${studentId}`;
+    url = `${API_BASE}/api/exams/dates/naplan?exam=${examKey}&student_id=${studentId}`;
   } else if (isOCExam) {
-    url = `${API_BASE}/api/exams/dates/oc?exam=${exam}&student_id=${studentId}`;
+    url = `${API_BASE}/api/exams/dates/oc?exam=${examKey}&student_id=${studentId}`;
   } else {
-    url = `${API_BASE}/api/exams/dates?exam=${exam}&student_id=${studentId}`;
+    url = `${API_BASE}/api/exams/dates?exam=${examKey}&student_id=${studentId}`;
   }
-  console.log("📡 Fetching student exam dates from:", url);
-
+  
+  console.log("🚀 FINAL URL (student):", url);
+  
   fetch(url)
     .then(res => {
       if (!res.ok) {
@@ -505,18 +508,22 @@
         return;
       }
     
-      const isNaplanExam = exam?.startsWith("naplan");
-      const isOCExam = exam?.startsWith("oc");
+      const examKey = exam?.toLowerCase().trim();
+
+      const isNaplanExam = examKey?.startsWith("naplan");
+      const isOCExam = examKey?.startsWith("oc");
       
       let url = "";
       
       if (isNaplanExam) {
-        url = `${API_BASE}/api/exams/dates/naplan?exam=${exam}&student_id=${studentId}`;
+        url = `${API_BASE}/api/exams/dates/naplan?exam=${examKey}&student_id=${studentId}`;
       } else if (isOCExam) {
-        url = `${API_BASE}/api/exams/dates/oc?exam=${exam}&student_id=${studentId}`;
+        url = `${API_BASE}/api/exams/dates/oc?exam=${examKey}&student_id=${studentId}`;
       } else {
-        url = `${API_BASE}/api/exams/dates?exam=${exam}&student_id=${studentId}`;
-      }  
+        url = `${API_BASE}/api/exams/dates?exam=${examKey}&student_id=${studentId}`;
+      }
+      
+      console.log("🚀 FINAL URL (student):", url); 
       fetch(url)
         .then(res => {
           if (!res.ok) {
