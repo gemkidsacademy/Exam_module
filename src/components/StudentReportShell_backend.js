@@ -145,11 +145,11 @@
     return;
   }
 
-  const url =
-    exam === "naplan_numeracy"
-      ? `${API_BASE}/api/exams/dates/naplan?exam=${exam}&student_id=${studentId}`
-      : `${API_BASE}/api/exams/dates?exam=${exam}&student_id=${studentId}`;
+  const isNaplanExam = exam?.startsWith("naplan");
 
+  const url = isNaplanExam
+    ? `${API_BASE}/api/exams/dates/naplan?exam=${exam}&student_id=${studentId}`
+    : `${API_BASE}/api/exams/dates?exam=${exam}&student_id=${studentId}`;
   console.log("📡 Fetching student exam dates from:", url);
 
   fetch(url)
@@ -498,11 +498,11 @@
         return;
       }
     
-      const url =
-      exam === "naplan_numeracy"
+      const isNaplanExam = exam?.startsWith("naplan");
+
+      const url = isNaplanExam
         ? `${API_BASE}/api/exams/dates/naplan?exam=${exam}&student_id=${studentId}`
-        : `${API_BASE}/api/exams/dates?exam=${exam}&student_id=${studentId}`;
-    
+        : `${API_BASE}/api/exams/dates?exam=${exam}&student_id=${studentId}`;    
       fetch(url)
         .then(res => {
           if (!res.ok) {
