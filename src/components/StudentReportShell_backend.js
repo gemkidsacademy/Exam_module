@@ -398,11 +398,12 @@
     setReportError(null);
   
     // 🔑 Route writing and MCQ to correct endpoints
+    const examKey = exam?.toLowerCase().trim();
+
     const url =
-      exam === "writing"
+      examKey === "writing"
         ? `${API_BASE}/api/reports/student/writing?student_id=${studentId}&date=${date}&class_name=${className}`
-        : `${API_BASE}/api/reports/student?student_id=${studentId}&exam=${exam}&date=${date}&class_name=${className}`;
-  
+        : `${API_BASE}/api/reports/student?student_id=${studentId}&exam=${examKey}&date=${date}&class_name=${className}`; 
     fetch(url)
       .then(res => {
         if (!res.ok) {
