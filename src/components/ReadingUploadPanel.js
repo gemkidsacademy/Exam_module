@@ -16,42 +16,13 @@ export default function ReadingUploadPanel() {
       <h2>Upload Reading Question Sets</h2>
 
       {!activeUpload && (
-        <>
-          <button
-            className="upload-btn gapped"
-            onClick={() => setActiveUpload("gapped")}
-          >
-            Upload Gapped Text Questions
-          </button>
-
-          <button
-            className="upload-btn main-idea"
-            onClick={() => setActiveUpload("main-idea")}
-          >
-            Upload Main Idea & Summary Questions
-          </button>
-          <button
-            className="upload-btn main-idea"
-            onClick={() => setActiveUpload("main-idea-type-2")}
-          >
-            Upload Main Idea & Summary Questions (Type 2)
-          </button>
-
-          <button
-            className="upload-btn comparative"
-            onClick={() => setActiveUpload("comparative")}
-          >
-            Upload Comparative Analysis Questions 
-          </button>
-       
-          
-          
-          <button
+        <>       
+       <button
             className="upload-btn unified"
             onClick={() => setActiveUpload("reading-unified")}
           >
             Upload Reading Questions (Unified)
-          </button>
+       </button>
           
           
               
