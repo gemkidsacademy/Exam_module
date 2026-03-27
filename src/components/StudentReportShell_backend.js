@@ -146,10 +146,17 @@
   }
 
   const isNaplanExam = exam?.startsWith("naplan");
-
-  const url = isNaplanExam
-    ? `${API_BASE}/api/exams/dates/naplan?exam=${exam}&student_id=${studentId}`
-    : `${API_BASE}/api/exams/dates?exam=${exam}&student_id=${studentId}`;
+  const isOCExam = exam?.startsWith("oc");
+  
+  let url = "";
+  
+  if (isNaplanExam) {
+    url = `${API_BASE}/api/exams/dates/naplan?exam=${exam}&student_id=${studentId}`;
+  } else if (isOCExam) {
+    url = `${API_BASE}/api/exams/dates/oc?exam=${exam}&student_id=${studentId}`;
+  } else {
+    url = `${API_BASE}/api/exams/dates?exam=${exam}&student_id=${studentId}`;
+  }
   console.log("📡 Fetching student exam dates from:", url);
 
   fetch(url)
@@ -499,10 +506,17 @@
       }
     
       const isNaplanExam = exam?.startsWith("naplan");
-
-      const url = isNaplanExam
-        ? `${API_BASE}/api/exams/dates/naplan?exam=${exam}&student_id=${studentId}`
-        : `${API_BASE}/api/exams/dates?exam=${exam}&student_id=${studentId}`;    
+      const isOCExam = exam?.startsWith("oc");
+      
+      let url = "";
+      
+      if (isNaplanExam) {
+        url = `${API_BASE}/api/exams/dates/naplan?exam=${exam}&student_id=${studentId}`;
+      } else if (isOCExam) {
+        url = `${API_BASE}/api/exams/dates/oc?exam=${exam}&student_id=${studentId}`;
+      } else {
+        url = `${API_BASE}/api/exams/dates?exam=${exam}&student_id=${studentId}`;
+      }  
       fetch(url)
         .then(res => {
           if (!res.ok) {
