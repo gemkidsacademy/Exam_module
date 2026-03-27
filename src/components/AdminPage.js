@@ -139,8 +139,8 @@
      { id: "add-quiz", label: "Create Exam" },
      { id: "generate-exam", label: "Generate Exam" },
      { id: "student-exam-reports", label: "Student Exam Reports" },
-     { id: "topic-report-limited", label: "Topic Report (Front End only)" },
-     { id: "topic-report-limited-2", label: "Topic Report (coming soon)" },
+     
+     { id: "topic-report-limited-2", label: "Topic Report " },
      { id: "selective-readiness-overall", label: "Selective Readiness (Overall)" },
    ];
    
@@ -712,12 +712,7 @@
                       <SelectiveReadinessOverall />
                     </div>
                   )}
-                  {/* ===== TOPIC REPORT (LIMITED) ===== */}
-                  {activeTab === "topic-report-limited" && (
-                    <div className="tab-panel">
-                      <StudentReportShell />
-                    </div>
-                  )}
+                  
                   {activeTab === "topic-report-limited-2" && (
                     <div className="tab-panel">
                       <StudentReportShell_backend />
