@@ -318,13 +318,9 @@ const finishExam = useCallback(
     };
 
     console.log("📤 finish-exam payload:", payload);
-    console.log(
-      "🧪 FINAL ANSWERS OBJECT:",
-      JSON.stringify(answers, null, 2)
-    );
 
     try {
-      await fetch(
+      const res = await fetch(
         `${API_BASE}/api/student/finish-exam`,
         {
           method: "POST",
@@ -333,17 +329,26 @@ const finishExam = useCallback(
         }
       );
 
-      // ⬅️ ONLY NOW load report
+      if (!res.ok) {
+        console.error("❌ finish-exam failed");
+        return;
+      }
+
+      // 🔥 IMPORTANT: refresh dates FIRST
+      await loadExamDates();
+
+      // Then load report (latest exam already selected)
       await loadReport();
+
       onExamFinish?.();
 
     } catch (err) {
       console.error("❌ finish-exam error:", err);
     }
   },
-  [studentId, answers, loadReport]
+  [studentId, answers, loadReport, loadExamDates]
 );
-
+ 
 /* ============================================================
    TIMER (AUTO SUBMIT)
 ============================================================ */
