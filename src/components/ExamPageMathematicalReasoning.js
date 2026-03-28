@@ -446,6 +446,7 @@ if (mode === "loading") {
 if (mode === "report") {
 return (
   <MathematicalReasoningReport
+   key={selectedExamId}   // 🔥 ADD THIS
    report={report}
    examDates={examDates}
    selectedExamId={selectedExamId}
