@@ -817,7 +817,7 @@ function MathematicalReasoningReport({
         <div
           style={{
             display: "flex",
-            justifyContent: "flex-end",
+            justifyContent: "flex-start",
             alignItems: "flex-end",
             gap: "16px"
           }}
