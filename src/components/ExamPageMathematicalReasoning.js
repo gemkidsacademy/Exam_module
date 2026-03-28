@@ -21,6 +21,8 @@ const studentId = sessionStorage.getItem("student_id");
 const hasSubmittedRef = useRef(false);
 const prevIndexRef = useRef(null);
 const [explanation, setExplanation] = useState(null);
+const [examDates, setExamDates] = useState([]);
+const [selectedExamId, setSelectedExamId] = useState(null);
 const [loadingExplanation, setLoadingExplanation] = useState(false);
 const isPopNavigationRef = useRef(false);
 /**
@@ -30,6 +32,35 @@ const isPopNavigationRef = useRef(false);
  * - report  → completed attempt
  */
 const [mode, setMode] = useState("loading");
+const handleDateChange = async (e) => {
+  const examId = Number(e.target.value);
+  setSelectedExamId(examId);
+
+  await loadReport(examId);
+};
+const loadExamDates = useCallback(async () => {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/student/exam-dates/mathematical-reasoning?student_id=${studentId}`
+    );
+
+    const data = await res.json();
+    console.log("📅 exam dates:", data);
+
+    setExamDates(data);
+
+    if (data.length > 0) {
+      const latestExamId = data[0].exam_id;
+      setSelectedExamId(latestExamId);
+
+      // ✅ Immediately load report with correct id
+      await loadReport(latestExamId);
+    }
+
+  } catch (err) {
+    console.error("❌ loadExamDates error:", err);
+  }
+}, [studentId, loadReport]);
 const handleExitReview = () => {
   console.log("🔙 Exit Review clicked (MR)");
 
@@ -86,10 +117,12 @@ const [report, setReport] = useState(null);
 /* ============================================================
    LOAD REPORT (ONLY WHEN EXAM IS COMPLETED)
 ============================================================ */
-const loadReport = useCallback(async () => {
+const loadReport = useCallback(async (examIdParam) => {
   try {
+    const examIdToUse = examIdParam || selectedExamId;
+
     const res = await fetch(
-      `${API_BASE}/api/student/exam-report/mathematical-reasoning?student_id=${studentId}`
+      `${API_BASE}/api/student/exam-report/mathematical-reasoning?student_id=${studentId}&exam_id=${examIdToUse}`
     );
 
     if (!res.ok) {
@@ -106,7 +139,7 @@ const loadReport = useCallback(async () => {
   } catch (err) {
     console.error("❌ loadReport error:", err);
   }
-}, [studentId]);
+}, [studentId, selectedExamId]);
 useEffect(() => {
   if (mode !== "exam") return;
 
@@ -198,7 +231,8 @@ useEffect(() => {
 
       // ✅ COMPLETED → SHOW REPORT
       if (data.completed === true) {
-        await loadReport();
+        await loadExamDates();
+        
         onExamFinish?.();
         return;
       }
@@ -406,9 +440,12 @@ if (mode === "loading") {
 if (mode === "report") {
 return (
   <MathematicalReasoningReport
-    report={report}
-    onViewExamDetails={() => setMode("review")}
-  />
+   report={report}
+   examDates={examDates}
+   selectedExamId={selectedExamId}
+   onDateChange={handleDateChange}
+   onViewExamDetails={() => setMode("review")}
+ />
 
 );
 }
@@ -720,7 +757,13 @@ return (
  REPORT COMPONENT
 ============================================================ */
 
-function MathematicalReasoningReport({ report, onViewExamDetails }) {
+function MathematicalReasoningReport({
+  report,
+  examDates,
+  selectedExamId,
+  onDateChange,
+  onViewExamDetails
+}) {
   if (!report?.overall) {
     return <p className="loading">Generating your report…</p>;
   }
@@ -748,8 +791,36 @@ function MathematicalReasoningReport({ report, onViewExamDetails }) {
          boxSizing: "border-box",
          zIndex: 1
        }}
-     >
-
+     > 
+      <div style={{ marginBottom: "20px" }}>
+       <label
+         style={{
+           display: "block",
+           marginBottom: "6px",
+           fontWeight: "500"
+         }}
+       >
+         Date
+       </label>
+     
+       <select
+         value={selectedExamId || ""}
+         onChange={onDateChange}
+         style={{
+           padding: "8px 12px",
+           borderRadius: "6px",
+           border: "1px solid #d1d5db",
+           minWidth: "220px"
+         }}
+       >
+         {examDates.map((d) => (
+           <option key={d.exam_id} value={d.exam_id}>
+             {new Date(d.date).toLocaleString()}
+           </option>
+         ))}
+       </select>
+     </div>
+      
       {/* HEADER */}
       <h2
         style={{
