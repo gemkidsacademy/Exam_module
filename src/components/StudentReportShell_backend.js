@@ -723,10 +723,15 @@
           <select
             value={className}
             onChange={e => {
-              setClassName(e.target.value);
-              setDate("");                 // 🔑 reset
-              setAvailableClassDates([]); 
-              setShouldGenerate(false);
+              const selectedClass = e.target.value;
+            
+              setClassName(selectedClass);
+            
+              setExam("");                  // reset exam
+              setDate("");                  // reset date
+              setAvailableClassDates([]);   // reset dates list
+            
+              setShouldGenerate(false);     // stop any pending generation
             }}
           >
             <option value="">Select class</option>
