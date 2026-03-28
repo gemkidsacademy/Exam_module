@@ -76,14 +76,14 @@
     return;
   }
 
-  console.log("📡 Fetching exams for class:", className);
+  console.log("📡 Fetching exams for class/category:", className);
 
   setLoadingExams(true);
 
-  fetch(`${API_BASE}/api/exams/available?class_name=${encodeURIComponent(className)}`)
+  fetch(`${API_BASE}/api/exams/by-category?category=${encodeURIComponent(className)}`)
     .then(res => {
       if (!res.ok) {
-        throw new Error("Failed to fetch exams for class");
+        throw new Error("Failed to fetch exams for class/category");
       }
       return res.json();
     })
@@ -100,6 +100,7 @@
     });
 
 }, [className, reportType]);
+    
     useEffect(() => {
   // Guard conditions
       if (!date || !studentId) return;
