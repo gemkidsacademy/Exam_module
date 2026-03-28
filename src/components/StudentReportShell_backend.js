@@ -763,7 +763,11 @@
                 setDate("");
                 setDateWarning("");
               }}
-              disabled={!studentId || loadingExams}
+              disabled={
+                loadingExams ||
+                (reportType === "student" && !studentId) ||
+                (reportType === "class" && !className)
+              }
             >
               <option value="">
                 {loadingExams ? "Loading exams..." : "Select exam"}
