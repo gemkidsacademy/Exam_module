@@ -71,6 +71,36 @@
   
     const [shouldGenerate, setShouldGenerate] = useState(false);
     useEffect(() => {
+  // Only run for class report
+  if (reportType !== "class" || !className) {
+    return;
+  }
+
+  console.log("📡 Fetching exams for class:", className);
+
+  setLoadingExams(true);
+
+  fetch(`${API_BASE}/api/exams/available?class_name=${encodeURIComponent(className)}`)
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch exams for class");
+      }
+      return res.json();
+    })
+    .then(data => {
+      console.log("✅ Class exams received:", data.exams);
+      setExamOptions(data.exams || []);
+    })
+    .catch(err => {
+      console.error("❌ Class exam fetch error:", err);
+      setExamOptions([]);
+    })
+    .finally(() => {
+      setLoadingExams(false);
+    });
+
+}, [className, reportType]);
+    useEffect(() => {
   // Guard conditions
       if (!date || !studentId) return;
     
