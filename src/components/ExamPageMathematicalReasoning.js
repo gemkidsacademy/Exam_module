@@ -38,7 +38,31 @@ const handleDateChange = async (e) => {
 
   await loadReport(examId);
 };
-const loadExamDates = useCallback(async () => {
+
+ const loadReport = useCallback(async (examIdParam) => {
+  try {
+    const examIdToUse = examIdParam || selectedExamId;
+
+    const res = await fetch(
+      `${API_BASE}/api/student/exam-report/mathematical-reasoning?student_id=${studentId}&exam_id=${examIdToUse}`
+    );
+
+    if (!res.ok) {
+      console.warn("⚠️ Report not available yet");
+      return;
+    }
+
+    const data = await res.json();
+    console.log("📊 report loaded:", data);
+
+    setReport(data);
+    
+    setMode("report");
+  } catch (err) {
+    console.error("❌ loadReport error:", err);
+  }
+}, [studentId, selectedExamId]);
+ const loadExamDates = useCallback(async () => {
   try {
     const res = await fetch(
       `${API_BASE}/api/student/exam-dates/mathematical-reasoning?student_id=${studentId}`
@@ -117,29 +141,7 @@ const [report, setReport] = useState(null);
 /* ============================================================
    LOAD REPORT (ONLY WHEN EXAM IS COMPLETED)
 ============================================================ */
-const loadReport = useCallback(async (examIdParam) => {
-  try {
-    const examIdToUse = examIdParam || selectedExamId;
 
-    const res = await fetch(
-      `${API_BASE}/api/student/exam-report/mathematical-reasoning?student_id=${studentId}&exam_id=${examIdToUse}`
-    );
-
-    if (!res.ok) {
-      console.warn("⚠️ Report not available yet");
-      return;
-    }
-
-    const data = await res.json();
-    console.log("📊 report loaded:", data);
-
-    setReport(data);
-    
-    setMode("report");
-  } catch (err) {
-    console.error("❌ loadReport error:", err);
-  }
-}, [studentId, selectedExamId]);
 useEffect(() => {
   if (mode !== "exam") return;
 
