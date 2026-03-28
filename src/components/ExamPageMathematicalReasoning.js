@@ -843,7 +843,7 @@ function MathematicalReasoningReport({
           >
             {examDates.map((d) => (
               <option key={d.exam_id} value={d.exam_id}>
-                {new Date(d.date).toLocaleString()}
+                {new Date(d.date).toLocaleDateString()}
               </option>
             ))}
           </select>
