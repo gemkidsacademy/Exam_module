@@ -808,6 +808,17 @@ function MathematicalReasoningReport({
           marginBottom: "20px"
         }}
       >
+        {/* HEADER (keep this BELOW) */}
+      <h2
+        style={{
+          fontSize: "26px",
+          fontWeight: "600",
+          marginBottom: "16px"
+        }}
+      >
+        You scored {overall.correct} out of {overall.total_questions} in NSW
+        Selective Mathematical Reasoning Test
+      </h2>
         {/* Date Dropdown */}
         <div>
           <label
@@ -857,27 +868,8 @@ function MathematicalReasoningReport({
         </button>
       </div>
       
-      {/* HEADER (keep this BELOW) */}
-      <h2
-        style={{
-          fontSize: "26px",
-          fontWeight: "600",
-          marginBottom: "16px"
-        }}
-      >
-        You scored {overall.correct} out of {overall.total_questions} in NSW
-        Selective Mathematical Reasoning Test
-      </h2>
-      <h2
-        style={{
-          fontSize: "26px",
-          fontWeight: "600",
-          marginBottom: "16px"
-        }}
-      >
-        You scored {overall.correct} out of {overall.total_questions} in NSW
-        Selective Mathematical Reasoning Test
-      </h2>
+      
+      
       <div
         style={{
           display: "grid",
