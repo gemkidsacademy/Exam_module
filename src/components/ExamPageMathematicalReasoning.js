@@ -39,12 +39,12 @@ const handleDateChange = async (e) => {
   await loadReport(examId);
 };
 
- const loadReport = useCallback(async (examIdParam) => {
+ const loadReport = useCallback(async (examId) => {
   try {
-    const examIdToUse = examIdParam || selectedExamId;
+    if (!examId) return;
 
     const res = await fetch(
-      `${API_BASE}/api/student/exam-report/mathematical-reasoning?student_id=${studentId}&exam_id=${examIdToUse}`
+      `${API_BASE}/api/student/exam-report/mathematical-reasoning?student_id=${studentId}&exam_id=${examId}`
     );
 
     if (!res.ok) {
@@ -56,12 +56,12 @@ const handleDateChange = async (e) => {
     console.log("📊 report loaded:", data);
 
     setReport(data);
-    
     setMode("report");
+
   } catch (err) {
     console.error("❌ loadReport error:", err);
   }
-}, [studentId, selectedExamId]);
+}, [studentId]);
  const loadExamDates = useCallback(async () => {
   try {
     const res = await fetch(
@@ -337,8 +337,7 @@ const finishExam = useCallback(
       // 🔥 IMPORTANT: refresh dates FIRST
       await loadExamDates();
 
-      // Then load report (latest exam already selected)
-      await loadReport();
+      
 
       onExamFinish?.();
 
