@@ -799,73 +799,74 @@ function MathematicalReasoningReport({
          zIndex: 1
        }}
      > 
-      {/* Top Row: Date + Button */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "flex-end",
-          gap: "16px",
-          marginBottom: "20px"
-        }}
-      >
-        {/* HEADER (keep this BELOW) */}
-      <h2
-        style={{
-          fontSize: "26px",
-          fontWeight: "600",
-          marginBottom: "16px"
-        }}
-      >
-        You scored {overall.correct} out of {overall.total_questions} in NSW
-        Selective Mathematical Reasoning Test
-      </h2>
-        {/* Date Dropdown */}
-        <div>
-          <label
-            style={{
-              display: "block",
-              marginBottom: "6px",
-              fontWeight: "500"
-            }}
-          >
-            Date
-          </label>
-      
-          <select
-            value={selectedExamId || ""}
-            onChange={onDateChange}
-            style={{
-              padding: "8px 12px",
-              borderRadius: "6px",
-              border: "1px solid #d1d5db",
-              minWidth: "220px"
-            }}
-          >
-            {examDates.map((d) => (
-              <option key={d.exam_id} value={d.exam_id}>
-                {new Date(d.date).toLocaleDateString()}
-              </option>
-            ))}
-          </select>
-        </div>
-      
-        {/* Button */}
-        <button
-          onClick={() => {
-            console.log("🟢 Review Exam button clicked");
-            onViewExamDetails();
-          }}
+      <div style={{ display: "flex", flexDirection: "column" }}>
+  
+        {/* Row 1: Heading */}
+        <h2
           style={{
-            padding: "10px 18px",
-            background: "#2563eb",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer"
+            fontSize: "26px",
+            fontWeight: "600",
+            marginBottom: "12px"
           }}
         >
-          View Exam Details
-        </button>
+          You scored {overall.correct} out of {overall.total_questions} in NSW
+          Selective Mathematical Reasoning Test
+        </h2>
+
+        {/* Row 2: Right-aligned controls */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "flex-end",
+            gap: "16px"
+          }}
+        >
+          {/* Date */}
+          <div>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "6px",
+                fontWeight: "500"
+              }}
+            >
+              Date
+            </label>
+
+            <select
+              value={selectedExamId || ""}
+              onChange={onDateChange}
+              style={{
+                padding: "8px 12px",
+                borderRadius: "6px",
+                border: "1px solid #d1d5db"
+              }}
+            >
+              {examDates.map((d) => (
+                <option key={d.exam_id} value={d.exam_id}>
+                  {new Date(d.date).toLocaleDateString()}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Button */}
+          <button
+            onClick={onViewExamDetails}
+            style={{
+              padding: "10px 18px",
+              background: "#2563eb",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer"
+            }}
+          >
+            View Exam Details
+          </button>
+        </div>
+
       </div>
       
       
