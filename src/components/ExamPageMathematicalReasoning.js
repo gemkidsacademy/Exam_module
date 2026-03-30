@@ -520,9 +520,9 @@ return (
       onExit={handleExitReview}
     />
 
-    {!currentQ && (
-      <p className="loading">Loading review...</p>
-    )}
+    {reviewQuestions.length === 0 && (
+     <p className="loading">Loading review...</p>
+   )}
   </>
 )}
     
