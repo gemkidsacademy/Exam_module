@@ -556,24 +556,46 @@ return (
 </div>
     {/* HEADER */}
     <div className="exam-header">
-     {mode === "exam" && (
-       <div className="timer">⏳ {formatTime(timeLeft)}</div>
-     )}
-   
-     <div className="counter">
-       Question {currentIndex + 1} / {activeQuestions.length}
-     </div>
-   
-     {mode === "review" && (
-       <button
-         className="exit-review-btn"
-         onClick={handleExitReview}
-       >
-         Exit Review
-       </button>
-     )}
-   </div>
-
+  
+    {mode === "exam" && (
+      <div className="timer">⏳ {formatTime(timeLeft)}</div>
+    )}
+  
+    <div className="counter">
+      Question {currentIndex + 1} / {activeQuestions.length}
+    </div>
+  
+    {mode === "review" && (
+      <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+        
+        {/* 🔽 DATE DROPDOWN */}
+        <select
+          value={selectedExamId || ""}
+          onChange={handleDateChange}
+          style={{
+            padding: "6px 10px",
+            borderRadius: "6px",
+            border: "1px solid #d1d5db"
+          }}
+        >
+          {examDates.map((d) => (
+            <option key={d.exam_id} value={d.exam_id}>
+              {new Date(d.date).toLocaleDateString()}
+            </option>
+          ))}
+        </select>
+  
+        {/* 🔙 EXIT BUTTON */}
+        <button
+          className="exit-review-btn"
+          onClick={handleExitReview}
+        >
+          Exit Review
+        </button>
+  
+      </div>
+    )}
+  </div>
     {/* QUESTION INDEX */}
     <div className="index-row">
   {activeQuestions.map((q, i) => {
