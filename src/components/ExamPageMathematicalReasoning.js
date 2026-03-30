@@ -69,6 +69,7 @@ const handleDateChange = async (e) => {
   console.log("📅 Date changed → examId:", examId);
 
   setSelectedExamId(examId);
+  console.log("📅 AFTER setSelectedExamId (will update next render)");
 
   if (mode === "report") {
     await loadReport(examId);
@@ -176,7 +177,10 @@ const [report, setReport] = useState(null);
 /* ============================================================
    LOAD REPORT (ONLY WHEN EXAM IS COMPLETED)
 ============================================================ */
-
+useEffect(() => {
+  console.log("🎯 selectedExamId UPDATED:", selectedExamId);
+}, [selectedExamId]);
+ 
 useEffect(() => {
   if (mode !== "exam") return;
 
@@ -502,6 +506,7 @@ const isReview = mode === "review";
     selectedExamId,
     reviewQuestionsLength: reviewQuestions.length
   });
+  console.log("📥 Passing examId to Review:", selectedExamId);
 }
  
 const optionEntries = Object.entries(currentQ?.options || {});
@@ -511,6 +516,7 @@ return (
     {mode === "review" && (
   <>
     <MathematicalReasoningReview
+      key={selectedExamId} 
       studentId={studentId}
       examId={selectedExamId}
       examDates={examDates}
