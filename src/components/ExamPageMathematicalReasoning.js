@@ -64,18 +64,17 @@ const handleReviewLoaded = useCallback((questions) => {
   setCurrentIndex(0);
 }, []);
 const handleDateChange = async (e) => {
-  const examId = Number(e.target.value);
+  const examId = e.target.value ? Number(e.target.value) : null;
+
+  console.log("📅 Date changed → examId:", examId);
+
   setSelectedExamId(examId);
 
-  // 🔥 ONLY load report if we are in report mode
   if (mode === "report") {
     await loadReport(examId);
   }
-
-  // 🔥 DO NOTHING in review mode
-  // review will auto-reload via useEffect (examId change)
 };
- const loadReport = useCallback(async (examId) => {
+const loadReport = useCallback(async (examId) => {
   try {
     if (!examId) return;
 
@@ -498,6 +497,15 @@ return (
 
 const currentQ = activeQuestions[currentIndex];
 const isReview = mode === "review";
+ if (isReview) {
+  console.log("🧠 RENDER REVIEW MODE", {
+    selectedExamId,
+    reviewQuestionsLength: reviewQuestions.length
+  });
+}
+ if (!currentQ) {
+  return <p className="loading">Loading review...</p>;
+}
 const optionEntries = Object.entries(currentQ?.options || {});
 return (
 <div className="exam-shell">
