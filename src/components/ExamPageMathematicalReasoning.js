@@ -426,8 +426,8 @@ const handleGenerateExplanation = async () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          question: currentQ.blocks,
-          options: currentQ.options,
+          question: currentQ?.blocks,
+          options: currentQ?.options,
           correct_answer: currentQ.correct_answer
         })
       }
@@ -503,24 +503,27 @@ const isReview = mode === "review";
     reviewQuestionsLength: reviewQuestions.length
   });
 }
- if (!currentQ) {
-  return <p className="loading">Loading review...</p>;
-}
+ 
 const optionEntries = Object.entries(currentQ?.options || {});
 return (
 <div className="exam-shell">
   <div className="exam-container">
     {mode === "review" && (
-  <MathematicalReasoningReview
-  studentId={studentId}
-  examId={selectedExamId}
-  examDates={examDates}
-  selectedExamId={selectedExamId}
-  onDateChange={handleDateChange}
-  onLoaded={handleReviewLoaded}
-  onExit={handleExitReview}
-/>
-     
+  <>
+    <MathematicalReasoningReview
+      studentId={studentId}
+      examId={selectedExamId}
+      examDates={examDates}
+      selectedExamId={selectedExamId}
+      onDateChange={handleDateChange}
+      onLoaded={handleReviewLoaded}
+      onExit={handleExitReview}
+    />
+
+    {!currentQ && (
+      <p className="loading">Loading review...</p>
+    )}
+  </>
 )}
     
   
@@ -617,8 +620,8 @@ return (
 <div className="question-card">
 
     {/* ✅ RENDER QUESTION BLOCKS */}
-    {Array.isArray(currentQ.blocks) &&
-      currentQ.blocks.map((block, idx) => {
+    {Array.isArray(currentQ?.blocks) &&
+      currentQ?.blocks.map((block, idx) => {
         if (block.type === "text") {
           return (
             <p key={idx} className="question-text">
@@ -644,8 +647,8 @@ return (
       {/* OPTIONS */}
       {optionEntries.map(([key, opt], i) => {
         const optionKey = key.toUpperCase();
-        const student = currentQ.student_answer?.trim().toUpperCase();
-        const correct = currentQ.correct_answer?.trim().toUpperCase();
+        const student = currentQ?.student_answer?.trim().toUpperCase();
+        const correct = currentQ?.correct_answer?.trim().toUpperCase();
         
         let statusClass = "";
         
@@ -656,7 +659,7 @@ return (
             statusClass = "option-wrong";       // red
           }
         } else {
-          if (answers[currentQ.q_id] === optionKey) {
+          if (answers[currentQ?.q_id] === optionKey) {
             statusClass = "selected";
           }
         }
