@@ -36,9 +36,14 @@ const handleDateChange = async (e) => {
   const examId = Number(e.target.value);
   setSelectedExamId(examId);
 
-  await loadReport(examId);
-};
+  // 🔥 ONLY load report if we are in report mode
+  if (mode === "report") {
+    await loadReport(examId);
+  }
 
+  // 🔥 DO NOTHING in review mode
+  // review will auto-reload via useEffect (examId change)
+};
  const loadReport = useCallback(async (examId) => {
   try {
     if (!examId) return;
