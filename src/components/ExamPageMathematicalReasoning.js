@@ -467,7 +467,15 @@ return (
  
 
 const currentQ = activeQuestions[currentIndex];
-if (!currentQ) return null;
+if (!currentQ) {
+  return (
+    <div className="exam-shell">
+      <div className="exam-container">
+        <p className="loading">Loading review...</p>
+      </div>
+    </div>
+  );
+}
 const isReview = mode === "review";
 const optionEntries = Object.entries(currentQ.options || {});
 
