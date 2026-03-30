@@ -49,5 +49,5 @@ export default function MathematicalReasoningReview({
 }, [studentId, examId, API_BASE, onLoaded]);
   
   
-  return <p className="loading">Loading review…</p>;
+  return null
 }
