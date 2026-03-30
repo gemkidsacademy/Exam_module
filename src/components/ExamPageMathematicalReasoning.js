@@ -464,15 +464,10 @@ return (
 
 
 // ---------------- EXAM UI ----------------
- 
+
 const currentQ = activeQuestions[currentIndex];
-
-if (!currentQ) {
-  return <p className="loading">Loading review...</p>;
-}
-
 const isReview = mode === "review";
-const optionEntries = Object.entries(currentQ.options || {});
+const optionEntries = Object.entries(currentQ?.options || {});
 return (
 <div className="exam-shell">
   <div className="exam-container">
@@ -612,116 +607,116 @@ return (
     {/* QUESTION CARD */}
 <div className="question-card">
 
-{/* ✅ RENDER QUESTION BLOCKS */}
-{Array.isArray(currentQ.blocks) &&
-  currentQ.blocks.map((block, idx) => {
-    if (block.type === "text") {
-      return (
-        <p key={idx} className="question-text">
-          {block.content}
-        </p>
-      );
-    }
+    {/* ✅ RENDER QUESTION BLOCKS */}
+    {Array.isArray(currentQ.blocks) &&
+      currentQ.blocks.map((block, idx) => {
+        if (block.type === "text") {
+          return (
+            <p key={idx} className="question-text">
+              {block.content}
+            </p>
+          );
+        }
 
-    if (block.type === "image") {
-      return (
-        <img
-          key={idx}
-          src={block.src}
-          alt={`Question visual ${idx + 1}`}
-          className="question-image"
-        />
-      );
-    }
+        if (block.type === "image") {
+          return (
+            <img
+              key={idx}
+              src={block.src}
+              alt={`Question visual ${idx + 1}`}
+              className="question-image"
+            />
+          );
+        }
 
-    return null;
-  })}
+        return null;
+      })}
 
-{/* OPTIONS */}
-{optionEntries.map(([key, opt], i) => {
-  const optionKey = key.toUpperCase();
-  const student = currentQ.student_answer?.trim().toUpperCase();
-  const correct = currentQ.correct_answer?.trim().toUpperCase();
-  
-  let statusClass = "";
-  
-  if (isReview) {
-    if (optionKey === correct) {
-      statusClass = "option-correct";     // green
-    } else if (optionKey === student) {
-      statusClass = "option-wrong";       // red
-    }
-  } else {
-    if (answers[currentQ.q_id] === optionKey) {
-      statusClass = "selected";
-    }
-  }
+      {/* OPTIONS */}
+      {optionEntries.map(([key, opt], i) => {
+        const optionKey = key.toUpperCase();
+        const student = currentQ.student_answer?.trim().toUpperCase();
+        const correct = currentQ.correct_answer?.trim().toUpperCase();
+        
+        let statusClass = "";
+        
+        if (isReview) {
+          if (optionKey === correct) {
+            statusClass = "option-correct";     // green
+          } else if (optionKey === student) {
+            statusClass = "option-wrong";       // red
+          }
+        } else {
+          if (answers[currentQ.q_id] === optionKey) {
+            statusClass = "selected";
+          }
+        }
 
-  return (
-    <button
-      key={i}
-      disabled={isReview}
-      className={`option-btn ${statusClass}`}
-      onClick={() => !isReview && handleAnswer(optionKey)}
-    >
-      {opt?.type === "image" ? (
-       <img
-         src={opt.src}
-         alt={`Option ${optionKey}`}
-         className="option-image"
-       />
-     ) : (
-       <span>{opt?.content}</span>
-     )}
-    </button>
-  );
-})}
-{/* AI EXPLANATION SECTION */}
-{isReview && (
-  <div style={{ marginTop: "20px" }}>
+        return (
+          <button
+            key={i}
+            disabled={isReview}
+            className={`option-btn ${statusClass}`}
+            onClick={() => !isReview && handleAnswer(optionKey)}
+          >
+            {opt?.type === "image" ? (
+            <img
+              src={opt.src}
+              alt={`Option ${optionKey}`}
+              className="option-image"
+            />
+          ) : (
+            <span>{opt?.content}</span>
+          )}
+          </button>
+        );
+      })}
+    {/* AI EXPLANATION SECTION */}
+    {isReview && (
+      <div style={{ marginTop: "20px" }}>
 
-    <button
-      onClick={handleGenerateExplanation}
-      disabled={loadingExplanation}
-      style={{
-        padding: "10px 16px",
-        background: "#2563eb",
-        color: "white",
-        border: "none",
-        borderRadius: "6px",
-        cursor: "pointer"
-      }}
-    >
-      {loadingExplanation ? "Generating..." : "✨ Generate AI Explanation"}
-    </button>
-
-    {explanation && (
-      <div
-        style={{
-          marginTop: "15px",
-          padding: "15px",
-          background: "#f9fafb",
-          borderRadius: "8px",
-          border: "1px solid #e5e7eb",
-          lineHeight: "1.6"
-        }}
-      >
-        <h4 style={{ marginBottom: "10px" }}>AI Explanation</h4>
-
-        <p
-          dangerouslySetInnerHTML={{
-            __html: explanation
-              .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-              .replace(/\n/g, "<br/>")
+        <button
+          onClick={handleGenerateExplanation}
+          disabled={loadingExplanation}
+          style={{
+            padding: "10px 16px",
+            background: "#2563eb",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer"
           }}
-        />
+        >
+          {loadingExplanation ? "Generating..." : "✨ Generate AI Explanation"}
+        </button>
+
+        {explanation && (
+          <div
+            style={{
+              marginTop: "15px",
+              padding: "15px",
+              background: "#f9fafb",
+              borderRadius: "8px",
+              border: "1px solid #e5e7eb",
+              lineHeight: "1.6"
+            }}
+          >
+            <h4 style={{ marginBottom: "10px" }}>AI Explanation</h4>
+
+            <p
+              dangerouslySetInnerHTML={{
+                __html: explanation
+                  .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                  .replace(/\n/g, "<br/>")
+              }}
+            />
+          </div>
+        )}
+
       </div>
     )}
 
-  </div>
-)}
-
-</div>
+    </div>
 
 
     {/* NAVIGATION */}
