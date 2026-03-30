@@ -515,7 +515,45 @@ const optionEntries = Object.entries(currentQ.options || {});
 return (
 <div className="exam-shell">
   <div className="exam-container">
+    <div style={{
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: "16px"
+}}>
+  
+  {/* DATE DROPDOWN */}
+  <div>
+    <label style={{ marginRight: "8px", fontWeight: "500" }}>
+      Date:
+    </label>
 
+    <select
+      value={selectedExamId || ""}
+      onChange={onDateChange}
+      style={{
+        padding: "6px 10px",
+        borderRadius: "6px",
+        border: "1px solid #d1d5db"
+      }}
+    >
+      {examDates.map((d) => (
+        <option key={d.exam_id} value={d.exam_id}>
+          {new Date(d.date).toLocaleDateString()}
+        </option>
+      ))}
+    </select>
+  </div>
+
+  {/* EXIT BUTTON */}
+  <button
+    className="exit-review-btn"
+    onClick={onExit}
+  >
+    Exit Review
+  </button>
+
+</div>
     {/* HEADER */}
     <div className="exam-header">
      {mode === "exam" && (
