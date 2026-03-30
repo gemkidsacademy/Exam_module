@@ -16,29 +16,29 @@ export default function MathematicalReasoningReview({
   }, []);
 
   useEffect(() => {
-  if (!studentId) return;
+  if (!studentId || !examId) return;
 
   const loadReview = async () => {
     const res = await fetch(
-      `${API_BASE}/api/student/exam-review/mathematical-reasoning?student_id=${studentId}`
+      `${API_BASE}/api/student/exam-review/mathematical-reasoning?student_id=${studentId}&exam_id=${examId}`
     );
 
     const data = await res.json();
 
-    // 🔍 FULL RAW RESPONSE
+    // 🔍 KEEP YOUR DEBUGGING (very useful)
     console.log("📦 REVIEW RAW RESPONSE:", data);
+    console.log("📋 QUESTIONS:", data.questions);
+    console.log("🧠 FIRST QUESTION:", data.questions?.[0]);
 
-    // 🔍 QUESTIONS ONLY
-    console.log("📋 REVIEW QUESTIONS ARRAY:", data.questions);
-
-    // 🔍 FIRST QUESTION (most important)
-    console.log("🧠 FIRST REVIEW QUESTION:", data.questions?.[0]);
+    // 🔥 NEW DEBUG (important)
+    console.log("🎯 CURRENT examId:", examId);
 
     onLoaded?.(data.questions || []);
   };
 
   loadReview();
-}, [studentId, API_BASE, onLoaded]);
 
+}, [studentId, examId, API_BASE, onLoaded]);
+  
   return <p className="loading">Loading review…</p>;
 }
