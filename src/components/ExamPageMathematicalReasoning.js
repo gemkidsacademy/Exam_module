@@ -461,51 +461,7 @@ return (
 
 );
 }
-if (mode === "review" && reviewQuestions.length === 0) {
-  return (
-    <MathematicalReasoningReview
-      studentId={studentId}
-      examId={selectedExamId}
-      examDates={examDates}
-      selectedExamId={selectedExamId}
-      onDateChange={handleDateChange}
-      onLoaded={(questions) => {
-        console.log("✅ Review questions received:", questions.length);
 
-        const normalized = questions.map(q => {
-          const rawBlocks = Array.isArray(q.question_blocks)
-            ? q.question_blocks
-            : Array.isArray(q.blocks)
-            ? q.blocks
-            : [];
-
-          return {
-            ...q,
-            blocks: rawBlocks.map(block => {
-              if (
-                block?.type === "image" &&
-                block?.src &&
-                !block.src.startsWith("http")
-              ) {
-                return {
-                  ...block,
-                  src: `https://storage.googleapis.com/exammoduleimages/${block.src}`
-                };
-              }
-              return block;
-            })
-          };
-        });
-
-        setReviewQuestions(normalized);
-        setCurrentIndex(0);
-      }}
-
-      onExit={handleExitReview}   // 🔥 ADD THIS LINE
-
-    />
-  );
-}
 
 // ---------------- EXAM UI ----------------
  
@@ -520,45 +476,50 @@ const optionEntries = Object.entries(currentQ.options || {});
 return (
 <div className="exam-shell">
   <div className="exam-container">
-    <div style={{
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: "16px"
-}}>
+    {mode === "review" && (
+  <MathematicalReasoningReview
+    studentId={studentId}
+    examId={selectedExamId}
+    examDates={examDates}
+    selectedExamId={selectedExamId}
+    onDateChange={handleDateChange}
+    onLoaded={(questions) => {
+      console.log("✅ Review questions received:", questions.length);
+
+      const normalized = questions.map(q => {
+        const rawBlocks = Array.isArray(q.question_blocks)
+          ? q.question_blocks
+          : Array.isArray(q.blocks)
+          ? q.blocks
+          : [];
+
+        return {
+          ...q,
+          blocks: rawBlocks.map(block => {
+            if (
+              block?.type === "image" &&
+              block?.src &&
+              !block.src.startsWith("http")
+            ) {
+              return {
+                ...block,
+                src: `https://storage.googleapis.com/exammoduleimages/${block.src}`
+              };
+            }
+            return block;
+          })
+        };
+      });
+
+      setReviewQuestions(normalized);
+      setCurrentIndex(0);
+    }}
+    onExit={handleExitReview}
+  />
+)}
+    
   
-  {/* DATE DROPDOWN */}
-  <div>
-    <label style={{ marginRight: "8px", fontWeight: "500" }}>
-      Date:
-    </label>
-
-    <select
-      value={selectedExamId || ""}
-      onChange={handleDateChange}
-      style={{
-        padding: "6px 10px",
-        borderRadius: "6px",
-        border: "1px solid #d1d5db"
-      }}
-    >
-      {examDates.map((d) => (
-        <option key={d.exam_id} value={d.exam_id}>
-          {new Date(d.date).toLocaleDateString()}
-        </option>
-      ))}
-    </select>
-  </div>
-
-  {/* EXIT BUTTON */}
-  <button
-    className="exit-review-btn"
-    onClick={handleExitReview}
-  >
-    Exit Review
-  </button>
-
-</div>
+  
     {/* HEADER */}
     <div className="exam-header">
   
