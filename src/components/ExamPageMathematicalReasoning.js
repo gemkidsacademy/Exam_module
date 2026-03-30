@@ -460,6 +460,10 @@ if (mode === "review" && reviewQuestions.length === 0) {
   return (
     <MathematicalReasoningReview
       studentId={studentId}
+      examId={selectedExamId}
+      examDates={examDates}
+      selectedExamId={selectedExamId}
+      onDateChange={handleDateChange}
       onLoaded={(questions) => {
         console.log("✅ Review questions received:", questions.length);
 
