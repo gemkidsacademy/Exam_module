@@ -530,7 +530,7 @@ return (
 
     <select
       value={selectedExamId || ""}
-      onChange={onDateChange}
+      onChange={handleDateChange}
       style={{
         padding: "6px 10px",
         borderRadius: "6px",
@@ -548,7 +548,7 @@ return (
   {/* EXIT BUTTON */}
   <button
     className="exit-review-btn"
-    onClick={onExit}
+    onClick={handleExitReview}
   >
     Exit Review
   </button>
