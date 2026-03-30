@@ -32,6 +32,37 @@ const isPopNavigationRef = useRef(false);
  * - report  → completed attempt
  */
 const [mode, setMode] = useState("loading");
+const handleReviewLoaded = useCallback((questions) => {
+  console.log("✅ Review questions received:", questions.length);
+
+  const normalized = questions.map(q => {
+    const rawBlocks = Array.isArray(q.question_blocks)
+      ? q.question_blocks
+      : Array.isArray(q.blocks)
+      ? q.blocks
+      : [];
+
+    return {
+      ...q,
+      blocks: rawBlocks.map(block => {
+        if (
+          block?.type === "image" &&
+          block?.src &&
+          !block.src.startsWith("http")
+        ) {
+          return {
+            ...block,
+            src: `https://storage.googleapis.com/exammoduleimages/${block.src}`
+          };
+        }
+        return block;
+      })
+    };
+  });
+
+  setReviewQuestions(normalized);
+  setCurrentIndex(0);
+}, []);
 const handleDateChange = async (e) => {
   const examId = Number(e.target.value);
   setSelectedExamId(examId);
@@ -473,44 +504,14 @@ return (
   <div className="exam-container">
     {mode === "review" && (
   <MathematicalReasoningReview
-    studentId={studentId}
-    examId={selectedExamId}
-    examDates={examDates}
-    selectedExamId={selectedExamId}
-    onDateChange={handleDateChange}
-    onLoaded={(questions) => {
-      console.log("✅ Review questions received:", questions.length);
-
-      const normalized = questions.map(q => {
-        const rawBlocks = Array.isArray(q.question_blocks)
-          ? q.question_blocks
-          : Array.isArray(q.blocks)
-          ? q.blocks
-          : [];
-
-        return {
-          ...q,
-          blocks: rawBlocks.map(block => {
-            if (
-              block?.type === "image" &&
-              block?.src &&
-              !block.src.startsWith("http")
-            ) {
-              return {
-                ...block,
-                src: `https://storage.googleapis.com/exammoduleimages/${block.src}`
-              };
-            }
-            return block;
-          })
-        };
-      });
-
-      setReviewQuestions(normalized);
-      setCurrentIndex(0);
-    }}
-    onExit={handleExitReview}
-  />
+  studentId={studentId}
+  examId={selectedExamId}
+  examDates={examDates}
+  selectedExamId={selectedExamId}
+  onDateChange={handleDateChange}
+  onLoaded={handleReviewLoaded}
+  onExit={handleExitReview}
+/>
      
 )}
     
