@@ -2,6 +2,10 @@ import { useEffect } from "react";
 
 export default function MathematicalReasoningReview({
   studentId,
+  examId,
+  examDates,
+  selectedExamId,
+  onDateChange,
   onLoaded,
   onExit
 }) {
