@@ -163,6 +163,30 @@ export default function ReadingComponent({
   }
 };
 
+  const loadReportReading_v1 = async (examId) => {
+  try {
+    if (!examId) return;
+
+    console.log("📡 Loading report for examId:", examId);
+
+    const studentIdFromStorage = sessionStorage.getItem("student_id");
+
+    const res = await fetch(
+      `${API_BASE}/api/student/exam-report/reading?student_id=${studentIdFromStorage}&exam_id=${examId}`
+    );
+
+    const data = await res.json();
+
+    console.log("📊 Report data:", data);
+
+    setReport(data);
+    setFinished(true);
+
+  } catch (err) {
+    console.error("❌ loadReport error:", err);
+  }
+};
+    
   const loadReportBySession = async (sessionId) => {
   try {
     setLoadingReport(true);
@@ -573,11 +597,14 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
         
             <select
               value={selectedExamId || ""}
-              onChange={(e) => {
+              onChange={async (e) => {
                 const examId = Number(e.target.value);
-                setSelectedExamId(examId);
-        
+            
                 console.log("📅 Selected examId:", examId);
+            
+                setSelectedExamId(examId);
+            
+                await loadReportReading_v1(examId);
               }}
               style={{
                 padding: "8px 12px",
