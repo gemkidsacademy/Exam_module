@@ -361,6 +361,7 @@ useEffect(() => {
           }
         );
   
+        await loadExamDates();
         await loadReport();
         onExamFinish?.();
       } catch (err) {
