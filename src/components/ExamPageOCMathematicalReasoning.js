@@ -582,9 +582,10 @@ return (
          className="option-image"
        />
      ) : (
-       <span>
-         <strong>{optionKey}.</strong> {opt?.content}
-       </span>
+       <div className="option-row">
+         <span className="option-label">{optionKey}.</span>
+         <span>{opt?.content}</span>
+       </div>
      )}
     </button>
   );
