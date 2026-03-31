@@ -5,11 +5,12 @@ import ReadingReview from "./ReadingReview";
 
 
 export default function ReadingComponent({
-    
+    studentId,
     onExamStart,
     onExamFinish
   }) {
-  const studentId = sessionStorage.getItem("student_id");
+  console.log("🧪 studentId:", studentId);
+  
   const API_BASE = process.env.REACT_APP_API_URL;
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   console.log("🔗 API_BASE:", API_BASE);
