@@ -12,7 +12,7 @@ export default function NaplanNumeracyReview({
     const loadReview = async () => {
       try {
         const response = await fetch(
-          `${API_BASE}/api/student/exam-review/naplan-numeracy?student_id=${studentId}`
+          `${API_BASE}/api/student/exam-review/naplan-numeracy?student_id=${studentId}&exam_id=${examId}`
         );
 
         if (!response.ok) {
@@ -43,7 +43,7 @@ export default function NaplanNumeracyReview({
 
     loadReview();
 
-  }, [studentId, API_BASE, onLoaded]);
+  }, [studentId, examId, API_BASE, onLoaded]);
 
   return (
     <div
