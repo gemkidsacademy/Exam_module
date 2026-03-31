@@ -309,7 +309,7 @@ useEffect(() => {
         console.log("📘 QUESTIONS:", data.questions);
   
         if (data.completed === true) {
-          await loadReport();
+          await loadExamDates(); // 🔥 this will trigger report automatically
           return;
         }
   
