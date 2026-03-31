@@ -38,12 +38,18 @@ export default function ReadingComponent({
   
   const [reviewQuestions, setReviewQuestions] = useState([]);
   useEffect(() => {
-  if (!studentId) return;
+  console.log("📅 useEffect running (no dependency)");
 
-  const loadExamDates = async () => {
+  const studentIdFromStorage = sessionStorage.getItem("student_id");
+
+  console.log("🧪 studentId used:", studentIdFromStorage);
+
+  const loadExamDatesReading_v2 = async () => {
     try {
+      console.log("📡 Calling exam-dates API...");
+
       const res = await fetch(
-        `${API_BASE}/api/student/exam-dates/reading?student_id=${studentId}`
+        `${API_BASE}/api/student/exam-dates/reading?student_id=${studentIdFromStorage}`
       );
 
       const data = await res.json();
@@ -53,7 +59,7 @@ export default function ReadingComponent({
       setExamDates(data);
 
       if (data.length > 0) {
-        setSelectedExamId(data[0].exam_id); // latest selected
+        setSelectedExamId(data[0].exam_id);
       }
 
     } catch (err) {
@@ -61,8 +67,8 @@ export default function ReadingComponent({
     }
   };
 
-  loadExamDates();
-}, [studentId]);
+  loadExamDatesReading_v2();
+}, []); // ✅ NO dependency
   const formatExplanation = (text) => {
       if (!text) return "";
     
