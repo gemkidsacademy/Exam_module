@@ -3,6 +3,9 @@ import "./ExamPage.css";
 
 export default function NaplanNumeracyReport({
   report,
+  examDates,
+  selectedExamId,
+  onExamChange,
   onViewExamDetails
 }) {
   if (!report?.overall) {
@@ -22,10 +25,27 @@ export default function NaplanNumeracyReport({
           HEADER
       =============================== */}
       <h2 className="report-title">
-        You scored {overall.correct} out of {overall.total_questions} in NAPLAN
-        Numeracy
+        You scored {overall.correct} out of {overall.total_questions} in NAPLAN Numeracy
       </h2>
 
+      {/* 🔥 DROPDOWN (NEW POSITION) */}
+      {examDates?.length > 0 && (
+        <div className="report-header-controls">
+          <select
+            className="exam-dropdown"
+            value={selectedExamId || ""}
+            onChange={(e) => onExamChange(Number(e.target.value))}
+          >
+            {examDates.map((d) => (
+              <option key={d.exam_id} value={d.exam_id}>
+                {new Date(d.date).toLocaleDateString()}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* BUTTON */}
       <button
         className="view-exam-btn"
         onClick={onViewExamDetails}
@@ -84,7 +104,7 @@ export default function NaplanNumeracyReport({
         <div className="topic-performance-card">
           <h3>Topic-wise Performance</h3>
 
-          {topic_wise_performance.map(t => (
+          {topic_wise_performance.map((t) => (
             <div key={t.topic} className="topic-row">
               <div className="topic-title">
                 {t.topic}
@@ -113,15 +133,9 @@ export default function NaplanNumeracyReport({
 
               <div className="topic-metrics">
                 <span>Attempted: {t.attempted}</span>
-                <span className="correct">
-                  Correct: {t.correct}
-                </span>
-                <span className="incorrect">
-                  Incorrect: {t.incorrect}
-                </span>
-                <span className="not-attempted">
-                  Not Attempted: {t.not_attempted}
-                </span>
+                <span className="correct">Correct: {t.correct}</span>
+                <span className="incorrect">Incorrect: {t.incorrect}</span>
+                <span className="not-attempted">Not Attempted: {t.not_attempted}</span>
               </div>
             </div>
           ))}
@@ -133,7 +147,7 @@ export default function NaplanNumeracyReport({
         <div className="report-card">
           <h3>Improvement Areas</h3>
 
-          {improvement_areas.map(t => (
+          {improvement_areas.map((t) => (
             <div key={t.topic} className="topic-bar">
               <span>{t.topic}</span>
 
