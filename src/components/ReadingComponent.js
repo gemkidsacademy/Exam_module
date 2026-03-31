@@ -37,38 +37,44 @@ export default function ReadingComponent({
   const [attemptId, setAttemptId] = useState(null);
   
   const [reviewQuestions, setReviewQuestions] = useState([]);
+  const loadExamDatesReading_v1 = async () => {
+  try {
+    const studentIdFromStorage = sessionStorage.getItem("student_id");
+
+    const res = await fetch(
+      `${API_BASE}/api/student/exam-dates/reading?student_id=${studentIdFromStorage}`
+    );
+
+    const data = await res.json();
+
+    console.log("📅 Reading exam dates:", data);
+
+    setExamDates(data);
+
+    return data;
+
+  } catch (err) {
+    console.error("❌ loadExamDates error:", err);
+    return [];
+  }
+};
   useEffect(() => {
-  console.log("📅 useEffect running (no dependency)");
+  if (!finished) return;
+  const init = async () => {
+    const data = await loadExamDatesReading_v1();
 
-  const studentIdFromStorage = sessionStorage.getItem("student_id");
+    if (data.length > 0) {
+      const latestExamId = data[0].exam_id;
 
-  console.log("🧪 studentId used:", studentIdFromStorage);
+      setSelectedExamId(latestExamId);
 
-  const loadExamDatesReading_v2 = async () => {
-    try {
-      console.log("📡 Calling exam-dates API...");
-
-      const res = await fetch(
-        `${API_BASE}/api/student/exam-dates/reading?student_id=${studentIdFromStorage}`
-      );
-
-      const data = await res.json();
-
-      console.log("📅 Reading exam dates:", data);
-
-      setExamDates(data);
-
-      if (data.length > 0) {
-        setSelectedExamId(data[0].exam_id);
-      }
-
-    } catch (err) {
-      console.error("❌ loadExamDates error:", err);
+      await loadReportReading_v1(latestExamId);
     }
   };
 
-  loadExamDatesReading_v2();
-}, []); // ✅ NO dependency
+  init();
+}, []);
+    
   const formatExplanation = (text) => {
       if (!text) return "";
     
@@ -181,6 +187,7 @@ export default function ReadingComponent({
 
     setReport(data);
     setFinished(true);
+    await loadExamDatesReading_v1();  // 🔥 refresh dates
 
   } catch (err) {
     console.error("❌ loadReport error:", err);
@@ -201,6 +208,7 @@ export default function ReadingComponent({
 
     const data = await res.json();
     setReport(data);
+    await loadExamDatesReading_v1();
 
   } catch (err) {
     console.error("❌ loadReportBySession error:", err);
@@ -512,6 +520,16 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
     // ✅ CHANGE 4B: hydrate report immediately
     setReport(data.report);
 
+    const dates = await loadExamDatesReading_v1();  // 🔥 refresh dropdown
+    
+    if (dates.length > 0) {
+      const latestExamId = dates[0].exam_id;
+    
+      setSelectedExamId(latestExamId);
+    
+      
+    }
+    
     setFinished(true);
     onExamFinish?.();
 
