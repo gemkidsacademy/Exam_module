@@ -29,8 +29,8 @@ export default function NaplanNumeracyReport({
       </h2>
 
       {/* 🔥 DROPDOWN (NEW POSITION) */}
-      {examDates?.length > 0 && (
-        <div className="report-header-controls">
+      <div className="report-header-row">
+        {examDates?.length > 0 && (
           <select
             className="exam-dropdown"
             value={selectedExamId || ""}
@@ -42,9 +42,15 @@ export default function NaplanNumeracyReport({
               </option>
             ))}
           </select>
-        </div>
-      )}
-
+        )}
+      
+        <button
+          className="view-exam-btn"
+          onClick={onViewExamDetails}
+        >
+          View Exam Details
+        </button>
+      </div>
       {/* BUTTON */}
       <button
         className="view-exam-btn"
