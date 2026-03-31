@@ -202,10 +202,11 @@ import React, {
       
     useEffect(() => {
       console.log("Selected exam changed:", selectedExamId);
+    
       if (selectedExamId) {
         loadReport(selectedExamId);
       }
-    }, [selectedExamId]);
+    }, [selectedExamId, loadReport]);
     
   
         
