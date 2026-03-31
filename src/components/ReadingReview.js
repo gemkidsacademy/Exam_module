@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState } from "react";
 import "./ExamPage_reading.css";
 import "./ReadingReviewIndex.css";
@@ -9,7 +10,13 @@ import "./ReadingReviewIndex.css";
  * - questions: review questions from backend
  * - onExit: callback to leave review
  */
-export default function ReadingReview({ questions = [], onExit }) {
+export default function ReadingReview({
+  questions = [],
+  examDates = [],
+  selectedExamId,
+  onDateChange,
+  onExit
+}) {
   const [index, setIndex] = useState(0);
   const groupedQuestions = useMemo(() => {
     const g = {};
@@ -151,18 +158,46 @@ if (typeof rm === "string") {
          HEADER
       ============================= */}
       <div className="exam-header">
-        <div>Reading Exam Review</div>
 
+      {/* 🔽 LEFT: DATE DROPDOWN */}
+      <div>
+        <select
+          value={selectedExamId || ""}
+          onChange={(e) => {
+            const examId = Number(e.target.value);
+            onDateChange?.(examId);
+          }}
+          style={{
+            padding: "6px 10px",
+            borderRadius: "6px",
+            border: "1px solid #d1d5db"
+          }}
+        >
+          {examDates.map((d) => (
+            <option key={d.exam_id} value={d.exam_id}>
+              {new Date(d.date).toLocaleDateString()}
+            </option>
+          ))}
+        </select>
+      </div>
+    
+      {/* 🔹 CENTER */}
+      <div>Reading Exam Review</div>
+    
+      {/* 🔹 RIGHT */}
+      <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
         <div className="counter">
           Question {index + 1} / {questions.length}
         </div>
-
+    
         {onExit && (
           <button className="exit-review-btn" onClick={onExit}>
             Exit Review
           </button>
         )}
       </div>
+    
+    </div>
 
       {/* =============================
          QUESTION INDEX
