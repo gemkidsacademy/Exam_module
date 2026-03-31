@@ -486,37 +486,19 @@ useEffect(() => {
   
     if (mode === "report") {
       return (
-        <>
-          {examDates.length > 0 && (
-            <div style={{ marginBottom: "20px" }}>
-              <select
-                value={selectedExamId || ""}
-                onChange={(e) => {
-                  const newExamId = Number(e.target.value);
-                  setSelectedExamId(newExamId);
-                  loadReport(newExamId);
-                }}
-              >
-                {examDates.map((d) => (
-                  <option key={d.exam_id} value={d.exam_id}>
-                    {new Date(d.date).toLocaleDateString()}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-    
-          <NaplanNumeracyReport
-            report={report}
-            onViewExamDetails={() => {
-              setQuestions([]);
-              setCurrentIndex(0);
-              setVisited({});
-              setAnswers({});
-              setMode("review");
-            }}
-          />
-        </>
+        <NaplanNumeracyReport
+          report={report}
+          examDates={examDates}
+          selectedExamId={selectedExamId}
+          onExamChange={(newExamId) => setSelectedExamId(newExamId)}
+          onViewExamDetails={() => {
+            setQuestions([]);
+            setCurrentIndex(0);
+            setVisited({});
+            setAnswers({});
+            setMode("review");
+          }}
+        />
       );
     }
   
