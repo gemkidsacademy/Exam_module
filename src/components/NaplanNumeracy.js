@@ -122,6 +122,27 @@ import React, {
     // ---------------- REPORT ----------------
     const [report, setReport] = useState(null);
     const [examAttemptId, setExamAttemptId] = useState(null);
+    const loadExamDates = useCallback(async () => {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/student/exam-dates/naplan-numeracy?student_id=${studentId}`
+    );
+
+    if (!res.ok) return;
+
+    const data = await res.json();
+
+    setExamDates(data || []);
+
+    // 🔥 always select latest after refresh
+    if (data?.length > 0) {
+      setSelectedExamId(data[0].exam_id);
+    }
+
+  } catch (err) {
+    console.error("Failed to load exam dates", err);
+  }
+}, [API_BASE, studentId]);
   
     /* ============================================================
        LOAD REPORT
@@ -183,34 +204,15 @@ import React, {
       return numA === numB;
     }
     useEffect(() => {
+      loadExamDates();
+    }, [loadExamDates]);
+    useEffect(() => {
       if (selectedExamId) {
         loadReport(selectedExamId);
       }
     }, [selectedExamId]);
-    useEffect(() => {
-  if (!studentId) return;
-
-  const loadExamDates = useCallback(async () => {
-  try {
-    const res = await fetch(
-      `${API_BASE}/api/student/exam-dates/naplan-numeracy?student_id=${studentId}`
-    );
-
-    if (!res.ok) return;
-
-    const data = await res.json();
-
-    setExamDates(data || []);
-
-    // 🔥 always select latest after refresh
-    if (data?.length > 0) {
-      setSelectedExamId(data[0].exam_id);
-    }
-
-  } catch (err) {
-    console.error("Failed to load exam dates", err);
-  }
-}, [API_BASE, studentId]);
+    
+  
         
     useEffect(() => {
   if (mode !== "exam" || questions.length === 0) return;
