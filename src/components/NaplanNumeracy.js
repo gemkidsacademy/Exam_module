@@ -190,30 +190,28 @@ import React, {
     useEffect(() => {
   if (!studentId) return;
 
-  const loadExamDates = async () => {
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/student/exam-dates/naplan-numeracy?student_id=${studentId}`
-      );
+  const loadExamDates = useCallback(async () => {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/student/exam-dates/naplan-numeracy?student_id=${studentId}`
+    );
 
-      if (!res.ok) return;
+    if (!res.ok) return;
 
-      const data = await res.json();
+    const data = await res.json();
 
-      setExamDates(data || []);
+    setExamDates(data || []);
 
-      // 🔥 auto-select latest exam
-      if (data?.length > 0 && !selectedExamId) {
-        setSelectedExamId(data[0].exam_id);
-      }
-
-    } catch (err) {
-      console.error("Failed to load exam dates", err);
+    // 🔥 always select latest after refresh
+    if (data?.length > 0) {
+      setSelectedExamId(data[0].exam_id);
     }
-  };
 
-  loadExamDates();
-}, [studentId, API_BASE]);
+  } catch (err) {
+    console.error("Failed to load exam dates", err);
+  }
+}, [API_BASE, studentId]);
+        
     useEffect(() => {
   if (mode !== "exam" || questions.length === 0) return;
 
