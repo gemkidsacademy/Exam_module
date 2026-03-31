@@ -199,7 +199,9 @@ import React, {
     useEffect(() => {
       loadExamDates();
     }, [loadExamDates]);
+      
     useEffect(() => {
+      console.log("Selected exam changed:", selectedExamId);
       if (selectedExamId) {
         loadReport(selectedExamId);
       }
@@ -321,11 +323,7 @@ useEffect(() => {
   
       startExam();
     }, [studentId, API_BASE, loadReport, mode, onExamStart]);
-   useEffect(() => {
-  document.addEventListener("contextmenu", e => e.preventDefault());
-  document.addEventListener("copy", e => e.preventDefault());
-  document.addEventListener("cut", e => e.preventDefault());
-}, []);
+  
     const formatExplanation = (text) => {
       if (!text) return "";
     
