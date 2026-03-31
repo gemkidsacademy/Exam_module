@@ -360,7 +360,7 @@ useEffect(() => {
       } catch (err) {
         console.error("Finish exam failed", err);
       }
-    }, [API_BASE, studentId, answers, loadReport, onExamFinish]);
+    }, [API_BASE, studentId, answers, loadExamDates, onExamFinish]);
   
     /* ============================================================
        TIMER
