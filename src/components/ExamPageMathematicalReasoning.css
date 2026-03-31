@@ -298,3 +298,13 @@ body {
     font-size: 12px;
   }
 }
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.option-label {
+  font-weight: 600;
+  min-width: 24px; /* keeps alignment neat */
+}
