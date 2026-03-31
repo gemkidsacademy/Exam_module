@@ -1,4 +1,4 @@
-  import React, {
+import React, {
     useState,
     useEffect,
     useRef,
@@ -21,6 +21,8 @@
   }) {
     const studentId = sessionStorage.getItem("student_id");
     const API_BASE = process.env.REACT_APP_API_URL;
+    const [examDates, setExamDates] = useState([]);
+    const [selectedExamId, setSelectedExamId] = useState(null);
     const TYPE_2_MAX_SELECTIONS = 2;
   
     if (!API_BASE) {
@@ -124,18 +126,29 @@
     /* ============================================================
        LOAD REPORT
     ============================================================ */
-    const loadReport = useCallback(async () => {
-      const res = await fetch(
-        `${API_BASE}/api/student/exam-report/naplan-numeracy?student_id=${studentId}`
-      );
-  
-      if (!res.ok) return;
-  
-      const data = await res.json();
-      setReport(data);
-      setExamAttemptId(data.exam_attempt_id);
-      setMode("report");
-    }, [API_BASE, studentId]);
+    const loadReport = useCallback(async (examIdParam) => {
+  const examIdToUse = examIdParam ?? selectedExamId;
+
+  const res = await fetch(
+    `${API_BASE}/api/student/exam-report/naplan-numeracy?student_id=${studentId}${
+      examIdToUse ? `&exam_id=${examIdToUse}` : ""
+    }`
+  );
+
+  if (!res.ok) return;
+
+  const data = await res.json();
+
+  setReport(data);
+  setExamAttemptId(data.exam_attempt_id);
+
+  // 🔥 fallback: backend not ready yet
+  if (!selectedExamId && data.exam_id) {
+    setSelectedExamId(data.exam_id);
+  }
+
+  setMode("report");
+}, [API_BASE, studentId, selectedExamId]);
     function normalizeNumericValue(raw) {
       if (raw == null) return null;
     
@@ -458,6 +471,7 @@ useEffect(() => {
     return (
       <NaplanNumeracyReview
         studentId={studentId}
+        examId={selectedExamId}
         onLoaded={(qs, studentAnswers) => {
           const normalizedAnswers = {};
         
