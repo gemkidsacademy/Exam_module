@@ -7,6 +7,7 @@ import "./QuizSetup.css";
 
 export default function QuizSetupOCThinkingSkills() {
   const [availableTopics, setAvailableTopics] = useState([]);
+  const MAX_QUESTIONS = 30;
   const [questionBank, setQuestionBank] = useState([]);
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [qbLoading, setQbLoading] = useState(false);
@@ -66,7 +67,7 @@ export default function QuizSetupOCThinkingSkills() {
         Number(topics[index].db || 0);
 
       topics[index].total = total;
-      topics[index].warning = total > 35;
+      topics[index].warning = total > MAX_QUESTIONS;
 
       const globalTotal = topics.reduce(
         (sum, t) => sum + (Number(t.total) || 0),
@@ -185,10 +186,11 @@ export default function QuizSetupOCThinkingSkills() {
       return;
     }
 
-    if (totalQuestions !== 40) {
-      alert("Total must be exactly 40.");
-      return;
-    }
+    if (totalQuestions !== MAX_QUESTIONS) {
+     alert(`Total must be exactly ${MAX_QUESTIONS}.`);
+     return;
+   }
+    
 
     const payload = {
       class_name: quiz.className,
@@ -346,9 +348,11 @@ export default function QuizSetupOCThinkingSkills() {
           ))}
         </div>
 
-        <h3>Total: {totalQuestions}</h3>
+        <h3>
+           Total: {totalQuestions} / {MAX_QUESTIONS}
+         </h3>
 
-        <button type="submit" disabled={totalQuestions > 40}>
+        <button type="submit" disabled={totalQuestions > MAX_QUESTIONS}>
           Create Exam
         </button>
       </form>
