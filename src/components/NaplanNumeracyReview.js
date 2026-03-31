@@ -2,6 +2,7 @@ import { useEffect } from "react";
 
 export default function NaplanNumeracyReview({
   studentId,
+  examId,
   onLoaded
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
