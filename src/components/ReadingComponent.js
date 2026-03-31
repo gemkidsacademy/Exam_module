@@ -37,6 +37,54 @@ export default function ReadingComponent({
   const [attemptId, setAttemptId] = useState(null);
   
   const [reviewQuestions, setReviewQuestions] = useState([]);
+  const loadReviewByExamId = async (examId) => {
+  try {
+    if (!examId) return;
+
+    console.log("📡 Loading REVIEW for examId:", examId);
+
+    const studentIdFromStorage = sessionStorage.getItem("student_id");
+
+    if (!studentIdFromStorage) {
+      console.error("❌ No student_id in sessionStorage");
+      return;
+    }
+
+    const res = await fetch(
+      `${API_BASE}/api/student/exam-review/reading?student_id=${studentIdFromStorage}&exam_id=${examId}`
+    );
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error("❌ loadReviewByExamId failed:", errText);
+      throw new Error("Failed to load review");
+    }
+
+    const data = await res.json();
+
+    console.log("🧪 REVIEW DATA (examId):", data);
+
+    // ✅ Normalize questions (same logic you already use)
+    const normalizedQuestions = (data.questions || []).map((q) => ({
+      ...q,
+      answer_options:
+        (q.answer_options && Object.keys(q.answer_options).length > 0)
+          ? q.answer_options
+          : q.section_ref?.answer_options ||
+            q.section?.answer_options ||
+            {}
+    }));
+
+    setReviewQuestions(normalizedQuestions);
+
+    // 🔥 Ensure we are in review mode
+    setMode("review");
+
+  } catch (err) {
+    console.error("❌ loadReviewByExamId error:", err);
+    alert("Unable to load exam review.");
+  }
+};
   const loadExamDatesReading_v1 = async () => {
   try {
     const studentIdFromStorage = sessionStorage.getItem("student_id");
@@ -559,11 +607,21 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
       return (
         <ReadingReview
           questions={reviewQuestions}
+          examDates={examDates}
+          selectedExamId={selectedExamId}
+          onDateChange={async (examId) => {
+            setSelectedExamId(examId);
+        
+            // 🔥 load report (optional but good)
+            await loadReportReading_v1(examId);
+        
+            // 🔥 load review for this exam (NEW)
+            await loadReviewByExamId(examId);
+          }}
           onExit={() => {
-              setReviewQuestions([]);
-              setMode("exam");
-            }}
-
+            setReviewQuestions([]);
+            setMode("exam");
+          }}
         />
       );
     }
