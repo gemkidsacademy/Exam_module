@@ -925,6 +925,37 @@ progress::-webkit-progress-value {
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
+.report-header-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin: 16px 0 24px;
+}
+
+/* Dropdown styling */
+.exam-dropdown {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 140px;
+  transition: all 0.2s ease;
+}
+
+.exam-dropdown:hover {
+  border-color: #6366f1;
+  background: #ffffff;
+}
+
+.exam-dropdown:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+}
+
 
 .view-exam-btn:hover {
   transform: translateY(-1px);
