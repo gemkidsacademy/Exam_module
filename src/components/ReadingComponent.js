@@ -1,4 +1,3 @@
-#old 
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import "./ExamPage_reading.css";
 import ReadingReview from "./ReadingReview";
