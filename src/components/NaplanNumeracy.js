@@ -183,6 +183,38 @@ import React, {
       return numA === numB;
     }
     useEffect(() => {
+      if (selectedExamId) {
+        loadReport(selectedExamId);
+      }
+    }, [selectedExamId]);
+    useEffect(() => {
+  if (!studentId) return;
+
+  const loadExamDates = async () => {
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/student/exam-dates/naplan-numeracy?student_id=${studentId}`
+      );
+
+      if (!res.ok) return;
+
+      const data = await res.json();
+
+      setExamDates(data || []);
+
+      // 🔥 auto-select latest exam
+      if (data?.length > 0 && !selectedExamId) {
+        setSelectedExamId(data[0].exam_id);
+      }
+
+    } catch (err) {
+      console.error("Failed to load exam dates", err);
+    }
+  };
+
+  loadExamDates();
+}, [studentId, API_BASE]);
+    useEffect(() => {
   if (mode !== "exam" || questions.length === 0) return;
 
   // 🔥 Step 1: initial state
@@ -454,16 +486,37 @@ useEffect(() => {
   
     if (mode === "report") {
       return (
-        <NaplanNumeracyReport
-          report={report}
-          onViewExamDetails={() => {
-            setQuestions([]);
-            setCurrentIndex(0);
-            setVisited({});
-            setAnswers({});
-            setMode("review");
-          }}
-        />
+        <>
+          {examDates.length > 0 && (
+            <div style={{ marginBottom: "20px" }}>
+              <select
+                value={selectedExamId || ""}
+                onChange={(e) => {
+                  const newExamId = Number(e.target.value);
+                  setSelectedExamId(newExamId);
+                  loadReport(newExamId);
+                }}
+              >
+                {examDates.map((d) => (
+                  <option key={d.exam_id} value={d.exam_id}>
+                    {new Date(d.date).toLocaleDateString()}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+    
+          <NaplanNumeracyReport
+            report={report}
+            onViewExamDetails={() => {
+              setQuestions([]);
+              setCurrentIndex(0);
+              setVisited({});
+              setAnswers({});
+              setMode("review");
+            }}
+          />
+        </>
       );
     }
   
