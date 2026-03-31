@@ -1,3 +1,4 @@
+#old 
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import "./ExamPage_reading.css";
 import ReadingReview from "./ReadingReview";
@@ -20,9 +21,6 @@ export default function ReadingComponent({
      STATE
   ============================= */
   const [exam, setExam] = useState(null);
-  const [examDates, setExamDates] = useState([]);
-  const [selectedExamId, setSelectedExamId] = useState(null);
-  const [mode, setMode] = useState("loading"); // replace "exam"
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
   const isPopNavigationRef = useRef(false);
@@ -33,34 +31,8 @@ export default function ReadingComponent({
   const [loadingExplanation, setLoadingExplanation] = useState(null);
 
   const [attemptId, setAttemptId] = useState(null);
-  
+  const [mode, setMode] = useState("exam");
   const [reviewQuestions, setReviewQuestions] = useState([]);
-  useEffect(() => {
-  if (!studentId) return;
-
-  const loadExamDates = async () => {
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/student/exam-dates/reading?student_id=${studentId}`
-      );
-
-      const data = await res.json();
-
-      console.log("📅 Reading exam dates:", data);
-
-      setExamDates(data);
-
-      if (data.length > 0) {
-        setSelectedExamId(data[0].exam_id); // latest selected
-      }
-
-    } catch (err) {
-      console.error("❌ loadExamDates error:", err);
-    }
-  };
-
-  loadExamDates();
-}, [studentId]);
   const formatExplanation = (text) => {
       if (!text) return "";
     
@@ -526,74 +498,28 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
     }
 
     return (
-          <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            overflowY: "auto",
-            background: "#f3f4f6",
-            padding: "32px",
-            boxSizing: "border-box",
-            zIndex: 1
-          }}
-        >
-            <h1>
-              You scored {normalizedReport.correct} out of {normalizedReport.total}
-            </h1>
-            
-            {/* ✅ NEW: Review Exam Button */}
-            <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-end",
-            marginBottom: "20px"
-          }}
-        >
-        
-          {/* 🔽 LEFT: DATE DROPDOWN */}
-          <div>
-            <label
-              style={{
-                display: "block",
-                marginBottom: "6px",
-                fontWeight: "500"
-              }}
-            >
-              Date
-            </label>
-        
-            <select
-              value={selectedExamId || ""}
-              onChange={(e) => {
-                const examId = Number(e.target.value);
-                setSelectedExamId(examId);
-        
-                console.log("📅 Selected examId:", examId);
-              }}
-              style={{
-                padding: "8px 12px",
-                borderRadius: "6px",
-                border: "1px solid #d1d5db"
-              }}
-            >
-              {examDates.map((d) => (
-                <option key={d.exam_id} value={d.exam_id}>
-                  {new Date(d.date).toLocaleDateString()}
-                </option>
-              ))}
-            </select>
-          </div>
-        
-          {/* 🔘 RIGHT: REVIEW BUTTON */}
-          <button
-            className="review-exam-btn"
-            onClick={handleReviewExam}
-          >
-            Review Exam
-          </button>
-        
-        </div>
+  <div
+  style={{
+    position: "fixed",
+    inset: 0,
+    overflowY: "auto",
+    background: "#f3f4f6",
+    padding: "32px",
+    boxSizing: "border-box",
+    zIndex: 1
+  }}
+>
+    <h1>
+      You scored {normalizedReport.correct} out of {normalizedReport.total}
+    </h1>
+    
+    {/* ✅ NEW: Review Exam Button */}
+    <button
+      className="review-exam-btn"
+      onClick={handleReviewExam}
+    >
+      Review Exam
+    </button>
     <div className="report-grid">
 
       {/* =============================
