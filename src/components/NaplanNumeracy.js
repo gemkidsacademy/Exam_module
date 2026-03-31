@@ -148,21 +148,39 @@ import React, {
        LOAD REPORT
     ============================================================ */
     const loadReport = useCallback(async (examId) => {
-  if (!examId) return;
+  console.log("🚀 loadReport called with examId:", examId);
 
-  const res = await fetch(
-    `${API_BASE}/api/student/exam-report/naplan-numeracy?student_id=${studentId}&exam_id=${examId}`
-  );
+  if (!examId) {
+    console.warn("⚠️ loadReport aborted: examId is missing");
+    return;
+  }
 
-  if (!res.ok) return;
+  const url = `${API_BASE}/api/student/exam-report/naplan-numeracy?student_id=${studentId}&exam_id=${examId}`;
+  console.log("🌐 Fetching URL:", url);
 
-  const data = await res.json();
+  try {
+    const res = await fetch(url);
 
-  setReport(data);
-  setExamAttemptId(data.exam_attempt_id);
-  setMode("report");
-}, [API_BASE, studentId]);
-      
+    console.log("📡 Response status:", res.status);
+
+    if (!res.ok) {
+      console.error("❌ API request failed");
+      return;
+    }
+
+    const data = await res.json();
+    console.log("📦 Response data:", data);
+
+    setReport(data);
+    setExamAttemptId(data.exam_attempt_id);
+    setMode("report");
+
+    console.log("✅ Report state updated");
+
+  } catch (err) {
+    console.error("🔥 loadReport error:", err);
+  }
+}, [API_BASE, studentId]);      
     function normalizeNumericValue(raw) {
       if (raw == null) return null;
     
