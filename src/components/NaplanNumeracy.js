@@ -147,13 +147,11 @@ import React, {
     /* ============================================================
        LOAD REPORT
     ============================================================ */
-    const loadReport = useCallback(async (examIdParam) => {
-  const examIdToUse = examIdParam ?? selectedExamId;
+    const loadReport = useCallback(async (examId) => {
+  if (!examId) return;
 
   const res = await fetch(
-    `${API_BASE}/api/student/exam-report/naplan-numeracy?student_id=${studentId}${
-      examIdToUse ? `&exam_id=${examIdToUse}` : ""
-    }`
+    `${API_BASE}/api/student/exam-report/naplan-numeracy?student_id=${studentId}&exam_id=${examId}`
   );
 
   if (!res.ok) return;
@@ -162,14 +160,9 @@ import React, {
 
   setReport(data);
   setExamAttemptId(data.exam_attempt_id);
-
-  // 🔥 fallback: backend not ready yet
-  if (!selectedExamId && data.exam_id) {
-    setSelectedExamId(data.exam_id);
-  }
-
   setMode("report");
-}, [API_BASE, studentId, selectedExamId]);
+}, [API_BASE, studentId]);
+      
     function normalizeNumericValue(raw) {
       if (raw == null) return null;
     
@@ -362,7 +355,7 @@ useEffect(() => {
         );
   
         await loadExamDates();
-        await loadReport();
+        
         onExamFinish?.();
       } catch (err) {
         console.error("Finish exam failed", err);
