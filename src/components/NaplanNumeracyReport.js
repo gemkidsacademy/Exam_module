@@ -51,13 +51,7 @@ export default function NaplanNumeracyReport({
           View Exam Details
         </button>
       </div>
-      {/* BUTTON */}
-      <button
-        className="view-exam-btn"
-        onClick={onViewExamDetails}
-      >
-        View Exam Details
-      </button>
+      
 
       <div className="report-grid">
 
