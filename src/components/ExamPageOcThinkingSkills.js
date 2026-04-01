@@ -382,6 +382,7 @@ async (reason = "submitted") => {
       setSelectedAttemptId(latestAttemptId);
     
       await loadReport(latestAttemptId);
+      setMode("report");
     }
 
     // ✅ notify parent
@@ -460,9 +461,7 @@ const activeQuestions = questions;
 
 
 // Only block loading for exam & review
-if (mode === "exam" && !questions.length) {
-  return <p className="loading">Loading…</p>;
-}
+// 🔥 ALWAYS decide UI by mode FIRST
 
 if (mode === "loading") {
   return <p className="loading">Loading…</p>;
@@ -470,48 +469,51 @@ if (mode === "loading") {
 
 if (mode === "report") {
   return (
-  <ThinkingSkillsReport
-    report={report}
-    onViewExamDetails={handleViewExamDetails}
-    attempts={attempts}
-    selectedAttemptId={selectedAttemptId}
-    onAttemptChange={async (attemptId) => {
-      setSelectedAttemptId(attemptId);
+    <ThinkingSkillsReport
+      report={report}
+      onViewExamDetails={handleViewExamDetails}
+      attempts={attempts}
+      selectedAttemptId={selectedAttemptId}
+      onAttemptChange={async (attemptId) => {
+        setSelectedAttemptId(attemptId);
 
-      // 🔥 IMPORTANT
-      setQuestions([]);   // force reload review later
+        // 🔥 prepare for review reload
+        setQuestions([]);
 
-      await loadReport(attemptId);
-    }}
-  />
-); 
-}
- 
-if (mode === "review" && questions.length === 0) {
-  return (
-    <OcThinkingSkillsReview
-  studentId={studentId}
-  examAttemptId={examAttemptId}
-  attempts={attempts}
-  selectedAttemptId={selectedAttemptId}
-  onAttemptChange={async (attemptId) => {
-    setSelectedAttemptId(attemptId);
-
-    // 🔥 force reload
-    setQuestions([]);
-
-    setExamAttemptId(attemptId);
-  }}
-  onLoaded={(qs) => {
-    setQuestions(qs);
-    setCurrentIndex(0);
-    setVisited({});
-    setAnswers({});
-  }}
-/>
+        await loadReport(attemptId);
+      }}
+    />
   );
 }
 
+if (mode === "review" && questions.length === 0) {
+  return (
+    <OcThinkingSkillsReview
+      studentId={studentId}
+      examAttemptId={examAttemptId}
+      attempts={attempts}
+      selectedAttemptId={selectedAttemptId}
+      onAttemptChange={async (attemptId) => {
+        setSelectedAttemptId(attemptId);
+
+        // 🔥 force reload
+        setQuestions([]);
+
+        setExamAttemptId(attemptId);
+      }}
+      onLoaded={(qs) => {
+        setQuestions(qs);
+        setCurrentIndex(0);
+        setVisited({});
+        setAnswers({});
+      }}
+    />
+  );
+}
+
+if (mode === "exam" && !questions.length) {
+  return <p className="loading">Loading…</p>;
+}
 // ---------------- EXAM UI ----------------
 const currentQ = activeQuestions[currentIndex];
 if (!currentQ) return null;
