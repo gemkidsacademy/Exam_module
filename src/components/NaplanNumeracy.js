@@ -220,12 +220,10 @@ import React, {
     }, [loadExamDates]);
       
     useEffect(() => {
-      console.log("Selected exam changed:", selectedExamId);
-    
-      if (selectedExamId) {
-        loadReport(selectedExamId);
-      }
-    }, [selectedExamId, loadReport]);
+  if (selectedExamId && mode === "report") {
+    loadReport(selectedExamId);
+  }
+}, [selectedExamId, mode, loadReport]);
     
   
         
