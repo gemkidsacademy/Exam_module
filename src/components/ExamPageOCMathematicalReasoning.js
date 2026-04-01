@@ -81,7 +81,7 @@ const [selectedAttemptId, setSelectedAttemptId] = useState(null);
 /* ============================================================
    LOAD REPORT (ONLY WHEN EXAM IS COMPLETED)
 ============================================================ */
-/*const loadAttempts = async () => {
+const loadAttempts = async () => {
   try {
     const res = await fetch(
       `${API_BASE}/api/student/exam-attempts/oc-mathematical-reasoning?student_id=${studentId}`
@@ -106,7 +106,7 @@ const [selectedAttemptId, setSelectedAttemptId] = useState(null);
   } catch (err) {
     console.error("❌ loadAttempts error:", err);
   }
-};*/
+};
 const loadReport = useCallback(async (attemptId = null) => {
   try {
     let url = `${API_BASE}/api/student/exam-report/oc-mathematical-reasoning?student_id=${studentId}`;
