@@ -143,13 +143,19 @@ const handleGenerateExplanation = async () => {
  const handleViewExamDetails = () => {
   console.log("🟢 View Exam Details button clicked");
 
-  console.log("➡️ selectedAttemptId:", selectedAttemptId);
+  const attemptIdToUse = selectedAttemptId || report?.exam_attempt_id;
 
-  if (!selectedAttemptId) {
-    console.error("❌ No attempt selected!");
+  console.log("➡️ selectedAttemptId:", selectedAttemptId);
+  console.log("➡️ fallback report attempt:", report?.exam_attempt_id);
+  console.log("➡️ FINAL attemptId used:", attemptIdToUse);
+  
+  if (!attemptIdToUse) {
+    console.error("❌ No attempt available!");
     return;
   }
-
+  
+  // 🔥 use fallback-safe value
+  setExamAttemptId(attemptIdToUse);
   // 🔥 CRITICAL FIX
   setExamAttemptId(selectedAttemptId);
 
