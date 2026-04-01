@@ -472,7 +472,7 @@ if (mode === "report") {
 
           console.log("📅 REVIEW DROPDOWN:", id);
 
-          setQuestions([]);            // 🔥 force reload
+          setQuestions([]);
           setExamAttemptId(id);
         }}
         style={{
@@ -490,12 +490,11 @@ if (mode === "report") {
         ))}
       </select>
 
+      {/* 🔽 LOADER */}
       <OcThinkingSkillsReview
         studentId={studentId}
         examAttemptId={examAttemptId}
         onLoaded={(qs) => {
-          console.log("REVIEW QUESTIONS RECEIVED IN PARENT", qs);
-
           setQuestions(qs);
           setCurrentIndex(0);
           setVisited({});
@@ -506,7 +505,6 @@ if (mode === "report") {
     </div>
   );
 }
-
 // ---------------- EXAM UI ----------------
 const currentQ = activeQuestions[currentIndex];
 if (!currentQ) return null;
@@ -527,6 +525,36 @@ return (
   }}
 >
   <div className={styles.examContainer}>
+ {isReview && (
+  <div style={{ marginBottom: "12px" }}>
+    <select
+      value={examAttemptId || ""}
+      onChange={(e) => {
+        const value = e.target.value;
+        if (!value) return;
+
+        const id = Number(value);
+
+        console.log("📅 REVIEW DROPDOWN:", id);
+
+        setQuestions([]);   // 🔥 trigger reload
+        setExamAttemptId(id);
+      }}
+      style={{
+        padding: "8px",
+        borderRadius: "6px"
+      }}
+    >
+      <option value="">Select Attempt</option>
+
+      {attempts.map((a) => (
+        <option key={a.exam_attempt_id} value={a.exam_attempt_id}>
+          {new Date(a.completed_at).toLocaleString()}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
 
     {/* HEADER */}
     <div className={styles.examHeader}>
