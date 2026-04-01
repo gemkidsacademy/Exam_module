@@ -514,62 +514,42 @@ useEffect(() => {
       );
     }
   
-    
+    if (mode === "review" && !questions.length) {
+    return (
+      <NaplanNumeracyReview
+        studentId={studentId}
+        examId={selectedExamId}
+        onLoaded={(qs, studentAnswers) => {
+          const normalizedAnswers = {};
+        
+          Object.entries(studentAnswers || {}).forEach(([key, value]) => {
+            if (typeof value === "string") {
+              // convert "['E']" into ["E"]
+              try {
+                const parsed = JSON.parse(value.replace(/'/g, '"'));
+                normalizedAnswers[String(key)] = parsed;
+              } catch {
+                normalizedAnswers[String(key)] = value;
+              }
+            } else {
+              normalizedAnswers[String(key)] = value;
+            }
+          });
+        
+          setQuestions(qs || []);
+          setAnswers(normalizedAnswers);
+          setCurrentIndex(0);
+          setVisited({});
+        }}
+      />
+    );
+  }
   
     /* ============================================================
        EXAM UI
     ============================================================ */
     const currentQ = questions[currentIndex];
-    if (!currentQ) {
-  return (
-    <div className={`exam-shell ${styles.examShell}`}>
-      <div className={`exam-container ${styles.examContainer}`}>
-
-        {/* 🔽 KEEP DROPDOWN VISIBLE */}
-        {isReview && (
-          <NaplanNumeracyReview
-            studentId={studentId}
-            examId={selectedExamId}
-            examDates={examDates}
-            selectedExamId={selectedExamId}
-            onExamChange={(newExamId) => {
-              setQuestions([]);
-              setSelectedExamId(newExamId);
-            }}
-            onLoaded={(qs, studentAnswers) => {
-              const normalizedAnswers = {};
-
-              Object.entries(studentAnswers || {}).forEach(([key, value]) => {
-                if (typeof value === "string") {
-                  try {
-                    const parsed = JSON.parse(value.replace(/'/g, '"'));
-                    normalizedAnswers[String(key)] = parsed;
-                  } catch {
-                    normalizedAnswers[String(key)] = value;
-                  }
-                } else {
-                  normalizedAnswers[String(key)] = value;
-                }
-              });
-
-              setQuestions(qs || []);
-              setAnswers(normalizedAnswers);
-              setCurrentIndex(0);
-              setVisited({});
-            }}
-          />
-        )}
-
-        {/* 🔄 LOADING MESSAGE */}
-        <div style={{ padding: "40px", textAlign: "center" }}>
-          <p>Loading review questions...</p>
-        </div>
-
-      </div>
-    </div>
-  );
-}
-    
+    if (!currentQ) return null;
   
     const hasImageMultiSelect =
       currentQ.question_blocks?.some(
@@ -628,39 +608,6 @@ useEffect(() => {
     return (
       <div className={`exam-shell ${styles.examShell}`}>
         <div className={`exam-container ${styles.examContainer}`}>
-          {isReview && (
-  <NaplanNumeracyReview
-    studentId={studentId}
-    examId={selectedExamId}
-    examDates={examDates}
-    selectedExamId={selectedExamId}
-    onExamChange={(newExamId) => {
-      setQuestions([]);
-      setSelectedExamId(newExamId);
-    }}
-    onLoaded={(qs, studentAnswers) => {
-      const normalizedAnswers = {};
-
-      Object.entries(studentAnswers || {}).forEach(([key, value]) => {
-        if (typeof value === "string") {
-          try {
-            const parsed = JSON.parse(value.replace(/'/g, '"'));
-            normalizedAnswers[String(key)] = parsed;
-          } catch {
-            normalizedAnswers[String(key)] = value;
-          }
-        } else {
-          normalizedAnswers[String(key)] = value;
-        }
-      });
-
-      setQuestions(qs || []);
-      setAnswers(normalizedAnswers);
-      setCurrentIndex(0);
-      setVisited({});
-    }}
-  />
-)}
           {/* HEADER */}
           <div className={styles.examHeader}>
             {!isReview && <div className="timer">⏳ {formatTime(timeLeft)}</div>}
@@ -751,7 +698,6 @@ useEffect(() => {
   
           {/* QUESTION CARD */}
           <div className="question-card">
-              
             <div className="question-content-centered">
               {!currentQ.question_blocks?.some(b => b.type === "text") &&
                 currentQ.question_text && (
