@@ -457,26 +457,53 @@ if (mode === "report") {
 
   );
 }
- 
-if (mode === "review" && questions.length === 0) {
+ if (mode === "review" && questions.length === 0) {
   return (
-    <OcThinkingSkillsReview
-      studentId={studentId}
-      examAttemptId={examAttemptId}
-      onLoaded={(qs) => {
+    <div style={{ padding: "16px" }}>
 
-       console.log("REVIEW QUESTIONS RECEIVED IN PARENT", qs);
-     
-       if (qs.length > 0) {
-         console.log("FIRST REVIEW QUESTION OPTIONS", qs[0].options);
-       }
-     
-       setQuestions(qs);
-       setCurrentIndex(0);
-       setVisited({});
-       setAnswers({});
-     }}
-    />
+      {/* 🔽 DROPDOWN */}
+      <select
+        value={examAttemptId || ""}
+        onChange={(e) => {
+          const value = e.target.value;
+          if (!value) return;
+
+          const id = Number(value);
+
+          console.log("📅 REVIEW DROPDOWN:", id);
+
+          setQuestions([]);            // 🔥 force reload
+          setExamAttemptId(id);
+        }}
+        style={{
+          marginBottom: "12px",
+          padding: "8px",
+          borderRadius: "6px"
+        }}
+      >
+        <option value="">Select Attempt</option>
+
+        {attempts.map((a) => (
+          <option key={a.exam_attempt_id} value={a.exam_attempt_id}>
+            {new Date(a.completed_at).toLocaleString()}
+          </option>
+        ))}
+      </select>
+
+      <OcThinkingSkillsReview
+        studentId={studentId}
+        examAttemptId={examAttemptId}
+        onLoaded={(qs) => {
+          console.log("REVIEW QUESTIONS RECEIVED IN PARENT", qs);
+
+          setQuestions(qs);
+          setCurrentIndex(0);
+          setVisited({});
+          setAnswers({});
+        }}
+      />
+
+    </div>
   );
 }
 
