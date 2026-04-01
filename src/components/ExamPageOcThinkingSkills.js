@@ -468,22 +468,25 @@ if (mode === "report") {
 if (mode === "review" && questions.length === 0) {
   return (
     <OcThinkingSkillsReview
-      studentId={studentId}
-      examAttemptId={examAttemptId}
-      onLoaded={(qs) => {
+  studentId={studentId}
+  examAttemptId={examAttemptId}
+  attempts={attempts}
+  selectedAttemptId={selectedAttemptId}
+  onAttemptChange={async (attemptId) => {
+    setSelectedAttemptId(attemptId);
 
-       console.log("REVIEW QUESTIONS RECEIVED IN PARENT", qs);
-     
-       if (qs.length > 0) {
-         console.log("FIRST REVIEW QUESTION OPTIONS", qs[0].options);
-       }
-     
-       setQuestions(qs);
-       setCurrentIndex(0);
-       setVisited({});
-       setAnswers({});
-     }}
-    />
+    // 🔥 force reload
+    setQuestions([]);
+
+    setExamAttemptId(attemptId);
+  }}
+  onLoaded={(qs) => {
+    setQuestions(qs);
+    setCurrentIndex(0);
+    setVisited({});
+    setAnswers({});
+  }}
+/>
   );
 }
 
