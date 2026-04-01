@@ -18,6 +18,27 @@ export default function ExamPageOcThinkingSkills({
 }) {
 const studentId = sessionStorage.getItem("student_id");
 const isPopNavigationRef = useRef(false);
+const [attempts, setAttempts] = useState([]);
+const [selectedAttemptId, setSelectedAttemptId] = useState(null);
+const loadExamAttempts = useCallback(async () => {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/student/exam-attempts/oc-thinking-skills?student_id=${studentId}`
+    );
+
+    const data = await res.json();
+
+    console.log("📅 attempts:", data);
+
+    setAttempts(data);
+
+    // ✅ default = latest attempt
+    
+
+  } catch (err) {
+    console.error("❌ attempts load error:", err);
+  }
+}, [studentId]);
 const formatExplanation = (text) => {
   if (!text) return "";
 
@@ -158,10 +179,10 @@ const [report, setReport] = useState(null);
 /* ============================================================
    LOAD REPORT (ONLY WHEN EXAM IS COMPLETED)
 ============================================================ */
-const loadReport = useCallback(async () => {
+const loadReport = useCallback(async (attemptId = null) => {
   try {
     const res = await fetch(
-      `${API_BASE}/api/student/exam-report/oc-thinking-skills?student_id=${studentId}`
+      `${API_BASE}/api/student/exam-report/oc-thinking-skills?student_id=${studentId}&attempt_id=${attemptId}`
     );
 
     if (!res.ok) {
@@ -175,6 +196,8 @@ const loadReport = useCallback(async () => {
 
     setReport(data);
     setExamAttemptId(data.exam_attempt_id);
+    
+    setSelectedAttemptId(data.exam_attempt_id);
     setMode("report");
   } catch (err) {
     console.error("❌ loadReport error:", err);
@@ -294,10 +317,13 @@ useEffect(() => {
     );
 
     if (data.completed === true) {
-      sessionStorage.setItem("oc_thinking_skills_completed", "true");
-      await loadReport();
-      return;
-    }
+     sessionStorage.setItem("oc_thinking_skills_completed", "true");
+   
+     await loadExamAttempts();   // 🔥 NEW
+     await loadReport();         // loads latest
+   
+     return;
+   }
 
     setQuestions(data.questions || []);
     setTimeLeft(data.remaining_time);
@@ -422,12 +448,21 @@ if (mode === "loading") {
 
 if (mode === "report") {
   return (
-    <ThinkingSkillsReport
-     report={report}
-     onViewExamDetails={handleViewExamDetails}
-   />
+  <ThinkingSkillsReport
+    report={report}
+    onViewExamDetails={handleViewExamDetails}
+    attempts={attempts}
+    selectedAttemptId={selectedAttemptId}
+    onAttemptChange={async (attemptId) => {
+      setSelectedAttemptId(attemptId);
 
-  );
+      // 🔥 IMPORTANT
+      setQuestions([]);   // force reload review later
+
+      await loadReport(attemptId);
+    }}
+  />
+); 
 }
  
 if (mode === "review" && questions.length === 0) {
@@ -737,7 +772,13 @@ return (
 /* ============================================================
  REPORT COMPONENT
 ============================================================ */
-function ThinkingSkillsReport({ report, onViewExamDetails }) {
+function ThinkingSkillsReport({
+  report,
+  onViewExamDetails,
+  attempts,
+  selectedAttemptId,
+  onAttemptChange
+}) {
 if (!report?.overall) {
   return <p className="loading">Generating your report…</p>;
 }
@@ -765,10 +806,27 @@ return (
     {/* ===============================
        HEADER (Overall Result – B)
     =============================== */}
-    <h2 className="report-title">
-      You scored {overall.correct} out of {overall.total_questions} in 
-      OC Thinking Skills Test
-    </h2>
+    <div style={{ marginBottom: "16px" }}>
+  <select
+    value={selectedAttemptId || ""}
+    onChange={(e) => onAttemptChange(Number(e.target.value))}
+    style={{
+      padding: "8px",
+      borderRadius: "6px"
+    }}
+  >
+    {attempts.map((a) => (
+      <option key={a.attempt_id} value={a.attempt_id}>
+        {new Date(a.completed_at).toLocaleString()}
+      </option>
+    ))}
+  </select>
+</div>
+
+<h2 className="report-title">
+  You scored {overall.correct} out of {overall.total_questions} in 
+  OC Thinking Skills Test
+</h2>
     <button
       className="view-exam-btn"
       onClick={onViewExamDetails}
