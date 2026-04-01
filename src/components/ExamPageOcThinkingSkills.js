@@ -497,7 +497,7 @@ if (mode === "report") {
   );
 }
 
-if (mode === "review" && questions.length === 0) {
+if (mode === "review") {
   return (
     <OcThinkingSkillsReview
       studentId={studentId}
