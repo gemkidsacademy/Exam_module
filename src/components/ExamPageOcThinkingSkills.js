@@ -773,6 +773,10 @@ return (
        HEADER (Overall Result – B)
     =============================== */}
     <h2 className="report-title">
+    
+      You scored {overall.correct} out of {overall.total_questions} in 
+      OC Thinking Skills Test
+    </h2>
      {/* 🔽 DATE DROPDOWN */}
 <select
   value={selectedAttempt}
@@ -792,10 +796,7 @@ return (
       {a.label}
     </option>
   ))}
-</select>
-      You scored {overall.correct} out of {overall.total_questions} in 
-      OC Thinking Skills Test
-    </h2>
+</select>   
     <button
       className="view-exam-btn"
       onClick={onViewExamDetails}
