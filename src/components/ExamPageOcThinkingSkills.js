@@ -31,6 +31,12 @@ const loadExamAttempts = useCallback(async () => {
     console.log("📅 attempts:", data);
 
     setAttempts(data);
+    if (data.length > 0) {
+  setSelectedAttemptId((prev) => {
+    if (prev) return prev;  // don't overwrite existing
+    return data[0].attempt_id;
+  });
+}
 
     return data;   // 🔥 IMPORTANT
 
