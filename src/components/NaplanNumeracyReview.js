@@ -3,9 +3,6 @@ import { useEffect } from "react";
 export default function NaplanNumeracyReview({
   studentId,
   examId,
-  examDates,
-  selectedExamId,
-  onExamChange,
   onLoaded
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
@@ -13,11 +10,18 @@ export default function NaplanNumeracyReview({
   useEffect(() => {
     if (!studentId || !API_BASE || !examId) return;
 
-    const loadReviewData = async () => {
+    const abortController = new AbortController();
+
+    const fetchNaplanNumeracyReviewData = async () => {
       try {
-        const response = await fetch(
-          `${API_BASE}/api/student/exam-review/naplan-numeracy?student_id=${studentId}&exam_id=${examId}`
-        );
+        const url = `${API_BASE}/api/student/exam-review/naplan-numeracy?student_id=${studentId}&exam_id=${examId}`;
+
+        console.log("📘 Loading review for examId:", examId);
+        console.log("🌐 Request URL:", url);
+
+        const response = await fetch(url, {
+          signal: abortController.signal
+        });
 
         if (!response.ok) {
           throw new Error(`Review fetch failed: ${response.status}`);
@@ -25,27 +29,38 @@ export default function NaplanNumeracyReview({
 
         const data = await response.json();
 
-        const questions = Array.isArray(data.questions)
+        const safeQuestions = Array.isArray(data.questions)
           ? data.questions
           : [];
 
-        const studentAnswers =
+        const safeStudentAnswers =
           data.student_answers && typeof data.student_answers === "object"
             ? data.student_answers
             : {};
 
-        console.log("QUESTIONS:", questions);
-        console.log("STUDENT ANSWERS:", studentAnswers);
+        console.log("✅ Review loaded successfully");
+        console.log("📦 Questions:", safeQuestions);
+        console.log("📝 Student Answers:", safeStudentAnswers);
 
-        onLoaded?.(questions, studentAnswers);
+        onLoaded?.(safeQuestions, safeStudentAnswers);
 
       } catch (error) {
-        console.error("Review load failed:", error);
+        if (error.name === "AbortError") {
+          console.log("⏹️ Review request aborted");
+          return;
+        }
+
+        console.error("🔥 Review load failed:", error);
         onLoaded?.([], {});
       }
     };
 
-    loadReviewData();
+    fetchNaplanNumeracyReviewData();
+
+    return () => {
+      abortController.abort();
+    };
+
   }, [studentId, examId, API_BASE, onLoaded]);
 
   return (
@@ -61,45 +76,15 @@ export default function NaplanNumeracyReview({
         background: "#f6f7f9"
       }}
     >
-      <div
+      <p
         style={{
-          width: "100%",
-          maxWidth: "900px"
+          fontSize: "16px",
+          color: "#475569",
+          textAlign: "center"
         }}
       >
-        {/* HEADER */}
-        <div
-          style={{
-            marginBottom: "20px",
-            display: "flex",
-            justifyContent: "space-between"
-          }}
-        >
-          {examDates?.length > 0 && (
-            <select
-              className="exam-dropdown"
-              value={selectedExamId || ""}
-              onChange={(e) => onExamChange(Number(e.target.value))}
-            >
-              {examDates.map((d) => (
-                <option key={d.exam_id} value={d.exam_id}>
-                  {new Date(d.date).toLocaleDateString()}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-
-        <p
-          style={{
-            fontSize: "16px",
-            color: "#475569",
-            textAlign: "center"
-          }}
-        >
-          Loading NAPLAN Numeracy review…
-        </p>
-      </div>
+        Loading NAPLAN Numeracy review...
+      </p>
     </div>
   );
 }
