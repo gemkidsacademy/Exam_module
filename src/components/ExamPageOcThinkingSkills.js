@@ -137,7 +137,17 @@ const handleGenerateExplanation = async () => {
  const handleViewExamDetails = () => {
   console.log("🟢 View Exam Details button clicked");
 
-  // 🔥 force clean transition
+  console.log("➡️ selectedAttemptId:", selectedAttemptId);
+
+  if (!selectedAttemptId) {
+    console.error("❌ No attempt selected!");
+    return;
+  }
+
+  // 🔥 CRITICAL FIX
+  setExamAttemptId(selectedAttemptId);
+
+  // reset UI
   setQuestions([]);
   setCurrentIndex(0);
   setVisited({});
@@ -145,7 +155,6 @@ const handleGenerateExplanation = async () => {
 
   setMode("review");
 };
-
 
 
 
