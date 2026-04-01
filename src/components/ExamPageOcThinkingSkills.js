@@ -808,6 +808,7 @@ return (
       value={selectedAttempt}
       onChange={(e) => {
   const id = Number(e.target.value);
+       console.log("🔥 DROPDOWN CHANGED:", id);
   setSelectedAttempt(id);
   onSelectAttempt(id);   // 🔥 THIS triggers loadReport(id)
 }}
