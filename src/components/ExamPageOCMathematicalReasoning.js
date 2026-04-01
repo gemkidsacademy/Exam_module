@@ -179,10 +179,14 @@
   console.log("📊 reviewQuestions length:", reviewQuestions.length);
 }, [reviewQuestions]);
   useEffect(() => {
-    if (!selectedAttemptId) return;
+  if (!selectedAttemptId) return;
 
+  if (mode === "report") {
     loadReport(selectedAttemptId);
-  }, [selectedAttemptId]);
+  }
+
+  // ❌ DO NOT load report in review mode
+}, [selectedAttemptId, mode]);
   useEffect(() => {
     if (mode !== "exam" || questions.length === 0) return;
 
