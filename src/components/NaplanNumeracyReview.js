@@ -1,17 +1,19 @@
-
 import { useEffect } from "react";
 
 export default function NaplanNumeracyReview({
   studentId,
   examId,
+  examDates,
+  selectedExamId,
+  onExamChange,
   onLoaded
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
-    if (!studentId || !API_BASE) return;
+    if (!studentId || !API_BASE || !examId) return;
 
-    const loadReview = async () => {
+    const loadReviewData = async () => {
       try {
         const response = await fetch(
           `${API_BASE}/api/student/exam-review/naplan-numeracy?student_id=${studentId}&exam_id=${examId}`
@@ -43,8 +45,7 @@ export default function NaplanNumeracyReview({
       }
     };
 
-    loadReview();
-
+    loadReviewData();
   }, [studentId, examId, API_BASE, onLoaded]);
 
   return (
@@ -60,15 +61,45 @@ export default function NaplanNumeracyReview({
         background: "#f6f7f9"
       }}
     >
-      <p
+      <div
         style={{
-          fontSize: "16px",
-          color: "#475569",
-          textAlign: "center"
+          width: "100%",
+          maxWidth: "900px"
         }}
       >
-        Loading NAPLAN Numeracy review…
-      </p>
+        {/* HEADER */}
+        <div
+          style={{
+            marginBottom: "20px",
+            display: "flex",
+            justifyContent: "space-between"
+          }}
+        >
+          {examDates?.length > 0 && (
+            <select
+              className="exam-dropdown"
+              value={selectedExamId || ""}
+              onChange={(e) => onExamChange(Number(e.target.value))}
+            >
+              {examDates.map((d) => (
+                <option key={d.exam_id} value={d.exam_id}>
+                  {new Date(d.date).toLocaleDateString()}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        <p
+          style={{
+            fontSize: "16px",
+            color: "#475569",
+            textAlign: "center"
+          }}
+        >
+          Loading NAPLAN Numeracy review…
+        </p>
+      </div>
     </div>
   );
 }
