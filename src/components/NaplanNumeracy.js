@@ -607,7 +607,8 @@ useEffect(() => {
     
     return (
   <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-    {/* 🔽 SHOW HEADER ONLY IN REVIEW MODE */}
+    
+    {/* 🔽 HEADER */}
     {mode === "review" && (
       <div
         style={{
@@ -626,9 +627,6 @@ useEffect(() => {
           onChange={(e) => {
             const newExamId = Number(e.target.value);
 
-            console.log("🔄 Switching exam:", newExamId);
-
-            // 🔥 reset state before fetch
             setQuestions([]);
             setAnswers({});
             setVisited({});
@@ -645,8 +643,10 @@ useEffect(() => {
         </select>
       </div>
     )}
-        <div style={{ flex: 1, overflow: "hidden" }}>
-          <div className={`exam-container ${styles.examContainer}`}>
+
+    {/* 🔽 MAIN CONTENT WRAPPER */}
+    <div style={{ flex: 1, overflow: "hidden" }}>
+      <div className={`exam-container ${styles.examContainer}`}>
           {/* HEADER */}
           <div className={styles.examHeader}>
             {!isReview && <div className="timer">⏳ {formatTime(timeLeft)}</div>}
