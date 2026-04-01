@@ -519,6 +519,9 @@ useEffect(() => {
       <NaplanNumeracyReview
         studentId={studentId}
         examId={selectedExamId}
+         examDates={examDates}
+         selectedExamId={selectedExamId}
+         onExamChange={(newExamId) => setSelectedExamId(newExamId)}
         onLoaded={(qs, studentAnswers) => {
           const normalizedAnswers = {};
         
