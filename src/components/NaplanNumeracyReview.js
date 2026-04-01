@@ -75,44 +75,7 @@ export default function NaplanNumeracyReview({
       background: "#f6f7f9"
     }}
   >
-    {/* 🔷 HEADER */}
-    <div
-      style={{
-        padding: "16px 24px",
-        background: "#ffffff",
-        borderBottom: "1px solid #e5e7eb",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center"
-      }}
-    >
-      {/* Title */}
-      <div style={{ fontWeight: 600 }}>
-        NAPLAN Numeracy Review
-      </div>
-
-      {/* Dropdown */}
-      <select
-        value={selectedExamId || ""}
-        onChange={(e) => {
-          const newId = Number(e.target.value);
-          console.log("📅 Switching exam:", newId);
-          onExamChange?.(newId);
-        }}
-        style={{
-          padding: "6px 10px",
-          borderRadius: "6px",
-          border: "1px solid #cbd5e1"
-        }}
-      >
-        {examDates?.map((exam) => (
-          <option key={exam.exam_id} value={exam.exam_id}>
-            {new Date(exam.completed_at).toLocaleString()}
-          </option>
-        ))}
-      </select>
-    </div>
-
+    
     {/* 🔄 LOADING */}
     <div
       style={{
