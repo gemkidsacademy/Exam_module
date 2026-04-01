@@ -526,7 +526,7 @@ useEffect(() => {
       );
     }
   
-    if (mode === "review" && !questions.length) {
+    if (mode === "review") {
     return (
       <NaplanNumeracyReview
         key={selectedExamId}
