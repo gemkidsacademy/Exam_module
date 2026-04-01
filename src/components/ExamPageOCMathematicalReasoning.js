@@ -171,7 +171,9 @@
       loadAttempts();
     }
   }, [mode]);
-
+  useEffect(() => {
+  console.log("📊 reviewQuestions length:", reviewQuestions.length);
+}, [reviewQuestions]);
   useEffect(() => {
     if (!selectedAttemptId) return;
 
@@ -496,22 +498,35 @@
   // ---------------- EXAM UI ----------------
   
 
-  const currentQ = activeQuestions[currentIndex];
-  if (!currentQ) return null;
   const isReview = mode === "review";
+
+const reviewLoader = isReview && (
+  <OC_MathematicalReasoningReview
+    studentId={studentId}
+    attemptId={selectedAttemptId}
+    onLoaded={handleReviewLoaded}
+  />
+);
+
+const currentQ = activeQuestions[currentIndex];
+
+if (!currentQ) {
+  return (
+    <div className="exam-shell">
+      {reviewLoader}
+      <p style={{ padding: "20px" }}>Loading questions...</p>
+    </div>
+  );
+}
+
+  
   const optionEntries = Object.entries(currentQ.options || {});
 
   
   
   return (
   <div className="exam-shell">
-     {mode === "review" && (
-      <OC_MathematicalReasoningReview
-        studentId={studentId}
-        attemptId={selectedAttemptId}
-        onLoaded={handleReviewLoaded}
-      />
-    )}
+     {reviewLoader}
     <div className="exam-container">
 
       {/* HEADER */}
