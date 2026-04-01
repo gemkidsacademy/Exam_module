@@ -447,10 +447,14 @@ if (mode === "loading") {
 if (mode === "report") {
   return (
     <ThinkingSkillsReport
-     report={report}
-     attempts={attempts}   // 🔥 NEW
-     onViewExamDetails={handleViewExamDetails}
-   />
+      report={report}
+      attempts={attempts}
+      onViewExamDetails={handleViewExamDetails}
+      onSelectAttempt={(id) => {
+        console.log("📅 selected attempt:", id);
+        loadReport(id);   // 🔥 THIS IS YOUR “3rd INSTANCE”
+      }}
+    />
 
   );
 }
@@ -762,7 +766,7 @@ return (
 /* ============================================================
  REPORT COMPONENT
 ============================================================ */
-function ThinkingSkillsReport({ report, attempts, onViewExamDetails }) {
+function ThinkingSkillsReport({ report, attempts, onViewExamDetails, onSelectAttempt }) {
 const [selectedAttempt, setSelectedAttempt] = useState("");
 if (!report?.overall) {
   return <p className="loading">Generating your report…</p>;
@@ -802,7 +806,11 @@ return (
   <div style={{ marginTop: "12px" }}>
     <select
       value={selectedAttempt}
-      onChange={(e) => setSelectedAttempt(e.target.value)}
+      onChange={(e) => {
+  const id = Number(e.target.value);
+  setSelectedAttempt(id);
+  onSelectAttempt(id);   // 🔥 THIS triggers loadReport(id)
+}}
       style={{
         padding: "8px 12px",
         borderRadius: "6px",
