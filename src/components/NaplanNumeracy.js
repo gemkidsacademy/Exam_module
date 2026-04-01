@@ -604,7 +604,7 @@ useEffect(() => {
             return student === correct;
           })()
         : null;
-    const seenTextBlocks = new Set();
+    
     return (
   <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
     {/* 🔽 SHOW HEADER ONLY IN REVIEW MODE */}
