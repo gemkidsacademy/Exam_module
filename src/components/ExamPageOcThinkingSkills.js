@@ -31,6 +31,9 @@ const loadExamAttempts = useCallback(async () => {
     console.log("📅 attempts:", data);
 
     setAttempts(data);
+    if (data.length > 0) {
+      setSelectedAttemptId(data[0].attempt_id);
+    }
 
     // ✅ default = latest attempt
     
