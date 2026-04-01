@@ -492,18 +492,7 @@
 
   );
   }
-  if (mode === "review") {
-    return (
-      <OC_MathematicalReasoningReview
-        studentId={studentId}
-        attemptId={selectedAttemptId}
-        attempts={attempts}
-        onChangeAttempt={setSelectedAttemptId}
-        reviewQuestions={reviewQuestions}
-        onLoaded={handleReviewLoaded}
-      />
-    );
-  }
+  
   // ---------------- EXAM UI ----------------
   
 
@@ -516,6 +505,13 @@
   
   return (
   <div className="exam-shell">
+     {mode === "review" && (
+      <OC_MathematicalReasoningReview
+        studentId={studentId}
+        attemptId={selectedAttemptId}
+        onLoaded={handleReviewLoaded}
+      />
+    )}
     <div className="exam-container">
 
       {/* HEADER */}
