@@ -181,11 +181,15 @@ const [report, setReport] = useState(null);
 /* ============================================================
    LOAD REPORT (ONLY WHEN EXAM IS COMPLETED)
 ============================================================ */
-const loadReport = useCallback(async () => {
+const loadReport = useCallback(async (attemptId = null) => {
   try {
-    const res = await fetch(
-      `${API_BASE}/api/student/exam-report/oc-thinking-skills?student_id=${studentId}`
-    );
+    let url = `${API_BASE}/api/student/exam-report/oc-thinking-skills?student_id=${studentId}`;
+
+    if (attemptId !== null && attemptId !== undefined) {
+      url += `&exam_attempt_id=${attemptId}`;
+    }
+    
+    const res = await fetch(url);
 
     if (!res.ok) {
       console.warn("⚠️ Report not available yet");
