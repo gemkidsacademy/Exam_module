@@ -167,10 +167,14 @@
     }
   }, [studentId]);
   useEffect(() => {
-    if (mode === "report") {
-      loadAttempts();
-    }
-  }, [mode]);
+  if (mode === "report" || mode === "review") {
+    loadAttempts();
+  }
+}, [mode]);
+  useEffect(() => {
+  console.log("📅 attempts:", attempts);
+}, [attempts]);
+
   useEffect(() => {
   console.log("📊 reviewQuestions length:", reviewQuestions.length);
 }, [reviewQuestions]);
