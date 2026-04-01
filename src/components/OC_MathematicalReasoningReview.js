@@ -2,21 +2,22 @@ import { useEffect } from "react";
 
 export default function OC_MathematicalReasoningReview({
   studentId,
+  attemptId,
   onLoaded
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
-    console.log("🧠 OC_MathematicalReasoningReview MOUNTED");
+    console.log("🧠 OC_MR Review mounted", { studentId, attemptId });
   }, []);
 
   useEffect(() => {
-    if (!studentId) return;
+    if (!studentId || !attemptId) return;
 
     const loadReview_OC_MR = async () => {
       try {
         const res = await fetch(
-          `${API_BASE}/api/student/exam-review/oc-mathematical-reasoning?student_id=${studentId}`
+          `${API_BASE}/api/student/exam-review/oc-mathematical-reasoning?student_id=${studentId}&attempt_id=${attemptId}`
         );
 
         if (!res.ok) {
@@ -25,14 +26,7 @@ export default function OC_MathematicalReasoningReview({
 
         const data = await res.json();
 
-        // 🔍 FULL RAW RESPONSE
         console.log("📦 OC MR REVIEW RAW RESPONSE:", data);
-
-        // 🔍 QUESTIONS ONLY
-        console.log("📋 OC MR QUESTIONS ARRAY:", data.questions);
-
-        // 🔍 FIRST QUESTION
-        console.log("🧠 FIRST OC MR QUESTION:", data.questions?.[0]);
 
         onLoaded?.(data.questions || []);
       } catch (err) {
@@ -42,7 +36,7 @@ export default function OC_MathematicalReasoningReview({
     };
 
     loadReview_OC_MR();
-  }, [studentId, API_BASE, onLoaded]);
+  }, [studentId, attemptId, API_BASE, onLoaded]);
 
   return <p className="loading">Loading OC Mathematical Reasoning review…</p>;
 }
