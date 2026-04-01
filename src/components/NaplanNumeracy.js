@@ -512,8 +512,7 @@ useEffect(() => {
         />
       );
     }
-  
-    if (mode === "review") {
+  if (mode === "review" && !questions.length) {
   return (
     <div>
 
@@ -524,12 +523,12 @@ useEffect(() => {
           value={selectedExamId || ""}
           onChange={(e) => {
             const newExamId = Number(e.target.value);
-        
+
             setQuestions([]);
             setAnswers({});
             setVisited({});
             setCurrentIndex(0);
-        
+
             setSelectedExamId(newExamId);
           }}
         >
@@ -540,17 +539,14 @@ useEffect(() => {
           ))}
         </select>
 
-        <button
-          className="back-to-report-btn"
-          onClick={() => setMode("report")}
-        >
+        <button onClick={() => setMode("report")}>
           Back to Report
         </button>
       </div>
 
-      {/* REVIEW */}
+      {/* LOAD DATA ONLY */}
       <NaplanNumeracyReview
-        key={selectedExamId}   // 🔥 CRITICAL
+        key={selectedExamId}
         studentId={studentId}
         examId={selectedExamId}
         onLoaded={(qs, studentAnswers) => {
@@ -573,7 +569,6 @@ useEffect(() => {
           setVisited({});
         }}
       />
-
     </div>
   );
 }
