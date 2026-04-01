@@ -1347,8 +1347,9 @@ useEffect(() => {
         )}
   
           </div> {/* closes exam-container */}
-  </div>
-  );
+</div> {/* closes flex content */}
+</div> {/* closes main wrapper */}
+);
 }
   
 
