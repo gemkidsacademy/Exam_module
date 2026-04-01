@@ -613,11 +613,36 @@ useEffect(() => {
         <div className={`exam-container ${styles.examContainer}`}>
           {/* HEADER */}
           <div className={styles.examHeader}>
-            {!isReview && <div className="timer">⏳ {formatTime(timeLeft)}</div>}
-            <div className="counter">
-              Question {currentIndex + 1} / {questions.length}
+  
+              {/* LEFT SIDE */}
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                
+                {!isReview && (
+                  <div className="timer">⏳ {formatTime(timeLeft)}</div>
+                )}
+            
+                {isReview && examDates?.length > 0 && (
+                  <select
+                    className="exam-dropdown"
+                    value={selectedExamId || ""}
+                    onChange={(e) => onExamChange(Number(e.target.value))}
+                  >
+                    {examDates.map((d) => (
+                      <option key={d.exam_id} value={d.exam_id}>
+                        {new Date(d.date).toLocaleDateString()}
+                      </option>
+                    ))}
+                  </select>
+                )}
+            
+              </div>
+            
+              {/* RIGHT SIDE */}
+              <div className="counter">
+                Question {currentIndex + 1} / {questions.length}
+              </div>
+            
             </div>
-          </div>
   
           {/* QUESTION INDEX */}
           <div className={styles.indexRow}>
