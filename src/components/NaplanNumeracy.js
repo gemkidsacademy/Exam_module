@@ -559,52 +559,8 @@ useEffect(() => {
           b.options.some(opt => opt.image && opt.image.trim() !== "")
       );
   
-    const isCorrect =
-      mode === "review"
-        ? (() => {
-            const correctRaw = currentQ.correct_answer;
-            const studentRaw = answers[String(currentQ.id)];
     
-            // ✅ Type 2 (multi-select)
-            if (currentQ.question_type === 2) {
-              const correct = normalizeCorrectAnswer(
-                correctRaw,
-                currentQ.question_type
-              );
-    
-              const student = normalizeStudentAnswer(
-                studentRaw,
-                currentQ.question_type
-              );
-    
-              return (
-                Array.isArray(student) &&
-                Array.isArray(correct) &&
-                student.length === correct.length &&
-                student.every((v) => correct.includes(v))
-              );
-            }
-    
-            // ✅ Type 3 (numeric)
-            if (currentQ.question_type === 3) {
-              return areNumbersEqual(studentRaw, correctRaw);
-            }
-    
-            // ✅ Default (Type 1, 4, 6)
-            const correct = normalizeCorrectAnswer(
-              correctRaw,
-              currentQ.question_type
-            );
-    
-            const student = normalizeStudentAnswer(
-              studentRaw,
-              currentQ.question_type
-            );
-    
-            return student === correct;
-          })()
-        : null;
-    
+    const isCorrect = null;    
     return (
   <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
     
