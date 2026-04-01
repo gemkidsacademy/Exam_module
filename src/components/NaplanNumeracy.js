@@ -638,7 +638,12 @@ useEffect(() => {
                   <select
                     className="exam-dropdown"
                     value={selectedExamId || ""}
-                    onChange={(e) => setSelectedExamId(Number(e.target.value))}
+                    onChange={(e) => {
+                      const newId = Number(e.target.value);
+                    
+                      setQuestions([]);        // 🔥 this triggers Review reload
+                      setSelectedExamId(newId);
+                    }}
                   >
                     {examDates.map((d) => (
                       <option key={d.exam_id} value={d.exam_id}>
