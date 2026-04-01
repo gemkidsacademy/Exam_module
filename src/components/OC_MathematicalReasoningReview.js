@@ -5,6 +5,7 @@ export default function OC_MathematicalReasoningReview({
   attemptId,
   attempts,
   onChangeAttempt,
+  reviewQuestions,   // ✅ ADD THIS
   onLoaded
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
@@ -43,7 +44,7 @@ export default function OC_MathematicalReasoningReview({
   return (
   <div style={{ padding: "16px" }}>
 
-    {/* ✅ DROPDOWN GOES HERE */}
+    {/* ✅ DROPDOWN */}
     <div style={{ marginBottom: "16px" }}>
       <select
         value={attemptId || ""}
@@ -62,8 +63,19 @@ export default function OC_MathematicalReasoningReview({
       </select>
     </div>
 
-    {/* existing content */}
-    <p className="loading">Loading OC Mathematical Reasoning review…</p>
+    {/* ✅ CONDITIONAL CONTENT */}
+    {!reviewQuestions || reviewQuestions.length === 0 ? (
+      <p className="loading">Loading OC Mathematical Reasoning review…</p>
+    ) : (
+      <div>
+        <h3>Review Loaded: {reviewQuestions.length} questions</h3>
+
+        {/* TEMP DEBUG */}
+        <pre style={{ fontSize: "12px" }}>
+          {JSON.stringify(reviewQuestions[0], null, 2)}
+        </pre>
+      </div>
+    )}
 
   </div>
 );
