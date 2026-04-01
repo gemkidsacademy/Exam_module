@@ -486,10 +486,11 @@ return (
   <div className={styles.examContainer}>
  {isReview && examAttemptId != null && (
   <OcThinkingSkillsReview
-    studentId={studentId}
-    examAttemptId={examAttemptId}
-    onLoaded={handleReviewLoaded}
-  />
+  key={examAttemptId}   // 🔥 CRITICAL FIX
+  studentId={studentId}
+  examAttemptId={examAttemptId}
+  onLoaded={handleReviewLoaded}
+/>
 )}
  {isReview && (
   <div style={{ marginBottom: "12px" }}>
