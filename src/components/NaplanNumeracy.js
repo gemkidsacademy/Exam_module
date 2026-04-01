@@ -349,6 +349,7 @@ useEffect(() => {
   
         setQuestions(data.questions || []);
         setTimeLeft(data.remaining_time);
+        setExamAttemptId(data.exam_attempt_id);
         setMode("exam");
         onExamStart?.();
       };
@@ -369,28 +370,37 @@ useEffect(() => {
     ============================================================ */
     
     const finishExam = useCallback(async () => {
-      if (hasSubmittedRef.current) return;
-      hasSubmittedRef.current = true;
-  
-      setMode("submitting");
-  
-      try {
-        await fetch(
-          `${API_BASE}/api/student/finish-exam/naplan-numeracy`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ student_id: studentId, answers })
-          }
-        );
-  
-        await loadExamDates();
-        
-        onExamFinish?.();
-      } catch (err) {
-        console.error("Finish exam failed", err);
+  if (hasSubmittedRef.current) return;
+  hasSubmittedRef.current = true;
+
+  if (!examAttemptId) {
+    console.error("❌ Missing examAttemptId");
+    return;
+  }
+
+  setMode("submitting");
+
+  try {
+    await fetch(
+      `${API_BASE}/api/student/finish-exam/naplan-numeracy`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          student_id: studentId,
+          exam_attempt_id: examAttemptId,
+          answers
+        })
       }
-    }, [API_BASE, studentId, answers, loadExamDates, onExamFinish]);
+    );
+
+    await loadExamDates();
+    onExamFinish?.();
+
+  } catch (err) {
+    console.error("Finish exam failed", err);
+  }
+}, [API_BASE, studentId, answers, examAttemptId, loadExamDates, onExamFinish]);
   
     /* ============================================================
        TIMER
