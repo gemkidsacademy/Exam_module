@@ -75,15 +75,21 @@ if (!API_BASE) {
 
 // ---------------- REPORT ----------------
 const [report, setReport] = useState(null);
+const [attempts, setAttempts] = useState([]);
+const [selectedAttemptId, setSelectedAttemptId] = useState(null);
 
 /* ============================================================
    LOAD REPORT (ONLY WHEN EXAM IS COMPLETED)
 ============================================================ */
-const loadReport = useCallback(async () => {
+const loadReport = useCallback(async (attemptId = null) => {
   try {
-    const res = await fetch(
-      `${API_BASE}/api/student/exam-report/oc-mathematical-reasoning?student_id=${studentId}`
-    );
+    let url = `${API_BASE}/api/student/exam-report/oc-mathematical-reasoning?student_id=${studentId}`;
+
+    if (attemptId) {
+      url += `&attempt_id=${attemptId}`;
+    }
+
+    const res = await fetch(url);
 
     if (!res.ok) {
       console.warn("⚠️ Report not available yet");
@@ -91,6 +97,11 @@ const loadReport = useCallback(async () => {
     }
 
     const data = await res.json();
+    setAttempts(data.available_attempts || []);
+
+    if (attemptId === null && data.available_attempts?.length > 0) {
+      setSelectedAttemptId(data.available_attempts[0].attempt_id);
+    }
     console.log("📊 report loaded:", data);
 
     setReport(data);
@@ -100,6 +111,11 @@ const loadReport = useCallback(async () => {
     console.error("❌ loadReport error:", err);
   }
 }, [studentId]);
+useEffect(() => {
+  if (!selectedAttemptId) return;
+
+  loadReport(selectedAttemptId);
+}, [selectedAttemptId]);
 useEffect(() => {
   if (mode !== "exam" || questions.length === 0) return;
 
@@ -194,7 +210,7 @@ useEffect(() => {
 
       // ✅ COMPLETED → SHOW REPORT
       if (data.completed === true) {
-        await loadReport();
+        await loadReport(null);
         onExamFinish?.();
         return;
       }
@@ -294,7 +310,7 @@ const finishExam = useCallback(
       );
 
       // ⬅️ ONLY NOW load report
-      await loadReport();
+      await loadReport(null); 
       onExamFinish?.();
 
     } catch (err) {
@@ -402,9 +418,12 @@ if (mode === "loading") {
 if (mode === "report") {
 return (
   <MathematicalReasoningReport
-    report={report}
-    onViewExamDetails={() => setMode("review")}
-  />
+  report={report}
+  attempts={attempts}
+  selectedAttemptId={selectedAttemptId}
+  onChangeAttempt={(id) => setSelectedAttemptId(id)}
+  onViewExamDetails={() => setMode("review")}
+/>
 
 );
 }
@@ -710,7 +729,13 @@ return (
  REPORT COMPONENT
 ============================================================ */
 
-function MathematicalReasoningReport({ report, onViewExamDetails }) {
+function MathematicalReasoningReport({
+  report,
+  attempts,
+  selectedAttemptId,
+  onChangeAttempt,
+  onViewExamDetails
+}) {
   if (!report?.overall) {
     return <p className="loading">Generating your report…</p>;
   }
@@ -751,7 +776,23 @@ function MathematicalReasoningReport({ report, onViewExamDetails }) {
         You scored {overall.correct} out of {overall.total_questions} in 
         OC Mathematical Reasoning Test
       </h2>
-
+      <div style={{ marginBottom: "16px" }}>
+        <select
+          value={selectedAttemptId || ""}
+          onChange={(e) => onChangeAttempt(Number(e.target.value))}
+          style={{
+            padding: "8px 12px",
+            borderRadius: "6px",
+            border: "1px solid #ccc"
+          }}
+        >
+          {attempts.map((a) => (
+            <option key={a.attempt_id} value={a.attempt_id}>
+              {new Date(a.completed_at).toLocaleString()}
+            </option>
+          ))}
+        </select>
+      </div>
       <button
         onClick={() => {
           console.log("🟢 Review Exam button clicked");
