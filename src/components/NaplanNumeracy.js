@@ -514,16 +514,16 @@ useEffect(() => {
     }
   
     if (mode === "review" && !questions.length) {
-    return (
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       <NaplanNumeracyReview
         studentId={studentId}
         examId={selectedExamId}
         onLoaded={(qs, studentAnswers) => {
           const normalizedAnswers = {};
-        
+
           Object.entries(studentAnswers || {}).forEach(([key, value]) => {
             if (typeof value === "string") {
-              // convert "['E']" into ["E"]
               try {
                 const parsed = JSON.parse(value.replace(/'/g, '"'));
                 normalizedAnswers[String(key)] = parsed;
@@ -534,16 +534,17 @@ useEffect(() => {
               normalizedAnswers[String(key)] = value;
             }
           });
-        
+
           setQuestions(qs || []);
           setAnswers(normalizedAnswers);
           setCurrentIndex(0);
           setVisited({});
         }}
       />
-    );
-  }
-  
+    </div>
+  );
+}
+    
     /* ============================================================
        EXAM UI
     ============================================================ */
@@ -605,8 +606,47 @@ useEffect(() => {
         : null;
     const seenTextBlocks = new Set();
     return (
-      <div className={`exam-shell ${styles.examShell}`}>
-        <div className={`exam-container ${styles.examContainer}`}>
+  <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+    {/* 🔽 SHOW HEADER ONLY IN REVIEW MODE */}
+    {mode === "review" && (
+      <div
+        style={{
+          padding: "16px 24px",
+          background: "#ffffff",
+          borderBottom: "1px solid #e5e7eb",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center"
+        }}
+      >
+        <div style={{ fontWeight: 600 }}>NAPLAN Numeracy Review</div>
+
+        <select
+          value={selectedExamId || ""}
+          onChange={(e) => {
+            const newExamId = Number(e.target.value);
+
+            console.log("🔄 Switching exam:", newExamId);
+
+            // 🔥 reset state before fetch
+            setQuestions([]);
+            setAnswers({});
+            setVisited({});
+            setCurrentIndex(0);
+
+            setSelectedExamId(newExamId);
+          }}
+        >
+          {examDates.map((exam) => (
+            <option key={exam.exam_id} value={exam.exam_id}>
+              {new Date(exam.completed_at).toLocaleString()}
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
+        <div style={{ flex: 1, overflow: "hidden" }}>
+          <div className={`exam-container ${styles.examContainer}`}>
           {/* HEADER */}
           <div className={styles.examHeader}>
             {!isReview && <div className="timer">⏳ {formatTime(timeLeft)}</div>}
