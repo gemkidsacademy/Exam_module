@@ -432,7 +432,12 @@ const formatTime = (seconds) => {
 
 
 const activeQuestions = questions;
-
+const handleReviewLoaded = useCallback((qs) => {
+  setQuestions(qs);
+  setCurrentIndex(0);
+  setVisited({});
+  setAnswers({});
+}, []);
 
 // Only block loading for exam & review
 if (mode === "exam" && !questions.length) {
@@ -469,12 +474,7 @@ const optionEntries = currentQ
       {}
     )
   : [];
- const handleReviewLoaded = useCallback((qs) => {
-  setQuestions(qs);
-  setCurrentIndex(0);
-  setVisited({});
-  setAnswers({});
-}, []);
+ 
 return (
 <div
   className={styles.examShell}
