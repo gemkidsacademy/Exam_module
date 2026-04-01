@@ -16,9 +16,15 @@ export default function OcThinkingSkillsReview({
 
     const loadReview = async () => {
       try {
-        const response = await fetch(
-          `${API_BASE}/api/student/exam-review/oc-thinking-skills?student_id=${studentId}`
-        );
+        let url = `${API_BASE}/api/student/exam-review/oc-thinking-skills?student_id=${studentId}`;
+
+        if (examAttemptId !== null && examAttemptId !== undefined) {
+          url += `&exam_attempt_id=${examAttemptId}`;
+        }
+        
+        console.log("🌐 REVIEW URL:", url);
+        
+        const response = await fetch(url);
 
         if (!response.ok) {
           throw new Error(`Review fetch failed with status ${response.status}`);
