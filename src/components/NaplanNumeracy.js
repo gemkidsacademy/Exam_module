@@ -519,29 +519,26 @@ useEffect(() => {
 
       {/* HEADER */}
       <div className="review-header">
-        {examDates?.length > 0 && (
-          <select
-            className="exam-dropdown"
-            value={selectedExamId || ""}
-            onChange={(e) => {
-              const newExamId = Number(e.target.value);
-
-              // 🔥 reset state
-              setQuestions([]);
-              setAnswers({});
-              setVisited({});
-              setCurrentIndex(0);
-
-              setSelectedExamId(newExamId);
-            }}
-          >
-            {examDates.map((d) => (
-              <option key={d.exam_id} value={d.exam_id}>
-                {new Date(d.date).toLocaleDateString()}
-              </option>
-            ))}
-          </select>
-        )}
+        <select
+          className="exam-dropdown"
+          value={selectedExamId || ""}
+          onChange={(e) => {
+            const newExamId = Number(e.target.value);
+        
+            setQuestions([]);
+            setAnswers({});
+            setVisited({});
+            setCurrentIndex(0);
+        
+            setSelectedExamId(newExamId);
+          }}
+        >
+          {examDates.map((d) => (
+            <option key={d.exam_id} value={d.exam_id}>
+              {new Date(d.date).toLocaleDateString()}
+            </option>
+          ))}
+        </select>
 
         <button
           className="back-to-report-btn"
