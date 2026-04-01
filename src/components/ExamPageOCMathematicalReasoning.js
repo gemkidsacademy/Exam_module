@@ -461,13 +461,14 @@ return (
 
 );
 }
-if (mode === "review" && reviewQuestions.length === 0) {
+if (mode === "review") {
   return (
     <OC_MathematicalReasoningReview
       studentId={studentId}
       attemptId={selectedAttemptId}
-      attempts={attempts}                     // ✅ ADD
-      onChangeAttempt={setSelectedAttemptId}  // ✅ ADD
+      attempts={attempts}
+      onChangeAttempt={setSelectedAttemptId}
+      reviewQuestions={reviewQuestions}
       onLoaded={(questions) => {
         console.log("✅ Review questions received:", questions.length);
 
@@ -496,20 +497,12 @@ if (mode === "review" && reviewQuestions.length === 0) {
           };
         });
 
-        console.log("🧪 REVIEW QUESTION SAMPLE (normalized)", {
-          q_id: normalized[0]?.q_id,
-          student_answer: normalized[0]?.student_answer,
-          correct_answer: normalized[0]?.correct_answer,
-          blocks: normalized[0]?.blocks
-        });
-
         setReviewQuestions(normalized);
         setCurrentIndex(0);
       }}
     />
   );
 }
-
 // ---------------- EXAM UI ----------------
  
 
