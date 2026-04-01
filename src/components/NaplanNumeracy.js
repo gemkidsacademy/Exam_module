@@ -520,7 +520,13 @@ useEffect(() => {
        EXAM UI
     ============================================================ */
     const currentQ = questions[currentIndex];
-    if (!currentQ) return null;
+    if (!currentQ) {
+      return (
+        <div style={{ padding: "40px", textAlign: "center" }}>
+          <p>Loading review questions...</p>
+        </div>
+      );
+    }
   
     const hasImageMultiSelect =
       currentQ.question_blocks?.some(
