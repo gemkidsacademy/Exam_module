@@ -386,7 +386,7 @@ useEffect(() => {
     return;
   }
 
-  setMode("submitting");
+  
 
   try {
     await fetch(
@@ -401,7 +401,7 @@ useEffect(() => {
         })
       }
     );
-
+    setMode("submitting");
     await loadExamDates();
     onExamFinish?.();
 
