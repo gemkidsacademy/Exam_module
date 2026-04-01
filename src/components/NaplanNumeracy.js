@@ -517,31 +517,39 @@ useEffect(() => {
     if (mode === "review" && !questions.length) {
     return (
       <NaplanNumeracyReview
-        studentId={studentId}
-        examId={selectedExamId}
-        onLoaded={(qs, studentAnswers) => {
-          const normalizedAnswers = {};
-        
-          Object.entries(studentAnswers || {}).forEach(([key, value]) => {
-            if (typeof value === "string") {
-              // convert "['E']" into ["E"]
-              try {
-                const parsed = JSON.parse(value.replace(/'/g, '"'));
-                normalizedAnswers[String(key)] = parsed;
-              } catch {
-                normalizedAnswers[String(key)] = value;
-              }
-            } else {
-              normalizedAnswers[String(key)] = value;
-            }
-          });
-        
-          setQuestions(qs || []);
-          setAnswers(normalizedAnswers);
-          setCurrentIndex(0);
-          setVisited({});
-        }}
-      />
+  studentId={studentId}
+  examId={selectedExamId}
+
+  examDates={examDates}
+  selectedExamId={selectedExamId}
+
+  onExamChange={(newExamId) => {
+    setQuestions([]); // 🔥 important
+    setSelectedExamId(newExamId);
+  }}
+
+  onLoaded={(qs, studentAnswers) => {
+    const normalizedAnswers = {};
+
+    Object.entries(studentAnswers || {}).forEach(([key, value]) => {
+      if (typeof value === "string") {
+        try {
+          const parsed = JSON.parse(value.replace(/'/g, '"'));
+          normalizedAnswers[String(key)] = parsed;
+        } catch {
+          normalizedAnswers[String(key)] = value;
+        }
+      } else {
+        normalizedAnswers[String(key)] = value;
+      }
+    });
+
+    setQuestions(qs || []);
+    setAnswers(normalizedAnswers);
+    setCurrentIndex(0);
+    setVisited({});
+  }}
+/>
     );
   }
   
