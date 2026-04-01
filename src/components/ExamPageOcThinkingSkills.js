@@ -282,11 +282,6 @@ useEffect(() => {
   setMode("exam");
 }, [studentId]);
  // 🔑 only what actually matters
-useEffect(() => {
-  document.addEventListener("contextmenu", e => e.preventDefault());
-  document.addEventListener("copy", e => e.preventDefault());
-  document.addEventListener("cut", e => e.preventDefault());
-}, []);
 /* ============================================================
    START / RESUME EXAM (SINGLE SOURCE OF TRUTH)
 ============================================================ */
