@@ -31,18 +31,15 @@ const loadExamAttempts = useCallback(async () => {
     console.log("📅 attempts:", data);
 
     setAttempts(data);
-    if (data.length > 0) {
-      setSelectedAttemptId(data[0].attempt_id);
-    }
 
-    // ✅ default = latest attempt
-    
+    return data;   // 🔥 IMPORTANT
 
   } catch (err) {
     console.error("❌ attempts load error:", err);
+    return [];
   }
 }, [studentId]);
-const formatExplanation = (text) => {
+ const formatExplanation = (text) => {
   if (!text) return "";
 
   return text
@@ -191,29 +188,28 @@ const [report, setReport] = useState(null);
 /* ============================================================
    LOAD REPORT (ONLY WHEN EXAM IS COMPLETED)
 ============================================================ */
-const loadReport = useCallback(async (attemptId = null) => {
-  try {
-    const res = await fetch(
-      `${API_BASE}/api/student/exam-report/oc-thinking-skills?student_id=${studentId}&attempt_id=${attemptId}`
-    );
+const loadReport = useCallback(async (attemptId) => {
+  console.log("🚀 loadReport called with attemptId:", attemptId);
 
-    if (!res.ok) {
-      console.warn("⚠️ Report not available yet");
-      return;
-    }
-
-    const data = await res.json();
-    console.log("REVIEW API RESPONSE", data);
-    console.log("📊 report loaded:", data);
-
-    setReport(data);
-    setExamAttemptId(data.exam_attempt_id);
-    
-    setSelectedAttemptId(data.exam_attempt_id);
-    setMode("report");
-  } catch (err) {
-    console.error("❌ loadReport error:", err);
+  if (!attemptId) {
+    console.error("❌ No attemptId passed to loadReport");
+    return;
   }
+
+  const res = await fetch(
+    `${API_BASE}/api/student/exam-report/oc-thinking-skills?student_id=${studentId}&attempt_id=${attemptId}`
+  );
+
+  const data = await res.json();
+
+  console.log("📊 report loaded:", data);
+
+  setReport(data);
+
+  // 🔥 IMPORTANT
+  setExamAttemptId(data.exam_attempt_id);
+  setSelectedAttemptId(data.exam_attempt_id);
+
 }, [studentId]);
 useEffect(() => {
   setExplanation(null);
@@ -326,8 +322,17 @@ useEffect(() => {
     if (data.completed === true) {
      sessionStorage.setItem("oc_thinking_skills_completed", "true");
    
-     await loadExamAttempts();   // 🔥 NEW
-     await loadReport();         // loads latest
+     const attempts = await loadExamAttempts();   // 🔥 capture return value
+
+     if (attempts.length > 0) {
+       const latestAttemptId = attempts[0].attempt_id;
+     
+       console.log("🔥 Using attemptId for report:", latestAttemptId);
+     
+       setSelectedAttemptId(latestAttemptId);
+     
+       await loadReport(latestAttemptId);   // 🔥 PASS IT
+     }
    
      return;
    }
@@ -367,7 +372,17 @@ async (reason = "submitted") => {
       }
     );
 
-    await loadReport();
+    const attempts = await loadExamAttempts();
+
+    if (attempts.length > 0) {
+      const latestAttemptId = attempts[0].attempt_id;
+    
+      console.log("🔥 Using attemptId after finish:", latestAttemptId);
+    
+      setSelectedAttemptId(latestAttemptId);
+    
+      await loadReport(latestAttemptId);
+    }
 
     // ✅ notify parent
     onExamFinish?.();
