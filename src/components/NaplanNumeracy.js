@@ -526,6 +526,7 @@ useEffect(() => {
     if (mode === "review" && !questions.length) {
     return (
       <NaplanNumeracyReview
+        key={selectedExamId}
         studentId={studentId}
         examId={selectedExamId}
          examDates={examDates}
