@@ -319,7 +319,7 @@ useEffect(() => {
     useEffect(() => {
   if (!studentId) return;
    // 🛑 If report already loaded, do nothing
-  if (mode === "report") {
+  if (mode !== "loading") {
     console.log("🛑 Skipping startExam (already in report)");
     return;
   }
