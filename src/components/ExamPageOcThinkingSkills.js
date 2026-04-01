@@ -457,65 +457,24 @@ if (mode === "report") {
 
   );
 }
- if (mode === "review" && questions.length === 0) {
-  return (
-    <div style={{ padding: "16px" }}>
-
-      {/* 🔽 DROPDOWN */}
-      <select
-        value={examAttemptId || ""}
-        onChange={(e) => {
-          const value = e.target.value;
-          if (!value) return;
-
-          const id = Number(value);
-
-          console.log("📅 REVIEW DROPDOWN:", id);
-
-          setQuestions([]);
-          setExamAttemptId(id);
-        }}
-        style={{
-          marginBottom: "12px",
-          padding: "8px",
-          borderRadius: "6px"
-        }}
-      >
-        <option value="">Select Attempt</option>
-
-        {attempts.map((a) => (
-          <option key={a.exam_attempt_id} value={a.exam_attempt_id}>
-            {new Date(a.completed_at).toLocaleString()}
-          </option>
-        ))}
-      </select>
-
-      {/* 🔽 LOADER */}
-      <OcThinkingSkillsReview
-        studentId={studentId}
-        examAttemptId={examAttemptId}
-        onLoaded={(qs) => {
-          setQuestions(qs);
-          setCurrentIndex(0);
-          setVisited({});
-          setAnswers({});
-        }}
-      />
-
-    </div>
-  );
-}
 // ---------------- EXAM UI ----------------
 const currentQ = activeQuestions[currentIndex];
-if (!currentQ) return null;
+if (!currentQ && !isReview) return null;
 console.log("REVIEW QUESTION", currentQ);
-const optionEntries = Object.entries(
-  currentQ.options ||
-  currentQ.choices ||
-  currentQ.answer_options ||
-  {}
-);
-
+const optionEntries = currentQ
+  ? Object.entries(
+      currentQ.options ||
+      currentQ.choices ||
+      currentQ.answer_options ||
+      {}
+    )
+  : [];
+ const handleReviewLoaded = useCallback((qs) => {
+  setQuestions(qs);
+  setCurrentIndex(0);
+  setVisited({});
+  setAnswers({});
+}, []);
 return (
 <div
   className={styles.examShell}
@@ -525,20 +484,24 @@ return (
   }}
 >
   <div className={styles.examContainer}>
+ {isReview && examAttemptId != null && (
+  <OcThinkingSkillsReview
+    studentId={studentId}
+    examAttemptId={examAttemptId}
+    onLoaded={handleReviewLoaded}
+  />
+)}
  {isReview && (
   <div style={{ marginBottom: "12px" }}>
     <select
       value={examAttemptId || ""}
       onChange={(e) => {
-        const value = e.target.value;
-        if (!value) return;
-
-        const id = Number(value);
-
+        const id = Number(e.target.value);
+      
         console.log("📅 REVIEW DROPDOWN:", id);
-
-        setQuestions([]);   // 🔥 trigger reload
-        setExamAttemptId(id);
+      
+        setExamAttemptId(id);     // set FIRST
+        setQuestions([]);         // then clear (optional)
       }}
       style={{
         padding: "8px",
@@ -614,7 +577,7 @@ return (
 
 {/* QUESTION BLOCKS */}
 <div className="question-blocks">
-{currentQ.blocks?.map((block, idx) => {
+{currentQ?.blocks?.map((block, idx) => {
   if (block.type === "text") {
     return (
       <p key={idx} className="question-text">
