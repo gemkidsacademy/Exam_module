@@ -515,35 +515,37 @@ useEffect(() => {
     }
   
     if (mode === "review" && !questions.length) {
-    return (
-      <NaplanNumeracyReview
-  studentId={studentId}
-  examId={selectedExamId}
-  examDates={examDates}
-  selectedExamId={selectedExamId}
-  onExamChange={(id) => setSelectedExamId(id)}
-  onLoaded={(qs, studentAnswers) => {
-    const normalizedAnswers = {};
+  return (
+    <NaplanNumeracyReview
+      studentId={studentId}
+      examId={selectedExamId}
+      examDates={examDates}
+      selectedExamId={selectedExamId}
+      onExamChange={(id) => setSelectedExamId(id)}
+      onLoaded={(qs, studentAnswers) => {
+        const normalizedAnswers = {};
 
-    Object.entries(studentAnswers || {}).forEach(([key, value]) => {
-      if (typeof value === "string") {
-        try {
-          const parsed = JSON.parse(value.replace(/'/g, '"'));
-          normalizedAnswers[String(key)] = parsed;
-        } catch {
-          normalizedAnswers[String(key)] = value;
-        }
-      } else {
-        normalizedAnswers[String(key)] = value;
-      }
-    });
+        Object.entries(studentAnswers || {}).forEach(([key, value]) => {
+          if (typeof value === "string") {
+            try {
+              const parsed = JSON.parse(value.replace(/'/g, '"'));
+              normalizedAnswers[String(key)] = parsed;
+            } catch {
+              normalizedAnswers[String(key)] = value;
+            }
+          } else {
+            normalizedAnswers[String(key)] = value;
+          }
+        });
 
-    setQuestions(qs || []);
-    setAnswers(normalizedAnswers);
-    setCurrentIndex(0);
-    setVisited({});
-  }}
-/>
+        setQuestions(qs || []);
+        setAnswers(normalizedAnswers);
+        setCurrentIndex(0);
+        setVisited({});
+      }}
+    />
+  );
+}
   
     /* ============================================================
        EXAM UI
