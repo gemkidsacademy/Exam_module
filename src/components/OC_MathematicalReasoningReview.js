@@ -37,7 +37,7 @@ export default function OC_MathematicalReasoningReview({
     };
 
     loadReviewOCMR();
-}, [studentId, attemptId, API_BASE, onLoaded]);
+}, [studentId, attemptId, API_BASE]);
 
   // 🔥 No UI here anymore
   return null;
