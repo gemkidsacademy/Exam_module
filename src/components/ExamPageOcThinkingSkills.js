@@ -739,6 +739,12 @@ return (
  REPORT COMPONENT
 ============================================================ */
 function ThinkingSkillsReport({ report, onViewExamDetails }) {
+const [selectedAttempt, setSelectedAttempt] = useState("");
+const mockAttempts = [
+  { id: 1, label: "April 1, 2026 - 2:30 PM" },
+  { id: 2, label: "March 28, 2026 - 11:00 AM" },
+  { id: 3, label: "March 20, 2026 - 5:45 PM" }
+];
 if (!report?.overall) {
   return <p className="loading">Generating your report…</p>;
 }
@@ -767,6 +773,26 @@ return (
        HEADER (Overall Result – B)
     =============================== */}
     <h2 className="report-title">
+     {/* 🔽 DATE DROPDOWN */}
+<select
+  value={selectedAttempt}
+  onChange={(e) => setSelectedAttempt(e.target.value)}
+  style={{
+    marginTop: "12px",
+    padding: "8px 12px",
+    borderRadius: "6px",
+    border: "1px solid #ccc",
+    fontSize: "14px"
+  }}
+>
+  <option value="">Select Attempt</option>
+
+  {mockAttempts.map((a) => (
+    <option key={a.id} value={a.id}>
+      {a.label}
+    </option>
+  ))}
+</select>
       You scored {overall.correct} out of {overall.total_questions} in 
       OC Thinking Skills Test
     </h2>
