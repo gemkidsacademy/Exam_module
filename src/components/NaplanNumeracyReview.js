@@ -8,13 +8,20 @@ export default function NaplanNumeracyReview({
   const API_BASE = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
-    if (!studentId || !API_BASE) return;
+    if (!studentId || !API_BASE || !examId) return;
 
-    const loadReview = async () => {
+    const abortController = new AbortController();
+
+    const fetchNaplanNumeracyReviewData = async () => {
       try {
-        const response = await fetch(
-          `${API_BASE}/api/student/exam-review/naplan-numeracy?student_id=${studentId}&exam_id=${examId}`
-        );
+        const url = `${API_BASE}/api/student/exam-review/naplan-numeracy?student_id=${studentId}&exam_id=${examId}`;
+
+        console.log("📘 Loading review for examId:", examId);
+        console.log("🌐 Request URL:", url);
+
+        const response = await fetch(url, {
+          signal: abortController.signal
+        });
 
         if (!response.ok) {
           throw new Error(`Review fetch failed: ${response.status}`);
@@ -22,27 +29,37 @@ export default function NaplanNumeracyReview({
 
         const data = await response.json();
 
-        const questions = Array.isArray(data.questions)
+        const safeQuestions = Array.isArray(data.questions)
           ? data.questions
           : [];
 
-        const studentAnswers =
+        const safeStudentAnswers =
           data.student_answers && typeof data.student_answers === "object"
             ? data.student_answers
             : {};
 
-        console.log("QUESTIONS:", questions);
-        console.log("STUDENT ANSWERS:", studentAnswers);
+        console.log("✅ Review loaded successfully");
+        console.log("📦 Questions:", safeQuestions);
+        console.log("📝 Student Answers:", safeStudentAnswers);
 
-        onLoaded?.(questions, studentAnswers);
+        onLoaded?.(safeQuestions, safeStudentAnswers);
 
       } catch (error) {
-        console.error("Review load failed:", error);
+        if (error.name === "AbortError") {
+          console.log("⏹️ Review request aborted");
+          return;
+        }
+
+        console.error("🔥 Review load failed:", error);
         onLoaded?.([], {});
       }
     };
 
-    loadReview();
+    fetchNaplanNumeracyReviewData();
+
+    return () => {
+      abortController.abort();
+    };
 
   }, [studentId, examId, API_BASE, onLoaded]);
 
@@ -66,7 +83,7 @@ export default function NaplanNumeracyReview({
           textAlign: "center"
         }}
       >
-        Loading NAPLAN Numeracy review…
+        Loading NAPLAN Numeracy review...
       </p>
     </div>
   );
