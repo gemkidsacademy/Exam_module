@@ -374,6 +374,10 @@ useEffect(() => {
     ============================================================ */
     
     const finishExam = useCallback(async () => {
+    console.log("🚀 finishExam START", {
+    examAttemptId,
+    hasSubmitted: hasSubmittedRef.current
+  });
   if (hasSubmittedRef.current) return;
   hasSubmittedRef.current = true;
 
