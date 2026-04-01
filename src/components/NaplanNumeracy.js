@@ -317,45 +317,44 @@ useEffect(() => {
        START / RESUME EXAM
     ============================================================ */
     useEffect(() => {
-      if (!studentId) return;
-      if (hasSubmittedRef.current) return;
-      if (
-        mode === "report" ||
-        mode === "review" ||
-        mode === "submitting"
-      ) {
-        return;
+  if (!studentId) return;
+
+  const startExam = async () => {
+    const res = await fetch(
+      `${API_BASE}/api/student/start-exam/naplan-numeracy`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ student_id: studentId })
       }
-  
-      const startExam = async () => {
-        const res = await fetch(
-          `${API_BASE}/api/student/start-exam/naplan-numeracy`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ student_id: studentId })
-          }
-        );
-  
-        const data = await res.json();
-  
-        console.log("📘 START-EXAM RESPONSE:", data);
-        console.log("📘 QUESTIONS:", data.questions);
-  
-        if (data.completed === true) {
-          await loadExamDates(); // 🔥 this will trigger report automatically
-          return;
-        }
-  
-        setQuestions(data.questions || []);
-        setTimeLeft(data.remaining_time);
-        setExamAttemptId(data.exam_attempt_id);
-        setMode("exam");
-        onExamStart?.();
-      };
-  
-      startExam();
-    }, [studentId, API_BASE, loadReport, mode, onExamStart]);
+    );
+
+    const data = await res.json();
+
+    console.log("📘 START-EXAM RESPONSE:", data);
+
+    // 🔥 ALWAYS store attempt id (for BOTH cases)
+    if (data.exam_attempt_id) {
+      setExamAttemptId(data.exam_attempt_id);
+    }
+
+    // 🔥 KEY DECISION
+    if (data.completed === true) {
+      console.log("✅ Completed → go to report");
+      await loadExamDates();
+      return;
+    }
+
+    console.log("🟢 Starting exam");
+
+    setQuestions(data.questions || []);
+    setTimeLeft(data.remaining_time);
+    setMode("exam");
+    onExamStart?.();
+  };
+
+  startExam();
+}, [studentId, API_BASE, loadExamDates, onExamStart]);
   
     const formatExplanation = (text) => {
       if (!text) return "";
