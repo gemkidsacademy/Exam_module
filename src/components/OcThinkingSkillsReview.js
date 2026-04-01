@@ -60,7 +60,7 @@ export default function OcThinkingSkillsReview({
 
     loadReview();
 
-  }, [studentId, examAttemptId, API_BASE, onLoaded]);
+  }, [studentId, examAttemptId, API_BASE]);
 
   return (
     <p className={styles.loading}>
