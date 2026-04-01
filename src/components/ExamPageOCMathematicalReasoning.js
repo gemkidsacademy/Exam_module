@@ -466,6 +466,8 @@ if (mode === "review" && reviewQuestions.length === 0) {
     <OC_MathematicalReasoningReview
       studentId={studentId}
       attemptId={selectedAttemptId}
+      attempts={attempts}                     // ✅ ADD
+      onChangeAttempt={setSelectedAttemptId}  // ✅ ADD
       onLoaded={(questions) => {
         console.log("✅ Review questions received:", questions.length);
 
