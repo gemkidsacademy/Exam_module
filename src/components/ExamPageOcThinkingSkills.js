@@ -1,3 +1,4 @@
+#old
 import React, {
 useState,
 useEffect,
@@ -18,34 +19,7 @@ export default function ExamPageOcThinkingSkills({
 }) {
 const studentId = sessionStorage.getItem("student_id");
 const isPopNavigationRef = useRef(false);
-const [attempts, setAttempts] = useState([]);
-const [selectedAttemptId, setSelectedAttemptId] = useState(null);
-const loadExamAttempts = useCallback(async () => {
-  try {
-    const res = await fetch(
-      `${API_BASE}/api/student/exam-attempts/oc-thinking-skills?student_id=${studentId}`
-    );
-
-    const data = await res.json();
-
-    console.log("📅 attempts:", data);
-
-    setAttempts(data);
-    if (data.length > 0) {
-  setSelectedAttemptId((prev) => {
-    if (prev) return prev;  // don't overwrite existing
-    return data[0].attempt_id;
-  });
-}
-
-    return data;   // 🔥 IMPORTANT
-
-  } catch (err) {
-    console.error("❌ attempts load error:", err);
-    return [];
-  }
-}, [studentId]);
- const formatExplanation = (text) => {
+const formatExplanation = (text) => {
   if (!text) return "";
 
   return text
@@ -143,22 +117,7 @@ const handleGenerateExplanation = async () => {
  const handleViewExamDetails = () => {
   console.log("🟢 View Exam Details button clicked");
 
-  const attemptIdToUse = selectedAttemptId || report?.exam_attempt_id;
-
-  console.log("➡️ selectedAttemptId:", selectedAttemptId);
-  console.log("➡️ fallback report attempt:", report?.exam_attempt_id);
-  console.log("➡️ FINAL attemptId used:", attemptIdToUse);
-  
-  if (!attemptIdToUse) {
-    console.error("❌ No attempt available!");
-    return;
-  }
-  
-  // 🔥 use fallback-safe value
-  setExamAttemptId(attemptIdToUse);
-  // 🔥 CRITICAL FIX
-  
-  // reset UI
+  // 🔥 force clean transition
   setQuestions([]);
   setCurrentIndex(0);
   setVisited({});
@@ -166,6 +125,7 @@ const handleGenerateExplanation = async () => {
 
   setMode("review");
 };
+
 
 
 
@@ -199,28 +159,27 @@ const [report, setReport] = useState(null);
 /* ============================================================
    LOAD REPORT (ONLY WHEN EXAM IS COMPLETED)
 ============================================================ */
-const loadReport = useCallback(async (attemptId) => {
-  console.log("🚀 loadReport called with attemptId:", attemptId);
+const loadReport = useCallback(async () => {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/student/exam-report/oc-thinking-skills?student_id=${studentId}`
+    );
 
-  if (!attemptId) {
-    console.error("❌ No attemptId passed to loadReport");
-    return;
+    if (!res.ok) {
+      console.warn("⚠️ Report not available yet");
+      return;
+    }
+
+    const data = await res.json();
+    console.log("REVIEW API RESPONSE", data);
+    console.log("📊 report loaded:", data);
+
+    setReport(data);
+    setExamAttemptId(data.exam_attempt_id);
+    setMode("report");
+  } catch (err) {
+    console.error("❌ loadReport error:", err);
   }
-
-  const res = await fetch(
-    `${API_BASE}/api/student/exam-report/oc-thinking-skills?student_id=${studentId}&attempt_id=${attemptId}`
-  );
-
-  const data = await res.json();
-
-  console.log("📊 report loaded:", data);
-
-  setReport(data);
-
-  // 🔥 IMPORTANT
-  setExamAttemptId(data.exam_attempt_id);
-  setSelectedAttemptId(data.exam_attempt_id);
-
 }, [studentId]);
 useEffect(() => {
   setExplanation(null);
@@ -301,6 +260,11 @@ useEffect(() => {
   setMode("exam");
 }, [studentId]);
  // 🔑 only what actually matters
+useEffect(() => {
+  document.addEventListener("contextmenu", e => e.preventDefault());
+  document.addEventListener("copy", e => e.preventDefault());
+  document.addEventListener("cut", e => e.preventDefault());
+}, []);
 /* ============================================================
    START / RESUME EXAM (SINGLE SOURCE OF TRUTH)
 ============================================================ */
@@ -331,22 +295,10 @@ useEffect(() => {
     );
 
     if (data.completed === true) {
-     sessionStorage.setItem("oc_thinking_skills_completed", "true");
-   
-     const attempts = await loadExamAttempts();   // 🔥 capture return value
-
-     if (attempts.length > 0) {
-       const latestAttemptId = attempts[0].attempt_id;
-     
-       console.log("🔥 Using attemptId for report:", latestAttemptId);
-     
-       setSelectedAttemptId(latestAttemptId);
-     
-       await loadReport(latestAttemptId);   // 🔥 PASS IT
-     }
-     setMode("report");
-     return;
-   }
+      sessionStorage.setItem("oc_thinking_skills_completed", "true");
+      await loadReport();
+      return;
+    }
 
     setQuestions(data.questions || []);
     setTimeLeft(data.remaining_time);
@@ -383,18 +335,7 @@ async (reason = "submitted") => {
       }
     );
 
-    const attempts = await loadExamAttempts();
-
-    if (attempts.length > 0) {
-      const latestAttemptId = attempts[0].attempt_id;
-    
-      console.log("🔥 Using attemptId after finish:", latestAttemptId);
-    
-      setSelectedAttemptId(latestAttemptId);
-    
-      await loadReport(latestAttemptId);
-      setMode("report");
-    }
+    await loadReport();
 
     // ✅ notify parent
     onExamFinish?.();
@@ -472,7 +413,9 @@ const activeQuestions = questions;
 
 
 // Only block loading for exam & review
-// 🔥 ALWAYS decide UI by mode FIRST
+if (mode === "exam" && !questions.length) {
+  return <p className="loading">Loading…</p>;
+}
 
 if (mode === "loading") {
   return <p className="loading">Loading…</p>;
@@ -481,50 +424,35 @@ if (mode === "loading") {
 if (mode === "report") {
   return (
     <ThinkingSkillsReport
-      report={report}
-      onViewExamDetails={handleViewExamDetails}
-      attempts={attempts}
-      selectedAttemptId={selectedAttemptId}
-      onAttemptChange={async (attemptId) => {
-        setSelectedAttemptId(attemptId);
+     report={report}
+     onViewExamDetails={handleViewExamDetails}
+   />
 
-        // 🔥 prepare for review reload
-        setQuestions([]);
-
-        await loadReport(attemptId);
-      }}
-    />
   );
 }
-
-if (mode === "review") {
+ 
+if (mode === "review" && questions.length === 0) {
   return (
     <OcThinkingSkillsReview
       studentId={studentId}
       examAttemptId={examAttemptId}
-      attempts={attempts}
-      selectedAttemptId={selectedAttemptId}
-      onAttemptChange={async (attemptId) => {
-        setSelectedAttemptId(attemptId);
-
-        // 🔥 force reload
-        setQuestions([]);
-
-        setExamAttemptId(attemptId);
-      }}
       onLoaded={(qs) => {
-        setQuestions(qs);
-        setCurrentIndex(0);
-        setVisited({});
-        setAnswers({});
-      }}
+
+       console.log("REVIEW QUESTIONS RECEIVED IN PARENT", qs);
+     
+       if (qs.length > 0) {
+         console.log("FIRST REVIEW QUESTION OPTIONS", qs[0].options);
+       }
+     
+       setQuestions(qs);
+       setCurrentIndex(0);
+       setVisited({});
+       setAnswers({});
+     }}
     />
   );
 }
 
-if (mode === "exam" && !questions.length) {
-  return <p className="loading">Loading…</p>;
-}
 // ---------------- EXAM UI ----------------
 const currentQ = activeQuestions[currentIndex];
 if (!currentQ) return null;
@@ -810,13 +738,7 @@ return (
 /* ============================================================
  REPORT COMPONENT
 ============================================================ */
-function ThinkingSkillsReport({
-  report,
-  onViewExamDetails,
-  attempts,
-  selectedAttemptId,
-  onAttemptChange
-}) {
+function ThinkingSkillsReport({ report, onViewExamDetails }) {
 if (!report?.overall) {
   return <p className="loading">Generating your report…</p>;
 }
@@ -844,40 +766,17 @@ return (
     {/* ===============================
        HEADER (Overall Result – B)
     =============================== */}
-    
-
-<h2 className="report-title">
-  You scored {overall.correct} out of {overall.total_questions} in 
-  OC Thinking Skills Test
-</h2>
-
-{/* 🔽 ATTEMPT DROPDOWN */}
-{attempts.length > 0 && (
-  <div style={{ margin: "12px 0" }}>
-    <select
-      value={selectedAttemptId || ""}
-      onChange={(e) => onAttemptChange(Number(e.target.value))}
-      style={{
-        padding: "8px",
-        borderRadius: "6px"
-      }}
+    <h2 className="report-title">
+      You scored {overall.correct} out of {overall.total_questions} in 
+      OC Thinking Skills Test
+    </h2>
+    <button
+      className="view-exam-btn"
+      onClick={onViewExamDetails}
     >
-      {attempts.map((a) => (
-        <option key={a.attempt_id} value={a.attempt_id}>
-          {new Date(a.completed_at).toLocaleString()}
-        </option>
-      ))}
-    </select>
-  </div>
-)}
+      View Exam Details
+    </button>
 
-{/* 🔽 BUTTON */}
-<button
-  className="view-exam-btn"
-  onClick={onViewExamDetails}
->
-  View Exam Details
-</button>
 
 
 
@@ -995,4 +894,69 @@ return (
   </div>
 );
 }
+------------
+old review 
+#old
+import { useEffect } from "react";
+import styles from "./ThinkingSkillsReview.module.css";
 
+export default function OcThinkingSkillsReview({
+  studentId,
+  examAttemptId,
+  onLoaded
+}) {
+  const API_BASE = process.env.REACT_APP_API_URL;
+
+  useEffect(() => {
+    if (!studentId) {
+      return;
+    }
+
+    const loadReview = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE}/api/student/exam-review/oc-thinking-skills?student_id=${studentId}`
+        );
+
+        if (!response.ok) {
+          throw new Error(`Review fetch failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        console.log("===== OC REVIEW API RAW RESPONSE =====");
+        console.log(data);
+
+        const questions = Array.isArray(data.questions)
+          ? data.questions
+          : [];
+
+        questions.forEach((q, i) => {
+          console.log(`OC REVIEW QUESTION ${i + 1}`, {
+            q_id: q.q_id,
+            options: q.options,
+            choices: q.choices,
+            answer_options: q.answer_options
+          });
+        });
+
+        console.log("===================================");
+
+        onLoaded?.(questions);
+
+      } catch (error) {
+        console.error("Failed to load OC thinking skills review", error);
+        onLoaded?.([]);
+      }
+    };
+
+    loadReview();
+
+  }, [studentId, examAttemptId, API_BASE, onLoaded]);
+
+  return (
+    <p className={styles.loading}>
+      Loading OC review…
+    </p>
+  );
+}
