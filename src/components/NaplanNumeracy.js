@@ -550,6 +550,79 @@ useEffect(() => {
     /* ============================================================
        EXAM UI
     ============================================================ */
+    if (mode === "review") {
+  return (
+    <div
+      style={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        background: "#f6f7f9"
+      }}
+    >
+      {/* 🔷 HEADER (NOW ALWAYS VISIBLE) */}
+      <div
+        style={{
+          padding: "16px 24px",
+          background: "#ffffff",
+          borderBottom: "1px solid #e5e7eb",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center"
+        }}
+      >
+        <div style={{ fontWeight: 600 }}>
+          NAPLAN Numeracy Review
+        </div>
+
+        <select
+          value={selectedExamId || ""}
+          onChange={(e) => {
+            const newId = Number(e.target.value);
+            console.log("📅 Switching exam:", newId);
+
+            // 🔥 RESET STATE BEFORE LOAD
+            setQuestions([]);
+            setAnswers({});
+            setCurrentIndex(0);
+            setVisited({});
+
+            setSelectedExamId(newId);
+          }}
+          style={{
+            padding: "6px 10px",
+            borderRadius: "6px",
+            border: "1px solid #cbd5e1"
+          }}
+        >
+          {examDates?.map((exam) => (
+            <option key={exam.exam_id} value={exam.exam_id}>
+              {new Date(exam.completed_at).toLocaleString()}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* 🔄 CONTENT AREA */}
+      {!questions.length ? (
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <p>Loading review...</p>
+        </div>
+      ) : (
+        <div style={{ flex: 1 }}>
+          {/* 👇 TEMP placeholder */}
+        </div>
+      )}
+    </div>
+  );
+}
     const currentQ = questions[currentIndex];
     if (!currentQ) return null;
   
