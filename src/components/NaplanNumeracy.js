@@ -625,7 +625,7 @@ useEffect(() => {
                   <select
                     className="exam-dropdown"
                     value={selectedExamId || ""}
-                    onChange={(e) => onExamChange(Number(e.target.value))}
+                    onChange={(e) => setSelectedExamId(Number(e.target.value))}
                   >
                     {examDates.map((d) => (
                       <option key={d.exam_id} value={d.exam_id}>
