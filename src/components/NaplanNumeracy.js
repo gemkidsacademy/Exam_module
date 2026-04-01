@@ -1,3 +1,4 @@
+
 import React, {
     useState,
     useEffect,
@@ -514,16 +515,16 @@ useEffect(() => {
     }
   
     if (mode === "review" && !questions.length) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+    return (
       <NaplanNumeracyReview
         studentId={studentId}
         examId={selectedExamId}
         onLoaded={(qs, studentAnswers) => {
           const normalizedAnswers = {};
-
+        
           Object.entries(studentAnswers || {}).forEach(([key, value]) => {
             if (typeof value === "string") {
+              // convert "['E']" into ["E"]
               try {
                 const parsed = JSON.parse(value.replace(/'/g, '"'));
                 normalizedAnswers[String(key)] = parsed;
@@ -534,17 +535,16 @@ useEffect(() => {
               normalizedAnswers[String(key)] = value;
             }
           });
-
+        
           setQuestions(qs || []);
           setAnswers(normalizedAnswers);
           setCurrentIndex(0);
           setVisited({});
         }}
       />
-    </div>
-  );
-}
-    
+    );
+  }
+  
     /* ============================================================
        EXAM UI
     ============================================================ */
@@ -559,50 +559,55 @@ useEffect(() => {
           b.options.some(opt => opt.image && opt.image.trim() !== "")
       );
   
+    const isCorrect =
+      mode === "review"
+        ? (() => {
+            const correctRaw = currentQ.correct_answer;
+            const studentRaw = answers[String(currentQ.id)];
     
-    const isCorrect = null;    
+            // ✅ Type 2 (multi-select)
+            if (currentQ.question_type === 2) {
+              const correct = normalizeCorrectAnswer(
+                correctRaw,
+                currentQ.question_type
+              );
+    
+              const student = normalizeStudentAnswer(
+                studentRaw,
+                currentQ.question_type
+              );
+    
+              return (
+                Array.isArray(student) &&
+                Array.isArray(correct) &&
+                student.length === correct.length &&
+                student.every((v) => correct.includes(v))
+              );
+            }
+    
+            // ✅ Type 3 (numeric)
+            if (currentQ.question_type === 3) {
+              return areNumbersEqual(studentRaw, correctRaw);
+            }
+    
+            // ✅ Default (Type 1, 4, 6)
+            const correct = normalizeCorrectAnswer(
+              correctRaw,
+              currentQ.question_type
+            );
+    
+            const student = normalizeStudentAnswer(
+              studentRaw,
+              currentQ.question_type
+            );
+    
+            return student === correct;
+          })()
+        : null;
+    const seenTextBlocks = new Set();
     return (
-  <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-    
-    {/* 🔽 HEADER */}
-    {mode === "review" && (
-      <div
-        style={{
-          padding: "16px 24px",
-          background: "#ffffff",
-          borderBottom: "1px solid #e5e7eb",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center"
-        }}
-      >
-        <div style={{ fontWeight: 600 }}>NAPLAN Numeracy Review</div>
-
-        <select
-          value={selectedExamId || ""}
-          onChange={(e) => {
-            const newExamId = Number(e.target.value);
-
-            setQuestions([]);
-            setAnswers({});
-            setVisited({});
-            setCurrentIndex(0);
-
-            setSelectedExamId(newExamId);
-          }}
-        >
-          {examDates.map((exam) => (
-            <option key={exam.exam_id} value={exam.exam_id}>
-              {new Date(exam.completed_at).toLocaleString()}
-            </option>
-          ))}
-        </select>
-      </div>
-    )}
-
-    {/* 🔽 MAIN CONTENT WRAPPER */}
-    <div style={{ flex: 1, overflow: "hidden" }}>
-      <div className={`exam-container ${styles.examContainer}`}>
+      <div className={`exam-shell ${styles.examShell}`}>
+        <div className={`exam-container ${styles.examContainer}`}>
           {/* HEADER */}
           <div className={styles.examHeader}>
             {!isReview && <div className="timer">⏳ {formatTime(timeLeft)}</div>}
@@ -1303,9 +1308,8 @@ useEffect(() => {
         )}
   
           </div> {/* closes exam-container */}
-</div> {/* closes flex content */}
-</div> {/* closes main wrapper */}
-);
+  </div>
+  );
 }
   
 
