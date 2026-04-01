@@ -99,7 +99,7 @@ const loadAttempts = async () => {
     setAttempts(data.attempts || []);
 
     // ✅ set default selected attempt
-    if (data.attempts?.length > 0) {
+    if (!selectedAttemptId && data.attempts?.length > 0) {
       setSelectedAttemptId(data.attempts[0].attempt_id);
     }
 
@@ -324,13 +324,9 @@ const finishExam = useCallback(
     };
 
     console.log("📤 finish-exam payload:", payload);
-    console.log(
-      "🧪 FINAL ANSWERS OBJECT:",
-      JSON.stringify(answers, null, 2)
-    );
 
     try {
-      await fetch(
+      const res = await fetch(
         `${API_BASE}/api/student/finish-exam-oc-mathematical-reasoning`,
         {
           method: "POST",
@@ -339,15 +335,23 @@ const finishExam = useCallback(
         }
       );
 
-      // ⬅️ ONLY NOW load report
-      setMode("report"); 
+      const data = await res.json();
+
+      console.log("🎯 finish response:", data);
+
+      // ✅ Set attempt → triggers report load automatically
+      setSelectedAttemptId(data.attempt_id);
+
+      // ✅ Switch UI
+      setMode("report");
+
       onExamFinish?.();
 
     } catch (err) {
       console.error("❌ finish-exam error:", err);
     }
   },
-  [studentId, answers, loadReport]
+  [studentId, answers]
 );
 
 /* ============================================================
@@ -461,6 +465,7 @@ if (mode === "review" && reviewQuestions.length === 0) {
   return (
     <OC_MathematicalReasoningReview
       studentId={studentId}
+      attemptId={selectedAttemptId}
       onLoaded={(questions) => {
         console.log("✅ Review questions received:", questions.length);
 
