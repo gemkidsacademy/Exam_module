@@ -157,8 +157,7 @@ const handleGenerateExplanation = async () => {
   // 🔥 use fallback-safe value
   setExamAttemptId(attemptIdToUse);
   // 🔥 CRITICAL FIX
-  setExamAttemptId(selectedAttemptId);
-
+  
   // reset UI
   setQuestions([]);
   setCurrentIndex(0);
