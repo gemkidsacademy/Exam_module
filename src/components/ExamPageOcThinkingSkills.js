@@ -772,38 +772,44 @@ return (
     {/* ===============================
        HEADER (Overall Result – B)
     =============================== */}
-    <h2 className="report-title">
-    
-      You scored {overall.correct} out of {overall.total_questions} in 
-      OC Thinking Skills Test
-    </h2>
-     {/* 🔽 DATE DROPDOWN */}
-<select
-  value={selectedAttempt}
-  onChange={(e) => setSelectedAttempt(e.target.value)}
-  style={{
-    marginTop: "12px",
-    padding: "8px 12px",
-    borderRadius: "6px",
-    border: "1px solid #ccc",
-    fontSize: "14px"
-  }}
->
-  <option value="">Select Attempt</option>
+    <div style={{ marginBottom: "20px" }}>
 
-  {mockAttempts.map((a) => (
-    <option key={a.id} value={a.id}>
-      {a.label}
-    </option>
-  ))}
-</select>   
-    <button
-      className="view-exam-btn"
-      onClick={onViewExamDetails}
+  <h2 className="report-title">
+    You scored {overall.correct} out of {overall.total_questions} in 
+    OC Thinking Skills Test
+  </h2>
+
+  {/* 🔽 DATE DROPDOWN */}
+  <div style={{ marginTop: "12px" }}>
+    <select
+      value={selectedAttempt}
+      onChange={(e) => setSelectedAttempt(e.target.value)}
+      style={{
+        padding: "8px 12px",
+        borderRadius: "6px",
+        border: "1px solid #ccc",
+        fontSize: "14px"
+      }}
     >
-      View Exam Details
-    </button>
+      <option value="">Select Attempt</option>
 
+      {mockAttempts.map((a) => (
+        <option key={a.id} value={a.id}>
+          {a.label}
+        </option>
+      ))}
+    </select>
+  </div>
+
+  <button
+    className="view-exam-btn"
+    onClick={onViewExamDetails}
+    style={{ marginTop: "12px" }}
+  >
+    View Exam Details
+  </button>
+
+</div>
 
 
 
