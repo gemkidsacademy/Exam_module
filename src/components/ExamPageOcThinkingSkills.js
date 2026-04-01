@@ -18,6 +18,28 @@ export default function ExamPageOcThinkingSkills({
   onExamFinish
 }) {
 const studentId = sessionStorage.getItem("student_id");
+const [attempts, setAttempts] = useState([]);
+ const loadAttempts = useCallback(async () => {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/student/exam-attempts/oc-thinking-skills?student_id=${studentId}`
+    );
+
+    if (!res.ok) {
+      console.warn("⚠️ Failed to load attempts");
+      return;
+    }
+
+    const data = await res.json();
+
+    console.log("📅 attempts:", data);
+
+    setAttempts(data);
+
+  } catch (err) {
+    console.error("❌ loadAttempts error:", err);
+  }
+}, [studentId]);
 const isPopNavigationRef = useRef(false);
 const formatExplanation = (text) => {
   if (!text) return "";
@@ -177,10 +199,11 @@ const loadReport = useCallback(async () => {
     setReport(data);
     setExamAttemptId(data.exam_attempt_id);
     setMode("report");
+    await loadAttempts();
   } catch (err) {
     console.error("❌ loadReport error:", err);
   }
-}, [studentId]);
+}, [studentId, loadAttempts]);
 useEffect(() => {
   setExplanation(null);
 }, [currentIndex]);
@@ -425,6 +448,7 @@ if (mode === "report") {
   return (
     <ThinkingSkillsReport
      report={report}
+     attempts={attempts}   // 🔥 NEW
      onViewExamDetails={handleViewExamDetails}
    />
 
@@ -738,13 +762,8 @@ return (
 /* ============================================================
  REPORT COMPONENT
 ============================================================ */
-function ThinkingSkillsReport({ report, onViewExamDetails }) {
+function ThinkingSkillsReport({ report, attempts, onViewExamDetails }) {
 const [selectedAttempt, setSelectedAttempt] = useState("");
-const mockAttempts = [
-  { id: 1, label: "April 1, 2026 - 2:30 PM" },
-  { id: 2, label: "March 28, 2026 - 11:00 AM" },
-  { id: 3, label: "March 20, 2026 - 5:45 PM" }
-];
 if (!report?.overall) {
   return <p className="loading">Generating your report…</p>;
 }
@@ -793,9 +812,9 @@ return (
     >
       <option value="">Select Attempt</option>
 
-      {mockAttempts.map((a) => (
-        <option key={a.id} value={a.id}>
-          {a.label}
+      {attempts.map((a) => (
+        <option key={a.exam_attempt_id} value={a.exam_attempt_id}>
+          {new Date(a.completed_at).toLocaleString()}
         </option>
       ))}
     </select>
