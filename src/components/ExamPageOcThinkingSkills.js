@@ -333,7 +333,7 @@ useEffect(() => {
      
        await loadReport(latestAttemptId);   // 🔥 PASS IT
      }
-   
+     setMode("report");
      return;
    }
 
