@@ -318,7 +318,11 @@ useEffect(() => {
     ============================================================ */
     useEffect(() => {
   if (!studentId) return;
-
+   // 🛑 If report already loaded, do nothing
+  if (mode === "report") {
+    console.log("🛑 Skipping startExam (already in report)");
+    return;
+  }
   const startExam = async () => {
     const res = await fetch(
       `${API_BASE}/api/student/start-exam/naplan-numeracy`,
@@ -346,6 +350,7 @@ useEffect(() => {
     }
 
     console.log("🟢 Starting exam");
+    hasSubmittedRef.current = false;
 
     setQuestions(data.questions || []);
     setTimeLeft(data.remaining_time);
