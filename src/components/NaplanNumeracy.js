@@ -218,27 +218,15 @@ import React, {
     useEffect(() => {
       loadExamDates();
     }, [loadExamDates]);
-    useEffect(() => {
-      console.log("🔥 selectedExamId changed:", selectedExamId);
-    }, [selectedExamId]);
       
     useEffect(() => {
-  console.log("Selected exam changed:", selectedExamId, "mode:", mode);
-
-  if (!selectedExamId) return;
-
-  // ✅ allow initial load
-  if (mode === "loading") {
-    loadReport(selectedExamId);
-    return;
-  }
-
-  // ✅ allow when explicitly in report
-  if (mode === "report") {
-    loadReport(selectedExamId);
-  }
-
-}, [selectedExamId, mode, loadReport]);
+      console.log("Selected exam changed:", selectedExamId);
+    
+      if (selectedExamId) {
+        loadReport(selectedExamId);
+      }
+    }, [selectedExamId, loadReport]);
+    
   
         
     useEffect(() => {
@@ -317,49 +305,44 @@ useEffect(() => {
        START / RESUME EXAM
     ============================================================ */
     useEffect(() => {
-  if (!studentId) return;
-   // 🛑 If report already loaded, do nothing
-  if (mode !== "loading") {
-    console.log("🛑 Skipping startExam (already in report)");
-    return;
-  }
-  const startExam = async () => {
-    const res = await fetch(
-      `${API_BASE}/api/student/start-exam/naplan-numeracy`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ student_id: studentId })
+      if (!studentId) return;
+      if (hasSubmittedRef.current) return;
+      if (
+        mode === "report" ||
+        mode === "review" ||
+        mode === "submitting"
+      ) {
+        return;
       }
-    );
-
-    const data = await res.json();
-
-    console.log("📘 START-EXAM RESPONSE:", data);
-
-    // 🔥 ALWAYS store attempt id (for BOTH cases)
-    if (data.exam_attempt_id) {
-      setExamAttemptId(data.exam_attempt_id);
-    }
-
-    // 🔥 KEY DECISION
-    if (data.completed === true) {
-      console.log("✅ Completed → go to report");
-      await loadExamDates();
-      return;
-    }
-
-    console.log("🟢 Starting exam");
-    hasSubmittedRef.current = false;
-
-    setQuestions(data.questions || []);
-    setTimeLeft(data.remaining_time);
-    setMode("exam");
-    onExamStart?.();
-  };
-
-  startExam();
-}, [studentId, API_BASE, loadExamDates, onExamStart]);
+  
+      const startExam = async () => {
+        const res = await fetch(
+          `${API_BASE}/api/student/start-exam/naplan-numeracy`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ student_id: studentId })
+          }
+        );
+  
+        const data = await res.json();
+  
+        console.log("📘 START-EXAM RESPONSE:", data);
+        console.log("📘 QUESTIONS:", data.questions);
+  
+        if (data.completed === true) {
+          await loadExamDates(); // 🔥 this will trigger report automatically
+          return;
+        }
+  
+        setQuestions(data.questions || []);
+        setTimeLeft(data.remaining_time);
+        setMode("exam");
+        onExamStart?.();
+      };
+  
+      startExam();
+    }, [studentId, API_BASE, loadReport, mode, onExamStart]);
   
     const formatExplanation = (text) => {
       if (!text) return "";
@@ -374,41 +357,28 @@ useEffect(() => {
     ============================================================ */
     
     const finishExam = useCallback(async () => {
-    console.log("🚀 finishExam START", {
-    examAttemptId,
-    hasSubmitted: hasSubmittedRef.current
-  });
-  if (hasSubmittedRef.current) return;
-  hasSubmittedRef.current = true;
-
-  if (!examAttemptId) {
-    console.error("❌ Missing examAttemptId");
-    return;
-  }
-
+      if (hasSubmittedRef.current) return;
+      hasSubmittedRef.current = true;
   
-
-  try {
-    await fetch(
-      `${API_BASE}/api/student/finish-exam/naplan-numeracy`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          student_id: studentId,
-          exam_attempt_id: examAttemptId,
-          answers
-        })
+      setMode("submitting");
+  
+      try {
+        await fetch(
+          `${API_BASE}/api/student/finish-exam/naplan-numeracy`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ student_id: studentId, answers })
+          }
+        );
+  
+        await loadExamDates();
+        
+        onExamFinish?.();
+      } catch (err) {
+        console.error("Finish exam failed", err);
       }
-    );
-    setMode("submitting");
-    await loadExamDates();
-    onExamFinish?.();
-
-  } catch (err) {
-    console.error("Finish exam failed", err);
-  }
-}, [API_BASE, studentId, answers, examAttemptId, loadExamDates, onExamFinish]);
+    }, [API_BASE, studentId, answers, loadExamDates, onExamFinish]);
   
     /* ============================================================
        TIMER
@@ -544,15 +514,11 @@ useEffect(() => {
       );
     }
   
-    if (mode === "review" && questions.length === 0) {
+    if (mode === "review" && !questions.length) {
     return (
       <NaplanNumeracyReview
-        key={selectedExamId}
         studentId={studentId}
         examId={selectedExamId}
-         examDates={examDates}
-         selectedExamId={selectedExamId}
-         onExamChange={(newExamId) => setSelectedExamId(newExamId)}
         onLoaded={(qs, studentAnswers) => {
           const normalizedAnswers = {};
         
@@ -644,41 +610,11 @@ useEffect(() => {
         <div className={`exam-container ${styles.examContainer}`}>
           {/* HEADER */}
           <div className={styles.examHeader}>
-  
-              {/* LEFT SIDE */}
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                
-                {!isReview && (
-                  <div className="timer">⏳ {formatTime(timeLeft)}</div>
-                )}
-            
-                {isReview && examDates?.length > 0 && (
-                  <select
-                    className="exam-dropdown"
-                    value={selectedExamId || ""}
-                    onChange={(e) => {
-                      const newId = Number(e.target.value);
-                    
-                      setQuestions([]);        // 🔥 this triggers Review reload
-                      setSelectedExamId(newId);
-                    }}
-                  >
-                    {examDates.map((d) => (
-                      <option key={d.exam_id} value={d.exam_id}>
-                        {new Date(d.date).toLocaleDateString()}
-                      </option>
-                    ))}
-                  </select>
-                )}
-            
-              </div>
-            
-              {/* RIGHT SIDE */}
-              <div className="counter">
-                Question {currentIndex + 1} / {questions.length}
-              </div>
-            
+            {!isReview && <div className="timer">⏳ {formatTime(timeLeft)}</div>}
+            <div className="counter">
+              Question {currentIndex + 1} / {questions.length}
             </div>
+          </div>
   
           {/* QUESTION INDEX */}
           <div className={styles.indexRow}>
