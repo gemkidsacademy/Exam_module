@@ -3,6 +3,8 @@ import { useEffect } from "react";
 export default function OC_MathematicalReasoningReview({
   studentId,
   attemptId,
+  attempts,
+  onChangeAttempt,
   onLoaded
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
@@ -38,5 +40,31 @@ export default function OC_MathematicalReasoningReview({
     loadReview_OC_MR();
   }, [studentId, attemptId, API_BASE, onLoaded]);
 
-  return <p className="loading">Loading OC Mathematical Reasoning review…</p>;
+  return (
+  <div style={{ padding: "16px" }}>
+
+    {/* ✅ DROPDOWN GOES HERE */}
+    <div style={{ marginBottom: "16px" }}>
+      <select
+        value={attemptId || ""}
+        onChange={(e) => onChangeAttempt(Number(e.target.value))}
+        style={{
+          padding: "8px 12px",
+          borderRadius: "6px",
+          border: "1px solid #ccc"
+        }}
+      >
+        {attempts?.map((a) => (
+          <option key={a.attempt_id} value={a.attempt_id}>
+            {new Date(a.completed_at).toLocaleString()}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    {/* existing content */}
+    <p className="loading">Loading OC Mathematical Reasoning review…</p>
+
+  </div>
+);
 }
