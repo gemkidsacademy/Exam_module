@@ -161,7 +161,7 @@
 
       setReport(data);
       
-      setMode("report");
+      
     } catch (err) {
       console.error("❌ loadReport error:", err);
     }
