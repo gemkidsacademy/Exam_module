@@ -218,6 +218,9 @@ import React, {
     useEffect(() => {
       loadExamDates();
     }, [loadExamDates]);
+    useEffect(() => {
+      console.log("🔥 selectedExamId changed:", selectedExamId);
+    }, [selectedExamId]);
       
     useEffect(() => {
   console.log("Selected exam changed:", selectedExamId, "mode:", mode);
