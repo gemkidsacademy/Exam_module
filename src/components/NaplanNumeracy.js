@@ -220,11 +220,22 @@ import React, {
     }, [loadExamDates]);
       
     useEffect(() => {
-  if (selectedExamId && mode === "report") {
+  console.log("Selected exam changed:", selectedExamId, "mode:", mode);
+
+  if (!selectedExamId) return;
+
+  // ✅ allow initial load
+  if (mode === "loading") {
+    loadReport(selectedExamId);
+    return;
+  }
+
+  // ✅ allow when explicitly in report
+  if (mode === "report") {
     loadReport(selectedExamId);
   }
+
 }, [selectedExamId, mode, loadReport]);
-    
   
         
     useEffect(() => {
