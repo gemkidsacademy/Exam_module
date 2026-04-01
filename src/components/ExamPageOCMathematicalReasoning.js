@@ -528,7 +528,21 @@ return (
 
       </div>
     </div>
-
+     {/* ✅ ADD DROPDOWN HERE */}
+    {mode === "review" && (
+      <div style={{ marginBottom: "16px" }}>
+        <select
+          value={selectedAttemptId || ""}
+          onChange={(e) => setSelectedAttemptId(Number(e.target.value))}
+        >
+          {attempts.map((a) => (
+            <option key={a.attempt_id} value={a.attempt_id}>
+              {new Date(a.completed_at).toLocaleString()}
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
     {/* QUESTION INDEX */}
     <div className="index-row">
   {activeQuestions.map((q, i) => {
