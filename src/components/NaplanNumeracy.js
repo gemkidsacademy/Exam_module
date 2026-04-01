@@ -1,3 +1,4 @@
+
 import React, {
     useState,
     useEffect,
@@ -512,66 +513,37 @@ useEffect(() => {
         />
       );
     }
-  if (mode === "review" && !questions.length) {
-  return (
-    <div>
-
-      {/* HEADER */}
-      <div className="review-header">
-        <select
-          className="exam-dropdown"
-          value={selectedExamId || ""}
-          onChange={(e) => {
-            const newExamId = Number(e.target.value);
-
-            setQuestions([]);
-            setAnswers({});
-            setVisited({});
-            setCurrentIndex(0);
-
-            setSelectedExamId(newExamId);
-          }}
-        >
-          {examDates.map((d) => (
-            <option key={d.exam_id} value={d.exam_id}>
-              {new Date(d.date).toLocaleDateString()}
-            </option>
-          ))}
-        </select>
-
-        <button onClick={() => setMode("report")}>
-          Back to Report
-        </button>
-      </div>
-
-      {/* LOAD DATA ONLY */}
+  
+    if (mode === "review" && !questions.length) {
+    return (
       <NaplanNumeracyReview
-        key={selectedExamId}
         studentId={studentId}
         examId={selectedExamId}
         onLoaded={(qs, studentAnswers) => {
           const normalizedAnswers = {};
-
+        
           Object.entries(studentAnswers || {}).forEach(([key, value]) => {
-            try {
-              normalizedAnswers[String(key)] =
-                typeof value === "string"
-                  ? JSON.parse(value.replace(/'/g, '"'))
-                  : value;
-            } catch {
+            if (typeof value === "string") {
+              // convert "['E']" into ["E"]
+              try {
+                const parsed = JSON.parse(value.replace(/'/g, '"'));
+                normalizedAnswers[String(key)] = parsed;
+              } catch {
+                normalizedAnswers[String(key)] = value;
+              }
+            } else {
               normalizedAnswers[String(key)] = value;
             }
           });
-
+        
           setQuestions(qs || []);
           setAnswers(normalizedAnswers);
           setCurrentIndex(0);
           setVisited({});
         }}
       />
-    </div>
-  );
-}
+    );
+  }
   
     /* ============================================================
        EXAM UI
@@ -1340,3 +1312,4 @@ useEffect(() => {
   );
 }
   
+
