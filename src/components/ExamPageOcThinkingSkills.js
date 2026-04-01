@@ -806,34 +806,40 @@ return (
     {/* ===============================
        HEADER (Overall Result – B)
     =============================== */}
-    <div style={{ marginBottom: "16px" }}>
-  <select
-    value={selectedAttemptId || ""}
-    onChange={(e) => onAttemptChange(Number(e.target.value))}
-    style={{
-      padding: "8px",
-      borderRadius: "6px"
-    }}
-  >
-    {attempts.map((a) => (
-      <option key={a.attempt_id} value={a.attempt_id}>
-        {new Date(a.completed_at).toLocaleString()}
-      </option>
-    ))}
-  </select>
-</div>
+    
 
 <h2 className="report-title">
   You scored {overall.correct} out of {overall.total_questions} in 
   OC Thinking Skills Test
 </h2>
-    <button
-      className="view-exam-btn"
-      onClick={onViewExamDetails}
-    >
-      View Exam Details
-    </button>
 
+{/* 🔽 ATTEMPT DROPDOWN */}
+{attempts.length > 0 && (
+  <div style={{ margin: "12px 0" }}>
+    <select
+      value={selectedAttemptId || ""}
+      onChange={(e) => onAttemptChange(Number(e.target.value))}
+      style={{
+        padding: "8px",
+        borderRadius: "6px"
+      }}
+    >
+      {attempts.map((a) => (
+        <option key={a.attempt_id} value={a.attempt_id}>
+          {new Date(a.completed_at).toLocaleString()}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
+
+{/* 🔽 BUTTON */}
+<button
+  className="view-exam-btn"
+  onClick={onViewExamDetails}
+>
+  View Exam Details
+</button>
 
 
 
