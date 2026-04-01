@@ -81,6 +81,32 @@ const [selectedAttemptId, setSelectedAttemptId] = useState(null);
 /* ============================================================
    LOAD REPORT (ONLY WHEN EXAM IS COMPLETED)
 ============================================================ */
+const loadAttempts = async () => {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/student/exam-attempts/oc-mathematical-reasoning?student_id=${studentId}`
+    );
+
+    if (!res.ok) {
+      console.warn("⚠️ Failed to load attempts");
+      return;
+    }
+
+    const data = await res.json();
+
+    console.log("📅 attempts loaded:", data);
+
+    setAttempts(data.attempts || []);
+
+    // ✅ set default selected attempt
+    if (data.attempts?.length > 0) {
+      setSelectedAttemptId(data.attempts[0].attempt_id);
+    }
+
+  } catch (err) {
+    console.error("❌ loadAttempts error:", err);
+  }
+};
 const loadReport = useCallback(async (attemptId = null) => {
   try {
     let url = `${API_BASE}/api/student/exam-report/oc-mathematical-reasoning?student_id=${studentId}`;
@@ -97,11 +123,9 @@ const loadReport = useCallback(async (attemptId = null) => {
     }
 
     const data = await res.json();
-    setAttempts(data.available_attempts || []);
+    
 
-    if (attemptId === null && data.available_attempts?.length > 0) {
-      setSelectedAttemptId(data.available_attempts[0].attempt_id);
-    }
+    
     console.log("📊 report loaded:", data);
 
     setReport(data);
@@ -111,6 +135,12 @@ const loadReport = useCallback(async (attemptId = null) => {
     console.error("❌ loadReport error:", err);
   }
 }, [studentId]);
+useEffect(() => {
+  if (mode === "report") {
+    loadAttempts();
+  }
+}, [mode]);
+
 useEffect(() => {
   if (!selectedAttemptId) return;
 
@@ -210,7 +240,7 @@ useEffect(() => {
 
       // ✅ COMPLETED → SHOW REPORT
       if (data.completed === true) {
-        await loadReport(null);
+        setMode("report");
         onExamFinish?.();
         return;
       }
@@ -310,7 +340,7 @@ const finishExam = useCallback(
       );
 
       // ⬅️ ONLY NOW load report
-      await loadReport(null); 
+      setMode("report"); 
       onExamFinish?.();
 
     } catch (err) {
