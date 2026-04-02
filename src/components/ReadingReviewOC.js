@@ -18,6 +18,7 @@ export default function ReadingReviewOC({
   const [index, setIndex] = useState(0);
   const [explanations, setExplanations] = useState({});
   const [loadingExplanation, setLoadingExplanation] = useState(null);
+  console.log("📅 REVIEW attemptDates:", attemptDates);
 
   const API_BASE = process.env.REACT_APP_API_URL;
 
