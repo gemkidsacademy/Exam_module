@@ -109,7 +109,7 @@ export default function ReadingComponentOC({
         setLoadingExplanation(null);
       }
     };
-  const handleReviewExam = async () => {
+  const handleReviewExam = async (sid) => {
   const sessionToUse = selectedSessionId || attemptId;
 
   if (!sessionToUse) {
@@ -510,17 +510,20 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
   };
   // 🔴 1. REVIEW MODE — HIGHEST PRIORITY
     if (mode === "review") {
-      return (
-        <ReadingReviewOC
-          questions={reviewQuestions}
-          onExit={() => {
-              setReviewQuestions([]);
-              setMode("exam");
-            }}
-
-        />
-      );
-    }
+  return (
+    <ReadingReviewOC
+      questions={reviewQuestions}
+      attemptDates={attemptDates}
+      selectedSessionId={selectedSessionId}
+      setSelectedSessionId={setSelectedSessionId}
+      onSessionChange={handleReviewExam}   // 🔥 important
+      onExit={() => {
+        setReviewQuestions([]);
+        setMode("exam");
+      }}
+    />
+  );
+}
   /* =============================
      FINISHED VIEW
   ============================= */
