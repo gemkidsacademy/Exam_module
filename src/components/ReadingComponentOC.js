@@ -1,3 +1,4 @@
+
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import "./ExamPage_reading.css";   
 import ReadingReviewOC from "./ReadingReviewOC";   
@@ -21,6 +22,8 @@ export default function ReadingComponentOC({
   const [exam, setExam] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
+  const [attemptDates, setAttemptDates] = useState([]);
+  const [selectedSessionId, setSelectedSessionId] = useState(null);
 
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
@@ -31,6 +34,21 @@ export default function ReadingComponentOC({
   const [attemptId, setAttemptId] = useState(null);
   const [mode, setMode] = useState("exam");
   const [reviewQuestions, setReviewQuestions] = useState([]);
+  const loadAttemptDates = async () => {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/exams/oc-reading-attempts?student_id=${studentId}`
+    );
+
+    if (!res.ok) throw new Error("Failed to load attempts");
+
+    const data = await res.json();
+
+    setAttemptDates(data.attempts || []);
+  } catch (err) {
+    console.error("❌ loadAttemptDates error:", err);
+  }
+};
   const formatExplanation = (text) => {
       if (!text) return "";
     
@@ -86,15 +104,17 @@ export default function ReadingComponentOC({
       }
     };
   const handleReviewExam = async () => {
-  if (!attemptId) {
+  const sessionToUse = selectedSessionId || attemptId;
+
+  if (!sessionToUse) {
     console.error("❌ No session_id available for review");
-    alert("Exam session not found.");
+    alert("Please select an attempt first");
     return;
   }
 
   try {
     const res = await fetch(
-      `${API_BASE}/api/exams/review-oc-reading?session_id=${attemptId}`
+      `${API_BASE}/api/exams/review-oc-reading?session_id=${sessionToUse}`
     );
 
     if (!res.ok) {
@@ -195,6 +215,17 @@ export default function ReadingComponentOC({
   /* =============================
      LOAD EXAM
   ============================= */
+  useEffect(() => {
+  if (attemptDates.length > 0) {
+    const latest = attemptDates[0];
+    setSelectedSessionId(latest.session_id);
+  }
+}, [attemptDates]);
+  useEffect(() => {
+  if (finished && studentId) {
+    loadAttemptDates();
+  }
+}, [finished, studentId]);
   useEffect(() => {
   console.log("🧠 STATE UPDATED", {
     exam,
@@ -505,7 +536,29 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
     <h1>
       You scored {normalizedReport.correct} out of {normalizedReport.total}
     </h1>
-    
+    {/* ✅ DATE DROPDOWN */}
+    <select
+      value={selectedSessionId || ""}
+      onChange={(e) => {
+        const sessionId = e.target.value;
+        setSelectedSessionId(sessionId);
+
+        loadReportBySession(sessionId); // 🔥 updates report
+      }}
+      style={{
+        padding: "8px",
+        marginBottom: "12px",
+        display: "block"
+      }}
+    >
+      <option value="">Select attempt date</option>
+
+      {attemptDates.map((a) => (
+        <option key={a.session_id} value={a.session_id}>
+          {new Date(a.created_at).toLocaleString()}
+        </option>
+      ))}
+    </select>
     {/* ✅ NEW: Review Exam Button */}
     <button
       className="review-exam-btn"
