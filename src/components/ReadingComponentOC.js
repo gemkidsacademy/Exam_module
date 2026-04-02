@@ -269,10 +269,7 @@ export default function ReadingComponentOC({
     await loadReportBySession(meta.attempt_id);
   }
 
-  // 🔥 fetch attempts without blocking UI
-  if (studentId) {
-    loadAttemptDates(studentId);
-  }
+  
 
   onExamFinish?.();
   return;
