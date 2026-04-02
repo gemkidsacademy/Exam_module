@@ -258,11 +258,14 @@ export default function ReadingComponentOC({
     if (meta.completed === true) {
       setAttemptId(meta.attempt_id);
       setFinished(true);
-    
+
       if (meta.attempt_id) {
         await loadReportBySession(meta.attempt_id);
       }
-    
+
+      // 🔥 ensure dropdown gets data
+      await loadAttemptDates();
+
       onExamFinish?.();
       return;
     }
