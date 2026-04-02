@@ -7,7 +7,14 @@ import "./ReadingReviewIndex.css";
  *
  * Handles OC-specific data variations safely
  */
-export default function ReadingReviewOC({ questions = [], onExit }) {
+export default function ReadingReviewOC({
+  questions = [],
+  attemptDates = [],
+  selectedSessionId,
+  setSelectedSessionId,
+  onSessionChange,
+  onExit
+}) {
   const [index, setIndex] = useState(0);
   const [explanations, setExplanations] = useState({});
   const [loadingExplanation, setLoadingExplanation] = useState(null);
@@ -165,7 +172,32 @@ export default function ReadingReviewOC({ questions = [], onExit }) {
           </button>
         )}
       </div>
-
+      {/* 🔥 ADD DROPDOWN HERE */}
+      <div style={{ padding: "12px 16px" }}>
+        <select
+          value={selectedSessionId || ""}
+          onChange={(e) => {
+            const sessionId = e.target.value;
+            setSelectedSessionId(sessionId);
+      
+            // ✅ reload review for selected attempt
+            onSessionChange(sessionId);
+          }}
+          style={{
+            padding: "8px",
+            marginBottom: "12px",
+            display: "block"
+          }}
+        >
+          <option value="">Select attempt date</option>
+      
+          {attemptDates.map((a) => (
+            <option key={a.session_id} value={a.session_id}>
+              {new Date(a.created_at).toLocaleString()}
+            </option>
+          ))}
+        </select>
+      </div>
       {/* QUESTION INDEX */}
       <div className="question-index-grouped">
         {Object.entries(groupedQuestions).map(([key, data]) => (
