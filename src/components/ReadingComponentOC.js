@@ -34,15 +34,21 @@ export default function ReadingComponentOC({
   const [attemptId, setAttemptId] = useState(null);
   const [mode, setMode] = useState("exam");
   const [reviewQuestions, setReviewQuestions] = useState([]);
-  const loadAttemptDates = async () => {
+  const loadAttemptDates = async (sid) => {
   try {
+    console.log("📅 Fetching attempt dates for student:", sid);
+
     const res = await fetch(
-      `${API_BASE}/api/exams/oc-reading-attempts?student_id=${studentId}`
+      `${API_BASE}/api/exams/oc-reading-attempts?student_id=${sid}`
     );
 
-    if (!res.ok) throw new Error("Failed to load attempts");
+    if (!res.ok) {
+      throw new Error(`Failed to load attempts (status: ${res.status})`);
+    }
 
     const data = await res.json();
+
+    console.log("📅 Attempts response:", data);
 
     setAttemptDates(data.attempts || []);
   } catch (err) {
@@ -223,7 +229,7 @@ export default function ReadingComponentOC({
 }, [attemptDates]);
   useEffect(() => {
   if (finished && studentId) {
-    loadAttemptDates();
+    loadAttemptDates(studentId);
   }
 }, [finished, studentId]);
   useEffect(() => {
@@ -256,19 +262,21 @@ export default function ReadingComponentOC({
     console.log("🧪 START-READING META:", meta);
 
     if (meta.completed === true) {
-      setAttemptId(meta.attempt_id);
-      setFinished(true);
+  setAttemptId(meta.attempt_id);
+  setFinished(true);
 
-      if (meta.attempt_id) {
-        await loadReportBySession(meta.attempt_id);
-      }
+  if (meta.attempt_id) {
+    await loadReportBySession(meta.attempt_id);
+  }
 
-      // 🔥 ensure dropdown gets data
-      await loadAttemptDates();
+  // 🔥 fetch attempts without blocking UI
+  if (studentId) {
+    loadAttemptDates(studentId);
+  }
 
-      onExamFinish?.();
-      return;
-    }
+  onExamFinish?.();
+  return;
+}
 
 
     setAttemptId(meta.attempt_id);
