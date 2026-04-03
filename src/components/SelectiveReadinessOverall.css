@@ -48,13 +48,15 @@
   border-radius: 10px;
   border: 1px solid #e5e7eb;
 
-  flex: 1;              /* 🔥 KEY FIX */
-  min-width: 250px;     /* slightly bigger for safety */
-}
-.score-box .value {
-  word-break: break-word;   /* prevents long text overflow */
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
 }
 
+.score-box .value {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
 .score-box .label {
   font-size: 12px;
   color: #6b7280;
