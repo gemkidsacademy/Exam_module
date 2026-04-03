@@ -20,12 +20,47 @@ export default function SelectiveReadinessOverall() {
   const [error, setError] = useState(null);
 
   const [students, setStudents] = useState([]);
+  const [sendingEmail, setSendingEmail] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState("");
   const [availableDates, setAvailableDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [overall, setOverall] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const handleSendEmail = async () => {
+  if (!selectedStudent || !selectedDate) return;
+
+  setSendingEmail(true);
+
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/api/admin/send-selective-report-email`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          student_id: selectedStudent,
+          exam_date: selectedDate,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.message || "Failed to send email");
+      return;
+    }
+
+    alert("Email sent successfully ✅");
+  } catch (err) {
+    alert("Network error while sending email");
+  } finally {
+    setSendingEmail(false);
+  }
+};
   const printRef = useRef(null);
 
   const handlePrint = useReactToPrint({
@@ -258,6 +293,14 @@ const MAX_SCORES = {
           >
             Preview PDF
           </button>
+         <button
+          className="generate-button secondary"
+          onClick={handleSendEmail}
+          disabled={sendingEmail}
+        >
+          {sendingEmail ? "Sending..." : "Send Email"}
+        </button>
+         
         )}
       </div>
     )}
