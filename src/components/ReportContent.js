@@ -11,11 +11,12 @@ export default function ReportContent({
     <>
       {/* SCORE CARDS */}
       <div className="score-row">
-        <div className="score-box">
+        <div className="score-box score-box--primary">
           <div className="label">Overall Score</div>
           <div className="value">{overall.overall_percent}%</div>
         </div>
-        <div className="score-box">
+      
+        <div className="score-box score-box--secondary">
           <div className="label">Readiness Band</div>
           <div className="value">{overall.readiness_band}</div>
         </div>
