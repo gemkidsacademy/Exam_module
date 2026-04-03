@@ -276,34 +276,35 @@ const MAX_SCORES = {
 
     {/* ================= ACTION BUTTONS ================= */}
     {selectedStudent && selectedDate && (
-      <div className="action-row">
+  <div className="action-row">
+    <button
+      className="generate-button"
+      onClick={generateOverallReport}
+      disabled={loading}
+    >
+      {loading ? "Generating..." : "Generate Overall Readiness Report"}
+    </button>
+
+    {overall && (
+      <>
         <button
-          className="generate-button"
-          onClick={generateOverallReport}
-          disabled={loading}
+          className="generate-button secondary"
+          onClick={() => setShowPreview(true)}
         >
-          {loading ? "Generating..." : "Generate Overall Readiness Report"}
+          Preview PDF
         </button>
 
-
-        {overall && (
-          <button
-            className="generate-button secondary"
-            onClick={() => setShowPreview(true)}
-          >
-            Preview PDF
-          </button>
-         <button
+        <button
           className="generate-button secondary"
           onClick={handleSendEmail}
           disabled={sendingEmail}
         >
           {sendingEmail ? "Sending..." : "Send Email"}
         </button>
-         
-        )}
-      </div>
+      </>
     )}
+  </div>
+)}
     {error && (
       <div className="error-box">
         <h4>Unable to Generate Report because the student has not attempted all four exams</h4>
