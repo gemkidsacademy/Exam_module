@@ -46,8 +46,13 @@
   background: #f8fafc;
   padding: 18px 20px;
   border-radius: 10px;
-  min-width: 200px;
   border: 1px solid #e5e7eb;
+
+  flex: 1;              /* 🔥 KEY FIX */
+  min-width: 250px;     /* slightly bigger for safety */
+}
+.score-box .value {
+  word-break: break-word;   /* prevents long text overflow */
 }
 
 .score-box .label {
