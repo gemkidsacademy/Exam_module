@@ -12,15 +12,59 @@ export default function ReportContent({
   return (
     <>
       {/* SCORE CARDS */}
-      <div className="score-row">
-        <div className="score-box score-box--primary">
-          <div className="label">Overall Score</div>
-          <div className="value">{overall.overall_percent}%</div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
+          margin: "20px 0 12px"
+        }}
+      >
+        <div
+          style={{
+            background: "#eff6ff",
+            padding: "18px 20px",
+            borderRadius: "10px",
+            border: "1px solid #bfdbfe",
+            width: "100%"
+          }}
+        >
+          <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "6px" }}>
+            Overall Score
+          </div>
+          <div
+            style={{
+              fontSize: "24px",
+              fontWeight: "700",
+              color: "#111827",
+              whiteSpace: "nowrap"
+            }}
+          >
+            {overall.overall_percent}%
+          </div>
         </div>
       
-        <div className="score-box score-box--secondary">
-          <div className="label">Readiness Band</div>
-          <div className="value">{overall.readiness_band}</div>
+        <div
+          style={{
+            background: "#f8fafc",
+            padding: "18px 20px",
+            borderRadius: "10px",
+            border: "1px solid #e5e7eb",
+            width: "100%"
+          }}
+        >
+          <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "6px" }}>
+            Readiness Band
+          </div>
+          <div
+            style={{
+              fontSize: "24px",
+              fontWeight: "700",
+              color: "#111827"
+            }}
+          >
+            {overall.readiness_band}
+          </div>
         </div>
       </div>
 
