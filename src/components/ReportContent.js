@@ -1,4 +1,4 @@
-import "./SelectiveReadinessOverall.css";
+import "./SelectiveReadinessOverall.css"; 
 
 export default function ReportContent({
   overall,
