@@ -1,3 +1,5 @@
+import "./SelectiveReadinessOverall.css";
+
 export default function ReportContent({
   overall,
   balanceIndex,
