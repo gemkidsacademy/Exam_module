@@ -47,14 +47,13 @@ export default function SelectiveReadinessOverall() {
       }
     );
 
-    const data = await res.json();
+    const html = await res.text(); // ✅ IMPORTANT CHANGE
 
-    if (!res.ok) {
-      alert(data.message || "Failed to send email");
-      return;
-    }
+    // 👉 Open HTML in new tab
+    const newWindow = window.open();
+    newWindow.document.write(html);
+    newWindow.document.close();
 
-    alert("Email sent successfully ✅");
   } catch (err) {
     alert("Network error while sending email");
   } finally {
