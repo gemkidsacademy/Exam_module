@@ -53,22 +53,18 @@
   max-width: 100%;
 }
 
-.score-box .value {
-  word-break: break-word;
-  overflow-wrap: break-word;
-}
 .score-box .label {
   font-size: 12px;
   color: #6b7280;
   margin-bottom: 6px;
 }
-
 .score-box .value {
   font-size: 24px;
   font-weight: 700;
   color: #111827;
-}
 
+  white-space: nowrap;   /* 🔥 keeps 72.71% in one line */
+}
 /* ===============================
    OVERRIDE WARNING
 ================================ */
