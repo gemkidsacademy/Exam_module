@@ -88,13 +88,16 @@ export default function ReportContent({
         <p><strong>Strengths:</strong> {strengths.join(", ") || "—"}</p>
         <p><strong>Needs Improvement:</strong> {improvements.join(", ") || "None identified"}</p>
       </div>
-      <div className="schools-section">
-        <h3>Recommended Schools</h3>
-        <ul>
+      <div className="schools-section card">
+        <div className="chart-title">Recommended Schools</div>
+      
+        <div className="schools-list">
           {overall.school_recommendation?.map((school, index) => (
-            <li key={index}>{school}</li>
+            <div key={index} className="school-pill">
+              {school}
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
 
       {/* SUBJECT DETAIL */}
