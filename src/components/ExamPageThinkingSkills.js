@@ -14,8 +14,12 @@ import ThinkingSkillsReview from "./ThinkingSkillsReview";
  MAIN COMPONENT
 ============================================================ */
 export default function ExamPageThinkingSkills({
+  mode: parentMode,
+  studentId,
+  subject,
+  difficulty,
   onExamStart,
-  onExamFinish
+  onExamFinish,
 }) {
 const studentId = sessionStorage.getItem("student_id");
 const [attempts, setAttempts] = useState([]);
@@ -274,8 +278,18 @@ useEffect(() => {
 useEffect(() => {
   if (!studentId) return;
 
-  setMode("exam");
-}, [studentId]);
+  if (parentMode === "exam") {
+    setMode("exam");
+  }
+
+  if (parentMode === "report" && mode !== "report") {
+    loadAttempts().then(() => {
+      loadReport();
+    });
+  }
+
+}, [studentId, parentMode, mode]);
+ 
  // 🔑 only what actually matters
 /* ============================================================
    START / RESUME EXAM (SINGLE SOURCE OF TRUTH)
