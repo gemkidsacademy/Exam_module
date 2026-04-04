@@ -43,7 +43,7 @@ const SelectiveDashboard = () => {
   const [activeSubject, setActiveSubject] = useState(null);
   const [examInProgress, setExamInProgress] = useState(false);
   const [examPhase, setExamPhase] = useState("mode_selection");
-  const [examMode, setExamMode] = useState("exam");
+  const [examMode, setExamMode] = useState(null);
   
   // phases: selection → welcome → instructions → exam
 
