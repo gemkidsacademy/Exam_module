@@ -37,26 +37,75 @@ const SUBJECTS = [
 const OCDashboard = () => {
   const [activeSubject, setActiveSubject] = useState(null);
   const [examInProgress, setExamInProgress] = useState(false);
-  const [examPhase, setExamPhase] = useState("selection");
-
+  const [examPhase, setExamPhase] = useState("mode_selection");
+  const [examMode, setExamMode] = useState(null);
   const studentId = sessionStorage.getItem("student_id");
   const ActiveComponent = activeSubject?.component;
 
   const handleSubjectSelect = (subject) => {
-    if (examInProgress) {
-      alert("Please submit your current exam before switching subjects.");
-      return;
-    }
-    setActiveSubject(subject);
+  if (examInProgress) {
+    alert("Please submit your current exam before switching subjects.");
+    return;
+  }
+
+  setActiveSubject(subject);
+
+  if (examMode === "report") {
+    setExamPhase("exam"); // skip welcome/instructions
+  } else {
     setExamPhase("welcome");
-  };
+  }
+};
 
   return (
     <div className="selective-dashboard">
+       {/* 0️⃣ MODE SELECTION (ADD HERE) */}
+    {examPhase === "mode_selection" && (
+      <div className="subject-selection-wrapper">
 
+        <img
+          src="https://gemkidsacademy.com.au/wp-content/uploads/2024/10/cropped-logo-4-1.png"
+          alt="Gem Kids Academy"
+          className="dashboard-logo"
+        />
+
+        <div className="subject-selection-card">
+          <h1 className="dashboard-title">
+            OC Placement Practice Test
+          </h1>
+
+          <div className="title-divider" />
+
+          <div className="subject-buttons">
+
+            <button
+              className="subject-button"
+              onClick={() => {
+                setExamMode("exam");
+                setExamPhase("selection");
+              }}
+            >
+              View Exams
+            </button>
+
+            <button
+              className="subject-button"
+              onClick={() => {
+                setExamMode("report");
+                setExamPhase("selection");
+              }}
+            >
+              View Previous Results
+            </button>
+
+          </div>
+        </div>
+      </div>
+    )}
       {/* 1️⃣ SUBJECT SELECTION */}
       {examPhase === "selection" && (
         <div className="subject-selection-wrapper">
+        
 
           <img
             src="https://gemkidsacademy.com.au/wp-content/uploads/2024/10/cropped-logo-4-1.png"
@@ -106,8 +155,9 @@ const OCDashboard = () => {
         <main className="content-area">
           <div className="exam-root">
             <ActiveComponent
-              key={`exam-${activeSubject.key}`} // 🔑 important
+              key={`exam-${activeSubject.key}-${examMode}`}// 🔑 important
               studentId={studentId}
+              mode={examMode} 
               subject={activeSubject.key}
               difficulty="advanced"
               onExamStart={() => setExamInProgress(true)}
