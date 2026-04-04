@@ -91,12 +91,11 @@ const InstructionsScreen = ({ subject, onNext, onViewResults }) => {
           <button className="primary-btn" onClick={onNext}>
             Start Exam
           </button>
-
-          <button className="secondary-btn" onClick={onViewResults}>
+        
+          <button className="primary-btn" onClick={onViewResults}>
             View Previous Results
           </button>
         </div>
-
       </div>
     </div>
   );
