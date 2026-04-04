@@ -524,17 +524,17 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
 
     const data = await res.json();
 
-    // ✅ CHANGE 4B: hydrate report immediately
+    // ✅ IMPORTANT FIX
     setReport(data.report);
-
+    setMode("report");          // 🔥 ADD THIS LINE
     setFinished(true);
+
     onExamFinish?.();
 
   } catch (err) {
     console.error("❌ submit-reading error:", err);
   }
 };
-
 
   /* =============================
      ANSWER HANDLING
