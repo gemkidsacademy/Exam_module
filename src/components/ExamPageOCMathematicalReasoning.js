@@ -15,7 +15,8 @@
   MAIN COMPONENT
   ============================================================ */
   export default function ExamPageOCMathematicalReasoning({
-    onExamStart,
+    mode: parentMode,
+    onExamStart,    
     onExamFinish
   }) {
   const studentId = sessionStorage.getItem("student_id");
@@ -167,6 +168,14 @@
     }
   }, [studentId]);
   useEffect(() => {
+  if (!studentId) return;
+
+  if (parentMode === "report") {
+    setMode("report");   // 🔥 CRITICAL
+  }
+
+}, [studentId, parentMode]);
+  useEffect(() => {
   if (mode === "report" || mode === "review") {
     loadAttempts();
   }
@@ -262,38 +271,45 @@
     START / RESUME EXAM (SINGLE SOURCE OF TRUTH)
   ============================================================ */
   useEffect(() => {
-    if (!studentId) return;
-    if (mode === "report" || mode === "review") return;
+  if (!studentId) return;
 
-    const startExam = async () => {
-      try {
-        const res = await fetch(
-          `${API_BASE}/api/student/start-exam-oc-mathematical-reasoning`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ student_id: studentId })
-          }
-        );
+  // 🔥 ONLY run exam if explicitly told
+    // 🔥 HARD BLOCK FIRST
+  if (parentMode === "report") return;
+  
+  // 🔥 ONLY exam allowed
+  if (parentMode !== "exam") return;
+  
+  // 🔥 ONLY initial run
+  if (mode !== "loading") return;
 
-        const data = await res.json();
-        console.log("📥 start-exam:", data);
-
-        // ✅ COMPLETED → SHOW REPORT
-        if (data.completed === true) {
-          setMode("report");
-          onExamFinish?.();
-          return;
+  const startExam = async () => {
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/student/start-exam-oc-mathematical-reasoning`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ student_id: studentId })
         }
+      );
 
-        // ✅ NORMALIZE QUESTIONS (CRITICAL FIX)
-        const normalizedQuestions = (data.questions || []).map(q => {
+      const data = await res.json();
+      console.log("📥 start-exam:", data);
+
+      if (data.completed === true) {
+        setMode("report");
+        onExamFinish?.();
+        return;
+      }
+
+      const normalizedQuestions = (data.questions || []).map(q => {
         const rawBlocks = Array.isArray(q.question_blocks)
           ? q.question_blocks
           : Array.isArray(q.blocks)
           ? q.blocks
           : [];
-      
+
         return {
           ...q,
           blocks: rawBlocks.map(block => {
@@ -312,21 +328,19 @@
         };
       });
 
+      setQuestions(normalizedQuestions);
+      setTimeLeft(data.remaining_time);
+      setMode("exam");
+      onExamStart?.();
 
+    } catch (err) {
+      console.error("❌ start-exam error:", err);
+    }
+  };
 
-        setQuestions(normalizedQuestions);
-        setTimeLeft(data.remaining_time);
-        setMode("exam");
-        onExamStart?.();
+  startExam();
 
-      } catch (err) {
-        console.error("❌ start-exam error:", err);
-      }
-    };
-
-    startExam();
-  }, [studentId, loadReport]);
-
+}, [studentId, parentMode, mode]);
   
   /* ============================================================
     MARK VISITED QUESTIONS
