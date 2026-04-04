@@ -21,7 +21,7 @@ export default function ExamPageThinkingSkills({
   onExamStart,
   onExamFinish,
 }) {
-
+//const studentId = sessionStorage.getItem("student_id");
 const [attempts, setAttempts] = useState([]);
 const isPopNavigationRef = useRef(false);
 const loadAttempts = useCallback(async () => {
@@ -274,15 +274,19 @@ useEffect(() => {
    window.removeEventListener("popstate", handlePopState);
  };
 }, [mode, currentIndex]);
- 
-useEffect(() => {
+ useEffect(() => {
   if (!studentId) return;
+
+  // 🔒 Do NOT override if user is in review mode
+  if (mode === "review") return;
+
+  if (mode !== "loading") return;
 
   if (parentMode === "exam") {
     setMode("exam");
   }
 
-  if (parentMode === "report" && mode !== "report") {
+  if (parentMode === "report") {
     loadAttempts().then(() => {
       loadReport();
     });
@@ -297,7 +301,7 @@ useEffect(() => {
 useEffect(() => {
   if (!studentId) return;
   if (mode !== "exam") return;
-  if (hasStartedRef.current) return;   // 🔒 prevent double call
+  if (hasStartedRef.current) return; // prevent double call
 
   hasStartedRef.current = true;
 
@@ -307,13 +311,13 @@ useEffect(() => {
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ student_id: studentId })
+        body: JSON.stringify({ student_id: studentId }),
       }
     );
 
     const data = await res.json();
     setExamAttemptId(data.exam_attempt_id);
-    // 🔥 ADD THESE LOGS
+
     console.log("🧪 RAW start-exam response:", data);
     console.log("🧪 QUESTIONS PAYLOAD:", data.questions);
     console.log(
@@ -321,18 +325,20 @@ useEffect(() => {
       data.questions?.[0]?.options
     );
 
+    // 👉 Only show report if explicitly requested
     if (data.completed === true) {
-      sessionStorage.setItem("thinking_skills_completed", "true");
       await loadReport();
       return;
     }
 
+    // 👉 Normal exam flow (no flicker)
     setQuestions(data.questions || []);
     setTimeLeft(data.remaining_time);
     onExamStart?.();
   };
 
   startExam();
+
 }, [studentId, mode]);
 useEffect(() => {
   if (mode !== "exam") {
