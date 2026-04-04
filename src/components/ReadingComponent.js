@@ -5,10 +5,11 @@ import ReadingReview from "./ReadingReview";
 
 
 export default function ReadingComponent({
-    studentId,
-    onExamStart,
-    onExamFinish
-  }) {
+  studentId,
+  mode: parentMode,   // ✅ ADD THIS
+  onExamStart,
+  onExamFinish
+}) {
   console.log("🧪 studentId:", studentId);
   
   const API_BASE = process.env.REACT_APP_API_URL;
@@ -106,6 +107,21 @@ export default function ReadingComponent({
     return [];
   }
 };
+ useEffect(() => {
+  if (!studentId) return;
+  if (mode !== "loading") return;
+
+  // 🔥 REPORT PRIORITY
+  if (parentMode === "report") {
+    setMode("report");
+    setFinished(true);
+    
+    return;
+  }
+
+  // ❗ DO NOTHING for exam
+
+}, [studentId, parentMode, mode]);
   useEffect(() => {
   if (!finished) return;
   const init = async () => {
@@ -121,7 +137,7 @@ export default function ReadingComponent({
   };
 
   init();
-}, []);
+}, [finished]);
     
   const formatExplanation = (text) => {
       if (!text) return "";
@@ -398,9 +414,9 @@ useEffect(() => {
     
   useEffect(() => {
   if (!studentId) return;
+  if (parentMode !== "exam") return;   // 🔥 CRITICAL GUARD
 
-  const loadExam = async () => {
-    // 1️⃣ Start / resume attempt
+  const startReadingExam = async () => {
     const res = await fetch(
       `${API_BASE}/api/exams/start-reading`,
       {
@@ -411,80 +427,63 @@ useEffect(() => {
     );
 
     const meta = await res.json();
+
     console.log("🧪 START-READING META:", meta);
 
+    // 🔴 If already completed → go to report flow
     if (meta.completed === true) {
       setAttemptId(meta.attempt_id);
       setFinished(true);
-    
+
       if (meta.attempt_id) {
         await loadReportBySession(meta.attempt_id);
       }
-    
+
+      setMode("report");   // ✅ IMPORTANT
       onExamFinish?.();
       return;
     }
 
-
+    // 🟢 Continue exam
     setAttemptId(meta.attempt_id);
     setTimeLeft(meta.remaining_time);
 
-    // 2️⃣ Fetch exam content (NEW)
     const examRes = await fetch(
       `${API_BASE}/api/exams/reading-content/${meta.exam_id}`
     );
 
     const examData = await examRes.json();
-    
-
-    console.log("📘 EXAM CONTENT (raw):", examData);
-    console.log("📘 exam_json:", examData.exam_json);
-    console.log("📘 exam_json.sections:", examData.exam_json?.sections);
-    console.log("📘 sections length:", examData.exam_json?.sections?.length);
-    console.log("📘 EXAM CONTENT:", examData);
 
     const sections = examData.exam_json?.sections || [];
-    sections.forEach((section, i) => {
-      console.log(`🧱 SECTION ${i} KEYS:`, Object.keys(section));
+
+    const flatQuestions = sections.flatMap((section) => {
+      const qs =
+        section.questions ||
+        section.items ||
+        section.question_list ||
+        [];
+
+      return qs.map((q) => ({
+        ...q,
+        topic: TOPIC_LABELS[section.question_type] || "Other",
+        passage_style: section.passage_style || "informational",
+        answer_options: q.answer_options || section.answer_options || {},
+        section_ref: section
+      }));
     });
 
-
-console.log("🧩 FLATTEN: sections =", sections);
-
-const flatQuestions = sections.flatMap((section, idx) => {
-   console.log("🧪 SECTION", idx, {
-    question_type: section.question_type,
-    topic: section.topic,
-    keys: Object.keys(section),
-  });  
-  const qs =
-    section.questions ||
-    section.items ||
-    section.question_list ||
-    [];
-
-  return qs.map((q) => ({
-    ...q,
-    topic: TOPIC_LABELS[section.question_type] || "Other",
-    passage_style: section.passage_style || "informational",
-    answer_options: q.answer_options || section.answer_options || {},
-    section_ref: section
-  }));
-});
-
-console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
-
     setExam(examData.exam_json);
-    setIndex(0); // ✅ REQUIRED
+    setIndex(0);
     setQuestions(flatQuestions);
-    
 
+    setMode("exam");   // ✅ ONLY SOURCE OF EXAM MODE
 
     onExamStart?.();
   };
 
-  loadExam();
-}, [studentId]);
+  startReadingExam();
+
+}, [studentId, parentMode]);
 
   /* =============================
      TIMER
@@ -602,6 +601,9 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
     setVisited((v) => ({ ...v, [i]: true }));
     setIndex(i);
   };
+  if (mode === "loading") {
+  return <div>Loading...</div>;
+}  
   // 🔴 1. REVIEW MODE — HIGHEST PRIORITY
     if (mode === "review") {
       return (
@@ -620,7 +622,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
           }}
           onExit={() => {
             setReviewQuestions([]);
-            setMode("exam");
+            setMode("report");
           }}
         />
       );
