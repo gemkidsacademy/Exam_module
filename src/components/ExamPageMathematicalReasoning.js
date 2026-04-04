@@ -517,7 +517,9 @@ return (
 
 
 // ---------------- EXAM UI ----------------
-
+if (mode !== "exam" && mode !== "review") {
+  return <p className="loading">Loading...</p>;
+}
 const currentQ = activeQuestions[currentIndex];
 const isReview = mode === "review";
  if (isReview) {
