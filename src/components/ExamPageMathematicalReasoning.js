@@ -274,7 +274,6 @@ useEffect(() => {
 ============================================================ */
 useEffect(() => {
   if (!studentId) return;
-  if (mode !== "exam") return;
   if (parentMode !== "exam") return;
 
   const startExam = async () => {
@@ -339,7 +338,7 @@ useEffect(() => {
 
   startExam();
  
-}, [studentId, mode, parentMode]);
+}, [studentId, parentMode]);
 
  
 /* ============================================================
