@@ -174,7 +174,7 @@ const handleViewResults = () => {
         <main className="content-area">
           <div className="exam-root">
             <ActiveComponent
-            key={`exam-${activeSubject.key}`}   // 🔑 THIS LINE FIXES IT
+            key={`exam-${activeSubject.key}-${examMode}`}   // 🔑 THIS LINE FIXES IT
             studentId={studentId}
             subject={activeSubject.key}
             difficulty="advanced"
