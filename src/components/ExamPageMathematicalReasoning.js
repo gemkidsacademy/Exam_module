@@ -184,16 +184,19 @@ const [report, setReport] = useState(null);
 
   if (mode !== "loading") return;
 
+  // 🔥 PRIORITY: REPORT FIRST
+  if (parentMode === "report") {
+    setMode("report");
+    loadExamDates();
+    return; // 🔥 CRITICAL: STOP HERE
+  }
+
   if (parentMode === "exam") {
     setMode("exam");
   }
 
-  if (parentMode === "report") {
-    setMode("report"); 
-    loadExamDates();
-  }
-
 }, [studentId, parentMode, mode]);
+ 
 useEffect(() => {
   console.log("🎯 selectedExamId UPDATED:", selectedExamId);
 }, [selectedExamId]);
