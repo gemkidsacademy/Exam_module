@@ -322,7 +322,7 @@ useEffect(() => {
     );
 
     // 👉 Only show report if explicitly requested
-    if (data.completed === true && parentMode === "report") {
+    if (data.completed === true) {
       await loadReport();
       return;
     }
