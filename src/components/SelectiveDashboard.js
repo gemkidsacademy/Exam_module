@@ -42,8 +42,9 @@ const SUBJECTS = [
 const SelectiveDashboard = () => {
   const [activeSubject, setActiveSubject] = useState(null);
   const [examInProgress, setExamInProgress] = useState(false);
-  const [examPhase, setExamPhase] = useState("selection");
+  const [examPhase, setExamPhase] = useState("mode_selection");
   const [examMode, setExamMode] = useState("exam");
+  
   // phases: selection → welcome → instructions → exam
 
   const studentId = sessionStorage.getItem("student_id");
@@ -51,13 +52,20 @@ const SelectiveDashboard = () => {
   const ActiveComponent = activeSubject?.component;
 
   const handleSubjectSelect = (subject) => {
-    if (examInProgress) {
-      alert("Please submit your current exam before switching subjects.");
-      return;
-    }
-    setActiveSubject(subject);
+  if (examInProgress) {
+    alert("Please submit your current exam before switching subjects.");
+    return;
+  }
+
+  setActiveSubject(subject);
+
+  if (examMode === "report") {
+    setExamPhase("exam"); // go directly to reports
+  } else {
     setExamPhase("welcome");
-  };
+  }
+};
+  
   const handleStartExam = () => {
   setExamMode("exam");
   setExamPhase("exam");
@@ -70,6 +78,48 @@ const handleViewResults = () => {
 
   return (
     <div className="selective-dashboard">
+    {/* 0️⃣ MODE SELECTION */}
+{examPhase === "mode_selection" && (
+  <div className="subject-selection-wrapper">
+    
+    <img
+      src="https://gemkidsacademy.com.au/wp-content/uploads/2024/10/cropped-logo-4-1.png"
+      alt="Gem Kids Academy"
+      className="dashboard-logo"
+    />
+
+    <div className="subject-selection-card">
+      <h1 className="dashboard-title">
+        Selective High School Practice Test
+      </h1>
+      <div className="title-divider" />
+
+      <div className="subject-buttons">
+        
+        <button
+          className="subject-button"
+          onClick={() => {
+            setExamMode("exam");
+            setExamPhase("selection");
+          }}
+        >
+          View Exams
+        </button>
+
+        <button
+          className="subject-button"
+          onClick={() => {
+            setExamMode("report");
+            setExamPhase("selection");
+          }}
+        >
+          View Exam Reports
+        </button>
+
+      </div>
+    </div>
+  </div>
+)}
 
       {/* 1️⃣ SUBJECT SELECTION */}
       {examPhase === "selection" && (
