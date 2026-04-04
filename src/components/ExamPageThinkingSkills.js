@@ -297,7 +297,7 @@ useEffect(() => {
 useEffect(() => {
   if (!studentId) return;
   if (mode !== "exam") return;
-  if (hasStartedRef.current) return;   // 🔒 prevent double call
+  if (hasStartedRef.current) return; // prevent double call
 
   hasStartedRef.current = true;
 
@@ -307,13 +307,13 @@ useEffect(() => {
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ student_id: studentId })
+        body: JSON.stringify({ student_id: studentId }),
       }
     );
 
     const data = await res.json();
     setExamAttemptId(data.exam_attempt_id);
-    // 🔥 ADD THESE LOGS
+
     console.log("🧪 RAW start-exam response:", data);
     console.log("🧪 QUESTIONS PAYLOAD:", data.questions);
     console.log(
@@ -321,18 +321,20 @@ useEffect(() => {
       data.questions?.[0]?.options
     );
 
-    if (data.completed === true) {
-      sessionStorage.setItem("thinking_skills_completed", "true");
+    // 👉 Only show report if explicitly requested
+    if (data.completed === true && parentMode === "report") {
       await loadReport();
       return;
     }
 
+    // 👉 Normal exam flow (no flicker)
     setQuestions(data.questions || []);
     setTimeLeft(data.remaining_time);
     onExamStart?.();
   };
 
   startExam();
+
 }, [studentId, mode]);
 useEffect(() => {
   if (mode !== "exam") {
