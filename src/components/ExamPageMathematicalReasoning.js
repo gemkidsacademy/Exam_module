@@ -204,10 +204,9 @@ const [report, setReport] = useState(null);
 
   // 🔥 PRIORITY: REPORT ONLY
   if (parentMode === "report") {
-    setMode("report");
-    loadExamDates();
-    return;
-  }
+  loadExamDates();   // ✅ this will setMode("report") internally
+  return;
+}
 
   // ❗ DO NOTHING for exam
   // startExam effect will handle it
@@ -292,6 +291,7 @@ useEffect(() => {
 useEffect(() => {
   if (!studentId) return;
   if (parentMode !== "exam") return;
+  if (mode !== "loading") return;
 
   const startExam = async () => {
     try {
