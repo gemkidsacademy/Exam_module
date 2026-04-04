@@ -1,4 +1,3 @@
-
 import React, {
 useState,
 useEffect,
@@ -14,6 +13,7 @@ import OcThinkingSkillsReview from "./OcThinkingSkillsReview";
  MAIN COMPONENT
 ============================================================ */
 export default function ExamPageOcThinkingSkills({
+  mode: parentMode,   // 🔥 ADD THIS
   onExamStart,
   onExamFinish
 }) {
@@ -208,6 +208,19 @@ const loadReport = useCallback(async (attemptId = null) => {
     console.error("❌ loadReport error:", err);
   }
 }, [studentId, loadAttempts]);
+ useEffect(() => {
+  if (!studentId) return;
+  if (mode !== "loading") return;
+
+  // 🔥 REPORT PRIORITY
+  if (parentMode === "report") {
+    loadReport();   // this sets mode = "report"
+    return;
+  }
+
+  // ❗ DO NOTHING for exam
+
+}, [studentId, parentMode, mode, loadReport]);
 useEffect(() => {
   setExplanation(null);
 }, [currentIndex]);
@@ -281,21 +294,19 @@ useEffect(() => {
     window.removeEventListener("popstate", handlePopState);
   };
 }, [mode, currentIndex, showConfirmFinish]);
-useEffect(() => {
-  if (!studentId) return;
 
-  setMode("exam");
-}, [studentId]);
  // 🔑 only what actually matters
 /* ============================================================
    START / RESUME EXAM (SINGLE SOURCE OF TRUTH)
 ============================================================ */
 useEffect(() => {
   if (!studentId) return;
-  if (mode !== "exam") return;
+  if (parentMode !== "exam") return; 
   if (hasStartedRef.current) return;   // 🔒 prevent double call
 
   hasStartedRef.current = true;
+
+  setMode("exam");
 
   const startExam = async () => {
     const res = await fetch(
@@ -328,7 +339,7 @@ useEffect(() => {
   };
 
   startExam();
-}, [studentId, mode]);
+}, [studentId, parentMode]);
 useEffect(() => {
   if (mode !== "exam") {
     hasStartedRef.current = false;
