@@ -189,6 +189,7 @@ const [report, setReport] = useState(null);
   }
 
   if (parentMode === "report") {
+    setMode("report"); 
     loadExamDates();
   }
 
