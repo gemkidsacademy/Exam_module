@@ -47,9 +47,7 @@ const SelectiveDashboard = () => {
   // phases: selection → welcome → instructions → exam
 
   const studentId = sessionStorage.getItem("student_id");
-  const handleViewResults = () => {
-    setExamPhase("exam");
-  };
+  
   const ActiveComponent = activeSubject?.component;
 
   const handleSubjectSelect = (subject) => {
