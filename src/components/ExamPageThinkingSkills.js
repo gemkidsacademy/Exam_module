@@ -278,7 +278,7 @@ useEffect(() => {
 useEffect(() => {
   if (!studentId) return;
 
-  if (parentMode === "exam") {
+  if (parentMode === "exam" && mode === "loading") {
     setMode("exam");
   }
 
