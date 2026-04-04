@@ -116,7 +116,8 @@ const handleViewResults = () => {
       {examPhase === "instructions" && (
         <InstructionsScreen
           subject={activeSubject.key}
-          onNext={() => setExamPhase("exam")}
+          onNext={handleStartExam}          // ✅ updated
+          onViewResults={handleViewResults} // ✅ NEW
         />
       )}
 
