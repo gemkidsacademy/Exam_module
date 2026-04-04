@@ -21,7 +21,7 @@ export default function ExamPageThinkingSkills({
   onExamStart,
   onExamFinish,
 }) {
-const studentId = sessionStorage.getItem("student_id");
+//const studentId = sessionStorage.getItem("student_id");
 const [attempts, setAttempts] = useState([]);
 const isPopNavigationRef = useRef(false);
 const loadAttempts = useCallback(async () => {
