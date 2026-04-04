@@ -151,7 +151,7 @@ const OCDashboard = () => {
       )}
 
       {/* 4️⃣ EXAM */}
-      {examPhase === "exam" && (
+      {examPhase === "exam" && examMode !== null && (
         <main className="content-area">
           <div className="exam-root">
             <ActiveComponent
