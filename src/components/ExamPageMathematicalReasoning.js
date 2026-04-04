@@ -13,10 +13,12 @@ import "./ExamOptionStates_mr.css";
  MAIN COMPONENT
 ============================================================ */
 export default function ExamPageMathematicalReasoning({
+  mode: parentMode,
+  studentId,
   onExamStart,
   onExamFinish
 }) {
-const studentId = sessionStorage.getItem("student_id");
+
 
 const hasSubmittedRef = useRef(false);
 const prevIndexRef = useRef(null);
@@ -177,6 +179,20 @@ const [report, setReport] = useState(null);
 /* ============================================================
    LOAD REPORT (ONLY WHEN EXAM IS COMPLETED)
 ============================================================ */
+ useEffect(() => {
+  if (!studentId) return;
+
+  if (mode !== "loading") return;
+
+  if (parentMode === "exam") {
+    setMode("exam");
+  }
+
+  if (parentMode === "report") {
+    loadExamDates();
+  }
+
+}, [studentId, parentMode, mode]);
 useEffect(() => {
   console.log("🎯 selectedExamId UPDATED:", selectedExamId);
 }, [selectedExamId]);
@@ -254,7 +270,8 @@ useEffect(() => {
 ============================================================ */
 useEffect(() => {
   if (!studentId) return;
-  if (mode === "report" || mode === "review") return;
+  if (mode !== "exam") return;
+  if (parentMode !== "exam") return;
 
   const startExam = async () => {
     try {
@@ -317,7 +334,8 @@ useEffect(() => {
   };
 
   startExam();
-}, [studentId, loadReport]);
+ 
+}, [studentId, mode, parentMode]);
 
  
 /* ============================================================
