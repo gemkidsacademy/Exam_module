@@ -111,18 +111,36 @@ const loadReport = useCallback(async (examId) => {
 
     setExamDates(data);
 
-    if (data.length > 0) {
-      const latestExamId = data[0].exam_id;
-      setSelectedExamId(latestExamId);
+    // 🔥 Find FIRST exam that actually has a report
+    for (const exam of data) {
+      const examId = exam.exam_id;
 
-      // ✅ Immediately load report with correct id
-      await loadReport(latestExamId);
+      const reportRes = await fetch(
+        `${API_BASE}/api/student/exam-report/mathematical-reasoning?student_id=${studentId}&exam_id=${examId}`
+      );
+
+      if (reportRes.ok) {
+        const reportData = await reportRes.json();
+
+        console.log("✅ Found valid report for exam:", examId);
+
+        setSelectedExamId(examId);
+        setReport(reportData);
+        setMode("report");
+
+        return; // ✅ STOP at first valid one
+      }
     }
+
+    // ❗ No reports found
+    console.warn("⚠️ No valid reports available yet");
+    setReport(null);
 
   } catch (err) {
     console.error("❌ loadExamDates error:", err);
   }
-}, [studentId, loadReport]);
+}, [studentId]);
+ 
 const handleExitReview = () => {
   console.log("🔙 Exit Review clicked (MR)");
 
