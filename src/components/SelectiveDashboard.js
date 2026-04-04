@@ -43,9 +43,13 @@ const SelectiveDashboard = () => {
   const [activeSubject, setActiveSubject] = useState(null);
   const [examInProgress, setExamInProgress] = useState(false);
   const [examPhase, setExamPhase] = useState("selection");
+  const [examMode, setExamMode] = useState("exam");
   // phases: selection → welcome → instructions → exam
 
   const studentId = sessionStorage.getItem("student_id");
+  const handleViewResults = () => {
+    setExamPhase("exam");
+  };
   const ActiveComponent = activeSubject?.component;
 
   const handleSubjectSelect = (subject) => {
@@ -56,6 +60,15 @@ const SelectiveDashboard = () => {
     setActiveSubject(subject);
     setExamPhase("welcome");
   };
+  const handleStartExam = () => {
+  setExamMode("exam");
+  setExamPhase("exam");
+};
+
+const handleViewResults = () => {
+  setExamMode("report");
+  setExamPhase("exam");
+};
 
   return (
     <div className="selective-dashboard">
@@ -116,6 +129,7 @@ const SelectiveDashboard = () => {
             studentId={studentId}
             subject={activeSubject.key}
             difficulty="advanced"
+            mode={examMode} 
             onExamStart={() => setExamInProgress(true)}
             onExamFinish={() => setExamInProgress(false)}
           />
