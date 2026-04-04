@@ -732,6 +732,9 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
 }
 
 const currentQuestion = questions[index];
+if (!currentQuestion) {
+  return <div>Loading question...</div>;
+}
 console.log("CURRENT QUESTION:", currentQuestion);
 console.log("RM:", currentQuestion?.reading_material);
 console.log("EXTRACTS:", currentQuestion?.reading_material?.extracts);
