@@ -184,16 +184,15 @@ const [report, setReport] = useState(null);
 
   if (mode !== "loading") return;
 
-  // 🔥 PRIORITY: REPORT FIRST
+  // 🔥 PRIORITY: REPORT ONLY
   if (parentMode === "report") {
     setMode("report");
     loadExamDates();
-    return; // 🔥 CRITICAL: STOP HERE
+    return;
   }
 
-  if (parentMode === "exam") {
-    setMode("exam");
-  }
+  // ❗ DO NOTHING for exam
+  // startExam effect will handle it
 
 }, [studentId, parentMode, mode]);
  
