@@ -88,7 +88,7 @@ const InstructionsScreen = ({ subject, onNext }) => {
       </ul>
 
       <button className="primary-btn" onClick={onNext}>
-        Next
+        Start Exam
       </button>
     </div>
   </div>
