@@ -274,15 +274,19 @@ useEffect(() => {
    window.removeEventListener("popstate", handlePopState);
  };
 }, [mode, currentIndex]);
- 
-useEffect(() => {
+ useEffect(() => {
   if (!studentId) return;
 
-  if (parentMode === "exam" && mode === "loading") {
+  // 🔒 Do NOT override if user is in review mode
+  if (mode === "review") return;
+
+  if (mode !== "loading") return;
+
+  if (parentMode === "exam") {
     setMode("exam");
   }
 
-  if (parentMode === "report" && mode !== "report") {
+  if (parentMode === "report") {
     loadAttempts().then(() => {
       loadReport();
     });
