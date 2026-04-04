@@ -1,13 +1,13 @@
-
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import "./ExamPage_reading.css";   
 import ReadingReviewOC from "./ReadingReviewOC";   
 
 export default function ReadingComponentOC({
-    studentId,
-    onExamStart,
-    onExamFinish
-  }) {
+  studentId,
+  mode: parentMode,
+  onExamStart,
+  onExamFinish
+}) {
   const API_BASE = process.env.REACT_APP_API_URL;
   const isPopNavigationRef = useRef(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
@@ -32,7 +32,7 @@ export default function ReadingComponentOC({
   const [loadingExplanation, setLoadingExplanation] = useState(null);
 
   const [attemptId, setAttemptId] = useState(null);
-  const [mode, setMode] = useState("exam");
+  const [mode, setMode] = useState("loading");
   const [reviewQuestions, setReviewQuestions] = useState([]);
   const loadAttemptDates = async (sid) => {
   try {
@@ -222,6 +222,39 @@ export default function ReadingComponentOC({
      LOAD EXAM
   ============================= */
   useEffect(() => {
+  if (!studentId) return;
+
+  if (parentMode === "report") {
+    const goToReport = async () => {
+      setMode("report");
+
+      try {
+        const res = await fetch(
+          `${API_BASE}/api/exams/oc-reading-attempts?student_id=${studentId}`
+        );
+
+        const data = await res.json();
+        const attempts = data.attempts || [];
+
+        setAttemptDates(attempts);
+
+        if (attempts.length > 0) {
+          const latest = attempts[0];
+          setSelectedSessionId(latest.session_id);
+
+          await loadReportBySession(latest.session_id);
+        }
+
+      } catch (err) {
+        console.error("❌ report init error:", err);
+      }
+    };
+
+    goToReport();
+  }
+
+}, [studentId, parentMode, API_BASE]);
+  useEffect(() => {
   if (attemptDates.length > 0) {
     const latest = attemptDates[0];
     setSelectedSessionId(latest.session_id);
@@ -246,6 +279,15 @@ export default function ReadingComponentOC({
     
   useEffect(() => {
   if (!studentId) return;
+  // 🔥 HARD BLOCK REPORT
+  if (parentMode === "report") return;
+
+// 🔥 ONLY EXAM MODE
+  if (parentMode !== "exam") return;
+
+// 🔥 ONLY INITIAL LOAD
+  if (mode !== "loading") return;
+
 
   const loadExam = async () => {
     // 1️⃣ Start / resume attempt
@@ -262,8 +304,9 @@ export default function ReadingComponentOC({
     console.log("🧪 START-READING META:", meta);
 
     if (meta.completed === true) {
-  setAttemptId(meta.attempt_id);
-  setFinished(true);
+      setAttemptId(meta.attempt_id);
+      setFinished(true);
+      setMode("report");
 
   if (meta.attempt_id) {
     await loadReportBySession(meta.attempt_id);
@@ -524,167 +567,167 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
     />
   );
 }
+    
   /* =============================
      FINISHED VIEW
   ============================= */
-  if (finished) {
-    if (loadingReport || !normalizedReport) {
-      return <div>Loading your report…</div>;
-    }
+  if (mode === "report") {
+  if (loadingReport || !normalizedReport) {
+    return <div>Loading your report…</div>;
+  }
 
-    return (
-  <div
-  style={{
-    position: "fixed",
-    inset: 0,
-    overflowY: "auto",
-    background: "#f3f4f6",
-    padding: "32px",
-    boxSizing: "border-box",
-    zIndex: 1
-  }}
->
-    <h1>
-      You scored {normalizedReport.correct} out of {normalizedReport.total}
-    </h1>
-    {/* ✅ DATE DROPDOWN */}
-    <select
-      value={selectedSessionId || ""}
-      onChange={(e) => {
-        const sessionId = e.target.value;
-        setSelectedSessionId(sessionId);
-
-        loadReportBySession(sessionId); // 🔥 updates report
-      }}
+  return (
+    <div
       style={{
-        padding: "8px",
-        marginBottom: "12px",
-        display: "block"
+        position: "fixed",
+        inset: 0,
+        overflowY: "auto",
+        background: "#f3f4f6",
+        padding: "32px",
+        boxSizing: "border-box",
+        zIndex: 1
       }}
     >
-      <option value="">Select attempt date</option>
+      <h1>
+        You scored {normalizedReport.correct} out of {normalizedReport.total}
+      </h1>
 
-      {attemptDates.map((a) => (
-        <option key={a.session_id} value={a.session_id}>
-          {new Date(a.created_at).toLocaleString()}
-        </option>
-      ))}
-    </select>
-    {/* ✅ NEW: Review Exam Button */}
-    <button
-      className="review-exam-btn"
-      onClick={handleReviewExam}
-    >
-      Review Exam
-    </button>
-    <div className="report-grid">
+      {/* DATE DROPDOWN */}
+      <select
+        value={selectedSessionId || ""}
+        onChange={(e) => {
+          const sessionId = e.target.value;
+          setSelectedSessionId(sessionId);
+          loadReportBySession(sessionId);
+        }}
+        style={{
+          padding: "8px",
+          marginBottom: "12px",
+          display: "block"
+        }}
+      >
+        <option value="">Select attempt date</option>
 
-      {/* =============================
-          OVERALL ACCURACY
-      ============================= */}
-      <div className="card">
-        <h3>Accuracy</h3>
-        <div
-          className="accuracy-circle"
-          style={{ "--p": normalizedReport.accuracy }}
-        >
-          <span>{normalizedReport.accuracy}%</span>
-        </div>
-      </div>
-
-      {/* =============================
-          TOPIC BREAKDOWN
-      ============================= */}
-      <div className="card">
-        <h3>Topic Breakdown</h3>
-
-        {normalizedReport.topics.map((t) => (
-          <div key={t.topic} className="improve-row">
-            <label>{prettyTopic(t.topic)}</label>
-
-            <div className="bar">
-              <div
-                className="fill blue"
-                style={{ width: `${t.accuracy}%` }}
-              />
-            </div>
-
-            <span>{t.accuracy}%</span>
-
-            <small>
-              Attempted: {t.attempted} | Correct: {t.correct} | Incorrect:{" "}
-              {t.incorrect} | Not Attempted: {t.not_attempted}
-            </small>
-          </div>
+        {attemptDates.map((a) => (
+          <option key={a.session_id} value={a.session_id}>
+            {new Date(a.created_at).toLocaleString()}
+          </option>
         ))}
-      </div>
+      </select>
 
-      {/* =============================
-    IMPROVEMENT AREAS
-============================= */}
-{normalizedReport.has_sufficient_data && (
-  <div className="card">
-    <h3>Improvement Areas</h3>
-    <p className="section-note">
-      Topics are ranked from weakest to strongest based on performance.
-    </p>
+      {/* REVIEW BUTTON */}
+      <button
+        className="review-exam-btn"
+        onClick={handleReviewExam}
+      >
+        Review Exam
+      </button>
 
-    {normalizedReport.improvement_order.map((topic, idx) => {
-      const t = normalizedReport.topics.find(
-        (x) => x.topic === topic
-      );
+      <div className="report-grid">
 
-      if (!t) return null;
-
-      return (
-        <div key={topic} className="improve-row">
-          <strong>
-            {idx + 1}. {prettyTopic(topic)}
-          </strong>
-
-          <div className="bar">
-            <div
-              className="fill red"
-              style={{ width: `${t.accuracy}%` }}
-            />
+        {/* OVERALL ACCURACY */}
+        <div className="card">
+          <h3>Accuracy</h3>
+          <div
+            className="accuracy-circle"
+            style={{ "--p": normalizedReport.accuracy }}
+          >
+            <span>{normalizedReport.accuracy}%</span>
           </div>
-
-          <small>
-            Accuracy: {t.accuracy}% · Attempted: {t.attempted}/{t.total}
-          </small>
         </div>
-      );
-    })}
-  </div>
-)}
-{/* =============================
-    IMPROVEMENT AREAS (INSUFFICIENT DATA)
-============================= */}
-{!normalizedReport.has_sufficient_data && (
-  <div className="card">
-    <h3>Improvement Areas</h3>
-    <p className="section-note">
-      Not enough data is available to identify improvement areas yet.
-    </p>
 
-    <div className="low-data-warning">
-      Try attempting more questions to get a detailed topic-wise analysis.
+        {/* TOPIC BREAKDOWN */}
+        <div className="card">
+          <h3>Topic Breakdown</h3>
+
+          {normalizedReport.topics.map((t) => (
+            <div key={t.topic} className="improve-row">
+              <label>{prettyTopic(t.topic)}</label>
+
+              <div className="bar">
+                <div
+                  className="fill blue"
+                  style={{ width: `${t.accuracy}%` }}
+                />
+              </div>
+
+              <span>{t.accuracy}%</span>
+
+              <small>
+                Attempted: {t.attempted} | Correct: {t.correct} | Incorrect:{" "}
+                {t.incorrect} | Not Attempted: {t.not_attempted}
+              </small>
+            </div>
+          ))}
+        </div>
+
+        {/* IMPROVEMENT AREAS */}
+        {normalizedReport.has_sufficient_data && (
+          <div className="card">
+            <h3>Improvement Areas</h3>
+            <p className="section-note">
+              Topics are ranked from weakest to strongest based on performance.
+            </p>
+
+            {normalizedReport.improvement_order.map((topic, idx) => {
+              const t = normalizedReport.topics.find(
+                (x) => x.topic === topic
+              );
+
+              if (!t) return null;
+
+              return (
+                <div key={topic} className="improve-row">
+                  <strong>
+                    {idx + 1}. {prettyTopic(topic)}
+                  </strong>
+
+                  <div className="bar">
+                    <div
+                      className="fill red"
+                      style={{ width: `${t.accuracy}%` }}
+                    />
+                  </div>
+
+                  <small>
+                    Accuracy: {t.accuracy}% · Attempted: {t.attempted}/{t.total}
+                  </small>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* LOW DATA CASE */}
+        {!normalizedReport.has_sufficient_data && (
+          <div className="card">
+            <h3>Improvement Areas</h3>
+            <p className="section-note">
+              Not enough data is available to identify improvement areas yet.
+            </p>
+
+            <div className="low-data-warning">
+              Try attempting more questions to get a detailed topic-wise analysis.
+            </div>
+          </div>
+        )}
+
+      </div>
     </div>
-  </div>
-)}
-
-
-
-    </div>
-  </div>
-);
+  );
 }
+
+
+
+
+
+ 
 
 
   /* =============================
      SAFE GUARD
   ============================= */
-  if (!exam || questions.length === 0) {
+  if (mode === "exam" && (!exam || questions.length === 0)) {
   return <div>Loading Exam…</div>;
 }
 
