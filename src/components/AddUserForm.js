@@ -12,6 +12,8 @@ export default function AddStudentForm() {
   const STUDENT_YEAR_OPTIONS = [
         "Year 3",
         "Year 5",
+        "Year 7",
+        "Year 9",
         "N/A",  
       ];
   const CLASS_NAME_OPTIONS = [
