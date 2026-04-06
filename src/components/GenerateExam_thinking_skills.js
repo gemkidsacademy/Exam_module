@@ -93,7 +93,7 @@ export default function GenerateExam_thinking_skills() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            class_year: quiz.classYear
+            class_year: selectedClassYear
           }),
         }
       );
