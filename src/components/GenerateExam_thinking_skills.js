@@ -67,7 +67,7 @@ export default function GenerateExam_thinking_skills() {
           value={selectedClassYear}
           onChange={(e) => setSelectedClassYear(Number(e.target.value))}
         >
-          
+          <option value={3}>Year 3</option>
           <option value={4}>Year 4</option>
           <option value={5}>Year 5</option>
           <option value={6}>Year 6</option>
