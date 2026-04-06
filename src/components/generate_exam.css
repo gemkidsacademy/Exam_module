@@ -96,3 +96,11 @@
   cursor: not-allowed;
   box-shadow: none;
 }
+.green-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.green-btn:hover {
+  background-color: #218838;
+}
