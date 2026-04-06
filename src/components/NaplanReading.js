@@ -1,4 +1,3 @@
-
 import React, {
   useState,
   useEffect,
@@ -17,7 +16,8 @@ import NaplanReadingReview from "./NaplanReadingReview";
 ============================================================ */
 export default function NaplanReading({
   onExamStart,
-  onExamFinish
+  onExamFinish,
+  mode: parentMode // 🔥 ADD THIS
 }) {
   const studentId = sessionStorage.getItem("student_id");
   const API_BASE = process.env.REACT_APP_API_URL;
@@ -299,72 +299,88 @@ if (questionType === 5) {
     const res = await fetch(
       `${API_BASE}/api/student/exam-report/naplan-reading?student_id=${studentId}`
     );
-
+  
     if (!res.ok) return;
-
+  
     const data = await res.json();
     setReport(data);
     setExamAttemptId(data.exam_attempt_id);
-    setMode("report");
   }, [API_BASE, studentId]);
   
-  
-  
+  useEffect(() => {
+  if (mode !== "report") return;
+  loadReport();
+}, [mode, loadReport]);
+  useEffect(() => {
+  if (!studentId) return;
+  if (mode !== "loading") return;
+
+  // 🔥 REPORT MUST WIN
+  if (parentMode === "report") {
+    setMode("report");
+    return;
+  }
+
+  if (parentMode === "exam") {
+    setMode("exam");
+  }
+
+}, [studentId, parentMode, mode]);
   /* ============================================================
      START / RESUME EXAM
   ============================================================ */
-  useEffect(() => {
-    if (!studentId) return;
-  
-    // 🔒 start-exam must run ONCE only
-    if (mode !== "loading") return;
-  
-    // hard reset (safe here)
-    setAnswers({});
-    setVisited({});
-    setCurrentIndex(0);
-  
-    const startExam = async () => {
-      try {
-        const res = await fetch(
-          `${API_BASE}/api/student/start-exam/naplan-reading`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ student_id: studentId })
-          }
-        );
-  
-        const data = await res.json();
-        // 🔍 LOG BACKEND PAYLOAD
-        console.log("📦 start-exam response:", data);
-        if (data.completed === true) {
-          await loadReport();
-          return;
+ useEffect(() => {
+  if (!studentId) return;
+  if (mode !== "exam") return;
+  if (parentMode !== "exam") return; // 🔥 safety
+
+  // reset state
+  setAnswers({});
+  setVisited({});
+  setCurrentIndex(0);
+
+  const startExam = async () => {
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/student/start-exam/naplan-reading`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ student_id: studentId })
         }
-  
-        setQuestions(data.questions || []);
-        setTimeLeft(data.remaining_time);
-  
-        if (data.is_resumed === true && data.answers) {
-          setAnswers(data.answers);
-          setVisited(
-            Object.fromEntries(
-              Object.keys(data.answers).map(qid => [qid, true])
-            )
-          );
-        }
-  
-        setMode("exam");
-        onExamStart?.();
-  
-      } catch (err) {
-        console.error("❌ Failed to start exam:", err);
+      );
+
+      const data = await res.json();
+
+      if (data.completed === true) {
+        await loadReport();
+        setMode("report"); // 🔥 IMPORTANT
+        return;
       }
-    };
+
+      setQuestions(data.questions || []);
+      setTimeLeft(data.remaining_time);
+
+      if (data.is_resumed === true && data.answers) {
+        setAnswers(data.answers);
+        setVisited(
+          Object.fromEntries(
+            Object.keys(data.answers).map(qid => [qid, true])
+          )
+        );
+      }
+
+      onExamStart?.();
+
+    } catch (err) {
+      console.error("❌ Failed to start exam:", err);
+    }
+  };
+
+  startExam();
+
+}, [studentId, mode, parentMode, API_BASE, loadReport, onExamStart]);
   
-    startExam();
-  }, [studentId, API_BASE, loadReport, mode, onExamStart]);
   useEffect(() => {
   document.addEventListener("contextmenu", e => e.preventDefault());
   document.addEventListener("copy", e => e.preventDefault());
@@ -417,6 +433,7 @@ if (questionType === 5) {
     );
 
     await loadReport();
+    setMode("report"); 
     onExamFinish?.();
   }, [API_BASE, studentId, answers, loadReport, onExamFinish]);
   useEffect(() => {
@@ -1208,3 +1225,4 @@ useEffect(() => {
     </div>
   );
 }
+
