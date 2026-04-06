@@ -6,14 +6,17 @@ const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 export default function GenerateExam_thinking_skills() {
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
-  const [error, setError] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // ✅ NEW: class year state
+  const [selectedClassYear, setSelectedClassYear] = useState("year_5");
 
   /* ===========================
-     Generate Exam
+     Generate Exam Handler
   =========================== */
-  const handleGenerateExam = async () => {
+  const handleGenerateThinkingSkillsExam = async () => {
     setLoading(true);
-    setError("");
+    setErrorMessage("");
     setGeneratedExam(null);
 
     try {
@@ -23,7 +26,10 @@ export default function GenerateExam_thinking_skills() {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
-          }
+          },
+          body: JSON.stringify({
+            class_year: selectedClassYear   // ✅ KEY CHANGE
+          })
         }
       );
 
@@ -39,7 +45,9 @@ export default function GenerateExam_thinking_skills() {
       alert("✅ Exam generated successfully!");
     } catch (error) {
       console.error("❌ Generate exam failed:", error);
-      setError(error.message || "Something went wrong while generating the exam");
+      setErrorMessage(
+        error.message || "Something went wrong while generating the exam"
+      );
     } finally {
       setLoading(false);
     }
@@ -52,11 +60,25 @@ export default function GenerateExam_thinking_skills() {
     <div className="generate-exam-container">
       <h2>Generate Thinking Skills Exam</h2>
 
-      {error && <p className="error-text">{error}</p>}
+      {/* ✅ NEW: Class Year Selector */}
+      <div className="form-group">
+        <label>Select Class Year:</label>
+        <select
+          value={selectedClassYear}
+          onChange={(e) => setSelectedClassYear(e.target.value)}
+        >
+          <option value="year_3">Year 3</option>
+          <option value="year_4">Year 4</option>
+          <option value="year_5">Year 5</option>
+          <option value="year_6">Year 6</option>
+        </select>
+      </div>
+
+      {errorMessage && <p className="error-text">{errorMessage}</p>}
 
       <button
         className="generate-btn blue-btn"
-        onClick={handleGenerateExam}
+        onClick={handleGenerateThinkingSkillsExam}
         disabled={loading}
       >
         {loading ? "Generating..." : "Generate Exam"}
@@ -69,14 +91,14 @@ export default function GenerateExam_thinking_skills() {
 
           <p><strong>Exam ID:</strong> {generatedExam.exam_id}</p>
           <p><strong>Total Questions:</strong> {generatedExam.total_questions}</p>
+          <p><strong>Class Year:</strong> {selectedClassYear}</p>
 
-          {/* Sections Breakdown (if exists) */}
           {generatedExam.sections && (
             <div style={{ marginTop: "15px" }}>
               <h4>Sections:</h4>
-              {generatedExam.sections.map((sec, i) => (
-                <div key={i} style={{ marginBottom: "10px" }}>
-                  <strong>{sec.name}:</strong> {sec.total} questions
+              {generatedExam.sections.map((sectionItem, index) => (
+                <div key={index} style={{ marginBottom: "10px" }}>
+                  <strong>{sectionItem.name}:</strong> {sectionItem.total} questions
                 </div>
               ))}
             </div>
