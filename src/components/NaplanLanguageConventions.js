@@ -1,4 +1,3 @@
-#new
 import React, {
   useState,
   useEffect,
