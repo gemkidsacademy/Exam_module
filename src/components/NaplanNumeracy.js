@@ -1,4 +1,3 @@
-
 import React, {
     useState,
     useEffect,
@@ -17,9 +16,10 @@ import React, {
      MAIN COMPONENT
   ============================================================ */
   export default function NaplanNumeracy({
-    onExamStart,
-    onExamFinish
-  }) {
+  onExamStart,
+  onExamFinish,
+  mode: parentMode // 🔥 THIS
+}) {
     const studentId = sessionStorage.getItem("student_id");
     const API_BASE = process.env.REACT_APP_API_URL;
     const [examDates, setExamDates] = useState([]);
@@ -216,8 +216,25 @@ import React, {
       return numA === numB;
     }
     useEffect(() => {
+  if (!studentId) return;
+  if (mode !== "loading") return;
+
+  // 🔥 REPORT MUST WIN
+  if (parentMode === "report") {
+    setMode("report");
+    
+    return;
+  }
+
+  if (parentMode === "exam") {
+    setMode("exam");
+  }
+
+}, [studentId, parentMode, mode, loadExamDates]);
+    useEffect(() => {
+      if (mode !== "report") return;
       loadExamDates();
-    }, [loadExamDates]);
+    }, [mode, loadExamDates]);
       
     useEffect(() => {
       console.log("Selected exam changed:", selectedExamId);
@@ -305,45 +322,37 @@ useEffect(() => {
        START / RESUME EXAM
     ============================================================ */
     useEffect(() => {
-      if (!studentId) return;
-      if (hasSubmittedRef.current) return;
-      if (
-        mode === "report" ||
-        mode === "review" ||
-        mode === "submitting"
-      ) {
-        return;
+  if (!studentId) return;
+  if (mode !== "exam") return;
+  if (parentMode !== "exam") return; // 🔥 safety
+
+  const startExam = async () => {
+    const res = await fetch(
+      `${API_BASE}/api/student/start-exam/naplan-numeracy`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ student_id: studentId })
       }
-  
-      const startExam = async () => {
-        const res = await fetch(
-          `${API_BASE}/api/student/start-exam/naplan-numeracy`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ student_id: studentId })
-          }
-        );
-  
-        const data = await res.json();
-  
-        console.log("📘 START-EXAM RESPONSE:", data);
-        console.log("📘 QUESTIONS:", data.questions);
-  
-        if (data.completed === true) {
-          await loadExamDates(); // 🔥 this will trigger report automatically
-          return;
-        }
-  
-        setQuestions(data.questions || []);
-        setTimeLeft(data.remaining_time);
-        setMode("exam");
-        onExamStart?.();
-      };
-  
-      startExam();
-    }, [studentId, API_BASE, loadReport, mode, onExamStart]);
-  
+    );
+
+    const data = await res.json();
+
+    if (data.completed === true) {
+      await loadExamDates();
+      setMode("report"); // 🔥 go to report
+      return;
+    }
+
+    setQuestions(data.questions || []);
+    setTimeLeft(data.remaining_time);
+    onExamStart?.();
+  };
+
+  startExam();
+
+}, [studentId, mode, parentMode, API_BASE, loadExamDates, onExamStart]);
+      
     const formatExplanation = (text) => {
       if (!text) return "";
     
