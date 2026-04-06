@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 
 import "./QuizSetup.css";
@@ -26,15 +27,20 @@ export default function QuizSetup() {
   const [quiz, setQuiz] = useState({
        className: "selective",
        subject: "thinking_skills",
+       classYear: 5, 
        difficulty: "",
        numTopics: 1,
        topics: [],
      });
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setQuiz((prev) => ({ ...prev, [name]: value }));
-  };
+  const { name, value } = e.target;
+
+  setQuiz((prev) => ({
+    ...prev,
+    [name]: name === "classYear" ? Number(value) : value
+  }));
+};
 
   const generateTopics = () => {
     const num = parseInt(quiz.numTopics) || 1;
@@ -146,6 +152,7 @@ export default function QuizSetup() {
       const params = new URLSearchParams({
         class_name: quiz.className,
         subject: quiz.subject,
+        class_year: quiz.classYear,  
         difficulty: quiz.difficulty,
       });
 
@@ -167,7 +174,7 @@ export default function QuizSetup() {
   };
 
   fetchTopics();
-}, [quiz.className, quiz.subject, quiz.difficulty]);
+}, [quiz.className, quiz.subject, quiz.classYear, quiz.difficulty]);
 
      
   const handleSubmit = async (e) => {
@@ -191,6 +198,7 @@ export default function QuizSetup() {
     const payload = {
       class_name: quiz.className.trim(),
       subject: quiz.subject.trim(),
+      class_year: quiz.classYear,
       difficulty: quiz.difficulty.trim(),
       num_topics: quiz.topics.length,
       topics: quiz.topics.map((t) => ({
@@ -242,6 +250,18 @@ export default function QuizSetup() {
             value="Thinking Skills"
             readOnly
           />
+        <label>Class Year:</label>
+          <select
+            name="classYear"
+            value={quiz.classYear}
+            onChange={handleInputChange}
+            required
+          >
+            <option value={3}>Year 3</option>
+            <option value={4}>Year 4</option>
+            <option value={5}>Year 5</option>
+            <option value={6}>Year 6</option>
+          </select>
 
         <label>Difficulty Level:</label>
         <select
@@ -383,3 +403,4 @@ export default function QuizSetup() {
     </div>
   );
 }
+
