@@ -352,11 +352,7 @@ useEffect(() => {
   startExamNaplanLanguageConventions();
 
 }, [studentId, mode, parentMode, API_BASE, loadReport, onExamStart]);
-  useEffect(() => {
-  document.addEventListener("contextmenu", e => e.preventDefault());
-  document.addEventListener("copy", e => e.preventDefault());
-  document.addEventListener("cut", e => e.preventDefault());
-}, []);
+  
   /* ============================================================
      FINISH EXAM
   ============================================================ */
