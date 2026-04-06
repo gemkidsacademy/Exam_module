@@ -48,23 +48,72 @@ const SUBJECTS = [
 const NaplanDashboard = () => {
   const [activeSubject, setActiveSubject] = useState(null);
   const [examInProgress, setExamInProgress] = useState(false);
-  const [examPhase, setExamPhase] = useState("selection");
+  const [examPhase, setExamPhase] = useState("modeSelection"); 
+  const [examMode, setExamMode] = useState(null); // 🔥 NEW
   // phases: selection → welcome → instructions → exam
 
   const studentId = sessionStorage.getItem("student_id");
   const ActiveComponent = activeSubject?.component;
 
   const handleSubjectSelect = (subject) => {
-    if (examInProgress) {
-      alert("Please submit your current exam before switching subjects.");
-      return;
-    }
-    setActiveSubject(subject);
+  if (examInProgress) {
+    alert("Please submit your current exam before switching subjects.");
+    return;
+  }
+
+  setActiveSubject(subject);
+
+  if (examMode === "exam") {
     setExamPhase("welcome");
-  };
+  } else {
+    setExamPhase("exam"); // 🔥 go directly to report
+  }
+};
 
   return (
     <div className="naplan-dashboard">
+    {/* 🆕 0️⃣ MODE SELECTION (ADD HERE) */}
+    {examPhase === "modeSelection" && (
+      <div className="subject-selection-wrapper">
+
+        <img
+          src="https://gemkidsacademy.com.au/wp-content/uploads/2024/10/cropped-logo-4-1.png"
+          alt="Gem Kids Academy"
+          className="dashboard-logo"
+        />
+
+        <div className="subject-selection-card">
+          <h1 className="dashboard-title">
+            NAPLAN Practice Test
+          </h1>
+          <div className="title-divider" />
+
+          <div className="subject-buttons">
+
+            <button
+              className="subject-button"
+              onClick={() => {
+                setExamMode("exam");
+                setExamPhase("selection");
+              }}
+            >
+              View Exams
+            </button>
+
+            <button
+              className="subject-button"
+              onClick={() => {
+                setExamMode("report");
+                setExamPhase("selection");
+              }}
+            >
+              View Exam Reports
+            </button>
+
+          </div>
+        </div>
+      </div>
+    )}
 
       {/* 1️⃣ SUBJECT SELECTION */}
       {examPhase === "selection" && (
@@ -116,10 +165,11 @@ const NaplanDashboard = () => {
         {examPhase === "exam" && (
         <div className="exam-fullscreen-root exam-mode">
           <ActiveComponent
-            key={`naplan-${activeSubject.key}`}
+            key={`naplan-${activeSubject.key}-${examMode}`}
             studentId={studentId}
             subject={activeSubject.key}
             difficulty="naplan"
+            mode={examMode}
             onExamStart={() => setExamInProgress(true)}
             onExamFinish={() => setExamInProgress(false)}
           />
