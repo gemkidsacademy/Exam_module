@@ -97,7 +97,7 @@ const NaplanDashboard = () => {
                 setExamPhase("selection");
               }}
             >
-              View Exams
+              Active exams
             </button>
 
             <button
@@ -107,7 +107,7 @@ const NaplanDashboard = () => {
                 setExamPhase("selection");
               }}
             >
-              View Exam Reports
+              Historical reports
             </button>
 
           </div>
