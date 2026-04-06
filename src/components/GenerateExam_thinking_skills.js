@@ -75,7 +75,7 @@ export default function GenerateExam_thinking_skills() {
       </div>
 
       {errorMessage && <p className="error-text">{errorMessage}</p>}
-
+      <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
       <button
         className="generate-btn blue-btn"
         onClick={handleGenerateThinkingSkillsExam}
@@ -117,6 +117,7 @@ export default function GenerateExam_thinking_skills() {
 >
   Generate Exam (Homework)
 </button>
+</div>
 
       {/* RESULT */}
       {generatedExam && (
