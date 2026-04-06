@@ -103,7 +103,7 @@ const handleViewResults = () => {
             setExamPhase("selection");
           }}
         >
-          View Exams
+          Active exams
         </button>
 
         <button
@@ -113,7 +113,7 @@ const handleViewResults = () => {
             setExamPhase("selection");
           }}
         >
-          View Exam Reports
+          Historical reports
         </button>
 
       </div>
