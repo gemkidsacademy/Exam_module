@@ -10,6 +10,7 @@ export default function AddStudentForm() {
   const [parentEmail, setParentEmail] = useState("");
   const [studentYear, setStudentYear] = useState("");
   const STUDENT_YEAR_OPTIONS = [
+        "Year 4",    
         "Year 3",
         "Year 5",
         "Year 7",
