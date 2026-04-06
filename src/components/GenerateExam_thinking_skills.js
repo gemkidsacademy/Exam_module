@@ -9,7 +9,7 @@ export default function GenerateExam_thinking_skills() {
   const [errorMessage, setErrorMessage] = useState("");
 
   // ✅ NEW: class year state
-  const [selectedClassYear, setSelectedClassYear] = useState("year_5");
+  const [selectedClassYear, setSelectedClassYear] = useState(5);
 
   /* ===========================
      Generate Exam Handler
@@ -65,12 +65,12 @@ export default function GenerateExam_thinking_skills() {
         <label>Select Class Year:</label>
         <select
           value={selectedClassYear}
-          onChange={(e) => setSelectedClassYear(e.target.value)}
+          onChange={(e) => setSelectedClassYear(Number(e.target.value))}
         >
           
-          <option value="year_4">Year 4</option>
-          <option value="year_5">Year 5</option>
-          <option value="year_6">Year 6</option>
+          <option value={4}>Year 4</option>
+          <option value={5}>Year 5</option>
+          <option value={6}>Year 6</option>
         </select>
       </div>
 
