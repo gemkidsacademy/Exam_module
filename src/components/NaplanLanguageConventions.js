@@ -1,3 +1,4 @@
+#new
 import React, {
   useState,
   useEffect,
@@ -17,7 +18,8 @@ import NaplanLanguageConventionsReport from "./NaplanLanguageConventionsReport";
 ============================================================ */
 export default function NaplanLanguageConventions({
   onExamStart,
-  onExamFinish
+  onExamFinish,
+  mode: parentMode // 🔥 ADD THIS
 }) {
   const studentId = sessionStorage.getItem("student_id");
   const API_BASE = process.env.REACT_APP_API_URL;
@@ -218,9 +220,28 @@ export default function NaplanLanguageConventions({
     const data = await res.json();
     setReport(data);
     setExamAttemptId(data.exam_attempt_id);
-    setMode("report");
+    
   }, [API_BASE, studentId]);
+  useEffect(() => {
+  if (mode !== "report") return;
+  loadReport();
+}, [mode, loadReport]);
   
+  useEffect(() => {
+  if (!studentId) return;
+  if (mode !== "loading") return;
+
+  // 🔥 REPORT MUST WIN
+  if (parentMode === "report") {
+    setMode("report");
+    return;
+  }
+
+  if (parentMode === "exam") {
+    setMode("exam");
+  }
+
+}, [studentId, parentMode, mode]);
   useEffect(() => {
   if (mode !== "exam" || questions.length === 0) return;
 
@@ -296,49 +317,42 @@ useEffect(() => {
      START / RESUME EXAM
   ============================================================ */
   useEffect(() => {
-    if (!studentId) return;
-  
-    // Only run once while loading
-    if (mode !== "loading") return;
-  
-    const startExamNaplanLanguageConventions = async () => {
-      try {
-        const response = await fetch(
-          `${API_BASE}/api/student/start-exam/naplan-language-conventions`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ student_id: studentId })
-          }
-        );
-  
-        const examPayload = await response.json();
-  
-        // 🔎 Print everything received from backend
-        console.log("NAPLAN Language Conventions Exam Payload:", examPayload);
-  
-        if (examPayload.completed === true) {
-          await loadReport();
-          return;
+  if (!studentId) return;
+  if (mode !== "exam") return;
+  if (parentMode !== "exam") return; // 🔥 safety
+
+  const startExamNaplanLanguageConventions = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE}/api/student/start-exam/naplan-language-conventions`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ student_id: studentId })
         }
-  
-        console.log("Questions received:", examPayload.questions);
-        console.log("Remaining time:", examPayload.remaining_time);
-  
-        setQuestions(examPayload.questions || []);
-        setTimeLeft(examPayload.remaining_time);
-        setMode("exam");
-  
-        onExamStart?.();
-  
-      } catch (error) {
-        console.error("Failed to start NAPLAN Language Conventions exam:", error);
+      );
+
+      const examPayload = await response.json();
+
+      if (examPayload.completed === true) {
+        await loadReport();
+        setMode("report"); // 🔥 IMPORTANT
+        return;
       }
-    };
-  
-    startExamNaplanLanguageConventions();
-  
-  }, [studentId, API_BASE, loadReport, mode, onExamStart]);
+
+      setQuestions(examPayload.questions || []);
+      setTimeLeft(examPayload.remaining_time);
+
+      onExamStart?.();
+
+    } catch (error) {
+      console.error("Failed to start exam:", error);
+    }
+  };
+
+  startExamNaplanLanguageConventions();
+
+}, [studentId, mode, parentMode, API_BASE, loadReport, onExamStart]);
   useEffect(() => {
   document.addEventListener("contextmenu", e => e.preventDefault());
   document.addEventListener("copy", e => e.preventDefault());
