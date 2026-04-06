@@ -84,6 +84,7 @@ export default function GenerateExam_thinking_skills() {
         {loading ? "Generating..." : "Generate Exam"}
       </button>
       <button
+  className="generate-btn green-btn"
   type="button"
   onClick={async () => {
     try {
