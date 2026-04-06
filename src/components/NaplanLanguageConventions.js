@@ -370,6 +370,7 @@ useEffect(() => {
     );
   
     await loadReport();
+    setMode("report");
     onExamFinish?.();
   }, [API_BASE, studentId, answers, loadReport, onExamFinish]);
   /* ============================================================
