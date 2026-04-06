@@ -13,7 +13,25 @@ export default function QuizSetup() {
   const [questionBank, setQuestionBank] = useState([]);
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [qbLoading, setQbLoading] = useState(false);
+  const validateQuizBeforeSubmit = () => {
+  if (!quiz.className || !quiz.subject || !quiz.difficulty) {
+    alert("Please select class, subject, and difficulty.");
+    return false;
+  }
 
+  if (quiz.topics.length === 0) {
+    alert("Please generate at least one topic.");
+    return false;
+  }
+
+  if (totalQuestions !== 40) {
+    alert("Total questions across all topics must be 40.");
+    return false;
+  }
+
+  return true;
+};
+  
   const getUsedTopicNames = (currentIndex) => {
   return quiz.topics
     .map((t, i) => (i !== currentIndex ? t.name : null))
@@ -400,6 +418,67 @@ export default function QuizSetup() {
         <button type="submit" disabled={totalQuestions > 40}>
           Create Exam
         </button>
+        <button
+            type="button"
+            disabled={totalQuestions > 40}
+            onClick={async () => {
+              if (!quiz.className || !quiz.subject || !quiz.difficulty) {
+                alert("Please select class, subject, and difficulty.");
+                return;
+              }
+          
+              if (quiz.topics.length === 0) {
+                alert("Please generate at least one topic.");
+                return;
+              }
+          
+              if (totalQuestions !== 40) {
+                alert("Total questions across all topics must be 40.");
+                return;
+              }
+          
+              const payload = {
+                class_name: quiz.className.trim(),
+                subject: quiz.subject.trim(),
+                class_year: quiz.classYear,
+                difficulty: quiz.difficulty.trim(),
+                num_topics: quiz.topics.length,
+                topics: quiz.topics.map((t) => ({
+                  name: t.name.trim(),
+                  ai: Number(t.ai),
+                  db: Number(t.db),
+                  total: Number(t.total),
+                })),
+              };
+          
+              try {
+                const res = await fetch(
+                  "https://web-production-481a5.up.railway.app/api/quizzes-homework",
+                  {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                  }
+                );
+          
+                if (!res.ok) {
+                  const err = await res.json();
+                  console.error("Backend returned:", err);
+                  throw new Error("Failed to save homework");
+                }
+          
+                const data = await res.json();
+                console.log("Homework saved:", data);
+                alert("Homework created successfully!");
+              } catch (error) {
+                console.error(error);
+                alert("Error creating homework.");
+              }
+            }}
+            style={{ marginLeft: "10px" }}
+          >
+            Create Exam (Homework)
+          </button>     
       </form>
     </div>
   );
