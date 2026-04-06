@@ -85,7 +85,7 @@ const OCDashboard = () => {
                 setExamPhase("selection");
               }}
             >
-              View Exams
+              Active exams
             </button>
 
             <button
@@ -95,7 +95,7 @@ const OCDashboard = () => {
                 setExamPhase("selection");
               }}
             >
-              View Previous Results
+              Historical reports
             </button>
 
           </div>
