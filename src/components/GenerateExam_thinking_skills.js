@@ -83,6 +83,40 @@ export default function GenerateExam_thinking_skills() {
       >
         {loading ? "Generating..." : "Generate Exam"}
       </button>
+      <button
+  type="button"
+  onClick={async () => {
+    try {
+      const res = await fetch(
+        "https://web-production-481a5.up.railway.app/api/exams/generate-thinking-skills-homework",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            class_year: quiz.classYear
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        const err = await res.json();
+        console.error("Backend returned:", err);
+        throw new Error("Failed to generate homework exam");
+      }
+
+      const data = await res.json();
+      console.log("Homework exam generated:", data);
+
+      alert("Homework exam generated successfully!");
+    } catch (error) {
+      console.error(error);
+      alert("Error generating homework exam.");
+    }
+  }}
+  style={{ marginLeft: "10px" }}
+>
+  Generate Exam (Homework)
+</button>
 
       {/* RESULT */}
       {generatedExam && (
