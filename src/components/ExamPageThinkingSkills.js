@@ -177,29 +177,40 @@ const [report, setReport] = useState(null);
    LOAD REPORT (ONLY WHEN EXAM IS COMPLETED)
 ============================================================ */
 const loadReport = useCallback(async (attemptId = null) => {
- try {
-   let url = `${API_BASE}/api/student/exam-report/thinking-skills?student_id=${studentId}`;
+  try {
+    const reportEndpoint =
+      mode === "homework"
+        ? "/api/student/homework-report/thinking-skills"
+        : "/api/student/exam-report/thinking-skills";
 
-   if (attemptId !== null && attemptId !== undefined) {
-     url += `&exam_attempt_id=${attemptId}`;
-   }
+    let url = `${API_BASE}${reportEndpoint}?student_id=${studentId}`;
 
-   const res = await fetch(url);
+    if (attemptId !== null && attemptId !== undefined) {
+      url += `&exam_attempt_id=${attemptId}`;
+    }
 
-   if (!res.ok) {
-     console.warn("⚠️ Report not available yet");
-     return;
-   }
+    console.log("📊 REPORT MODE:", mode);
+    console.log("🌐 REPORT ENDPOINT:", reportEndpoint);
 
-   const data = await res.json();
+    const res = await fetch(url);
 
-   setReport(data);
-   setExamAttemptId(data.exam_attempt_id);
-   setMode("report");
- } catch (err) {
-   console.error("❌ loadReport error:", err);
- }
-}, [studentId]);
+    if (!res.ok) {
+      console.warn("⚠️ Report not available yet");
+      return;
+    }
+
+    const data = await res.json();
+
+    setReport(data);
+    setExamAttemptId(data.exam_attempt_id);
+    setMode("report");
+
+  } catch (err) {
+    console.error("❌ loadReport error:", err);
+  }
+}, [studentId, mode]);
+
+
 useEffect(() => {
   loadAttempts();
 }, [loadAttempts]);
