@@ -115,6 +115,15 @@ const handleViewResults = () => {
         >
           Historical reports
         </button>
+        <button
+          className="subject-button"
+          onClick={() => {
+            setExamMode("homework");
+            setExamPhase("selection");
+          }}
+        >
+          Homework
+        </button>
 
       </div>
     </div>
@@ -175,6 +184,7 @@ const handleViewResults = () => {
           <div className="exam-root">
             <ActiveComponent
             key={`exam-${activeSubject.key}-${examMode}`}   // 🔑 THIS LINE FIXES IT
+            type={examMode}
             studentId={studentId}
             subject={activeSubject.key}
             difficulty="advanced"
