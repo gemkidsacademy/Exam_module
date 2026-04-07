@@ -201,7 +201,7 @@ const loadReport = useCallback(async (attemptId = null) => {
   try {
     const reportEndpoint =
       parentMode === "homework"
-        ? "/api/student/homework-report/thinking-skills"
+        ? "/api/student/homework-report/thinking-skills-new"
         : "/api/student/exam-report/thinking-skills";
 
     let url = `${API_BASE}${reportEndpoint}?student_id=${studentId}`;
