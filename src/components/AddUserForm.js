@@ -13,6 +13,7 @@ export default function AddStudentForm() {
         "Year 4",    
         "Year 3",
         "Year 5",
+        "Year 6",       
         "Year 7",
         "Year 9",
         "N/A",  
