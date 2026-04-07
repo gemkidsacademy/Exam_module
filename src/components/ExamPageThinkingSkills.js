@@ -21,6 +21,7 @@ export default function ExamPageThinkingSkills({
   onExamStart,
   onExamFinish,
 }) {
+console.log("PARENT MODE RECEIVED:", parentMode);  
 //const studentId = sessionStorage.getItem("student_id");
 const [attempts, setAttempts] = useState([]);
 const isPopNavigationRef = useRef(false);

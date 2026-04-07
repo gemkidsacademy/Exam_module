@@ -67,7 +67,7 @@ const SelectiveDashboard = () => {
 };
   
   const handleStartExam = () => {
-  setExamMode("exam");
+  
   setExamPhase("exam");
 };
 
