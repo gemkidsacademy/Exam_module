@@ -1,4 +1,3 @@
-#new 
 import React, {
 useState,
 useEffect,
@@ -105,7 +104,8 @@ const ENDPOINTS = {
   },
 };
 
-const API = ENDPOINTS[type];
+onst normalizedType = type === "homework" ? "homework" : "exam";
+const API = ENDPOINTS[normalizedType];
 
 if (!API) {
   throw new Error(`Invalid type: ${type}`);
