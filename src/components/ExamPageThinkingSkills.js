@@ -552,7 +552,7 @@ if (mode === "report") {
 if (mode === "review" && questions.length === 0) {
  return (
    <ThinkingSkillsReview
-     mode={mode} 
+     mode={parentMode} 
      studentId={studentId}
      examAttemptId={examAttemptId}
      attempts={attempts}
