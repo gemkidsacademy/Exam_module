@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import styles from "./ThinkingSkillsReview.module.css";
 
 export default function ThinkingSkillsReview({
+  mode,
   studentId,
   examAttemptId,
   onLoaded,
@@ -17,8 +18,16 @@ useEffect(() => {
 
     const loadReviewForAttempt = async () => {
       try {
+        const reviewEndpoint =
+          mode === "homework"
+            ? "/api/student/homework-review/thinking-skills"
+            : "/api/student/exam-review/thinking-skills";
+
+        console.log("🔍 REVIEW MODE:", mode);
+        console.log("🌐 REVIEW ENDPOINT:", reviewEndpoint);
+
         const response = await fetch(
-          `${API_BASE}/api/student/exam-review/thinking-skills?student_id=${studentId}&exam_attempt_id=${examAttemptId}`
+          `${API_BASE}${reviewEndpoint}?student_id=${studentId}&exam_attempt_id=${examAttemptId}`
         );
 
         if (!response.ok) {
@@ -55,7 +64,7 @@ useEffect(() => {
     };
 
     loadReviewForAttempt();
-  }, [studentId, examAttemptId, API_BASE, onLoaded]);
+  }, [studentId, examAttemptId, API_BASE, onLoaded, mode]);
 
   return (
     <div className={styles.reviewWrapper}>

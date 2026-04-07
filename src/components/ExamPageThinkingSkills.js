@@ -26,16 +26,35 @@ console.log("PARENT MODE RECEIVED:", parentMode);
 const [attempts, setAttempts] = useState([]);
 const isPopNavigationRef = useRef(false);
 const loadAttempts = useCallback(async () => {
-  const res = await fetch(
-    `${API_BASE}/api/student/exam-attempts/thinking-skills?student_id=${studentId}`
-  );
+  try {
+    const attemptsEndpoint =
+      mode === "homework"
+        ? "/api/student/homework-attempts/thinking-skills"
+        : "/api/student/exam-attempts/thinking-skills";
 
-  const data = await res.json();
+    const url = `${API_BASE}${attemptsEndpoint}?student_id=${studentId}`;
 
-  console.log("ATTEMPTS API RESPONSE:", data);
+    console.log("📚 ATTEMPTS MODE:", mode);
+    console.log("🌐 ATTEMPTS ENDPOINT:", attemptsEndpoint);
 
-  setAttempts(Array.isArray(data) ? data : []);
-}, [studentId]);
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      console.warn("⚠️ Failed to load attempts");
+      return;
+    }
+
+    const data = await res.json();
+
+    console.log("📚 ATTEMPTS API RESPONSE:", data);
+
+    setAttempts(Array.isArray(data) ? data : []);
+
+  } catch (err) {
+    console.error("❌ loadAttempts error:", err);
+  }
+}, [studentId, mode]);
+
 const formatExplanation = (text) => {
   if (!text) return "";
 
@@ -531,6 +550,7 @@ if (mode === "report") {
 if (mode === "review" && questions.length === 0) {
  return (
    <ThinkingSkillsReview
+     mode={mode} 
      studentId={studentId}
      examAttemptId={examAttemptId}
      attempts={attempts}
