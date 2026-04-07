@@ -409,6 +409,11 @@ const finishExam = useCallback(
 
       console.log("🏁 FINISH MODE:", mode);
       console.log("🌐 FINISH ENDPOINT:", finishEndpoint);
+      console.log("📤 FINAL PAYLOAD:", payload);
+      console.log("📤 student_id type:", typeof payload.student_id);
+      console.log("📤 exam_attempt_id:", payload.exam_attempt_id);
+      console.log("📤 answers type:", typeof payload.answers);
+      console.log("📤 answers value:", payload.answers);
 
       const response = await fetch(
       `${API_BASE}${finishEndpoint}`,
@@ -420,6 +425,8 @@ const finishExam = useCallback(
       );
 
       console.log("✅ finish-exam response status:", response.status);
+      const responseText = await response.text();
+      console.log("📥 RAW RESPONSE:", responseText);
 
       console.log("📊 Loading report after submission...");
       await loadReport();
