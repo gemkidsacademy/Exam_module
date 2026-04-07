@@ -20,7 +20,7 @@ useEffect(() => {
       try {
         const reviewEndpoint =
           mode === "homework"
-            ? "/api/student/homework-review/thinking-skills"
+            ? "/api/student/homework-review/thinking-skills-new"
             : "/api/student/exam-review/thinking-skills";
 
         console.log("🔍 REVIEW MODE:", mode);
