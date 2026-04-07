@@ -25,35 +25,6 @@ console.log("PARENT MODE RECEIVED:", parentMode);
 //const studentId = sessionStorage.getItem("student_id");
 const [attempts, setAttempts] = useState([]);
 const isPopNavigationRef = useRef(false);
-const loadAttempts = useCallback(async () => {
-  try {
-    const attemptsEndpoint =
-      mode === "homework"
-        ? "/api/student/homework-attempts/thinking-skills"
-        : "/api/student/exam-attempts/thinking-skills";
-
-    const url = `${API_BASE}${attemptsEndpoint}?student_id=${studentId}`;
-
-    console.log("📚 ATTEMPTS MODE:", mode);
-    console.log("🌐 ATTEMPTS ENDPOINT:", attemptsEndpoint);
-
-    const res = await fetch(url);
-
-    if (!res.ok) {
-      console.warn("⚠️ Failed to load attempts");
-      return;
-    }
-
-    const data = await res.json();
-
-    console.log("📚 ATTEMPTS API RESPONSE:", data);
-
-    setAttempts(Array.isArray(data) ? data : []);
-
-  } catch (err) {
-    console.error("❌ loadAttempts error:", err);
-  }
-}, [studentId, mode]);
 
 const formatExplanation = (text) => {
   if (!text) return "";
@@ -113,6 +84,36 @@ if (!API_BASE) {
   throw new Error("❌ REACT_APP_API_URL is not defined");
 }
 const [examAttemptId, setExamAttemptId] = useState(null);
+const loadAttempts = useCallback(async () => {
+  try {
+    const attemptsEndpoint =
+      mode === "homework"
+        ? "/api/student/homework-attempts/thinking-skills"
+        : "/api/student/exam-attempts/thinking-skills";
+
+    const url = `${API_BASE}${attemptsEndpoint}?student_id=${studentId}`;
+
+    console.log("📚 ATTEMPTS MODE:", mode);
+    console.log("🌐 ATTEMPTS ENDPOINT:", attemptsEndpoint);
+
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      console.warn("⚠️ Failed to load attempts");
+      return;
+    }
+
+    const data = await res.json();
+
+    console.log("📚 ATTEMPTS API RESPONSE:", data);
+
+    setAttempts(Array.isArray(data) ? data : []);
+
+  } catch (err) {
+    console.error("❌ loadAttempts error:", err);
+  }
+}, [studentId, mode]);
+
 const handleGenerateExplanation = async () => {
   if (!currentQ) return;
 
