@@ -1,3 +1,5 @@
+#old
+
 import React, {
 useState,
 useEffect,
@@ -13,7 +15,6 @@ import ThinkingSkillsReview from "./ThinkingSkillsReview";
  MAIN COMPONENT
 ============================================================ */
 export default function ExamPageThinkingSkills({
-  type = "exam",
   mode: parentMode,
   studentId,
   subject,
@@ -26,7 +27,7 @@ const [attempts, setAttempts] = useState([]);
 const isPopNavigationRef = useRef(false);
 const loadAttempts = useCallback(async () => {
   const res = await fetch(
-    `${API_BASE}${API.attempts}?student_id=${studentId}`
+    `${API_BASE}/api/student/exam-attempts/thinking-skills?student_id=${studentId}`
   );
 
   const data = await res.json();
@@ -34,8 +35,7 @@ const loadAttempts = useCallback(async () => {
   console.log("ATTEMPTS API RESPONSE:", data);
 
   setAttempts(Array.isArray(data) ? data : []);
- 
-}, [studentId, API]);
+}, [studentId]);
 const formatExplanation = (text) => {
   if (!text) return "";
 
@@ -89,27 +89,6 @@ const normalizeOption = (value) => {
   };
 };
 const API_BASE = process.env.REACT_APP_API_URL;
-const ENDPOINTS = {
-  exam: {
-    start: "/api/student/start-exam-thinkingskills",
-    finish: "/api/student/finish-exam/thinking-skills",
-    report: "/api/student/exam-report/thinking-skills",
-    attempts: "/api/student/exam-attempts/thinking-skills",
-  },
-  homework: {
-    start: "/api/student/start-homework-thinkingskills",
-    finish: "/api/student/finish-homework/thinking-skills",
-    report: "/api/student/homework-report/thinking-skills",
-    attempts: "/api/student/homework-attempts/thinking-skills",
-  },
-};
-
-onst normalizedType = type === "homework" ? "homework" : "exam";
-const API = ENDPOINTS[normalizedType];
-
-if (!API) {
-  throw new Error(`Invalid type: ${type}`);
-}
 
 if (!API_BASE) {
   throw new Error("❌ REACT_APP_API_URL is not defined");
@@ -199,7 +178,7 @@ const [report, setReport] = useState(null);
 ============================================================ */
 const loadReport = useCallback(async (attemptId = null) => {
  try {
-   let url = `${API_BASE}${API.report}?student_id=${studentId}`;
+   let url = `${API_BASE}/api/student/exam-report/thinking-skills?student_id=${studentId}`;
 
    if (attemptId !== null && attemptId !== undefined) {
      url += `&exam_attempt_id=${attemptId}`;
@@ -220,7 +199,7 @@ const loadReport = useCallback(async (attemptId = null) => {
  } catch (err) {
    console.error("❌ loadReport error:", err);
  }
-}, [studentId, API]);
+}, [studentId]);
 useEffect(() => {
   loadAttempts();
 }, [loadAttempts]);
@@ -304,15 +283,15 @@ useEffect(() => {
 
   if (mode !== "loading") return;
 
-  if (parentMode === "exam" || parentMode === "homework") {
-  setMode("exam"); // 👈 SAME UI reused
-}
+  if (parentMode === "exam") {
+    setMode("exam");
+  }
 
-if (parentMode === "report") {
-  loadAttempts().then(() => {
-    loadReport();
-  });
-}
+  if (parentMode === "report") {
+    loadAttempts().then(() => {
+      loadReport();
+    });
+  }
 
 }, [studentId, parentMode, mode]);
  
@@ -329,7 +308,7 @@ useEffect(() => {
 
   const startExam = async () => {
     const res = await fetch(
-      `${API_BASE}${API.start}`,
+      `${API_BASE}/api/student/start-exam-thinkingskills`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -361,7 +340,7 @@ useEffect(() => {
 
   startExam();
 
-}, [studentId, mode, API]);
+}, [studentId, mode]);
 useEffect(() => {
   if (mode !== "exam") {
     hasStartedRef.current = false;
@@ -400,7 +379,7 @@ const finishExam = useCallback(
       console.log("🌐 Calling finish-exam API...");
 
       const response = await fetch(
-        `${API_BASE}${API.finish}`,
+        `${API_BASE}/api/student/finish-exam/thinking-skills`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -421,7 +400,7 @@ const finishExam = useCallback(
       console.error("❌ finish-exam error:", err);
     }
   },
-  [studentId, answers, loadReport, onExamFinish, examAttemptId, API]);
+  [studentId, answers, loadReport, onExamFinish, examAttemptId]
 );
 
 /* ============================================================
