@@ -200,7 +200,7 @@ const [report, setReport] = useState(null);
 const loadReport = useCallback(async (attemptId = null) => {
   try {
     const reportEndpoint =
-      mode === "homework"
+      parentMode === "homework"
         ? "/api/student/homework-report/thinking-skills"
         : "/api/student/exam-report/thinking-skills";
 
