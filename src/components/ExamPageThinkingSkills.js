@@ -204,7 +204,7 @@ useEffect(() => {
 }, [loadAttempts]);
  
 useEffect(() => {
-  if (mode !== "exam") return;
+  if (mode !== "exam" && mode !== "homework") return;
 
   window.history.replaceState(
    { questionIndex: 0 },
@@ -213,7 +213,7 @@ useEffect(() => {
  );
 }, [mode]);
 useEffect(() => {
- if (mode !== "exam") return;
+ if (mode !== "exam" && mode !== "homework") return;
 
  if (isPopNavigationRef.current) {
    isPopNavigationRef.current = false;
@@ -238,7 +238,7 @@ useEffect(() => {
 
  
 useEffect(() => {
- if (mode !== "exam") return;
+ if (mode !== "exam" && mode !== "homework") return;
 
  const handlePopState = (e) => {
    const state = e.state;
@@ -285,6 +285,9 @@ useEffect(() => {
   if (parentMode === "exam") {
     setMode("exam");
   }
+  if (parentMode === "homework") {
+    setMode("homework");   // ✅ ADD THIS
+  }
 
   if (parentMode === "report") {
     loadAttempts().then(() => {
@@ -300,48 +303,59 @@ useEffect(() => {
 ============================================================ */
 useEffect(() => {
   if (!studentId) return;
-  if (mode !== "exam") return;
+  if (mode !== "exam" && mode !== "homework") return;
   if (hasStartedRef.current) return; // prevent double call
 
   hasStartedRef.current = true;
 
   const startExam = async () => {
-    const res = await fetch(
-      `${API_BASE}/api/student/start-exam-thinkingskills`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ student_id: studentId }),
-      }
-    );
+  try {
+    const startEndpoint =
+      mode === "homework"
+        ? "/api/student/start-homework-thinkingskills"
+        : "/api/student/start-exam-thinkingskills";
+
+    console.log("🚀 START MODE:", mode);
+    console.log("🌐 ENDPOINT:", startEndpoint);
+
+    const res = await fetch(`${API_BASE}${startEndpoint}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ student_id: studentId }),
+    });
 
     const data = await res.json();
+
     setExamAttemptId(data.exam_attempt_id);
 
-    console.log("🧪 RAW start-exam response:", data);
+    console.log("🧪 RAW start response:", data);
     console.log("🧪 QUESTIONS PAYLOAD:", data.questions);
     console.log(
       "🧪 FIRST QUESTION OPTIONS:",
       data.questions?.[0]?.options
     );
 
-    // 👉 Only show report if explicitly requested
+    // 👉 If already completed, go to report
     if (data.completed === true) {
       await loadReport();
       return;
     }
 
-    // 👉 Normal exam flow (no flicker)
+    // 👉 Normal flow
     setQuestions(data.questions || []);
     setTimeLeft(data.remaining_time);
     onExamStart?.();
-  };
 
-  startExam();
+  } catch (err) {
+    console.error("❌ startExam error:", err);
+  }
+};
+
+startExam();
 
 }, [studentId, mode]);
 useEffect(() => {
-  if (mode !== "exam") {
+  if (mode !== "exam" && mode !== "homework") {
     hasStartedRef.current = false;
   }
 }, [mode]);
@@ -406,7 +420,7 @@ const finishExam = useCallback(
    TIMER (AUTO SUBMIT)
 ============================================================ */
 useEffect(() => {
-  if (mode !== "exam" || timeLeft === null) return;
+  if ((mode !== "exam" && mode !== "homework") || timeLeft === null) return;
 
   if (timeLeft <= 0) {
     setShowConfirmFinish(false); // ✅ force-close modal
