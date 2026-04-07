@@ -19,7 +19,7 @@ useEffect(() => {
     const loadReviewForAttempt = async () => {
       try {
         const reviewEndpoint =
-          mode === "homework"
+          parentMode === "homework"
             ? "/api/student/homework-review/thinking-skills"
             : "/api/student/exam-review/thinking-skills";
 
