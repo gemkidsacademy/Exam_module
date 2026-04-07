@@ -87,7 +87,7 @@ const [examAttemptId, setExamAttemptId] = useState(null);
 const loadAttempts = useCallback(async () => {
   try {
     const attemptsEndpoint =
-      mode === "homework"
+       parentMode === "homework"
         ? "/api/student/homework-attempts/thinking-skills"
         : "/api/student/exam-attempts/thinking-skills";
 
