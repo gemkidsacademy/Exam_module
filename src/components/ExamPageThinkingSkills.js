@@ -391,9 +391,16 @@ const finishExam = useCallback(
 
     try {
       console.log("🌐 Calling finish-exam API...");
+      const finishEndpoint =
+        mode === "homework"
+          ? "/api/student/finish-homework-thinkingskills"
+          : "/api/student/finish-exam/thinking-skills";
+
+      console.log("🏁 FINISH MODE:", mode);
+      console.log("🌐 FINISH ENDPOINT:", finishEndpoint);
 
       const response = await fetch(
-        `${API_BASE}/api/student/finish-exam/thinking-skills`,
+      `${API_BASE}${finishEndpoint}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
