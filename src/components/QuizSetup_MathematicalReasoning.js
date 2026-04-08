@@ -28,6 +28,61 @@
     /* ============================
        HANDLERS
     ============================ */
+    const handleHomeworkSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!quiz.difficulty) {
+    alert("Please select difficulty level.");
+    return;
+  }
+
+  if (quiz.topics.length === 0) {
+    alert("Please generate at least one topic.");
+    return;
+  }
+
+  if (totalQuestions !== 35) {
+    alert("Total questions must be 35.");
+    return;
+  }
+
+  const payload = {
+    class_name: quiz.className,
+    subject: quiz.subject,
+    class_year: quiz.classYear,
+    difficulty: quiz.difficulty,
+    num_topics: quiz.topics.length,
+    topics: quiz.topics.map((t) => ({
+      name: t.name.trim(),
+      ai: Number(t.ai),
+      db: Number(t.db),
+      total: Number(t.total),
+    })),
+  };
+
+  try {
+    const res = await fetch(
+      "https://web-production-481a5.up.railway.app/api/quizzes/mathematical-reasoning/homework",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.json();
+      console.error("Backend returned:", err);
+      throw new Error("Failed to save homework quiz");
+    }
+
+    await res.json();
+    alert("Mathematical Reasoning Homework created successfully!");
+  } catch (error) {
+    console.error(error);
+    alert("Error saving homework exam. Please try again.");
+  }
+};
     const handleDeleteAllQuestions = async () => {
   const confirmed = window.confirm(
     "Are you sure you want to delete ALL questions? This cannot be undone."
@@ -382,6 +437,17 @@
           <button type="submit" disabled={totalQuestions > 40}>
             Create Mathematical Reasoning Exam
           </button>
+          
+
+          <button
+            type="button"
+            onClick={handleHomeworkSubmit}
+            disabled={totalQuestions > 40}
+            style={{ marginLeft: "10px", backgroundColor: "#28a745", color: "white" }}
+          >
+            Create Homework Exam
+          </button>
+
         </form>
       </div>
     );
