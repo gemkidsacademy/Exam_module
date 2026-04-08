@@ -395,11 +395,16 @@ const finishExam = useCallback(
       answers
     };
 
-    console.log("📤 finish-exam payload:", payload);
+    console.log("📤 finish payload:", payload);
 
     try {
+      const endpoint =
+        parentMode === "homework"
+          ? "/api/student/finish-homework-math-reasoning"
+          : "/api/student/finish-exam";
+
       const res = await fetch(
-        `${API_BASE}/api/student/finish-exam`,
+        `${API_BASE}${endpoint}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -408,24 +413,22 @@ const finishExam = useCallback(
       );
 
       if (!res.ok) {
-        console.error("❌ finish-exam failed");
+        console.error("❌ finish failed");
         return;
       }
 
       // 🔥 IMPORTANT: refresh dates FIRST
       await loadExamDates();
 
-      
-
       onExamFinish?.();
 
     } catch (err) {
-      console.error("❌ finish-exam error:", err);
+      console.error("❌ finish error:", err);
     }
   },
-  [studentId, answers, loadReport, loadExamDates]
+  [studentId, answers, parentMode, loadExamDates]
 );
- 
+
 /* ============================================================
    TIMER (AUTO SUBMIT)
 ============================================================ */
