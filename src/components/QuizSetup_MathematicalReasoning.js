@@ -11,6 +11,7 @@
     const [quiz, setQuiz] = useState({
       className: "selective",
       subject: "mathematical_reasoning",
+      classYear: "",   // 👈 ADD THIS
       difficulty: "",
       numTopics: 1,
       topics: [],
@@ -128,7 +129,7 @@
     };
     useEffect(() => {
     // Do not fetch until difficulty is selected
-    if (!quiz.difficulty) {
+    if (!quiz.difficulty || !quiz.classYear) {
       setAvailableTopics([]);
       return;
     }
@@ -185,6 +186,7 @@
         class_name: quiz.className,
         subject: quiz.subject,
         difficulty: quiz.difficulty,
+        class_year: quiz.classYear,   
         num_topics: quiz.topics.length,
         topics: quiz.topics.map((t) => ({
           name: t.name.trim(),
@@ -231,6 +233,18 @@
   
           <label>Subject:</label>
           <input type="text" value="Mathematical Reasoning" disabled />
+          <label>Class Year:</label>
+          <select
+            name="classYear"
+            value={quiz.classYear}
+            onChange={handleInputChange}
+            required
+          >
+            <option value="">Select Year</option>
+            <option value="Year 4">Year 4</option>
+            <option value="Year 5">Year 5</option>
+            <option value="Year 6">Year 6</option>
+          </select>
   
           {/* CONFIGURABLE */}
           <label>Difficulty Level:</label>
