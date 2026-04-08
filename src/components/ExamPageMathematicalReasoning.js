@@ -290,13 +290,18 @@ useEffect(() => {
 ============================================================ */
 useEffect(() => {
   if (!studentId) return;
-  if (parentMode !== "exam") return;
+  if (parentMode !== "exam" && parentMode !== "homework") return;
   if (mode !== "loading") return;
 
   const startExam = async () => {
     try {
+      const endpoint =
+        parentMode === "homework"
+          ? "/api/student/start-homework-math-reasoning"
+          : "/api/student/start-exam-math-reasoning";
+
       const res = await fetch(
-        `${API_BASE}/api/student/start-exam`,
+        `${API_BASE}${endpoint}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -305,43 +310,40 @@ useEffect(() => {
       );
 
       const data = await res.json();
-      console.log("📥 start-exam:", data);
+      console.log("📥 start:", data);
 
       // ✅ COMPLETED → SHOW REPORT
       if (data.completed === true) {
         await loadExamDates();
-        
         onExamFinish?.();
         return;
       }
 
-      // ✅ NORMALIZE QUESTIONS (CRITICAL FIX)
+      // ✅ Normalize questions (unchanged)
       const normalizedQuestions = (data.questions || []).map(q => {
-      const rawBlocks = Array.isArray(q.question_blocks)
-        ? q.question_blocks
-        : Array.isArray(q.blocks)
-        ? q.blocks
-        : [];
-    
-      return {
-        ...q,
-        blocks: rawBlocks.map(block => {
-          if (
-            block?.type === "image" &&
-            block?.src &&
-            !block.src.startsWith("http")
-          ) {
-            return {
-              ...block,
-              src: `https://storage.googleapis.com/exammoduleimages/${block.src}`
-            };
-          }
-          return block;
-        })
-      };
-    });
+        const rawBlocks = Array.isArray(q.question_blocks)
+          ? q.question_blocks
+          : Array.isArray(q.blocks)
+          ? q.blocks
+          : [];
 
-
+        return {
+          ...q,
+          blocks: rawBlocks.map(block => {
+            if (
+              block?.type === "image" &&
+              block?.src &&
+              !block.src.startsWith("http")
+            ) {
+              return {
+                ...block,
+                src: `https://storage.googleapis.com/exammoduleimages/${block.src}`
+              };
+            }
+            return block;
+          })
+        };
+      });
 
       setQuestions(normalizedQuestions);
       setTimeLeft(data.remaining_time);
@@ -349,14 +351,13 @@ useEffect(() => {
       onExamStart?.();
 
     } catch (err) {
-      console.error("❌ start-exam error:", err);
+      console.error("❌ start error:", err);
     }
   };
 
   startExam();
- 
-}, [studentId, parentMode]);
 
+}, [studentId, parentMode]);
  
 /* ============================================================
    MARK VISITED QUESTIONS
