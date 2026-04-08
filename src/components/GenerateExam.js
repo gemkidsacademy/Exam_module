@@ -17,9 +17,9 @@ export default function GenerateExam() {
   };
 
   /* -------------------------------------------
-     GENERATE EXAM (NORMAL / HOMEWORK)
+     GENERATE NORMAL EXAM
   ------------------------------------------- */
-  const handleGenerateExam = async (mode = "exam") => {
+  const handleGenerateExam = async () => {
     if (!selectedYear) {
       alert("Please select a class year.");
       return;
@@ -37,29 +37,67 @@ export default function GenerateExam() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             difficulty: "medium",
-            class_year: selectedYear,
-            mode: mode // 👈 key addition
+            class_year: selectedYear
           })
         }
       );
 
       const data = await response.json();
-      console.log("Diagnostic response:", data);
+      console.log("Exam response:", data);
 
       if (!response.ok) {
         throw new Error(data?.detail || "Failed to generate exam");
       }
 
       setGeneratedExam(data);
-
-      if (mode === "homework") {
-        alert("✅ Homework exam generated!");
-      } else {
-        alert("✅ Exam generated!");
-      }
+      alert("✅ Exam generated!");
 
     } catch (err) {
       console.error("Exam generation failed:", err);
+      setError(err.message || "Unexpected error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* -------------------------------------------
+     GENERATE HOMEWORK EXAM
+  ------------------------------------------- */
+  const handleGenerateHomeworkExam = async () => {
+    if (!selectedYear) {
+      alert("Please select a class year.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    setGeneratedExam(null);
+
+    try {
+      const response = await fetch(
+        `${BACKEND_URL}/generate-new-mr-homework`, // 👈 separate endpoint
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            difficulty: "medium",
+            class_year: selectedYear
+          })
+        }
+      );
+
+      const data = await response.json();
+      console.log("Homework response:", data);
+
+      if (!response.ok) {
+        throw new Error(data?.detail || "Failed to generate homework exam");
+      }
+
+      setGeneratedExam(data);
+      alert("✅ Homework exam generated!");
+
+    } catch (err) {
+      console.error("Homework generation failed:", err);
       setError(err.message || "Unexpected error occurred");
     } finally {
       setLoading(false);
@@ -96,7 +134,7 @@ export default function GenerateExam() {
       {/* NORMAL EXAM BUTTON */}
       <button
         className="primary-btn"
-        onClick={() => handleGenerateExam("exam")}
+        onClick={handleGenerateExam}
         disabled={loading || !selectedYear}
       >
         {loading ? "Generating..." : "Generate Exam"}
@@ -106,7 +144,7 @@ export default function GenerateExam() {
       <button
         className="primary-btn"
         style={{ marginTop: "10px", backgroundColor: "#4caf50" }}
-        onClick={() => handleGenerateExam("homework")}
+        onClick={handleGenerateHomeworkExam}
         disabled={loading || !selectedYear}
       >
         {loading ? "Generating..." : "Generate Exam (Homework)"}
