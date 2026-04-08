@@ -584,6 +584,7 @@ return (
       onDateChange={handleDateChange}
       onLoaded={handleReviewLoaded}
       onExit={handleExitReview}
+      mode={parentMode}
     />
 
     {reviewQuestions.length === 0 && (

@@ -7,7 +7,8 @@ export default function MathematicalReasoningReview({
   selectedExamId,
   onDateChange,
   onLoaded,
-  onExit
+  onExit,
+  mode   // ✅ RECEIVE THIS
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
 
@@ -16,38 +17,43 @@ export default function MathematicalReasoningReview({
   }, []);
 
   useEffect(() => {
-  console.log("🚀 REVIEW useEffect triggered", {
-    studentId,
-    examId
-  });
-
-  if (!studentId || !examId) {
-    console.log("⛔ Skipping fetch — missing data", {
+    console.log("🚀 REVIEW useEffect triggered", {
       studentId,
-      examId
+      examId,
+      mode
     });
-    return;
-  }
 
-  const loadReview = async () => {
-    console.log("📡 Calling review API...");
+    if (!studentId || !examId) {
+      console.log("⛔ Skipping fetch — missing data", {
+        studentId,
+        examId
+      });
+      return;
+    }
 
-    const res = await fetch(
-      `${API_BASE}/api/student/exam-review/mathematical-reasoning?student_id=${studentId}&exam_id=${examId}`
-    );
+    const loadReview = async () => {
+      console.log("📡 Calling review API...");
 
-    console.log("📥 Response received", res.status);
+      const endpoint =
+        mode === "homework"
+          ? "/api/student/homework-review/mathematical-reasoning"
+          : "/api/student/exam-review/mathematical-reasoning";
 
-    const data = await res.json();
+      const res = await fetch(
+        `${API_BASE}${endpoint}?student_id=${studentId}&exam_id=${examId}`
+      );
 
-    console.log("📦 REVIEW DATA:", data);
+      console.log("📥 Response received", res.status);
 
-    onLoaded?.(data.questions || []);
-  };
+      const data = await res.json();
 
-  loadReview();
-}, [studentId, examId, API_BASE, onLoaded]);
-  
-  
-  return null
+      console.log("📦 REVIEW DATA:", data);
+
+      onLoaded?.(data.questions || []);
+    };
+
+    loadReview();
+  }, [studentId, examId, mode, API_BASE, onLoaded]);
+
+  return null;
 }
