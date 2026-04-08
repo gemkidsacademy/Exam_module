@@ -36,7 +36,7 @@ export default function MathematicalReasoningReview({
 
       const endpoint =
         mode === "homework"
-          ? "/api/student/homework-review/mathematical-reasoning"
+          ? "/api/student/homework-review/mathematical-reasoning-new"
           : "/api/student/exam-review/mathematical-reasoning";
 
       const res = await fetch(
