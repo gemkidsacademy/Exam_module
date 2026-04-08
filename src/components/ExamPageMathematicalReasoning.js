@@ -81,8 +81,13 @@ const loadReport = useCallback(async (examId) => {
   try {
     if (!examId) return;
 
+    const endpoint =
+      parentMode === "homework"
+        ? "/api/student/homework-report/mathematical-reasoning"
+        : "/api/student/exam-report/mathematical-reasoning";
+
     const res = await fetch(
-      `${API_BASE}/api/student/exam-report/mathematical-reasoning?student_id=${studentId}&exam_id=${examId}`
+      `${API_BASE}${endpoint}?student_id=${studentId}&exam_id=${examId}`
     );
 
     if (!res.ok) {
@@ -99,7 +104,8 @@ const loadReport = useCallback(async (examId) => {
   } catch (err) {
     console.error("❌ loadReport error:", err);
   }
-}, [studentId]);
+}, [studentId, parentMode]);
+
  const loadExamDates = useCallback(async () => {
   try {
     const datesEndpoint =
