@@ -297,8 +297,8 @@ useEffect(() => {
     try {
       const endpoint =
         parentMode === "homework"
-          ? "/api/student/start-homework-math-reasoning"
-          : "/api/student/start-exam-math-reasoning";
+          ? "/api/student/start-homework-mr"
+          : "/api/student/start-exam";
 
       const res = await fetch(
         `${API_BASE}${endpoint}`,
