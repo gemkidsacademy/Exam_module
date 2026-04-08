@@ -113,8 +113,12 @@
   try {
     setQbLoading(true);
 
+    const params = new URLSearchParams({
+      class_name: quiz.className,  // 👈 ADD THIS
+    });
+
     const res = await fetch(
-      "https://web-production-481a5.up.railway.app/api/admin/question-bank-mathematical-reasoning"
+      `https://web-production-481a5.up.railway.app/api/admin/question-bank-mathematical-reasoning?${params.toString()}`
     );
 
     if (!res.ok) {
