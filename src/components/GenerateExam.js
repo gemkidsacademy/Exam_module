@@ -7,6 +7,7 @@ export default function GenerateExam() {
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
 
   const renderText = (value) => {
     if (!value) return "";
@@ -15,7 +16,15 @@ export default function GenerateExam() {
     return String(value);
   };
 
-  const handleGenerateExam = async () => {
+  /* -------------------------------------------
+     GENERATE EXAM (NORMAL / HOMEWORK)
+  ------------------------------------------- */
+  const handleGenerateExam = async (mode = "exam") => {
+    if (!selectedYear) {
+      alert("Please select a class year.");
+      return;
+    }
+
     setLoading(true);
     setError("");
     setGeneratedExam(null);
@@ -26,7 +35,11 @@ export default function GenerateExam() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ difficulty: "medium" })
+          body: JSON.stringify({
+            difficulty: "medium",
+            class_year: selectedYear,
+            mode: mode // 👈 key addition
+          })
         }
       );
 
@@ -38,6 +51,13 @@ export default function GenerateExam() {
       }
 
       setGeneratedExam(data);
+
+      if (mode === "homework") {
+        alert("✅ Homework exam generated!");
+      } else {
+        alert("✅ Exam generated!");
+      }
+
     } catch (err) {
       console.error("Exam generation failed:", err);
       setError(err.message || "Unexpected error occurred");
@@ -52,12 +72,44 @@ export default function GenerateExam() {
 
       {error && <div className="error-text">{error}</div>}
 
+      {/* YEAR DROPDOWN */}
+      <label style={{ marginTop: "10px", display: "block" }}>
+        Select Year:
+      </label>
+
+      <select
+        value={selectedYear}
+        onChange={(e) => setSelectedYear(e.target.value)}
+        style={{
+          padding: "10px",
+          width: "100%",
+          marginTop: "5px",
+          marginBottom: "15px"
+        }}
+      >
+        <option value="">-- Select Year --</option>
+        <option value="Year 3">Year 3</option>
+        <option value="Year 4">Year 4</option>
+        <option value="Year 5">Year 5</option>
+      </select>
+
+      {/* NORMAL EXAM BUTTON */}
       <button
         className="primary-btn"
-        onClick={handleGenerateExam}
-        disabled={loading}
+        onClick={() => handleGenerateExam("exam")}
+        disabled={loading || !selectedYear}
       >
         {loading ? "Generating..." : "Generate Exam"}
+      </button>
+
+      {/* HOMEWORK BUTTON */}
+      <button
+        className="primary-btn"
+        style={{ marginTop: "10px", backgroundColor: "#4caf50" }}
+        onClick={() => handleGenerateExam("homework")}
+        disabled={loading || !selectedYear}
+      >
+        {loading ? "Generating..." : "Generate Exam (Homework)"}
       </button>
 
       {generatedExam && (
@@ -74,10 +126,7 @@ export default function GenerateExam() {
           {generatedExam.questions?.length > 0 ? (
             <div className="questions-preview">
               {generatedExam.questions.map((question) => (
-                <div
-                  key={question.q_id}
-                  className="question-card"
-                >
+                <div key={question.q_id} className="question-card">
                   <strong>Q{question.q_id}.</strong>{" "}
                   {question.question_blocks?.map((block, i) => (
                     <p key={i}>{renderText(block)}</p>
@@ -101,8 +150,7 @@ export default function GenerateExam() {
                   </ul>
 
                   <div className="correct-answer">
-                    Correct Answer:{" "}
-                    {renderText(question.correct)}
+                    Correct Answer: {renderText(question.correct)}
                   </div>
                 </div>
               ))}
