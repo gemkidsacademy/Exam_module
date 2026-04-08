@@ -102,27 +102,37 @@ const loadReport = useCallback(async (examId) => {
 }, [studentId]);
  const loadExamDates = useCallback(async () => {
   try {
+    const datesEndpoint =
+      parentMode === "homework"
+        ? "/api/student/homework-dates/mathematical-reasoning"
+        : "/api/student/exam-dates/mathematical-reasoning";
+
+    const reportEndpoint =
+      parentMode === "homework"
+        ? "/api/student/homework-report/mathematical-reasoning"
+        : "/api/student/exam-report/mathematical-reasoning";
+
     const res = await fetch(
-      `${API_BASE}/api/student/exam-dates/mathematical-reasoning?student_id=${studentId}`
+      `${API_BASE}${datesEndpoint}?student_id=${studentId}`
     );
 
     const data = await res.json();
-    console.log("📅 exam dates:", data);
+    console.log("📅 dates:", data);
 
     setExamDates(data);
 
-    // 🔥 Find FIRST exam that actually has a report
+    // 🔥 Find FIRST attempt that actually has a report
     for (const exam of data) {
       const examId = exam.exam_id;
 
       const reportRes = await fetch(
-        `${API_BASE}/api/student/exam-report/mathematical-reasoning?student_id=${studentId}&exam_id=${examId}`
+        `${API_BASE}${reportEndpoint}?student_id=${studentId}&exam_id=${examId}`
       );
 
       if (reportRes.ok) {
         const reportData = await reportRes.json();
 
-        console.log("✅ Found valid report for exam:", examId);
+        console.log("✅ Found valid report for:", examId);
 
         setSelectedExamId(examId);
         setReport(reportData);
@@ -139,7 +149,7 @@ const loadReport = useCallback(async (examId) => {
   } catch (err) {
     console.error("❌ loadExamDates error:", err);
   }
-}, [studentId]);
+}, [studentId, parentMode]);
  
 const handleExitReview = () => {
   console.log("🔙 Exit Review clicked (MR)");
