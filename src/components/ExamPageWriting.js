@@ -315,6 +315,7 @@
         setTimeLeft(data.remaining_seconds);
         setExamActive(true);
         onExamStart?.();
+        setLoading(false); 
       } else {
         console.warn("⚠️ Exam started but no exam returned");
       }
