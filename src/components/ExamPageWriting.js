@@ -96,22 +96,26 @@
 };  
     const startHomeworkWriting = async () => {
   try {
-    const studentIdFromStorage = sessionStorage.getItem("student_id");
+    if (!studentId) {
+      console.error("❌ studentId missing");
+      return;
+    }
 
     const res = await fetch(
-      `${API_BASE}/api/student/start-homework-writing`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ student_id: studentId })
-      }
+      `${API_BASE}/api/student/start-homework-writing?student_id=${studentId}`,
+      { method: "POST" }
     );
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error("❌ API failed:", errText);
+      return;
+    }
 
     const meta = await res.json();
 
     console.log("🟣 START HOMEWORK WRITING:", meta);
 
-    // 🔴 already completed
     if (meta.completed === true) {
       setCompleted(true);
       setLoading(false);
@@ -120,11 +124,15 @@
       return;
     }
 
-    // 🟢 continue
+    if (!meta.homework_id) {
+      console.error("❌ Missing homework_id:", meta);
+      return;
+    }
+
     setTimeLeft(meta.remaining_time);
 
     const examRes = await fetch(
-      `${API_BASE}/api/student/homework-writing-content/${meta.exam_id}`
+      `${API_BASE}/api/student/homework-writing-content/${meta.homework_id}?student_id=${studentId}`
     );
 
     const examData = await examRes.json();
@@ -136,7 +144,7 @@
 
   } catch (err) {
     console.error("❌ startHomeworkWriting error:", err);
-  } 
+  }
 };
   
     const startExam = async () => {
