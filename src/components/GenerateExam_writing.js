@@ -58,7 +58,7 @@ export default function GenerateExam_writing() {
 
   try {
     const res = await fetch(
-      `${BACKEND_URL}/api/exams/generate-writing-homework`, // ✅ NEW ENDPOINT
+      `${BACKEND_URL}/api/exams/generate-writing-homework`, // ✅ NEW ENDPOINT /api/exams/generate-writing-homework
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

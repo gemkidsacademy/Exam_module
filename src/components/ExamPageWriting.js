@@ -30,6 +30,7 @@
 
   export default function WritingComponent({
     studentId,
+    mode: parentMode, 
     onExamStart,
     onExamFinish
   }) {
@@ -75,31 +76,68 @@
       document.body.style.height = "auto";
       document.body.style.overflowY = "auto";
     }, []);    
-      
-  
-    /* -----------------------------------------------------------
-       STEP 1 — Start writing exam session
-    ----------------------------------------------------------- */
     const loadResult = async () => {
-    console.log("🔵 loadResult() called");
-  
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/exams/writing/result?student_id=${studentId}`
-      );
-  
-      if (!res.ok) {
-        throw new Error("Failed to load writing result");
+  try {
+    const endpoint =
+      parentMode === "homework"
+        ? `/api/student/homework-writing-report?student_id=${studentId}`
+        : `/api/exams/writing/result?student_id=${studentId}`;
+
+    const res = await fetch(`${API_BASE}${endpoint}`);
+
+    if (!res.ok) throw new Error("Failed to load writing result");
+
+    const data = await res.json();
+    setResult(data);
+
+  } catch (err) {
+    console.error("❌ loadResult error:", err);
+  }
+};  
+    const startHomeworkWriting = async () => {
+  try {
+    const studentIdFromStorage = sessionStorage.getItem("student_id");
+
+    const res = await fetch(
+      `${API_BASE}/api/student/start-homework-writing`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ student_id: studentId })
       }
-  
-      const data = await res.json();
-      console.log("🔵 writing/result response:", data);
-  
-      setResult(data);
-    } catch (err) {
-      console.error("❌ loadResult error:", err);
+    );
+
+    const meta = await res.json();
+
+    console.log("🟣 START HOMEWORK WRITING:", meta);
+
+    // 🔴 already completed
+    if (meta.completed === true) {
+      setCompleted(true);
+      setLoading(false);
+      await loadResult();
+      onExamFinish?.();
+      return;
     }
-  };
+
+    // 🟢 continue
+    setTimeLeft(meta.remaining_time);
+
+    const examRes = await fetch(
+      `${API_BASE}/api/student/homework-writing-content/${meta.exam_id}`
+    );
+
+    const examData = await examRes.json();
+
+    setExam(examData.exam);
+    setExamActive(true);
+
+    onExamStart?.();
+
+  } catch (err) {
+    console.error("❌ startHomeworkWriting error:", err);
+  } 
+};
   
     const startExam = async () => {
       console.log("🟢 startExam() called");
@@ -213,6 +251,11 @@
 
   const init = async () => {
   try {
+     // 🔴 HOMEWORK FLOW
+    if (parentMode === "homework") {
+      await startHomeworkWriting();
+      return;
+    }
     // STEP 1: Try current exam
     const res = await fetch(
       `${API_BASE}/api/exams/writing/current?student_id=${studentId}`
@@ -300,8 +343,13 @@
       setSubmitting(true); // 🔒 LOCK UI IMMEDIATELY
     
       try {
+        const endpoint =
+          parentMode === "homework"
+            ? "/api/student/submit-homework-writing"
+            : "/api/exams/writing/submit";
+
         const res = await fetch(
-          `${API_BASE}/api/exams/writing/submit?student_id=${studentId}`,
+          `${API_BASE}${endpoint}?student_id=${studentId}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
