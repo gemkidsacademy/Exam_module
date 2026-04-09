@@ -11,6 +11,7 @@ export default function GenerateExam_reading() {
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [selectedClassYear, setSelectedClassYear] = useState("");
 
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
@@ -40,7 +41,46 @@ export default function GenerateExam_reading() {
 
     load();
   }, []);
+  const handleGenerateHomeworkExam = async () => {
+  if (!selectedClass || !selectedDifficulty || !selectedClassYear) {
+    alert("Please select class, difficulty, and class year.");
+    return;
+  }
 
+  setLoading(true);
+  setError("");
+  setSuccessMessage("");
+  setGeneratedExam(null);
+
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/api/exams/generate-reading-homework`, // ✅ NEW ENDPOINT
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          class_name: selectedClass,
+          class_year: selectedClassYear, // ✅ KEY
+          difficulty: selectedDifficulty
+        })
+      }
+    );
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.detail || "Homework generation failed");
+    }
+
+    setGeneratedExam(data);
+    setSuccessMessage("Homework exam created successfully.");
+
+  } catch (err) {
+    console.error(err);
+    setError("Failed to generate homework exam.");
+  } finally {
+    setLoading(false);
+  }
+};
   /* ---------------------------
      GENERATE EXAM
   --------------------------- */
@@ -96,7 +136,21 @@ export default function GenerateExam_reading() {
       
       {error && <p className="error-text">{error}</p>}
       {successMessage && <p className="success-text">{successMessage}</p>}
+      <label>Class Year:</label>
+      <select
+        value={selectedClassYear}
+        onChange={(e) => setSelectedClassYear(e.target.value)}
+      >
+        <option value="">Select Year</option>
+        <option value="Year 1">Year 1</option>
+        <option value="Year 2">Year 2</option>
+        <option value="Year 3">Year 3</option>
+      </select>
+
       <h2>Generate Reading Exam</h2>
+      <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+  
+      {/* Exam */}
       <button
         className="primary-btn"
         onClick={handleGenerateExam}
@@ -104,6 +158,22 @@ export default function GenerateExam_reading() {
       >
         {loading ? "Generating..." : "Generate Exam"}
       </button>
+
+      {/* Homework */}
+      <button
+        className="primary-btn"
+        onClick={handleGenerateHomeworkExam}
+        disabled={
+          loading ||
+          !selectedClass ||
+          !selectedDifficulty ||
+          !selectedClassYear
+        }
+      >
+        {loading ? "Generating..." : "Generate Exam (Homework)"}
+      </button>
+
+    </div>
 
       {/* Optional: keep preview logic if backend returns exam */}
       {generatedExam && (
