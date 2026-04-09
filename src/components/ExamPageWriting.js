@@ -462,8 +462,9 @@
 
           <h2>Category Evaluation</h2>
 
-          {Object.entries(evalData.categories).map(([key, data]) => (
-            <section key={key}>
+          {evalData?.categories &&
+              Object.entries(evalData.categories).map(([key, data]) => (
+              <section key={key}>
               <h3>{CATEGORY_LABELS[key]}</h3>
 
               <p>{data.score} / 5</p>
