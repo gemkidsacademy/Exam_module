@@ -4,6 +4,7 @@ import "./QuizSetup.css";
 export default function QuizSetup_reading() {
   const [quiz, setQuiz] = useState({
     className: "selective",
+    classYear: "", // ✅ NEW
     subject: "reading_comprehension",
     difficulty: "",
     numTopics: 1,
@@ -33,7 +34,52 @@ export default function QuizSetup_reading() {
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
   
+  const handleCreateHomework = async () => {
+  if (!quiz.classYear) {
+    alert("Please select class year.");
+    return;
+  }
 
+  const payload = {
+    class_name: quiz.className.trim(),
+    class_year: quiz.classYear,
+    subject: quiz.subject,
+    difficulty: quiz.difficulty,
+    topics: quiz.topics.map((t) => ({
+      name: t.name.trim(),
+      num_questions: Number(t.num_questions),
+    })),
+  };
+
+  try {
+    setLoading(true);
+
+    const response = await fetch(
+      "https://web-production-481a5.up.railway.app/api/admin/create-reading-homework", // ✅ NEW ENDPOINT
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const data = await response.json();
+    setLoading(false);
+
+    if (!response.ok) {
+      alert("Error: " + data.detail);
+      return;
+    }
+
+    alert(
+      `Reading Homework Created!\nID: ${data.id}\nCreated At: ${data.created_at}`
+    );
+  } catch (err) {
+    setLoading(false);
+    console.error(err);
+    alert("Failed to create homework.");
+  }
+};
   const handleDeleteAllQuestions = async () => {
   const confirmed = window.confirm(
     "Are you sure you want to delete all reading questions?"
@@ -260,6 +306,18 @@ export default function QuizSetup_reading() {
       <form onSubmit={handleSubmit}>
         <label>Class:</label>
         <input value="Selective" readOnly />
+        <label>Class Year:</label>
+        <select
+          name="classYear"
+          value={quiz.classYear}
+          onChange={handleInputChange}
+          required
+        >
+          <option value="">Select Year</option>
+          <option value="Year 1">Year 1</option>
+          <option value="Year 2">Year 2</option>
+          <option value="Year 3">Year 3</option>
+        </select>
 
         <label>Subject:</label>
         <input value="Reading Comprehension" readOnly />
@@ -421,6 +479,8 @@ export default function QuizSetup_reading() {
           )}
         </div>
 
+        <div style={{ display: "flex", gap: "10px" }}>
+        {/* Exam */}
         <button
           type="submit"
           disabled={
@@ -429,6 +489,18 @@ export default function QuizSetup_reading() {
         >
           {loading ? "Saving..." : "Create Reading Exam"}
         </button>
+
+        {/* Homework */}
+        <button
+          type="button"
+          onClick={handleCreateHomework}
+          disabled={
+            loading || totalQuestions < 29 || totalQuestions > 38
+          }
+        >
+          {loading ? "Saving..." : "Create Reading Homework"}
+        </button>
+      </div>
       </form>
     </div>
   );
