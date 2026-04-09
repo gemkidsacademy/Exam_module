@@ -10,6 +10,7 @@ export default function GenerateExam_writing() {
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [selectedClassYear, setSelectedClassYear] = useState("Year 6");
 
 
   const BACKEND_URL = "https://web-production-481a5.up.railway.app";
@@ -44,7 +45,43 @@ export default function GenerateExam_writing() {
 
     load();
   }, []);
+  const handleGenerateHomeworkExam = async () => {
+  if (!selectedClass || !selectedClassYear || !selectedDifficulty) {
+    alert("Quiz configuration not ready");
+    return;
+  }
 
+  setLoading(true);
+  setError("");
+  setGeneratedExam(null);
+  setSuccessMessage("");
+
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/api/exams/generate-writing-homework`, // ✅ NEW ENDPOINT
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          class_name: selectedClass,
+          class_year: selectedClassYear,
+          difficulty: selectedDifficulty
+        })
+      }
+    );
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Failed to generate homework exam");
+
+    setSuccessMessage("Writing homework exam created successfully.");
+    setGeneratedExam(data);
+  } catch (err) {
+    console.error(err);
+    setError("Network error while generating writing homework exam.");
+  } finally {
+    setLoading(false);
+  }
+};
   /* ---------------- Generate Writing Exam ---------------- */
   const handleGenerateExam = async () => {
     if (!selectedClass || !selectedDifficulty) {
@@ -91,6 +128,19 @@ export default function GenerateExam_writing() {
       {successMessage && (
         <div className="success-text">{successMessage}</div>
       )}
+      {/* CLASS YEAR */}
+      <label>Class Year:</label>
+      <select
+        value={selectedClassYear}
+        onChange={(e) => setSelectedClassYear(e.target.value)}
+        required
+      >
+        <option value="">Select Year</option>
+        <option value="Year 4">Year 4</option>
+        <option value="Year 5">Year 5</option>
+        <option value="Year 6">Year 6</option>
+        
+      </select>
       <h2>Generate Writing Exam</h2>
 
       <button
@@ -99,6 +149,14 @@ export default function GenerateExam_writing() {
         disabled={loading}
       >
         {loading ? "Generating..." : "Generate Writing Exam"}
+      </button>
+      <button
+        className="primary-btn"
+        onClick={handleGenerateHomeworkExam}
+        disabled={loading}
+        style={{ marginTop: "10px", backgroundColor: "#6c63ff" }}
+      >
+        {loading ? "Generating..." : "Generate Writing Exam (Homework)"}
       </button>
     </div>
   );
