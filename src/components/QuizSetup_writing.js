@@ -169,10 +169,10 @@ export default function QuizSetup_writing() {
           required
         >
           <option value="">Select Year</option>
-          <option value="year_1">Year 1</option>
-          <option value="year_2">Year 2</option>
-          <option value="year_3">Year 3</option>
-          <option value="year_4">Year 4</option>
+          <option value="Year 4">Year 4</option>
+          <option value="Year 5">Year 5</option>
+          <option value="Year 6">Year 6</option>
+          
         </select>
         {/* SUBJECT (LOCKED) */}
         <label>Subject:</label>
