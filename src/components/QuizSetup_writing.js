@@ -7,12 +7,56 @@ const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 export default function QuizSetup_writing() {
   const [form, setForm] = useState({
     className: "selective",
+    classYear: "",
     topic: "",
     difficulty: ""
   });
 
   const [loading, setLoading] = useState(false);
   const [availableTopics, setAvailableTopics] = useState([]);
+  const handleHomeworkSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!form.className || !form.classYear || !form.topic.trim() || !form.difficulty) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    const payload = {
+      class_name: form.className,
+      class_year: form.classYear,
+      subject: "writing",
+      topic: form.topic.trim(),
+      difficulty: form.difficulty
+    };
+
+    try {
+      setLoading(true);
+
+      const res = await fetch(
+        `${BACKEND_URL}/api/quizzes-writing-homework`, // ✅ DIFFERENT ENDPOINT
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.detail || "Failed to save writing homework exam");
+      }
+
+      alert("✅ Writing Homework exam saved!");
+
+    } catch (err) {
+      console.error(err);
+      alert("❌ Error saving writing homework exam.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   const handleChange = (e) => {
@@ -26,13 +70,14 @@ export default function QuizSetup_writing() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.className || !form.topic.trim() || !form.difficulty) {
+     if (!form.className || !form.classYear || !form.topic.trim() || !form.difficulty) {
       alert("Please fill in all required fields.");
       return;
     }
 
     const payload = {
       class_name: form.className,
+      class_year: form.classYear,
       subject: "writing",   // canonical API key
       topic: form.topic.trim(),
       difficulty: form.difficulty
@@ -115,6 +160,20 @@ export default function QuizSetup_writing() {
           readOnly
           style={{ backgroundColor: "#f0f0f0" }}
         />
+        {/* CLASS YEAR */}
+        <label>Class Year:</label>
+        <select
+          name="classYear"
+          value={form.classYear}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Select Year</option>
+          <option value="year_1">Year 1</option>
+          <option value="year_2">Year 2</option>
+          <option value="year_3">Year 3</option>
+          <option value="year_4">Year 4</option>
+        </select>
         {/* SUBJECT (LOCKED) */}
         <label>Subject:</label>
         <input
@@ -159,6 +218,14 @@ export default function QuizSetup_writing() {
         {/* SUBMIT */}
         <button type="submit" disabled={loading}>
           {loading ? "Saving..." : "Save Writing Exam"}
+        </button>
+        <button
+          type="button"
+          onClick={handleHomeworkSubmit}
+          disabled={loading}
+          style={{ marginTop: "10px", backgroundColor: "#6c63ff", color: "white" }}
+        >
+          {loading ? "Saving..." : "Save Writing Exam (Homework)"}
         </button>
       </form>
     </div>
