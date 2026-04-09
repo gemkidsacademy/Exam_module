@@ -284,7 +284,7 @@
     try {
       const endpoint =
         parentMode === "homework"
-          ? "/api/student/homework-review/reading"
+          ? "/api/student/homework-review-by-session/reading"
           : "/api/exams/review-reading";
 
       const res = await fetch(
