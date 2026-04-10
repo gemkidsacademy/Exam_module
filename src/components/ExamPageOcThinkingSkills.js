@@ -357,26 +357,30 @@ useEffect(() => {
   setMode("exam"); // reuse same UI
 
   const startHomework = async () => {
-    const res = await fetch(
-      `${API_BASE}/api/student/start-homework-oc-thinking-skills`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ student_id: studentId })
-      }
-    );
+  const res = await fetch(
+    `${API_BASE}/api/student/start-homework-oc-thinking-skills`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ student_id: studentId })
+    }
+  );
 
-    const data = await res.json();
+  const data = await res.json();
 
-    console.log("📘 HOMEWORK RESPONSE:", data);
+  console.log("📘 HOMEWORK RESPONSE:", data);
 
-    setQuestions(data.questions || []);
-    setTimeLeft(data.remaining_time); // ✅ no timer
-    onExamStart?.();
-  };
+  // 🔥 ADD THIS BLOCK (CRITICAL)
+  if (data.completed === true) {
+    await loadReport();
+    return;
+  }
 
-  startHomework();
-}, [studentId, parentMode]);
+  setQuestions(data.questions || []);
+  setTimeLeft(data.remaining_time);
+  onExamStart?.();
+};
+
 useEffect(() => {
   if (mode !== "exam") {
     hasStartedRef.current = false;
