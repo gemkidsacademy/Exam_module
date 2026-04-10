@@ -20,10 +20,17 @@ export default function ExamPageOcThinkingSkills({
 const studentId = sessionStorage.getItem("student_id");
 console.log("🔥 parentMode (child):", parentMode);
 const [attempts, setAttempts] = useState([]);
- const loadAttempts = useCallback(async () => {
+const loadAttempts = useCallback(async () => {
   try {
+    const endpoint =
+      parentMode === "homework"
+        ? "/api/student/homework-attempts/oc-thinking-skills"
+        : "/api/student/exam-attempts/oc-thinking-skills";
+
+    console.log("📡 Fetching attempts from:", endpoint);
+
     const res = await fetch(
-      `${API_BASE}/api/student/exam-attempts/oc-thinking-skills?student_id=${studentId}`
+      `${API_BASE}${endpoint}?student_id=${studentId}`
     );
 
     if (!res.ok) {
@@ -40,7 +47,7 @@ const [attempts, setAttempts] = useState([]);
   } catch (err) {
     console.error("❌ loadAttempts error:", err);
   }
-}, [studentId]);
+}, [studentId, parentMode]); 
 const isPopNavigationRef = useRef(false);
 const formatExplanation = (text) => {
   if (!text) return "";
