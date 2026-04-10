@@ -16,6 +16,7 @@ export default function QuizSetupOCThinkingSkills() {
 
   const [quiz, setQuiz] = useState({
     className: "oc",
+    classYear: "", // ✅ NEW
     subject: "thinking_skills",
     difficulty: "",
     numTopics: 1,
@@ -25,6 +26,59 @@ export default function QuizSetupOCThinkingSkills() {
   /* ============================
      HELPERS
   ============================ */
+  const handleCreateHomeworkExam = async () => {
+    if (!quiz.classYear) {
+      alert("Please select class year.");
+      return;
+    }
+
+    if (!quiz.difficulty) {
+      alert("Please select difficulty.");
+      return;
+    }
+
+    if (quiz.topics.length === 0) {
+      alert("Generate topics first.");
+      return;
+    }
+
+    if (totalQuestions !== MAX_QUESTIONS) {
+      alert(`Total must be exactly ${MAX_QUESTIONS}.`);
+      return;
+    }
+
+    const payload = {
+      class_name: quiz.className,
+      class_year: quiz.classYear,
+      subject: quiz.subject,
+      difficulty: quiz.difficulty,
+      num_topics: quiz.topics.length,
+      topics: quiz.topics.map((t) => ({
+        name: t.name.trim(),
+        ai: Number(t.ai),
+        db: Number(t.db),
+        total: Number(t.total),
+      })),
+    };
+
+    try {
+      const res = await fetch(
+        "https://web-production-481a5.up.railway.app/api/quizzes/oc-thinking-skills-homework", // ✅ NEW ENDPOINT
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to save homework exam");
+
+      alert("Homework Exam created successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Error saving homework exam.");
+    }
+  };
 
   const getUsedTopicNames = (currentIndex) => {
     return quiz.topics
@@ -233,6 +287,18 @@ export default function QuizSetupOCThinkingSkills() {
       <form onSubmit={handleSubmit}>
         <label>Class:</label>
         <input type="text" value="OC" readOnly />
+        <label>Class Year:</label>
+        <select
+          name="classYear"
+          value={quiz.classYear}
+          onChange={handleInputChange}
+          required
+        >
+          <option value="">Select Year</option>
+          <option value="Year 3">Year 3</option>
+          <option value="Year 4">Year 4</option>
+          
+        </select>
 
         <label>Subject:</label>
         <input type="text" value="Thinking Skills" readOnly />
@@ -354,6 +420,13 @@ export default function QuizSetupOCThinkingSkills() {
 
         <button type="submit" disabled={totalQuestions > MAX_QUESTIONS}>
           Create Exam
+        </button>
+        <button
+          type="button"
+          onClick={handleCreateHomeworkExam}
+          disabled={totalQuestions > MAX_QUESTIONS}
+        >
+          Create Exam (Homework)
         </button>
       </form>
     </div>
