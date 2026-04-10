@@ -97,6 +97,15 @@ const OCDashboard = () => {
             >
               Historical reports
             </button>
+            <button
+              className="subject-button"
+              onClick={() => {
+                setExamMode("homework");   // ✅ NEW MODE
+                setExamPhase("selection");
+              }}
+            >
+              Homework exams
+            </button>
 
           </div>
         </div>
