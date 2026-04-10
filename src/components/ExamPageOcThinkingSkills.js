@@ -371,7 +371,7 @@ useEffect(() => {
     console.log("📘 HOMEWORK RESPONSE:", data);
 
     setQuestions(data.questions || []);
-    setTimeLeft(null); // ✅ no timer
+    setTimeLeft(data.remaining_time); // ✅ no timer
     onExamStart?.();
   };
 
