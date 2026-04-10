@@ -552,6 +552,7 @@ return (
   key={examAttemptId}   // 🔥 CRITICAL FIX
   studentId={studentId}
   examAttemptId={examAttemptId}
+  parentMode={parentMode} 
   onLoaded={handleReviewLoaded}
 />
 )}

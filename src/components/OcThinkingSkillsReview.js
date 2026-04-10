@@ -5,6 +5,7 @@ import styles from "./ThinkingSkillsReview.module.css";
 export default function OcThinkingSkillsReview({
   studentId,
   examAttemptId,
+  parentMode, 
   onLoaded
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
@@ -16,7 +17,12 @@ export default function OcThinkingSkillsReview({
 
     const loadReview = async () => {
       try {
-        let url = `${API_BASE}/api/student/exam-review/oc-thinking-skills?student_id=${studentId}`;
+        const endpoint =
+          parentMode === "homework"
+            ? "/api/student/homework-review/oc-thinking-skills"
+            : "/api/student/exam-review/oc-thinking-skills";
+
+        let url = `${API_BASE}${endpoint}?student_id=${studentId}`;
 
         if (examAttemptId !== null && examAttemptId !== undefined) {
           url += `&exam_attempt_id=${examAttemptId}`;
@@ -60,7 +66,7 @@ export default function OcThinkingSkillsReview({
 
     loadReview();
 
-  }, [studentId, examAttemptId, API_BASE]);
+  }, [studentId, examAttemptId, API_BASE, parentMode]);
 
   return (
     <p className={styles.loading}>
