@@ -306,7 +306,8 @@ useEffect(() => {
 ============================================================ */
 useEffect(() => {
   if (!studentId) return;
-  if (parentMode !== "exam") return; 
+  if (parentMode !== "exam") return;
+  if (!parentMode) return;  
   if (hasStartedRef.current) return;   // 🔒 prevent double call
 
   hasStartedRef.current = true;
@@ -347,6 +348,7 @@ useEffect(() => {
 }, [studentId, parentMode]);
 useEffect(() => {
   if (!studentId) return;
+  if (!parentMode) return; 
   if (parentMode !== "homework") return;
   if (hasStartedRef.current) return;
 
@@ -478,10 +480,7 @@ const formatTime = (seconds) => {
    RENDER
 ============================================================ */
 
-if (!parentMode) {
-  console.log("⛔ parentMode not ready yet");
-  return <p className="loading">Initializing...</p>;
-}
+
 const activeQuestions = questions;
 const handleReviewLoaded = useCallback((qs) => {
   setQuestions(qs);
