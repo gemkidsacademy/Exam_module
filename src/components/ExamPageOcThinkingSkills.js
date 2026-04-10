@@ -183,7 +183,10 @@ const [report, setReport] = useState(null);
 ============================================================ */
 const loadReport = useCallback(async (attemptId = null) => {
   try {
-    let url = `${API_BASE}/api/student/exam-report/oc-thinking-skills?student_id=${studentId}`;
+    let url =
+      parentMode === "homework"
+        ? `${API_BASE}/api/student/homework-report/oc-thinking-skills?student_id=${studentId}`
+        : `${API_BASE}/api/student/exam-report/oc-thinking-skills?student_id=${studentId}`;
 
     if (attemptId !== null && attemptId !== undefined) {
       url += `&exam_attempt_id=${attemptId}`;
@@ -212,14 +215,15 @@ const loadReport = useCallback(async (attemptId = null) => {
   if (!studentId) return;
   if (mode !== "loading") return;
 
-  // 🔥 REPORT PRIORITY
+  // 🟣 REPORT MODE
   if (parentMode === "report") {
-    loadReport();   // this sets mode = "report"
+    loadReport();
     return;
   }
 
-  // ❗ DO NOTHING for exam
+ 
 
+  // 🟢 EXAM MODE handled separately
 }, [studentId, parentMode, mode, loadReport]);
 useEffect(() => {
   setExplanation(null);
@@ -341,6 +345,36 @@ useEffect(() => {
   startExam();
 }, [studentId, parentMode]);
 useEffect(() => {
+  if (!studentId) return;
+  if (parentMode !== "homework") return;
+  if (hasStartedRef.current) return;
+
+  hasStartedRef.current = true;
+
+  setMode("exam"); // reuse same UI
+
+  const startHomework = async () => {
+    const res = await fetch(
+      `${API_BASE}/api/student/start-homework-oc-thinking-skills`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ student_id: studentId })
+      }
+    );
+
+    const data = await res.json();
+
+    console.log("📘 HOMEWORK RESPONSE:", data);
+
+    setQuestions(data.questions || []);
+    setTimeLeft(null); // ✅ no timer
+    onExamStart?.();
+  };
+
+  startHomework();
+}, [studentId, parentMode]);
+useEffect(() => {
   if (mode !== "exam") {
     hasStartedRef.current = false;
   }
@@ -359,14 +393,16 @@ async (reason = "submitted") => {
   };
 
   try {
-    await fetch(
-      `${API_BASE}/api/student/finish-exam/oc-thinking-skills`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      }
-    );
+    const endpoint =
+      parentMode === "homework"
+        ? "/api/student/submit-homework-oc-thinking-skills"
+        : "/api/student/finish-exam/oc-thinking-skills";
+
+    await fetch(`${API_BASE}${endpoint}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
 
     await loadReport();
 
