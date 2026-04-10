@@ -18,6 +18,7 @@ export default function ExamPageOcThinkingSkills({
   onExamFinish
 }) {
 const studentId = sessionStorage.getItem("student_id");
+console.log("🔥 parentMode (child):", parentMode);
 const [attempts, setAttempts] = useState([]);
  const loadAttempts = useCallback(async () => {
   try {
@@ -477,7 +478,10 @@ const formatTime = (seconds) => {
    RENDER
 ============================================================ */
 
-
+if (!parentMode) {
+  console.log("⛔ parentMode not ready yet");
+  return <p className="loading">Initializing...</p>;
+}
 const activeQuestions = questions;
 const handleReviewLoaded = useCallback((qs) => {
   setQuestions(qs);
