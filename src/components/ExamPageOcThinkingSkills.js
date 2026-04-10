@@ -381,6 +381,8 @@ useEffect(() => {
   onExamStart?.();
 };
 
+  startHomework();
+}, [studentId, parentMode]);
 useEffect(() => {
   if (mode !== "exam") {
     hasStartedRef.current = false;
