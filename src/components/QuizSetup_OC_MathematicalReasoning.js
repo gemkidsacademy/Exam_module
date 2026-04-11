@@ -10,6 +10,7 @@ export default function QuizSetup_OC_MathematicalReasoning() {
   const [quiz, setQuiz] = useState({
     className: "oc", // ✅ OC
     subject: "mathematical_reasoning", // ⚠️ keep consistent with backend
+    classYear: "",
     difficulty: "",
     numTopics: 1,
     topics: [],
@@ -162,7 +163,64 @@ export default function QuizSetup_OC_MathematicalReasoning() {
   /* ============================
      SUBMIT
   ============================ */
+  const handleSubmitHomework_OC_MR = async () => {
+  if (!quiz.difficulty) {
+    alert("Select difficulty");
+    return;
+  }
 
+  if (!quiz.classYear) {
+    alert("Select class year");
+    return;
+  }
+
+  if (quiz.topics.length === 0) {
+    alert("Generate topics first");
+    return;
+  }
+
+  if (totalQuestions !== 35) {
+    alert("Total must be 35");
+    return;
+  }
+
+  const payload = {
+    class_name: quiz.className,
+    subject: quiz.subject,
+    class_year: quiz.classYear, // ✅ included
+    difficulty: quiz.difficulty,
+    num_topics: quiz.topics.length,
+    topics: quiz.topics.map((t) => ({
+      name: t.name.trim(),
+      ai: Number(t.ai),
+      db: Number(t.db),
+      total: Number(t.total),
+    })),
+  };
+
+  try {
+    const res = await fetch(
+      "https://web-production-481a5.up.railway.app/api/quizzes/oc-mathematical-reasoning-homework", // ✅ NEW ENDPOINT
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.json();
+      console.error(err);
+      throw new Error("Failed");
+    }
+
+    await res.json();
+    alert("OC Mathematical Reasoning Homework created!");
+  } catch (err) {
+    console.error(err);
+    alert("Error saving homework");
+  }
+};
   const handleSubmit_OC_MR = async (e) => {
     e.preventDefault();
 
@@ -231,6 +289,18 @@ export default function QuizSetup_OC_MathematicalReasoning() {
 
         <label>Subject:</label>
         <input type="text" value="Mathematical Reasoning" disabled />
+        <label>Class Year:</label>
+        <select
+          name="classYear"
+          value={quiz.classYear || ""}
+          onChange={handleInputChange_OC_MR}
+          required
+        >
+          <option value="">Select Class Year</option>
+          <option value="Year 3">Year 3</option>
+          <option value="Year 4">Year 4</option>
+          
+        </select>
 
         <label>Difficulty Level:</label>
         <select
@@ -353,6 +423,13 @@ export default function QuizSetup_OC_MathematicalReasoning() {
 
         <button type="submit">
           Create OC Mathematical Reasoning Exam
+        </button>
+        <button
+          type="button"
+          onClick={handleSubmitHomework_OC_MR}
+          style={{ marginTop: "10px", backgroundColor: "#28a745", color: "white" }}
+        >
+          Create OC Mathematical Reasoning (Homework)
         </button>
       </form>
     </div>
