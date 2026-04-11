@@ -8,6 +8,7 @@ const GenerateExam_oc_reading = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [classYear, setClassYear] = useState("");
 
   /* ---------------------------
      LOAD QUIZ CONFIGS
@@ -34,7 +35,45 @@ const GenerateExam_oc_reading = () => {
 
     load();
   }, []);
+  const handleGenerateHomeworkExam = async () => {
+  if (!className || !difficulty || !classYear) {
+    setMessage("Config not loaded yet or class year missing...");
+    return;
+  }
 
+  try {
+    setLoading(true);
+    setMessage("");
+
+    const response = await fetch(
+      `${BACKEND_URL}/api/exams/generate-oc-reading-homework`, // ✅ NEW ENDPOINT
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          class_name: className,
+          difficulty: difficulty,
+          class_year: classYear, // ✅ IMPORTANT
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+      setMessage("✅ OC Reading Homework generated successfully");
+    } else {
+      setMessage(data.detail || "❌ Failed to generate homework");
+    }
+  } catch (error) {
+    console.error(error);
+    setMessage("❌ Server error while generating homework");
+  } finally {
+    setLoading(false);
+  }
+};
   const handleGenerateExam = async () => {
     if (!className || !difficulty) {
       setMessage("Config not loaded yet...");
@@ -79,13 +118,28 @@ const GenerateExam_oc_reading = () => {
       <h2>Generate OC Reading Exam</h2>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
-
+      <label>Class Year:</label>
+      <select
+        value={classYear}
+        onChange={(e) => setClassYear(e.target.value)}
+      >
+        <option value="">Select</option>
+        <option value="3">Year 3</option>
+        <option value="4">Year 4</option>
+      </select>
       <button
         className="dashboard-button"
         onClick={handleGenerateExam}
         disabled={loading || !className}
       >
         {loading ? "Generating..." : "Generate Exam"}
+      </button>
+      <button
+        className="dashboard-button"
+        onClick={handleGenerateHomeworkExam}
+        disabled={loading || !className}
+      >
+        {loading ? "Generating..." : "Generate Exam (Homework)"}
       </button>
 
       {message && <p style={{ marginTop: "15px" }}>{message}</p>}
