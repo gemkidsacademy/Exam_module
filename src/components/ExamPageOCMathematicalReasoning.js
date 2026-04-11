@@ -545,6 +545,7 @@ const reviewLoader = isReview && (
     studentId={studentId}
     attemptId={selectedAttemptId}
     onLoaded={handleReviewLoaded}
+    mode={parentMode} 
   />
 );
 
