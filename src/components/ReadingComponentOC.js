@@ -12,6 +12,7 @@ export default function ReadingComponentOC({
   const isPopNavigationRef = useRef(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   console.log("🔗 API_BASE:", API_BASE);
+
   if (!API_BASE) {
    console.error("❌ REACT_APP_API_URL is not defined");
   }
@@ -34,6 +35,27 @@ export default function ReadingComponentOC({
   const [attemptId, setAttemptId] = useState(null);
   const [mode, setMode] = useState("loading");
   const [reviewQuestions, setReviewQuestions] = useState([]);
+  const isHomework = parentMode === "homework";
+
+  const START_ENDPOINT = isHomework
+    ? "/api/exams/start-oc-reading-homework"
+    : "/api/exams/start-oc-reading";
+
+  const SUBMIT_ENDPOINT = isHomework
+    ? "/api/exams/submit-oc-reading-homework"
+    : "/api/exams/submit-oc-reading";
+
+  const REPORT_ENDPOINT = isHomework
+    ? "/api/exams/oc-reading-homework-report"
+    : "/api/exams/oc-reading-report";
+
+  const ATTEMPTS_ENDPOINT = isHomework
+    ? "/api/exams/oc-reading-homework-attempts"
+    : "/api/exams/oc-reading-attempts";
+
+  const REVIEW_ENDPOINT = isHomework
+    ? "/api/exams/review-oc-reading-homework"
+    : "/api/exams/review-oc-reading";
   const loadAttemptDates = async (sid) => {
   try {
     console.log("📅 Fetching attempt dates for student:", sid);
@@ -120,7 +142,7 @@ export default function ReadingComponentOC({
 
   try {
     const res = await fetch(
-      `${API_BASE}/api/exams/review-oc-reading?session_id=${sessionToUse}`
+      `${API_BASE}${REVIEW_ENDPOINT}?session_id=${sessionToUse}`
     );
 
     if (!res.ok) {
@@ -156,7 +178,7 @@ export default function ReadingComponentOC({
     setLoadingReport(true);
 
     const res = await fetch(
-      `${API_BASE}/api/exams/oc-reading-report?session_id=${sessionId}`
+      `${API_BASE}${REPORT_ENDPOINT}?session_id=${sessionId}`
     );
 
     if (!res.ok) {
@@ -230,7 +252,7 @@ export default function ReadingComponentOC({
 
       try {
         const res = await fetch(
-          `${API_BASE}/api/exams/oc-reading-attempts?student_id=${studentId}`
+          `${API_BASE}${ATTEMPTS_ENDPOINT}?student_id=${studentId}`
         );
 
         const data = await res.json();
@@ -283,7 +305,7 @@ export default function ReadingComponentOC({
   if (parentMode === "report") return;
 
 // 🔥 ONLY EXAM MODE
-  if (parentMode !== "exam") return;
+  if (parentMode !== "exam" && parentMode !== "homework") return;
 
 // 🔥 ONLY INITIAL LOAD
   if (mode !== "loading") return;
@@ -292,7 +314,7 @@ export default function ReadingComponentOC({
   const loadExam = async () => {
     // 1️⃣ Start / resume attempt
     const res = await fetch(
-      `${API_BASE}/api/exams/start-oc-reading`,
+      `${API_BASE}${START_ENDPOINT}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -505,7 +527,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
 
   try {
     const res = await fetch(
-      `${API_BASE}/api/exams/submit-oc-reading`,
+      `${API_BASE}${SUBMIT_ENDPOINT}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
