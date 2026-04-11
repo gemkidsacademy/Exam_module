@@ -64,7 +64,7 @@ export default function ReadingComponentOC({
     console.log("📅 Fetching attempt dates for student:", sid);
 
     const res = await fetch(
-      `${API_BASE}/api/exams/oc-reading-attempts?student_id=${sid}`
+      `${API_BASE}${ATTEMPTS_ENDPOINT}?student_id=${sid}`
     );
 
     if (!res.ok) {
@@ -585,6 +585,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
       selectedSessionId={selectedSessionId}
       setSelectedSessionId={setSelectedSessionId}
       onSessionChange={handleReviewExam}   // 🔥 important
+      mode={parentMode}
       onExit={() => {
         setReviewQuestions([]);
         setMode("exam");

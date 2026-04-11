@@ -13,6 +13,7 @@ export default function ReadingReviewOC({
   selectedSessionId,
   setSelectedSessionId,
   onSessionChange,
+  mode,
   onExit
 }) {
   const [index, setIndex] = useState(0);
