@@ -114,31 +114,38 @@
     LOAD REPORT (ONLY WHEN EXAM IS COMPLETED)
   ============================================================ */
   const loadAttempts = async () => {
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/student/exam-attempts/oc-mathematical-reasoning?student_id=${studentId}`
-      );
+  try {
+    const endpoint =
+      parentMode === "homework"
+        ? "/api/student/homework-attempts/oc-mathematical-reasoning"
+        : "/api/student/exam-attempts/oc-mathematical-reasoning";
 
-      if (!res.ok) {
-        console.warn("⚠️ Failed to load attempts");
-        return;
-      }
+    const res = await fetch(
+      `${API_BASE}${endpoint}?student_id=${studentId}`
+    );
 
-      const data = await res.json();
-
-      console.log("📅 attempts loaded:", data);
-
-      setAttempts(data.attempts || []);
-
-      // ✅ set default selected attempt
-      if (!selectedAttemptId && data.attempts?.length > 0) {
-        setSelectedAttemptId(data.attempts[0].attempt_id);
-      }
-
-    } catch (err) {
-      console.error("❌ loadAttempts error:", err);
+    if (!res.ok) {
+      console.warn(`⚠️ Failed to load ${parentMode} attempts`);
+      return;
     }
-  };
+
+    const data = await res.json();
+
+    console.log(`📅 ${parentMode} attempts loaded:`, data);
+
+    const attemptsList = data.attempts || [];
+    setAttempts(attemptsList);
+
+    // ✅ set default selected attempt
+    if (!selectedAttemptId && attemptsList.length > 0) {
+      setSelectedAttemptId(attemptsList[0].attempt_id);
+    }
+
+  } catch (err) {
+    console.error(`❌ loadAttempts (${parentMode}) error:`, err);
+  }
+};
+
   const loadReport = useCallback(async (attemptId = null) => {
     try {
       let url = `${API_BASE}/api/student/exam-report/oc-mathematical-reasoning?student_id=${studentId}`;
