@@ -277,25 +277,31 @@
     // 🔥 HARD BLOCK FIRST
   if (parentMode === "report") return;
   
-  // 🔥 ONLY exam allowed
-  if (parentMode !== "exam") return;
+  // ✅ Allow BOTH exam + homework
+  if (parentMode !== "exam" && parentMode !== "homework") return;
   
   // 🔥 ONLY initial run
   if (mode !== "loading") return;
 
   const startExam = async () => {
     try {
-      const res = await fetch(
-        `${API_BASE}/api/student/start-exam-oc-mathematical-reasoning`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ student_id: studentId })
-        }
-      );
+      const endpoint =
+        parentMode === "homework"
+          ? "/api/student/start-homework-oc-mathematical-reasoning"
+          : "/api/student/start-exam-oc-mathematical-reasoning";
+
+      const body = {
+        student_id: studentId
+      };
+
+      const res = await fetch(`${API_BASE}${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
 
       const data = await res.json();
-      console.log("📥 start-exam:", data);
+      console.log(`📥 start-${parentMode}:`, data);
 
       if (data.completed === true) {
         setMode("report");
@@ -381,14 +387,17 @@
       console.log("📤 finish-exam payload:", payload);
 
       try {
-        const res = await fetch(
-          `${API_BASE}/api/student/finish-exam-oc-mathematical-reasoning`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          }
-        );
+        const endpoint =
+          parentMode === "homework"
+            ? "/api/student/finish-homework-oc-mathematical-reasoning"
+            : "/api/student/finish-exam-oc-mathematical-reasoning";
+
+        
+        const res = await fetch(`${API_BASE}${endpoint}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
 
         const data = await res.json();
 
