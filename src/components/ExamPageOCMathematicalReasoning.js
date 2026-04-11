@@ -147,33 +147,35 @@
 };
 
   const loadReport = useCallback(async (attemptId = null) => {
-    try {
-      let url = `${API_BASE}/api/student/exam-report/oc-mathematical-reasoning?student_id=${studentId}`;
+  try {
+    const endpoint =
+      parentMode === "homework"
+        ? "/api/student/homework-report/oc-mathematical-reasoning"
+        : "/api/student/exam-report/oc-mathematical-reasoning";
 
-      if (attemptId) {
-        url += `&attempt_id=${attemptId}`;
-      }
+    let url = `${API_BASE}${endpoint}?student_id=${studentId}`;
 
-      const res = await fetch(url);
-
-      if (!res.ok) {
-        console.warn("⚠️ Report not available yet");
-        return;
-      }
-
-      const data = await res.json();
-      
-
-      
-      console.log("📊 report loaded:", data);
-
-      setReport(data);
-      
-      
-    } catch (err) {
-      console.error("❌ loadReport error:", err);
+    if (attemptId) {
+      url += `&attempt_id=${attemptId}`;
     }
-  }, [studentId]);
+
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      console.warn(`⚠️ ${parentMode} report not available yet`);
+      return;
+    }
+
+    const data = await res.json();
+
+    console.log(`📊 ${parentMode} report loaded:`, data);
+
+    setReport(data);
+
+  } catch (err) {
+    console.error(`❌ loadReport (${parentMode}) error:`, err);
+  }
+}, [studentId, parentMode]);
   useEffect(() => {
   if (!studentId) return;
 
