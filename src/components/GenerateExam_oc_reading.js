@@ -124,8 +124,8 @@ const GenerateExam_oc_reading = () => {
         onChange={(e) => setClassYear(e.target.value)}
       >
         <option value="">Select</option>
-        <option value="3">Year 3</option>
-        <option value="4">Year 4</option>
+        <option value="Year 3">Year 3</option>
+        <option value="Year 4">Year 4</option>
       </select>
       <button
         className="dashboard-button"
