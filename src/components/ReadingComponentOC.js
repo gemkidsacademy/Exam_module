@@ -56,6 +56,9 @@ export default function ReadingComponentOC({
   const REVIEW_ENDPOINT = isHomework
     ? "/api/exams/review-oc-reading-homework"
     : "/api/exams/review-oc-reading";
+  const CONTENT_ENDPOINT = isHomework
+  ? `/api/exams/reading-content-homework`
+  : `/api/exams/reading-content`;
   const loadAttemptDates = async (sid) => {
   try {
     console.log("📅 Fetching attempt dates for student:", sid);
@@ -346,7 +349,7 @@ export default function ReadingComponentOC({
 
     // 2️⃣ Fetch exam content (NEW)
     const examRes = await fetch(
-      `${API_BASE}/api/exams/reading-content/${meta.exam_id}`
+      `${API_BASE}${CONTENT_ENDPOINT}/${meta.exam_id}`
     );
 
     const examData = await examRes.json();
