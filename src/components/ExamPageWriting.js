@@ -503,7 +503,10 @@
       <div style={{ marginTop: "12px" }}>
         <button
           disabled={!attemptId}
-          onClick={() => navigate(`/writing-review/${attemptId}?mode=${parentMode}`)}
+          onClick={() => {
+            console.log("👉 navigating to:", `/writing-review/${attemptId}?mode=${parentMode}`);
+            navigate(`/writing-review/${attemptId}?mode=${parentMode}`);
+          }}
           style={{
             backgroundColor: "#2E7D32",
             color: "white",
