@@ -97,10 +97,10 @@
           setHistory(data);
 
           // default = latest snapshot (first item)
-          if (data.length > 0) {
+          if (data.length > 0 && !selectedAttempt) {
             const latestId = data[0].attempt_id;
             setSelectedAttempt(latestId);
-            loadResultByAttempt(latestId);
+            
           }
         })
         .catch(err => {
@@ -501,9 +501,11 @@
         </span>
       </p>
       <div style={{ marginTop: "12px" }}>
+        
         <button
           disabled={!attemptId}
           onClick={() => {
+            
             console.log("👉 navigating to:", `/writing-review/${attemptId}?mode=${parentMode}`);
             navigate(`/writing-review/${attemptId}?mode=${parentMode}`);
           }}
