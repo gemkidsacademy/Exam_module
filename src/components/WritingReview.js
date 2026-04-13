@@ -3,28 +3,82 @@ import { useParams } from "react-router-dom";
 
 const API_BASE = process.env.REACT_APP_API_URL;
 
-export default function WritingReview() {
+export default function WritingReview({ studentId }) {
   const { attemptId } = useParams();
 
+  const [history, setHistory] = useState([]);
+  const [selectedAttempt, setSelectedAttempt] = useState(null);
   const [essay, setEssay] = useState("");
   const [loading, setLoading] = useState(true);
 
+  // --------------------------------------------------
+  // Load history (dropdown)
+  // --------------------------------------------------
   useEffect(() => {
-    fetch(`${API_BASE}/api/student/writing/review/${attemptId}`)
+    fetch(`${API_BASE}/api/exams/writing/history?student_id=${studentId}`)
+      .then(res => res.json())
+      .then(data => {
+        setHistory(data);
+
+        if (data.length > 0) {
+          const initialId = attemptId || data[0].attempt_id;
+          setSelectedAttempt(initialId);
+        }
+      })
+      .catch(() => {});
+  }, [studentId, attemptId]);
+
+  // --------------------------------------------------
+  // Load essay when attempt changes
+  // --------------------------------------------------
+  useEffect(() => {
+    if (!selectedAttempt) return;
+
+    setLoading(true);
+
+    fetch(`${API_BASE}/api/student/writing/review/${selectedAttempt}`)
       .then(res => res.json())
       .then(data => {
         setEssay(data.essay_text || "");
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [attemptId]);
+  }, [selectedAttempt]);
 
+  // --------------------------------------------------
+  // Loading state
+  // --------------------------------------------------
   if (loading) return <div>Loading essay...</div>;
 
+  // --------------------------------------------------
+  // UI
+  // --------------------------------------------------
   return (
     <div style={{ padding: "32px", maxWidth: "800px", margin: "auto" }}>
+      
       <h1>Your Writing</h1>
 
+      {/* ✅ Dropdown */}
+      <select
+        value={selectedAttempt || ""}
+        onChange={(e) => {
+          const id = Number(e.target.value);
+          setSelectedAttempt(id);
+        }}
+        style={{
+          padding: "8px",
+          marginBottom: "16px",
+          borderRadius: "6px"
+        }}
+      >
+        {history.map(item => (
+          <option key={item.attempt_id} value={item.attempt_id}>
+            {item.date} — Score: {item.score}
+          </option>
+        ))}
+      </select>
+
+      {/* ✅ Essay Display */}
       <div
         style={{
           background: "white",
