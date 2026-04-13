@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 const API_BASE = process.env.REACT_APP_API_URL;
 
 export default function WritingReview() {
-  const studentId = localStorage.getItem("student_id");
   const { attemptId } = useParams();
 
   const [history, setHistory] = useState([]);
@@ -13,21 +12,23 @@ export default function WritingReview() {
   const [loading, setLoading] = useState(true);
 
   // --------------------------------------------------
-  // Load history (dropdown)
+  // Load history USING attempt_id (NEW ENDPOINT)
   // --------------------------------------------------
   useEffect(() => {
-    fetch(`${API_BASE}/api/exams/writing/history?student_id=${studentId}`)
+    if (!attemptId) return;
+
+    fetch(`${API_BASE}/api/exams/writing/history-by-attempt?attempt_id=${attemptId}`)
       .then(res => res.json())
       .then(data => {
         setHistory(data);
 
         if (data.length > 0) {
-          const initialId = attemptId || data[0].attempt_id;
+          const initialId = Number(attemptId) || data[0].attempt_id;
           setSelectedAttempt(initialId);
         }
       })
       .catch(() => {});
-  }, [studentId, attemptId]);
+  }, [attemptId]);
 
   // --------------------------------------------------
   // Load essay when attempt changes
