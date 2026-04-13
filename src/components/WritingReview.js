@@ -34,18 +34,22 @@ export default function WritingReview() {
   // Load essay when attempt changes
   // --------------------------------------------------
   useEffect(() => {
-    if (!selectedAttempt) return;
+  if (!selectedAttempt) return;
 
-    setLoading(true);
+  console.log("🧪 Fetching essay for:", selectedAttempt);  // ADD
 
-    fetch(`${API_BASE}/api/student/writing/review/${selectedAttempt}`)
-      .then(res => res.json())
-      .then(data => {
-        setEssay(data.essay_text || "");
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [selectedAttempt]);
+  setLoading(true);
+
+  fetch(`${API_BASE}/api/student/writing/review/${selectedAttempt}`)
+    .then(res => res.json())
+    .then(data => {
+      console.log("🧪 Essay response:", data);  // ADD
+
+      setEssay(data.essay_text || "");
+      setLoading(false);
+    })
+    .catch(() => setLoading(false));
+}, [selectedAttempt]);
 
   // --------------------------------------------------
   // Loading state
