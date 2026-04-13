@@ -1,5 +1,7 @@
   import React, { useState, useEffect } from "react";
+  import { useNavigate } from "react-router-dom";
   import "./WritingComponent.css";
+  import WritingReview from "./WritingReview";
 
 
   const API_BASE = process.env.REACT_APP_API_URL;
@@ -40,6 +42,7 @@
     ----------------------------------------------------------- */
     const [exam, setExam] = useState(null);
     const [examActive, setExamActive] = useState(false);
+    const navigate = useNavigate();
 
     const CATEGORY_LABELS = {
       audience_purpose_form: "Audience, Purpose & Form",
@@ -409,6 +412,7 @@
     ----------------------------------------------------------- */
     if (completed && result) {
   const evalData = result.evaluation;
+  const attemptId = result?.attempt_id;
 
   return (
     <div
@@ -430,10 +434,27 @@
           {result.selective_readiness_band}
         </span>
       </p>
-
+      <div style={{ marginTop: "12px" }}>
+        <button
+          disabled={!attemptId}
+          onClick={() => navigate(`/writing-review/${attemptId}`)}
+          style={{
+            backgroundColor: "#2E7D32",
+            color: "white",
+            padding: "10px 14px",
+            borderRadius: "8px",
+            border: "none",
+            cursor: "pointer",
+            fontWeight: 600
+          }}
+        >
+          Review Your Writing
+        </button>
+      </div>
       <p className="scale-note">
         Scoring is based on NSW Selective criteria (25 marks total).
       </p>
+      
 
       <div className="score-bar">
         <span>

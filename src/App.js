@@ -185,6 +185,14 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/writing-review/:attemptId"
+            element={
+              <PrivateRoute isLoggedIn={isLoggedIn}>
+                <WritingReview />
+              </PrivateRoute>
+            }
+          />
           
 
   
