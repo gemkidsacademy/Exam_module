@@ -291,20 +291,23 @@
 
   const init = async () => {
   try {
-     // 🔴 HOMEWORK FLOW
+    // 🔴 HOMEWORK FLOW
     if (parentMode === "homework") {
       await startHomeworkWriting();
       return;
     }
+
+    // --------------------------------------------------
     // STEP 1: Try current exam
+    // --------------------------------------------------
     const res = await fetch(
       `${API_BASE}/api/exams/writing/current?student_id=${studentId}`
     );
 
-    // ✅ CASE 1: ACTIVE exam exists
     if (res.status === 200) {
       const data = await res.json();
 
+      // ✅ CASE A: Completed
       if (data.completed === true) {
         setCompleted(true);
         await loadResult();
@@ -312,6 +315,7 @@
         return;
       }
 
+      // ✅ CASE B: Active exam
       if (data.exam) {
         setExam(data.exam);
         setTimeLeft(data.remaining_seconds);
@@ -321,46 +325,47 @@
       }
     }
 
-    // ❗ STEP 2: NO ACTIVE EXAM → CHECK RESULT
-    console.log("🟡 No active exam → checking result");
+    // --------------------------------------------------
+    // 🟢 STEP 2: NO ACTIVE EXAM → START NEW EXAM FIRST
+    // --------------------------------------------------
+    console.log("🟢 No active exam → starting new exam");
+
+    await startExam();
+
+    // --------------------------------------------------
+    // STEP 3: Fetch exam AFTER start
+    // --------------------------------------------------
+    const retryRes = await fetch(
+      `${API_BASE}/api/exams/writing/current?student_id=${studentId}`
+    );
+
+    if (retryRes.status === 200) {
+      const data = await retryRes.json();
+
+      if (data.exam) {
+        setExam(data.exam);
+        setTimeLeft(data.remaining_seconds);
+        setExamActive(true);
+        onExamStart?.();
+        return;
+      }
+    }
+
+    // --------------------------------------------------
+    // 🔴 STEP 4: FALLBACK → ONLY NOW check result
+    // --------------------------------------------------
+    console.log("🔴 No exam available → fallback to result");
 
     const resultRes = await fetch(
       `${API_BASE}/api/exams/writing/result?student_id=${studentId}`
     );
 
     if (resultRes.status === 200) {
-      console.log("🟢 Found completed exam → showing report");
-
       const data = await resultRes.json();
       setResult(data);
       setCompleted(true);
       onExamFinish?.();
       return;
-    }
-
-    // 🟢 STEP 3: NO RESULT → START NEW EXAM
-    console.log("🟢 No result → starting fresh exam");
-
-    await startExam();
-
-    const retryRes = await fetch(
-      `${API_BASE}/api/exams/writing/current?student_id=${studentId}`
-    );
-    
-    if (retryRes.status === 200) {
-      const data = await retryRes.json();
-    
-      if (data.exam) {
-        setExam(data.exam);
-        setTimeLeft(data.remaining_seconds);
-        setExamActive(true);
-        onExamStart?.();
-        setLoading(false); 
-      } else {
-        console.warn("⚠️ Exam started but no exam returned");
-      }
-    } else {
-      console.error("❌ Failed to fetch exam after start");
     }
 
   } catch (err) {
