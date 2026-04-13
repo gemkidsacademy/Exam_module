@@ -53,6 +53,8 @@
     };
 
     const [timeLeft, setTimeLeft] = useState(0);
+    const [history, setHistory] = useState([]);
+    const [selectedAttempt, setSelectedAttempt] = useState(null);
     const [answerText, setAnswerText] = useState("");
     const [completed, setCompleted] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -64,11 +66,32 @@
     
 
 
-    
+    const loadResultByAttempt = async (attemptId) => {
+      const res = await fetch(
+        `${API_BASE}/api/exams/writing/result-by-attempt?attempt_id=${attemptId}`
+      );
+      const data = await res.json();
+      setResult(data);
+    };
     const parsedPrompt = React.useMemo(() => {
       if (!exam?.question_text) return {};
       return parseWritingPrompt(exam.question_text);
     }, [exam]);
+    
+    useEffect(() => {
+      fetch(`${API_BASE}/api/exams/writing/history?student_id=${studentId}`)
+        .then(res => res.json())
+        .then(data => {
+          setHistory(data);
+
+          // default = latest
+          if (data.length > 0) {
+            const latestId = data[0].attempt_id;   // ✅ DEFINE IT
+            setSelectedAttempt(latestId);
+            loadResultByAttempt(latestId);
+          }
+        });
+    }, []);
     useEffect(() => {
       document.addEventListener("contextmenu", e => e.preventDefault());
       document.addEventListener("copy", e => e.preventDefault());
@@ -427,6 +450,28 @@
       }}
     >
       <h1>Writing Report</h1>
+      <select
+        value={selectedAttempt || ""}
+        onChange={(e) => {
+          const id = e.target.value;
+          setSelectedAttempt(id);
+
+          if (id) {
+            loadResultByAttempt(id);
+          }
+        }}
+        style={{
+          padding: "8px",
+          marginBottom: "16px",
+          borderRadius: "6px"
+        }}
+      >
+        {history.map(item => (
+          <option key={item.attempt_id} value={item.attempt_id}>
+            {item.date} — Score: {item.score}
+          </option>
+        ))}
+      </select>
 
       <p>
         <strong>Selective Readiness:</strong>{" "}
