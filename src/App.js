@@ -16,6 +16,7 @@ import DeleteDoctor from "./components/DeleteDoctor";
 import UsageDashboard from "./components/UsageDashboard";
 import SelectiveDashboard from "./components/SelectiveDashboard";
 import OCDashboard from "./components/OCDashboard";
+import WritingReview from "./WritingReview";
 
 import Foundational_dashboard from "./components/Foundational_dashboard";
 import NaplanDashboard from "./components/NaplanDashboard";
