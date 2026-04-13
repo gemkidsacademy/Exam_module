@@ -79,19 +79,24 @@
     }, [exam]);
     
     useEffect(() => {
-      fetch(`${API_BASE}/api/exams/writing/history?student_id=${studentId}`)
+      if (!result?.attempt_id) return;
+
+      fetch(`${API_BASE}/api/exams/writing/history-by-attempt?attempt_id=${result.attempt_id}`)
         .then(res => res.json())
         .then(data => {
           setHistory(data);
 
-          // default = latest
+          // default = latest snapshot (first item)
           if (data.length > 0) {
-            const latestId = data[0].attempt_id;   // ✅ DEFINE IT
+            const latestId = data[0].attempt_id;
             setSelectedAttempt(latestId);
             loadResultByAttempt(latestId);
           }
+        })
+        .catch(err => {
+          console.error("❌ Failed to load history:", err);
         });
-    }, []);
+    }, [result?.attempt_id]);
     
     //useEffect(() => {
       //document.addEventListener("contextmenu", e => e.preventDefault());
