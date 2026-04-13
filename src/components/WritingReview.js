@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
 
-import { useParams } from "react-router-dom";
+
 
 const API_BASE = process.env.REACT_APP_API_URL;
 
 export default function WritingReview() {
   const { attemptId } = useParams();
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get("mode"); 
 
   const [history, setHistory] = useState([]);
   const [selectedAttempt, setSelectedAttempt] = useState(null);
@@ -18,7 +21,12 @@ export default function WritingReview() {
   useEffect(() => {
     if (!attemptId) return;
 
-    fetch(`${API_BASE}/api/exams/writing/history-by-attempt?attempt_id=${attemptId}`)
+    const historyEndpoint =
+      mode === "homework"
+        ? `/api/student/homework-writing-history-by-attempt?attempt_id=${attemptId}`
+        : `/api/exams/writing/history-by-attempt?attempt_id=${attemptId}`;
+
+    fetch(`${API_BASE}${historyEndpoint}`)
       .then(res => res.json())
       .then(data => {
         setHistory(data);
@@ -29,7 +37,7 @@ export default function WritingReview() {
         }
       })
       .catch(() => {});
-  }, [attemptId]);
+  }, [attemptId, mode]);
 
   // --------------------------------------------------
   // Load essay when attempt changes
@@ -41,7 +49,12 @@ export default function WritingReview() {
 
   setLoading(true);
 
-  fetch(`${API_BASE}/api/student/writing/review/${selectedAttempt}`)
+  const reviewEndpoint =
+    mode === "homework"
+      ? `/api/student/homework-writing/review/${selectedAttempt}`
+      : `/api/student/writing/review/${selectedAttempt}`;
+
+  fetch(`${API_BASE}${reviewEndpoint}`)
     .then(res => res.json())
     .then(data => {
       console.log("🧪 Essay response:", data);  // ADD
@@ -50,7 +63,7 @@ export default function WritingReview() {
       setLoading(false);
     })
     .catch(() => setLoading(false));
-}, [selectedAttempt]);
+}, [selectedAttempt, mode]);
 
   // --------------------------------------------------
   // Loading state

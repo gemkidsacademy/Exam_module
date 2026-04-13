@@ -67,12 +67,17 @@
 
 
     const loadResultByAttempt = async (attemptId) => {
-      const res = await fetch(
-        `${API_BASE}/api/exams/writing/result-by-attempt?attempt_id=${attemptId}`
-      );
-      const data = await res.json();
-      setResult(data);
-    };
+    const endpoint =
+      parentMode === "homework"
+        ? `/api/student/homework-writing-result-by-attempt?attempt_id=${attemptId}`
+        : `/api/exams/writing/result-by-attempt?attempt_id=${attemptId}`;
+
+    const res = await fetch(`${API_BASE}${endpoint}`);
+    const data = await res.json();
+    setResult(data);
+  };
+
+
     const parsedPrompt = React.useMemo(() => {
       if (!exam?.question_text) return {};
       return parseWritingPrompt(exam.question_text);
@@ -81,7 +86,12 @@
     useEffect(() => {
       if (!result?.attempt_id) return;
 
-      fetch(`${API_BASE}/api/exams/writing/history-by-attempt?attempt_id=${result.attempt_id}`)
+      const endpoint =
+        parentMode === "homework"
+          ? `/api/student/homework-writing-history-by-attempt?attempt_id=${result.attempt_id}`
+          : `/api/exams/writing/history-by-attempt?attempt_id=${result.attempt_id}`;
+
+      fetch(`${API_BASE}${endpoint}`)
         .then(res => res.json())
         .then(data => {
           setHistory(data);
@@ -493,7 +503,7 @@
       <div style={{ marginTop: "12px" }}>
         <button
           disabled={!attemptId}
-          onClick={() => navigate(`/writing-review/${attemptId}`)}
+          onClick={() => navigate(`/writing-review/${attemptId}?mode=${parentMode}`)}
           style={{
             backgroundColor: "#2E7D32",
             color: "white",
