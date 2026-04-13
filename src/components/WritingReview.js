@@ -3,7 +3,8 @@ import { useParams } from "react-router-dom";
 
 const API_BASE = process.env.REACT_APP_API_URL;
 
-export default function WritingReview({ studentId }) {
+export default function WritingReview() {
+  const studentId = localStorage.getItem("student_id");
   const { attemptId } = useParams();
 
   const [history, setHistory] = useState([]);
