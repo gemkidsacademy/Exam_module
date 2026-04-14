@@ -488,6 +488,20 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
     window.removeEventListener("popstate", handlePopState);
   };
 }, [mode, index, showSubmitConfirm, questions.length]);
+useEffect(() => {
+  if (mode !== "exam" || parentMode === "report") return;
+
+  const handleBeforeUnload = (e) => {
+    e.preventDefault();
+    e.returnValue = ""; // 🔥 triggers browser confirmation
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, [mode, parentMode]);
     
   /* =============================
      GROUP QUESTIONS BY TOPIC

@@ -276,6 +276,20 @@
   useEffect(() => {
     console.log("🔄 MODE CHANGED:", mode);
   }, [mode]);
+  useEffect(() => {
+  if (mode !== "exam") return;
+
+  const handleBeforeUnload = (e) => {
+    e.preventDefault();
+    e.returnValue = ""; // 🔥 triggers browser confirmation
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, [mode]);
   /* ============================================================
     START / RESUME EXAM (SINGLE SOURCE OF TRUTH)
   ============================================================ */
