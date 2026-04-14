@@ -173,7 +173,20 @@ useEffect(() => {
 
             <div className="subject-buttons">
               {SUBJECTS.map((subject) => {
-                const isEnabled = subjectAvailability[subject.key] ?? true; // 👈 default to enabled
+                const subjectData = subjectAvailability[subject.key];
+
+                let isEnabled = true;
+
+                if (typeof subjectData === "object" && subjectData !== null) {
+                  // Thinking Skills (mode-aware)
+                  isEnabled =
+                    examMode === "exam"
+                      ? subjectData.exam
+                      : subjectData.homework;
+                } else {
+                  // Other subjects (boolean)
+                  isEnabled = subjectData ?? true;
+                } // 👈 default to enabled
 
                 return (
                   <button
