@@ -219,17 +219,7 @@ const loadReport = useCallback(async (attemptId = null) => {
     console.error("❌ loadReport error:", err);
   }
 }, [studentId, loadAttempts]);
- useEffect(() => {
-  if (!studentId) return;
-  if (mode !== "loading") return;
-
-  // 🟣 REPORT MODE
-  if (parentMode === "report") {
-    loadReport();
-    return;
-  }
-
- useEffect(() => {
+useEffect(() => {
   if (mode !== "exam") return;
 
   const handleBeforeUnload = (e) => {
@@ -243,6 +233,17 @@ const loadReport = useCallback(async (attemptId = null) => {
     window.removeEventListener("beforeunload", handleBeforeUnload);
   };
 }, [mode]);
+ useEffect(() => {
+  if (!studentId) return;
+  if (mode !== "loading") return;
+
+  // 🟣 REPORT MODE
+  if (parentMode === "report") {
+    loadReport();
+    return;
+  }
+
+ 
 
   // 🟢 EXAM MODE handled separately
 }, [studentId, parentMode, mode, loadReport]);
