@@ -82,7 +82,21 @@
       if (!exam?.question_text) return {};
       return parseWritingPrompt(exam.question_text);
     }, [exam]);
-    
+    useEffect(() => {
+  if (!examActive) return;
+  if (!exam) return;
+
+  const handleBeforeUnload = (e) => {
+    e.preventDefault();
+    e.returnValue = ""; // 🔥 browser confirmation
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, [examActive, exam]);
     useEffect(() => {
       if (!result?.attempt_id) return;
 
