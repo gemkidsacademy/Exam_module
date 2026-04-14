@@ -229,7 +229,20 @@ const loadReport = useCallback(async (attemptId = null) => {
     return;
   }
 
- 
+ useEffect(() => {
+  if (mode !== "exam") return;
+
+  const handleBeforeUnload = (e) => {
+    e.preventDefault();
+    e.returnValue = ""; // 🔥 required for browser to show confirmation
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, [mode]);
 
   // 🟢 EXAM MODE handled separately
 }, [studentId, parentMode, mode, loadReport]);
