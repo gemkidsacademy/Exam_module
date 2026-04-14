@@ -79,13 +79,22 @@ const handleViewResults = () => {
 
 useEffect(() => {
   if (examPhase === "selection" && studentId && examMode) {
-    fetch(`/api/student/available-subjects?mode=${examMode}&studentId=${studentId}`)
-      .then(res => res.json())
-      .then(data => {
+    fetch(`https://web-production-481a5.up.railway.app/api/student/available-subjects?mode=${examMode}&studentId=${studentId}`)
+      .then(async (res) => {
+        // 🔍 Better error handling (very important)
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("❌ Non-JSON response:", text);
+          throw new Error("Failed to fetch availability");
+        }
+        return res.json();
+      })
+      .then((data) => {
+        console.log("✅ Availability response:", data);
         setSubjectAvailability(data);
       })
-      .catch(err => {
-        console.error("Failed to fetch availability", err);
+      .catch((err) => {
+        console.error("❌ Failed to fetch availability", err);
       });
   }
 }, [examPhase, examMode, studentId]);
