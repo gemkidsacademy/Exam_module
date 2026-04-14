@@ -79,7 +79,7 @@ const handleViewResults = () => {
 
 useEffect(() => {
   if (examPhase === "selection" && studentId && examMode) {
-    fetch(`https://web-production-481a5.up.railway.app/api/student/available-subjects?mode=${examMode}&studentId=${studentId}`)
+    fetch(`https://web-production-481a5.up.railway.app/api/student/available-subjects?mode=${examMode}&student_id=${studentId}`)
       .then(async (res) => {
         // 🔍 Better error handling (very important)
         if (!res.ok) {
