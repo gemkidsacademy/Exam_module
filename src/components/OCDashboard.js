@@ -60,7 +60,7 @@ const OCDashboard = () => {
 useEffect(() => {
   if (examPhase === "selection" && studentId && examMode) {
     fetch(
-      `/api/student/oc-available-subjects?mode=${examMode}&student_id=${studentId}`
+      `https://web-production-481a5.up.railway.app/api/student/oc-available-subjects?mode=${examMode}&student_id=${studentId}`
     )
       .then(async (res) => {
         if (!res.ok) {
