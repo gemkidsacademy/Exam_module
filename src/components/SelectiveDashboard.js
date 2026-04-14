@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./SelectiveDashboard.css";
 
 // EXAM COMPONENTS (UNCHANGED)
@@ -44,6 +44,7 @@ const SelectiveDashboard = () => {
   const [examInProgress, setExamInProgress] = useState(false);
   const [examPhase, setExamPhase] = useState("mode_selection");
   const [examMode, setExamMode] = useState(null);
+  const [subjectAvailability, setSubjectAvailability] = useState({});
   
   // phases: selection → welcome → instructions → exam
 
@@ -76,6 +77,19 @@ const handleViewResults = () => {
   setExamPhase("exam");
 };
 
+useEffect(() => {
+  if (examPhase === "selection" && studentId && examMode) {
+    fetch(`/api/student/available-subjects?mode=${examMode}&studentId=${studentId}`)
+      .then(res => res.json())
+      .then(data => {
+        setSubjectAvailability(data);
+      })
+      .catch(err => {
+        console.error("Failed to fetch availability", err);
+      });
+  }
+}, [examPhase, examMode, studentId]);
+
   return (
     <div className="selective-dashboard">
     {/* 0️⃣ MODE SELECTION */}
@@ -100,6 +114,7 @@ const handleViewResults = () => {
           className="subject-button"
           onClick={() => {
             setExamMode("exam");
+            setSubjectAvailability({});
             setExamPhase("selection");
           }}
         >
@@ -148,15 +163,20 @@ const handleViewResults = () => {
             <div className="title-divider" />
 
             <div className="subject-buttons">
-              {SUBJECTS.map((subject) => (
-                <button
-                  key={subject.key}
-                  className="subject-button"
-                  onClick={() => handleSubjectSelect(subject)}
-                >
-                  {subject.label}
-                </button>
-              ))}
+              {SUBJECTS.map((subject) => {
+                const isEnabled = subjectAvailability[subject.key] ?? true; // 👈 default to enabled
+
+                return (
+                  <button
+                    key={subject.key}
+                    className={`subject-button ${!isEnabled ? "disabled" : ""}`}
+                    disabled={!isEnabled}
+                    onClick={() => isEnabled && handleSubjectSelect(subject)}
+                  >
+                    {subject.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
