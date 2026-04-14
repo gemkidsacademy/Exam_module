@@ -294,6 +294,21 @@ useEffect(() => {
     window.removeEventListener("popstate", handlePopState);
   };
 }, [mode, currentIndex, showConfirmFinish]);
+useEffect(() => {
+  if (mode !== "exam") return;
+  if (questions.length === 0) return;
+
+  const handleBeforeUnload = (e) => {
+    e.preventDefault();
+    e.returnValue = ""; // 🔥 triggers browser confirmation
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, [mode, questions.length]);
  
 useEffect(() => {
   setExplanation(null);

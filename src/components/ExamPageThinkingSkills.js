@@ -307,6 +307,21 @@ useEffect(() => {
    window.removeEventListener("popstate", handlePopState);
  };
 }, [mode, currentIndex]);
+useEffect(() => {
+  if (mode !== "exam" && mode !== "homework") return;
+  if (questions.length === 0) return;
+
+  const handleBeforeUnload = (e) => {
+    e.preventDefault();
+    e.returnValue = ""; // 🔥 triggers browser confirmation
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, [mode, questions.length]);
  useEffect(() => {
   if (!studentId) return;
 

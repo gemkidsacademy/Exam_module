@@ -495,6 +495,22 @@
       window.removeEventListener("popstate", handlePopState);
     };
   }, [index, showSubmitConfirm, exam]);
+  useEffect(() => {
+  if (mode !== "exam") return;
+  if (questions.length === 0) return;
+
+  const handleBeforeUnload = (e) => {
+    e.preventDefault();
+    e.returnValue = ""; // 🔥 triggers browser confirmation
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, [mode, questions.length]);
+
     useEffect(() => {
     console.log("🧠 STATE UPDATED", {
       exam,
