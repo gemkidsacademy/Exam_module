@@ -14,6 +14,35 @@ export default function QuizSetup_writing() {
 
   const [loading, setLoading] = useState(false);
   const [availableTopics, setAvailableTopics] = useState([]);
+  const handleDeleteAllWritingHomework = async () => {
+  if (!window.confirm("⚠️ Are you sure you want to delete ALL writing homework questions?")) {
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const res = await fetch(
+      `${BACKEND_URL}/api/admin/delete-writing-homework-questions`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.detail || "Failed to delete questions");
+    }
+
+    alert("✅ All writing homework questions deleted successfully!");
+  } catch (err) {
+    console.error(err);
+    alert("❌ Failed to delete questions.");
+  } finally {
+    setLoading(false);
+  }
+};
   const handleHomeworkSubmit = async (e) => {
     e.preventDefault();
 
@@ -226,6 +255,18 @@ export default function QuizSetup_writing() {
           style={{ marginTop: "10px", backgroundColor: "#6c63ff", color: "white" }}
         >
           {loading ? "Saving..." : "Save Writing Exam (Homework)"}
+        </button>
+        <button
+          type="button"
+          onClick={handleDeleteAllWritingHomework}
+          disabled={loading}
+          style={{
+            marginTop: "10px",
+            backgroundColor: "#ff4d4f",
+            color: "white"
+          }}
+        >
+          {loading ? "Deleting..." : "Delete All Writing Homework Questions"}
         </button>
       </form>
     </div>
