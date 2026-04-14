@@ -395,6 +395,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
     setExam(examData.exam_json);
     setIndex(0); // ✅ REQUIRED
     setQuestions(flatQuestions);
+    setMode("exam"); 
     
 
 
@@ -501,7 +502,7 @@ useEffect(() => {
   return () => {
     window.removeEventListener("beforeunload", handleBeforeUnload);
   };
-}, [mode, parentMode]);
+}, [mode, parentMode]); 
     
   /* =============================
      GROUP QUESTIONS BY TOPIC
