@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./SelectiveDashboard.css"; // you can reuse same CSS
 
 // EXAM COMPONENTS
@@ -40,6 +40,7 @@ const OCDashboard = () => {
   const [examPhase, setExamPhase] = useState("mode_selection");
   const [examMode, setExamMode] = useState(null);
   const studentId = sessionStorage.getItem("student_id");
+  const [subjectAvailability, setSubjectAvailability] = useState({});
   const ActiveComponent = activeSubject?.component;
 
   const handleSubjectSelect = (subject) => {
@@ -56,7 +57,28 @@ const OCDashboard = () => {
     setExamPhase("welcome");
   }
 };
-
+useEffect(() => {
+  if (examPhase === "selection" && studentId && examMode) {
+    fetch(
+      `/api/student/oc-available-subjects?mode=${examMode}&student_id=${studentId}`
+    )
+      .then(async (res) => {
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("❌ Non-JSON response:", text);
+          throw new Error("Failed to fetch availability");
+        }
+        return res.json();
+      })
+      .then((data) => {
+        console.log("✅ OC Availability:", data);
+        setSubjectAvailability(data);
+      })
+      .catch((err) => {
+        console.error("❌ Failed to fetch OC availability", err);
+      });
+  }
+}, [examPhase, examMode, studentId]);
   return (
     <div className="selective-dashboard">
        {/* 0️⃣ MODE SELECTION (ADD HERE) */}
@@ -82,6 +104,7 @@ const OCDashboard = () => {
               className="subject-button"
               onClick={() => {
                 setExamMode("exam");
+                setSubjectAvailability({});
                 setExamPhase("selection");
               }}
             >
@@ -92,6 +115,7 @@ const OCDashboard = () => {
               className="subject-button"
               onClick={() => {
                 setExamMode("report");
+                setSubjectAvailability({});
                 setExamPhase("selection");
               }}
             >
@@ -101,6 +125,7 @@ const OCDashboard = () => {
               className="subject-button"
               onClick={() => {
                 setExamMode("homework");   // ✅ NEW MODE
+                setSubjectAvailability({});
                 setExamPhase("selection");
               }}
             >
@@ -130,15 +155,27 @@ const OCDashboard = () => {
             <div className="title-divider" />
 
             <div className="subject-buttons">
-              {SUBJECTS.map((subject) => (
-                <button
-                  key={subject.key}
-                  className="subject-button"
-                  onClick={() => handleSubjectSelect(subject)}
-                >
-                  {subject.label}
-                </button>
-              ))}
+              {SUBJECTS.map((subject) => {
+                const subjectData = subjectAvailability[subject.key];
+
+                const isEnabled =
+                  subjectData !== undefined
+                    ? examMode === "exam"
+                      ? subjectData.exam
+                      : subjectData.homework
+                    : true;
+
+                return (
+                  <button
+                    key={subject.key}
+                    className={`subject-button ${!isEnabled ? "disabled" : ""}`}
+                    disabled={!isEnabled}
+                    onClick={() => isEnabled && handleSubjectSelect(subject)}
+                  >
+                    {subject.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
