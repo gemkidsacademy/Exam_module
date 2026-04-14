@@ -92,10 +92,17 @@ const MAX_SCORES = {
      Helpers
   ============================ */
   const normalizeScore = (subject, value) => {
-    const max = MAX_SCORES[subject];
-    return Math.round((value / max) * 100);
-  };
+  const max = MAX_SCORES[subject];
 
+  const actualValue =
+    typeof value === "object" && value !== null
+      ? value.percent
+      : value;
+
+  if (actualValue == null) return 0;
+
+  return Math.round((actualValue / max) * 100);
+};
   
 
   /* ============================
@@ -202,35 +209,49 @@ const MAX_SCORES = {
      Subject Focus Card
   ============================ */
   function SubjectFocusCard({ subjectKey, label, rawScore }) {
-    const percent = normalizeScore(subjectKey, rawScore);
-  
-    const isWarning =
-      subjectKey === "writing" && percent < 95;
-  
-    return (
-      <div className={`subject-focus ${isWarning ? "warning" : ""}`}>
-        <h4>{label} Performance</h4>
-  
-        <div className="progress-bar">
-          <div
-            className="progress-fill"
-            style={{
-              width: `${percent}%`,
-              background: isWarning
-                ? "linear-gradient(90deg,#f59e0b,#f97316)"
-                : "#2563eb"
-            }}
-          />
-        </div>
-  
-        <p>
-          {label} Score: {rawScore} / {MAX_SCORES[subjectKey]} ({percent}%)
-        </p>
+  const percent = normalizeScore(subjectKey, rawScore);
 
-      </div>
-    );
+  // ✅ Extract safely from new backend format
+  const obtained =
+    rawScore?.obtained ?? null;
+
+  const total =
+    rawScore?.total ?? null;
+
+  const isWarning =
+    subjectKey === "writing" && percent < 95;
+
+  // ✅ Smart display logic
+  let displayText = "";
+
+  if (obtained !== null && total !== null) {
+    displayText = `${obtained} / ${total} (${percent}%)`;
+  } else {
+    displayText = `${percent}%`;
   }
 
+  return (
+    <div className={`subject-focus ${isWarning ? "warning" : ""}`}>
+      <h4>{label} Performance</h4>
+
+      <div className="progress-bar">
+        <div
+          className="progress-fill"
+          style={{
+            width: `${percent}%`,
+            background: isWarning
+              ? "linear-gradient(90deg,#f59e0b,#f97316)"
+              : "#2563eb"
+          }}
+        />
+      </div>
+
+      <p>
+        {label} Score: {displayText}
+      </p>
+    </div>
+  );
+}
   
   /* ============================
      UI
