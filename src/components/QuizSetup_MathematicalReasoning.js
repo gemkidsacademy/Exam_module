@@ -214,32 +214,48 @@
     }
   
     const fetchTopics = async () => {
-      try {
-        const params = new URLSearchParams({
-          class_name: quiz.className,
-          subject: quiz.subject, // mathematical_reasoning
-          difficulty: quiz.difficulty,
-        });
-  
-        const res = await fetch(
-          `https://web-production-481a5.up.railway.app/api/topics?${params.toString()}`
-        );
-  
-        if (!res.ok) {
-          throw new Error("Failed to load topics");
-        }
-  
-        const data = await res.json();
-        setAvailableTopics(data);
-      } catch (err) {
-        console.error("Failed to fetch topics", err);
-        setAvailableTopics([]);
-      }
-    };
-  
-    fetchTopics();
-  }, [quiz.className, quiz.subject, quiz.difficulty]);
-  
+  try {
+    // ✅ Normalize classYear safely
+    let classYearValue = quiz.classYear;
+
+    if (typeof classYearValue === "string") {
+      const match = classYearValue.match(/\d+/);
+      classYearValue = match ? Number(match[0]) : null;
+    }
+
+    if (!quiz.className || !quiz.subject || !quiz.difficulty || !classYearValue) {
+      setAvailableTopics([]);
+      return;
+    }
+
+    const params = new URLSearchParams({
+      class_name: quiz.className,
+      subject: quiz.subject,
+      class_year: String(classYearValue),   // ✅ NEW
+      difficulty: quiz.difficulty,
+    });
+
+    const res = await fetch(
+      `https://web-production-481a5.up.railway.app/api/topics?${params.toString()}`
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to load topics");
+    }
+
+    const data = await res.json();
+    setAvailableTopics(data);
+
+  } catch (err) {
+    console.error("Failed to fetch topics", err);
+    setAvailableTopics([]);
+  }
+};
+
+fetchTopics();
+
+}, [quiz.className, quiz.subject, quiz.classYear, quiz.difficulty]);  // ✅ added classYear dependency
+
     /* ============================
        SUBMIT
     ============================ */
