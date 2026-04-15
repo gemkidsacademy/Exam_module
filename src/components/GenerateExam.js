@@ -20,35 +20,43 @@ export default function GenerateExam() {
      GENERATE NORMAL EXAM
   ------------------------------------------- */
   const handleGenerateExam = async () => {
-    setLoading(true);
-    setError("");
-    setGeneratedExam(null);
+  if (!selectedYear) {
+    setError("Please select a class year first");
+    return;
+  }
 
-    try {
-      const response = await fetch(
-        `${BACKEND_URL}/generate-new-mr`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ difficulty: "medium" })
-        }
-      );
+  setLoading(true);
+  setError("");
+  setGeneratedExam(null);
 
-      const data = await response.json();
-      console.log("Diagnostic response:", data);
-
-      if (!response.ok) {
-        throw new Error(data?.detail || "Failed to generate exam");
+  try {
+    const response = await fetch(
+      `${BACKEND_URL}/generate-new-mr`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          difficulty: "medium",
+          class_year: Number(selectedYear)   // ✅ KEY CHANGE
+        })
       }
+    );
 
-      setGeneratedExam(data);
-    } catch (err) {
-      console.error("Exam generation failed:", err);
-      setError(err.message || "Unexpected error occurred");
-    } finally {
-      setLoading(false);
+    const data = await response.json();
+    console.log("Diagnostic response:", data);
+
+    if (!response.ok) {
+      throw new Error(data?.detail || "Failed to generate exam");
     }
-  };
+
+    setGeneratedExam(data);
+  } catch (err) {
+    console.error("Exam generation failed:", err);
+    setError(err.message || "Unexpected error occurred");
+  } finally {
+    setLoading(false);
+  }
+};
 
   /* -------------------------------------------
      GENERATE HOMEWORK EXAM
