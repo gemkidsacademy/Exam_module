@@ -266,7 +266,7 @@ export default function QuizSetup_writing() {
             color: "white"
           }}
         >
-          {loading ? "Deleting..." : "Delete All Writing Homework Questions"}
+          {loading ? "Deleting..." : "Delete All Writing Questions"}
         </button>
       </form>
     </div>
