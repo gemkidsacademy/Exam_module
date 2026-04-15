@@ -113,15 +113,27 @@
   try {
     setQbLoading(true);
 
-    // Guard (optional but recommended)
     if (!quiz.className || !quiz.classYear) {
       alert("Please select class and class year.");
       return;
     }
 
+    // ✅ Normalize classYear safely (handles "Year 5" OR 5)
+    let classYearValue = quiz.classYear;
+
+    if (typeof classYearValue === "string") {
+      const match = classYearValue.match(/\d+/);
+      classYearValue = match ? Number(match[0]) : null;
+    }
+
+    if (!classYearValue) {
+      alert("Invalid class year.");
+      return;
+    }
+
     const params = new URLSearchParams({
       class_name: quiz.className,
-      class_year: String(quiz.classYear),   // ✅ NEW
+      class_year: String(classYearValue),
     });
 
     const res = await fetch(
