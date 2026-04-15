@@ -113,8 +113,15 @@
   try {
     setQbLoading(true);
 
+    // Guard (optional but recommended)
+    if (!quiz.className || !quiz.classYear) {
+      alert("Please select class and class year.");
+      return;
+    }
+
     const params = new URLSearchParams({
-      class_name: quiz.className,  // 👈 ADD THIS
+      class_name: quiz.className,
+      class_year: String(quiz.classYear),   // ✅ NEW
     });
 
     const res = await fetch(
@@ -128,6 +135,7 @@
     const data = await res.json();
     setQuestionBank(data);
     setShowQuestionBank(true);
+
   } catch (err) {
     console.error(err);
     alert("Failed to fetch question bank data.");
