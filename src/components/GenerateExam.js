@@ -19,9 +19,22 @@ export default function GenerateExam() {
   /* -------------------------------------------
      GENERATE NORMAL EXAM
   ------------------------------------------- */
-  const handleGenerateExam = async () => {
+  const extractYearNumber = (val) => {
+  if (!val) return null;
+  const num = val.replace(/\D/g, ""); // remove non-digits
+  return num ? Number(num) : null;
+};
+
+const handleGenerateExam = async () => {
   if (!selectedYear) {
     setError("Please select a class year first");
+    return;
+  }
+
+  const parsedYear = extractYearNumber(selectedYear);
+
+  if (!parsedYear) {
+    setError("Invalid year format");
     return;
   }
 
@@ -30,6 +43,8 @@ export default function GenerateExam() {
   setGeneratedExam(null);
 
   try {
+    console.log("Sending class_year:", parsedYear, typeof parsedYear);
+
     const response = await fetch(
       `${BACKEND_URL}/generate-new-mr`,
       {
@@ -37,7 +52,7 @@ export default function GenerateExam() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           difficulty: "medium",
-          class_year: Number(selectedYear)   // ✅ KEY CHANGE
+          class_year: parsedYear   // ✅ FIXED
         })
       }
     );
