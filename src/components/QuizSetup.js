@@ -80,7 +80,7 @@ export default function QuizSetup() {
     setQbLoading(true);
 
     const res = await fetch(
-      "https://web-production-481a5.up.railway.app/api/admin/question-bank-thinking-skills"
+      `https://web-production-481a5.up.railway.app/api/admin/question-bank-thinking-skills?class_year=${quiz.classYear}`
     );
 
     if (!res.ok) {
