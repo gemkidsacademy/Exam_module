@@ -81,40 +81,66 @@ export default function QuizSetup_reading() {
   }
 };
   const handleDeleteAllQuestions = async () => {
-  if (!quiz.classYear) {
+  console.log("\n================ DELETE DEBUG START ================");
+
+  // 🔍 Full state snapshot
+  console.log("🧠 FULL QUIZ STATE:", quiz);
+  console.log("🧠 quiz.classYear:", quiz.classYear);
+  console.log("🧠 typeof classYear:", typeof quiz.classYear);
+
+  const year = quiz.classYear?.trim();
+
+  console.log("🧹 Trimmed classYear:", year);
+
+  if (!year) {
+    console.log("❌ classYear is EMPTY at click time");
     alert("Please select class year.");
     return;
   }
 
   const confirmed = window.confirm(
-    "Are you sure you want to delete all reading questions?"
+    `Are you sure you want to delete all reading questions for ${year}?`
   );
 
-  if (!confirmed) return;
+  if (!confirmed) {
+    console.log("⛔ User cancelled delete");
+    return;
+  }
 
   try {
     const params = new URLSearchParams({
-      class_year: quiz.classYear,
+      class_year: year,
     });
 
-    const response = await fetch(
-      `https://web-production-481a5.up.railway.app/api/admin/delete-all-questions-selective-reading?${params.toString()}`,
-      {
-        method: "DELETE",
-      }
-    );
+    const url = `https://web-production-481a5.up.railway.app/api/admin/delete-all-questions-selective-reading?${params.toString()}`;
+
+    // 🔍 Final request inspection
+    console.log("🚀 FINAL REQUEST URL:", url);
+
+    const response = await fetch(url, {
+      method: "DELETE",
+    });
+
+    console.log("📡 RESPONSE STATUS:", response.status);
 
     const data = await response.json();
 
+    console.log("📦 RESPONSE DATA:", data);
+
     if (!response.ok) {
+      console.log("❌ API returned error:", data);
       throw new Error(data.detail || "Failed to delete questions");
     }
 
+    console.log("✅ DELETE SUCCESS");
+
     alert(data.message || "All Reading questions deleted.");
   } catch (error) {
-    console.error("Error deleting questions:", error);
+    console.error("💥 DELETE ERROR:", error);
     alert("Something went wrong while deleting the questions.");
   }
+
+  console.log("================ DELETE DEBUG END ================\n");
 };
 
   const handleViewQuestionBank = async () => {
