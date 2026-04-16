@@ -265,7 +265,7 @@ export default function QuizSetup_reading() {
       difficulty: quiz.difficulty,
       topics: quiz.topics.map((t) => ({
         name: t.name.trim(),
-        num_questions: Number(t.num_questions),
+        num_questions: Number(t.num_questions), 
       })),
     };
 
