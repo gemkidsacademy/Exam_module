@@ -19,28 +19,47 @@ export default function GenerateExam_reading() {
      LOAD QUIZ CONFIGS
   --------------------------- */
   useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/quizzes-reading`);
-        if (!res.ok) throw new Error("Failed to load quizzes");
-
-        const data = await res.json();
-        setQuizzes(data);
-
-        if (data.length > 0) {
-          const latest = data[data.length - 1];
-          setSelectedQuiz(latest);
-          setSelectedClass(latest.class_name);
-          setSelectedDifficulty(latest.difficulty);
-        }
-      } catch (err) {
-        console.error(err);
-        setError("Failed to load quizzes.");
+  const load = async () => {
+    try {
+      // ✅ Guard (optional but recommended)
+      if (!selectedClassYear) {
+        console.log("⏸ Waiting for class year...");
+        return;
       }
-    };
 
-    load();
-  }, []);
+      const params = new URLSearchParams({
+        class_year: selectedClassYear, // ✅ ADD THIS
+      });
+
+      const url = `${BACKEND_URL}/api/quizzes-reading?${params.toString()}`;
+
+      console.log("🚀 FETCH QUIZZES URL:", url);
+
+      const res = await fetch(url);
+
+      if (!res.ok) throw new Error("Failed to load quizzes");
+
+      const data = await res.json();
+
+      console.log("📦 QUIZZES RESPONSE:", data);
+
+      setQuizzes(data);
+
+      if (data.length > 0) {
+        const latest = data[data.length - 1];
+        setSelectedQuiz(latest);
+        setSelectedClass(latest.class_name);
+        setSelectedDifficulty(latest.difficulty);
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load quizzes.");
+    }
+  };
+
+  load();
+}, [selectedClassYear]); // ✅ IMPORTANT dependency
+
   const handleGenerateHomeworkExam = async () => {
   if (!selectedClass || !selectedDifficulty || !selectedClassYear) {
     alert("Please select class, difficulty, and class year.");
@@ -85,48 +104,67 @@ export default function GenerateExam_reading() {
      GENERATE EXAM
   --------------------------- */
   const handleGenerateExam = async () => {
-    if (!selectedClass || !selectedDifficulty) {
-      alert("Quiz configuration not ready");
-      return;
-    }
+  console.log("\n================ GENERATE EXAM DEBUG =================");
 
-    // Reset UI before request (same pattern as MR)
-    setLoading(true);
-    setError("");
-    setSuccessMessage("");
-    setGeneratedExam(null);
+  console.log("📦 selectedClass:", selectedClass);
+  console.log("📦 selectedDifficulty:", selectedDifficulty);
+  console.log("📦 selectedClassYear:", selectedClassYear);
 
-    try {
-      const res = await fetch(
-        `${BACKEND_URL}/api/exams/generate-reading`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            class_name: selectedClass,
-            difficulty: selectedDifficulty
-          })
-        }
-      );
+  if (!selectedClass || !selectedDifficulty || !selectedClassYear) {
+    console.log("❌ Missing required fields");
+    alert("Please select class, difficulty, and class year.");
+    return;
+  }
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.detail || "Exam generation failed");
+  // Reset UI before request
+  setLoading(true);
+  setError("");
+  setSuccessMessage("");
+  setGeneratedExam(null);
+
+  try {
+    const payload = {
+      class_name: selectedClass,
+      class_year: selectedClassYear, // ✅ ADDED
+      difficulty: selectedDifficulty
+    };
+
+    console.log("🚀 REQUEST PAYLOAD:", payload);
+
+    const res = await fetch(
+      `${BACKEND_URL}/api/exams/generate-reading`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
       }
+    );
 
-      // ✅ success only AFTER backend response
-      setGeneratedExam(data);
-      setSuccessMessage(
-        `Exam created successfully.`
-      );
+    console.log("📡 RESPONSE STATUS:", res.status);
 
-    } catch (err) {
-      console.error(err);
-      setError("Failed to generate exam. Check console for details.");
-    } finally {
-      setLoading(false);
+    const data = await res.json();
+
+    console.log("📦 RESPONSE DATA:", data);
+
+    if (!res.ok) {
+      console.log("❌ API ERROR:", data);
+      throw new Error(data.detail || "Exam generation failed");
     }
-  };
+
+    // ✅ success only AFTER backend response
+    setGeneratedExam(data);
+    setSuccessMessage("Exam created successfully.");
+
+    console.log("✅ EXAM GENERATED SUCCESSFULLY");
+
+  } catch (err) {
+    console.error("💥 GENERATE EXAM ERROR:", err);
+    setError("Failed to generate exam. Check console for details.");
+  } finally {
+    setLoading(false);
+    console.log("================ END GENERATE EXAM =================\n");
+  }
+};
 
   /* ---------------------------
      UI
