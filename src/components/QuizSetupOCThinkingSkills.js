@@ -202,6 +202,7 @@ export default function QuizSetupOCThinkingSkills() {
       try {
         const params = new URLSearchParams({
           class_name: quiz.className,
+          class_year: quiz.classYear,   // ✅ ADD THIS
           subject: quiz.subject,
           difficulty: quiz.difficulty,
         });
@@ -221,7 +222,7 @@ export default function QuizSetupOCThinkingSkills() {
     };
 
     fetchTopics();
-  }, [quiz.className, quiz.subject, quiz.difficulty]);
+  }, [quiz.className, quiz.classYear, quiz.subject, quiz.difficulty]);
 
   /* ============================
      SUBMIT
@@ -248,6 +249,7 @@ export default function QuizSetupOCThinkingSkills() {
 
     const payload = {
       class_name: quiz.className,
+      class_year: quiz.classYear,   // ✅ ADD HERE
       subject: quiz.subject,
       difficulty: quiz.difficulty,
       num_topics: quiz.topics.length,
