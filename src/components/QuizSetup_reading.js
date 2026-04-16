@@ -260,6 +260,7 @@ export default function QuizSetup_reading() {
 
     const payload = {
       class_name: quiz.className.trim(),
+      class_year: quiz.classYear,   // ✅ ADD THIS LINE
       subject: quiz.subject,
       difficulty: quiz.difficulty,
       topics: quiz.topics.map((t) => ({
