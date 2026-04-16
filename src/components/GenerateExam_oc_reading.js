@@ -75,43 +75,44 @@ const GenerateExam_oc_reading = () => {
   }
 };
   const handleGenerateExam = async () => {
-    if (!className || !difficulty) {
-      setMessage("Config not loaded yet...");
-      return;
-    }
+  if (!className || !difficulty || !classYear) {
+    setMessage("Config not loaded yet or class year missing...");
+    return;
+  }
 
-    try {
-      setLoading(true);
-      setMessage("");
+  try {
+    setLoading(true);
+    setMessage("");
 
-      const response = await fetch(
-        `${BACKEND_URL}/api/exams/generate-oc-reading`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            class_name: className,
-            difficulty: difficulty,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage("✅ OC Reading Exam generated successfully");
-      } else {
-        setMessage(data.detail || "❌ Failed to generate exam");
+    const response = await fetch(
+      `${BACKEND_URL}/api/exams/generate-oc-reading`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          class_name: className,
+          difficulty: difficulty,
+          class_year: classYear,   // ✅ ADD THIS
+        }),
       }
-    } catch (error) {
-      console.error(error);
-      setMessage("❌ Server error while generating exam");
-    } finally {
-      setLoading(false);
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+      setMessage("✅ OC Reading Exam generated successfully");
+    } else {
+      setMessage(data.detail || "❌ Failed to generate exam");
     }
-  };
+  } catch (error) {
+    console.error(error);
+    setMessage("❌ Server error while generating exam");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div style={{ maxWidth: "400px", margin: "0 auto" }}>
