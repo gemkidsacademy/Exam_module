@@ -81,6 +81,11 @@ export default function QuizSetup_reading() {
   }
 };
   const handleDeleteAllQuestions = async () => {
+  if (!quiz.classYear) {
+    alert("Please select class year.");
+    return;
+  }
+
   const confirmed = window.confirm(
     "Are you sure you want to delete all reading questions?"
   );
@@ -88,9 +93,16 @@ export default function QuizSetup_reading() {
   if (!confirmed) return;
 
   try {
-    const response = await fetch("https://web-production-481a5.up.railway.app/api/admin/delete-all-questions-selective-reading", {
-      method: "DELETE",
+    const params = new URLSearchParams({
+      class_year: quiz.classYear,
     });
+
+    const response = await fetch(
+      `https://web-production-481a5.up.railway.app/api/admin/delete-all-questions-selective-reading?${params.toString()}`,
+      {
+        method: "DELETE",
+      }
+    );
 
     const data = await response.json();
 
@@ -98,13 +110,20 @@ export default function QuizSetup_reading() {
       throw new Error(data.detail || "Failed to delete questions");
     }
 
-    alert(data.message || "All Mathematical Reasoning questions deleted.");
+    alert(data.message || "All Reading questions deleted.");
   } catch (error) {
     console.error("Error deleting questions:", error);
     alert("Something went wrong while deleting the questions.");
   }
 };
+
   const handleViewQuestionBank = async () => {
+  // Ensure class year is selected
+  if (!quiz.classYear) {
+    alert("Please select class year.");
+    return;
+  }
+
   try {
     setLoadingQuestions(true);
     setShowQuestionBank(false);
@@ -112,10 +131,11 @@ export default function QuizSetup_reading() {
     const params = new URLSearchParams({
       subject: quiz.subject,
       class_name: quiz.className,
+      class_year: quiz.classYear, // ✅ added
     });
 
     const res = await fetch(
-      `https://web-production-481a5.up.railway.app/api/reading/question-bank?${params}`
+      `https://web-production-481a5.up.railway.app/api/reading/question-bank?${params.toString()}`
     );
 
     if (!res.ok) {
@@ -123,15 +143,17 @@ export default function QuizSetup_reading() {
     }
 
     const data = await res.json();
+
     setQuestionBank(data.rows || []);
     setShowQuestionBank(true);
   } catch (err) {
-    console.error(err);
+    console.error("Error fetching question bank:", err);
     alert("Failed to load question bank");
   } finally {
     setLoadingQuestions(false);
   }
 };
+
 
 
   const getUsedTopicNames = (currentIndex) =>
@@ -206,33 +228,36 @@ export default function QuizSetup_reading() {
   // FETCH TOPICS
   // ---------------------------------------
   useEffect(() => {
-    if (!quiz.difficulty) {
-      setAvailableTopics([]);
-      return;
-    }
+  if (!quiz.difficulty || !quiz.classYear) {
+    setAvailableTopics([]);
+    return;
+  }
 
-    const fetchReadingTopics = async () => {
-      try {
-        const params = new URLSearchParams({
-          difficulty: quiz.difficulty,
-        });
+  const fetchReadingTopics = async () => {
+    try {
+      const params = new URLSearchParams({
+        difficulty: quiz.difficulty,
+        class_year: quiz.classYear,
+      });
 
-        const res = await fetch(
-          `https://web-production-481a5.up.railway.app/api/reading/topics?${params.toString()}`
-        );
+      const res = await fetch(
+        `https://web-production-481a5.up.railway.app/api/reading/topics?${params.toString()}`
+      );
 
-        if (!res.ok) throw new Error("Failed to load reading topics");
-
-        const data = await res.json();
-        setAvailableTopics(data);
-      } catch (err) {
-        console.error(err);
-        setAvailableTopics([]);
+      if (!res.ok) {
+        throw new Error("Failed to load reading topics");
       }
-    };
 
-    fetchReadingTopics();
-  }, [quiz.difficulty]);
+      const data = await res.json();
+      setAvailableTopics(data);
+    } catch (err) {
+      console.error("Error fetching reading topics:", err);
+      setAvailableTopics([]);
+    }
+  };
+
+  fetchReadingTopics();
+}, [quiz.difficulty, quiz.classYear]);
 
   // ---------------------------------------
   // SUBMIT
