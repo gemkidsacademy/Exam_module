@@ -159,7 +159,9 @@ useEffect(() => {
                 const subjectData = subjectAvailability[subject.key];
 
                 const isEnabled =
-                  subjectData !== undefined
+                  examMode === "report"
+                    ? true   // ✅ always enabled for reports
+                    : subjectData !== undefined
                     ? examMode === "exam"
                       ? subjectData.exam
                       : subjectData.homework
