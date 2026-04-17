@@ -147,7 +147,8 @@ export default function QuizSetup_writing() {
     }
   };
   useEffect(() => {
-  if (!form.difficulty) {
+  // 🚫 Do nothing until BOTH are selected
+  if (!form.difficulty || !form.classYear) {
     setAvailableTopics([]);
     return;
   }
@@ -156,6 +157,8 @@ export default function QuizSetup_writing() {
     try {
       const params = new URLSearchParams({
         difficulty: form.difficulty,
+        class_year: form.classYear,
+        class_name: form.className
       });
 
       const res = await fetch(
@@ -175,7 +178,7 @@ export default function QuizSetup_writing() {
   };
 
   fetchWritingTopics();
-}, [form.difficulty]);
+}, [form.difficulty, form.classYear]);  // ✅ BOTH dependencies
 
 
   return (
@@ -220,6 +223,7 @@ export default function QuizSetup_writing() {
           value={form.topic}
           onChange={handleChange}
           required
+          disabled={!form.difficulty || !form.classYear}  // ✅
         >
           <option value="">Select Topic</option>
         
