@@ -86,7 +86,10 @@ export default function GenerateExam_writing() {
 };
   /* ---------------- Generate Writing Exam ---------------- */
   const handleGenerateExam = async () => {
-  
+  if (!selectedClassYear) {
+    setError("Please select a class year");
+    return;
+  }
 
   setLoading(true);
   setError("");
@@ -100,9 +103,7 @@ export default function GenerateExam_writing() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          class_name: selectedClass,
-          class_year: selectedClassYear,   // ✅ ADD THIS
-          difficulty: selectedDifficulty
+          class_year: selectedClassYear
         })
       }
     );
