@@ -34,10 +34,15 @@ export default function GenerateExam_writing() {
         // 🔑 Auto-select latest config (same data dropdown used before)
         if (filtered.length > 0) {
           const latest = filtered[filtered.length - 1];
+
           setSelectedQuiz(latest);
           setSelectedClass(latest.class_name);
           setSelectedDifficulty(latest.difficulty);
-          setSelectedClassYear(latest.class_year);
+
+          // ✅ prevent overwriting with empty/undefined
+          if (latest.class_year && latest.class_year.trim() !== "") {
+            setSelectedClassYear(latest.class_year.trim());
+          }
         }
       } catch (err) {
         console.error(err);
@@ -48,10 +53,10 @@ export default function GenerateExam_writing() {
     load();
   }, []);
   const handleGenerateHomeworkExam = async () => {
-  if (!selectedClass || !selectedClassYear || !selectedDifficulty) {
-    alert("Quiz configuration not ready");
-    return;
-  }
+  if (!selectedClassYear || selectedClassYear.trim() === "") {
+  setError("Please select a class year");
+  return;
+}
 
   setLoading(true);
   setError("");
@@ -65,9 +70,7 @@ export default function GenerateExam_writing() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          class_name: selectedClass,
-          class_year: selectedClassYear,
-          difficulty: selectedDifficulty
+          class_year: selectedClassYear
         })
       }
     );
@@ -86,10 +89,10 @@ export default function GenerateExam_writing() {
 };
   /* ---------------- Generate Writing Exam ---------------- */
   const handleGenerateExam = async () => {
-  if (!selectedClassYear) {
-    setError("Please select a class year");
-    return;
-  }
+  if (!selectedClassYear || selectedClassYear.trim() === "") {
+  setError("Please select a class year");
+  return;
+}
 
   setLoading(true);
   setError("");
@@ -132,9 +135,8 @@ export default function GenerateExam_writing() {
       {/* CLASS YEAR */}
       <label>Class Year:</label>
       <select
-        value={selectedClassYear}
+        value={selectedClassYear || "Year 6"}   // ✅ fallback fix
         onChange={(e) => setSelectedClassYear(e.target.value)}
-        required
       >
         <option value="">Select Year</option>
         <option value="Year 4">Year 4</option>
