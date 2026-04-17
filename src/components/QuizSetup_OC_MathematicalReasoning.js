@@ -144,7 +144,7 @@ export default function QuizSetup_OC_MathematicalReasoning() {
         });
 
         const res = await fetch(
-          `https://web-production-481a5.up.railway.app/api/topics?${params.toString()}`
+          `https://web-production-481a5.up.railway.app/api/topic/oc/math?${params.toString()}`
         );
 
         if (!res.ok) throw new Error("Failed");
