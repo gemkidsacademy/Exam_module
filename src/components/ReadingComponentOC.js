@@ -603,7 +603,7 @@ useEffect(() => {
       mode={parentMode}
       onExit={() => {
         setReviewQuestions([]);
-        setMode("exam");
+        setMode("report");
       }}
     />
   );
