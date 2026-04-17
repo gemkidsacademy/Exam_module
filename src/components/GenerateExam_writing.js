@@ -25,7 +25,8 @@ export default function GenerateExam_writing() {
         const data = await res.json();
         const filtered = data.map((q) => ({
           class_name: q.class_name,
-          difficulty: q.difficulty
+          difficulty: q.difficulty,
+          class_year: q.class_year   // ✅ ADD THIS
         }));
 
         setQuizzes(filtered);
@@ -36,6 +37,7 @@ export default function GenerateExam_writing() {
           setSelectedQuiz(latest);
           setSelectedClass(latest.class_name);
           setSelectedDifficulty(latest.difficulty);
+          setSelectedClassYear(latest.class_year);
         }
       } catch (err) {
         console.error(err);
