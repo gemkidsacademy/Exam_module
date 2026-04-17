@@ -177,16 +177,16 @@ useEffect(() => {
 
                 let isEnabled = true;
 
-                if (typeof subjectData === "object" && subjectData !== null) {
-                  // Thinking Skills (mode-aware)
-                  isEnabled =
-                    examMode === "exam"
-                      ? subjectData.exam
-                      : subjectData.homework;
-                } else {
-                  // Other subjects (boolean)
-                  isEnabled = subjectData ?? true;
-                } // 👈 default to enabled
+                  if (examMode === "report") {
+                    isEnabled = true;   // ✅ always enabled
+                  } else if (typeof subjectData === "object" && subjectData !== null) {
+                    isEnabled =
+                      examMode === "exam"
+                        ? subjectData.exam
+                        : subjectData.homework;
+                  } else {
+                    isEnabled = subjectData ?? true;
+                  }
 
                 return (
                   <button
