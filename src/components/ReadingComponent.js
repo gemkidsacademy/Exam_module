@@ -209,11 +209,12 @@
       const data = await loadExamDatesReading_v1();
 
       if (data.length > 0) {
-        const latestExamId = data[0].exam_id;
+        const latest = data[0];
 
-        setSelectedExamId(latestExamId);
+        setSelectedExamId(latest.exam_id);
+        setAttemptId(latest.session_id);   // 🔥 ADD THIS
 
-        await loadReportReading_v1(latestExamId);
+        await loadReportReading_v1(latest.exam_id);
       }
     };
 
@@ -274,50 +275,55 @@
           setLoadingExplanation(null);
         }
       };
-    const handleReviewExam = async () => {
-    if (!attemptId) {
-      console.error("❌ No session_id available for review");
-      alert("Exam session not found.");
-      return;
+    const handleReviewExam = async (sessionIdOverride = null) => {
+  const sessionId = sessionIdOverride || attemptId;
+
+  if (!sessionId) {
+    console.error("❌ No session_id available for review");
+    console.log("🧪 examDates:", examDates);
+    console.log("🧪 selectedExamId:", selectedExamId);
+    alert("Exam session not found.");
+    return;
+  }
+
+  try {
+    const endpoint =
+      parentMode === "homework"
+        ? "/api/student/homework-review-by-session/reading"
+        : "/api/exams/review-reading";
+
+    const res = await fetch(
+      `${API_BASE}${endpoint}?session_id=${sessionId}`
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to load review");
     }
 
-    try {
-      const endpoint =
-        parentMode === "homework"
-          ? "/api/student/homework-review-by-session/reading"
-          : "/api/exams/review-reading";
+    const data = await res.json();
 
-      const res = await fetch(
-        `${API_BASE}${endpoint}?session_id=${attemptId}`
-      );
+    console.log("🧪 REVIEW PAYLOAD:", data);
 
-      if (!res.ok) {
-        throw new Error("Failed to load review");
-      }
+    setReviewQuestions(
+      (data.questions || []).map((q) => ({
+        ...q,
+        answer_options:
+          (q.answer_options && Object.keys(q.answer_options).length > 0)
+            ? q.answer_options
+            : q.section_ref?.answer_options ||
+              q.section?.answer_options ||
+              {}
+      }))
+    );
 
-      const data = await res.json();
+    setAttemptId(sessionId); // keep state in sync
+    setMode("review");
 
-      console.log("🧪 REVIEW PAYLOAD:", data);
-
-      setReviewQuestions(
-        (data.questions || []).map((q) => ({
-          ...q,
-          answer_options:
-            (q.answer_options && Object.keys(q.answer_options).length > 0)
-              ? q.answer_options
-              : q.section_ref?.answer_options ||
-                q.section?.answer_options ||
-                {}
-        }))
-      );
-
-      setMode("review");
-
-    } catch (err) {
-      console.error("❌ Review exam error:", err);
-      alert("Unable to load exam review.");
-    }
-  };
+  } catch (err) {
+    console.error("❌ Review exam error:", err);
+    alert("Unable to load exam review.");
+  }
+};
 
     const loadReportReading_v1 = async (examId) => {
     try {
@@ -736,7 +742,9 @@
               await loadReportReading_v1(examId);
           
               // 🔥 load review for this exam (NEW)
-              await loadReviewByExamId(examId);
+              const selected = examDates.find(d => d.exam_id === examId);
+
+              await handleReviewExam(selected?.session_id);
             }}
             onExit={() => {
               setReviewQuestions([]);
@@ -795,11 +803,16 @@
                 value={selectedExamId || ""}
                 onChange={async (e) => {
                   const examId = Number(e.target.value);
-              
-                  console.log("📅 Selected examId:", examId);
-              
+
+                  const selected = examDates.find(d => d.exam_id === examId);
+
+                  console.log("📅 Selected exam object:", selected); // ✅ debug
+
                   setSelectedExamId(examId);
-              
+
+                  // 🔥 CRITICAL LINE (this fixes your bug)
+                  setAttemptId(selected?.session_id);
+
                   await loadReportReading_v1(examId);
                 }}
                 style={{
@@ -820,6 +833,7 @@
             <button
               className="review-exam-btn"
               onClick={handleReviewExam}
+              disabled={!attemptId}
             >
               Review Exam
             </button>
