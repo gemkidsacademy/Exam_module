@@ -428,23 +428,31 @@ export default function QuizSetup_reading() {
               >
                 <option value="">Select Topic</option>
                 {availableTopics
-                  .filter((t) => {
-                    const usedNames = getUsedTopicNames(index);
-                    const usageCount = usedNames.filter(name => name === t.name).length;
-                
-                    // Enforce max usage if defined
-                    if (MAX_TOPIC_USAGE[t.name] !== undefined) {
-                      return usageCount < MAX_TOPIC_USAGE[t.name];
-                    }
-                
-                    // Default: allow only once
-                    return !usedNames.includes(t.name);
-                  })
-                  .map((t) => (
-                    <option key={t.name} value={t.name}>
-                      {t.name}
-                    </option>
-                  ))}
+                .filter((t) => {
+                  // ✅ Guard against bad data
+                  if (!t || !t.name) return false;
+
+                  const usedNames = getUsedTopicNames(index) || [];
+
+                  // ✅ Normalize for case consistency
+                  const currentName = t.name.toLowerCase();
+                  const normalizedUsed = usedNames.map(n => n?.toLowerCase());
+
+                  const usageCount = normalizedUsed.filter(name => name === currentName).length;
+
+                  // ✅ Respect max usage if defined
+                  if (MAX_TOPIC_USAGE[t.name] !== undefined) {
+                    return usageCount < MAX_TOPIC_USAGE[t.name];
+                  }
+
+                  // ✅ Default: allow only once
+                  return !normalizedUsed.includes(currentName);
+                })
+                .map((t) => (
+                  <option key={t.name} value={t.name}>
+                    {t.name}
+                  </option>
+                ))}
 
               </select>
 
