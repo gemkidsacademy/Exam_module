@@ -106,8 +106,8 @@ export default function QuizSetup_writing() {
 
     const payload = {
       class_name: form.className,
-      class_year: form.classYear,
-      subject: "writing",   // canonical API key
+      class_year: form.classYear,   // ✅ already included
+      subject: "writing",
       topic: form.topic.trim(),
       difficulty: form.difficulty
     };
@@ -134,10 +134,11 @@ export default function QuizSetup_writing() {
       alert("✅ Writing exam setup saved successfully!");
 
       setForm({
-        className: "",
-        topic: "",
-        difficulty: ""
-      });
+      className: "selective",
+      classYear: "",
+      topic: "",
+      difficulty: ""
+    });
     } catch (err) {
       console.error(err);
       alert("❌ Error saving writing exam setup.");
