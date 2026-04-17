@@ -84,41 +84,42 @@ export default function GenerateExam_writing() {
 };
   /* ---------------- Generate Writing Exam ---------------- */
   const handleGenerateExam = async () => {
-    if (!selectedClass || !selectedDifficulty) {
-      alert("Quiz configuration not ready");
-      return;
-    }
+  if (!selectedClass || !selectedDifficulty || !selectedClassYear) {
+    alert("Quiz configuration not ready");
+    return;
+  }
 
-    setLoading(true);
-    setError("");
-    setGeneratedExam(null);
-    setSuccessMessage("");
+  setLoading(true);
+  setError("");
+  setGeneratedExam(null);
+  setSuccessMessage("");
 
-    try {
-      const res = await fetch(
-        `${BACKEND_URL}/api/exams/generate-writing`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            class_name: selectedClass,
-            difficulty: selectedDifficulty
-          })
-        }
-      );
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/api/exams/generate-writing`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          class_name: selectedClass,
+          class_year: selectedClassYear,   // ✅ ADD THIS
+          difficulty: selectedDifficulty
+        })
+      }
+    );
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || "Failed to generate exam");
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Failed to generate exam");
 
-      setSuccessMessage("Writing exam created successfully.");
-      setGeneratedExam(data);
-    } catch (err) {
-      console.error(err);
-      setError("Network error while generating writing exam.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    setSuccessMessage("Writing exam created successfully.");
+    setGeneratedExam(data);
+  } catch (err) {
+    console.error(err);
+    setError("Network error while generating writing exam.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   /* ---------------- UI (BUTTON ONLY) ---------------- */
   return (
