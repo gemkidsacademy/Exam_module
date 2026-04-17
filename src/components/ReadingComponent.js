@@ -276,54 +276,59 @@
         }
       };
     const handleReviewExam = async (sessionIdOverride = null) => {
-  const sessionId = sessionIdOverride || attemptId;
+      const sessionId = sessionIdOverride ?? attemptId;
 
-  if (!sessionId) {
-    console.error("❌ No session_id available for review");
-    console.log("🧪 examDates:", examDates);
-    console.log("🧪 selectedExamId:", selectedExamId);
-    alert("Exam session not found.");
-    return;
-  }
+      console.log("🚨 attemptId state:", attemptId);
+      console.log("🚨 override:", sessionIdOverride);
+      console.log("🚨 final sessionId used:", sessionId);
+      console.log("🚨 type of sessionId:", typeof sessionId);
 
-  try {
-    const endpoint =
-      parentMode === "homework"
-        ? "/api/student/homework-review-by-session/reading"
-        : "/api/exams/review-reading";
+      if (!sessionId) {
+        console.error("❌ No session_id available for review");
+        console.log("🧪 examDates:", examDates);
+        console.log("🧪 selectedExamId:", selectedExamId);
+        alert("Exam session not found.");
+        return;
+      }
 
-    const res = await fetch(
-      `${API_BASE}${endpoint}?session_id=${sessionId}`
-    );
+      try {
+        const endpoint =
+          parentMode === "homework"
+            ? "/api/student/homework-review-by-session/reading"
+            : "/api/exams/review-reading";
 
-    if (!res.ok) {
-      throw new Error("Failed to load review");
-    }
+        const res = await fetch(
+          `${API_BASE}${endpoint}?session_id=${sessionId}`
+        );
 
-    const data = await res.json();
+        if (!res.ok) {
+          throw new Error("Failed to load review");
+        }
 
-    console.log("🧪 REVIEW PAYLOAD:", data);
+        const data = await res.json();
 
-    setReviewQuestions(
-      (data.questions || []).map((q) => ({
-        ...q,
-        answer_options:
-          (q.answer_options && Object.keys(q.answer_options).length > 0)
-            ? q.answer_options
-            : q.section_ref?.answer_options ||
-              q.section?.answer_options ||
-              {}
-      }))
-    );
+        console.log("🧪 REVIEW PAYLOAD:", data);
 
-    setAttemptId(sessionId); // keep state in sync
-    setMode("review");
+        setReviewQuestions(
+          (data.questions || []).map((q) => ({
+            ...q,
+            answer_options:
+              (q.answer_options && Object.keys(q.answer_options).length > 0)
+                ? q.answer_options
+                : q.section_ref?.answer_options ||
+                  q.section?.answer_options ||
+                  {}
+          }))
+        );
 
-  } catch (err) {
-    console.error("❌ Review exam error:", err);
-    alert("Unable to load exam review.");
-  }
-};
+        setAttemptId(sessionId); // keep state in sync
+        setMode("review");
+
+      } catch (err) {
+        console.error("❌ Review exam error:", err);
+        alert("Unable to load exam review.");
+      }
+    };
 
     const loadReportReading_v1 = async (examId) => {
     try {
@@ -805,7 +810,10 @@
                   const examId = Number(e.target.value);
 
                   const selected = examDates.find(d => d.exam_id === examId);
-
+                  
+                   // 🔥 ADD THESE
+                  console.log("🚨 selected:", selected);
+                  console.log("🚨 session_id:", selected?.session_id);  
                   console.log("📅 Selected exam object:", selected); // ✅ debug
 
                   setSelectedExamId(examId);
