@@ -86,7 +86,7 @@ export default function GenerateExam_writing() {
 };
   /* ---------------- Generate Writing Exam ---------------- */
   const handleGenerateExam = async () => {
-  if (!selectedClass || !selectedDifficulty || !selectedClassYear) {
+  if (!selectedClassYear) {
     alert("Quiz configuration not ready");
     return;
   }
