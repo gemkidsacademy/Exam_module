@@ -59,45 +59,55 @@ export default function GenerateExam_oc_thinking_skills() {
   }
 };
   const handleGenerateExam_oc_thinking_skills = async () => {
-    setLoading(true);
-    setError("");
-    setGeneratedExam(null);
+  if (!classYear) {
+    setError("Please select class year");
+    return;
+  }
 
-    try {
-      const response = await fetch(
-        `${BACKEND_URL}/api/exams/generate-oc-thinking-skills`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: null
-        }
-      );
+  setLoading(true);
+  setError("");
+  setGeneratedExam(null);
 
-      const responseText = await response.text();
-      const data = responseText ? JSON.parse(responseText) : {};
+  try {
+    const payload = {
+      class_year: Number(classYear)
+    };
 
-      console.log("OC Thinking Skills exam response:", data);
+    console.log("📤 Sending payload (exam generation):", payload);
 
-      if (!response.ok) {
-        throw new Error(
-          data.detail || "Failed to generate OC Thinking Skills exam"
-        );
+    const response = await fetch(
+      `${BACKEND_URL}/api/exams/generate-oc-thinking-skills`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
       }
+    );
 
-      setGeneratedExam(data);
-      alert("OC Thinking Skills exam generated successfully!");
-    } catch (error) {
-      console.error("❌ OC exam generation failed:", error);
-      setError(
-        error.message || "Something went wrong while generating the exam"
+    const responseText = await response.text();
+    const data = responseText ? JSON.parse(responseText) : {};
+
+    console.log("📥 OC Thinking Skills exam response:", data);
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail || "Failed to generate OC Thinking Skills exam"
       );
-    } finally {
-      setLoading(false);
     }
-  };
 
+    setGeneratedExam(data);
+    alert("OC Thinking Skills exam generated successfully!");
+  } catch (error) {
+    console.error("❌ OC exam generation failed:", error);
+    setError(
+      error.message || "Something went wrong while generating the exam"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
   /* ===========================
      UI
   =========================== */
