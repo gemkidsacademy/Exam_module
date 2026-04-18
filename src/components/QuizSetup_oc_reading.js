@@ -174,32 +174,32 @@ export default function QuizSetup_oc_reading() {
   // ---------------------------------------
 
   const handleViewQuestionBank_oc = async () => {
-    try {
-      setLoadingQuestions(true);
-      setShowQuestionBank(true);
+  try {
+    setLoadingQuestions(true);
+    setShowQuestionBank(true);
 
-      const params = new URLSearchParams({
-        subject: quiz.subject,
-        class_name: "oc",
-      });
+    const params = new URLSearchParams({
+      subject: quiz.subject,
+      class_name: "oc",
+      class_year: quiz.classYear, // ✅ send selected class year
+    });
 
-      const res = await fetch(
-        `https://web-production-481a5.up.railway.app/api/reading/question-bank-oc?${params}`
-      );
+    const res = await fetch(
+      `https://web-production-481a5.up.railway.app/api/reading/question-bank-oc?${params}`
+    );
 
-      if (!res.ok) throw new Error("Failed");
+    if (!res.ok) throw new Error("Failed");
 
-      const data = await res.json();
-      setQuestionBank(data.rows || []);
-      setShowQuestionBank(true);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to load question bank");
-    } finally {
-      setLoadingQuestions(false);
-    }
-  };
-
+    const data = await res.json();
+    setQuestionBank(data.rows || []);
+    setShowQuestionBank(true);
+  } catch (err) {
+    console.error(err);
+    alert("Failed to load question bank");
+  } finally {
+    setLoadingQuestions(false);
+  }
+};
   // ---------------------------------------
   // SUBMIT
   // ---------------------------------------
