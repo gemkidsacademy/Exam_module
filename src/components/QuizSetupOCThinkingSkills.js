@@ -147,7 +147,7 @@ export default function QuizSetupOCThinkingSkills() {
   ============================ */
 
   const handleViewQuestionBank = async () => {
-  if (!quiz.classYear) {
+  if (!quiz.classYear || quiz.classYear.toString().trim() === "") {
     alert("Please select class year first.");
     return;
   }
@@ -155,22 +155,32 @@ export default function QuizSetupOCThinkingSkills() {
   try {
     setQbLoading(true);
 
+    console.log("🚨 DEBUG PARAMS:");
+    console.log("class_name:", quiz.className);
+    console.log("class_year:", quiz.classYear);
+    console.log("subject:", quiz.subject);
+
     const params = new URLSearchParams({
-      class_name: quiz.className,
-      class_year: quiz.classYear,
-      subject: quiz.subject,
+      class_name: quiz.className?.trim() || "",
+      class_year: quiz.classYear?.toString().trim() || "",
+      subject: quiz.subject?.trim() || "",
     });
 
-    const res = await fetch(
-      `https://web-production-481a5.up.railway.app/api/admin/question-bank-oc-thinking-skills?${params.toString()}`
-    );
+    const url = `https://web-production-481a5.up.railway.app/api/admin/question-bank-oc-thinking-skills?${params.toString()}`;
 
-    if (!res.ok) throw new Error("Failed to load question bank");
+    console.log("🌐 FINAL URL:", url);
+
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error("❌ API ERROR RESPONSE:", errText);
+      throw new Error("Failed to load question bank");
+    }
 
     const data = await res.json();
 
     console.log("📚 Question Bank Response:", data);
-    console.log("📚 class_year sent:", quiz.classYear);
 
     setQuestionBank(data);
     setShowQuestionBank(true);
