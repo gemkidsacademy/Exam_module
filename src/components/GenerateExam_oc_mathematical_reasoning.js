@@ -59,45 +59,51 @@ export default function GenerateExam_oc_mathematical_reasoning() {
   }
 };
   const handleGenerateExam_oc_mathematical_reasoning = async () => {
-    setLoading(true);
-    setError("");
-    setGeneratedExam(null);
+  if (!classYear) {
+    alert("Please select class year");
+    return;
+  }
 
-    try {
-      const response = await fetch(
-        `${BACKEND_URL}/api/exams/generate-oc-mathematical-reasoning`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: null
-        }
-      );
+  setLoading(true);
+  setError("");
+  setGeneratedExam(null);
 
-      const responseText = await response.text();
-      const data = responseText ? JSON.parse(responseText) : {};
-
-      console.log("OC Mathematical Reasoning exam response:", data);
-
-      if (!response.ok) {
-        throw new Error(
-          data.detail || "Failed to generate OC Mathematical Reasoning exam"
-        );
+  try {
+    const response = await fetch(
+      `${BACKEND_URL}/api/exams/generate-oc-mathematical-reasoning`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          class_year: classYear
+        })
       }
+    );
 
-      setGeneratedExam(data);
-      alert("OC Mathematical Reasoning exam generated successfully!");
-    } catch (error) {
-      console.error("❌ OC MR exam generation failed:", error);
-      setError(
-        error.message || "Something went wrong while generating the exam"
+    const responseText = await response.text();
+    const data = responseText ? JSON.parse(responseText) : {};
+
+    console.log("OC Mathematical Reasoning exam response:", data);
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail || "Failed to generate OC Mathematical Reasoning exam"
       );
-    } finally {
-      setLoading(false);
     }
-  };
 
+    setGeneratedExam(data);
+    alert("OC Mathematical Reasoning exam generated successfully!");
+  } catch (error) {
+    console.error("❌ OC MR exam generation failed:", error);
+    setError(
+      error.message || "Something went wrong while generating the exam"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
   /* ===========================
      UI
   =========================== */
