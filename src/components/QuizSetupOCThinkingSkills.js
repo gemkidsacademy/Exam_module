@@ -147,26 +147,40 @@ export default function QuizSetupOCThinkingSkills() {
   ============================ */
 
   const handleViewQuestionBank = async () => {
-    try {
-      setQbLoading(true);
+  if (!quiz.classYear) {
+    alert("Please select class year first.");
+    return;
+  }
 
-      const res = await fetch(
-        "https://web-production-481a5.up.railway.app/api/admin/question-bank-oc-thinking-skills"
-      );
+  try {
+    setQbLoading(true);
 
-      if (!res.ok) throw new Error("Failed to load question bank");
+    const params = new URLSearchParams({
+      class_name: quiz.className,
+      class_year: quiz.classYear,
+      subject: quiz.subject,
+    });
 
-      const data = await res.json();
-      setQuestionBank(data);
-      setShowQuestionBank(true);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to fetch question bank data.");
-    } finally {
-      setQbLoading(false);
-    }
-  };
+    const res = await fetch(
+      `https://web-production-481a5.up.railway.app/api/admin/question-bank-oc-thinking-skills?${params.toString()}`
+    );
 
+    if (!res.ok) throw new Error("Failed to load question bank");
+
+    const data = await res.json();
+
+    console.log("📚 Question Bank Response:", data);
+    console.log("📚 class_year sent:", quiz.classYear);
+
+    setQuestionBank(data);
+    setShowQuestionBank(true);
+  } catch (err) {
+    console.error("❌ Question bank fetch error:", err);
+    alert("Failed to fetch question bank data.");
+  } finally {
+    setQbLoading(false);
+  }
+};
   const handleDeletePreviousQuestions = () => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete all previous OC Thinking Skills questions?"
