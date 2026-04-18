@@ -54,26 +54,34 @@ export default function QuizSetup_OC_MathematicalReasoning() {
   };
 
   const handleViewQuestionBank_OC_MR = async () => {
-    try {
-      setQbLoading(true);
-
-      const res = await fetch(
-        "https://web-production-481a5.up.railway.app/api/admin/question-bank-oc-mathematical-reasoning"
-      );
-
-      if (!res.ok) throw new Error("Failed");
-
-      const data = await res.json();
-      setQuestionBank(data);
-      setShowQuestionBank(true);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to fetch question bank");
-    } finally {
-      setQbLoading(false);
+  try {
+    if (!quiz.classYear) {
+      alert("Please select class year first");
+      return;
     }
-  };
 
+    setQbLoading(true);
+
+    const params = new URLSearchParams({
+      class_year: quiz.classYear, // ✅ ADD THIS
+    });
+
+    const res = await fetch(
+      `https://web-production-481a5.up.railway.app/api/admin/question-bank-oc-mathematical-reasoning?${params.toString()}`
+    );
+
+    if (!res.ok) throw new Error("Failed");
+
+    const data = await res.json();
+    setQuestionBank(data);
+    setShowQuestionBank(true);
+  } catch (err) {
+    console.error(err);
+    alert("Failed to fetch question bank");
+  } finally {
+    setQbLoading(false);
+  }
+};
   const handleInputChange_OC_MR = (e) => {
     const { name, value } = e.target;
     setQuiz((prev) => ({ ...prev, [name]: value }));
