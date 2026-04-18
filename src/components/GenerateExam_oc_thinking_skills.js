@@ -120,7 +120,10 @@ export default function GenerateExam_oc_thinking_skills() {
       <label>Select Class Year</label>
       <select
         value={classYear}
-        onChange={(e) => setClassYear(e.target.value)}
+        onChange={(e) => {
+          console.log("🟢 Selected value:", e.target.value);
+          setClassYear(e.target.value);
+        }}
       >
         <option value="">-- Select Year --</option>
         <option value="3">Year 3</option>
