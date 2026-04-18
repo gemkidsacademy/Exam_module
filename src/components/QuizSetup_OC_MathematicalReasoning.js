@@ -230,60 +230,67 @@ export default function QuizSetup_OC_MathematicalReasoning() {
   }
 };
   const handleSubmit_OC_MR = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!quiz.difficulty) {
-      alert("Select difficulty");
-      return;
-    }
+  if (!quiz.difficulty) {
+    alert("Select difficulty");
+    return;
+  }
 
-    if (quiz.topics.length === 0) {
-      alert("Generate topics first");
-      return;
-    }
+  if (!quiz.classYear) {
+    alert("Select class year");   // ✅ add this validation
+    return;
+  }
 
-    if (totalQuestions !== 35) {
-      alert("Total must be 35");
-      return;
-    }
+  if (quiz.topics.length === 0) {
+    alert("Generate topics first");
+    return;
+  }
 
-    const payload = {
-      class_name: quiz.className,
-      subject: quiz.subject,
-      difficulty: quiz.difficulty,
-      num_topics: quiz.topics.length,
-      topics: quiz.topics.map((t) => ({
-        name: t.name.trim(),
-        ai: Number(t.ai),
-        db: Number(t.db),
-        total: Number(t.total),
-      })),
-    };
+  if (totalQuestions !== 35) {
+    alert("Total must be 35");
+    return;
+  }
 
-    try {
-      const res = await fetch(
-        "https://web-production-481a5.up.railway.app/api/quizzes/oc-mathematical-reasoning",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (!res.ok) {
-        const err = await res.json();
-        console.error(err);
-        throw new Error("Failed");
-      }
-
-      await res.json();
-      alert("OC Mathematical Reasoning exam created!");
-    } catch (err) {
-      console.error(err);
-      alert("Error saving exam");
-    }
+  const payload = {
+    class_name: quiz.className,
+    subject: quiz.subject,
+    class_year: quiz.classYear,   // ✅ THIS IS THE FIX
+    difficulty: quiz.difficulty,
+    num_topics: quiz.topics.length,
+    topics: quiz.topics.map((t) => ({
+      name: t.name.trim(),
+      ai: Number(t.ai),
+      db: Number(t.db),
+      total: Number(t.total),
+    })),
   };
 
+  console.log("📤 Sending quiz payload:", payload); // ✅ debug
+
+  try {
+    const res = await fetch(
+      "https://web-production-481a5.up.railway.app/api/quizzes/oc-mathematical-reasoning",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.json();
+      console.error(err);
+      throw new Error("Failed");
+    }
+
+    await res.json();
+    alert("OC Mathematical Reasoning exam created!");
+  } catch (err) {
+    console.error(err);
+    alert("Error saving exam");
+  }
+};
   /* ============================
      RENDER
   ============================ */
