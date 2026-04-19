@@ -145,11 +145,19 @@ export default function QuizSetup_OC_MathematicalReasoning() {
 
     const fetchTopics_OC_MR = async () => {
       try {
+        if (!quiz.classYear) {
+          setAvailableTopics([]);
+          return;
+        }
+
         const params = new URLSearchParams({
           class_name: quiz.className,
           subject: quiz.subject,
           difficulty: quiz.difficulty,
+          class_year: quiz.classYear,   // ✅ added
         });
+
+        console.log("📤 Fetching topics with params:", params.toString());
 
         const res = await fetch(
           `https://web-production-481a5.up.railway.app/api/topic/oc/math?${params.toString()}`
@@ -158,6 +166,9 @@ export default function QuizSetup_OC_MathematicalReasoning() {
         if (!res.ok) throw new Error("Failed");
 
         const data = await res.json();
+
+        console.log("📥 Topics received:", data);
+
         setAvailableTopics(data);
       } catch (err) {
         console.error(err);
