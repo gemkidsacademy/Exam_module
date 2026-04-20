@@ -27,36 +27,68 @@ export default function SelectiveReadinessOverall() {
   const [overall, setOverall] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const handleSendEmail = async () => {
-  if (!selectedStudent || !selectedDate) return;
+  // Replace your current handleSendEmail with this version
+
+const handleSendEmail = async () => {
+  if (!selectedStudent || !selectedDate || !printRef.current) return;
 
   setSendingEmail(true);
 
   try {
+    // install first:
+    // npm install html2pdf.js
+
+    const html2pdf = (await import("html2pdf.js")).default;
+
+    const element = printRef.current;
+
+    const pdfBlob = await html2pdf()
+      .from(element)
+      .set({
+        margin: 8,
+        filename: "Selective_Report.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true
+        },
+        jsPDF: {
+          unit: "mm",
+          format: "a4",
+          orientation: "portrait"
+        }
+      })
+      .outputPdf("blob");
+
+    const formData = new FormData();
+
+    formData.append("student_id", selectedStudent);
+    formData.append("exam_date", selectedDate);
+    formData.append(
+      "file",
+      pdfBlob,
+      `Selective_Report_${selectedStudent}.pdf`
+    );
+
     const res = await fetch(
       `${BACKEND_URL}/api/admin/send-selective-report-email`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          student_id: selectedStudent,
-          exam_date: selectedDate,
-        }),
+        body: formData
       }
     );
 
-    const data = await res.json(); // ✅ back to JSON
+    const data = await res.json();
 
     if (!res.ok) {
       alert(data.message || "Failed to send email");
       return;
     }
 
-    alert("PDF generated successfully ✅"); // temp message
-  } catch (err) {
-    alert("Network error while sending email");
+    alert("Email sent successfully ✅");
+  } catch (error) {
+    console.error(error);
+    alert("Failed to generate/send PDF");
   } finally {
     setSendingEmail(false);
   }
