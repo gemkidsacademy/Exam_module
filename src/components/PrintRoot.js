@@ -1,5 +1,6 @@
 // PrintRoot.jsx
 import { forwardRef } from "react";
+import "./SelectiveReadinessOverall.css";
 
 const PrintRoot = forwardRef(function PrintRoot(props, ref) {
   const { overall } = props;
