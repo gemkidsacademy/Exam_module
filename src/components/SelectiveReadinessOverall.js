@@ -411,17 +411,14 @@ const MAX_SCORES = {
           </div>
 
           <div className="pdf-preview-body">
-            <div className="overall-summary">
-              <ReportContent
-                overall={overall}
-                balanceIndex={balanceIndex}
-                strengths={strengths}
-                improvements={improvements}
-                subjectChartData={subjectChartData}
-                SUBJECT_LABELS={SUBJECT_LABELS}
-                SubjectFocusCard={SubjectFocusCard}
-              />
-            </div>
+            <PrintRoot
+              overall={overall}
+              balanceIndex={balanceIndex}
+              strengths={strengths}
+              improvements={improvements}
+              subjectChartData={subjectChartData}
+              SUBJECT_LABELS={SUBJECT_LABELS}
+            />
           </div>
         </div>
       </div>
