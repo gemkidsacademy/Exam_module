@@ -2,116 +2,211 @@
 import { forwardRef } from "react";
 
 const PrintRoot = forwardRef(function PrintRoot(props, ref) {
-  
-  const {
-    overall,
-    balanceIndex,
+  const { overall } = props;
+
+  if (!overall) {
+    return (
+      <div ref={ref} className="pdf-report-page">
+        Preparing report...
+      </div>
+    );
+  }
+
+  const studentName = overall.student_name || overall.student_id;
+  const studentId = overall.student_id;
+  const yearLevel = overall.year_level || "Year 5";
+  const examDate = overall.exam_date;
+
+  const components = overall.components || {};
+
+  const reading = components.reading || {};
+  const maths = components.mathematical_reasoning || {};
+  const thinking = components.thinking_skills || {};
+  const writing = components.writing || {};
+
+  function getPerformanceLevel(score) {
+    const val = Number(score || 0);
+
+    if (val >= 85) return "Excellent";
+    if (val >= 75) return "Very Strong";
+    if (val >= 65) return "Strong";
+    if (val >= 50) return "Sound";
+    return "Needs Improvement";
+  }
+
+  function renderAcademicSection(
+    title,
+    data,
+    meaning,
     strengths,
-    improvements,
-    SUBJECT_LABELS,
-  } = props;
-  console.group("📄 PrintRoot render");
-  console.log("overall:", overall);
-  console.log("balanceIndex:", balanceIndex);
-  console.log("strengths:", strengths);
-  console.log("improvements:", improvements);
-  console.groupEnd();
+    improve,
+    focus,
+    isWriting = false
+  ) {
+    const scoreText = isWriting
+      ? `Score: ${data.percent || 0} / 25`
+      : `Score: ${data.obtained || 0} / ${data.total || 0}`;
+
+    const accuracyText = isWriting ? null : `Accuracy: ${data.percent || 0}%`;
+
+    return (
+      <section className="pdf-section-card">
+        <h3 className="pdf-section-heading">{title}</h3>
+
+        <p className="pdf-line"><strong>{scoreText}</strong></p>
+
+        {accuracyText && (
+          <p className="pdf-line">{accuracyText}</p>
+        )}
+
+        <p className="pdf-line">
+          Performance Level:{" "}
+          <strong>{getPerformanceLevel(data.percent)}</strong>
+        </p>
+
+        <div className="pdf-sub-block">
+          <div className="pdf-mini-title">What this means</div>
+          <p>{meaning}</p>
+        </div>
+
+        <div className="pdf-sub-block">
+          <div className="pdf-mini-title">Strengths</div>
+          <p>{strengths}</p>
+        </div>
+
+        <div className="pdf-sub-block">
+          <div className="pdf-mini-title">Area to Improve</div>
+          <p>{improve}</p>
+        </div>
+
+        <div className="pdf-sub-block">
+          <div className="pdf-mini-title">Recommended Focus</div>
+          <p>{focus}</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    // ✅ REF IS ALWAYS ATTACHED TO A REAL DOM NODE
-    <div ref={ref} className="pdf-print-root">
-      {/* ================= EMPTY STATE ================= */}
-      {!overall && (
-        <div className="pdf-placeholder">
-          Preparing report…
+    <div ref={ref} className="pdf-report-page">
+      {/* HEADER */}
+      <header className="pdf-report-header">
+        <div className="pdf-brand">GEM KIDS ACADEMY</div>
+        <div className="pdf-main-title">
+          SELECTIVE DIAGNOSTIC PERFORMANCE REPORT
         </div>
+      </header>
+
+      {/* STUDENT INFO */}
+      <section className="pdf-student-box">
+        <div><strong>Student Name:</strong> {studentName}</div>
+        <div><strong>Student ID:</strong> {studentId}</div>
+        <div><strong>Year Level:</strong> {yearLevel}</div>
+        <div><strong>Test Date:</strong> {examDate}</div>
+        <div><strong>Assessment:</strong> Selective Full-Length Practice Test</div>
+        <div><strong>Mode:</strong> Online (Gem Exam Portal)</div>
+      </section>
+
+      {/* OVERVIEW */}
+      <section className="pdf-intro-box">
+        <h3 className="pdf-section-heading">Test Overview</h3>
+        <p>
+          This assessment is designed to closely reflect the NSW Selective High
+          School Placement Test in structure, difficulty, and time pressure.
+          Results are analysed using Gem Kids Academy benchmarking standards to
+          provide a clear view of current performance, strengths, and next steps.
+        </p>
+      </section>
+
+      {/* SUBJECTS */}
+      {renderAcademicSection(
+        "Reading",
+        reading,
+        `${studentName} demonstrates reading comprehension ability with good understanding of explicit and implicit information.`,
+        "Strong ability to identify key ideas and supporting details.",
+        "Handling more complex passages under time pressure.",
+        "Regular timed reading practice with inference-heavy passages."
       )}
 
-      {/* ================= PRINT CONTENT ================= */}
-      {overall && (
-        <div className="pdf-content">
+      {renderAcademicSection(
+        "Mathematical Reasoning",
+        maths,
+        `${studentName} shows mathematical reasoning ability across multi-step problem solving.`,
+        "Solid numeracy skills and structured problem solving.",
+        "Minor calculation slips under pressure.",
+        "Timed drills and answer-checking habits."
+      )}
 
-          {/* ===== HEADER ===== */}
-          <h2 className="pdf-title">
-            Selective Readiness Report
-          </h2>
+      {renderAcademicSection(
+        "Thinking Skills",
+        thinking,
+        `${studentName} has developing logical reasoning and pattern recognition skills.`,
+        "Good standard logic question performance.",
+        "More complex and unfamiliar reasoning sets.",
+        "Higher difficulty puzzle and reasoning exposure."
+      )}
 
-          {/* ===== SUMMARY ROW ===== */}
-          <div className="score-row">
-            <div className="score-box">
-              <div className="label">Overall Score</div>
-              <div className="value">
-                {overall.overall_percent}%
-              </div>
-            </div>
+      {renderAcademicSection(
+        "Writing",
+        writing,
+        `${studentName}'s writing is structured and relevant, with room to improve depth and sophistication.`,
+        "Clear structure and stays on topic.",
+        "Idea expansion and stronger vocabulary.",
+        "Planning techniques and deeper paragraph development.",
+        true
+      )}
 
-            <div className="score-box">
-              <div className="label">Readiness Band</div>
-              <div className="value">
-                {overall.readiness_band}
-              </div>
-            </div>
+      {/* OVERALL SUMMARY */}
+      <section className="pdf-summary-box">
+        <h3 className="pdf-section-heading">Overall Performance Summary</h3>
 
-            <div className="score-box">
-              <div className="label">Balance Index</div>
-              <div className="value">
-                {balanceIndex}
-              </div>
-            </div>
+        <p><strong>Overall Score:</strong> {overall.overall_percent}%</p>
+        <p><strong>Selective Readiness:</strong> {overall.readiness_band}</p>
+
+        <p className="pdf-summary-text">
+          {studentName} is currently performing with strongest outcomes in
+          higher-scoring sections and would benefit from continued structured
+          practice in weaker areas to improve competitive readiness.
+        </p>
+
+        {overall.override_message && (
+          <div className="pdf-warning-box">
+            {overall.override_message}
           </div>
+        )}
+      </section>
 
-          {/* ===== COMPONENT TABLE ===== */}
-          <h3 className="section-title">
-            Component Breakdown
-          </h3>
+      {/* SCHOOL GUIDANCE */}
+      <section className="pdf-section-card">
+        <h3 className="pdf-section-heading">
+          Target School Guidance (Indicative Only)
+        </h3>
 
-          <table className="breakdown-table">
-            <thead>
-              <tr>
-                <th>Subject</th>
-                <th>Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(overall.components).map(([key, value]) => (
-                <tr key={key}>
-                  <td>{SUBJECT_LABELS[key]}</td>
-                  <td>
-                    {key === "writing"
-                      ? `${value} / 20`
-                      : `${value} / 100`}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <ul className="pdf-list">
+          {(overall.school_recommendation || []).map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
+      </section>
 
-          {/* ===== STRENGTHS ===== */}
-          {strengths?.length > 0 && (
-            <>
-              <h3 className="section-title">Strengths</h3>
-              <ul className="tag-list">
-                {strengths.map((s) => (
-                  <li key={s}>{s}</li>
-                ))}
-              </ul>
-            </>
-          )}
+      {/* NEXT STEPS */}
+      <section className="pdf-section-card">
+        <h3 className="pdf-section-heading">Recommended Next Steps</h3>
 
-          {/* ===== IMPROVEMENTS ===== */}
-          {improvements?.length > 0 && (
-            <>
-              <h3 className="section-title">Areas for Improvement</h3>
-              <ul className="tag-list warning">
-                {improvements.map((s) => (
-                  <li key={s}>{s}</li>
-                ))}
-              </ul>
-            </>
-          )}
+        <ul className="pdf-list">
+          <li>Maintain regular weekly exam practice.</li>
+          <li>Strengthen lower-performing subjects first.</li>
+          <li>Use timed mock exams under real conditions.</li>
+          <li>Review mistakes carefully after each attempt.</li>
+        </ul>
+      </section>
 
-        </div>
-      )}
+      {/* FOOTER */}
+      <footer className="pdf-footer-note">
+        This report provides indicative guidance based on Gem Kids Academy
+        internal assessment standards. Final placement outcomes are determined
+        by official statewide ranking, scaling, and moderation processes.
+      </footer>
     </div>
   );
 });
