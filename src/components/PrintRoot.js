@@ -30,10 +30,10 @@ const PrintRoot = forwardRef(function PrintRoot(props, ref) {
       </div>
 
       <div className="benchmark-bands">
-        <span className={data.overall === "top_10" ? "active gold" : ""}>All Top 10%</span>
-        <span className={data.overall === "top_25" ? "active gold" : ""}>All Top 25%</span>
-        <span className={data.overall === "top_50" ? "active gold" : ""}>All Top 50%</span>
-        <span className={data.overall === "lower_50" ? "active gold" : ""}>All Lower</span>
+        <span className={`band-pill ${data.overall === "top_10" ? "active gold" : ""}`}>All Top 10%</span>
+        <span className={`band-pill ${data.overall === "top_25" ? "active gold" : ""}`}>All Top 25%</span>
+        <span className={`band-pill ${data.overall === "top_50" ? "active gold" : ""}`}>All Top 50%</span>
+        <span className={`band-pill ${data.overall === "lower_50" ? "active gold" : ""}`}>All Lower 50%</span>
       </div>
     </div>
   );
