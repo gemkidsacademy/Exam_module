@@ -99,6 +99,7 @@ const PrintRoot = forwardRef(function PrintRoot(props, ref) {
       </header>
 
       {/* STUDENT INFO */}
+      {/* STUDENT INFO */}
       <section className="pdf-student-box">
         <div><strong>Student Name:</strong> {studentName}</div>
         <div><strong>Student ID:</strong> {studentId}</div>
@@ -106,6 +107,41 @@ const PrintRoot = forwardRef(function PrintRoot(props, ref) {
         <div><strong>Test Date:</strong> {examDate}</div>
         <div><strong>Assessment:</strong> Selective Full-Length Practice Test</div>
         <div><strong>Mode:</strong> Online (Gem Exam Portal)</div>
+      </section>
+
+      {/* PREMIUM METRICS */}
+      <section className="pdf-metric-row">
+
+        <div className="pdf-metric-card">
+          <div className="pdf-metric-label">Your Profile Score</div>
+          <div className="pdf-metric-value">
+            {overall.profile_score || 0}
+          </div>
+          <div className="pdf-metric-sub">
+            out of 100
+          </div>
+        </div>
+
+        <div className="pdf-metric-card">
+          <div className="pdf-metric-label">Gender Rank</div>
+          <div className="pdf-metric-value">
+            {overall.gender_rank || 0}
+          </div>
+          <div className="pdf-metric-sub">
+            out of {overall.total_gender_students || 0}
+          </div>
+        </div>
+
+        <div className="pdf-metric-card">
+          <div className="pdf-metric-label">Overall Rank</div>
+          <div className="pdf-metric-value">
+            {overall.overall_rank || 0}
+          </div>
+          <div className="pdf-metric-sub">
+            out of {overall.total_students || 0}
+          </div>
+        </div>
+
       </section>
 
       {/* OVERVIEW */}
