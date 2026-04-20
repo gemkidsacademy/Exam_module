@@ -485,53 +485,42 @@
 
 .pdf-student-box,
 .pdf-section-card,
-.pdf-summary-box{
+.pdf-summary-box,
+.pdf-intro-box{
   border:1px solid #dbeafe;
-  padding:18px;
+  padding:14px;
   border-radius:10px;
-  margin-bottom:18px;
+  margin-bottom:14px;
 }
 
 .pdf-section-heading{
   font-size:18px;
   font-weight:700;
   color:#1d4ed8;
-  margin-bottom:10px;
-}
-
-.pdf-line{
-  margin:6px 0;
-}
-
-.pdf-sub-block{
-  margin-top:12px;
-}
-
-.pdf-mini-title{
-  font-weight:700;
-  color:#1e3a8a;
-  margin-bottom:4px;
-}
-
-.pdf-list{
-  padding-left:20px;
-}
-
-.pdf-list li{
   margin-bottom:8px;
 }
 
-.pdf-warning-box{
-  margin-top:12px;
-  padding:12px;
-  background:#fff7ed;
-  border-left:4px solid #f97316;
+.pdf-line{
+  margin:4px 0;
+}
+
+.pdf-sub-block{
+  margin-top:8px;
+}
+
+.pdf-list{
+  padding-left:18px;
+  margin:6px 0;
+}
+
+.pdf-list li{
+  margin-bottom:4px;
 }
 
 .pdf-footer-note{
-  margin-top:24px;
+  margin-top:18px;
   font-size:12px;
-  line-height:1.5;
+  line-height:1.45;
   color:#6b7280;
 }
 /* ===========================

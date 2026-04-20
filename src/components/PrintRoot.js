@@ -24,6 +24,24 @@ const PrintRoot = forwardRef(function PrintRoot(props, ref) {
   const maths = components.mathematical_reasoning || {};
   const thinking = components.thinking_skills || {};
   const writing = components.writing || {};
+  function getPercent(subjectData) {
+  return Number(subjectData?.percent || 0);
+}
+
+const subjectScores = {
+  Reading: getPercent(reading),
+  "Mathematical Reasoning": getPercent(maths),
+  "Thinking Skills": getPercent(thinking),
+  Writing: getPercent(writing)
+};
+
+const strongestSubject = Object.keys(subjectScores).reduce((a, b) =>
+  subjectScores[a] >= subjectScores[b] ? a : b
+);
+
+const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
+  subjectScores[a] <= subjectScores[b] ? a : b
+);
 
   function getPerformanceLevel(score) {
     const val = Number(score || 0);
@@ -34,6 +52,23 @@ const PrintRoot = forwardRef(function PrintRoot(props, ref) {
     if (val >= 50) return "Sound";
     return "Needs Improvement";
   }
+  function getSmartStrengthComment(title, score) {
+  const val = Number(score || 0);
+
+  if (val >= 85) {
+    return `${title} is currently a standout strength and competitive asset.`;
+  }
+
+  if (val >= 70) {
+    return `${title} is performing strongly with good consistency.`;
+  }
+
+  if (val >= 55) {
+    return `${title} shows solid foundations with room to grow further.`;
+  }
+
+  return `${title} remains an important growth opportunity.`;
+}
 
   function renderAcademicSection(
     title,
@@ -72,12 +107,21 @@ const PrintRoot = forwardRef(function PrintRoot(props, ref) {
 
         <div className="pdf-sub-block">
           <div className="pdf-mini-title">Strengths</div>
-          <p>{strengths}</p>
+          <p>
+            {getSmartStrengthComment(title, data.percent)}
+            {" "}
+            {strengths}
+          </p>
         </div>
 
         <div className="pdf-sub-block">
           <div className="pdf-mini-title">Area to Improve</div>
-          <p>{improve}</p>
+          <p>
+            {Number(data.percent || 0) < 65
+              ? `${title} should be prioritised in the next study cycle. `
+              : ""}
+            {improve}
+          </p>
         </div>
 
         <div className="pdf-sub-block">
@@ -209,11 +253,35 @@ const PrintRoot = forwardRef(function PrintRoot(props, ref) {
   <p><strong>Summary Insight:</strong></p>
 
   <p className="pdf-summary-text">
-    {studentName} is performing at a solid level across core sections. With
-    focused improvement in Writing and continued development in Thinking
-    Skills, {studentName.split(" ")[0]} is well positioned to strengthen
-    selective competitiveness further.
-  </p>
+
+  {overall.profile_score >= 80 && (
+    <>
+      {studentName} is currently performing at a highly competitive level across
+      core selective test areas. <strong>{strongestSubject}</strong> is a standout
+      strength, while refining <strong>{weakestSubject}</strong> could further
+      strengthen top-tier readiness.
+    </>
+  )}
+
+  {overall.profile_score >= 65 && overall.profile_score < 80 && (
+    <>
+      {studentName} is demonstrating strong readiness across key areas.
+      <strong> {strongestSubject}</strong> is currently a strength, while focused
+      improvement in <strong>{weakestSubject}</strong> can significantly improve
+      competitiveness.
+    </>
+  )}
+
+  {overall.profile_score < 65 && (
+    <>
+      {studentName} is building solid foundations across core areas.
+      <strong> {strongestSubject}</strong> shows encouraging progress, while
+      consistent work in <strong>{weakestSubject}</strong> will help accelerate
+      readiness.
+    </>
+  )}
+
+</p>
 
   {overall.override_message && (
     <div className="pdf-warning-box">
@@ -237,12 +305,17 @@ const PrintRoot = forwardRef(function PrintRoot(props, ref) {
     ))}
   </ul>
 
-  <p><strong>With Further Improvement:</strong></p>
-  <ul className="pdf-list">
-    {(overall.school_recommendation || []).slice(3).map((item, index) => (
-      <li key={index}>{item}</li>
-    ))}
-  </ul>
+  {(overall.school_recommendation || []).length > 3 && (
+    <>
+      <p><strong>With Further Improvement:</strong></p>
+
+      <ul className="pdf-list">
+        {(overall.school_recommendation || []).slice(3).map((item, index) => (
+          <li key={index}>{item}</li>
+        ))}
+      </ul>
+    </>
+  )}
 </section>
 
 {/* NEXT STEPS */}
