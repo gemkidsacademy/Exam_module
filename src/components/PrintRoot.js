@@ -193,51 +193,76 @@ const PrintRoot = forwardRef(function PrintRoot(props, ref) {
         true
       )}
 
-      {/* OVERALL SUMMARY */}
-      <section className="pdf-summary-box">
-        <h3 className="pdf-section-heading">Overall Performance Summary</h3>
+      {/* OVERALL PERFORMANCE SUMMARY */}
+<section className="pdf-summary-box">
+  <h3 className="pdf-section-heading">
+    Overall Performance Summary
+  </h3>
 
-        <p><strong>Overall Score:</strong> {overall.overall_percent}%</p>
-        <p><strong>Selective Readiness:</strong> {overall.readiness_band}</p>
+  <p><strong>Overall Score:</strong> {overall.overall_percent}%</p>
 
-        <p className="pdf-summary-text">
-          {studentName} is currently performing with strongest outcomes in
-          higher-scoring sections and would benefit from continued structured
-          practice in weaker areas to improve competitive readiness.
-        </p>
+  <p>
+    <strong>Selective Readiness:</strong>{" "}
+    {overall.readiness_band}
+  </p>
 
-        {overall.override_message && (
-          <div className="pdf-warning-box">
-            {overall.override_message}
-          </div>
-        )}
-      </section>
+  <p><strong>Summary Insight:</strong></p>
 
-      {/* SCHOOL GUIDANCE */}
-      <section className="pdf-section-card">
-        <h3 className="pdf-section-heading">
-          Target School Guidance (Indicative Only)
-        </h3>
+  <p className="pdf-summary-text">
+    {studentName} is performing at a solid level across core sections. With
+    focused improvement in Writing and continued development in Thinking
+    Skills, {studentName.split(" ")[0]} is well positioned to strengthen
+    selective competitiveness further.
+  </p>
 
-        <ul className="pdf-list">
-          {(overall.school_recommendation || []).map((item, index) => (
-            <li key={index}>{item}</li>
-          ))}
-        </ul>
-      </section>
+  {overall.override_message && (
+    <div className="pdf-warning-box">
+      {overall.override_message}
+    </div>
+  )}
+</section>
 
-      {/* NEXT STEPS */}
-      <section className="pdf-section-card">
-        <h3 className="pdf-section-heading">Recommended Next Steps</h3>
+{/* SCHOOL GUIDANCE */}
+<section className="pdf-section-card">
+  <h3 className="pdf-section-heading">
+    Target School Guidance (Indicative Only)
+  </h3>
 
-        <ul className="pdf-list">
-          <li>Maintain regular weekly exam practice.</li>
-          <li>Strengthen lower-performing subjects first.</li>
-          <li>Use timed mock exams under real conditions.</li>
-          <li>Review mistakes carefully after each attempt.</li>
-        </ul>
-      </section>
+  <p><strong>Based on current performance:</strong></p>
 
+  <p><strong>Competitive Range:</strong></p>
+  <ul className="pdf-list">
+    {(overall.school_recommendation || []).slice(0,3).map((item, index) => (
+      <li key={index}>{item}</li>
+    ))}
+  </ul>
+
+  <p><strong>With Further Improvement:</strong></p>
+  <ul className="pdf-list">
+    {(overall.school_recommendation || []).slice(3).map((item, index) => (
+      <li key={index}>{item}</li>
+    ))}
+  </ul>
+</section>
+
+{/* NEXT STEPS */}
+<section className="pdf-section-card">
+  <h3 className="pdf-section-heading">
+    Recommended Next Steps
+  </h3>
+
+  <ul className="pdf-list">
+    <li>Focus on improving Writing depth and expression.</li>
+    <li>Strengthen advanced Thinking Skills performance.</li>
+    <li>Maintain strong Reading and Mathematical Reasoning results.</li>
+    <li>Continue regular full-length mock tests under exam conditions.</li>
+  </ul>
+
+  <p className="pdf-line">
+    <strong>Suggested Preparation Timeline:</strong>
+    {" "}6 to 9 months of structured practice
+  </p>
+</section>
       {/* FOOTER */}
       <footer className="pdf-footer-note">
         This report provides indicative guidance based on Gem Kids Academy
