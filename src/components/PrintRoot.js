@@ -48,7 +48,7 @@ const PrintRoot = forwardRef(function PrintRoot(props, ref) {
 
 console.log("BENCHMARK DATA:", overall.benchmark_bands);
 
-const studentName = overall.student_name || overall.student_id;
+
 
   const studentName = overall.student_name || overall.student_id;
   const studentId = overall.student_id;
