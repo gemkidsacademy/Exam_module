@@ -89,9 +89,9 @@ const handleSendEmail = async () => {
 
     alert("Email sent successfully ✅");
   } catch (error) {
-    console.error(error);
-    alert("Failed to generate/send PDF");
-  } finally {
+  console.error("SEND EMAIL ERROR:", error);
+  alert(error?.message || "Failed to generate/send PDF");
+} finally {
     setSendingEmail(false);
   }
 };
