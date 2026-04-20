@@ -39,12 +39,16 @@ const PrintRoot = forwardRef(function PrintRoot(props, ref) {
   );
 }
   if (!overall) {
-    return (
-      <div ref={ref} className="pdf-report-page">
-        Preparing report...
-      </div>
-    );
-  }
+  return (
+    <div ref={ref} className="pdf-report-page">
+      Preparing report...
+    </div>
+  );
+}
+
+console.log("BENCHMARK DATA:", overall.benchmark_bands);
+
+const studentName = overall.student_name || overall.student_id;
 
   const studentName = overall.student_name || overall.student_id;
   const studentId = overall.student_id;
