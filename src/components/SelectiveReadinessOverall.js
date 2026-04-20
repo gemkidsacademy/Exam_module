@@ -64,11 +64,13 @@ const handleSendEmail = async () => {
 
     formData.append("student_id", selectedStudent);
     formData.append("exam_date", selectedDate);
-    formData.append(
-      "file",
-      pdfBlob,
-      `Selective_Report_${selectedStudent}.pdf`
+    const pdfFile = new File(
+      [pdfBlob],
+      `Selective_Report_${selectedStudent}.pdf`,
+      { type: "application/pdf" }
     );
+
+    formData.append("file", pdfFile);
 
     const res = await fetch(
       `${BACKEND_URL}/api/admin/send-selective-report-email`,
