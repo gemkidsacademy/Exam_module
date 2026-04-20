@@ -12,10 +12,21 @@ const PrintRoot = forwardRef(function PrintRoot(props, ref) {
       <div className="benchmark-title">{title}</div>
 
       <div className="benchmark-bands">
-        <span className={data.gender === "top_10" ? "active pink" : ""}>G Top 10%</span>
-        <span className={data.gender === "top_25" ? "active pink" : ""}>G Top 25%</span>
-        <span className={data.gender === "top_50" ? "active pink" : ""}>G Top 50%</span>
-        <span className={data.gender === "lower_50" ? "active pink" : ""}>G Lower</span>
+        <span className={`band-pill ${data.gender === "top_10" ? "active pink" : ""}`}>
+          {overall.gender === "Female" ? "Girls" : "Gender"} Top 10%
+        </span>
+
+        <span className={`band-pill ${data.gender === "top_25" ? "active pink" : ""}`}>
+          {overall.gender === "Female" ? "Girls" : "Gender"} Top 25%
+        </span>
+
+        <span className={`band-pill ${data.gender === "top_50" ? "active pink" : ""}`}>
+          {overall.gender === "Female" ? "Girls" : "Gender"} Top 50%
+        </span>
+
+        <span className={`band-pill ${data.gender === "lower_50" ? "active pink" : ""}`}>
+          {overall.gender === "Female" ? "Girls" : "Gender"} Lower 50%
+        </span>
       </div>
 
       <div className="benchmark-bands">
@@ -209,6 +220,9 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
         </div>
 
       </section>
+      <p className="pdf-line">
+        Pink = Gender Cohort | Gold = Overall Cohort
+      </p>
       {/* BENCHMARK PERFORMANCE */}
       <section className="pdf-section-card">
         <h3 className="pdf-section-heading">
