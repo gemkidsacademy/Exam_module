@@ -561,3 +561,35 @@
   font-size:13px;
   color:#6b7280;
 }
+.benchmark-row{
+  margin-bottom:14px;
+  padding-bottom:10px;
+  border-bottom:1px solid #e5e7eb;
+}
+
+.benchmark-title{
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+.benchmark-bands{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:6px;
+}
+
+.benchmark-bands span{
+  font-size:11px;
+  padding:4px 8px;
+  border-radius:20px;
+  background:#f3f4f6;
+}
+
+.active.pink{
+  background:#fbcfe8;
+}
+
+.active.gold{
+  background:#fde68a;
+}

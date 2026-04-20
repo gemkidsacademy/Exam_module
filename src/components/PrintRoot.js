@@ -4,7 +4,29 @@ import "./SelectiveReadinessOverall.css";
 
 const PrintRoot = forwardRef(function PrintRoot(props, ref) {
   const { overall } = props;
+  function BenchmarkRow({ title, data }) {
+  if (!data) return null;
 
+  return (
+    <div className="benchmark-row">
+      <div className="benchmark-title">{title}</div>
+
+      <div className="benchmark-bands">
+        <span className={data.gender === "top_10" ? "active pink" : ""}>G Top 10%</span>
+        <span className={data.gender === "top_25" ? "active pink" : ""}>G Top 25%</span>
+        <span className={data.gender === "top_50" ? "active pink" : ""}>G Top 50%</span>
+        <span className={data.gender === "lower_50" ? "active pink" : ""}>G Lower</span>
+      </div>
+
+      <div className="benchmark-bands">
+        <span className={data.overall === "top_10" ? "active gold" : ""}>All Top 10%</span>
+        <span className={data.overall === "top_25" ? "active gold" : ""}>All Top 25%</span>
+        <span className={data.overall === "top_50" ? "active gold" : ""}>All Top 50%</span>
+        <span className={data.overall === "lower_50" ? "active gold" : ""}>All Lower</span>
+      </div>
+    </div>
+  );
+}
   if (!overall) {
     return (
       <div ref={ref} className="pdf-report-page">
@@ -187,7 +209,32 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
         </div>
 
       </section>
+      {/* BENCHMARK PERFORMANCE */}
+      <section className="pdf-section-card">
+        <h3 className="pdf-section-heading">
+          Student Test Performance Benchmarking
+        </h3>
 
+        <BenchmarkRow
+          title="Reading"
+          data={overall.benchmark_bands?.reading}
+        />
+
+        <BenchmarkRow
+          title="Mathematical Reasoning"
+          data={overall.benchmark_bands?.maths}
+        />
+
+        <BenchmarkRow
+          title="Thinking Skills"
+          data={overall.benchmark_bands?.thinking}
+        />
+
+        <BenchmarkRow
+          title="Writing"
+          data={overall.benchmark_bands?.writing}
+        />
+      </section>
       {/* OVERVIEW */}
       <section className="pdf-intro-box">
         <h3 className="pdf-section-heading">Test Overview</h3>
