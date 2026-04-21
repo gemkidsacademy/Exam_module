@@ -79,28 +79,35 @@ const hasSubmittedRef = useRef(false);
 const normalizeOption = (value) => {
   if (!value) return null;
 
-  if (typeof value === "object") {
+  // already normalized object
+  if (
+    typeof value === "object" &&
+    value.type &&
+    (value.src || value.content)
+  ) {
     return value;
   }
 
-  const str = String(value).trim();
+  const str =
+    typeof value === "string"
+      ? value.trim()
+      : JSON.stringify(value).trim();
 
   const isImage =
-    str.startsWith("http") ||
+    str.includes("storage.googleapis.com") ||
+    /^https?:\/\//i.test(str) ||
     /\.(png|jpg|jpeg|webp)(\?.*)?$/i.test(str);
 
   if (isImage) {
     return {
       type: "image",
-      src: str.startsWith("http")
-        ? str
-        : IMAGE_BASE + str
+      src: str.replace(/^"|"$/g, "")
     };
   }
 
   return {
     type: "text",
-    content: str
+    content: str.replace(/^"|"$/g, "")
   };
 };
 const API_BASE = process.env.REACT_APP_API_URL;
@@ -700,9 +707,17 @@ return (
 <div className="options-container">
 
   {optionEntries.map(([optionKey, rawValue]) => {
-   console.log("OPTION DEBUG", optionKey, rawValue, normalizeOption(rawValue));
+   console.log("----------- OPTION DEBUG -----------");
+  console.log("KEY:", optionKey);
+  console.log("RAW VALUE:", rawValue);
+  console.log("TYPE OF RAW:", typeof rawValue);
 
-    const optionValue = normalizeOption(rawValue);
+  const optionValue = normalizeOption(rawValue);
+
+  console.log("NORMALIZED:", optionValue);
+  console.log("-----------------------------------");
+
+    
 
     const studentAnswer = isReview
       ? currentQ.student_answer
@@ -749,12 +764,17 @@ return (
         )}
 
         {optionValue?.type === "image" && (
-         <img
-           src={optionValue.src}
-           alt={`Option ${optionKey}`}
-           className="option-image"
-         />
-       )}
+          <>
+            {console.log("IMAGE TAG RENDERING:", optionValue.src)}
+            <img
+              src={optionValue.src}
+              alt={`Option ${optionKey}`}
+              className="option-image"
+              onError={() => console.log("IMAGE FAILED:", optionValue.src)}
+              onLoad={() => console.log("IMAGE LOADED:", optionValue.src)}
+            />
+          </>
+        )}
              
       </button>
     );
