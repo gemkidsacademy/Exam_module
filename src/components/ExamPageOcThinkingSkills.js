@@ -77,28 +77,30 @@ const [loadingExplanation, setLoadingExplanation] = useState(false);
 
 const hasSubmittedRef = useRef(false);
 const normalizeOption = (value) => {
-
   if (!value) return null;
 
-  // already normalized by backend
   if (typeof value === "object") {
     return value;
   }
 
-  // string image filename
-  if (typeof value === "string" && value.match(/\.(png|jpg|jpeg|webp)$/i)) {
+  const str = String(value).trim();
+
+  const isImage =
+    str.startsWith("http") ||
+    /\.(png|jpg|jpeg|webp)(\?.*)?$/i.test(str);
+
+  if (isImage) {
     return {
       type: "image",
-      src: value.startsWith("http")
-        ? value
-        : IMAGE_BASE + value
+      src: str.startsWith("http")
+        ? str
+        : IMAGE_BASE + str
     };
   }
 
-  // text
   return {
     type: "text",
-    content: String(value)
+    content: str
   };
 };
 const API_BASE = process.env.REACT_APP_API_URL;
@@ -657,7 +659,10 @@ return (
 {/* QUESTION BLOCKS */}
 <div className="question-blocks">
 {currentQ?.blocks?.map((block, idx) => {
-  if (block.type === "text") {
+  if (
+    block.type === "text" &&
+    !block.content?.startsWith("CLASS_YEAR:")
+  ) {
     return (
       <p key={idx} className="question-text">
         {block.content}

@@ -575,11 +575,14 @@
   z-index: 2;
 }
 .option-image {
-  display: block;          /* helps layout */
+  display: block;
   max-width: 100%;
-  max-height: 180px;       /* prevents giant images */
+  max-height: 220px;
+  width: auto;
   height: auto;
+  object-fit: contain;
   margin-top: 8px;
+  margin-left: 12px;
 }
 /* -------------------------------
    COMPLETED RESULT CARD
