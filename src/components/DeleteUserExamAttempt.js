@@ -83,6 +83,37 @@ const DeleteUserExamAttempt = ({ onClose }) => {
   /* ============================
      DELETE HANDLER
   ============================ */
+  const handleDeleteHomeworkAttemptClick = async () => {
+  try {
+    const response = await fetch(
+      "https://web-production-481a5.up.railway.app/api/delete-homework-attempt",
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          student_id: selectedStudentId,
+          exam_type: selectedExamType,
+          class_name: selectedClassType,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(`❌ ${data.detail || "Failed to delete homework attempt"}`);
+      return;
+    }
+
+    alert(`✅ ${data.message || "Homework attempt deleted"}`);
+    onClose();
+
+  } catch (error) {
+    alert("❌ Network error. Please try again.");
+  }
+};
   const handleDeleteExamAttemptClick = async () => {
   try {
     console.log({
@@ -172,6 +203,9 @@ const DeleteUserExamAttempt = ({ onClose }) => {
       <div className="button-group">
         <button onClick={handleDeleteExamAttemptClick}>
           Delete Exam Attempt
+        </button>
+        <button onClick={handleDeleteHomeworkAttemptClick}>
+          Delete Homework Attempt
         </button>
       
         <button onClick={onClose}>
