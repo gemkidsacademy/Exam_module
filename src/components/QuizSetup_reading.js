@@ -366,9 +366,9 @@ export default function QuizSetup_reading() {
           required
         >
           <option value="">Select Year</option>
-          <option value="Year 4">Year 4</option>
-          <option value="Year 5">Year 5</option>
-          <option value="Year 6">Year 6</option>
+          <option value="4">Year 4</option>
+          <option value="5">Year 5</option>
+          <option value="6">Year 6</option>
         </select>
 
         <label>Subject:</label>
