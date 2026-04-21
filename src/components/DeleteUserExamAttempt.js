@@ -200,14 +200,22 @@ const DeleteUserExamAttempt = ({ onClose }) => {
       {/* ============================
           ACTION BUTTONS
       ============================ */}
+      
       <div className="button-group">
-        <button onClick={handleDeleteExamAttemptClick}>
+        <button
+          className="danger-btn"
+          onClick={handleDeleteExamAttemptClick}
+        >
           Delete Exam Attempt
         </button>
-        <button onClick={handleDeleteHomeworkAttemptClick}>
+
+        <button
+          className="danger-btn"
+          onClick={handleDeleteHomeworkAttemptClick}
+        >
           Delete Homework Attempt
         </button>
-      
+
         <button onClick={onClose}>
           Cancel
         </button>

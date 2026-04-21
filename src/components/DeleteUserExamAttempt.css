@@ -93,3 +93,16 @@
 .modal button:last-child:hover {
   background-color: #d0d7de;
 }
+.danger-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.danger-btn:hover {
+  opacity: 0.9;
+}
