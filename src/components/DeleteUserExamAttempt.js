@@ -84,13 +84,16 @@ const DeleteUserExamAttempt = ({ onClose }) => {
      DELETE HANDLER
   ============================ */
   const handleDeleteExamAttemptClick = async () => {
-    try {
-      console.log({
-        student_id: selectedStudentId,
-        exam_type: selectedExamType,
-        class_name: selectedClassType,
-      });
-      await fetch("https://web-production-481a5.up.railway.app/api/delete-exam-attempt", {
+  try {
+    console.log({
+      student_id: selectedStudentId,
+      exam_type: selectedExamType,
+      class_name: selectedClassType,
+    });
+
+    const response = await fetch(
+      "https://web-production-481a5.up.railway.app/api/delete-exam-attempt",
+      {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -100,16 +103,24 @@ const DeleteUserExamAttempt = ({ onClose }) => {
           exam_type: selectedExamType,
           class_name: selectedClassType,
         }),
-      });
+      }
+    );
 
-      alert("✅ Exam attempt deleted");
-      onClose();
-    } catch (error) {
-      console.error("❌ Delete failed", error);
-      alert("❌ Failed to delete exam attempt");
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(`❌ ${data.detail || "Failed to delete exam attempt"}`);
+      return;
     }
-  };
 
+    alert(`✅ ${data.message || "Exam attempt deleted"}`);
+    onClose();
+
+  } catch (error) {
+    console.error("❌ Delete failed", error);
+    alert("❌ Network error. Please try again.");
+  }
+};
   return (
     <div className="modal">
       <h2>Delete User Exam Attempt</h2>
