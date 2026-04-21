@@ -715,3 +715,26 @@
   margin-top:6px;
   margin-left:140px;
 }
+.chart-cell{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:4px;
+}
+
+.chart-cell-text{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  line-height:1.1;
+}
+
+.chart-cell-text strong{
+  font-size:12px;
+  font-weight:700;
+}
+
+.chart-cell-text span{
+  font-size:9px;
+}

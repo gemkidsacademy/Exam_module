@@ -35,19 +35,31 @@ const PrintRoot = forwardRef(function PrintRoot(props, ref) {
         <div className="chart-band-grid">
 
           <div className={`chart-cell ${genderPos === 0 || overallPos === 0 ? "active-zone" : ""}`}>
-            50%
+            <div className="chart-cell-text">
+              <strong>50%</strong>
+              <span>of students who sat the test</span>
+            </div>
           </div>
 
           <div className={`chart-cell ${genderPos === 1 || overallPos === 1 ? "active-zone" : ""}`}>
-            25%
+            <div className="chart-cell-text">
+              <strong>25%</strong>
+              <span>of students who sat the test</span>
+            </div>
           </div>
 
           <div className={`chart-cell ${genderPos === 2 || overallPos === 2 ? "active-zone" : ""}`}>
-            15%
+            <div className="chart-cell-text">
+              <strong>15%</strong>
+              <span>of students who sat the test</span>
+            </div>
           </div>
 
           <div className={`chart-cell ${genderPos === 3 || overallPos === 3 ? "active-zone" : ""}`}>
-            10%
+            <div className="chart-cell-text">
+              <strong>10%</strong>
+              <span>of students who sat the test</span>
+            </div>
           </div>
 
           <div
