@@ -4,9 +4,14 @@ import "./SelectiveReadinessOverall.css";
 
 const PrintRoot = forwardRef(function PrintRoot(props, ref) {
   const { overall } = props;
-  function BenchmarkRow({ title, data, raw, total }) {
+  function BenchmarkRow({ title, data, raw, total, studentName }) {
   if (!data) return null;
-
+  function labelText(val) {
+    if (val === "top_10") return "top 10%";
+    if (val === "top_25") return "top 25%";
+    if (val === "top_50") return "top 50%";
+    return "lower 50%";
+  }
   const bandIndex = {
     lower_50: 0,
     top_50: 1,
@@ -18,6 +23,7 @@ const PrintRoot = forwardRef(function PrintRoot(props, ref) {
   const overallPos = bandIndex[data.overall] ?? 0;
 
   return (
+  <div className="chart-row-wrap">
     <div className="chart-row">
 
       <div className="chart-subject">
@@ -67,7 +73,15 @@ const PrintRoot = forwardRef(function PrintRoot(props, ref) {
         <div className="raw-score-sub">OUT OF {total}</div>
       </div>
 
+        </div>
+
+    <div className="chart-summary">
+      In {title}, {studentName} performed in the {labelText(data.gender)} of same-gender students and the {labelText(data.overall)} overall.
     </div>
+
+  </div>
+
+
   );
 }
   if (!overall) {
@@ -256,9 +270,11 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
         </div>
 
       </section>
-      <p className="pdf-line">
-        Pink = Gender Cohort | Gold = Overall Cohort
-      </p>
+      <div className="pdf-legend">
+        <span className="legend-item pink-text">● Gender Ranking</span>
+        <span className="legend-divider">|</span>
+        <span className="legend-item gold-text">★ Overall Ranking</span>
+      </div>
       {/* BENCHMARK PERFORMANCE */}
       <section className="pdf-section-card">
         <h3 className="pdf-section-heading">
@@ -270,6 +286,7 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
           data={overall.benchmark_bands?.reading}
           raw={reading.obtained || 0}
           total={reading.total || 0}
+          studentName={studentName}
         />
 
         <BenchmarkRow
@@ -277,6 +294,7 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
           data={overall.benchmark_bands?.maths}
           raw={maths.obtained || 0}
           total={maths.total || 0}
+          studentName={studentName}
         />
 
         <BenchmarkRow
@@ -284,6 +302,7 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
           data={overall.benchmark_bands?.thinking}
           raw={thinking.obtained || 0}
           total={thinking.total || 0}
+          studentName={studentName}
         />
 
         <BenchmarkRow
@@ -291,6 +310,7 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
           data={overall.benchmark_bands?.writing}
           raw={writing.percent || 0}
           total={25}
+          studentName={studentName}
         />
       </section>
       {/* OVERVIEW */}

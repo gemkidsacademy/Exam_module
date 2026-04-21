@@ -676,3 +676,42 @@
   margin-top:6px;
   font-weight:700;
 }
+.pdf-legend{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  font-size:13px;
+  font-weight:600;
+  margin:8px 0 14px;
+}
+
+.legend-item{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+.pink-text{
+  color:#ec4899;
+}
+
+.gold-text{
+  color:#f59e0b;
+}
+
+.legend-divider{
+  color:#9ca3af;
+}
+.chart-row-wrap{
+  padding:10px 0;
+  border-bottom:1px solid #e5e7eb;
+}
+
+.chart-summary{
+  font-size:12px;
+  line-height:1.4;
+  color:#374151;
+  margin-top:6px;
+  margin-left:140px;
+}
