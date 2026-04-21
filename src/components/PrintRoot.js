@@ -4,37 +4,69 @@ import "./SelectiveReadinessOverall.css";
 
 const PrintRoot = forwardRef(function PrintRoot(props, ref) {
   const { overall } = props;
-  function BenchmarkRow({ title, data }) {
+  function BenchmarkRow({ title, data, raw, total }) {
   if (!data) return null;
 
+  const bandIndex = {
+    lower_50: 0,
+    top_50: 1,
+    top_25: 2,
+    top_10: 3
+  };
+
+  const genderPos = bandIndex[data.gender] ?? 0;
+  const overallPos = bandIndex[data.overall] ?? 0;
+
   return (
-    <div className="benchmark-row">
-      <div className="benchmark-title">{title}</div>
+    <div className="chart-row">
 
-      <div className="benchmark-bands">
-        <span className={`band-pill ${data.gender === "top_10" ? "active pink" : ""}`}>
-          {overall.gender === "Female" ? "Girls" : "Gender"} Top 10%
-        </span>
-
-        <span className={`band-pill ${data.gender === "top_25" ? "active pink" : ""}`}>
-          {overall.gender === "Female" ? "Girls" : "Gender"} Top 25%
-        </span>
-
-        <span className={`band-pill ${data.gender === "top_50" ? "active pink" : ""}`}>
-          {overall.gender === "Female" ? "Girls" : "Gender"} Top 50%
-        </span>
-
-        <span className={`band-pill ${data.gender === "lower_50" ? "active pink" : ""}`}>
-          {overall.gender === "Female" ? "Girls" : "Gender"} Lower 50%
-        </span>
+      <div className="chart-subject">
+        {title}
       </div>
 
-      <div className="benchmark-bands">
-        <span className={`band-pill ${data.overall === "top_10" ? "active gold" : ""}`}>All Top 10%</span>
-        <span className={`band-pill ${data.overall === "top_25" ? "active gold" : ""}`}>All Top 25%</span>
-        <span className={`band-pill ${data.overall === "top_50" ? "active gold" : ""}`}>All Top 50%</span>
-        <span className={`band-pill ${data.overall === "lower_50" ? "active gold" : ""}`}>All Lower 50%</span>
+      <div className="chart-band-wrap">
+
+        <div className="chart-band-grid">
+
+          <div className={`chart-cell ${genderPos === 0 || overallPos === 0 ? "active-zone" : ""}`}>
+            50%
+          </div>
+
+          <div className={`chart-cell ${genderPos === 1 || overallPos === 1 ? "active-zone" : ""}`}>
+            25%
+          </div>
+
+          <div className={`chart-cell ${genderPos === 2 || overallPos === 2 ? "active-zone" : ""}`}>
+            15%
+          </div>
+
+          <div className={`chart-cell ${genderPos === 3 || overallPos === 3 ? "active-zone" : ""}`}>
+            10%
+          </div>
+
+          <div
+            className="marker pink-marker"
+            style={{ left: `${genderPos * 25 + 12}%` }}
+          >
+            ●
+          </div>
+
+          <div
+            className="marker gold-marker"
+            style={{ left: `${overallPos * 25 + 12}%` }}
+          >
+            ★
+          </div>
+
+        </div>
+
       </div>
+
+      <div className="raw-score-box">
+        <div className="raw-score-main">{raw}</div>
+        <div className="raw-score-sub">OUT OF {total}</div>
+      </div>
+
     </div>
   );
 }
@@ -236,21 +268,29 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
         <BenchmarkRow
           title="Reading"
           data={overall.benchmark_bands?.reading}
+          raw={reading.obtained || 0}
+          total={reading.total || 0}
         />
 
         <BenchmarkRow
           title="Mathematical Reasoning"
           data={overall.benchmark_bands?.maths}
+          raw={maths.obtained || 0}
+          total={maths.total || 0}
         />
 
         <BenchmarkRow
           title="Thinking Skills"
           data={overall.benchmark_bands?.thinking}
+          raw={thinking.obtained || 0}
+          total={thinking.total || 0}
         />
 
         <BenchmarkRow
           title="Writing"
           data={overall.benchmark_bands?.writing}
+          raw={writing.percent || 0}
+          total={25}
         />
       </section>
       {/* OVERVIEW */}
