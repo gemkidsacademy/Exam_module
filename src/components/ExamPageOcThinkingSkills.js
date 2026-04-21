@@ -18,6 +18,7 @@ export default function ExamPageOcThinkingSkills({
   onExamFinish
 }) {
 const studentId = sessionStorage.getItem("student_id");
+const [reviewLoading, setReviewLoading] = useState(false);
 console.log("🔥 parentMode (child):", parentMode);
 const [attempts, setAttempts] = useState([]);
 const loadAttempts = useCallback(async () => {
@@ -80,13 +81,29 @@ const normalizeOption = (value) => {
   if (!value) return null;
 
   // already normalized object
-  if (
-    typeof value === "object" &&
-    value.type &&
-    (value.src || value.content)
-  ) {
-    return value;
+  if (typeof value === "object" && value) {
+  const raw = value.src || value.content || "";
+
+  const looksLikeImage =
+    typeof raw === "string" &&
+    (
+      raw.includes("storage.googleapis.com") ||
+      /^https?:\/\//i.test(raw) ||
+      /\.(png|jpg|jpeg|webp)(\?.*)?$/i.test(raw)
+    );
+
+  if (looksLikeImage) {
+    return {
+      type: "image",
+      src: raw.trim()
+    };
   }
+
+  return {
+    type: "text",
+    content: String(raw).trim()
+  };
+}
 
   const str =
     typeof value === "string"
@@ -154,14 +171,11 @@ const handleGenerateExplanation = async () => {
   }
 };
  const handleViewExamDetails = () => {
-  console.log("🟢 View Exam Details button clicked");
-
-  // 🔥 force clean transition
+  setReviewLoading(true);
   setQuestions([]);
   setCurrentIndex(0);
   setVisited({});
   setAnswers({});
-
   setMode("review");
 };
 
@@ -208,7 +222,7 @@ const loadReport = useCallback(async (attemptId = null) => {
     if (attemptId !== null && attemptId !== undefined) {
       url += `&exam_attempt_id=${attemptId}`;
     }
-    
+
     const res = await fetch(url);
 
     if (!res.ok) {
@@ -217,17 +231,38 @@ const loadReport = useCallback(async (attemptId = null) => {
     }
 
     const data = await res.json();
+
     console.log("REVIEW API RESPONSE", data);
     console.log("📊 report loaded:", data);
 
     setReport(data);
-    setExamAttemptId(data.exam_attempt_id);
+
+    if (
+      data.exam_attempt_id &&
+      examAttemptId !== data.exam_attempt_id
+    ) {
+      setExamAttemptId(data.exam_attempt_id);
+    }
+
     setMode("report");
+
     await loadAttempts();
+
   } catch (err) {
     console.error("❌ loadReport error:", err);
   }
-}, [studentId, loadAttempts]);
+}, [
+  studentId,
+  parentMode,
+  API_BASE,
+  examAttemptId,
+  loadAttempts
+]);
+useEffect(() => {
+  document.addEventListener("contextmenu", e => e.preventDefault());
+  document.addEventListener("copy", e => e.preventDefault());
+  document.addEventListener("cut", e => e.preventDefault());
+}, []);
 useEffect(() => {
   if (mode !== "exam") return;
 
@@ -519,10 +554,11 @@ const formatTime = (seconds) => {
 
 const activeQuestions = questions;
 const handleReviewLoaded = useCallback((qs) => {
-  setQuestions(qs);
+  setQuestions(qs || []);
   setCurrentIndex(0);
   setVisited({});
   setAnswers({});
+  setReviewLoading(false);
 }, []);
 
 // Only block loading for exam & review
@@ -570,14 +606,14 @@ return (
   }}
 >
   <div className={styles.examContainer}>
- {isReview && examAttemptId != null && (
+ {isReview && reviewLoading && (
   <OcThinkingSkillsReview
-  key={examAttemptId}   // 🔥 CRITICAL FIX
-  studentId={studentId}
-  examAttemptId={examAttemptId}
-  parentMode={parentMode} 
-  onLoaded={handleReviewLoaded}
-/>
+    key={examAttemptId || "latest"}
+    studentId={studentId}
+    examAttemptId={examAttemptId}
+    parentMode={parentMode}
+    onLoaded={handleReviewLoaded}
+  />
 )}
  {isReview && (
   <div style={{ marginBottom: "12px" }}>
@@ -614,7 +650,7 @@ return (
       )}
 
       <div className="counter">
-        Question {currentIndex + 1} / {activeQuestions.length}
+        Question {activeQuestions.length ? currentIndex + 1 : 0} / {activeQuestions.length}
       </div>
     </div>
 

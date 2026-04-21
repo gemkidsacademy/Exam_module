@@ -1,22 +1,24 @@
-
 import { useEffect } from "react";
 import styles from "./ThinkingSkillsReview.module.css";
 
 export default function OcThinkingSkillsReview({
   studentId,
   examAttemptId,
-  parentMode, 
+  parentMode,
   onLoaded
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     if (!studentId) {
+      console.log("⚠️ No studentId provided for review");
       return;
     }
 
-    const loadReview = async () => {
+    const loadReviewQuestions = async () => {
       try {
+        console.log("🚀 Loading OC Thinking Skills review");
+
         const endpoint =
           parentMode === "homework"
             ? "/api/student/homework-review/oc-thinking-skills"
@@ -24,16 +26,24 @@ export default function OcThinkingSkillsReview({
 
         let url = `${API_BASE}${endpoint}?student_id=${studentId}`;
 
-        if (examAttemptId !== null && examAttemptId !== undefined) {
+        if (
+          examAttemptId !== null &&
+          examAttemptId !== undefined &&
+          examAttemptId !== ""
+        ) {
           url += `&exam_attempt_id=${examAttemptId}`;
         }
-        
+
         console.log("🌐 REVIEW URL:", url);
-        
+
         const response = await fetch(url);
 
+        console.log("📡 RESPONSE STATUS:", response.status);
+
         if (!response.ok) {
-          throw new Error(`Review fetch failed with status ${response.status}`);
+          throw new Error(
+            `Review fetch failed with status ${response.status}`
+          );
         }
 
         const data = await response.json();
@@ -41,36 +51,55 @@ export default function OcThinkingSkillsReview({
         console.log("===== OC REVIEW API RAW RESPONSE =====");
         console.log(data);
 
-        const questions = Array.isArray(data.questions)
-          ? data.questions
-          : [];
+        const questions =
+          Array.isArray(data.questions)
+            ? data.questions
+            : Array.isArray(data.review_questions)
+            ? data.review_questions
+            : [];
 
-        questions.forEach((q, i) => {
-          console.log(`OC REVIEW QUESTION ${i + 1}`, {
-            q_id: q.q_id,
-            options: q.options,
-            choices: q.choices,
-            answer_options: q.answer_options
+        console.log("📚 QUESTIONS RECEIVED:", questions.length);
+
+        questions.forEach((questionItem, index) => {
+          console.log(`🧠 QUESTION ${index + 1}`, {
+            q_id: questionItem.q_id,
+            options: questionItem.options,
+            choices: questionItem.choices,
+            answer_options: questionItem.answer_options,
+            student_answer: questionItem.student_answer,
+            correct_answer: questionItem.correct_answer
           });
         });
 
-        console.log("===================================");
+        console.log("✅ Sending questions to parent component");
 
         onLoaded?.(questions);
 
+        console.log("=====================================");
+
       } catch (error) {
-        console.error("Failed to load OC thinking skills review", error);
+        console.error(
+          "❌ Failed to load OC Thinking Skills review:",
+          error
+        );
+
         onLoaded?.([]);
       }
     };
 
-    loadReview();
+    loadReviewQuestions();
 
-  }, [studentId, examAttemptId, API_BASE, parentMode]);
+  }, [
+    studentId,
+    examAttemptId,
+    API_BASE,
+    parentMode,
+    onLoaded
+  ]);
 
   return (
     <p className={styles.loading}>
-      Loading OC review…
+      Loading OC review...
     </p>
   );
 }
