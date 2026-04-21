@@ -738,3 +738,23 @@
 .chart-cell-text span{
   font-size:9px;
 }
+.pdf-section-card,
+.pdf-summary-box,
+.pdf-student-box,
+.pdf-intro-box,
+.chart-row-wrap,
+.pdf-metric-card {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+h3,
+.pdf-section-heading {
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+.pdf-footer-note {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
