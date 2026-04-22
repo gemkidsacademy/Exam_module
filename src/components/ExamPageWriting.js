@@ -508,7 +508,7 @@
 
           <button
             className="start-writing-btn"
-            onClick={() => window.location.reload()}
+            onClick={() => navigate("/SelectiveDashboard")}
           >
             Start Writing Exam
           </button>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./SelectiveDashboard.css";
-
+import { useLocation } from "react-router-dom";
 // EXAM COMPONENTS (UNCHANGED)
 import ExamPageThinkingSkills from "./ExamPageThinkingSkills";
 import ExamPageMathematicalReasoning from "./ExamPageMathematicalReasoning";
@@ -45,6 +45,7 @@ const SelectiveDashboard = () => {
   const [examPhase, setExamPhase] = useState("mode_selection");
   const [examMode, setExamMode] = useState(null);
   const [subjectAvailability, setSubjectAvailability] = useState({});
+  const location = useLocation();
   
   // phases: selection → welcome → instructions → exam
 
@@ -76,7 +77,17 @@ const handleViewResults = () => {
   setExamMode("report");
   setExamPhase("exam");
 };
+useEffect(() => {
+  if (location.state?.tab === "historical") {
+    const writingSubject = SUBJECTS.find(
+      (item) => item.key === "writing"
+    );
 
+    setExamMode("report");
+    setActiveSubject(writingSubject);
+    setExamPhase("exam");
+  }
+}, [location.state]);
 useEffect(() => {
   if (examPhase === "selection" && studentId && examMode) {
     fetch(`https://web-production-481a5.up.railway.app/api/student/available-subjects?mode=${examMode}&student_id=${studentId}`)

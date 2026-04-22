@@ -93,7 +93,11 @@ export default function WritingReview() {
         <h1 style={{ margin: 0 }}>Your Writing</h1>
 
         <button
-          onClick={() => navigate(-1)}
+          onClick={() =>
+            navigate("/SelectiveDashboard", {
+              state: { tab: "historical" }
+            })
+          }
           style={{
             background: "#2E7D32",
             color: "white",
