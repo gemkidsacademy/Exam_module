@@ -6,6 +6,12 @@ const PrintRoot = forwardRef(function PrintRoot(props, ref) {
   const { overall } = props;
   const thinkingDiag =
   overall?.section_diagnostics?.thinking_skills || null;
+  const mathsDiag =
+  overall?.section_diagnostics?.mathematical_reasoning || null;
+  const readingDiag =
+  overall?.section_diagnostics?.reading || null;
+  const writingDiag =
+  overall?.section_diagnostics?.writing || null;
   
   function BenchmarkRow({ title, data, raw, total, studentName }) {
   if (!data) return null;
@@ -176,14 +182,27 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
         {title} Topic Breakdown
       </h3>
 
+      <div className="topic-summary-banner">
+        <div>
+          <strong>Overall Accuracy:</strong>{" "}
+          {Math.round(diag.overall.accuracy_percent)}%
+        </div>
+
+        <div>
+          <strong>Total Questions:</strong>{" "}
+          {diag.overall.total_questions}
+        </div>
+      </div>
+
       <table className="pdf-topic-table">
         <thead>
           <tr>
             <th>Topic</th>
-            <th>Qs</th>
+            <th>Questions</th>
             <th>Correct</th>
             <th>Incorrect</th>
             <th>Accuracy</th>
+            <th>Feedback</th>
           </tr>
         </thead>
 
@@ -194,20 +213,53 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
               <td>{row.total_questions}</td>
               <td>{row.correct}</td>
               <td>{row.incorrect}</td>
-              <td>{row.accuracy_percent}%</td>
+              <td>
+                <span
+                  className={
+                    row.accuracy_percent >= 80
+                      ? "accuracy-good"
+                      : row.accuracy_percent >= 50
+                      ? "accuracy-mid"
+                      : "accuracy-low"
+                  }
+                >
+                  {Math.round(row.accuracy_percent)}%
+                </span>
+              </td>
+              <td>{row.feedback}</td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      <p className="pdf-line">
-        <strong>Top Strengths:</strong>{" "}
-        {diag.top_strengths.map(x => x.topic).join(", ")}
-      </p>
+      <div className="insight-row">
 
-      <p className="pdf-line">
-        <strong>Improvement Areas:</strong>{" "}
-        {diag.improvement_areas.map(x => x.topic).join(", ")}
+        <div className="strength-box">
+          <strong>Top Strengths</strong>
+          <div>
+            {(diag.top_strengths || [])
+              .map(x => x.topic)
+              .join(", ")}
+          </div>
+        </div>
+
+        <div className="improve-box">
+          <strong>Improvement Areas</strong>
+          <div>
+            {(diag.improvement_areas || [])
+              .map(x => x.topic)
+              .join(", ")}
+          </div>
+        </div>
+
+      </div>
+      <p className="pdf-line topic-action-note">
+        <strong>Recommended Focus:</strong>{" "}
+        Prioritise{" "}
+        {(diag.improvement_areas || [])
+          .map(x => x.topic)
+          .join(" and ")}{" "}
+        during the next study cycle.
       </p>
     </section>
   );
@@ -393,7 +445,10 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
         "Handling more complex passages under time pressure.",
         "Regular timed reading practice with inference-heavy passages."
       )}
-
+      {renderTopicBreakdown(
+        "Reading",
+        readingDiag
+      )}
       {renderAcademicSection(
         "Mathematical Reasoning",
         maths,
@@ -401,6 +456,10 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
         "Solid numeracy skills and structured problem solving.",
         "Minor calculation slips under pressure.",
         "Timed drills and answer-checking habits."
+      )}
+      {renderTopicBreakdown(
+        "Mathematical Reasoning",
+        mathsDiag
       )}
 
       {renderAcademicSection(
@@ -425,7 +484,10 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
         "Planning techniques and deeper paragraph development.",
         true
       )}
-
+      {renderTopicBreakdown(
+        "Writing",
+        writingDiag
+      )}
       {/* OVERALL PERFORMANCE SUMMARY */}
 <section className="pdf-summary-box">
   <h3 className="pdf-section-heading">

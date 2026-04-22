@@ -776,3 +776,56 @@ h3,
   background:#f3f4f6;
   font-weight:700;
 }
+.topic-summary-banner{
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  padding:8px 12px;
+  margin:10px 0;
+  background:#f8fafc;
+  border:1px solid #dbeafe;
+  border-radius:8px;
+  font-size:12px;
+}
+.accuracy-good{
+  font-weight:700;
+  color:#15803d;
+}
+
+.accuracy-mid{
+  font-weight:700;
+  color:#b45309;
+}
+
+.accuracy-low{
+  font-weight:700;
+  color:#dc2626;
+}
+.insight-row{
+  display:flex;
+  gap:12px;
+  margin-top:12px;
+}
+
+.strength-box,
+.improve-box{
+  flex:1;
+  padding:10px;
+  border-radius:8px;
+  font-size:12px;
+}
+
+.strength-box{
+  background:#ecfdf5;
+  border:1px solid #bbf7d0;
+}
+
+.improve-box{
+  background:#fef2f2;
+  border:1px solid #fecaca;
+}
+.topic-action-note{
+  margin-top:10px;
+  font-size:12px;
+  line-height:1.5;
+}
