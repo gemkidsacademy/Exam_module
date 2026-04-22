@@ -97,7 +97,8 @@
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
   const [timeLeft, setTimeLeft] = useState(null);
-  const API_BASE = process.env.REACT_APP_API_URL;
+  const API_BASE =
+  process.env.REACT_APP_API_URL || "http://localhost:3000";
 
 
   if (!API_BASE) {
@@ -769,7 +770,21 @@ if (!currentQ) {
 
 
       {/* NAVIGATION */}
+      {/* NAVIGATION */}
       <div className="nav-buttons">
+
+        {isReview && (
+          <button
+            className="nav-btn finish"
+            onClick={() => {
+              setMode("report");
+              setExplanation(null);
+            }}
+          >
+            Exit Review
+          </button>
+        )}
+
         <button
           className="nav-btn prev"
           onClick={() => goToQuestion(currentIndex - 1)}
@@ -790,13 +805,13 @@ if (!currentQ) {
         {mode !== "review" &&
           currentIndex === activeQuestions.length - 1 && (
             <button
-            className="nav-btn finish"
-            onClick={() => setShowConfirmFinish(true)}
-          >
-            Finish Exam
-          </button>
+              className="nav-btn finish"
+              onClick={() => setShowConfirmFinish(true)}
+            >
+              Finish Exam
+            </button>
+        )}
 
-          )}
       </div>
     </div> 
     {showConfirmFinish && (

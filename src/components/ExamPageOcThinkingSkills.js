@@ -127,7 +127,9 @@ const normalizeOption = (value) => {
     content: str.replace(/^"|"$/g, "")
   };
 };
-const API_BASE = process.env.REACT_APP_API_URL;
+const API_BASE =
+  process.env.REACT_APP_API_URL || "http://localhost:3000";
+
 
 if (!API_BASE) {
   throw new Error("❌ REACT_APP_API_URL is not defined");
@@ -851,7 +853,21 @@ return (
 
 
     {/* NAVIGATION */}
+    {/* NAVIGATION */}
     <div className="nav-buttons">
+
+      {isReview && (
+        <button
+          className="nav-btn finish"
+          onClick={() => {
+            setMode("report");
+            setExplanation(null);
+          }}
+        >
+          Exit Review
+        </button>
+      )}
+
       <button
         className="nav-btn prev"
         onClick={() => goToQuestion(currentIndex - 1)}
@@ -861,23 +877,22 @@ return (
       </button>
 
       {currentIndex < activeQuestions.length - 1 && (
-       <button
-         className="nav-btn next"
-         onClick={() => goToQuestion(currentIndex + 1)}
-       >
-         Next
-       </button>
-     )}
-     
-     {currentIndex === activeQuestions.length - 1 && !isReview && (
-       <button
-        className="nav-btn finish"
-        onClick={() => setShowConfirmFinish(true)}
-      >
-        Finish Exam
-      </button>
+        <button
+          className="nav-btn next"
+          onClick={() => goToQuestion(currentIndex + 1)}
+        >
+          Next
+        </button>
+      )}
 
-     )}
+      {currentIndex === activeQuestions.length - 1 && !isReview && (
+        <button
+          className="nav-btn finish"
+          onClick={() => setShowConfirmFinish(true)}
+        >
+          Finish Exam
+        </button>
+      )}
 
     </div>
 
