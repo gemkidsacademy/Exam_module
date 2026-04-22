@@ -4,6 +4,9 @@ import "./SelectiveReadinessOverall.css";
 
 const PrintRoot = forwardRef(function PrintRoot(props, ref) {
   const { overall } = props;
+  const thinkingDiag =
+  overall?.section_diagnostics?.thinking_skills || null;
+  
   function BenchmarkRow({ title, data, raw, total, studentName }) {
   if (!data) return null;
   function labelText(val) {
@@ -163,6 +166,51 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
   }
 
   return `${title} remains an important growth opportunity.`;
+}
+  function renderTopicBreakdown(title, diag) {
+  if (!diag || !diag.topic_breakdown?.length) return null;
+
+  return (
+    <section className="pdf-section-card">
+      <h3 className="pdf-section-heading">
+        {title} Topic Breakdown
+      </h3>
+
+      <table className="pdf-topic-table">
+        <thead>
+          <tr>
+            <th>Topic</th>
+            <th>Qs</th>
+            <th>Correct</th>
+            <th>Incorrect</th>
+            <th>Accuracy</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {diag.topic_breakdown.map((row, i) => (
+            <tr key={i}>
+              <td>{row.topic}</td>
+              <td>{row.total_questions}</td>
+              <td>{row.correct}</td>
+              <td>{row.incorrect}</td>
+              <td>{row.accuracy_percent}%</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <p className="pdf-line">
+        <strong>Top Strengths:</strong>{" "}
+        {diag.top_strengths.map(x => x.topic).join(", ")}
+      </p>
+
+      <p className="pdf-line">
+        <strong>Improvement Areas:</strong>{" "}
+        {diag.improvement_areas.map(x => x.topic).join(", ")}
+      </p>
+    </section>
+  );
 }
 
   function renderAcademicSection(
@@ -362,6 +410,10 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
         "Good standard logic question performance.",
         "More complex and unfamiliar reasoning sets.",
         "Higher difficulty puzzle and reasoning exposure."
+      )}
+      {renderTopicBreakdown(
+        "Thinking Skills",
+        thinkingDiag
       )}
 
       {renderAcademicSection(

@@ -14,8 +14,8 @@ import { useReactToPrint } from "react-to-print";
 
 import "./SelectiveReadinessOverall.css";
 
-const BACKEND_URL = "https://web-production-481a5.up.railway.app";
-//const BACKEND_URL = "http://localhost:8000";
+//const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+const BACKEND_URL = "http://localhost:8000";
 
 export default function SelectiveReadinessOverall() {
   const [error, setError] = useState(null);

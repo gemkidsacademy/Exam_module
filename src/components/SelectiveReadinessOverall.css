@@ -758,3 +758,21 @@ h3,
   break-inside: avoid;
   page-break-inside: avoid;
 }
+.pdf-topic-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+  font-size:12px;
+}
+
+.pdf-topic-table th,
+.pdf-topic-table td{
+  border:1px solid #d1d5db;
+  padding:6px;
+  text-align:left;
+}
+
+.pdf-topic-table th{
+  background:#f3f4f6;
+  font-weight:700;
+}
