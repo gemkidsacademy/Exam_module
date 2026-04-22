@@ -298,3 +298,50 @@ html, body {
   height: auto;
   overflow-y: auto;
 }
+.empty-report-card {
+  max-width: 560px;
+  margin: 80px auto;
+  background: white;
+  border-radius: 18px;
+  padding: 40px 32px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.empty-report-card h1 {
+  font-size: 30px;
+  margin-bottom: 14px;
+}
+
+.empty-report-card h3 {
+  font-size: 22px;
+  margin-bottom: 12px;
+  color: #2e7d32;
+}
+
+.empty-report-card p {
+  color: #555;
+  line-height: 1.7;
+  font-size: 16px;
+  margin-bottom: 28px;
+}
+
+.empty-icon {
+  font-size: 54px;
+  margin-bottom: 18px;
+}
+
+.start-writing-btn {
+  background: #2e7d32;
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.start-writing-btn:hover {
+  opacity: 0.95;
+}

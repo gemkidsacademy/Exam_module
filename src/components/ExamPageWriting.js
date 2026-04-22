@@ -494,10 +494,24 @@
     ----------------------------------------------------------- */
     if (completed && !result) {
       return (
-        <div className="empty-report">
+        <div className="empty-report-card">
+          <div className="empty-icon">✍️</div>
+
           <h1>Writing Reports</h1>
-          <p>No writing reports yet.</p>
-          <p>Complete your first writing exam to see reports here.</p>
+
+          <h3>No reports yet</h3>
+
+          <p>
+            Complete your first writing exam to unlock
+            detailed feedback, scores, and progress tracking.
+          </p>
+
+          <button
+            className="start-writing-btn"
+            onClick={() => window.location.reload()}
+          >
+            Start Writing Exam
+          </button>
         </div>
       );
     }
