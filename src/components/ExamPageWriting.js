@@ -506,12 +506,7 @@
             detailed feedback, scores, and progress tracking.
           </p>
 
-          <button
-            className="start-writing-btn"
-            onClick={() => navigate("/SelectiveDashboard")}
-          >
-            Start Writing Exam
-          </button>
+          
         </div>
       );
     }
