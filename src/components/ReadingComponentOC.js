@@ -8,7 +8,8 @@ export default function ReadingComponentOC({
   onExamStart,
   onExamFinish
 }) {
-  const API_BASE = process.env.REACT_APP_API_URL;
+  const API_BASE =
+  process.env.REACT_APP_API_URL || "http://localhost:3000";
   const isPopNavigationRef = useRef(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   console.log("🔗 API_BASE:", API_BASE);

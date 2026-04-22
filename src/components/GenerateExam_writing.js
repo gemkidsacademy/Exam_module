@@ -13,7 +13,8 @@ export default function GenerateExam_writing() {
   const [selectedClassYear, setSelectedClassYear] = useState("Year 6");
 
 
-  const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+  //const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+  const BACKEND_URL = "http://localhost:8000";
 
   /* ---------------- Load Writing Quiz Configs ---------------- */
   useEffect(() => {

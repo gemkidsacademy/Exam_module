@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import {
+  useParams,
+  useSearchParams,
+  useNavigate
+} from "react-router-dom";
 
 
 
-const API_BASE = process.env.REACT_APP_API_URL;
+const API_BASE =
+  process.env.REACT_APP_API_URL || "http://localhost:8000";
 
 export default function WritingReview() {
   const { attemptId } = useParams();
   const [searchParams] = useSearchParams();
   const mode = searchParams.get("mode"); 
+  const navigate = useNavigate();
 
   const [history, setHistory] = useState([]);
   const [selectedAttempt, setSelectedAttempt] = useState(null);
@@ -75,8 +81,32 @@ export default function WritingReview() {
   // --------------------------------------------------
   return (
     <div style={{ padding: "32px", maxWidth: "800px", margin: "auto" }}>
-      
-      <h1>Your Writing</h1>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "20px"
+        }}
+      >
+        <h1 style={{ margin: 0 }}>Your Writing</h1>
+
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            background: "#2E7D32",
+            color: "white",
+            border: "none",
+            padding: "10px 14px",
+            borderRadius: "8px",
+            cursor: "pointer",
+            fontWeight: 600
+          }}
+        >
+          Exit Review
+        </button>
+      </div>
 
       {/* ✅ Dropdown */}
       <select

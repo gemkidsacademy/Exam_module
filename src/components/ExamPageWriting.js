@@ -4,7 +4,8 @@
   
 
 
-  const API_BASE = process.env.REACT_APP_API_URL;
+  const API_BASE =
+  process.env.REACT_APP_API_URL || "http://localhost:8000";
   console.log("🧪 API_BASE:", API_BASE);
 
   if (!API_BASE) {
@@ -53,6 +54,7 @@
     };
 
     const [timeLeft, setTimeLeft] = useState(0);
+    
     const [history, setHistory] = useState([]);
     const [selectedAttempt, setSelectedAttempt] = useState(null);
     const [answerText, setAnswerText] = useState("");
@@ -67,15 +69,22 @@
 
 
     const loadResultByAttempt = async (attemptId) => {
-    const endpoint =
-      parentMode === "homework"
-        ? `/api/student/homework-writing-result-by-attempt?attempt_id=${attemptId}`
-        : `/api/exams/writing/result-by-attempt?attempt_id=${attemptId}`;
+      setExam(null);
+      setExamActive(false);
+      setCompleted(true);
+      setLoading(true);
 
-    const res = await fetch(`${API_BASE}${endpoint}`);
-    const data = await res.json();
-    setResult(data);
-  };
+      const endpoint =
+        parentMode === "homework"
+          ? `/api/student/homework-writing-result-by-attempt?attempt_id=${attemptId}`
+          : `/api/exams/writing/result-by-attempt?attempt_id=${attemptId}`;
+
+      const res = await fetch(`${API_BASE}${endpoint}`);
+      const data = await res.json();
+
+      setResult(data);
+      setLoading(false);
+    };
 
 
     const parsedPrompt = React.useMemo(() => {
@@ -134,6 +143,10 @@
     }, []);    
     const loadResult = async () => {
   try {
+    setExam(null);
+    setExamActive(false);
+    setCompleted(true);
+
     const endpoint =
       parentMode === "homework"
         ? `/api/student/homework-writing-report?student_id=${studentId}`
@@ -141,15 +154,21 @@
 
     const res = await fetch(`${API_BASE}${endpoint}`);
 
+    if (res.status === 404) {
+      setResult(null);
+      return;
+    }
+
     if (!res.ok) throw new Error("Failed to load writing result");
 
     const data = await res.json();
     setResult(data);
 
   } catch (err) {
-    console.error("❌ loadResult error:", err);
+    console.error(err);
+    setResult(null);
   }
-};  
+}; 
     const startHomeworkWriting = async () => {
   try {
     if (!studentId) {
@@ -313,91 +332,96 @@
     useEffect(() => {
   console.log("🔵 WritingComponent mounted");
 
-  const init = async () => {
-  try {
-    // 🔴 HOMEWORK FLOW
-    if (parentMode === "homework") {
-      await startHomeworkWriting();
-      return;
-    }
-
-    // --------------------------------------------------
-    // STEP 1: Try current exam
-    // --------------------------------------------------
-    const res = await fetch(
-      `${API_BASE}/api/exams/writing/current?student_id=${studentId}`
-    );
-
-    if (res.status === 200) {
-      const data = await res.json();
-
-      // ✅ CASE A: Completed
-      if (data.completed === true) {
-        setCompleted(true);
-        await loadResult();
-        onExamFinish?.();
-        return;
-      }
-
-      // ✅ CASE B: Active exam
-      if (data.exam) {
-        setExam(data.exam);
-        setTimeLeft(data.remaining_seconds);
-        setExamActive(true);
-        onExamStart?.();
-        return;
-      }
-    }
-
-    // --------------------------------------------------
-    // 🟢 STEP 2: NO ACTIVE EXAM → START NEW EXAM FIRST
-    // --------------------------------------------------
-    console.log("🟢 No active exam → starting new exam");
-
-    await startExam();
-
-    // --------------------------------------------------
-    // STEP 3: Fetch exam AFTER start
-    // --------------------------------------------------
-    const retryRes = await fetch(
-      `${API_BASE}/api/exams/writing/current?student_id=${studentId}`
-    );
-
-    if (retryRes.status === 200) {
-      const data = await retryRes.json();
-
-      if (data.exam) {
-        setExam(data.exam);
-        setTimeLeft(data.remaining_seconds);
-        setExamActive(true);
-        onExamStart?.();
-        return;
-      }
-    }
-
-    // --------------------------------------------------
-    // 🔴 STEP 4: FALLBACK → ONLY NOW check result
-    // --------------------------------------------------
-    console.log("🔴 No exam available → fallback to result");
-
-    const resultRes = await fetch(
-      `${API_BASE}/api/exams/writing/result?student_id=${studentId}`
-    );
-
-    if (resultRes.status === 200) {
-      const data = await resultRes.json();
-      setResult(data);
-      setCompleted(true);
-      onExamFinish?.();
-      return;
-    }
-
-  } catch (err) {
-    console.error("❌ init error:", err);
-  } finally {
+  if (completed || result) {
+    console.log("🟢 Already in report mode. Skip init.");
     setLoading(false);
+    return;
   }
-};
+
+  const init = async () => {
+    try {
+      // 🔴 HOMEWORK FLOW
+      if (parentMode === "report") {
+        await loadResult();
+        setLoading(false);
+        return;
+      }
+      if (parentMode === "homework") {
+        await startHomeworkWriting();
+        return;
+      }
+
+      const res = await fetch(
+        `${API_BASE}/api/exams/writing/current?student_id=${studentId}`
+      );
+
+      if (res.status === 200) {
+        const data = await res.json();
+
+        if (data.completed === true) {
+          setCompleted(true);
+          await loadResult();
+          onExamFinish?.();
+          return;
+        }
+
+        if (data.exam) {
+          setExam(data.exam);
+          setTimeLeft(data.remaining_seconds);
+          setExamActive(true);
+          onExamStart?.();
+          return;
+        }
+      }
+
+      if (parentMode === "report") {
+        console.log("📘 Report mode with no attempts");
+
+        const resultRes = await fetch(
+          `${API_BASE}/api/exams/writing/result?student_id=${studentId}`
+        );
+
+        if (resultRes.status === 200) {
+          const data = await resultRes.json();
+          setResult(data);
+          setCompleted(true);
+          onExamFinish?.();
+        } else {
+          setCompleted(true);
+          setResult(null);
+        }
+
+        return;
+      }
+
+      /* Normal Active Exams mode */
+      console.log("🟢 No active exam → starting new exam");
+
+      await startExam();
+
+      const retryRes = await fetch(
+        `${API_BASE}/api/exams/writing/current?student_id=${studentId}`
+      );
+
+      if (retryRes.status === 200) {
+        const retryData = await retryRes.json();
+
+        if (retryData.exam) {
+          setExam(retryData.exam);
+          setTimeLeft(retryData.remaining_seconds);
+          setExamActive(true);
+          onExamStart?.();
+          return;
+        }
+      }
+
+    } catch (err) {
+      console.error("❌ init error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   init();
 }, [studentId]);
 
@@ -468,6 +492,15 @@
     /* -----------------------------------------------------------
        COMPLETED VIEW
     ----------------------------------------------------------- */
+    if (completed && !result) {
+      return (
+        <div className="empty-report">
+          <h1>Writing Reports</h1>
+          <p>No writing reports yet.</p>
+          <p>Complete your first writing exam to see reports here.</p>
+        </div>
+      );
+    }
     if (completed && result) {
   const evalData = result.evaluation;
   const attemptId = result?.attempt_id;
@@ -475,13 +508,10 @@
   return (
     <div
       style={{
-        position: "fixed",
-        inset: 0,
-        overflowY: "auto",
+        minHeight: "100vh",
         background: "#f9fafb",
         padding: "32px",
-        boxSizing: "border-box",
-        zIndex: 1
+        boxSizing: "border-box"
       }}
     >
       <h1>Writing Report</h1>
@@ -576,7 +606,7 @@
               <p>{data.score} / 5</p>
           
               <p className="section-label">Strengths</p>
-              c
+              
           
               <p className="section-label">Improvements Needed</p>
 
@@ -695,6 +725,10 @@
       value={answerText}
       disabled={submitting || timeLeft === 0}
       onChange={(e) => setAnswerText(e.target.value)}
+      onPaste={(e) => e.preventDefault()}
+      onCopy={(e) => e.preventDefault()}
+      onCut={(e) => e.preventDefault()}
+      onContextMenu={(e) => e.preventDefault()}
     />
 
     <button

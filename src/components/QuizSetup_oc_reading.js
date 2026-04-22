@@ -57,7 +57,7 @@ export default function QuizSetup_oc_reading() {
         throw new Error(data.detail || "Failed to delete questions");
       }
   
-      alert(data.message || "All Mathematical Reasoning questions deleted.");
+      alert(data.message || "All Reading questions deleted.");
     } catch (error) {
       console.error("Error deleting questions:", error);
       alert("Something went wrong while deleting the questions.");

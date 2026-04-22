@@ -7,7 +7,8 @@ export default function GenerateExam_oc_mathematical_reasoning() {
   const [error, setError] = useState("");
   const [classYear, setClassYear] = useState("");
 
-  const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+  //const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+  const BACKEND_URL = "http://localhost:3000"
 
   /* ===========================
      Generate OC Mathematical Reasoning Exam
@@ -119,9 +120,9 @@ export default function GenerateExam_oc_mathematical_reasoning() {
         required
       >
         <option value="">Select Class Year</option>
+        <option value="Year 3">Year 3</option>
         <option value="Year 4">Year 4</option>
-        <option value="Year 5">Year 5</option>
-        <option value="Year 6">Year 6</option>
+        
       </select>
       <button
         className="generate-btn blue-btn"
