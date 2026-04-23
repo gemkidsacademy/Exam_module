@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./generate_exam.css";
 
 const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+//const BACKEND_URL = "http://127.0.0.1:8000";
 
 export default function GenerateExam_thinking_skills() {
   const [loading, setLoading] = useState(false);
@@ -122,25 +123,69 @@ export default function GenerateExam_thinking_skills() {
 
       {/* RESULT */}
       {generatedExam && (
-        <div className="generated-output">
-          <h3>Generated Exam</h3>
+      <div className="generated-output">
+        <h3>Generated Exam Preview</h3>
 
-          <p><strong>Exam ID:</strong> {generatedExam.exam_id}</p>
-          <p><strong>Total Questions:</strong> {generatedExam.total_questions}</p>
-          <p><strong>Class Year:</strong> {selectedClassYear}</p>
+        <p><strong>Exam ID:</strong> {generatedExam.exam_id}</p>
+        <p><strong>Quiz ID:</strong> {generatedExam.quiz_id}</p>
+        <p><strong>Total Questions:</strong> {generatedExam.total_questions}</p>
+        <p><strong>Class Year:</strong> {generatedExam.class_year}</p>
 
-          {generatedExam.sections && (
-            <div style={{ marginTop: "15px" }}>
-              <h4>Sections:</h4>
-              {generatedExam.sections.map((sectionItem, index) => (
-                <div key={index} style={{ marginBottom: "10px" }}>
-                  <strong>{sectionItem.name}:</strong> {sectionItem.total} questions
+        {generatedExam.questions?.length > 0 ? (
+          <div className="questions-preview">
+            {generatedExam.questions.map((question, index) => (
+              <div key={index} className="question-card">
+
+                <h4>
+                  Q{question.q_id || index + 1}
+                </h4>
+
+                {/* Question Blocks */}
+                {question.question_blocks?.map((block, i) => (
+                  <div key={i} style={{ marginBottom: "10px" }}>
+
+                    {block.type === "text" && (
+                      <p>{block.content}</p>
+                    )}
+
+                    {block.type === "image" && (
+                      <img
+                        src={block.content}
+                        alt="question"
+                        style={{
+                          maxWidth: "300px",
+                          borderRadius: "8px"
+                        }}
+                      />
+                    )}
+
+                  </div>
+                ))}
+
+                {/* Options */}
+                <ul>
+                  {Object.entries(question.options || {}).map(
+                    ([key, value]) => (
+                      <li key={key}>
+                        <strong>{key}.</strong> {value}
+                      </li>
+                    )
+                  )}
+                </ul>
+
+                {/* Correct Answer */}
+                <div className="correct-answer">
+                  Correct Answer: {question.correct}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>No questions found.</p>
+        )}
+      </div>
+    )}
     </div>
   );
 }

@@ -13,7 +13,8 @@ export default function GenerateExam_reading() {
   const [successMessage, setSuccessMessage] = useState("");
   const [selectedClassYear, setSelectedClassYear] = useState("");
 
-  const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+  //const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+  const BACKEND_URL = "http://127.0.0.1:8000";
 
   /* ---------------------------
      LOAD QUIZ CONFIGS
@@ -44,6 +45,11 @@ export default function GenerateExam_reading() {
       console.log("📦 QUIZZES RESPONSE:", data);
 
       setQuizzes(data);
+      if (data.length === 0) {
+        setSelectedQuiz(null);
+        setSelectedClass("");
+        setSelectedDifficulty("");
+      }
 
       if (data.length > 0) {
         const latest = data[data.length - 1];
@@ -61,8 +67,8 @@ export default function GenerateExam_reading() {
 }, [selectedClassYear]); // ✅ IMPORTANT dependency
 
   const handleGenerateHomeworkExam = async () => {
-  if (!selectedClass || !selectedDifficulty || !selectedClassYear) {
-    alert("Please select class, difficulty, and class year.");
+  if (!selectedClassYear) {
+    alert("Please select class year.");
     return;
   }
 
@@ -78,9 +84,9 @@ export default function GenerateExam_reading() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          class_name: selectedClass,
-          class_year: selectedClassYear, // ✅ KEY
-          difficulty: selectedDifficulty
+          class_name: "Selective",
+          class_year: selectedClassYear // ✅ KEY
+          
         })
       }
     );
@@ -110,9 +116,9 @@ export default function GenerateExam_reading() {
   console.log("📦 selectedDifficulty:", selectedDifficulty);
   console.log("📦 selectedClassYear:", selectedClassYear);
 
-  if (!selectedClass || !selectedDifficulty || !selectedClassYear) {
+  if ( !selectedClassYear) {
     console.log("❌ Missing required fields");
-    alert("Please select class, difficulty, and class year.");
+    alert("Please select class year.");
     return;
   }
 
@@ -124,9 +130,9 @@ export default function GenerateExam_reading() {
 
   try {
     const payload = {
-      class_name: selectedClass,
-      class_year: selectedClassYear, // ✅ ADDED
-      difficulty: selectedDifficulty
+      class_name: "Selective",
+      class_year: selectedClassYear // ✅ ADDED
+      
     };
 
     console.log("🚀 REQUEST PAYLOAD:", payload);
@@ -192,7 +198,7 @@ export default function GenerateExam_reading() {
       <button
         className="primary-btn"
         onClick={handleGenerateExam}
-        disabled={loading || !selectedClass || !selectedDifficulty}
+        disabled={loading || !selectedClassYear}
       >
         {loading ? "Generating..." : "Generate Exam"}
       </button>
@@ -216,7 +222,165 @@ export default function GenerateExam_reading() {
       {/* Optional: keep preview logic if backend returns exam */}
       {generatedExam && (
         <div className="generated-output">
+          <h3>Generated Reading Exam</h3>
+
           <p><strong>Exam ID:</strong> {generatedExam.generated_exam_id}</p>
+          <p><strong>Total Questions:</strong> {generatedExam.total_questions}</p>
+
+          <p>
+            <strong>Class Year:</strong>{" "}
+            {generatedExam.exam_json?.class_year}
+          </p>
+
+          <p>
+            <strong>Difficulty:</strong>{" "}
+            {generatedExam.exam_json?.difficulty}
+          </p>
+
+          {generatedExam.exam_json?.sections?.length > 0 ? (
+            <div className="sections-wrapper">
+
+              {generatedExam.exam_json.sections.map(
+                (section, sectionIndex) => (
+                  <div
+                    key={sectionIndex}
+                    className="section-card"
+                    style={{
+                      border: "1px solid #ddd",
+                      padding: "15px",
+                      marginBottom: "20px",
+                      borderRadius: "8px"
+                    }}
+                  >
+                    <h4>
+                      Section {section.section_index}: {section.topic}
+                    </h4>
+
+                    <p>
+                      <strong>Type:</strong>{" "}
+                      {section.question_type}
+                    </p>
+
+                    {/* Reading Passage */}
+                    {section.reading_material && (
+                      <div
+                        style={{
+                          background: "#f8f8f8",
+                          padding: "10px",
+                          marginBottom: "15px",
+                          borderRadius: "6px"
+                        }}
+                      >
+                        <strong>Passage:</strong>
+                        {typeof section.reading_material === "string" ? (
+                          <p>{section.reading_material}</p>
+                        ) : section.reading_material?.extracts ? (
+                              <div>
+                                {Array.isArray(section.reading_material.extracts) ? (
+                                  section.reading_material.extracts.map((item, idx) => (
+                                    <p key={idx}>
+                                      {typeof item === "string"
+                                        ? item
+                                        : JSON.stringify(item)}
+                                    </p>
+                                  ))
+                                ) : typeof section.reading_material.extracts === "string" ? (
+                                  <p>{section.reading_material.extracts}</p>
+                                ) : (
+                                  <pre>
+                                    {JSON.stringify(
+                                      section.reading_material.extracts,
+                                      null,
+                                      2
+                                    )}
+                                  </pre>
+                                )}
+                              </div>
+                            ) : (
+                          <pre>{JSON.stringify(section.reading_material, null, 2)}</pre>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Shared Options */}
+                    {section.answer_options && (
+                      <div style={{ marginBottom: "15px" }}>
+                        <strong>Shared Options:</strong>
+
+                        <ul>
+                          {Array.isArray(section.answer_options) ? (
+                            section.answer_options.map((option, idx) => (
+                              <li key={idx}>{option}</li>
+                            ))
+                          ) : (
+                            Object.entries(section.answer_options).map(
+                              ([key, value]) => (
+                                <li key={key}>
+                                  <strong>{key}.</strong> {value}
+                                </li>
+                              )
+                            )
+                          )}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Questions */}
+                    {section.questions?.map(
+                      (question, qIndex) => (
+                        <div
+                          key={qIndex}
+                          style={{
+                            marginBottom: "15px",
+                            padding: "10px",
+                            border: "1px solid #eee",
+                            borderRadius: "6px"
+                          }}
+                        >
+                          <p>
+                            <strong>
+                              Q{question.question_number}
+                            </strong>{" "}
+                            {typeof question.question_text === "string"
+                              ? question.question_text
+                              : JSON.stringify(question.question_text)}
+                          </p>
+
+                          {/* Per Question Options */}
+                          {question.options && (
+                            <ul>
+                              {Object.entries(
+                                question.options
+                              ).map(
+                                ([key, value]) => (
+                                  <li key={key}>
+                                    <strong>{key}.</strong>{" "}
+                                    {typeof value === "string"
+                                      ? value
+                                      : JSON.stringify(value)}
+                                  </li>
+                                )
+                              )}
+                            </ul>
+                          )}
+
+                          <p>
+                            <strong>
+                              Correct:
+                            </strong>{" "}
+                            {question.correct_answer}
+                          </p>
+                        </div>
+                      )
+                    )}
+                  </div>
+                )
+              )}
+
+            </div>
+          ) : (
+            <p>No sections found.</p>
+          )}
         </div>
       )}
     </div>

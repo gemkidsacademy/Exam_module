@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 
-const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+//const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+//const BACKEND_URL = "http://127.0.0.1:8000";
+const BACKEND_URL = "http://localhost:8000";
+
 
 const GenerateExam_oc_reading = () => {
   const [className, setClassName] = useState("");
@@ -10,33 +13,9 @@ const GenerateExam_oc_reading = () => {
   const [error, setError] = useState("");
   const [classYear, setClassYear] = useState("");
 
-  /* ---------------------------
-     LOAD QUIZ CONFIGS
-  --------------------------- */
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/quizzes-reading-oc`);
-        if (!res.ok) throw new Error("Failed to load quizzes");
-
-        const data = await res.json();
-
-        if (data.length > 0) {
-          const latest = data[data.length - 1];
-
-          setClassName(latest.class_name);
-          setDifficulty(latest.difficulty);
-        }
-      } catch (err) {
-        console.error(err);
-        setError("Failed to load quizzes.");
-      }
-    };
-
-    load();
-  }, []);
+  
   const handleGenerateHomeworkExam = async () => {
-  if (!className || !difficulty || !classYear) {
+  if (!classYear) {
     setMessage("Config not loaded yet or class year missing...");
     return;
   }
@@ -53,9 +32,8 @@ const GenerateExam_oc_reading = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          class_name: className,
-          difficulty: difficulty,
-          class_year: classYear, // ✅ IMPORTANT
+          class_year: classYear,
+          class_name: "OC"
         }),
       }
     );
@@ -75,7 +53,7 @@ const GenerateExam_oc_reading = () => {
   }
 };
   const handleGenerateExam = async () => {
-  if (!className || !difficulty || !classYear) {
+  if (!classYear) {
     setMessage("Config not loaded yet or class year missing...");
     return;
   }
@@ -92,9 +70,8 @@ const GenerateExam_oc_reading = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          class_name: className,
-          difficulty: difficulty,
-          class_year: classYear,   // ✅ ADD THIS
+          class_year: classYear,
+          class_name: "OC"
         }),
       }
     );
@@ -131,14 +108,14 @@ const GenerateExam_oc_reading = () => {
       <button
         className="dashboard-button"
         onClick={handleGenerateExam}
-        disabled={loading || !className}
+        disabled={loading || !classYear}
       >
         {loading ? "Generating..." : "Generate Exam"}
       </button>
       <button
         className="dashboard-button"
         onClick={handleGenerateHomeworkExam}
-        disabled={loading || !className}
+        disabled={loading || !classYear}
       >
         {loading ? "Generating..." : "Generate Exam (Homework)"}
       </button>

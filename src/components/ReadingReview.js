@@ -318,7 +318,7 @@ if (typeof rm === "string") {
           <div className="question-header-row">
             <p className="question-text">
               Q{currentQuestion.question_number}.{" "}
-              {currentQuestion.question_text}
+              {String(currentQuestion.question_text).replace(/^\s*\d+\.\s*/, "")}
             </p>
 
             {!explanations[qid] && (

@@ -8,6 +8,8 @@ export default function UploadWord() {
   const [exams, setExams] = useState([]);
   const [error, setError] = useState(null);
   const [deletingDuplicates, setDeletingDuplicates] = useState(false);
+  const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+  //const BACKEND_URL = "http://127.0.0.1:8000";
 
   // -----------------------------
   // File selection
@@ -28,7 +30,7 @@ export default function UploadWord() {
 
   try {
     const res = await fetch(
-      "https://web-production-481a5.up.railway.app/delete-duplicate-questions",
+      "BACKEND_URL/delete-duplicate-questions",
       {
         method: "POST",
       }
@@ -69,7 +71,7 @@ export default function UploadWord() {
 
     try {
       const res = await fetch(
-        "https://web-production-481a5.up.railway.app/upload-word",
+        `${BACKEND_URL}/upload-word`,
         {
           method: "POST",
           body: formData,

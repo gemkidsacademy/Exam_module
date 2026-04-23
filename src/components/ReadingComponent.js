@@ -962,7 +962,10 @@
 
   const currentQuestion = questions[index];
 
-
+    console.log("QUESTION DEBUG:", {
+      question_number: currentQuestion.question_number,
+      question_text: currentQuestion.question_text
+    });  
     const options = currentQuestion.answer_options || {};
     const hasOptions = Object.keys(options).length > 0;
 
@@ -1084,7 +1087,7 @@
         <div className="question-pane">
           <p className="question-text">
             Q{currentQuestion.question_number}.{" "}
-            {currentQuestion.question_text}
+            {String(currentQuestion.question_text).replace(/^\s*\d+\.\s*/, "")}
           </p>
 
           <div className="options">

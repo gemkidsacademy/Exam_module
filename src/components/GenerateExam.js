@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import "./generateexam_MR.css";
 
 const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+//const BACKEND_URL = "http://127.0.0.1:8000";
+
 
 export default function GenerateExam() {
   const [loading, setLoading] = useState(false);
