@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 
-//const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 //const BACKEND_URL = "http://127.0.0.1:8000";
-const BACKEND_URL = "http://localhost:8000";
 
 
 const GenerateExam_oc_reading = () => {
