@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./QuizSetup.css";
 
+const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+//const BACKEND_URL = "http://127.0.0.1:8000";
+
+
 /* ============================
    Setup OC Thinking Skills
 ============================ */
@@ -166,7 +170,7 @@ export default function QuizSetupOCThinkingSkills() {
       subject: quiz.subject?.trim() || "",
     });
 
-    const url = `https://web-production-481a5.up.railway.app/api/admin/question-bank-oc-thinking-skills?${params.toString()}`;
+    const url = `${BACKEND_URL}/api/admin/question-bank-oc-thinking-skills?${params.toString()}`;
 
     console.log("🌐 FINAL URL:", url);
 
@@ -199,7 +203,7 @@ export default function QuizSetupOCThinkingSkills() {
     if (!confirmDelete) return;
 
     fetch(
-      "https://web-production-481a5.up.railway.app/api/admin/delete-previous-questions-OC-TS",
+      `${BACKEND_URL}/api/admin/delete-previous-questions-OC-TS`,
       { method: "DELETE" }
     )
       .then((res) => res.json())
@@ -217,36 +221,58 @@ export default function QuizSetupOCThinkingSkills() {
   ============================ */
 
   useEffect(() => {
-    if (!quiz.className || !quiz.subject || !quiz.difficulty) {
+  console.log("TOPIC useEffect triggered");
+  console.log("className:", quiz.className);
+  console.log("classYear:", quiz.classYear);
+  console.log("subject:", quiz.subject);
+  console.log("difficulty:", quiz.difficulty);
+
+  if (
+    !quiz.className ||
+    !quiz.classYear ||
+    !quiz.subject ||
+    !quiz.difficulty
+  ) {
+    console.log("Blocked: missing required values");
+    setAvailableTopics([]);
+    return;
+  }
+
+  const fetchTopics = async () => {
+    try {
+      const params = new URLSearchParams({
+        class_name: quiz.className,
+        class_year: quiz.classYear,
+        subject: quiz.subject,
+        difficulty: quiz.difficulty,
+      });
+
+      const url = `${BACKEND_URL}/api/topics?${params.toString()}`;
+
+      console.log("Calling:", url);
+
+      const res = await fetch(url);
+
+      console.log("Status:", res.status);
+
+      const data = await res.json();
+
+      console.log("Topics:", data);
+
+      setAvailableTopics(data);
+    } catch (error) {
+      console.error(error);
       setAvailableTopics([]);
-      return;
     }
+  };
 
-    const fetchTopics = async () => {
-      try {
-        const params = new URLSearchParams({
-          class_name: quiz.className,
-          class_year: quiz.classYear,   // ✅ ADD THIS
-          subject: quiz.subject,
-          difficulty: quiz.difficulty,
-        });
-
-        const res = await fetch(
-          `https://web-production-481a5.up.railway.app/api/topics?${params.toString()}`
-        );
-
-        if (!res.ok) throw new Error("Failed to load topics");
-
-        const data = await res.json();
-        setAvailableTopics(data);
-      } catch (err) {
-        console.error(err);
-        setAvailableTopics([]);
-      }
-    };
-
-    fetchTopics();
-  }, [quiz.className, quiz.classYear, quiz.subject, quiz.difficulty]);
+  fetchTopics();
+}, [
+  quiz.className,
+  quiz.classYear,
+  quiz.subject,
+  quiz.difficulty
+]);
 
   /* ============================
      SUBMIT
@@ -287,7 +313,7 @@ export default function QuizSetupOCThinkingSkills() {
 
     try {
       const res = await fetch(
-        "https://web-production-481a5.up.railway.app/api/quizzes/oc-thinking-skills",
+        `${BACKEND_URL}/api/quizzes/oc-thinking-skills`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

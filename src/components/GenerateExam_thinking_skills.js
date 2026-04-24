@@ -90,7 +90,7 @@ export default function GenerateExam_thinking_skills() {
   onClick={async () => {
     try {
       const res = await fetch(
-        "https://web-production-481a5.up.railway.app/api/exams/generate-thinking-skills-homework",
+        `${BACKEND_URL}/api/exams/generate-thinking-skills-homework`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -200,7 +200,7 @@ export default function GenerateExam_thinking_skills() {
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
 
-  const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+  const BACKEND_URL = "${backend_url}";
 
   // ===========================
   // Generate Exam

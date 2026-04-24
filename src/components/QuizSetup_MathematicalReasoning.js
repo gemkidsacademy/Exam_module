@@ -1,7 +1,9 @@
   import React, { useState, useEffect } from "react";
   
   import "./QuizSetup.css";
-  
+  const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+  //const BACKEND_URL = "http://127.0.0.1:8000";
+
   export default function QuizSetup_MathematicalReasoning() {
     const [availableTopics, setAvailableTopics] = useState([]);
     const [questionBank, setQuestionBank] = useState([]);
@@ -62,7 +64,7 @@
 
   try {
     const res = await fetch(
-      "https://web-production-481a5.up.railway.app/api/quizzes/mathematical-reasoning/homework",
+      `${BACKEND_URL}/api/quizzes/mathematical-reasoning/homework`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -91,7 +93,7 @@
   if (!confirmed) return;
 
   try {
-    const response = await fetch("https://web-production-481a5.up.railway.app/api/admin/delete-all-questions-MR", {
+    const response = await fetch(`${BACKEND_URL}/api/admin/delete-all-questions-MR`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -137,7 +139,7 @@
     });
 
     const res = await fetch(
-      `https://web-production-481a5.up.railway.app/api/admin/question-bank-mathematical-reasoning?${params.toString()}`
+      `${BACKEND_URL}/api/admin/question-bank-mathematical-reasoning?${params.toString()}`
     );
 
     if (!res.ok) {
@@ -236,7 +238,7 @@
     });
 
     const res = await fetch(
-      `https://web-production-481a5.up.railway.app/api/topics?${params.toString()}`
+      `${BACKEND_URL}/api/topics?${params.toString()}`
     );
 
     if (!res.ok) {
@@ -293,7 +295,7 @@ fetchTopics();
   
       try {
         const res = await fetch(
-          "https://web-production-481a5.up.railway.app/api/quizzes/mathematical-reasoning",
+          `${BACKEND_URL}/api/quizzes/mathematical-reasoning`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

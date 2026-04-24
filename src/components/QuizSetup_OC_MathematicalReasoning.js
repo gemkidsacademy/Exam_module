@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./QuizSetup.css";
+const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+//const BACKEND_URL = "http://127.0.0.1:8000";
+
 
 export default function QuizSetup_OC_MathematicalReasoning() {
   const [availableTopics, setAvailableTopics] = useState([]);
@@ -36,7 +39,7 @@ export default function QuizSetup_OC_MathematicalReasoning() {
 
     try {
       const res = await fetch(
-        "https://web-production-481a5.up.railway.app/api/admin/delete-all-questions-OC-MR",
+        `${BACKEND_URL}/api/admin/delete-all-questions-OC-MR`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -67,7 +70,7 @@ export default function QuizSetup_OC_MathematicalReasoning() {
     });
 
     const res = await fetch(
-      `https://web-production-481a5.up.railway.app/api/admin/question-bank-oc-mathematical-reasoning?${params.toString()}`
+      `${BACKEND_URL}/api/admin/question-bank-oc-mathematical-reasoning?${params.toString()}`
     );
 
     if (!res.ok) throw new Error("Failed");
@@ -160,7 +163,7 @@ export default function QuizSetup_OC_MathematicalReasoning() {
         console.log("📤 Fetching topics with params:", params.toString());
 
         const res = await fetch(
-          `https://web-production-481a5.up.railway.app/api/topic/oc/math?${params.toString()}`
+          `${BACKEND_URL}/api/topic/oc/math?${params.toString()}`
         );
 
         if (!res.ok) throw new Error("Failed");
@@ -219,7 +222,7 @@ export default function QuizSetup_OC_MathematicalReasoning() {
 
   try {
     const res = await fetch(
-      "https://web-production-481a5.up.railway.app/api/quizzes/oc-mathematical-reasoning-homework", // ✅ NEW ENDPOINT
+      `${BACKEND_URL}/api/quizzes/oc-mathematical-reasoning-homework`, // ✅ NEW ENDPOINT
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -281,7 +284,7 @@ export default function QuizSetup_OC_MathematicalReasoning() {
 
   try {
     const res = await fetch(
-      "https://web-production-481a5.up.railway.app/api/quizzes/oc-mathematical-reasoning",
+      `${BACKEND_URL}/api/quizzes/oc-mathematical-reasoning`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./QuizSetup.css";
 
+//const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+const BACKEND_URL = "http://127.0.0.1:8000";
+
+
 export default function QuizSetup_reading() {
   const [quiz, setQuiz] = useState({
     className: "selective",
@@ -55,7 +59,7 @@ export default function QuizSetup_reading() {
     setLoading(true);
 
     const response = await fetch(
-      "https://web-production-481a5.up.railway.app/api/admin/create-reading-homework", // ✅ NEW ENDPOINT
+      `${BACKEND_URL}/api/admin/create-reading-homework`, // ✅ NEW ENDPOINT
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -112,7 +116,7 @@ export default function QuizSetup_reading() {
       class_year: year,
     });
 
-    const url = `https://web-production-481a5.up.railway.app/api/admin/delete-all-questions-selective-reading?${params.toString()}`;
+    const url = `${BACKEND_URL}/api/admin/delete-all-questions-selective-reading?${params.toString()}`;
 
     // 🔍 Final request inspection
     console.log("🚀 FINAL REQUEST URL:", url);
@@ -161,7 +165,7 @@ export default function QuizSetup_reading() {
     });
 
     const res = await fetch(
-      `https://web-production-481a5.up.railway.app/api/reading/question-bank?${params.toString()}`
+      `${BACKEND_URL}/api/reading/question-bank?${params.toString()}`
     );
 
     if (!res.ok) {
@@ -254,7 +258,12 @@ export default function QuizSetup_reading() {
   // FETCH TOPICS
   // ---------------------------------------
   useEffect(() => {
-  if (!quiz.difficulty || !quiz.classYear) {
+  console.log("Triggered useEffect");
+  console.log("quiz.classYear =", quiz.classYear);
+  console.log("quiz.difficulty =", quiz.difficulty);
+
+  if (!quiz.classYear || !quiz.difficulty) {
+    console.log("Blocked: missing values");
     setAvailableTopics([]);
     return;
   }
@@ -266,24 +275,28 @@ export default function QuizSetup_reading() {
         class_year: quiz.classYear,
       });
 
-      const res = await fetch(
-        `https://web-production-481a5.up.railway.app/api/reading/topics?${params.toString()}`
-      );
+      const url =
+        `${BACKEND_URL}/api/reading/topics?${params.toString()}`;
 
-      if (!res.ok) {
-        throw new Error("Failed to load reading topics");
-      }
+      console.log("Calling:", url);
+
+      const res = await fetch(url);
+
+      console.log("Status:", res.status);
 
       const data = await res.json();
+
+      console.log("Received:", data);
+
       setAvailableTopics(data);
-    } catch (err) {
-      console.error("Error fetching reading topics:", err);
+    } catch (error) {
+      console.error(error);
       setAvailableTopics([]);
     }
   };
 
   fetchReadingTopics();
-}, [quiz.difficulty, quiz.classYear]);
+}, [quiz.classYear, quiz.difficulty]);
 
   // ---------------------------------------
   // SUBMIT
@@ -324,7 +337,7 @@ export default function QuizSetup_reading() {
       setLoading(true);
 
       const response = await fetch(
-        "https://web-production-481a5.up.railway.app/api/admin/create-reading-config",
+        `${BACKEND_URL}/api/admin/create-reading-config`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

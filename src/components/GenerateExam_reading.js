@@ -13,8 +13,8 @@ export default function GenerateExam_reading() {
   const [successMessage, setSuccessMessage] = useState("");
   const [selectedClassYear, setSelectedClassYear] = useState("");
 
-  //const BACKEND_URL = "https://web-production-481a5.up.railway.app";
-  const BACKEND_URL = "http://127.0.0.1:8000";
+  const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+  //const BACKEND_URL = "http://127.0.0.1:8000";
 
   /* ---------------------------
      LOAD QUIZ CONFIGS
@@ -67,7 +67,14 @@ export default function GenerateExam_reading() {
 }, [selectedClassYear]); // ✅ IMPORTANT dependency
 
   const handleGenerateHomeworkExam = async () => {
+  console.log(
+    "\n================ GENERATE HOMEWORK DEBUG ================="
+  );
+
+  console.log("📦 selectedClassYear:", selectedClassYear);
+
   if (!selectedClassYear) {
+    console.log("❌ Missing class year");
     alert("Please select class year.");
     return;
   }
@@ -78,32 +85,62 @@ export default function GenerateExam_reading() {
   setGeneratedExam(null);
 
   try {
+    const payload = {
+      class_name: "Selective",
+      class_year: selectedClassYear,
+    };
+
+    console.log("🚀 REQUEST PAYLOAD:", payload);
+
     const res = await fetch(
-      `${BACKEND_URL}/api/exams/generate-reading-homework`, // ✅ NEW ENDPOINT
+      `${BACKEND_URL}/api/exams/generate-reading-homework`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          class_name: "Selective",
-          class_year: selectedClassYear // ✅ KEY
-          
-        })
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       }
     );
 
+    console.log("📡 RESPONSE STATUS:", res.status);
+
     const data = await res.json();
+
+    console.log("📦 RESPONSE DATA:", data);
+
     if (!res.ok) {
-      throw new Error(data.detail || "Homework generation failed");
+      throw new Error(
+        typeof data.detail === "string"
+          ? data.detail
+          : JSON.stringify(data.detail, null, 2)
+      );
     }
 
     setGeneratedExam(data);
-    setSuccessMessage("Homework exam created successfully.");
+    setSuccessMessage(
+      "Homework exam created successfully."
+    );
 
-  } catch (err) {
-    console.error(err);
-    setError("Failed to generate homework exam.");
+    console.log("✅ HOMEWORK GENERATED SUCCESSFULLY");
+
+  } catch (error) {
+    console.error(
+      "💥 GENERATE HOMEWORK ERROR:",
+      error
+    );
+
+    setError(
+      error.message ||
+      "Failed to generate homework exam."
+    );
+
   } finally {
     setLoading(false);
+
+    console.log(
+      "================ END HOMEWORK DEBUG =================\n"
+    );
   }
 };
   /* ---------------------------
@@ -207,12 +244,7 @@ export default function GenerateExam_reading() {
       <button
         className="primary-btn"
         onClick={handleGenerateHomeworkExam}
-        disabled={
-          loading ||
-          !selectedClass ||
-          !selectedDifficulty ||
-          !selectedClassYear
-        }
+        disabled={loading || !selectedClassYear}
       >
         {loading ? "Generating..." : "Generate Exam (Homework)"}
       </button>

@@ -3,8 +3,10 @@ import React, { useState, useEffect } from "react";
 
 import "./QuizSetup.css";
 
+const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+//const BACKEND_URL = "http://127.0.0.1:8000";
 /* ============================
-     this is helping setup Mathematical Reasoning
+     this is helping setup Thinking skills
   ============================ */
 
 
@@ -80,7 +82,7 @@ export default function QuizSetup() {
     setQbLoading(true);
 
     const res = await fetch(
-      `https://web-production-481a5.up.railway.app/api/admin/question-bank-thinking-skills?class_year=${quiz.classYear}`
+      `${BACKEND_URL}/api/admin/question-bank-thinking-skills?class_year=${quiz.classYear}`
     );
 
     if (!res.ok) {
@@ -107,7 +109,7 @@ export default function QuizSetup() {
   if (!confirmDelete) return;
 
   // call backend API
-  fetch("https://web-production-481a5.up.railway.app/api/admin/delete-previous-questions-TS", {
+  fetch(`${BACKEND_URL}/api/admin/delete-previous-questions-TS`, {
     method: "DELETE",
   })
     .then((res) => res.json())
@@ -175,7 +177,7 @@ export default function QuizSetup() {
       });
 
       const res = await fetch(
-        `https://web-production-481a5.up.railway.app/api/topics?${params.toString()}`
+        `${BACKEND_URL}/api/topics?${params.toString()}`
         
       );
 
@@ -229,7 +231,7 @@ export default function QuizSetup() {
 
     try {
       const res = await fetch(
-        "https://web-production-481a5.up.railway.app/api/quizzes",
+        `${BACKEND_URL}/api/quizzes`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -453,7 +455,7 @@ export default function QuizSetup() {
           
               try {
                 const res = await fetch(
-                  "https://web-production-481a5.up.railway.app/api/quizzes-homework",
+                  `${BACKEND_URL}/api/quizzes-homework`,
                   {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },

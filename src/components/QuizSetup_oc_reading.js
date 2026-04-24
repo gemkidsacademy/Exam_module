@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./QuizSetup.css";
+//const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+const BACKEND_URL = "http://127.0.0.1:8000";
+
 
 export default function QuizSetup_oc_reading() {
   const [quiz, setQuiz] = useState({
@@ -47,7 +50,7 @@ export default function QuizSetup_oc_reading() {
     if (!confirmed) return;
   
     try {
-      const response = await fetch("https://web-production-481a5.up.railway.app/api/admin/delete-all-questions-oc-reading", {
+      const response = await fetch(`${BACKEND_URL}/api/admin/delete-all-questions-oc-reading`, {
         method: "DELETE",
       });
   
@@ -153,7 +156,7 @@ export default function QuizSetup_oc_reading() {
         });
 
         const res = await fetch(
-          `https://web-production-481a5.up.railway.app/api/reading/topics-oc?${params}`
+          `${BACKEND_URL}/api/reading/topics-oc?${params}`
         );
 
         if (!res.ok) throw new Error("Failed to load topics");
@@ -185,7 +188,7 @@ export default function QuizSetup_oc_reading() {
     });
 
     const res = await fetch(
-      `https://web-production-481a5.up.railway.app/api/reading/question-bank-oc?${params}`
+      `${BACKEND_URL}/api/reading/question-bank-oc?${params}`
     );
 
     if (!res.ok) throw new Error("Failed");
@@ -240,7 +243,7 @@ export default function QuizSetup_oc_reading() {
       setLoading(true);
 
       const res = await fetch(
-        "https://web-production-481a5.up.railway.app/api/admin/create-reading-config",
+        `${BACKEND_URL}/api/admin/create-reading-config`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -465,7 +468,7 @@ export default function QuizSetup_oc_reading() {
             setLoading(true);
 
             const res = await fetch(
-              "https://web-production-481a5.up.railway.app/api/admin/create-reading-homework-config",
+              `${BACKEND_URL}/api/admin/create-reading-homework-config`,
               {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
