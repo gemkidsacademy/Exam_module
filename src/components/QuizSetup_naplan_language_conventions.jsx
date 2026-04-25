@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./QuizSetup.css";
+const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+//const BACKEND_URL = "http://127.0.0.1:8000";
 
 export default function QuizSetup_naplan_language_conventions() {
   const [availableTopics, setAvailableTopics] = useState([]);
@@ -37,6 +39,56 @@ export default function QuizSetup_naplan_language_conventions() {
   /* ============================
      Input Handlers
   ============================ */
+  const handleReusedQuestions = async () => {
+  const confirmed = window.confirm(
+    "Are you sure you want to reset used questions?"
+  );
+
+  if (!confirmed) return;
+
+  if (!quiz.year || !quiz.difficulty) {
+    alert("Please select Year and Difficulty first.");
+    return;
+  }
+
+  try {
+    const params = new URLSearchParams({
+      year: quiz.year,
+      difficulty: quiz.difficulty,
+    });
+
+    const response = await fetch(
+      `${BACKEND_URL}/api/admin/reuse-used-questions-naplan-language-conventions?${params.toString()}`,
+      {
+        method: "PUT",
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail ||
+        "Failed to reset used questions."
+      );
+    }
+
+    alert(
+      data.message ||
+      "Used questions reset successfully."
+    );
+
+  } catch (error) {
+    console.error(
+      "Reset used questions error:",
+      error
+    );
+
+    alert(
+      "Something went wrong while resetting used questions."
+    );
+  }
+};
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setQuiz((prev) => ({ ...prev, [name]: value }));
@@ -118,7 +170,7 @@ export default function QuizSetup_naplan_language_conventions() {
         });
 
         const res = await fetch(
-          `https://web-production-481a5.up.railway.app/api/topics-naplan?${params.toString()}`
+          `${BACKEND_URL}/api/topics-naplan?${params.toString()}`
         );
 
         if (!res.ok) throw new Error("Failed to fetch topics");
@@ -152,7 +204,7 @@ const selectedTopicNames = quiz.topics
 
   try {
     const response = await fetch(
-      "https://web-production-481a5.up.railway.app/api/admin/delete-all-questions-naplan-lc",
+      `${BACKEND_URL}/api/admin/delete-all-questions-naplan-lc`,
       {
         method: "DELETE",
       }
@@ -181,7 +233,7 @@ const selectedTopicNames = quiz.topics
       setShowQuestionBank(false);
 
       const res = await fetch(
-        `https://web-production-481a5.up.railway.app/api/admin/question-bank/naplan?subject=language_conventions&year=${quiz.year}`
+        `${BACKEND_URL}/api/admin/question-bank/naplan?subject=language_conventions&year=${quiz.year}`
       );
 
       if (!res.ok) throw new Error("Failed to load question bank");
@@ -200,6 +252,64 @@ const selectedTopicNames = quiz.topics
   /* ============================
      Create Exam
   ============================ */
+  const handleGenerateHomeWorkExam = async () => {
+  if (!isTotalValid) {
+    alert("Total questions do not meet NAPLAN requirements.");
+    return;
+  }
+
+  if (!quiz.topics.length) {
+    alert("Please generate and select topics first.");
+    return;
+  }
+
+  const payload = {
+    class_name: "naplan",
+    subject: "Language Conventions",
+    year: Number(quiz.year),
+    difficulty: quiz.difficulty,
+    num_topics: quiz.topics.length,
+    topics: quiz.topics.map((t) => ({
+      name: t.name,
+      ai: t.ai,
+      db: t.db,
+      total: t.total,
+    })),
+
+    total_questions: totalQuestions,
+  };
+
+  console.log(
+    "📤 LANGUAGE CONVENTIONS HOMEWORK PAYLOAD:",
+    payload
+  );
+
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/api/quizzes-naplan-language-conventions-homework`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to create homework exam");
+    }
+
+    await res.json();
+
+    alert(
+      "NAPLAN Language Conventions homework exam created successfully!"
+    );
+
+  } catch (err) {
+    console.error(err);
+
+    alert("Failed to create homework exam.");
+  }
+};
   const handleGenerateExam = async () => {
     if (!isTotalValid) {
       alert("Total questions do not meet NAPLAN requirements.");
@@ -230,7 +340,7 @@ const selectedTopicNames = quiz.topics
 
     try {
       const res = await fetch(
-        "https://web-production-481a5.up.railway.app/api/quizzes-naplan-language-conventions",
+        `${BACKEND_URL}/api/quizzes-naplan-language-conventions`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -355,6 +465,7 @@ const selectedTopicNames = quiz.topics
       )}
       
       <button onClick={handleViewQuestionBank}>View Question Bank</button>
+      <button onClick={handleReusedQuestions}>Reset used questions</button>
       <button onClick={handleDeleteAllQuestions}>
         Delete All Questions
       </button>
@@ -367,6 +478,16 @@ const selectedTopicNames = quiz.topics
         }}
       >
         Create Exam
+      </button>
+      <button
+        onClick={handleGenerateHomeWorkExam}
+        disabled={!isTotalValid}
+        style={{
+          backgroundColor: isTotalValid ? "#0d6efd" : "#ccc",
+          cursor: isTotalValid ? "pointer" : "not-allowed",
+        }}
+      >
+        Create Exam (homework)
       </button>
 
 

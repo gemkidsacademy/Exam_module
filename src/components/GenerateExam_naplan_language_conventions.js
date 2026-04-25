@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+//const BACKEND_URL = "http://127.0.0.1:8000";
 
 const GenerateExam_naplan_language_conventions = () => {
   const [years, setYears] = useState([]);
@@ -17,7 +19,7 @@ const GenerateExam_naplan_language_conventions = () => {
     const fetchYears = async () => {
       try {
         const response = await fetch(
-          "https://web-production-481a5.up.railway.app/naplan/language-conventions/available-years"
+          `${BACKEND_URL}/naplan/language-conventions/available-years`
         );
 
         const data = await response.json();
@@ -44,6 +46,50 @@ const GenerateExam_naplan_language_conventions = () => {
   /* ----------------------------------------------------
      Generate exam
   ---------------------------------------------------- */
+  const handleGenerateHomeWork = async () => {
+  if (!selectedYear) {
+    setError("Please select a year");
+    return;
+  }
+
+  setLoadingExam(true);
+  setMessage(null);
+  setError(null);
+
+  try {
+    const response = await fetch(
+      `${BACKEND_URL}/naplan/language-conventions/generate-homework`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          year: selectedYear,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail ||
+        "Failed to generate homework exam"
+      );
+    }
+
+    setMessage(
+      `✅ Homework exam generated successfully (Year: ${selectedYear}, Exam ID: ${data.exam_id}, ${data.total_questions} questions)`
+    );
+
+  } catch (err) {
+    setError(err.message);
+
+  } finally {
+    setLoadingExam(false);
+  }
+};
   const handleGenerate = async () => {
     if (!selectedYear) {
       setError("Please select a year");
@@ -56,7 +102,7 @@ const GenerateExam_naplan_language_conventions = () => {
 
     try {
       const response = await fetch(
-        "https://web-production-481a5.up.railway.app/naplan/language-conventions/generate-exam",
+        `${BACKEND_URL}/naplan/language-conventions/generate-exam`,
         {
           method: "POST",
           headers: {
@@ -121,6 +167,14 @@ const GenerateExam_naplan_language_conventions = () => {
         style={{ width: "100%" }}
       >
         {loadingExam ? "Generating..." : "Generate Exam"}
+      </button>
+      <button
+        className="dashboard-button"
+        onClick={handleGenerateHomeWork}
+        disabled={loadingExam || loadingYears}
+        style={{ width: "100%" }}
+      >
+        {loadingExam ? "Generating..." : "Generate Exam (home work)"}
       </button>
 
       {/* SUCCESS */}

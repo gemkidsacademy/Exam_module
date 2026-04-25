@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./QuizSetup.css";
-//const BACKEND_URL = "https://web-production-481a5.up.railway.app";
-const BACKEND_URL = "http://127.0.0.1:8000";
+const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+//const BACKEND_URL = "http://127.0.0.1:8000";
 
 export default function QuizSetup_naplan({ examType }) {
   const [availableTopics, setAvailableTopics] = useState([]);
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [availableYears, setAvailableYears] = useState([]);
+  const [isGeneratingHomework, setIsGeneratingHomework] = useState(false);
 
   const [questionBank, setQuestionBank] = useState([]);
   const [showQuestionBank, setShowQuestionBank] = useState(false);
@@ -86,6 +87,52 @@ useEffect(() => {
   /* ============================
      Input handlers
   ============================ */
+  const handleReuseUsedQuestions = async () => {
+  const confirmed = window.confirm(
+    "Are you sure you want to make all used questions available again?"
+  );
+
+  if (!confirmed) return;
+
+  if (!quiz.year || !quiz.difficulty) {
+    alert("Please select Year and Difficulty first.");
+    return;
+  }
+
+  try {
+    const params = new URLSearchParams({
+      year: quiz.year,
+      difficulty: quiz.difficulty,
+    });
+
+    const response = await fetch(
+      `${BACKEND_URL}/api/admin/reuse-used-questions-naplan-numeracy?${params.toString()}`,
+      {
+        method: "PUT",
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail || "Failed to reuse used questions"
+      );
+    }
+
+    alert(
+      data.message ||
+      "Used questions have been reset successfully."
+    );
+
+  } catch (error) {
+    console.error("Error reusing used questions:", error);
+
+    alert(
+      "Something went wrong while resetting used questions."
+    );
+  }
+};
   const handleDeleteAllQuestions = async () => {
   const confirmed = window.confirm(
     "Are you sure you want to delete all questions?"
@@ -208,7 +255,11 @@ useEffect(() => {
     }
   };
   const handleGenerateHomeworkExam = async () => {
+  if (isGeneratingHomework) return;
+
   try {
+    setIsGeneratingHomework(true);
+
     if (!isTotalValid) {
       alert("Total questions do not meet NAPLAN requirements.");
       return;
@@ -259,8 +310,12 @@ useEffect(() => {
   } catch (error) {
     console.error(error);
     alert(error.message);
+
+  } finally {
+    setIsGeneratingHomework(false);
   }
 };
+
   const handleGenerateExam = async () => {
   try {
     // -----------------------------
@@ -536,7 +591,23 @@ useEffect(() => {
         >
           View Question Bank
         </button>
-
+        <button
+          type="button"
+          onClick={handleReuseUsedQuestions}
+          disabled={!quiz.year || !quiz.difficulty}
+          style={{
+            backgroundColor:
+              !quiz.year || !quiz.difficulty
+                ? "#ccc"
+                : "#0d6efd",
+            cursor:
+              !quiz.year || !quiz.difficulty
+                ? "not-allowed"
+                : "pointer",
+          }}
+        >
+          Reuse Used Questions
+        </button>
         <button
           type="button"
           onClick={handleDeleteAllQuestions}

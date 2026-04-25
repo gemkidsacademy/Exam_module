@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
+const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+//const BACKEND_URL = "http://127.0.0.1:8000";
 
 const GenerateExamNaplanNumeracy = () => {
   const [loading, setLoading] = useState(false);
   const [yearsLoading, setYearsLoading] = useState(true);
+  const [generatedExam, setGeneratedExam] = useState(null);
 
   const [classYears, setClassYears] = useState([]);
   const [selectedYear, setSelectedYear] = useState("");
@@ -16,7 +19,7 @@ const GenerateExamNaplanNumeracy = () => {
   const fetchClassYears = async () => {
     try {
       const response = await fetch(
-        "https://web-production-481a5.up.railway.app/naplan/numeracy/class-years"
+        `${BACKEND_URL}/naplan/numeracy/class-years`
       );
 
       const data = await response.json();
@@ -40,6 +43,55 @@ const GenerateExamNaplanNumeracy = () => {
   // ---------------------------------------
   // Generate exam
   // ---------------------------------------
+  const handleGenerateHomeWork = async () => {
+  try {
+    if (loading || yearsLoading) return;
+
+    setLoading(true);
+
+    if (!selectedYear) {
+      alert("Please select a year first.");
+      return;
+    }
+
+    const response = await fetch(
+      `${BACKEND_URL}/naplan/numeracy/generate-homework`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          class_year: selectedYear
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail || "Failed to generate homework exam."
+      );
+    }
+
+    console.log("Homework exam response:", data);
+
+    setGeneratedExam(data);
+
+    alert("Homework exam generated successfully!");
+
+  } catch (error) {
+    console.error("Homework generation error:", error);
+
+    alert(
+      error.message ||
+      "Something went wrong while generating homework exam."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
   const handleGenerate = async () => {
     if (!selectedYear) {
       setError("Please select a class year first.");
@@ -52,7 +104,7 @@ const GenerateExamNaplanNumeracy = () => {
 
     try {
       const response = await fetch(
-        "https://web-production-481a5.up.railway.app/naplan/numeracy/generate-exam",
+        `${BACKEND_URL}/naplan/numeracy/generate-exam`,
         {
           method: "POST",
           headers: {
@@ -117,6 +169,16 @@ const GenerateExamNaplanNumeracy = () => {
       >
         {loading ? "Generating Exam..." : "Generate Exam"}
       </button>
+      {/* Generate HOMEWORK Button */}
+      <button
+        className="dashboard-button"
+        onClick={handleGenerateHomeWork}
+        disabled={loading || yearsLoading}
+        style={{ width: "100%" }}
+      >
+        {loading ? "Generating Exam..." : "Generate Exam(homework)"}
+      </button>
+      
 
       {message && (
         <p style={{ color: "green", marginTop: "14px" }}>{message}</p>

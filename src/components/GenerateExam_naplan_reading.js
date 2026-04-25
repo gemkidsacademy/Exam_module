@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+//const BACKEND_URL = "http://127.0.0.1:8000";
 
 const GenerateExamNaplanReading = () => {
   const [loading, setLoading] = useState(false);
@@ -14,7 +16,7 @@ const GenerateExamNaplanReading = () => {
     const fetchAvailableYears = async () => {
       try {
         const response = await fetch(
-          "https://web-production-481a5.up.railway.app/naplan/reading/available-years"
+          `${BACKEND_URL}/naplan/reading/available-years`
         );
 
         const data = await response.json();
@@ -47,7 +49,7 @@ const GenerateExamNaplanReading = () => {
 
     try {
       const response = await fetch(
-        "https://web-production-481a5.up.railway.app/naplan/reading/generate-exam",
+        `${BACKEND_URL}/naplan/reading/generate-exam`,
         {
           method: "POST",
           headers: {
@@ -74,7 +76,50 @@ const GenerateExamNaplanReading = () => {
       setLoading(false);
     }
   };
+  const handleGenerateHomeWork = async () => {
+  if (!selectedYear) {
+    setError("Please select a year first");
+    return;
+  }
 
+  setLoading(true);
+  setMessage(null);
+  setError(null);
+
+  try {
+    const response = await fetch(
+      `${BACKEND_URL}/naplan/reading/generate-homework`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          year: parseInt(selectedYear),
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail ||
+        "Failed to generate homework exam"
+      );
+    }
+
+    setMessage(
+      `✅ Year ${selectedYear} homework exam generated successfully (Exam ID: ${data.exam_id}, ${data.total_questions} questions)`
+    );
+
+  } catch (err) {
+    setError(err.message);
+
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div style={{ maxWidth: 400, margin: "0 auto" }}>
       <h3>Generate NAPLAN Reading Exam</h3>
@@ -101,6 +146,14 @@ const GenerateExamNaplanReading = () => {
         style={{ width: "100%" }}
       >
         {loading ? "Generating..." : "Generate Exam"}
+      </button>
+      <button
+        className="dashboard-button"
+        onClick={handleGenerateHomeWork}
+        disabled={loading}
+        style={{ width: "100%" }}
+      >
+        {loading ? "Generating..." : "Generate Exam(homework)"}
       </button>
 
       {message && (

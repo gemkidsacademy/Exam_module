@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./QuizSetup.css";
+const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+//const BACKEND_URL = "http://127.0.0.1:8000";
+
 
 export default function QuizSetup_naplan_reading({ examType }) {
   const [availableTopics, setAvailableTopics] = useState([]);
@@ -53,6 +56,57 @@ export default function QuizSetup_naplan_reading({ examType }) {
   /* ============================
      Input handlers
   ============================ */
+  const handleResetQuestions = async () => {
+  if (!quiz.year) {
+    alert("Please select a year first.");
+    return;
+  }
+
+  const confirmed = window.confirm(
+    "Are you sure you want to reset used questions?"
+  );
+
+  if (!confirmed) return;
+
+  try {
+    const params = new URLSearchParams({
+      year: quiz.year,
+      difficulty: quiz.difficulty || "",
+    });
+
+    const response = await fetch(
+      `${BACKEND_URL}/api/admin/reuse-used-questions-naplan-reading?${params.toString()}`,
+      {
+        method: "PUT",
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail ||
+        "Failed to reset used questions."
+      );
+    }
+
+    alert(
+      data.message ||
+      "Used questions reset successfully."
+    );
+
+  } catch (error) {
+    console.error(
+      "Reset questions error:",
+      error
+    );
+
+    alert(
+      error.message ||
+      "Something went wrong while resetting questions."
+    );
+  }
+};
   const handleDeleteAllQuestions = async () => {
   const confirmed = window.confirm(
     "Are you sure you want to delete ALL Reading questions?"
@@ -62,7 +116,7 @@ export default function QuizSetup_naplan_reading({ examType }) {
 
   try {
     const response = await fetch(
-      "https://web-production-481a5.up.railway.app/api/admin/delete-all-questions-naplan-reading",
+      `${BACKEND_URL}/api/admin/delete-all-questions-naplan-reading`,
       {
         method: "DELETE",
       }
@@ -156,7 +210,7 @@ export default function QuizSetup_naplan_reading({ examType }) {
       setShowQuestionBank(false);
 
       const res = await fetch(
-        `https://web-production-481a5.up.railway.app/api/admin/question-bank-reading/naplan?subject=reading&year=${quiz.year}`
+        `${BACKEND_URL}/api/admin/question-bank-reading/naplan?subject=reading&year=${quiz.year}`
       );
 
       if (!res.ok) throw new Error("Failed to load question bank");
@@ -205,7 +259,7 @@ export default function QuizSetup_naplan_reading({ examType }) {
 
     try {
       const res = await fetch(
-        "https://web-production-481a5.up.railway.app/api/quizzes-naplan-reading",
+        `${BACKEND_URL}/api/quizzes-naplan-reading`,
         {
           method: "POST",
           headers: {
@@ -227,7 +281,75 @@ export default function QuizSetup_naplan_reading({ examType }) {
       alert("Failed to create exam. Check console for details.");
     }
   };
+const handleGenerateExamHomeWork = async () => {
+  if (!isTotalValid) {
+    alert("Total questions do not meet NAPLAN requirements.");
+    return;
+  }
 
+  if (!quiz.topics.length) {
+    alert("Please generate and select topics first.");
+    return;
+  }
+
+  const payload = {
+    class_name: quiz.className,
+    subject: "reading",
+    year: Number(quiz.year),
+    difficulty: quiz.difficulty,
+    num_topics: quiz.topics.length,
+    topics: quiz.topics.map((t) => ({
+      name: t.name,
+      ai: t.ai,
+      db: t.db,
+      total: t.total,
+    })),
+    total_questions: totalQuestions,
+  };
+
+  console.log(
+    "📤 NAPLAN READING HOMEWORK PAYLOAD:",
+    payload
+  );
+
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/api/quizzes-naplan-reading-homework`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!res.ok) {
+      const errText = await res.text();
+
+      throw new Error(
+        errText ||
+        "Failed to create homework quiz"
+      );
+    }
+
+    await res.json();
+
+    alert(
+      "NAPLAN Reading homework exam created successfully!"
+    );
+
+  } catch (err) {
+    console.error(
+      "❌ ERROR CREATING HOMEWORK QUIZ:",
+      err
+    );
+
+    alert(
+      "Failed to create homework exam. Check console for details."
+    );
+  }
+};
   /* ============================
      Fetch available topics
   ============================ */
@@ -246,7 +368,7 @@ export default function QuizSetup_naplan_reading({ examType }) {
         });
 
         const res = await fetch(
-          `https://web-production-481a5.up.railway.app/topics-naplan-reading?${params.toString()}`
+          `${BACKEND_URL}/topics-naplan-reading?${params.toString()}`
         );
 
         if (!res.ok) throw new Error("Failed to fetch topics");
@@ -399,6 +521,13 @@ const selectedTopicNames = quiz.topics
         </button>
         <button
           type="button"
+          onClick={handleResetQuestions}
+          disabled={!quiz.year}
+        >
+          Reset used Questions
+        </button>
+        <button
+          type="button"
           onClick={handleDeleteAllQuestions}
           
         >
@@ -414,6 +543,17 @@ const selectedTopicNames = quiz.topics
           }}
         >
           Generate Exam
+        </button>
+        <button
+          type="button"
+          onClick={handleGenerateExamHomeWork}
+          disabled={!quiz.topics.length || !isTotalValid}
+          style={{
+            backgroundColor: isTotalValid ? "#0d6efd" : "#ccc",
+            cursor: isTotalValid ? "pointer" : "not-allowed",
+          }}
+        >
+          Generate Exam (Homework)
         </button>
       </div>
 
