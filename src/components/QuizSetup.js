@@ -255,74 +255,100 @@ export default function QuizSetup() {
   };
 
   return (
-    <div className="quiz-setup-container">
+  <div className="quiz-setup-container">
+    <div className="quiz-card">
+      <h1 className="page-title">Thinking Skills Exam Setup</h1>
+
       <form onSubmit={handleSubmit}>
-        <label>Class:</label>
-          <input
-            type="text"
-            value="Selective"
-            readOnly
-          />
+  <div className="section-card">
+    <h2>Exam Information</h2>
 
-        <label>Subject:</label>
-          <input
-            type="text"
-            value="Thinking Skills"
-            readOnly
-          />
-        <label>Class Year:</label>
-          <select
-            name="classYear"
-            value={quiz.classYear}
-            onChange={handleInputChange}
-            required
-          >
-            
-            
-            <option value={4}>Year 4</option>
-            <option value={5}>Year 5</option>
-            <option value={6}>Year 6</option>
-          </select>
+    <div className="grid-2">
+      <div>
+        <label>Class</label>
+        <input
+          type="text"
+          value="Selective"
+          readOnly
+        />
+      </div>
 
-        <label>Difficulty Level:</label>
+      <div>
+        <label>Subject</label>
+        <input
+          type="text"
+          value="Thinking Skills"
+          readOnly
+        />
+      </div>
+
+      <div>
+        <label>Class Year</label>
         <select
-          name="difficulty"
-          value={quiz.difficulty}
+          name="classYear"
+          value={quiz.classYear}
           onChange={handleInputChange}
           required
         >
-          <option value="">Select Difficulty</option>
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
+          <option value={4}>Year 4</option>
+          <option value={5}>Year 5</option>
+          <option value={6}>Year 6</option>
         </select>
+      </div>
+    </div>
+  </div>
 
-        <label>Number of Topics:</label>
-        <input
-          type="number"
-          name="numTopics"
-          min="1"
-          value={quiz.numTopics}
-          onChange={handleInputChange}
-        />
+        <div className="section-card">
+          <h2>Difficulty Level</h2>
 
-        <button type="button" onClick={generateTopics}>
-          Generate Topics
-        </button>
-        <button
-            type="button"
-            onClick={handleViewQuestionBank}
-            style={{ marginLeft: "10px" }}
+          <label>Select Difficulty</label>
+          <select
+            name="difficulty"
+            value={quiz.difficulty}
+            onChange={handleInputChange}
           >
-            View Question Bank
-       </button>
-       <button
-       type="button"
-       onClick={handleDeletePreviousQuestions}
-       style={{ marginLeft: "10px" }}
-     >
-       Delete Previous Questions
-     </button>
+            <option value="">Select Difficulty</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+
+        <div className="section-card">
+          <h2>Topic Controls</h2>
+
+          <label>Number of Topics</label>
+          <input
+            type="number"
+            name="numTopics"
+            min="1"
+            value={quiz.numTopics}
+            onChange={handleInputChange}
+          />
+
+          <div className="button-row">
+            <button
+              type="button"
+              onClick={generateTopics}
+            >
+              Generate Topics
+            </button>
+
+            <button
+              type="button"
+              onClick={handleViewQuestionBank}
+            >
+              View Question Bank
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDeletePreviousQuestions}
+            >
+              Delete Previous Questions
+            </button>
+          </div>
+        </div>
        {showQuestionBank && (
             <div className="question-bank">
               <h3>Question Bank (Thinking Skills)</h3>
@@ -359,130 +385,133 @@ export default function QuizSetup() {
 
         <div className="topics-container">
           {quiz.topics.map((topic, index) => (
-            <div className="topic" key={index}>
-              <h4>Topic {index + 1}</h4>
+            <div className="topic-card" key={index}>
+  <h4>Topic {index + 1}</h4>
 
-              <label>Topic Name:</label>
-               <select
-                 value={topic.name}
-                 onChange={(e) =>
-                   handleTopicNameChange(index, e.target.value)
-                 }
-                 required
-               >
-                 <option value="">Select a topic</option>
-               
-                 {availableTopics
-                   .filter(
-                     (t) =>
-                       !getUsedTopicNames(index).includes(t.name)
-                   )
-                   .map((t) => (
-                     <option key={t.id || t.name} value={t.name}>
-                       {t.name}
-                     </option>
-                   ))}
-               </select>
+  <label>Topic Name</label>
+  <select
+    value={topic.name}
+    onChange={(e) =>
+      handleTopicNameChange(index, e.target.value)
+    }
+    required
+  >
+    <option value="">Select a topic</option>
 
+    {availableTopics
+      .filter(
+        (t) =>
+          !getUsedTopicNames(index).includes(t.name)
+      )
+      .map((t) => (
+        <option
+          key={t.id || t.name}
+          value={t.name}
+        >
+          {t.name}
+        </option>
+      ))}
+  </select>
 
-              <label>Questions Generated by AI:</label>
-              <input
-                type="number"
-                min="0"
-                value={topic.ai}
-                onChange={(e) =>
-                  handleTopicChange(index, "ai", e.target.value)
-                }
-                required
-              />
+  <div className="grid-2">
+    <div>
+      <label>Questions Generated by AI</label>
+      <input
+        type="number"
+        min="0"
+        value={topic.ai}
+        onChange={(e) =>
+          handleTopicChange(index, "ai", e.target.value)
+        }
+        required
+      />
+    </div>
 
-              <label>Questions from Database:</label>
-              <input
-                type="number"
-                min="0"
-                value={topic.db}
-                onChange={(e) =>
-                  handleTopicChange(index, "db", e.target.value)
-                }
-                required
-              />
-            </div>
+    <div>
+      <label>Questions from Database</label>
+      <input
+        type="number"
+        min="0"
+        value={topic.db}
+        onChange={(e) =>
+          handleTopicChange(index, "db", e.target.value)
+        }
+        required
+      />
+    </div>
+  </div>
+</div>
           ))}
         </div>
 
-        <div className="total-section">
-          <h3>Total Questions: {totalQuestions}</h3>
+        <div className="summary-box">
+          <div>Total Questions: {totalQuestions} / 40</div>
+
+          {totalQuestions === 40 && (
+            <div className="ready-text">✔ Ready to Create Exam</div>
+          )}
+
           {totalQuestions > 40 && (
             <div className="warning">Total cannot exceed 40!</div>
           )}
         </div>
-
+        <div className="button-row final-actions">    
         <button type="submit" disabled={totalQuestions > 40}>
           Create Exam
         </button>
         <button
-            type="button"
-            disabled={totalQuestions > 40}
-            onClick={async () => {
-              if (!quiz.className || !quiz.subject || !quiz.difficulty) {
-                alert("Please select class, subject, and difficulty.");
-                return;
-              }
-          
-              if (quiz.topics.length === 0) {
-                alert("Please generate at least one topic.");
-                return;
-              }
-          
-              if (totalQuestions !== 40) {
-                alert("Total questions across all topics must be 40.");
-                return;
-              }
-          
-              const payload = {
-                class_name: quiz.className.trim(),
-                subject: quiz.subject.trim(),
-                class_year: quiz.classYear,
-                difficulty: quiz.difficulty.trim(),
-                num_topics: quiz.topics.length,
-                topics: quiz.topics.map((t) => ({
-                  name: t.name.trim(),
-                  ai: Number(t.ai),
-                  db: Number(t.db),
-                  total: Number(t.total),
-                })),
-              };
-          
-              try {
-                const res = await fetch(
-                  `${BACKEND_URL}/api/quizzes-homework`,
-                  {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload),
-                  }
-                );
-          
-                if (!res.ok) {
-                  const err = await res.json();
-                  console.error("Backend returned:", err);
-                  throw new Error("Failed to save homework");
-                }
-          
-                const data = await res.json();
-                console.log("Homework saved:", data);
-                alert("Homework created successfully!");
-              } catch (error) {
-                console.error(error);
-                alert("Error creating homework.");
-              }
-            }}
-            style={{ marginLeft: "10px" }}
-          >
-            Create Exam (Homework)
-          </button>     
-      </form>
+  type="button"
+  className="secondary-btn"
+  disabled={totalQuestions > 40}
+  onClick={async () => {
+  if (!validateQuizBeforeSubmit()) {
+    return;
+  }
+    const payload = {
+      class_name: quiz.className.trim(),
+      subject: quiz.subject.trim(),
+      class_year: quiz.classYear,
+      difficulty: quiz.difficulty.trim(),
+      num_topics: quiz.topics.length,
+      topics: quiz.topics.map((t) => ({
+        name: t.name.trim(),
+        ai: Number(t.ai),
+        db: Number(t.db),
+        total: Number(t.total),
+      })),
+    };
+
+    try {
+      const res = await fetch(
+        `${BACKEND_URL}/api/quizzes-homework`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!res.ok) {
+        const err = await res.json();
+        console.error("Backend returned:", err);
+        throw new Error("Failed to save homework");
+      }
+
+      const data = await res.json();
+      console.log("Homework saved:", data);
+      alert("Homework created successfully!");
+    } catch (error) {
+      console.error(error);
+      alert("Error creating homework.");
+    }
+  }}
+>
+  Create Exam (Homework)
+</button>
+          </div>
+          </form>
     </div>
-  );
+  </div>
+);
 }
 
