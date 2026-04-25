@@ -79,7 +79,9 @@ const normalizeOption = (value) => {
     content: String(value)
   };
 };
-const API_BASE = process.env.REACT_APP_API_URL;
+//const API_BASE = process.env.REACT_APP_API_URL;
+const API_BASE = "http://127.0.0.1:8000";
+
 
 if (!API_BASE) {
   throw new Error("❌ REACT_APP_API_URL is not defined");
@@ -796,9 +798,32 @@ return (
         <strong>{optionKey})</strong>
 
         {optionValue.type === "text" && (
-          <span className="option-text">
-            {optionValue.content}
+          <>
+          <span
+            style={{
+              fontWeight: "700",
+              minWidth: "28px",
+              color: "#111827",
+              flexShrink: 0
+            }}
+          >
+            {optionKey}.
           </span>
+
+          <span
+            style={{
+              color: "#111827",
+              fontSize: "16px",
+              lineHeight: "1.5",
+              display: "block",
+              flex: 1,
+              whiteSpace: "normal",
+              wordBreak: "break-word"
+            }}
+          >
+            {optionValue?.content || ""}
+          </span>
+        </>
         )}
 
         {optionValue?.type === "image" && (

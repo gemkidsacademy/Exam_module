@@ -168,3 +168,14 @@
   color: white;
   border-color: #dc2626;
 }
+.option-text {
+  color: #111827 !important;
+  font-size: 16px !important;
+  line-height: 1.5;
+  display: block !important;
+  flex: 1;
+  white-space: normal;
+  word-break: break-word;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
