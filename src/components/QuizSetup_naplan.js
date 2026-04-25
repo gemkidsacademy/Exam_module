@@ -205,6 +205,60 @@ useEffect(() => {
       setQbLoading(false);
     }
   };
+  const handleGenerateHomeworkExam = async () => {
+  try {
+    if (!isTotalValid) {
+      alert("Total questions do not meet NAPLAN requirements.");
+      return;
+    }
+
+    if (!quiz.topics || quiz.topics.length === 0) {
+      alert("Please generate and select topics first.");
+      return;
+    }
+
+    const payload = {
+      class_name: quiz.className,
+      subject: quiz.subject,
+      year: Number(quiz.year),
+      difficulty: quiz.difficulty,
+      total_questions: totalQuestions,
+      num_topics: quiz.topics.length,
+
+      topics: quiz.topics.map((t) => ({
+        name: t.name,
+        ai: Number(t.ai || 0),
+        db: Number(t.db || 0),
+        total: Number(t.total || 0),
+      })),
+    };
+
+    const response = await fetch(
+      "https://web-production-481a5.up.railway.app/api/quizzes-naplan-homework",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(text || "Failed to generate homework exam");
+    }
+
+    const data = await response.json();
+
+    alert("Homework exam created successfully!");
+    console.log(data);
+
+  } catch (error) {
+    console.error(error);
+    alert(error.message);
+  }
+};
   const handleGenerateExam = async () => {
   try {
     // -----------------------------
@@ -465,7 +519,14 @@ useEffect(() => {
       {/* ============================
          Question Bank
       ============================ */}
-      <div style={{ marginTop: "15px" }}>
+      <div
+        style={{
+          marginTop: "15px",
+          display: "flex",
+          gap: "10px",
+          flexWrap: "wrap",
+        }}
+      >
         <button
           type="button"
           onClick={handleViewQuestionBank}
@@ -473,12 +534,14 @@ useEffect(() => {
         >
           View Question Bank
         </button>
+
         <button
           type="button"
-          onClick={handleDeleteAllQuestions}          
+          onClick={handleDeleteAllQuestions}
         >
           Delete All Questions
         </button>
+
         <button
           type="button"
           onClick={handleGenerateExam}
@@ -492,6 +555,21 @@ useEffect(() => {
           }}
         >
           Generate Exam
+        </button>
+
+        <button
+          type="button"
+          onClick={handleGenerateHomeworkExam}
+          disabled={
+            !quiz.topics.length ||
+            !isTotalValid
+          }
+          style={{
+            backgroundColor: isTotalValid ? "#198754" : "#ccc",
+            cursor: isTotalValid ? "pointer" : "not-allowed",
+          }}
+        >
+          Generate Exam (Homework)
         </button>
       </div>
       

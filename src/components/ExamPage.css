@@ -237,18 +237,21 @@
 ============================================ */
 .option-btn {
   display: flex;
-  flex-direction: row;   /* 🔥 THIS IS THE FIX */
+  flex-direction: row;
   align-items: flex-start;
   gap: 8px;
 
   width: 100%;
   text-align: left;
 
-  padding: 10px 12px;
+  padding: 14px;
   margin-bottom: 6px;
 
-  line-height: 1.4;
+  line-height: 1.5;
   font-size: 16px;
+
+  white-space: normal;
+  word-break: break-word;
 
   border-radius: 10px;
   border: 2px solid transparent;
@@ -1182,10 +1185,10 @@ progress::-moz-progress-bar {
   flex-direction: column;
   gap: 12px;
 
-  max-height: 420px;
-  overflow-y: auto;
+  max-height: none;
+  overflow: visible;
 
-  padding-right: 6px;
+  padding-right: 0;
 }
 /* ===============================
    AI EXPLANATION SECTION
