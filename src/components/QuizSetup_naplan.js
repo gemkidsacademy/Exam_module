@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./QuizSetup.css";
+//const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+const BACKEND_URL = "http://127.0.0.1:8000";
 
 export default function QuizSetup_naplan({ examType }) {
   const [availableTopics, setAvailableTopics] = useState([]);
@@ -66,7 +68,7 @@ useEffect(() => {
   const fetchYears = async () => {
     try {
       const res = await fetch(
-        "https://web-production-481a5.up.railway.app/api/naplan-years"
+        `${BACKEND_URL}/api/naplan-years`
       );
 
       if (!res.ok) throw new Error("Failed to fetch years");
@@ -93,7 +95,7 @@ useEffect(() => {
 
   try {
     const response = await fetch(
-      "https://web-production-481a5.up.railway.app/api/admin/delete-all-questions-naplan-numeracy",
+      `${BACKEND_URL}/api/admin/delete-all-questions-naplan-numeracy`,
       {
         method: "DELETE",
       }
@@ -190,7 +192,7 @@ useEffect(() => {
       setShowQuestionBank(false);
 
       const res = await fetch(
-        `https://web-production-481a5.up.railway.app/api/admin/question-bank/naplan?subject=${quiz.subject}&year=${quiz.year}`
+        `${BACKEND_URL}/api/admin/question-bank/naplan?subject=${quiz.subject}&year=${quiz.year}`
       );
 
       if (!res.ok) throw new Error("Failed to load question bank");
@@ -234,7 +236,7 @@ useEffect(() => {
     };
 
     const response = await fetch(
-      "https://web-production-481a5.up.railway.app/api/quizzes-naplan-homework",
+      `${BACKEND_URL}/api/quizzes-naplan-homework`,
       {
         method: "POST",
         headers: {
@@ -301,7 +303,7 @@ useEffect(() => {
     // 3️⃣ Fetch with strong error visibility
     // -----------------------------
     const response = await fetch(
-      "https://web-production-481a5.up.railway.app/api/quizzes-naplan-numeracy",
+      `${BACKEND_URL}/api/quizzes-naplan-numeracy`,
       {
         method: "POST",
         headers: {
@@ -365,7 +367,7 @@ useEffect(() => {
         });
         
         const res = await fetch(
-          `https://web-production-481a5.up.railway.app/api/topics-naplan?${params.toString()}`
+          `${BACKEND_URL}/api/topics-naplan?${params.toString()}`
         );
 
         if (!res.ok) throw new Error("Failed to fetch topics");

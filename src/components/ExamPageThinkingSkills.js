@@ -791,50 +791,47 @@ return (
 
     return (
       <button
-        key={optionKey}
-        className={optionClass + (isReview ? " review" : "")}
-        onClick={() => !isReview && handleAnswer(optionKey)}
+  key={optionKey}
+  className={optionClass + (isReview ? " review" : "")}
+  onClick={() => !isReview && handleAnswer(optionKey)}
+>
+  {optionValue.type === "text" && (
+    <>
+      <span
+        style={{
+          fontWeight: "700",
+          minWidth: "28px",
+          color: "#111827",
+          flexShrink: 0
+        }}
       >
-        <strong>{optionKey})</strong>
+        {optionKey}.
+      </span>
 
-        {optionValue.type === "text" && (
-          <>
-          <span
-            style={{
-              fontWeight: "700",
-              minWidth: "28px",
-              color: "#111827",
-              flexShrink: 0
-            }}
-          >
-            {optionKey}.
-          </span>
+      <span
+        style={{
+          color: "#111827",
+          fontSize: "16px",
+          lineHeight: "1.5",
+          display: "block",
+          flex: 1,
+          whiteSpace: "normal",
+          wordBreak: "break-word"
+        }}
+      >
+        {optionValue?.content || ""}
+      </span>
+    </>
+  )}
 
-          <span
-            style={{
-              color: "#111827",
-              fontSize: "16px",
-              lineHeight: "1.5",
-              display: "block",
-              flex: 1,
-              whiteSpace: "normal",
-              wordBreak: "break-word"
-            }}
-          >
-            {optionValue?.content || ""}
-          </span>
-        </>
-        )}
-
-        {optionValue?.type === "image" && (
-         <img
-           src={optionValue.src}
-           alt={`Option ${optionKey}`}
-           className="option-image"
-         />
-       )}
-             
-      </button>
+  {optionValue?.type === "image" && (
+    <img
+      src={optionValue.src}
+      alt={`Option ${optionKey}`}
+      className="option-image"
+    />
+  )}
+</button>
     );
 
   })}
