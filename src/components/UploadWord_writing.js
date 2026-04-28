@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import "./UploadPDF.css"; // reuse same styles
+//const API_BASE = process.env.REACT_APP_API_URL;
+const API_BASE = "http://127.0.0.1:8000";
 
 export default function UploadWord_writing() {
   const [wordFile, setWordFile] = useState(null);
@@ -24,7 +26,7 @@ export default function UploadWord_writing() {
 
     try {
       const res = await fetch(
-        "https://web-production-481a5.up.railway.app/upload-word-writing",
+        `${API_BASE}/upload-word-writing`,
         {
           method: "POST",
           body: formData
