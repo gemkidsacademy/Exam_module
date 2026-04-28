@@ -11,8 +11,8 @@ import NaplanReading from "./NaplanReading";
 // SHARED SCREENS
 import WelcomeScreen from "./WelcomeScreen";
 import InstructionsScreen_naplan from "./InstructionsScreen_naplan";
-//const API_BASE = process.env.REACT_APP_API_URL;
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = process.env.REACT_APP_API_URL;
+//const API_BASE = "http://127.0.0.1:8000";
 
 
 /*
@@ -52,6 +52,7 @@ const NaplanDashboard = () => {
   const [examInProgress, setExamInProgress] = useState(false);
   const [examPhase, setExamPhase] = useState("modeSelection"); 
   const [subjectAvailability, setSubjectAvailability] = useState({});
+  const [isLoadingAvailability, setIsLoadingAvailability] = useState(true);
   const [examMode, setExamMode] = useState(null); // 🔥 NEW
   // phases: selection → welcome → instructions → exam
 
@@ -65,20 +66,25 @@ const NaplanDashboard = () => {
   setSubjectAvailability({}); // reset stale data
 
   const fetchAvailabilityNaplan = async () => {
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/student/available-subjects-naplan?student_id=${studentId}`
-      );
+  try {
+    setIsLoadingAvailability(true);
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch availability");
-      }
+    const res = await fetch(
+      `${API_BASE}/api/student/available-subjects-naplan?student_id=${studentId}`
+    );
 
-      const data = await res.json();
-      setSubjectAvailability(data);
-    } catch (err) {
-      console.error("Failed to fetch subject availability", err);
+    if (!res.ok) {
+      throw new Error("Failed to fetch availability");
     }
+
+    const data = await res.json();
+    setSubjectAvailability(data);
+  } catch (err) {
+    console.error("Failed to fetch subject availability", err);
+  } finally {
+    setIsLoadingAvailability(false);
+  }
+
   };
 
   fetchAvailabilityNaplan();
@@ -182,19 +188,21 @@ const NaplanDashboard = () => {
                   } else if (examMode === "homework") {
                     isEnabled = subjectData.homework;
                   } else {
-                    isEnabled = true; // for report mode
+                    isEnabled = true;
                   }
                 }
+
+                const isDisabled = isLoadingAvailability || isEnabled === false;
 
                 return (
                   <button
                     key={subject.key}
                     className="subject-button"
-                    disabled={isEnabled === false}
-                    onClick={() => isEnabled !== false && handleSubjectSelect(subject)}
+                    disabled={isDisabled}
+                    onClick={() => !isDisabled && handleSubjectSelect(subject)}
                     style={{
-                      opacity: isEnabled === false ? 0.5 : 1,
-                      cursor: isEnabled === false ? "not-allowed" : "pointer",
+                      opacity: isDisabled ? 0.5 : 1,
+                      cursor: isDisabled ? "not-allowed" : "pointer",
                     }}
                   >
                     {subject.label}
