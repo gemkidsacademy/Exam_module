@@ -279,7 +279,7 @@ useEffect(() => {
   if (!studentId) return;
   if (mode !== "loading") return;
 
-  if (parentMode === "report") {
+  if (parentMode === "actual") {
     setMode("report");
     return;
   }

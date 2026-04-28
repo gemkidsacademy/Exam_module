@@ -12,7 +12,6 @@ import NaplanReading from "./NaplanReading";
 import WelcomeScreen from "./WelcomeScreen";
 import InstructionsScreen_naplan from "./InstructionsScreen_naplan";
 const API_BASE = process.env.REACT_APP_API_URL;
-//const API_BASE = "http://127.0.0.1:8000";
 
 
 /*
@@ -51,6 +50,7 @@ const NaplanDashboard = () => {
   const [activeSubject, setActiveSubject] = useState(null);
   const [examInProgress, setExamInProgress] = useState(false);
   const [examPhase, setExamPhase] = useState("modeSelection"); 
+  const [reportVariant, setReportVariant] = useState(null);
   const [subjectAvailability, setSubjectAvailability] = useState({});
   const [isLoadingAvailability, setIsLoadingAvailability] = useState(true);
   const [examMode, setExamMode] = useState(null); // 🔥 NEW
@@ -140,7 +140,7 @@ const NaplanDashboard = () => {
               className="subject-button"
               onClick={() => {
                 setExamMode("report");
-                setExamPhase("selection");
+                setExamPhase("report_type_selection");
               }}
             >
               Historical reports
@@ -159,7 +159,40 @@ const NaplanDashboard = () => {
         </div>
       </div>
     )}
+      {examPhase === "report_type_selection" && (
+  <div className="subject-selection-wrapper">
 
+    <div className="subject-selection-card">
+      <h1 className="dashboard-title">
+        Select Report Type
+      </h1>
+
+      <div className="subject-buttons">
+
+        <button
+          className="subject-button"
+          onClick={() => {
+            setReportVariant("actual");
+            setExamPhase("selection");
+          }}
+        >
+          Actual Exams
+        </button>
+
+        <button
+          className="subject-button"
+          onClick={() => {
+            setReportVariant("homework");
+            setExamPhase("selection");
+          }}
+        >
+          Homework
+        </button>
+
+      </div>
+    </div>
+  </div>
+)}
       {/* 1️⃣ SUBJECT SELECTION */}
       {examPhase === "selection" && (
         <div className="subject-selection-wrapper">
@@ -187,7 +220,7 @@ const NaplanDashboard = () => {
                     isEnabled = subjectData.exam;
                   } else if (examMode === "homework") {
                     isEnabled = subjectData.homework;
-                  } else {
+                  } else if (examMode === "report") {
                     isEnabled = true;
                   }
                 }
@@ -233,11 +266,11 @@ const NaplanDashboard = () => {
         {examPhase === "exam" && (
         <div className="exam-fullscreen-root exam-mode">
           <ActiveComponent
-            key={`naplan-${activeSubject.key}-${examMode}`}
+            key={`naplan-${activeSubject.key}-${examMode}-${reportVariant}`}
             studentId={studentId}
             subject={activeSubject.key}
             difficulty="naplan"
-            mode={examMode}
+            mode={examMode === "report" ? reportVariant : examMode}
             onExamStart={() => setExamInProgress(true)}
             onExamFinish={() => setExamInProgress(false)}
           />

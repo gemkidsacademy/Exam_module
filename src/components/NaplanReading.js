@@ -380,11 +380,13 @@ if (questionType === 5) {
   if (!studentId) return;
   if (mode !== "loading") return;
 
-  if (
-    parentMode === "report" ||
-    parentMode === "review"
-  ) {
-    setMode(parentMode);
+  if (parentMode === "actual") {
+    setMode("report");
+    return;
+  }
+
+  if (parentMode === "review") {
+    setMode("review");
     return;
   }
 

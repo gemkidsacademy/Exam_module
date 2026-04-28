@@ -1,12 +1,9 @@
 import { useEffect } from "react";
 
 export default function NaplanNumeracyReview({
-  studentId,
+   studentId,
   examId,
-  examDates,
-  selectedExamId,
-  onExamChange,
-  onLoaded,
+  onLoaded, 
   mode
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
@@ -89,31 +86,8 @@ export default function NaplanNumeracyReview({
     studentId,
     examId,
     API_BASE,
-    onLoaded,
     mode
   ]);
 
-  return (
-    <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        background: "#f6f7f9"
-      }}
-    >
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center"
-        }}
-      >
-        <p style={{ color: "#475569" }}>
-          Loading NAPLAN Numeracy review...
-        </p>
-      </div>
-    </div>
-  );
+  return null;
 }
