@@ -56,18 +56,24 @@ const [loadingExplanation, setLoadingExplanation] = useState(false);
 
 const hasSubmittedRef = useRef(false);
 const normalizeOption = (value) => {
-
   if (!value) return null;
 
-  // already normalized by backend
+  // ✅ if backend already structured it
   if (typeof value === "object") {
-  return {
-    type: "text",
-    content: value.content || ""
-  };
-}
+    if (value.type === "image") {
+      return {
+        type: "image",
+        src: value.src
+      };
+    }
 
-  // string image filename
+    return {
+      type: "text",
+      content: value.content || ""
+    };
+  }
+
+  // string image
   if (typeof value === "string" && value.match(/\.(png|jpg|jpeg|webp)$/i)) {
     return {
       type: "image",
@@ -77,7 +83,6 @@ const normalizeOption = (value) => {
     };
   }
 
-  // text
   return {
     type: "text",
     content: String(value)
@@ -807,51 +812,33 @@ return (
     }
 
     return (
-      <button
-  key={optionKey}
-  className={optionClass + (isReview ? " review" : "")}
-  onClick={() => !isReview && handleAnswer(optionKey)}
->
-  {true && (
-    <>
-      <span
-        style={{
-          fontWeight: "700",
-          minWidth: "28px",
-          color: "#111827",
-          flexShrink: 0
-        }}
-      >
-        {optionKey}.
-      </span>
+  <button
+    key={optionKey}
+    className={optionClass + (isReview ? " review" : "")}
+    onClick={() => !isReview && handleAnswer(optionKey)}
+    style={{ display: "flex", alignItems: "center", gap: "10px" }}
+  >
+    {/* OPTION LABEL */}
+    <span style={{ fontWeight: "700" }}>
+      {optionKey}.
+    </span>
 
-      <span
-        style={{
-          color: "#111827",
-          fontSize: "16px",
-          lineHeight: "1.5",
-          display: "block",
-          flex: 1,
-          whiteSpace: "normal",
-          wordBreak: "break-word"
-        }}
-      >
-        <span>
-          {rawValue?.content || rawValue?.text || "MISSING"}
-        </span>
-      </span>
-    </>
-  )}
+    {/* TEXT OPTION */}
+    {optionValue?.type === "text" && (
+      <span>{optionValue.content}</span>
+    )}
 
-  {optionValue?.type === "image" && (
-    <img
-      src={optionValue.src}
-      alt={`Option ${optionKey}`}
-      className="option-image"
-    />
-  )}
-</button>
-    );
+    {/* IMAGE OPTION */}
+    {optionValue?.type === "image" && (
+      <img
+        src={optionValue.src}
+        alt={`Option ${optionKey}`}
+        className="option-image"
+        style={{ maxWidth: "150px" }}
+      />
+    )}
+  </button>
+);
 
   })}
 
