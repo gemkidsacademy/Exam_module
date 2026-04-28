@@ -3,10 +3,17 @@ import "./ExamPage.css";
 
 export default function NaplanLanguageConventionsReport({
   report,
-  onViewExamDetails
+  onViewExamDetails,
+  examDates = [],
+  selectedExamId,
+  onExamChange
 }) {
   if (!report?.overall) {
-    return <p className="loading">Generating your report…</p>;
+    return (
+      <p className="loading">
+        Generating your report…
+      </p>
+    );
   }
 
   const {
@@ -22,9 +29,44 @@ export default function NaplanLanguageConventionsReport({
           HEADER
       =============================== */}
       <h2 className="report-title">
-        You scored {overall.correct} out of {overall.total_questions} in NAPLAN
-        Language Conventions
+        You scored {overall.correct} out of{" "}
+        {overall.total_questions} in
+        NAPLAN Language Conventions
       </h2>
+
+      {/* ===============================
+          DATE DROPDOWN
+      =============================== */}
+      {examDates.length > 0 && (
+        <div className="report-filter-row">
+          <label className="report-label">
+            Select Date:
+          </label>
+
+          <select
+            className="report-select"
+            value={selectedExamId || ""}
+            onChange={(e) => {
+              const newExamId = Number(
+                e.target.value
+              );
+
+              onExamChange?.(newExamId);
+            }}
+          >
+            {examDates.map((item) => (
+              <option
+                key={item.exam_id}
+                value={item.exam_id}
+              >
+                {new Date(
+                  item.date
+                ).toLocaleDateString()}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <button
         className="view-exam-btn"
@@ -43,14 +85,18 @@ export default function NaplanLanguageConventionsReport({
 
           {(() => {
             const accuracy = Math.round(
-              (overall.correct / overall.total_questions) * 100
+              (overall.correct /
+                overall.total_questions) *
+                100
             );
 
             const donutBackground =
               accuracy === 0
                 ? "#e5e7eb"
                 : `conic-gradient(
-                    #22c55e ${accuracy * 3.6}deg,
+                    #22c55e ${
+                      accuracy * 3.6
+                    }deg,
                     #e5e7eb 0deg
                   )`;
 
@@ -58,7 +104,10 @@ export default function NaplanLanguageConventionsReport({
               <div className="donut-wrapper">
                 <div
                   className="donut"
-                  style={{ background: donutBackground }}
+                  style={{
+                    background:
+                      donutBackground
+                  }}
                 >
                   <span className="donut-text">
                     {accuracy}%
@@ -69,62 +118,108 @@ export default function NaplanLanguageConventionsReport({
           })()}
 
           <div className="stats">
-            <p>Total Questions: {overall.total_questions}</p>
-            <p>Attempted: {overall.attempted}</p>
-            <p>Correct: {overall.correct}</p>
-            <p>Incorrect: {overall.incorrect}</p>
-            <p>Not Attempted: {overall.not_attempted}</p>
-            <p>Score: {overall.score_percent}%</p>
+            <p>
+              Total Questions:{" "}
+              {overall.total_questions}
+            </p>
+            <p>
+              Attempted:{" "}
+              {overall.attempted}
+            </p>
+            <p>
+              Correct: {overall.correct}
+            </p>
+            <p>
+              Incorrect:{" "}
+              {overall.incorrect}
+            </p>
+            <p>
+              Not Attempted:{" "}
+              {overall.not_attempted}
+            </p>
+            <p>
+              Score:{" "}
+              {overall.score_percent}%
+            </p>
           </div>
         </div>
 
         {/* ===============================
-            TOPIC-WISE PERFORMANCE
+            TOPIC PERFORMANCE
         =============================== */}
         <div className="topic-performance-card">
-          <h3>Topic-wise Performance</h3>
+          <h3>
+            Topic-wise Performance
+          </h3>
 
-          {topic_wise_performance.map(t => (
-            <div key={t.topic} className="topic-row">
-              <div className="topic-title">
-                {t.topic}
-              </div>
+          {topic_wise_performance.map(
+            (t) => (
+              <div
+                key={t.topic}
+                className="topic-row"
+              >
+                <div className="topic-title">
+                  {t.topic}
+                </div>
 
-              <div className="stack-bar">
-                <div
-                  className="stack correct"
-                  style={{
-                    width: `${(t.correct / t.total) * 100}%`
-                  }}
-                />
-                <div
-                  className="stack incorrect"
-                  style={{
-                    width: `${(t.incorrect / t.total) * 100}%`
-                  }}
-                />
-                <div
-                  className="stack not-attempted"
-                  style={{
-                    width: `${(t.not_attempted / t.total) * 100}%`
-                  }}
-                />
-              </div>
+                <div className="stack-bar">
+                  <div
+                    className="stack correct"
+                    style={{
+                      width: `${
+                        (t.correct /
+                          t.total) *
+                        100
+                      }%`
+                    }}
+                  />
 
-              <div className="topic-metrics">
-                <span>Attempted: {t.attempted}</span>
-                <span className="correct">
-                  Correct: {t.correct}
-                </span>
-                <span className="incorrect">
-                  Incorrect: {t.incorrect}
-                </span>
-                <span className="not-attempted">
-                  Not Attempted: {t.not_attempted}
-                </span>
+                  <div
+                    className="stack incorrect"
+                    style={{
+                      width: `${
+                        (t.incorrect /
+                          t.total) *
+                        100
+                      }%`
+                    }}
+                  />
+
+                  <div
+                    className="stack not-attempted"
+                    style={{
+                      width: `${
+                        (t.not_attempted /
+                          t.total) *
+                        100
+                      }%`
+                    }}
+                  />
+                </div>
+
+                <div className="topic-metrics">
+                  <span>
+                    Attempted:{" "}
+                    {t.attempted}
+                  </span>
+
+                  <span className="correct">
+                    Correct: {t.correct}
+                  </span>
+
+                  <span className="incorrect">
+                    Incorrect:{" "}
+                    {t.incorrect}
+                  </span>
+
+                  <span className="not-attempted">
+                    Not Attempted:{" "}
+                    {t.not_attempted}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          )}
         </div>
 
         {/* ===============================
@@ -133,28 +228,35 @@ export default function NaplanLanguageConventionsReport({
         <div className="report-card">
           <h3>Improvement Areas</h3>
 
-          {improvement_areas.map(t => (
-            <div key={t.topic} className="topic-bar">
-              <span>{t.topic}</span>
+          {improvement_areas.map(
+            (t) => (
+              <div
+                key={t.topic}
+                className="topic-bar"
+              >
+                <span>{t.topic}</span>
 
-              <div className="bar">
-                <div
-                  className="bar-fill"
-                  style={{
-                    width: `${t.accuracy_percent}%`
-                  }}
-                />
+                <div className="bar">
+                  <div
+                    className="bar-fill"
+                    style={{
+                      width: `${t.accuracy_percent}%`
+                    }}
+                  />
+                </div>
+
+                <span>
+                  {t.accuracy_percent}%
+                </span>
+
+                {t.limited_data && (
+                  <small className="warning">
+                    Limited data
+                  </small>
+                )}
               </div>
-
-              <span>{t.accuracy_percent}%</span>
-
-              {t.limited_data && (
-                <small className="warning">
-                  Limited data
-                </small>
-              )}
-            </div>
-          ))}
+            )
+          )}
         </div>
 
       </div>

@@ -21,6 +21,11 @@ export default function NaplanReading({
 }) {
   const studentId = sessionStorage.getItem("student_id");
   const API_BASE = process.env.REACT_APP_API_URL;
+  
+  //const API_BASE = "http://127.0.0.1:8000";
+  const [examDates, setExamDates] = useState([]);
+  
+  const [selectedExamId, setSelectedExamId] = useState(null);
   const TYPE_2_MAX_SELECTIONS = 2;
   const [explanations, setExplanations] = useState({});
   const explanationRef = useRef(null);
@@ -295,34 +300,100 @@ if (questionType === 5) {
   /* ============================================================
      LOAD REPORT
   ============================================================ */
-  const loadReport = useCallback(async () => {
-    const res = await fetch(
-      `${API_BASE}/api/student/exam-report/naplan-reading?student_id=${studentId}`
-    );
-  
-    if (!res.ok) return;
-  
-    const data = await res.json();
-    setReport(data);
-    setExamAttemptId(data.exam_attempt_id);
-  }, [API_BASE, studentId]);
+  const loadReport = async (examId = selectedExamId) => {
+  const examParam =
+    examId != null
+      ? `&exam_id=${examId}`
+      : "";
+
+  const reportUrl =
+    parentMode === "homework"
+      ? `${API_BASE}/api/student/exam-report/naplan-reading-homework?student_id=${studentId}${examParam}`
+      : `${API_BASE}/api/student/exam-report/naplan-reading?student_id=${studentId}${examParam}`;
+
+  const res = await fetch(reportUrl);
+
+  if (!res.ok) return;
+
+  const data = await res.json();
+
+  setReport(data);
+  setExamAttemptId(data.exam_attempt_id);
+};
+  useEffect(() => {
+  if (!studentId) return;
+
+  if (
+    mode !== "report" &&
+    mode !== "review"
+  ) {
+    return;
+  }
+
+  const loadDates = async () => {
+    try {
+      const url =
+        parentMode === "homework"
+          ? `${API_BASE}/api/student/exam-dates/naplan-reading-homework?student_id=${studentId}`
+          : `${API_BASE}/api/student/exam-dates/naplan-reading?student_id=${studentId}`;
+
+      const res = await fetch(url);
+
+      if (!res.ok) return;
+
+      const data = await res.json();
+
+      setExamDates(data || []);
+
+      if (
+        data?.length > 0 &&
+        selectedExamId == null
+      ) {
+        setSelectedExamId(
+          data[0].exam_id
+        );
+      }
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  loadDates();
+
+}, [
+  API_BASE,
+  studentId,
+  parentMode,
+  selectedExamId,
+  mode
+]);
   
   useEffect(() => {
   if (mode !== "report") return;
-  loadReport();
-}, [mode, loadReport]);
+  if (!studentId) return;
+
+  loadReport(selectedExamId);
+
+}, [mode, selectedExamId, studentId]);
   useEffect(() => {
   if (!studentId) return;
   if (mode !== "loading") return;
 
-  // 🔥 REPORT MUST WIN
-  if (parentMode === "report") {
-    setMode("report");
+  if (
+    parentMode === "report" ||
+    parentMode === "review"
+  ) {
+    setMode(parentMode);
     return;
   }
 
-  if (parentMode === "exam") {
+  if (
+    parentMode === "exam" ||
+    parentMode === "homework"
+  ) {
     setMode("exam");
+    return;
   }
 
 }, [studentId, parentMode, mode]);
@@ -332,7 +403,10 @@ if (questionType === 5) {
  useEffect(() => {
   if (!studentId) return;
   if (mode !== "exam") return;
-  if (parentMode !== "exam") return; // 🔥 safety
+  if (
+    parentMode !== "exam" &&
+    parentMode !== "homework"
+  ) return; // 🔥 safety
 
   // reset state
   setAnswers({});
@@ -340,52 +414,97 @@ if (questionType === 5) {
   setCurrentIndex(0);
 
   const startExam = async () => {
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/student/start-exam/naplan-reading`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ student_id: studentId })
-        }
+  try {
+    const startUrl =
+      parentMode === "homework"
+        ? `${API_BASE}/api/student/start-homework-exam/naplan-reading`
+        : `${API_BASE}/api/student/start-exam/naplan-reading`;
+
+    const res = await fetch(
+      startUrl,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+        body: JSON.stringify({
+          student_id:
+            studentId
+        })
+      }
+    );
+
+    const data =
+      await res.json();
+
+    if (
+      data.completed === true
+    ) {
+      await loadReport();
+
+      setMode(
+        "report"
       );
 
-      const data = await res.json();
-
-      if (data.completed === true) {
-        await loadReport();
-        setMode("report"); // 🔥 IMPORTANT
-        return;
-      }
-
-      setQuestions(data.questions || []);
-      setTimeLeft(data.remaining_time);
-
-      if (data.is_resumed === true && data.answers) {
-        setAnswers(data.answers);
-        setVisited(
-          Object.fromEntries(
-            Object.keys(data.answers).map(qid => [qid, true])
-          )
-        );
-      }
-
-      onExamStart?.();
-
-    } catch (err) {
-      console.error("❌ Failed to start exam:", err);
+      return;
     }
-  };
 
-  startExam();
+    setQuestions(
+      data.questions || []
+    );
 
-}, [studentId, mode, parentMode, API_BASE, loadReport, onExamStart]);
-  
+    setTimeLeft(
+      data.remaining_time
+    );
+
+    if (
+      data.is_resumed === true &&
+      data.answers
+    ) {
+      setAnswers(
+        data.answers
+      );
+
+      setVisited(
+        Object.fromEntries(
+          Object.keys(
+            data.answers
+          ).map(
+            (qid) => [
+              qid,
+              true
+            ]
+          )
+        )
+      );
+    }
+
+    onExamStart?.();
+
+  } catch (err) {
+    console.error(
+      "❌ Failed to start exam:",
+      err
+    );
+  }
+};
+
+startExam();
+
+}, [
+  studentId,
+  mode,
+  parentMode,
+  API_BASE,
+  onExamStart
+]);
+  /*
   useEffect(() => {
   document.addEventListener("contextmenu", e => e.preventDefault());
   document.addEventListener("copy", e => e.preventDefault());
   document.addEventListener("cut", e => e.preventDefault());
-}, []);
+}, []); */
   /* ============================================================
      GROUP QUESTIONS BY PASSAGE
   ============================================================ */
@@ -419,23 +538,54 @@ if (questionType === 5) {
   /* ============================================================
      FINISH EXAM
   ============================================================ */
-  const finishExam = useCallback(async () => {
-    if (hasSubmittedRef.current) return;
-    hasSubmittedRef.current = true;
+  const finishExam = useCallback(
+  async () => {
+    if (
+      hasSubmittedRef.current
+    ) return;
+
+    hasSubmittedRef.current =
+      true;
+
+    const finishUrl =
+      parentMode === "homework"
+        ? `${API_BASE}/api/student/finish-homework-exam/naplan-reading`
+        : `${API_BASE}/api/student/finish-exam/naplan-reading`;
 
     await fetch(
-      `${API_BASE}/api/student/finish-exam/naplan-reading`,
+      finishUrl,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ student_id: studentId, answers })
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+        body: JSON.stringify({
+          student_id:
+            studentId,
+          answers
+        })
       }
     );
 
     await loadReport();
-    setMode("report"); 
+
+    setMode(
+      "report"
+    );
+
     onExamFinish?.();
-  }, [API_BASE, studentId, answers, loadReport, onExamFinish]);
+  },
+  [
+    API_BASE,
+    studentId,
+    answers,
+    parentMode,
+    loadReport,
+    onExamFinish
+  ]
+);
+
   useEffect(() => {
   if (mode !== "exam" || flatQuestions.length === 0) return;
 
@@ -580,7 +730,47 @@ useEffect(() => {
     );
   }
   if (mode === "report") {
-    return (
+  return (
+    <>
+      {examDates.length > 0 && (
+        <div className="report-filter-row">
+          <label className="report-label">
+            Select Date:
+          </label>
+
+          <select
+            className="report-select"
+            value={selectedExamId || ""}
+            onChange={(e) => {
+              const newId = Number(e.target.value);
+
+              console.log(
+                "Report changed:",
+                "old =", selectedExamId,
+                "new =", newId
+              );
+
+              if (newId === selectedExamId) return;
+
+              setSelectedExamId(newId);
+            }}
+          >
+            {examDates.map(
+              (item) => (
+                <option
+                  key={item.exam_id}
+                  value={item.exam_id}
+                >
+                  {new Date(
+                    item.date
+                  ).toLocaleDateString()}
+                </option>
+              )
+            )}
+          </select>
+        </div>
+      )}
+
       <NaplanReadingReport
         report={report}
         onViewExamDetails={() => {
@@ -591,32 +781,88 @@ useEffect(() => {
           setMode("review");
         }}
       />
-    );
-  }
+    </>
+  );
+}
 
-  if (mode === "review" && !questions.length) {
-    return (
+  if (
+  mode === "review" &&
+  !questions.length
+) {
+  return (
+    <>
+      {examDates.length > 0 && (
+        <div className="report-filter-row">
+          <label className="report-label">
+            Select Date:
+          </label>
+
+          <select
+            className="report-select"
+            value={selectedExamId || ""}
+            onChange={(e) => {
+              setQuestions([]);
+              setAnswers({});
+              setVisited({});
+              setCurrentIndex(0);
+
+              setSelectedExamId(
+                Number(
+                  e.target.value
+                )
+              );
+            }}
+          >
+            {examDates.map((item) => (
+              <option
+                key={item.exam_id}
+                value={item.exam_id}
+              >
+                {new Date(
+                  item.date
+                ).toLocaleDateString()}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <NaplanReadingReview
         studentId={studentId}
-        examAttemptId={examAttemptId}
+        selectedExamId={selectedExamId}
+        parentMode={parentMode}
         onLoaded={(qs, ans) => {
           setQuestions(qs);
           setCurrentIndex(0);
           setVisited({});
+
           const cleanedAnswers = {};
           const correctnessMap = {};
-          
-          Object.entries(ans || {}).forEach(([qid, obj]) => {
-            cleanedAnswers[qid] = obj.answer;
-            correctnessMap[qid] = obj.is_correct;
-          });
-          
-          setAnswers(cleanedAnswers);
-          setCorrectness(correctnessMap);
+
+          Object.entries(
+            ans || {}
+          ).forEach(
+            ([qid, obj]) => {
+              cleanedAnswers[qid] =
+                obj.answer;
+
+              correctnessMap[qid] =
+                obj.is_correct;
+            }
+          );
+
+          setAnswers(
+            cleanedAnswers
+          );
+
+          setCorrectness(
+            correctnessMap
+          );
         }}
       />
-    );
-  }
+    </>
+  );
+}
 
   if (!currentQ) return null;
 
@@ -638,6 +884,54 @@ useEffect(() => {
 
   return (
     <div className={`exam-shell ${mode === "review" ? "review-mode" : ""}`}>
+
+      {mode === "review" && (
+        <div className="review-top-bar">
+
+          <button
+            className="exit-review-btn"
+            onClick={() => {
+              setQuestions([]);
+              setAnswers({});
+              setVisited({});
+              setCurrentIndex(0);
+              setMode("report");
+            }}
+          >
+            ← Exit Review
+          </button>
+
+          {examDates.length > 0 && (
+            <div className="report-filter-row">
+              <label className="report-label">
+                Select Date:
+              </label>
+
+              <select
+                className="report-select"
+                value={selectedExamId || ""}
+                onChange={(e) => {
+                  setQuestions([]);
+                  setAnswers({});
+                  setVisited({});
+                  setCurrentIndex(0);
+                  setSelectedExamId(Number(e.target.value));
+                }}
+              >
+                {examDates.map((item) => (
+                  <option
+                    key={item.exam_id}
+                    value={item.exam_id}
+                  >
+                    {new Date(item.date).toLocaleDateString()}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+        </div>
+      )}
       <div className="exam-container">
 
         {/* HEADER */}

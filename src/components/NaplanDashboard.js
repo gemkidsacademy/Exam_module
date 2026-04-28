@@ -63,10 +63,10 @@ const NaplanDashboard = () => {
 
   setActiveSubject(subject);
 
-  if (examMode === "exam") {
+  if (examMode === "exam" || examMode === "homework") {
     setExamPhase("welcome");
-  } else {
-    setExamPhase("exam"); // 🔥 go directly to report
+  } else if (examMode === "report") {
+    setExamPhase("exam");
   }
 };
 
@@ -100,6 +100,7 @@ const NaplanDashboard = () => {
               Active exams
             </button>
 
+
             <button
               className="subject-button"
               onClick={() => {
@@ -108,6 +109,15 @@ const NaplanDashboard = () => {
               }}
             >
               Historical reports
+            </button>
+            <button
+              className="subject-button"
+              onClick={() => {
+                setExamMode("homework");
+                setExamPhase("selection");
+              }}
+            >
+              Homework Exams
             </button>
 
           </div>

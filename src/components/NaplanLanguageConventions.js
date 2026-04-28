@@ -22,6 +22,7 @@ export default function NaplanLanguageConventions({
 }) {
   const studentId = sessionStorage.getItem("student_id");
   const API_BASE = process.env.REACT_APP_API_URL;
+  //const API_BASE = "http://127.0.0.1:8000";
   const TYPE_2_MAX_SELECTIONS = 2;
   const isPopNavigationRef = useRef(false);
 
@@ -206,41 +207,92 @@ export default function NaplanLanguageConventions({
   const [report, setReport] = useState(null);
   const [examAttemptId, setExamAttemptId] = useState(null);
 
-  /* ============================================================
-     LOAD REPORT
-  ============================================================ */
-  const loadReport = useCallback(async () => {
-    const res = await fetch(
-      `${API_BASE}/api/student/exam-report/naplan-language-conventions?student_id=${studentId}`
-    );
+  const [examDates, setExamDates] = useState([]);
+  const [selectedExamId, setSelectedExamId] = useState(null);
+  const loadExamDates = useCallback(async () => {
+  try {
+    const datesUrl =
+      parentMode === "homework"
+        ? `${API_BASE}/api/student/exam-dates/naplan-language-conventions-homework?student_id=${studentId}`
+        : `${API_BASE}/api/student/exam-dates/naplan-language-conventions?student_id=${studentId}`;
+
+    const res = await fetch(datesUrl);
 
     if (!res.ok) return;
 
     const data = await res.json();
+
+    setExamDates(data || []);
+
+    if (data?.length > 0) {
+      setSelectedExamId(data[0].exam_id);
+    }
+
+  } catch (err) {
+    console.error("Failed to load exam dates", err);
+  }
+}, [API_BASE, studentId, parentMode]);
+  /* ============================================================
+     LOAD REPORT
+  ============================================================ */
+  const loadReport = useCallback(async (examId) => {
+  if (!examId) return;
+
+  try {
+    const reportUrl =
+      parentMode === "homework"
+        ? `${API_BASE}/api/student/exam-report/naplan-language-conventions-homework?student_id=${studentId}&exam_id=${examId}`
+        : `${API_BASE}/api/student/exam-report/naplan-language-conventions?student_id=${studentId}&exam_id=${examId}`;
+
+    const res = await fetch(reportUrl);
+
+    if (!res.ok) return;
+
+    const data = await res.json();
+
     setReport(data);
     setExamAttemptId(data.exam_attempt_id);
-    
-  }, [API_BASE, studentId]);
+    setMode("report");
+
+  } catch (err) {
+    console.error(err);
+  }
+
+}, [API_BASE, studentId, parentMode]);
+
   useEffect(() => {
   if (mode !== "report") return;
-  loadReport();
-}, [mode, loadReport]);
+
+  loadExamDates();
+
+}, [mode, loadExamDates]);
+
+useEffect(() => {
+  if (mode !== "report") return;
+  if (!selectedExamId) return;
+
+  loadReport(selectedExamId);
+
+}, [mode, selectedExamId, loadReport]);
   
   useEffect(() => {
   if (!studentId) return;
   if (mode !== "loading") return;
 
-  // 🔥 REPORT MUST WIN
   if (parentMode === "report") {
     setMode("report");
     return;
   }
 
-  if (parentMode === "exam") {
+  if (
+    parentMode === "exam" ||
+    parentMode === "homework"
+  ) {
     setMode("exam");
   }
 
 }, [studentId, parentMode, mode]);
+
   useEffect(() => {
   if (mode !== "exam" || questions.length === 0) return;
 
@@ -318,61 +370,115 @@ useEffect(() => {
   useEffect(() => {
   if (!studentId) return;
   if (mode !== "exam") return;
-  if (parentMode !== "exam") return; // 🔥 safety
 
-  const startExamNaplanLanguageConventions = async () => {
+  if (
+    parentMode !== "exam" &&
+    parentMode !== "homework"
+  ) return;
+
+  const startExamNaplanLanguageConventions =
+    async () => {
+
+    const startUrl =
+      parentMode === "homework"
+        ? `${API_BASE}/api/student/start-homework-exam/naplan-language-conventions`
+        : `${API_BASE}/api/student/start-exam/naplan-language-conventions`;
+
     try {
       const response = await fetch(
-        `${API_BASE}/api/student/start-exam/naplan-language-conventions`,
+        startUrl,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ student_id: studentId })
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            student_id: studentId
+          })
         }
       );
 
-      const examPayload = await response.json();
+      const examPayload =
+        await response.json();
 
-      if (examPayload.completed === true) {
-        await loadReport();
-        setMode("report"); // 🔥 IMPORTANT
+      if (examPayload.completed) {
+        await loadExamDates();
+        setMode("report");
         return;
       }
 
-      setQuestions(examPayload.questions || []);
-      setTimeLeft(examPayload.remaining_time);
+      setQuestions(
+        examPayload.questions || []
+      );
+
+      setTimeLeft(
+        examPayload.remaining_time
+      );
 
       onExamStart?.();
 
     } catch (error) {
-      console.error("Failed to start exam:", error);
+      console.error(
+        "Failed to start exam:",
+        error
+      );
     }
   };
 
   startExamNaplanLanguageConventions();
 
-}, [studentId, mode, parentMode, API_BASE, loadReport, onExamStart]);
+}, [
+  studentId,
+  mode,
+  parentMode,
+  API_BASE,
+  loadReport,
+  onExamStart
+]);
   
   /* ============================================================
      FINISH EXAM
   ============================================================ */
   const finishExam = useCallback(async () => {
-    if (hasSubmittedRef.current) return;
-    hasSubmittedRef.current = true;
-  
-    await fetch(
-      `${API_BASE}/api/student/finish-exam/naplan-language-conventions`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ student_id: studentId, answers })
-      }
-    );
-  
-    await loadReport();
+  if (hasSubmittedRef.current) return;
+
+  hasSubmittedRef.current = true;
+
+  try {
+    const finishUrl =
+      parentMode === "homework"
+        ? `${API_BASE}/api/student/finish-homework-exam/naplan-language-conventions`
+        : `${API_BASE}/api/student/finish-exam/naplan-language-conventions`;
+
+    await fetch(finishUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        student_id: studentId,
+        answers
+      })
+    });
+
+    await loadExamDates();
     setMode("report");
+
     onExamFinish?.();
-  }, [API_BASE, studentId, answers, loadReport, onExamFinish]);
+
+  } catch (err) {
+    console.error(err);
+  }
+
+}, [
+  API_BASE,
+  studentId,
+  answers,
+  parentMode,
+  loadReport,
+  onExamFinish
+]);
+
   /* ============================================================
      TIMER
   ============================================================ */
@@ -454,6 +560,12 @@ useEffect(() => {
     return (
       <NaplanLanguageConventionsReport
         report={report}
+        examDates={examDates}
+        selectedExamId={selectedExamId}
+        onExamChange={(id) => {
+          setQuestions([]);
+          setSelectedExamId(id);
+        }}
         onViewExamDetails={() => {
           setQuestions([]);
           setCurrentIndex(0);
@@ -468,8 +580,9 @@ useEffect(() => {
   if (mode === "review" && !questions.length) {
     return (
       <NaplanLanguageConventionsReview
+        mode={parentMode}
         studentId={studentId}
-        examAttemptId={examAttemptId}
+        examId={selectedExamId}
         onLoaded={(qs, studentAnswers) => {
           setQuestions(qs);
           setCurrentIndex(0);
@@ -513,7 +626,35 @@ useEffect(() => {
   return (
     <div className={`exam-shell ${styles.examShell}`}>
       <div className={`exam-container ${styles.examContainer}`}>
+        {mode === "review" && examDates.length > 0 && (
+  <div className="report-filter-row">
+    <label className="report-label">
+      Select Date:
+    </label>
 
+    <select
+      className="report-select"
+      value={selectedExamId || ""}
+      onChange={(e) => {
+        setQuestions([]);
+        setSelectedExamId(
+          Number(e.target.value)
+        );
+      }}
+    >
+      {examDates.map((item) => (
+        <option
+          key={item.exam_id}
+          value={item.exam_id}
+        >
+          {new Date(
+            item.date
+          ).toLocaleDateString()}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
         {/* HEADER */}
         <div className={styles.examHeader}>
           {!isReview && <div className="timer">⏳ {formatTime(timeLeft)}</div>}

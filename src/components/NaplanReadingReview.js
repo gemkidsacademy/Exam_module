@@ -6,10 +6,14 @@ import "./NaplanReadingReview.css";
 ============================================================ */
 export default function NaplanReadingReview({
   studentId,
+  selectedExamId,
+  parentMode,
   onLoaded
 }) {
-  const API_BASE = process.env.REACT_APP_API_URL;
 
+  const API_BASE = process.env.REACT_APP_API_URL;
+  
+  //const API_BASE = "http://127.0.0.1:8000";
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(true);
@@ -22,35 +26,71 @@ export default function NaplanReadingReview({
      LOAD REVIEW DATA
   ============================================================ */
   useEffect(() => {
-    if (!studentId) return;
+    if (!studentId) {
+    setLoading(false);
+    return;
+  }
 
-    const loadReview = async () => {
-      try {
-        const res = await fetch(
-          `${API_BASE}/api/student/exam-review/naplan-reading?student_id=${studentId}`
+  if (selectedExamId == null) {
+    setLoading(false);
+    console.log(
+      "Waiting for selectedExamId..."
+    );
+    return;
+  }
+  setLoading(true);
+  const loadReview = async () => {
+    try {
+      const reviewUrl =
+        parentMode === "homework"
+          ? `${API_BASE}/api/student/exam-review/naplan-reading-homework?student_id=${studentId}&exam_id=${selectedExamId}`
+          : `${API_BASE}/api/student/exam-review/naplan-reading?student_id=${studentId}&exam_id=${selectedExamId}`;
+
+      const res = await fetch(
+        reviewUrl
+      );
+
+      if (!res.ok) {
+        throw new Error(
+          "Failed to load review"
         );
-
-        if (!res.ok) throw new Error("Failed to load review");
-
-        const data = await res.json();
-
-        const qs = data.questions || [];
-        const ans = data.student_answers || {};
-
-        setQuestions(qs);
-        setAnswers(ans);
-
-        onLoaded?.(qs, ans);
-
-      } catch (err) {
-        console.error("❌ Failed to load review:", err);
-      } finally {
-        setLoading(false);
       }
-    };
 
-    loadReview();
-  }, [API_BASE, studentId, onLoaded]);
+      const data =
+        await res.json();
+
+      const qs =
+        data.questions || [];
+
+      const ans =
+        data.student_answers || {};
+
+      setQuestions(qs);
+      setAnswers(ans);
+
+      onLoaded?.(
+        qs,
+        ans
+      );
+
+    } catch (err) {
+      console.error(
+        "❌ Failed to load review:",
+        err
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  loadReview();
+
+}, [
+  API_BASE,
+  studentId, 
+  selectedExamId,
+  parentMode
+]);
 
   /* ============================================================
      AI EXPLANATION HANDLER

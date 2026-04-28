@@ -3,8 +3,8 @@ import React, { useState, useEffect } from "react";
 
 import "./QuizSetup.css";
 
-const BACKEND_URL = "https://web-production-481a5.up.railway.app";
-//const BACKEND_URL = "http://127.0.0.1:8000";
+//const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+const BACKEND_URL = "http://127.0.0.1:8000";
 /* ============================
      this is helping setup Thinking skills
   ============================ */
@@ -16,14 +16,28 @@ export default function QuizSetup() {
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [qbLoading, setQbLoading] = useState(false);
   const validateQuizBeforeSubmit = () => {
-  if (!quiz.className || !quiz.subject || !quiz.difficulty) {
-    alert("Please select class, subject, and difficulty.");
+  if (!quiz.className || !quiz.subject) {
+    alert("Please select class and subject.");
     return false;
   }
 
   if (quiz.topics.length === 0) {
     alert("Please generate at least one topic.");
-    return false;
+    return false;;
+  }
+
+  for (const topic of quiz.topics) {
+    const hasDifficulty =
+      topic.easy.enabled ||
+      topic.medium.enabled ||
+      topic.hard.enabled;
+
+    if (!hasDifficulty) {
+      alert(
+        `Please select at least one difficulty for topic: ${topic.name || "Unnamed Topic"}`
+      );
+      return;
+    }
   }
 
   if (totalQuestions !== 40) {
@@ -61,14 +75,77 @@ export default function QuizSetup() {
     [name]: name === "classYear" ? Number(value) : value
   }));
 };
+  const toggleDifficulty = (index, level) => {
+  setQuiz((prev) => {
+    const topics = [...prev.topics];
+
+    const currentTopic = topics[index];
+    const currentLevel = currentTopic[level];
+
+    const newEnabled = !currentLevel.enabled;
+
+    topics[index] = {
+      ...currentTopic,
+      [level]: {
+        ...currentLevel,
+        enabled: newEnabled,
+        ai: newEnabled ? currentLevel.ai : 0,
+        db: newEnabled ? currentLevel.db : 0
+      }
+    };
+
+    return {
+      ...prev,
+      topics
+    };
+  });
+};
+  const handleDifficultyChange = (
+  index,
+  level,
+  field,
+  value
+) => {
+  setQuiz((prev) => {
+    const topics = [...prev.topics];
+    const num = Number(value) || 0;
+
+    const topic = topics[index];
+
+    topics[index] = {
+      ...topic,
+      [level]: {
+        ...topic[level],
+        [field]: num
+      }
+    };
+
+    const t = topics[index];
+
+    t.total =
+      t.easy.ai + t.easy.db +
+      t.medium.ai + t.medium.db +
+      t.hard.ai + t.hard.db;
+
+    const grandTotal = topics.reduce(
+      (sum, item) => sum + item.total,
+      0
+    );
+
+    setTotalQuestions(grandTotal);
+
+    return { ...prev, topics };
+  });
+};
 
   const generateTopics = () => {
     const num = parseInt(quiz.numTopics) || 1;
 
     const topicsArray = Array.from({ length: num }, () => ({
       name: "",
-      ai: 0,
-      db: 0,
+      easy: { enabled: false, ai: 0, db: 0 },
+      medium: { enabled: false, ai: 0, db: 0 },
+      hard: { enabled: false, ai: 0, db: 0 },
       total: 0
     }));
 
@@ -76,6 +153,7 @@ export default function QuizSetup() {
     setQuiz((prev) => ({ ...prev, topics: topicsArray }));
     setTotalQuestions(0);
   };
+
      
   const handleViewQuestionBank = async () => {
   try {
@@ -122,35 +200,7 @@ export default function QuizSetup() {
       alert("Error deleting questions.");
     });
 };
-  const handleTopicChange = (index, field, value) => {
-    setQuiz((prev) => {
-      const topics = [...prev.topics];
-
-      // Convert input to number safely
-      const numValue = Number(value) || 0;
-
-      // Update the ai/db field
-      topics[index][field] = numValue;
-
-      // Recalculate per-topic total
-      const total =
-        Number(topics[index].ai || 0) +
-        Number(topics[index].db || 0);
-
-      topics[index].total = total;
-      topics[index].warning = total > 35;
-
-      // After updating topics, recalc global total
-      const globalTotal = topics.reduce(
-        (sum, t) => sum + (Number(t.total) || 0),
-        0
-      );
-
-      setTotalQuestions(globalTotal);
-
-      return { ...prev, topics };
-    });
-  };
+  
 
   const handleTopicNameChange = (index, value) => {
     setQuiz((prev) => {
@@ -162,7 +212,7 @@ export default function QuizSetup() {
 
   useEffect(() => {
   // Do not fetch until difficulty is selected
-  if (!quiz.className || !quiz.subject || !quiz.difficulty) {
+  if (!quiz.className || !quiz.subject) {
     setAvailableTopics([]);
     return;
   }
@@ -173,7 +223,7 @@ export default function QuizSetup() {
         class_name: quiz.className,
         subject: quiz.subject,
         class_year: quiz.classYear,  
-        difficulty: quiz.difficulty,
+        
       });
 
       const res = await fetch(
@@ -200,14 +250,28 @@ export default function QuizSetup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!quiz.className || !quiz.subject || !quiz.difficulty) {
-      alert("Please select class, subject, and difficulty.");
+    if(!quiz.className || !quiz.subject) {
+      alert("Please select class and subject.");
       return;
     }
 
     if (quiz.topics.length === 0) {
       alert("Please generate at least one topic.");
-      return;
+      return false;;
+    }
+
+    for (const topic of quiz.topics) {
+      const hasDifficulty =
+        topic.easy.enabled ||
+        topic.medium.enabled ||
+        topic.hard.enabled;
+
+      if (!hasDifficulty) {
+        alert(
+          `Please select at least one difficulty for topic: ${topic.name || "Unnamed Topic"}`
+        );
+        return;
+      }
     }
 
     if (totalQuestions !== 40) {
@@ -219,13 +283,13 @@ export default function QuizSetup() {
       class_name: quiz.className.trim(),
       subject: quiz.subject.trim(),
       class_year: quiz.classYear,
-      difficulty: quiz.difficulty.trim(),
       num_topics: quiz.topics.length,
       topics: quiz.topics.map((t) => ({
         name: t.name.trim(),
-        ai: Number(t.ai),
-        db: Number(t.db),
-        total: Number(t.total),
+        easy: t.easy,
+        medium: t.medium,
+        hard: t.hard,
+        total: t.total
       })),
     };
 
@@ -298,21 +362,7 @@ export default function QuizSetup() {
     </div>
   </div>
 
-        <div className="section-card">
-          <h2>Difficulty Level</h2>
-
-          <label>Select Difficulty</label>
-          <select
-            name="difficulty"
-            value={quiz.difficulty}
-            onChange={handleInputChange}
-          >
-            <option value="">Select Difficulty</option>
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-          </select>
-        </div>
+        
 
         <div className="section-card">
           <h2>Topic Controls</h2>
@@ -386,61 +436,194 @@ export default function QuizSetup() {
         <div className="topics-container">
           {quiz.topics.map((topic, index) => (
             <div className="topic-card" key={index}>
-  <h4>Topic {index + 1}</h4>
+              <h4>Topic {index + 1}</h4>
 
-  <label>Topic Name</label>
-  <select
-    value={topic.name}
-    onChange={(e) =>
-      handleTopicNameChange(index, e.target.value)
-    }
-    required
-  >
-    <option value="">Select a topic</option>
+              <label>Topic Name</label>
+              <select
+                value={topic.name}
+                onChange={(e) =>
+                  handleTopicNameChange(index, e.target.value)
+                }
+                required
+              >
+                <option value="">Select a topic</option>
 
-    {availableTopics
-      .filter(
-        (t) =>
-          !getUsedTopicNames(index).includes(t.name)
-      )
-      .map((t) => (
-        <option
-          key={t.id || t.name}
-          value={t.name}
-        >
-          {t.name}
-        </option>
-      ))}
-  </select>
+                {availableTopics
+                  .filter(
+                    (t) =>
+                      !getUsedTopicNames(index).includes(t.name)
+                  )
+                  .map((t) => (
+                    <option
+                      key={t.id || t.name}
+                      value={t.name}
+                    >
+                      {t.name}
+                    </option>
+                  ))}
+              </select>
 
-  <div className="grid-2">
-    <div>
-      <label>Questions Generated by AI</label>
-      <input
-        type="number"
-        min="0"
-        value={topic.ai}
-        onChange={(e) =>
-          handleTopicChange(index, "ai", e.target.value)
-        }
-        required
-      />
-    </div>
+              <div className="difficulty-block">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={topic.easy.enabled}
+                    onChange={() =>
+                      toggleDifficulty(index, "easy")
+                    }
+                  />
+                  Easy
+                </label>
 
-    <div>
-      <label>Questions from Database</label>
-      <input
-        type="number"
-        min="0"
-        value={topic.db}
-        onChange={(e) =>
-          handleTopicChange(index, "db", e.target.value)
-        }
-        required
-      />
-    </div>
-  </div>
-</div>
+                {topic.easy.enabled && (
+                  <div className="grid-2">
+                    <div>
+                      <label>Questions Generated by AI</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={topic.easy.ai}
+                        onChange={(e) =>
+                          handleDifficultyChange(
+                            index,
+                            "easy",
+                            "ai",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </div>
+
+                    <div>
+                      <label>Questions from Database</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={topic.easy.db}
+                        onChange={(e) =>
+                          handleDifficultyChange(
+                            index,
+                            "easy",
+                            "db",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="difficulty-block">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={topic.medium.enabled}
+                    onChange={() =>
+                      toggleDifficulty(index, "medium")
+                    }
+                  />
+                  Medium
+                </label>
+
+                {topic.medium.enabled && (
+                  <div className="grid-2">
+                    <div>
+                      <label>Questions Generated by AI</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={topic.medium.ai}
+                        onChange={(e) =>
+                          handleDifficultyChange(
+                            index,
+                            "medium",
+                            "ai",
+                            e.target.value
+                          )
+                        }
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label>Questions from Database</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={topic.medium.db}
+                        onChange={(e) =>
+                          handleDifficultyChange(
+                            index,
+                            "medium",
+                            "db",
+                            e.target.value
+                          )
+                        }
+                        required
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="difficulty-block">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={topic.hard.enabled}
+                    onChange={() =>
+                      toggleDifficulty(index, "hard")
+                    }
+                  />
+                  Hard
+                </label>
+
+                {topic.hard.enabled && (
+                  <div className="grid-2">
+                    <div>
+                      <label>Questions Generated by AI</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={topic.hard.ai}
+                        onChange={(e) =>
+                          handleDifficultyChange(
+                            index,
+                            "hard",
+                            "ai",
+                            e.target.value
+                          )
+                        }
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label>Questions from Database</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={topic.hard.db}
+                        onChange={(e) =>
+                          handleDifficultyChange(
+                            index,
+                            "hard",
+                            "db",
+                            e.target.value
+                          )
+                        }
+                        required
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="topic-total">
+                Total Questions: {topic.total}
+              </div>
+            </div>
           ))}
         </div>
 
@@ -465,19 +648,19 @@ export default function QuizSetup() {
   disabled={totalQuestions > 40}
   onClick={async () => {
   if (!validateQuizBeforeSubmit()) {
-    return;
+    return false;
   }
     const payload = {
       class_name: quiz.className.trim(),
       subject: quiz.subject.trim(),
       class_year: quiz.classYear,
-      difficulty: quiz.difficulty.trim(),
       num_topics: quiz.topics.length,
       topics: quiz.topics.map((t) => ({
         name: t.name.trim(),
-        ai: Number(t.ai),
-        db: Number(t.db),
-        total: Number(t.total),
+        easy: t.easy,
+        medium: t.medium,
+        hard: t.hard,
+        total: t.total
       })),
     };
 

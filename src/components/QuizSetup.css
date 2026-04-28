@@ -79,6 +79,26 @@ label {
   margin-bottom: 8px;
   color: #374151;
 }
+.difficulty-block label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.difficulty-block input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  padding: 0;
+}
+.difficulty-block {
+  margin-bottom: 18px;
+}
+
+.difficulty-block .grid-2 {
+  margin-top: 10px;
+}
 
 /* ===============================
    INPUTS / SELECTS
