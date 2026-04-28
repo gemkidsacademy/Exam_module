@@ -583,8 +583,14 @@ const isReview = mode === "review";
   });
   console.log("📥 Passing examId to Review:", selectedExamId);
 }
- 
-const optionEntries = Object.entries(currentQ?.options || {});
+  console.log("🧪 FULL QUESTION:", currentQ);
+  console.log("🧪 OPTIONS FIELD:", currentQ?.options);
+const optionEntries = Object.entries(
+  currentQ?.options ||
+  currentQ?.answer_options ||
+  currentQ?.choices ||
+  {}
+);
 return (
 <div className="exam-shell">
   <div className="exam-container">
@@ -748,15 +754,16 @@ return (
             className={`option-btn ${statusClass}`}
             onClick={() => !isReview && handleAnswer(optionKey)}
           >
-            {opt?.type === "image" ? (
-            <img
-              src={opt.src}
-              alt={`Option ${optionKey}`}
-              className="option-image"
-            />
-          ) : (
-            <span>{opt?.content}</span>
-          )}
+            <>
+              <span style={{ fontWeight: "700", marginRight: "8px" }}>
+                {optionKey}.
+              </span>
+
+              <span>
+                {(opt?.content || opt?.text || "")
+                  .replace(/^[A-E]\)\s*/, "")}
+              </span>
+            </>
           </button>
         );
       })}

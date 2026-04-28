@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useEffect } from "react";
 import "./NaplanDashboard.css";
 
 // NAPLAN EXAM COMPONENTS
@@ -10,7 +11,8 @@ import NaplanReading from "./NaplanReading";
 // SHARED SCREENS
 import WelcomeScreen from "./WelcomeScreen";
 import InstructionsScreen_naplan from "./InstructionsScreen_naplan";
-
+//const API_BASE = process.env.REACT_APP_API_URL;
+const API_BASE = "http://127.0.0.1:8000";
 
 
 /*
@@ -49,11 +51,38 @@ const NaplanDashboard = () => {
   const [activeSubject, setActiveSubject] = useState(null);
   const [examInProgress, setExamInProgress] = useState(false);
   const [examPhase, setExamPhase] = useState("modeSelection"); 
+  const [subjectAvailability, setSubjectAvailability] = useState({});
   const [examMode, setExamMode] = useState(null); // 🔥 NEW
   // phases: selection → welcome → instructions → exam
 
   const studentId = sessionStorage.getItem("student_id");
   const ActiveComponent = activeSubject?.component;
+  
+  useEffect(() => {
+  if (examPhase !== "selection") return;
+  if (!studentId) return;
+
+  setSubjectAvailability({}); // reset stale data
+
+  const fetchAvailabilityNaplan = async () => {
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/student/available-subjects-naplan?student_id=${studentId}`
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch availability");
+      }
+
+      const data = await res.json();
+      setSubjectAvailability(data);
+    } catch (err) {
+      console.error("Failed to fetch subject availability", err);
+    }
+  };
+
+  fetchAvailabilityNaplan();
+}, [examPhase, studentId]);
 
   const handleSubjectSelect = (subject) => {
   if (examInProgress) {
@@ -142,15 +171,36 @@ const NaplanDashboard = () => {
             <div className="title-divider" />
 
             <div className="subject-buttons">
-              {SUBJECTS.map((subject) => (
-                <button
-                  key={subject.key}
-                  className="subject-button"
-                  onClick={() => handleSubjectSelect(subject)}
-                >
-                  {subject.label}
-                </button>
-              ))}
+              {SUBJECTS.map((subject) => {
+                const subjectData = subjectAvailability[subject.key];
+
+                let isEnabled = true;
+
+                if (subjectData) {
+                  if (examMode === "exam") {
+                    isEnabled = subjectData.exam;
+                  } else if (examMode === "homework") {
+                    isEnabled = subjectData.homework;
+                  } else {
+                    isEnabled = true; // for report mode
+                  }
+                }
+
+                return (
+                  <button
+                    key={subject.key}
+                    className="subject-button"
+                    disabled={isEnabled === false}
+                    onClick={() => isEnabled !== false && handleSubjectSelect(subject)}
+                    style={{
+                      opacity: isEnabled === false ? 0.5 : 1,
+                      cursor: isEnabled === false ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    {subject.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

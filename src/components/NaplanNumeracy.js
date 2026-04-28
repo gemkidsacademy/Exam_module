@@ -21,8 +21,8 @@
     mode: parentMode // 🔥 THIS
   }) {
       const studentId = sessionStorage.getItem("student_id");
-      const API_BASE = process.env.REACT_APP_API_URL;
-      //const API_BASE = "http://127.0.0.1:8000";
+      //const API_BASE = process.env.REACT_APP_API_URL;
+      const API_BASE = "http://127.0.0.1:8000";
       const [examDates, setExamDates] = useState([]);
       const [selectedExamId, setSelectedExamId] = useState(null);
       const TYPE_2_MAX_SELECTIONS = 2;
@@ -122,7 +122,7 @@
       };
     
       // ---------------- REPORT ----------------
-      const [report, setReport] = useState(null);
+      const [report, setReport] = useState(undefined);
       const [examAttemptId, setExamAttemptId] = useState(null);
       const loadExamDates = useCallback(async () => {
   try {
@@ -181,6 +181,15 @@
 
     console.log("📦 Response data:", data);
 
+    // 🔥 NEW: handle empty state
+    if (data.status === "no_data") {
+      setReport(null);              // important
+      setExamAttemptId(null);       // avoid stale data
+      setMode("report");            // still go to report screen
+      return;
+    }
+
+    // ✅ normal case
     setReport(data);
     setExamAttemptId(data.exam_attempt_id);
     setMode("report");
@@ -414,6 +423,7 @@
       },
       body: JSON.stringify({
         student_id: studentId,
+        exam_id: selectedExamId,   // ✅ REQUIRED
         answers
       })
     });

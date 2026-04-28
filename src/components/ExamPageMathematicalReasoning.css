@@ -163,6 +163,10 @@ body {
   border-radius: 8px;
   border: 2px solid #d1d5db;
   background: #ffffff;
+
+  /* 🔥 ADD THIS LINE */
+  color: #111827;
+
   text-align: left;
   font-size: 15px;
   cursor: pointer;

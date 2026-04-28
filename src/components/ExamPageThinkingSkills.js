@@ -60,8 +60,11 @@ const normalizeOption = (value) => {
 
   // already normalized by backend
   if (typeof value === "object") {
-    return value;
-  }
+  return {
+    type: "text",
+    content: value.content || ""
+  };
+}
 
   // string image filename
   if (typeof value === "string" && value.match(/\.(png|jpg|jpeg|webp)$/i)) {
@@ -393,6 +396,7 @@ useEffect(() => {
 
     // 👉 Normal flow
     setQuestions(data.questions || []);
+    console.log("✅ SET QUESTIONS:", data.questions);
     setTimeLeft(data.remaining_time);
     onExamStart?.();
 
@@ -599,8 +603,19 @@ if (mode === "review" && questions.length === 0) {
 
 // ---------------- EXAM UI ----------------
 const currentQ = activeQuestions[currentIndex];
+
+if (!currentQ) {
+  console.log("❌ currentQ is missing", {
+    currentIndex,
+    questionsLength: activeQuestions.length,
+    questions: activeQuestions
+  });
+
+  return <p>Loading question...</p>;
+}
 if (!currentQ) return null;
 console.log("REVIEW QUESTION", currentQ);
+console.log("🚨 RENDER OPTIONS:", currentQ.options);
 const optionEntries = Object.entries(
   currentQ.options ||
   currentQ.choices ||
@@ -756,6 +771,7 @@ return (
 
   {optionEntries.map(([optionKey, rawValue]) => {
    console.log("OPTION DEBUG", optionKey, rawValue, normalizeOption(rawValue));
+    console.log("🚨 RAW VALUE:", rawValue);
 
     const optionValue = normalizeOption(rawValue);
 
@@ -795,7 +811,7 @@ return (
   className={optionClass + (isReview ? " review" : "")}
   onClick={() => !isReview && handleAnswer(optionKey)}
 >
-  {optionValue.type === "text" && (
+  {true && (
     <>
       <span
         style={{
@@ -819,7 +835,9 @@ return (
           wordBreak: "break-word"
         }}
       >
-        {optionValue?.content || ""}
+        <span>
+          {rawValue?.content || rawValue?.text || "MISSING"}
+        </span>
       </span>
     </>
   )}

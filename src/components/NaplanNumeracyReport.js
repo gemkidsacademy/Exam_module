@@ -8,9 +8,34 @@ export default function NaplanNumeracyReport({
   onExamChange,
   onViewExamDetails
 }) {
-  if (!report?.overall) {
-    return <p className="loading">Generating your report…</p>;
-  }
+  // 🔥 1. Loading state
+if (report === undefined) {
+  return <p className="loading">Loading report…</p>;
+}
+
+// 🔥 2. No data state
+if (!report || report.status === "no_data" || !report.overall) {
+  return (
+    <div className="empty-state">
+      <h3>📭 No reports available</h3>
+      <p>This student has not completed this exam yet.</p>
+
+      {examDates?.length > 0 && (
+        <select
+          className="exam-dropdown"
+          value={selectedExamId || ""}
+          onChange={(e) => onExamChange(Number(e.target.value))}
+        >
+          {examDates.map((d) => (
+            <option key={d.exam_id} value={d.exam_id}>
+              {new Date(d.date).toLocaleDateString()}
+            </option>
+          ))}
+        </select>
+      )}
+    </div>
+  );
+}
 
   const {
     overall,
