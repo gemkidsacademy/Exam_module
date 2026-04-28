@@ -549,7 +549,7 @@
           disabled={!attemptId}
           onClick={() => {
             
-            console.log("👉 navigating to:", `/writing-review/${attemptId}?mode=${parentMode}`);
+            console.log("👉 navigating to:", `/writing-review/${attemptId}?variant=${variant}`);
             navigate(`/writing-review/${attemptId}?variant=${variant}`);
           }}
           style={{
