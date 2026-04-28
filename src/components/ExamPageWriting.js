@@ -4,8 +4,8 @@
   
 
 
-  const API_BASE =
-  process.env.REACT_APP_API_URL || "http://localhost:8000";
+  const API_BASE = process.env.REACT_APP_API_URL 
+  //const API_BASE= "http://localhost:8000";
   console.log("🧪 API_BASE:", API_BASE);
 
   if (!API_BASE) {
@@ -351,7 +351,8 @@
         if (variant === "homework") {
           await startHomeworkWriting();
         } else {
-          await startExam();   // 🔥 ADD THIS
+          await startExam();
+          await loadExam();   // 🔥 THIS IS THE MISSING PIECE
         }
         return;
       }
