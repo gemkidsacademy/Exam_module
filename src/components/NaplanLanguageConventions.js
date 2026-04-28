@@ -41,7 +41,7 @@ export default function NaplanLanguageConventions({
    */
   const [mode, setMode] = useState("loading");
   const isReview = mode === "review";
-
+  const [isLoadingDates, setIsLoadingDates] = useState(true);
   // ---------------- EXAM STATE ----------------
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -209,15 +209,18 @@ export default function NaplanLanguageConventions({
 
   const [examDates, setExamDates] = useState([]);
   const [selectedExamId, setSelectedExamId] = useState(null);
+  const isHomework =
+  parentMode === "homework" ||
+  parentMode === "report_homework";
   const loadExamDates = useCallback(async () => {
   try {
-    const datesUrl =
-      parentMode === "homework"
-        ? `${API_BASE}/api/student/exam-dates/naplan-language-conventions-homework?student_id=${studentId}`
-        : `${API_BASE}/api/student/exam-dates/naplan-language-conventions?student_id=${studentId}`;
+    setIsLoadingDates(true); // 🔥 ADD
+
+    const datesUrl = isHomework
+      ? `${API_BASE}/api/student/exam-dates/naplan-language-conventions-homework?student_id=${studentId}`
+      : `${API_BASE}/api/student/exam-dates/naplan-language-conventions?student_id=${studentId}`;
 
     const res = await fetch(datesUrl);
-
     if (!res.ok) return;
 
     const data = await res.json();
@@ -230,8 +233,10 @@ export default function NaplanLanguageConventions({
 
   } catch (err) {
     console.error("Failed to load exam dates", err);
+  } finally {
+    setIsLoadingDates(false); // 🔥 ADD
   }
-}, [API_BASE, studentId, parentMode]);
+}, [API_BASE, studentId, isHomework]);
   /* ============================================================
      LOAD REPORT
   ============================================================ */
@@ -240,7 +245,7 @@ export default function NaplanLanguageConventions({
 
   try {
     const reportUrl =
-      parentMode === "homework"
+      isHomework
         ? `${API_BASE}/api/student/exam-report/naplan-language-conventions-homework?student_id=${studentId}&exam_id=${examId}`
         : `${API_BASE}/api/student/exam-report/naplan-language-conventions?student_id=${studentId}&exam_id=${examId}`;
 
@@ -279,15 +284,12 @@ useEffect(() => {
   if (!studentId) return;
   if (mode !== "loading") return;
 
-  if (parentMode === "actual") {
+  if (parentMode?.startsWith("report")) {
     setMode("report");
     return;
   }
 
-  if (
-    parentMode === "exam" ||
-    parentMode === "homework"
-  ) {
+  if (parentMode === "exam" || parentMode === "homework") {
     setMode("exam");
   }
 
@@ -380,7 +382,7 @@ useEffect(() => {
     async () => {
 
     const startUrl =
-      parentMode === "homework"
+      isHomework
         ? `${API_BASE}/api/student/start-homework-exam/naplan-language-conventions`
         : `${API_BASE}/api/student/start-exam/naplan-language-conventions`;
 
@@ -446,7 +448,7 @@ useEffect(() => {
 
   try {
     const finishUrl =
-      parentMode === "homework"
+      isHomework
         ? `${API_BASE}/api/student/finish-homework-exam/naplan-language-conventions`
         : `${API_BASE}/api/student/finish-exam/naplan-language-conventions`;
 
@@ -556,6 +558,20 @@ useEffect(() => {
       </div>
     );
   }
+ // ✅ show loading first
+if (mode === "report" && isLoadingDates) {
+  return <p className="loading">Generating your report...</p>;
+}
+
+// ✅ show empty only AFTER loading
+if (mode === "report" && !isLoadingDates && examDates.length === 0) {
+  return (
+    <div className="no-report">
+      <h3>No reports available yet</h3>
+      <p>Please complete an exam first.</p>
+    </div>
+  );
+}
   if (mode === "report") {
     return (
       <NaplanLanguageConventionsReport

@@ -212,8 +212,10 @@ const NaplanDashboard = () => {
             <div className="subject-buttons">
               {SUBJECTS.map((subject) => {
                 const subjectData = subjectAvailability[subject.key];
+                console.log("DEBUG →", subject.key, subjectData); // 👈 ADD THIS
 
                 let isEnabled = true;
+                
 
                 if (subjectData) {
                   if (examMode === "exam") {
@@ -224,6 +226,11 @@ const NaplanDashboard = () => {
                     isEnabled = true;
                   }
                 }
+                console.log("DEBUG →", subject.key, {
+                  subjectData,
+                  examMode,
+                  isEnabled
+                });
 
                 const isDisabled = isLoadingAvailability || isEnabled === false;
 
@@ -270,7 +277,11 @@ const NaplanDashboard = () => {
             studentId={studentId}
             subject={activeSubject.key}
             difficulty="naplan"
-            mode={examMode === "report" ? reportVariant : examMode}
+            mode={
+              examMode === "report"
+                ? `report_${reportVariant}`
+                : examMode
+            }
             onExamStart={() => setExamInProgress(true)}
             onExamFinish={() => setExamInProgress(false)}
           />
