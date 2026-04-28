@@ -88,7 +88,7 @@ useEffect(() => {
     setExamPhase("exam");
   }
 }, [location.state]);
-/*
+
 useEffect(() => {
   if (examPhase === "selection" && studentId && examMode) {
     fetch(`https://web-production-481a5.up.railway.app/api/student/available-subjects?mode=${examMode}&student_id=${studentId}`)
@@ -109,7 +109,7 @@ useEffect(() => {
       });
   }
 }, [examPhase, examMode, studentId]);
-*/
+
   return (
     <div className="selective-dashboard">
     {/* 0️⃣ MODE SELECTION */}
