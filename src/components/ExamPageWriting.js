@@ -1,5 +1,6 @@
   import React, { useState, useEffect } from "react";
   import { useNavigate } from "react-router-dom";
+  import useVariant from "../hooks/useVariant";
   import "./WritingComponent.css";
   
 
@@ -32,17 +33,18 @@
     Math.min(Math.max(value, min), max);
 
   export default function WritingComponent({
-    studentId,
-    mode: parentMode, 
-    variant, 
-    onExamStart,
-    onExamFinish
-  }) {
+  studentId,
+  mode: parentMode, 
+  variant: parentVariant,
+  onExamStart,
+  onExamFinish
+}) {
   
     /* -----------------------------------------------------------
        STATE
     ----------------------------------------------------------- */
     const [exam, setExam] = useState(null);
+    const variant = useVariant(parentVariant);
     const [examActive, setExamActive] = useState(false);
     const navigate = useNavigate();
 
@@ -130,7 +132,7 @@
         .catch(err => {
           console.error("❌ Failed to load history:", err);
         });
-    }, [result?.attempt_id]);
+    }, [result?.attempt_id, variant]);
     
     //useEffect(() => {
       //document.addEventListener("contextmenu", e => e.preventDefault());
@@ -282,7 +284,7 @@
   
         setExam(data.exam);
         setTimeLeft(data.remaining_seconds);
-  
+        setExamActive(true);  
         if (typeof onExamStart === "function") {
           console.log("🟢 Calling onExamStart()");
           onExamStart();
@@ -502,7 +504,7 @@
     }
     if (completed && result) {
   const evalData = result.evaluation;
-  const attemptId = result?.attempt_id;
+  const attemptId = result?.attempt_id || selectedAttempt;
 
   return (
     <div

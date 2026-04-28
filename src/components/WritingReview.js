@@ -7,13 +7,13 @@ import {
 
 
 
-const API_BASE =
-  process.env.REACT_APP_API_URL || "http://localhost:8000";
+const API_BASE =   process.env.REACT_APP_API_URL
+//const API_BASE = "http://localhost:8000";
 
 export default function WritingReview() {
   const { attemptId } = useParams();
   const [searchParams] = useSearchParams();
-  const mode = searchParams.get("mode"); 
+  const variant = searchParams.get("variant") || "actual";
   const navigate = useNavigate();
 
   const [history, setHistory] = useState([]);
@@ -28,7 +28,7 @@ export default function WritingReview() {
     if (!attemptId) return;
 
     const historyEndpoint =
-      mode === "homework"
+      variant === "homework"
         ? `/api/student/homework-writing-history-by-attempt?attempt_id=${attemptId}`
         : `/api/exams/writing/history-by-attempt?attempt_id=${attemptId}`;
 
@@ -43,7 +43,7 @@ export default function WritingReview() {
         }
       })
       .catch(() => {});
-  }, [attemptId, mode]);
+  }, [attemptId, variant]);
 
   // --------------------------------------------------
   // Load essay when attempt changes
@@ -56,9 +56,9 @@ export default function WritingReview() {
   setLoading(true);
 
   const reviewEndpoint =
-    mode === "homework"
-      ? `/api/student/homework-writing/review/${selectedAttempt}`
-      : `/api/student/writing/review/${selectedAttempt}`;
+    variant === "homework"
+      ? `/api/student/homework-writing-review-by-attempt?attempt_id=${selectedAttempt}`
+      : `/api/exams/writing/review-by-attempt?attempt_id=${selectedAttempt}`;
 
   fetch(`${API_BASE}${reviewEndpoint}`)
     .then(res => res.json())
@@ -69,7 +69,7 @@ export default function WritingReview() {
       setLoading(false);
     })
     .catch(() => setLoading(false));
-}, [selectedAttempt, mode]);
+}, [selectedAttempt, variant]);
 
   // --------------------------------------------------
   // Loading state
