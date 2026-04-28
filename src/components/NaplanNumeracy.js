@@ -21,8 +21,8 @@
     mode: parentMode // 🔥 THIS
   }) {
       const studentId = sessionStorage.getItem("student_id");
-      //const API_BASE = process.env.REACT_APP_API_URL;
-      const API_BASE = "http://127.0.0.1:8000";
+      const API_BASE = process.env.REACT_APP_API_URL;
+      //const API_BASE = "http://127.0.0.1:8000";
       const [examDates, setExamDates] = useState([]);
       const [selectedExamId, setSelectedExamId] = useState(null);
       const TYPE_2_MAX_SELECTIONS = 2;
