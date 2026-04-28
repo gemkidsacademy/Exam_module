@@ -34,6 +34,7 @@
   export default function WritingComponent({
     studentId,
     mode: parentMode, 
+    variant, 
     onExamStart,
     onExamFinish
   }) {
@@ -75,7 +76,7 @@
       setLoading(true);
 
       const endpoint =
-        parentMode === "homework"
+        variant === "homework"
           ? `/api/student/homework-writing-result-by-attempt?attempt_id=${attemptId}`
           : `/api/exams/writing/result-by-attempt?attempt_id=${attemptId}`;
 
@@ -110,7 +111,7 @@
       if (!result?.attempt_id) return;
 
       const endpoint =
-        parentMode === "homework"
+        variant === "homework"
           ? `/api/student/homework-writing-history-by-attempt?attempt_id=${result.attempt_id}`
           : `/api/exams/writing/history-by-attempt?attempt_id=${result.attempt_id}`;
 
@@ -148,7 +149,7 @@
     setCompleted(true);
 
     const endpoint =
-      parentMode === "homework"
+      variant === "homework"
         ? `/api/student/homework-writing-report?student_id=${studentId}`
         : `/api/exams/writing/result?student_id=${studentId}`;
 
@@ -346,8 +347,12 @@
         setLoading(false);
         return;
       }
-      if (parentMode === "homework") {
-        await startHomeworkWriting();
+      if (parentMode === "exam") {
+        if (variant === "homework") {
+          await startHomeworkWriting();
+        } else {
+          await startExam();   // 🔥 ADD THIS
+        }
         return;
       }
 
@@ -374,30 +379,14 @@
         }
       }
 
-      if (parentMode === "report") {
-        console.log("📘 Report mode with no attempts");
-
-        const resultRes = await fetch(
-          `${API_BASE}/api/exams/writing/result?student_id=${studentId}`
-        );
-
-        if (resultRes.status === 200) {
-          const data = await resultRes.json();
-          setResult(data);
-          setCompleted(true);
-          onExamFinish?.();
-        } else {
-          setCompleted(true);
-          setResult(null);
-        }
-
-        return;
-      }
+      
 
       /* Normal Active Exams mode */
       console.log("🟢 No active exam → starting new exam");
 
-      await startExam();
+      if (variant !== "homework") {
+        await startExam();
+      }
 
       const retryRes = await fetch(
         `${API_BASE}/api/exams/writing/current?student_id=${studentId}`
@@ -423,7 +412,7 @@
   };
 
   init();
-}, [studentId]);
+}, [studentId, parentMode, variant]);
 
     
   
@@ -438,7 +427,7 @@
     
       try {
         const endpoint =
-          parentMode === "homework"
+          variant === "homework"
             ? "/api/student/submit-homework-writing"
             : "/api/exams/writing/submit";
 
@@ -560,7 +549,7 @@
           onClick={() => {
             
             console.log("👉 navigating to:", `/writing-review/${attemptId}?mode=${parentMode}`);
-            navigate(`/writing-review/${attemptId}?mode=${parentMode}`);
+            navigate(`/writing-review/${attemptId}?variant=${variant}`);
           }}
           style={{
             backgroundColor: "#2E7D32",

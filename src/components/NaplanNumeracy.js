@@ -122,7 +122,7 @@
       };
     
       // ---------------- REPORT ----------------
-      const [report, setReport] = useState(undefined);
+      const [report, setReport] = useState(null);
       const [examAttemptId, setExamAttemptId] = useState(null);
       const loadExamDates = useCallback(async () => {
   try {
@@ -181,15 +181,6 @@
 
     console.log("📦 Response data:", data);
 
-    // 🔥 NEW: handle empty state
-    if (data.status === "no_data") {
-      setReport(null);              // important
-      setExamAttemptId(null);       // avoid stale data
-      setMode("report");            // still go to report screen
-      return;
-    }
-
-    // ✅ normal case
     setReport(data);
     setExamAttemptId(data.exam_attempt_id);
     setMode("report");
@@ -423,7 +414,6 @@
       },
       body: JSON.stringify({
         student_id: studentId,
-        exam_id: selectedExamId,   // ✅ REQUIRED
         answers
       })
     });

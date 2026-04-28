@@ -52,6 +52,7 @@ export default function ReadingReview({
       .replace(/\n/g, "<br/>");
   };
   const API_BASE = process.env.REACT_APP_API_URL;
+  //const API_BASE = "http://127.0.0.1:8000";
 
 const handleGenerateExplanation = async (question) => {
   const qid = String(question.question_id);

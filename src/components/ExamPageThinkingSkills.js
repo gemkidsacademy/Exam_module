@@ -15,6 +15,7 @@ import ThinkingSkillsReview from "./ThinkingSkillsReview";
 ============================================================ */
 export default function ExamPageThinkingSkills({
   mode: parentMode,
+  variant,   // 👈 ADD THIS
   studentId,
   subject,
   difficulty,
@@ -93,7 +94,7 @@ const [examAttemptId, setExamAttemptId] = useState(null);
 const loadAttempts = useCallback(async () => {
   try {
     const attemptsEndpoint =
-       parentMode === "homework"
+       variant === "homework"
         ? "/api/student/homework-attempts/thinking-skills"
         : "/api/student/exam-attempts/thinking-skills";
 
@@ -118,7 +119,7 @@ const loadAttempts = useCallback(async () => {
   } catch (err) {
     console.error("❌ loadAttempts error:", err);
   }
-}, [studentId, parentMode]);
+}, [studentId, variant]);
 
 const handleGenerateExplanation = async () => {
   if (!currentQ) return;
@@ -205,7 +206,7 @@ const [report, setReport] = useState(null);
 const loadReport = useCallback(async (attemptId = null) => {
   try {
     const reportEndpoint =
-      parentMode === "homework"
+      variant === "homework"
         ? "/api/student/homework-report/thinking-skills"
         : "/api/student/exam-report/thinking-skills";
 
@@ -242,7 +243,7 @@ useEffect(() => {
 }, [loadAttempts]);
  
 useEffect(() => {
-  if (mode !== "exam" && mode !== "homework") return;
+  if (mode !== "exam") return;
 
   window.history.replaceState(
    { questionIndex: 0 },
@@ -251,7 +252,7 @@ useEffect(() => {
  );
 }, [mode]);
 useEffect(() => {
- if (mode !== "exam" && mode !== "homework") return;
+ if (mode !== "exam") return;
 
  if (isPopNavigationRef.current) {
    isPopNavigationRef.current = false;
@@ -276,7 +277,7 @@ useEffect(() => {
 
  
 useEffect(() => {
- if (mode !== "exam" && mode !== "homework") return;
+ if (mode !== "exam") return;
 
  const handlePopState = (e) => {
    const state = e.state;
@@ -313,7 +314,7 @@ useEffect(() => {
  };
 }, [mode, currentIndex]);
 useEffect(() => {
-  if (mode !== "exam" && mode !== "homework") return;
+  if (mode !== "exam") return;
   if (questions.length === 0) return;
 
   const handleBeforeUnload = (e) => {
@@ -336,19 +337,18 @@ useEffect(() => {
   if (mode !== "loading") return;
 
   if (parentMode === "exam") {
-    setMode("exam");
-  }
-  if (parentMode === "homework") {
-    setMode("homework");   // ✅ ADD THIS
-  }
+  setMode("exam");
+}
 
-  if (parentMode === "report") {
-    loadAttempts().then(() => {
-      loadReport();
-    });
-  }
+if (parentMode === "report") {
+  loadAttempts().then(() => {
+    loadReport();
+  });
+}
 
-}, [studentId, parentMode, mode]);
+  
+
+}, [studentId, parentMode, mode, variant]);
  
  // 🔑 only what actually matters
 /* ============================================================
@@ -356,7 +356,7 @@ useEffect(() => {
 ============================================================ */
 useEffect(() => {
   if (!studentId) return;
-  if (mode !== "exam" && mode !== "homework") return;
+  if (mode !== "exam") return;
   if (hasStartedRef.current) return; // prevent double call
 
   hasStartedRef.current = true;
@@ -364,7 +364,7 @@ useEffect(() => {
   const startExam = async () => {
   try {
     const startEndpoint =
-      mode === "homework"
+      variant === "homework"
         ? "/api/student/start-homework-thinkingskills"
         : "/api/student/start-exam-thinkingskills";
 
@@ -409,7 +409,7 @@ startExam();
 
 }, [studentId, mode]);
 useEffect(() => {
-  if (mode !== "exam" && mode !== "homework") {
+  if (mode !== "exam") {
     hasStartedRef.current = false;
   }
 }, [mode]);
@@ -445,7 +445,7 @@ const finishExam = useCallback(
     try {
       console.log("🌐 Calling finish-exam API...");
       const finishEndpoint =
-        mode === "homework"
+         variant === "homework"
           ? "/api/student/finish-homework-thinkingskills"
           : "/api/student/finish-exam/thinking-skills";
 
@@ -488,7 +488,7 @@ const finishExam = useCallback(
    TIMER (AUTO SUBMIT)
 ============================================================ */
 useEffect(() => {
-  if ((mode !== "exam" && mode !== "homework") || timeLeft === null) return;
+  if (mode !== "exam" || timeLeft === null) return;
 
   if (timeLeft <= 0) {
     setShowConfirmFinish(false); // ✅ force-close modal
@@ -574,6 +574,7 @@ if (mode === "review" && questions.length === 0) {
  return (
    <ThinkingSkillsReview
      mode={parentMode} 
+     variant={variant}
      studentId={studentId}
      examAttemptId={examAttemptId}
      attempts={attempts}

@@ -46,7 +46,7 @@ const SelectiveDashboard = () => {
   const [examMode, setExamMode] = useState(null);
   const [subjectAvailability, setSubjectAvailability] = useState({});
   const location = useLocation();
-  
+  const [reportVariant, setReportVariant] = useState(null);
   // phases: selection → welcome → instructions → exam
 
   const studentId = sessionStorage.getItem("student_id");
@@ -134,6 +134,7 @@ useEffect(() => {
           className="subject-button"
           onClick={() => {
             setExamMode("exam");
+            setReportVariant("actual");   // ✅ ADD THIS
             setSubjectAvailability({});
             setExamPhase("selection");
           }}
@@ -145,7 +146,7 @@ useEffect(() => {
           className="subject-button"
           onClick={() => {
             setExamMode("report");
-            setExamPhase("selection");
+            setExamPhase("report_type_selection");
           }}
         >
           Historical reports
@@ -153,7 +154,8 @@ useEffect(() => {
         <button
           className="subject-button"
           onClick={() => {
-            setExamMode("homework");
+            setExamMode("exam");
+            setReportVariant("homework");
             setExamPhase("selection");
           }}
         >
@@ -164,7 +166,42 @@ useEffect(() => {
     </div>
   </div>
 )}
+{/* 🆕 REPORT TYPE SELECTION */}
+{examPhase === "report_type_selection" && (
+  <div className="subject-selection-wrapper">
+    
+    <div className="subject-selection-card">
+      <h1 className="dashboard-title">
+        Select Report Type
+      </h1>
+      <div className="title-divider" />
 
+      <div className="subject-buttons">
+        
+        <button
+          className="subject-button"
+          onClick={() => {
+            setReportVariant("actual");
+            setExamPhase("selection");
+          }}
+        >
+          Actual Exam
+        </button>
+
+        <button
+          className="subject-button"
+          onClick={() => {
+            setReportVariant("homework");
+            setExamPhase("selection");
+          }}
+        >
+          Homework
+        </button>
+
+      </div>
+    </div>
+  </div>
+)}
       {/* 1️⃣ SUBJECT SELECTION */}
       {examPhase === "selection" && (
         <div className="subject-selection-wrapper">
@@ -236,12 +273,13 @@ useEffect(() => {
         <main className="content-area">
           <div className="exam-root">
             <ActiveComponent
-            key={`exam-${activeSubject.key}-${examMode}`}   // 🔑 THIS LINE FIXES IT
+            key={`exam-${activeSubject.key}-${examMode}-${reportVariant}`}  // 🔑 THIS LINE FIXES IT
             type={examMode}
             studentId={studentId}
             subject={activeSubject.key}
             difficulty="advanced"
             mode={examMode} 
+            variant={reportVariant}
             onExamStart={() => setExamInProgress(true)}
             onExamFinish={() => setExamInProgress(false)}
           />

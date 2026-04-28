@@ -3,27 +3,32 @@ import styles from "./ThinkingSkillsReview.module.css";
 
 export default function ThinkingSkillsReview({
   mode,
+  variant,   // 👈 NEW (actual | homework)
   studentId,
   examAttemptId,
   onLoaded,
   onExit
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
-  
-useEffect(() => {
-  console.log("🧠 Review received examAttemptId:", examAttemptId);
-}, [examAttemptId]);  
+  //const API_BASE = "http://127.0.0.1:8000";
+
+  useEffect(() => {
+    console.log("🧠 Review received examAttemptId:", examAttemptId);
+    console.log("🧠 Review variant:", variant);
+  }, [examAttemptId, variant]);
+
   useEffect(() => {
     if (!studentId || !examAttemptId) return;
 
-    const loadReviewForAttempt = async () => {
+    const loadReviewForAttemptThinkingSkills = async () => {
       try {
         const reviewEndpoint =
-          mode === "homework"
+          variant === "homework"
             ? "/api/student/homework-review/thinking-skills"
             : "/api/student/exam-review/thinking-skills";
 
         console.log("🔍 REVIEW MODE:", mode);
+        console.log("📦 REVIEW VARIANT:", variant);
         console.log("🌐 REVIEW ENDPOINT:", reviewEndpoint);
 
         const response = await fetch(
@@ -57,25 +62,22 @@ useEffect(() => {
         console.log("======================================");
 
         onLoaded?.(questions);
+
       } catch (error) {
         console.error("Failed to load thinking skills review", error);
         onLoaded?.([]);
       }
     };
 
-    loadReviewForAttempt();
-  }, [studentId, examAttemptId, API_BASE, onLoaded, mode]);
+    loadReviewForAttemptThinkingSkills();
+
+  }, [studentId, examAttemptId, API_BASE, onLoaded, mode, variant]);
 
   return (
     <div className={styles.reviewWrapper}>
-      
-      
-      {/* ⏳ LOADING */}
       <p className={styles.loading}>
         Loading review…
       </p>
-
-      
     </div>
   );
 }

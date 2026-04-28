@@ -7,12 +7,14 @@
   export default function ReadingComponent({
     studentId,
     mode: parentMode,   // ✅ ADD THIS
+    variant, 
     onExamStart,
     onExamFinish
   }) {
     console.log("🧪 studentId:", studentId);
     
     const API_BASE = process.env.REACT_APP_API_URL;
+    //const API_BASE = "http://127.0.0.1:8000";
     const startReadingHomework = async () => {
     try {
       const studentIdFromStorage = sessionStorage.getItem("student_id");
@@ -118,7 +120,7 @@
       }
 
       const endpoint =
-        parentMode === "homework"
+        variant === "homework"
           ? "/api/student/homework-review/reading"
           : "/api/student/exam-review/reading";
 
@@ -158,31 +160,32 @@
     }
   };
     const loadExamDatesReading_v1 = async () => {
-    try {
-      const studentIdFromStorage = sessionStorage.getItem("student_id");
+  try {
+    const studentIdFromStorage = sessionStorage.getItem("student_id");
 
-      const endpoint =
-        parentMode === "homework"
-          ? "/api/student/homework-dates/reading"
-          : "/api/student/exam-dates/reading";
+    const endpoint =
+      variant === "homework"
+        ? "/api/student/homework-dates/reading"
+        : "/api/student/exam-dates/reading";
 
-      const res = await fetch(
-        `${API_BASE}${endpoint}?student_id=${studentIdFromStorage}`
-      );
+    const res = await fetch(
+      `${API_BASE}${endpoint}?student_id=${studentIdFromStorage}`
+    );
 
-      const data = await res.json();
+    const data = await res.json();
 
-      console.log("📅 Reading exam dates:", data);
+    // 🔥 ADD LOG HERE
+    console.log("📅 Reading exam dates:", data);
 
-      setExamDates(data);
+    setExamDates(data);
 
-      return data;
+    return data;
 
-    } catch (err) {
-      console.error("❌ loadExamDates error:", err);
-      return [];
-    }
-  };
+  } catch (err) {
+    console.error("❌ loadExamDates error:", err);
+    return [];
+  }
+};
   useEffect(() => {
     if (!studentId) return;
     if (mode !== "loading") return;
@@ -195,13 +198,16 @@
     }
 
     // 🟢 HOMEWORK (NEW)
-    if (parentMode === "homework") {
-      startReadingHomework();
+    if (parentMode === "exam") {
+      if (variant === "homework") {
+        startReadingHomework();
+      }
+      // else → normal exam handled below
       return;
     }
 
     // 🟢 EXAM → handled separately
-  }, [studentId, parentMode, mode]);
+  }, [studentId, parentMode, mode, variant]);
   
     useEffect(() => {
     if (!finished) return;
@@ -219,7 +225,7 @@
     };
 
     init();
-  }, [finished]);
+  }, [finished, variant]);
       
     const formatExplanation = (text) => {
         if (!text) return "";
@@ -295,7 +301,7 @@
 
   try {
     const endpoint =
-      parentMode === "homework"
+      variant === "homework"
         ? "/api/student/homework-review-by-session/reading"
         : "/api/exams/review-reading";
 
@@ -341,7 +347,7 @@
       const studentIdFromStorage = sessionStorage.getItem("student_id");
 
       const endpoint =
-        parentMode === "homework"
+        variant === "homework"
           ? "/api/student/homework-report/reading"
           : "/api/student/exam-report/reading";
 
@@ -354,6 +360,12 @@
       console.log("📊 Report data:", data);
 
       setReport(data);
+
+      // 👇 ADD THIS LINE
+      if (data.session_id) {
+        setAttemptId(data.session_id);
+      }
+
       setFinished(true);
       await loadExamDatesReading_v1();  // 🔥 refresh dates
 
@@ -367,7 +379,7 @@
       setLoadingReport(true);
 
       const endpoint =
-        parentMode === "homework"
+        variant === "homework"
           ? "/api/student/homework-report-by-session"
           : "/api/exams/reading-report";
 
@@ -396,22 +408,21 @@
 
     const [report, setReport] = useState(null);
     const normalizedReport = useMemo(() => {
-        if (!report) return null;
-      
-        return {
-          total: report.overall.total_questions,
-          attempted: report.overall.attempted,
-          correct: report.overall.correct,
-          incorrect: report.overall.incorrect,
-          not_attempted: report.overall.not_attempted,
-          accuracy: report.overall.accuracy,
-          score: report.overall.score,
-          result: report.overall.result,   // ✅ PASS / FAIL
-          has_sufficient_data: report.has_sufficient_data,
-          topics: report.topics || [],
-          improvement_order: report.improvement_order || []
-        };
-      }, [report]);
+      if (!report || !report.overall) return null;
+
+      return {
+        total: report.overall.total_questions,
+        attempted: report.overall.attempted,
+        correct: report.overall.correct,
+        incorrect: report.overall.incorrect,
+        not_attempted: report.overall.not_attempted,
+        accuracy: report.overall.accuracy,
+        coverage: report.overall.coverage,
+        score: report.overall.score,
+        result: report.overall.result,
+        topics: report.topics || []
+      };
+    }, [report]);
 
     const [loadingReport, setLoadingReport] = useState(false);
 
@@ -539,7 +550,7 @@
       
     useEffect(() => {
     if (!studentId) return;
-    if (parentMode !== "exam") return; 
+    if (parentMode !== "exam" || variant === "homework") return;
     if (mode !== "loading") return;  // 🔥 CRITICAL GUARD
 
     const startReadingExam = async () => {
@@ -609,7 +620,7 @@
 
     startReadingExam();
 
-  }, [studentId, parentMode]);
+  }, [studentId, parentMode, variant]);
 
     /* =============================
       TIMER
@@ -671,7 +682,7 @@
 
     try {
       const endpoint =
-        parentMode === "homework"
+        variant === "homework"
           ? "/api/student/submit-homework-reading"
           : "/api/exams/submit-reading";
 
@@ -764,8 +775,12 @@
       FINISHED VIEW
     ============================= */
     if (finished) {
-      if (loadingReport || !normalizedReport) {
+      if (loadingReport) {
         return <div>Loading your report…</div>;
+      }
+
+      if (!report || !report.overall) {
+        return <div>No report data available</div>;
       }
 
       return (

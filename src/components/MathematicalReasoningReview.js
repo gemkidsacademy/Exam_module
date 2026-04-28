@@ -8,9 +8,12 @@ export default function MathematicalReasoningReview({
   onDateChange,
   onLoaded,
   onExit,
-  mode   // ✅ RECEIVE THIS
+  mode,        // UI state (exam/report/review)
+  variant      // 👈 NEW (actual | homework)
 }) {
   const API_BASE = process.env.REACT_APP_API_URL;
+  //const API_BASE = "http://127.0.0.1:8000";
+
 
   useEffect(() => {
     console.log("🧠 MathematicalReasoningReview MOUNTED");
@@ -20,7 +23,8 @@ export default function MathematicalReasoningReview({
     console.log("🚀 REVIEW useEffect triggered", {
       studentId,
       examId,
-      mode
+      mode,
+      variant
     });
 
     if (!studentId || !examId) {
@@ -31,29 +35,42 @@ export default function MathematicalReasoningReview({
       return;
     }
 
-    const loadReview = async () => {
-      console.log("📡 Calling review API...");
+    const loadReviewForMR = async () => {
+      try {
+        console.log("📡 Calling review API...");
 
-      const endpoint =
-        mode === "homework"
-          ? "/api/student/homework-review/mathematical-reasoning"
-          : "/api/student/exam-review/mathematical-reasoning";
+        const endpoint =
+          variant === "homework"
+            ? "/api/student/homework-review/mathematical-reasoning"
+            : "/api/student/exam-review/mathematical-reasoning";
 
-      const res = await fetch(
-        `${API_BASE}${endpoint}?student_id=${studentId}&exam_id=${examId}`
-      );
+        console.log("🌐 Endpoint:", endpoint);
 
-      console.log("📥 Response received", res.status);
+        const res = await fetch(
+          `${API_BASE}${endpoint}?student_id=${studentId}&exam_id=${examId}`
+        );
 
-      const data = await res.json();
+        console.log("📥 Response received", res.status);
 
-      console.log("📦 REVIEW DATA:", data);
+        if (!res.ok) {
+          throw new Error(`Review fetch failed: ${res.status}`);
+        }
 
-      onLoaded?.(data.questions || []);
+        const data = await res.json();
+
+        console.log("📦 REVIEW DATA:", data);
+
+        onLoaded?.(data.questions || []);
+
+      } catch (err) {
+        console.error("❌ Failed to load MR review", err);
+        onLoaded?.([]);
+      }
     };
 
-    loadReview();
-  }, [studentId, examId, mode, API_BASE, onLoaded]);
+    loadReviewForMR();
+
+  }, [studentId, examId, variant, API_BASE, onLoaded]);
 
   return null;
 }

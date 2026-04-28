@@ -14,6 +14,7 @@ import "./ExamOptionStates_mr.css";
 ============================================================ */
 export default function ExamPageMathematicalReasoning({
   mode: parentMode,
+  variant,  
   studentId,
   onExamStart,
   onExamFinish
@@ -82,7 +83,7 @@ const loadReport = useCallback(async (examId) => {
     if (!examId) return;
 
     const endpoint =
-      parentMode === "homework"
+      variant === "homework"
         ? "/api/student/homework-report/mathematical-reasoning"
         : "/api/student/exam-report/mathematical-reasoning";
 
@@ -104,17 +105,17 @@ const loadReport = useCallback(async (examId) => {
   } catch (err) {
     console.error("❌ loadReport error:", err);
   }
-}, [studentId, parentMode]);
+}, [studentId, variant]);
 
  const loadExamDates = useCallback(async () => {
   try {
     const datesEndpoint =
-      parentMode === "homework"
+      variant === "homework"
         ? "/api/student/homework-dates/mathematical-reasoning"
         : "/api/student/exam-dates/mathematical-reasoning";
 
     const reportEndpoint =
-      parentMode === "homework"
+      variant === "homework"
         ? "/api/student/homework-report/mathematical-reasoning"
         : "/api/student/exam-report/mathematical-reasoning";
 
@@ -155,7 +156,7 @@ const loadReport = useCallback(async (examId) => {
   } catch (err) {
     console.error("❌ loadExamDates error:", err);
   }
-}, [studentId, parentMode]);
+}, [studentId, variant]);
  
 const handleExitReview = () => {
   console.log("🔙 Exit Review clicked (MR)");
@@ -200,6 +201,8 @@ const [answers, setAnswers] = useState({});
 const [visited, setVisited] = useState({});
 const [timeLeft, setTimeLeft] = useState(null);
 const API_BASE = process.env.REACT_APP_API_URL;
+//const API_BASE = "http://127.0.0.1:8000";
+
 
 
 if (!API_BASE) {
@@ -321,13 +324,13 @@ useEffect(() => {
 ============================================================ */
 useEffect(() => {
   if (!studentId) return;
-  if (parentMode !== "exam" && parentMode !== "homework") return;
+  if (parentMode !== "exam") return;
   if (mode !== "loading") return;
 
   const startExam = async () => {
     try {
       const endpoint =
-        parentMode === "homework"
+        variant === "homework"
           ? "/api/student/start-homework-mr"
           : "/api/student/start-exam";
 
@@ -388,7 +391,7 @@ useEffect(() => {
 
   startExam();
 
-}, [studentId, parentMode]);
+}, [studentId, parentMode, variant]);
  
 /* ============================================================
    MARK VISITED QUESTIONS
@@ -430,7 +433,7 @@ const finishExam = useCallback(
 
     try {
       const endpoint =
-        parentMode === "homework"
+        variant === "homework"
           ? "/api/student/finish-homework-math-reasoning"
           : "/api/student/finish-exam";
 
@@ -457,7 +460,7 @@ const finishExam = useCallback(
       console.error("❌ finish error:", err);
     }
   },
-  [studentId, answers, parentMode, loadExamDates]
+   [studentId, answers, variant, loadExamDates]
 );
 
 /* ============================================================
@@ -606,6 +609,7 @@ return (
       onLoaded={handleReviewLoaded}
       onExit={handleExitReview}
       mode={parentMode}
+      variant={variant}
     />
 
     {reviewQuestions.length === 0 && (
