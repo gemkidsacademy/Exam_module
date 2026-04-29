@@ -25,7 +25,7 @@ export default function NaplanLanguageConventionsReview({
     const loadReview = async () => {
       try {
         const reviewUrl =
-          mode === "homework"
+          mode?.includes("homework")
             ? `${API_BASE}/api/student/exam-review/naplan-language-conventions-homework?student_id=${studentId}&exam_id=${examId}`
             : `${API_BASE}/api/student/exam-review/naplan-language-conventions?student_id=${studentId}&exam_id=${examId}`;
 

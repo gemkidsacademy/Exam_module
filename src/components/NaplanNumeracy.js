@@ -49,6 +49,8 @@ mode: parentMode // 🔥 THIS
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentQ = questions[currentIndex];
+  console.log("MODE →", mode);
+  
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
   const [timeLeft, setTimeLeft] = useState(null);
@@ -267,7 +269,7 @@ if (!studentId) return;
 if (mode !== "loading") return;
 
 // Report mode takes priority
-if (parentMode === "actual") {
+if (parentMode?.startsWith("report")) {
   setMode("report");
   return;
 }
@@ -395,6 +397,7 @@ const startExam = async () => {
   });
 
   const data = await res.json();
+  console.log("START EXAM RESPONSE →", data);
 
   if (data.completed === true) {
     await loadExamDates();
@@ -402,7 +405,12 @@ const startExam = async () => {
     return;
   }
 
-  setQuestions(data.questions || []);
+  const qs =
+    data.questions ||
+    data.data?.questions ||
+    [];
+
+  setQuestions(qs);
   setTimeLeft(data.remaining_time);
   onExamStart?.();
 };
@@ -431,45 +439,51 @@ onExamStart
   ============================================================ */
   
   const finishExam = useCallback(async () => {
-if (hasSubmittedRef.current) return;
+  if (hasSubmittedRef.current) return;
 
-hasSubmittedRef.current = true;
+  hasSubmittedRef.current = true;
 
-setMode("submitting");
+  setMode("submitting");
 
-try {
-const finishUrl =
-  parentMode === "homework"
-    ? `${API_BASE}/api/student/finish-homework-exam/naplan-numeracy`
-    : `${API_BASE}/api/student/finish-exam/naplan-numeracy`;
+  try {
+    const finishUrl =
+      parentMode === "homework"
+        ? `${API_BASE}/api/student/finish-homework-exam/naplan-numeracy`
+        : `${API_BASE}/api/student/finish-exam/naplan-numeracy`;
 
-await fetch(finishUrl, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    student_id: studentId,
-    answers
-  })
-});
+    await fetch(finishUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        student_id: studentId,
+        answers
+      })
+    });
 
-await loadExamDates();
+    await loadExamDates();
+    // 🔥 Immediately select latest exam
+    if (examDates?.length > 0) {
+      setSelectedExamId(examDates[0].exam_id);
+    }
+    // 🔥 THIS LINE FIXES YOUR ISSUE
+    setMode("report");
 
-onExamFinish?.();
+    onExamFinish?.();
 
-} catch (err) {
-console.error("Finish exam failed", err);
-}
+  } catch (err) {
+    console.error("Finish exam failed", err);
+  }
 
 }, [
-API_BASE,
-studentId,
-answers,
-parentMode,
-loadExamDates,
-onExamFinish
-]);    
+  API_BASE,
+  studentId,
+  answers,
+  parentMode,
+  loadExamDates,
+  onExamFinish
+]); 
   /* ============================================================
     TIMER
   ============================================================ */
@@ -609,7 +623,7 @@ try {
   /* ============================================================
     EXAM UI
   ============================================================ */
-  if (mode === "review") {
+  if (mode === "exam" || mode === "review") {
     
     
 return (
@@ -778,7 +792,11 @@ return (
 
               if (block.type === "text") {
                 return (
-                  <p key={idx} className="question-text">
+                  <p
+                    key={idx}
+                    className="question-text"
+                    style={{ color: "black", fontSize: "18px" }}
+                  >
                     {block.content}
                   </p>
                 );
