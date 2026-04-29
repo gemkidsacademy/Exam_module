@@ -150,7 +150,7 @@
   const loadReport = useCallback(async (attemptId = null) => {
   try {
     const endpoint =
-      parentMode === "homework"
+      parentMode?.includes("homework")
         ? "/api/student/homework-report/oc-mathematical-reasoning"
         : "/api/student/exam-report/oc-mathematical-reasoning";
 
@@ -180,8 +180,9 @@
   useEffect(() => {
   if (!studentId) return;
 
-  if (parentMode === "report") {
-    setMode("report");   // 🔥 CRITICAL
+  if (parentMode?.startsWith("report")) {
+    setMode("report");   // 🔥 THIS WAS MISSING
+    loadReport();
   }
 
 }, [studentId, parentMode]);
@@ -299,7 +300,7 @@
 
   // 🔥 ONLY run exam if explicitly told
     // 🔥 HARD BLOCK FIRST
-  if (parentMode === "report") return;
+  if (parentMode?.startsWith("report")) return;
   
   // ✅ Allow BOTH exam + homework
   if (parentMode !== "exam" && parentMode !== "homework") return;

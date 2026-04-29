@@ -40,6 +40,8 @@ const OCDashboard = () => {
   const [examPhase, setExamPhase] = useState("mode_selection");
   const [examMode, setExamMode] = useState(null);
   const studentId = sessionStorage.getItem("student_id");
+  const [availabilityLoading, setAvailabilityLoading] = useState(true);
+  const API_BASE = process.env.REACT_APP_API_URL;
   const [subjectAvailability, setSubjectAvailability] = useState({});
   const ActiveComponent = activeSubject?.component;
 
@@ -51,7 +53,7 @@ const OCDashboard = () => {
 
   setActiveSubject(subject);
 
-  if (examMode === "report") {
+  if (examMode?.startsWith("report")) {
     setExamPhase("exam"); // skip welcome/instructions
   } else {
     setExamPhase("welcome");
@@ -59,8 +61,17 @@ const OCDashboard = () => {
 };
 useEffect(() => {
   if (examPhase === "selection" && studentId && examMode) {
+    const normalizedMode =
+      examMode?.includes("homework")
+        ? "homework"
+        : examMode?.includes("report")
+        ? "report"
+        : "exam";
+
+    setAvailabilityLoading(true);
+
     fetch(
-      `https://web-production-481a5.up.railway.app/api/student/oc-available-subjects?mode=${examMode}&student_id=${studentId}`
+      `${API_BASE}/api/student/oc-available-subjects?mode=${normalizedMode}&student_id=${studentId}`
     )
       .then(async (res) => {
         if (!res.ok) {
@@ -76,6 +87,9 @@ useEffect(() => {
       })
       .catch((err) => {
         console.error("❌ Failed to fetch OC availability", err);
+      })
+      .finally(() => {
+        setAvailabilityLoading(false); // 🔥 THIS WAS MISSING
       });
   }
 }, [examPhase, examMode, studentId]);
@@ -116,7 +130,7 @@ useEffect(() => {
               onClick={() => {
                 setExamMode("report");
                 setSubjectAvailability({});
-                setExamPhase("selection");
+                setExamPhase("report_mode_selection");
               }}
             >
               Historical reports
@@ -136,6 +150,48 @@ useEffect(() => {
         </div>
       </div>
     )}
+    {examPhase === "report_mode_selection" && (
+  <div className="subject-selection-wrapper">
+
+    <img
+      src="https://gemkidsacademy.com.au/wp-content/uploads/2024/10/cropped-logo-4-1.png"
+      alt="Gem Kids Academy"
+      className="dashboard-logo"
+    />
+
+    <div className="subject-selection-card">
+      <h1 className="dashboard-title">
+        Select Report Type
+      </h1>
+
+      <div className="title-divider" />
+
+      <div className="subject-buttons">
+
+        <button
+          className="subject-button"
+          onClick={() => {
+            setExamMode("report_actual");
+            setExamPhase("selection");
+          }}
+        >
+          Actual exams
+        </button>
+
+        <button
+          className="subject-button"
+          onClick={() => {
+            setExamMode("report_homework");
+            setExamPhase("selection");
+          }}
+        >
+          Homework exams
+        </button>
+
+      </div>
+    </div>
+  </div>
+)}
       {/* 1️⃣ SUBJECT SELECTION */}
       {examPhase === "selection" && (
         <div className="subject-selection-wrapper">
@@ -159,13 +215,15 @@ useEffect(() => {
                 const subjectData = subjectAvailability[subject.key];
 
                 const isEnabled =
-                  examMode === "report"
-                    ? true   // ✅ always enabled for reports
-                    : subjectData !== undefined
+                  availabilityLoading
+                    ? false
+                    : examMode?.startsWith("report")
+                    ? true
+                    : subjectData
                     ? examMode === "exam"
-                      ? subjectData.exam
-                      : subjectData.homework
-                    : true;
+                      ? subjectData.exam === true
+                      : subjectData.homework === true
+                    : false;
 
                 return (
                   <button

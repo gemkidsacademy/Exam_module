@@ -284,7 +284,7 @@ useEffect(() => {
   if (mode !== "loading") return;
 
   // 🟣 REPORT MODE
-  if (parentMode === "report") {
+  if (parentMode?.startsWith("report")) {
     loadReport();
     return;
   }

@@ -36,7 +36,7 @@ export default function ReadingComponentOC({
   const [attemptId, setAttemptId] = useState(null);
   const [mode, setMode] = useState("loading");
   const [reviewQuestions, setReviewQuestions] = useState([]);
-  const isHomework = parentMode === "homework";
+  const isHomework = parentMode?.includes("homework");
 
   const START_ENDPOINT = isHomework
     ? "/api/exams/start-oc-reading-homework"
@@ -250,7 +250,7 @@ export default function ReadingComponentOC({
   useEffect(() => {
   if (!studentId) return;
 
-  if (parentMode === "report") {
+  if (parentMode?.startsWith("report")) {
     const goToReport = async () => {
       setMode("report");
 
@@ -306,7 +306,7 @@ export default function ReadingComponentOC({
   useEffect(() => {
   if (!studentId) return;
   // 🔥 HARD BLOCK REPORT
-  if (parentMode === "report") return;
+  if (parentMode?.startsWith("report")) return;
 
 // 🔥 ONLY EXAM MODE
   if (parentMode !== "exam" && parentMode !== "homework") return;
@@ -491,7 +491,7 @@ console.log("✅ FLATTENED QUESTIONS COUNT:", flatQuestions.length);
   };
 }, [mode, index, showSubmitConfirm, questions.length]);
 useEffect(() => {
-  if (mode !== "exam" || parentMode === "report") return;
+  if (mode !== "exam" || parentMode?.startsWith("report")) return;
 
   const handleBeforeUnload = (e) => {
     e.preventDefault();
