@@ -228,6 +228,8 @@ const loadReport = useCallback(async (attemptId = null) => {
 
     if (!res.ok) {
       console.warn("⚠️ Report not available yet");
+      setReport(null);      // ✅ explicitly no report
+      setMode("report");    // ✅ EXIT loading state
       return;
     }
 
@@ -240,7 +242,7 @@ const loadReport = useCallback(async (attemptId = null) => {
   } catch (err) {
     console.error("❌ loadReport error:", err);
   }
-}, [studentId, mode]);
+}, [studentId, variant]);
 
 
 useEffect(() => {
@@ -949,9 +951,24 @@ return (
  REPORT COMPONENT
 ============================================================ */
 function ThinkingSkillsReport({ report, onViewExamDetails, attempts, onAttemptChange }) {
-if (!report?.overall) {
-  return <p className="loading">Generating your report…</p>;
-}
+  // 🔴 NO REPORT EXISTS (never attempted)
+  if (!report) {
+    return (
+      <div className="empty-state">
+        <h3>No reports available yet</h3>
+        <p>
+          You haven’t attempted any exams yet.
+          <br />
+          Complete an exam to see your performance here.
+        </p>
+      </div>
+    );
+  }
+
+  // 🟡 REPORT EXISTS BUT STILL PROCESSING (rare case)
+  if (!report.overall) {
+    return <p className="loading">Generating your report…</p>;
+  }
 
 const {
   overall,

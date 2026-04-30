@@ -779,9 +779,24 @@
         return <div>Loading your report…</div>;
       }
 
-      if (!report || !report.overall) {
-        return <div>No report data available</div>;
-      }
+      // 🔴 NO REPORT EXISTS
+    if (!report) {
+      return (
+        <div className="empty-state">
+          <h3>No reports available yet</h3>
+          <p>
+            You haven’t attempted any exams yet.
+            <br />
+            Complete an exam to see your performance here.
+          </p>
+        </div>
+      );
+    }
+
+    // 🟡 REPORT EXISTS BUT INVALID / PROCESSING
+    if (!report.overall) {
+      return <div className="loading">Generating your report…</div>;
+    }
 
       return (
             <div

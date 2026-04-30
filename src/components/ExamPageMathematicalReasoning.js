@@ -152,6 +152,7 @@ const loadReport = useCallback(async (examId) => {
     // ❗ No reports found
     console.warn("⚠️ No valid reports available yet");
     setReport(null);
+    setMode("report"); 
 
   } catch (err) {
     console.error("❌ loadExamDates error:", err);
@@ -898,6 +899,19 @@ function MathematicalReasoningReport({
   onDateChange,
   onViewExamDetails
 }) {
+  // 🔴 NO REPORT CASE
+  if (!report) {
+    return (
+      <div className="empty-state">
+        <h3>No reports available yet</h3>
+        <p>
+          You haven’t attempted any exams yet.
+          <br />
+          Once you complete an exam, your performance report will appear here.
+        </p>
+      </div>
+    );
+  }
   if (!report?.overall) {
     return <p className="loading">Generating your report…</p>;
   }

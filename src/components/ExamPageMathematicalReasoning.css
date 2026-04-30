@@ -312,3 +312,22 @@ body {
   font-weight: 600;
   min-width: 24px; /* keeps alignment neat */
 }
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  text-align: center;
+  color: #374151;
+}
+
+.empty-state h3 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  font-size: 16px;
+  color: #6b7280;
+}
