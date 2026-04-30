@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./SelectiveDashboard.css";
 import { useLocation } from "react-router-dom";
+
 // EXAM COMPONENTS (UNCHANGED)
 import ExamPageThinkingSkills from "./ExamPageThinkingSkills";
 import ExamPageMathematicalReasoning from "./ExamPageMathematicalReasoning";
@@ -40,6 +41,7 @@ const SUBJECTS = [
 ];
 
 const SelectiveDashboard = () => {
+  const BACKEND_URL = process.env.REACT_APP_API_URL;
   const [activeSubject, setActiveSubject] = useState(null);
   const [examInProgress, setExamInProgress] = useState(false);
   const [examPhase, setExamPhase] = useState("mode_selection");
@@ -91,7 +93,7 @@ useEffect(() => {
 
 useEffect(() => {
   if (examPhase === "selection" && studentId && examMode) {
-    fetch(`https://web-production-481a5.up.railway.app/api/student/available-subjects?mode=${examMode}&student_id=${studentId}`)
+    fetch(`${BACKEND_URL}/api/student/available-subjects?mode=${examMode}&student_id=${studentId}`)
       .then(async (res) => {
         if (!res.ok) {
           const text = await res.text();
