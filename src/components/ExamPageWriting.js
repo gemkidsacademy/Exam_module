@@ -508,109 +508,126 @@
 
   return (
     <div
+  style={{
+    position: "fixed",
+    inset: 0,
+    overflowY: "auto",
+    background: "#f9fafb"
+  }}
+>
+  <div
+    style={{
+      maxWidth: "900px",
+      margin: "0 auto",
+      padding: "24px",
+      boxSizing: "border-box"
+    }}
+  >
+    <h1>Writing Report</h1>
+
+    <select
+      value={selectedAttempt || ""}
+      onChange={(e) => {
+        const id = e.target.value;
+        setSelectedAttempt(id);
+
+        if (id) {
+          loadResultByAttempt(id);
+        }
+      }}
       style={{
-        minHeight: "100vh",
-        background: "#f9fafb",
-        padding: "32px",
-        boxSizing: "border-box"
+        padding: "8px",
+        marginBottom: "16px",
+        borderRadius: "6px"
       }}
     >
-      <h1>Writing Report</h1>
-      <select
-        value={selectedAttempt || ""}
-        onChange={(e) => {
-          const id = e.target.value;
-          setSelectedAttempt(id);
+      {history.map(item => (
+        <option key={item.attempt_id} value={item.attempt_id}>
+          {item.date} — Score: {item.score}
+        </option>
+      ))}
+    </select>
 
-          if (id) {
-            loadResultByAttempt(id);
-          }
+    <p>
+      <strong>Selective Readiness:</strong>{" "}
+      <span className="status">
+        {result.selective_readiness_band}
+      </span>
+    </p>
+
+    <div style={{ marginTop: "12px" }}>
+      <button
+        disabled={!attemptId}
+        onClick={() => {
+          console.log(
+            "👉 navigating to:",
+            `/writing-review/${attemptId}?variant=${variant}`
+          );
+          navigate(`/writing-review/${attemptId}?variant=${variant}`);
         }}
         style={{
-          padding: "8px",
-          marginBottom: "16px",
-          borderRadius: "6px"
+          backgroundColor: "#2E7D32",
+          color: "white",
+          padding: "10px 14px",
+          borderRadius: "8px",
+          border: "none",
+          cursor: "pointer",
+          fontWeight: 600
         }}
       >
-        {history.map(item => (
-          <option key={item.attempt_id} value={item.attempt_id}>
-            {item.date} — Score: {item.score}
-          </option>
-        ))}
-      </select>
+        Review Your Writing
+      </button>
+    </div>
 
-      <p>
-        <strong>Selective Readiness:</strong>{" "}
-        <span className="status">
-          {result.selective_readiness_band}
-        </span>
-      </p>
-      <div style={{ marginTop: "12px" }}>
-        
-        <button
-          disabled={!attemptId}
-          onClick={() => {
-            
-            console.log("👉 navigating to:", `/writing-review/${attemptId}?variant=${variant}`);
-            navigate(`/writing-review/${attemptId}?variant=${variant}`);
-          }}
-          style={{
-            backgroundColor: "#2E7D32",
-            color: "white",
-            padding: "10px 14px",
-            borderRadius: "8px",
-            border: "none",
-            cursor: "pointer",
-            fontWeight: 600
-          }}
-        >
-          Review Your Writing
-        </button>
+    <p className="scale-note">
+      Scoring is based on NSW Selective criteria (25 marks total).
+    </p>
+
+    <div className="score-bar">
+      <span>
+        Writing Score: {result.score} / 25
+      </span>
+
+      <div className="score-progress">
+        <div
+          className="score-progress-fill"
+          style={{ width: `${(result.score / 25) * 100}%` }}
+        />
       </div>
-      <p className="scale-note">
-        Scoring is based on NSW Selective criteria (25 marks total).
-      </p>
-      
+    </div>
 
-      <div className="score-bar">
-        <span>
-          Writing Score: {result.score} / 25
-        </span>
-      
-        <div className="score-progress">
-          <div
-            className="score-progress-fill"
-            style={{ width: `${(result.score / 25) * 100}%` }}
-          />
-        </div>
-      </div>
+    <p className="advisory-text">{result.advisory}</p>
+    <div style={{ marginTop: "24px" }}>
+  <h2>Your Writing</h2>
 
+  <div
+    style={{
+      background: "#ffffff",
+      padding: "16px",
+      borderRadius: "8px",
+      border: "1px solid #e5e7eb",
+      whiteSpace: "pre-wrap",
+      lineHeight: "1.6",
+      marginTop: "8px"
+    }}
+  >
+    {result?.answer_text || "No response found"}
+  </div>
+</div>
+    {evalData && (
+      <div className="ai-report">
+        <h2>Category Evaluation</h2>
 
-
-      <p className="advisory-text">{result.advisory}</p>
-
-      {/* ---------- AI EVALUATION ---------- */}
-      {evalData && (
-        <div className="ai-report">
-
-          
-
-
-
-          <h2>Category Evaluation</h2>
-
-          {evalData?.categories &&
-              Object.entries(evalData.categories).map(([key, data]) => (
-              <section key={key}>
+        {evalData?.categories &&
+          Object.entries(evalData.categories).map(([key, data]) => (
+            <section key={key}>
               <h3>{CATEGORY_LABELS[key]}</h3>
 
               <p>{data.score} / 5</p>
-          
-              <p className="section-label">Strengths</p>
-              
-          
-              <p className="section-label">Improvements Needed</p>
 
+              <p className="section-label">Strengths</p>
+
+              <p className="section-label">Improvements Needed</p>
 
               {data.improvements && data.improvements.length > 0 ? (
                 <ul>
@@ -621,21 +638,15 @@
               ) : (
                 <p className="na-text">N/A</p>
               )}
-
             </section>
           ))}
 
-
-          
-
-          <h2>Teacher Feedback</h2>
-          <p>{evalData.teacher_feedback}</p>
-
-        </div>
-      )}
-    
-
-    </div>
+        <h2>Teacher Feedback</h2>
+        <p>{evalData.teacher_feedback}</p>
+      </div>
+    )}
+  </div>
+</div>
   );
 }
 
@@ -726,9 +737,9 @@
       value={answerText}
       disabled={submitting || timeLeft === 0}
       onChange={(e) => setAnswerText(e.target.value)}
-      onPaste={(e) => e.preventDefault()}
-      onCopy={(e) => e.preventDefault()}
-      onCut={(e) => e.preventDefault()}
+      //onPaste={(e) => e.preventDefault()}
+      //onCopy={(e) => e.preventDefault()}
+      //onCut={(e) => e.preventDefault()}
       onContextMenu={(e) => e.preventDefault()}
     />
 

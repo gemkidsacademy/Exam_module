@@ -65,7 +65,7 @@ export default function WritingReview() {
     .then(data => {
       console.log("🧪 Essay response:", data);  // ADD
 
-      setEssay(data.essay_text || "");
+      setEssay(data.answer_text || "");
       setLoading(false);
     })
     .catch(() => setLoading(false));
