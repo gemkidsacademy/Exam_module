@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./QuizSetup.css";
-const BACKEND_URL = "https://web-production-481a5.up.railway.app";
-//const BACKEND_URL = "http://127.0.0.1:8000";
 
+const BACKEND_URL = process.env.REACT_APP_API_URL;
 
 export default function QuizSetup_oc_reading() {
   const [quiz, setQuiz] = useState({
     className: "oc",
     subject: "reading_comprehension",
-    difficulty: "",
-    classYear: "", 
+    classYear: "",
     numTopics: 1,
     topics: [],
   });
@@ -89,6 +87,8 @@ export default function QuizSetup_oc_reading() {
 
     const topicsArray = Array.from({ length: num }, () => ({
       name: "",
+      difficulty: "",
+      available_difficulties: [],
       num_questions: 0,
     }));
 
@@ -96,30 +96,51 @@ export default function QuizSetup_oc_reading() {
     setTotalQuestions(0);
   };
 
-  const handleTopicSelect_oc = (index, value) => {
+  const handleTopicSelect_oc = async (index, value) => {
+  try {
+    // Step 1: update topic basic state
     setQuiz((prev) => {
       const topics = [...prev.topics];
-      topics[index].name = value;
 
-      if (FIXED_TOPIC_QUESTION_RULES_OC[value] !== undefined) {
-        topics[index].num_questions =
-          FIXED_TOPIC_QUESTION_RULES_OC[value];
-      }
+      topics[index] = {
+        ...topics[index],
+        name: value,
+        difficulty: "",
+        available_difficulties: [],
+        num_questions: 0,
+      };
 
-      if (CHOICE_TOPIC_QUESTION_RULES_OC[value]) {
-        topics[index].num_questions =
-          CHOICE_TOPIC_QUESTION_RULES_OC[value][0];
-      }
-
-      const total = topics.reduce(
-        (sum, t) => sum + (Number(t.num_questions) || 0),
-        0
-      );
-
-      setTotalQuestions(total);
       return { ...prev, topics };
     });
-  };
+
+    // Step 2: fetch difficulties from backend
+    const params = new URLSearchParams({
+      class_year: quiz.classYear,
+      topic: value,
+    });
+
+    const res = await fetch(
+      `${BACKEND_URL}/api/reading-oc/topic-difficulties?${params}`
+    );
+
+    const data = await res.json();
+
+    // Step 3: update available difficulties
+    setQuiz((prev) => {
+      const topics = [...prev.topics];
+
+      topics[index] = {
+        ...topics[index],
+        available_difficulties: data || [],
+      };
+
+      return { ...prev, topics };
+    });
+
+  } catch (error) {
+    console.error("Error fetching difficulties:", error);
+  }
+};
 
   const handleTopicTotalChange_oc = (index, value) => {
     const numValue = Number(value) || 0;
@@ -143,16 +164,12 @@ export default function QuizSetup_oc_reading() {
   // ---------------------------------------
 
   useEffect(() => {
-    if (!quiz.difficulty) {
-      setAvailableTopics([]);
-      return;
-    }
+    
 
     const fetchTopics_oc = async () => {
       try {
         const params = new URLSearchParams({
-          difficulty: quiz.difficulty,
-          class_name: "oc",
+          class_year: quiz.classYear,
         });
 
         const res = await fetch(
@@ -170,7 +187,7 @@ export default function QuizSetup_oc_reading() {
     };
 
     fetchTopics_oc();
-  }, [quiz.difficulty]);
+  }, [quiz.classYear]);
 
   // ---------------------------------------
   // VIEW QUESTION BANK
@@ -182,9 +199,7 @@ export default function QuizSetup_oc_reading() {
     setShowQuestionBank(true);
 
     const params = new URLSearchParams({
-      subject: quiz.subject,
-      class_name: "oc",
-      class_year: quiz.classYear, // ✅ send selected class year
+      class_year: quiz.classYear,
     });
 
     const res = await fetch(
@@ -210,10 +225,7 @@ export default function QuizSetup_oc_reading() {
   const handleSubmit_oc = async (e) => {
     e.preventDefault();
 
-    if (!quiz.difficulty) {
-      alert("Please select difficulty.");
-      return;
-    }
+    
 
     if (quiz.topics.length === 0) {
       alert("Generate topics first.");
@@ -230,11 +242,12 @@ export default function QuizSetup_oc_reading() {
 
     const payload = {
       class_name: "oc",
-      class_year: quiz.classYear,   // ✅ ADD THIS
+      class_year: quiz.classYear,
       subject: quiz.subject,
-      difficulty: quiz.difficulty,
+      difficulty: "mixed",   // ✅ ADD THIS
       topics: quiz.topics.map((t) => ({
         name: t.name.trim(),
+        difficulty: t.difficulty,
         num_questions: Number(t.num_questions),
       })),
     };
@@ -291,18 +304,7 @@ export default function QuizSetup_oc_reading() {
           <option value="4">Year 4</option>
         </select>
 
-        <label>Difficulty:</label>
-        <select
-          name="difficulty"
-          value={quiz.difficulty}
-          onChange={handleInputChange_oc}
-          required
-        >
-          <option value="">Select</option>
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-        </select>
+        
 
         <label>Number of Topics:</label>
         <input
@@ -319,7 +321,7 @@ export default function QuizSetup_oc_reading() {
         <button
           type="button"
           onClick={handleViewQuestionBank_oc}
-          disabled={!quiz.difficulty}
+          disabled={!quiz.classYear}
         >
           View Question Bank
         </button>
@@ -361,7 +363,58 @@ export default function QuizSetup_oc_reading() {
                     </option>
                   ))}
               </select>
+              <label>Difficulty:</label>
+                <select
+                  value={topic.difficulty || ""}
+                  onChange={(e) => {
+                    const selectedDifficulty = e.target.value;
 
+                    setQuiz((prev) => {
+                      const updatedTopics = [...prev.topics];
+
+                      const topicName = updatedTopics[index].name;
+
+                      let questionCount = 0;
+
+                      if (FIXED_TOPIC_QUESTION_RULES_OC[topicName] !== undefined) {
+                        questionCount = FIXED_TOPIC_QUESTION_RULES_OC[topicName];
+                      } else if (CHOICE_TOPIC_QUESTION_RULES_OC[topicName]) {
+                        questionCount = CHOICE_TOPIC_QUESTION_RULES_OC[topicName][0];
+                      }
+
+                      updatedTopics[index] = {
+                        ...updatedTopics[index],
+                        difficulty: selectedDifficulty,
+                        num_questions: questionCount,
+                      };
+
+                      const total = updatedTopics.reduce(
+                        (sum, t) => sum + (Number(t.num_questions) || 0),
+                        0
+                      );
+
+                      setTotalQuestions(total);
+
+                      const finalTotal = updatedTopics.reduce(
+                        (sum, t) => sum + (Number(t.num_questions) || 0),
+                        0
+                      );
+
+                      setTotalQuestions(finalTotal);
+
+                      return { ...prev, topics: updatedTopics };
+                    });
+                  }}
+                  required
+                  >
+                    <option value="">Select Difficulty</option>
+
+                    {topic.available_difficulties.map((difficultyOption) => (
+                      <option key={difficultyOption} value={difficultyOption}>
+                        {difficultyOption.charAt(0).toUpperCase() + difficultyOption.slice(1)}
+                      </option>
+                    ))}
+                </select>
               {/* Question Input */}
               {CHOICE_TOPIC_QUESTION_RULES_OC[topic.name] ? (
                 <select
@@ -424,6 +477,11 @@ export default function QuizSetup_oc_reading() {
           )}  
 
         <h3>Total Questions: {totalQuestions}</h3>
+        {(totalQuestions < 29 || totalQuestions > 38) && (
+          <div style={{ color: "red", fontWeight: "bold" }}>
+            Total must be between 29 and 38 questions.
+          </div>
+        )}
 
         <button type="submit" disabled={loading}>
           {loading ? "Saving..." : "Create OC Reading Exam"}
@@ -431,10 +489,7 @@ export default function QuizSetup_oc_reading() {
         <button
         type="button"
         onClick={async () => {
-          if (!quiz.difficulty) {
-            alert("Please select difficulty.");
-            return;
-          }
+          
 
           if (!quiz.classYear) {
             alert("Please select class year.");
@@ -446,9 +501,9 @@ export default function QuizSetup_oc_reading() {
             return;
           }
 
-          if (totalQuestions < 25 || totalQuestions > 35) {
+          if (totalQuestions < 29 || totalQuestions > 38) {
             alert(
-              `OC Reading must be between 25 and 35 questions. Current: ${totalQuestions}`
+              `OC Reading must be between 29 and 38 questions. Current: ${totalQuestions}`
             );
             return;
           }
@@ -456,10 +511,11 @@ export default function QuizSetup_oc_reading() {
           const payload = {
             class_name: "oc",
             subject: quiz.subject,
-            difficulty: quiz.difficulty,
-            class_year: quiz.classYear, // ✅ important
+            class_year: quiz.classYear,
+            difficulty: "mixed",   // ✅ REQUIRED
             topics: quiz.topics.map((t) => ({
               name: t.name.trim(),
+              difficulty: t.difficulty,
               num_questions: Number(t.num_questions),
             })),
           };
