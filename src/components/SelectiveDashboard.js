@@ -49,7 +49,7 @@ const SelectiveDashboard = () => {
   const [subjectAvailability, setSubjectAvailability] = useState({});
   const location = useLocation();
   const [reportVariant, setReportVariant] = useState(null);
-  const BACKEND_URL = process.env.REACT_APP_API_URL;
+  
   // phases: selection → welcome → instructions → exam
 
   const studentId = sessionStorage.getItem("student_id");
@@ -226,18 +226,20 @@ useEffect(() => {
               {SUBJECTS.map((subject) => {
                 const subjectData = subjectAvailability[subject.key];
 
-                let isEnabled = true;
+                let isEnabled = false;  // 🔥 default to false
 
-                  if (examMode === "report") {
-                    isEnabled = true;   // ✅ always enabled
-                  } else if (typeof subjectData === "object" && subjectData !== null) {
+                if (examMode === "report") {
+                  isEnabled = true;
+                } else if (subjectAvailability && subjectAvailability[subject.key]) {
+                  const subjectData = subjectAvailability[subject.key];
+
+                  if (examMode === "exam") {
                     isEnabled =
-                      examMode === "exam"
-                        ? subjectData.exam
-                        : subjectData.homework;
-                  } else {
-                    isEnabled = subjectData ?? true;
+                      reportVariant === "homework"
+                        ? subjectData.homework
+                        : subjectData.exam;
                   }
+                }
 
                 return (
                   <button

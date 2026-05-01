@@ -40,13 +40,11 @@ const CLASS_DAY_OPTIONS = [
 ];
 
   useEffect(() => {
-    const fetchNextId = async () => {
-      try {
-        const response = await fetch(
-          `${BACKEND_URL}/get_next_user_id_exam_module`
-        );
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
+  const fetchNextId = async () => {
+    try {
+      const response = await fetch(
+        `${BACKEND_URL}/get_next_user_id_exam_module`
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -59,7 +57,7 @@ const CLASS_DAY_OPTIONS = [
       setId(backendId);
 
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching next user ID:", err);
       alert("Unable to fetch next user ID");
     }
   };

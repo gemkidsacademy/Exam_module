@@ -162,7 +162,24 @@ button:disabled {
 }
 
 .secondary-btn {
-  background: #4b5563;
+  background-color: #6c757d;
+  color: white;
+  cursor: pointer;
+}
+
+.secondary-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.homework-btn {
+  background-color: #28a745;   /* green */
+  color: white;
+  cursor: pointer;
+}
+
+.homework-btn:hover {
+  background-color: #218838;
 }
 
 /* ===============================

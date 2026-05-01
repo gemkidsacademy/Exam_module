@@ -72,7 +72,43 @@
       console.error(err);
     }
   };
-    
+    const handleResetUsedQuestions = async () => {
+  const confirmReset = window.confirm(
+    "Are you sure you want to reset used questions for this class, subject, and year?"
+  );
+
+  if (!confirmReset) return;
+
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/api/admin/reset-used-questions`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          class_name: quiz.className,
+          subject: quiz.subject,
+          class_year: quiz.classYear,
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || "Failed to reset used questions");
+    }
+
+    const data = await res.json();
+    console.log("Reset success:", data);
+
+    alert(`Reset successful! ${data.updated_count} questions updated.`);
+  } catch (err) {
+    console.error(err);
+    alert("Error resetting used questions.");
+  }
+};
     const handleTopicNameChange = (index, value) => {
     setQuiz((prev) => {
       const topics = [...prev.topics];
@@ -437,6 +473,12 @@
               >
                 View Question Bank
               </button>
+              <button
+                type="button"
+                onClick={handleResetUsedQuestions}
+              >
+                Reset Used Questions
+              </button>
 
               <button
                 type="button"
@@ -706,7 +748,7 @@
           </button>
           <button
     type="button"
-    className="secondary-btn"
+    className="homework-btn"
     disabled={totalQuestions > 40}
     onClick={async () => {
     if (!validateQuizBeforeSubmit()) {
