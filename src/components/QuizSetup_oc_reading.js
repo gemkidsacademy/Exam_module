@@ -107,8 +107,17 @@ export default function QuizSetup_oc_reading() {
         name: value,
         difficulty: "",
         available_difficulties: [],
-        num_questions: 0,
+        num_questions:
+          FIXED_TOPIC_QUESTION_RULES_OC[value] !== undefined
+            ? FIXED_TOPIC_QUESTION_RULES_OC[value]
+            : 0,
       };
+      const total = topics.reduce(
+        (sum, t) => sum + (Number(t.num_questions) || 0),
+        0
+      );
+
+      setTotalQuestions(total);
 
       return { ...prev, topics };
     });
@@ -224,6 +233,24 @@ export default function QuizSetup_oc_reading() {
 
   const handleSubmit_oc = async (e) => {
     e.preventDefault();
+    for (let i = 0; i < quiz.topics.length; i++) {
+  const t = quiz.topics[i];
+
+  if (!t.name) {
+    alert(`Please select topic for Topic ${i + 1}`);
+    return;
+  }
+
+  if (!t.difficulty) {
+    alert(`Please select difficulty for Topic ${i + 1}`);
+    return;
+  }
+
+  if (!t.num_questions) {
+    alert(`Please select number of questions for Topic ${i + 1}`);
+    return;
+  }
+}
 
     
 
@@ -233,10 +260,10 @@ export default function QuizSetup_oc_reading() {
     }
 
     // OC RANGE (adjust if needed)
-    if (totalQuestions < 25 || totalQuestions > 35) {
+    if (totalQuestions < 28 || totalQuestions > 38) {
       alert(
-        `OC Reading must be between 25 and 35 questions. Current: ${totalQuestions}`
-      );
+          `OC Reading must be between 28 and 38 questions. Current: ${totalQuestions}`
+        );
       return;
     }
 
@@ -251,6 +278,9 @@ export default function QuizSetup_oc_reading() {
         num_questions: Number(t.num_questions),
       })),
     };
+    console.log("===== OC CONFIG PAYLOAD =====");
+    console.log(JSON.stringify(payload, null, 2));
+    console.log("=============================");
 
     try {
       setLoading(true);
@@ -367,42 +397,17 @@ export default function QuizSetup_oc_reading() {
                 <select
                   value={topic.difficulty || ""}
                   onChange={(e) => {
-                    const selectedDifficulty = e.target.value;
+                    const val = e.target.value;
 
                     setQuiz((prev) => {
-                      const updatedTopics = [...prev.topics];
+                      const topics = [...prev.topics];
 
-                      const topicName = updatedTopics[index].name;
-
-                      let questionCount = 0;
-
-                      if (FIXED_TOPIC_QUESTION_RULES_OC[topicName] !== undefined) {
-                        questionCount = FIXED_TOPIC_QUESTION_RULES_OC[topicName];
-                      } else if (CHOICE_TOPIC_QUESTION_RULES_OC[topicName]) {
-                        questionCount = CHOICE_TOPIC_QUESTION_RULES_OC[topicName][0];
-                      }
-
-                      updatedTopics[index] = {
-                        ...updatedTopics[index],
-                        difficulty: selectedDifficulty,
-                        num_questions: questionCount,
+                      topics[index] = {
+                        ...topics[index],
+                        difficulty: val,
                       };
 
-                      const total = updatedTopics.reduce(
-                        (sum, t) => sum + (Number(t.num_questions) || 0),
-                        0
-                      );
-
-                      setTotalQuestions(total);
-
-                      const finalTotal = updatedTopics.reduce(
-                        (sum, t) => sum + (Number(t.num_questions) || 0),
-                        0
-                      );
-
-                      setTotalQuestions(finalTotal);
-
-                      return { ...prev, topics: updatedTopics };
+                      return { ...prev, topics };
                     });
                   }}
                   required
