@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./generate_exam.css";
 
-const BACKEND_URL = "https://web-production-481a5.up.railway.app";
-//const BACKEND_URL = "http://127.0.0.1:8000";
+
+const BACKEND_URL = process.env.REACT_APP_API_URL;
 
 export default function GenerateExam_thinking_skills() {
   const [loading, setLoading] = useState(false);

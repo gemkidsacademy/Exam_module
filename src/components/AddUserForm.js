@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import "./AddStudentForm.css";
 
 export default function AddStudentForm() {
+  const API_BASE = process.env.REACT_APP_API_URL 
   const [id, setId] = useState(""); // Non-editable ID from backend
   const [studentId, setStudentId] = useState(""); // Editable Student ID entered by admin
   const [name, setName] = useState("");
@@ -39,24 +40,30 @@ const CLASS_DAY_OPTIONS = [
 ];
 
   useEffect(() => {
-    const fetchNextId = async () => {
-      try {
-        const response = await fetch(
-          "https://web-production-481a5.up.railway.app/get_next_user_id_exam_module"
-        );
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
+  const fetchNextId = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE}/get_next_user_id_exam_module`
+      );
 
-        // Assuming backend returns { next_id: "Gem001" }
-        const backendId = data.next_id || data;
-        setId(backendId); // Pre-fill non-editable ID field
-      } catch (err) {
-        console.error(err);
-        alert("Unable to fetch next user ID");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
-    fetchNextId();
-  }, []);
+
+      const data = await response.json();
+
+      // Assuming backend returns { next_id: "Gem001" }
+      const backendId = data.next_id || data;
+      setId(backendId);
+
+    } catch (err) {
+      console.error(err);
+      alert("Unable to fetch next user ID");
+    }
+  };
+
+  fetchNextId();
+}, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,7 +79,7 @@ const CLASS_DAY_OPTIONS = [
 
     try {
       const response = await fetch(
-        "https://web-production-481a5.up.railway.app/add_student_exam_module",
+        `${API_BASE}/add_student_exam_module`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

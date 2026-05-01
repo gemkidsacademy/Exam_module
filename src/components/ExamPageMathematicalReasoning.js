@@ -765,8 +765,16 @@ return (
               </span>
 
               <span>
-                {(opt?.content || opt?.text || "")
-                  .replace(/^[A-E]\)\s*/, "")}
+                {opt?.type === "image" && opt?.src ? (
+                  <img
+                    src={opt.src}
+                    alt={`Option ${optionKey}`}
+                    className="option-image"
+                  />
+                ) : (
+                  (opt?.content || opt?.text || "")
+                    .replace(/^[A-E]\)\s*/, "")
+                )}
               </span>
             </>
           </button>

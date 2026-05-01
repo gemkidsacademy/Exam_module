@@ -47,6 +47,7 @@ const SelectiveDashboard = () => {
   const [subjectAvailability, setSubjectAvailability] = useState({});
   const location = useLocation();
   const [reportVariant, setReportVariant] = useState(null);
+  const BACKEND_URL = process.env.REACT_APP_API_URL;
   // phases: selection → welcome → instructions → exam
 
   const studentId = sessionStorage.getItem("student_id");
@@ -91,7 +92,7 @@ useEffect(() => {
 
 useEffect(() => {
   if (examPhase === "selection" && studentId && examMode) {
-    fetch(`https://web-production-481a5.up.railway.app/api/student/available-subjects?mode=${examMode}&student_id=${studentId}`)
+    fetch(`${BACKEND_URL}/api/student/available-subjects?mode=${examMode}&student_id=${studentId}`)
       .then(async (res) => {
         if (!res.ok) {
           const text = await res.text();
