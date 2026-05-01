@@ -78,46 +78,51 @@ const handleGenerateExam = async () => {
      GENERATE HOMEWORK EXAM
   ------------------------------------------- */
   const handleGenerateHomeworkExam = async () => {
-    if (!selectedYear) {
-      alert("Please select a class year.");
-      return;
-    }
+  if (!selectedYear) {
+    alert("Please select a class year.");
+    return;
+  }
 
-    setLoading(true);
-    setError("");
-    setGeneratedExam(null);
+  const parsedYear = extractYearNumber(selectedYear);
 
-    try {
-      const response = await fetch(
-        `${BACKEND_URL}/generate-new-mr-homework`, // 👈 separate endpoint
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            difficulty: "medium",
-            class_year: selectedYear
-          })
-        }
-      );
+  if (!parsedYear) {
+    setError("Invalid year format");
+    return;
+  }
 
-      const data = await response.json();
-      console.log("Homework response:", data);
+  setLoading(true);
+  setError("");
+  setGeneratedExam(null);
 
-      if (!response.ok) {
-        throw new Error(data?.detail || "Failed to generate homework exam");
+  try {
+    const response = await fetch(
+      `${BACKEND_URL}/generate-new-mr-homework`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          class_year: parsedYear   // ✅ FIXED
+        })
       }
+    );
 
-      setGeneratedExam(data);
-      alert("✅ Homework exam generated!");
+    const data = await response.json();
+    console.log("Homework response:", data);
 
-    } catch (err) {
-      console.error("Homework generation failed:", err);
-      setError(err.message || "Unexpected error occurred");
-    } finally {
-      setLoading(false);
+    if (!response.ok) {
+      throw new Error(data?.detail || "Failed to generate homework exam");
     }
-  };
 
+    setGeneratedExam(data);
+    alert("✅ Homework exam generated!");
+
+  } catch (err) {
+    console.error("Homework generation failed:", err);
+    setError(err.message || "Unexpected error occurred");
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="generate-exam-container">
       <h2>Generate Mathematical Reasoning Exam</h2>

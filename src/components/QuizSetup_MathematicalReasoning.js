@@ -11,6 +11,31 @@
     const [showQuestionBank, setShowQuestionBank] = useState(false);
     const [qbLoading, setQbLoading] = useState(false);
     const [availableCounts, setAvailableCounts] = useState({});
+    const toggleDifficulty = (index, level) => {
+  setQuiz((prev) => {
+    const topics = [...prev.topics];
+    const currentTopic = topics[index];
+    const currentLevel = currentTopic[level];
+
+    const newEnabled = !currentLevel.enabled;
+
+    topics[index] = {
+      ...currentTopic,
+      [level]: {
+        ...currentLevel,
+        enabled: newEnabled,
+        ai: newEnabled ? currentLevel.ai : 0,
+        db: newEnabled ? currentLevel.db : 0
+      }
+    };
+
+    if (newEnabled && currentTopic.name) {
+      fetchQuestionCounts(currentTopic.name);
+    }
+
+    return { ...prev, topics };
+  });
+};
 
     const [quiz, setQuiz] = useState({
       className: "selective",
@@ -32,61 +57,103 @@
     /* ============================
        HANDLERS
     ============================ */
-    
-    const toggleDifficulty = (index, level) => {
-  setQuiz((prev) => {
-    const topics = prev.topics.map((t, i) => {
-      if (i !== index) return t;
+    const handleResetUsedQuestions_MR = async () => {
+  const confirmReset = window.confirm("Reset used questions?");
+  if (!confirmReset) return;
 
-      const enabled = !t[level].enabled;
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/api/admin/reset-used-questions`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          class_name: quiz.className,
+          subject: quiz.subject,
+          class_year: quiz.classYear,
+        }),
+      }
+    );
 
-      return {
-        ...t,
-        [level]: {
-          ...t[level],
-          enabled,
-          ai: enabled ? t[level].ai : 0,
-          db: enabled ? t[level].db : 0
-        }
-      };
-    });
+    if (!res.ok) throw new Error("Failed");
 
-    return { ...prev, topics };
-  });
+    const data = await res.json();
+    alert(`Reset successful! ${data.updated_count} updated.`);
+  } catch (err) {
+    console.error(err);
+    alert("Error resetting.");
+  }
 };
-    const fetchQuestionCounts = async (topicName) => {
-  const params = new URLSearchParams({
-    topic: topicName,
-    class_year: quiz.classYear,
-    class_name: quiz.className,
-    subject: quiz.subject
-  });
-
-  const res = await fetch(
-    `${BACKEND_URL}/api/question-count?${params.toString()}`
-  );
-
-  const data = await res.json();
-
-  setAvailableCounts(prev => ({
-    ...prev,
-    [topicName]: data
-  }));
-};
-    const handleHomeworkSubmit = async (e) => {
-  e.preventDefault();
+    const validateQuizBeforeSubmit_MR = () => {
+      if (quiz.topics.length === 0) {
+        alert("Please generate at least one topic.");
+        return false;
+      }
+      if (!quiz.className || !quiz.subject || !quiz.classYear) {
+        alert("Please select class, subject, and year.");
+        return false;
+      }
 
   
 
-  if (quiz.topics.length === 0) {
-    alert("Please generate at least one topic.");
-    return;
+  for (const topic of quiz.topics) {
+    const hasDifficulty =
+      topic.easy.enabled ||
+      topic.medium.enabled ||
+      topic.hard.enabled;
+
+    if (!hasDifficulty) {
+      alert(`Select at least one difficulty for topic: ${topic.name || "Unnamed"}`);
+      return false;
+    }
   }
 
   if (totalQuestions !== 35) {
     alert("Total questions must be 35.");
-    return;
+    return false;
   }
+
+  return true;
+};
+    
+    
+    const fetchQuestionCounts = async (topicName) => {
+  try {
+    const params = new URLSearchParams({
+      topic: topicName,
+      class_year: quiz.classYear,
+      class_name: quiz.className,
+      subject: quiz.subject
+    });
+
+    const response = await fetch(
+      `${BACKEND_URL}/api/question-count?${params.toString()}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch counts (status: ${response.status})`);
+    }
+
+    const data = await response.json();
+
+    setAvailableCounts((prevCounts) => ({
+      ...prevCounts,
+      [topicName]: data
+    }));
+
+  } catch (error) {
+    console.error("Error fetching question counts:", error);
+  }
+};
+    const handleHomeworkSubmit = async (e) => {
+      if (!validateQuizBeforeSubmit_MR()) return;
+  e.preventDefault();
+
+  
+
+  
+
+  
 
   const payload = {
     class_name: quiz.className,
@@ -96,10 +163,22 @@
     num_topics: quiz.topics.length,
     topics: quiz.topics.map((t) => ({
       name: t.name.trim(),
-      easy: t.easy,
-      medium: t.medium,
-      hard: t.hard,
-      total: t.total
+      easy: {
+        enabled: t.easy.enabled,
+        ai: Number(t.easy.ai),
+        db: Number(t.easy.db)
+      },
+      medium: {
+        enabled: t.medium.enabled,
+        ai: Number(t.medium.ai),
+        db: Number(t.medium.db)
+      },
+      hard: {
+        enabled: t.hard.enabled,
+        ai: Number(t.hard.ai),
+        db: Number(t.hard.db)
+      },
+      total: Number(t.total)
     })),
   };
 
@@ -324,19 +403,14 @@ fetchTopics();
        SUBMIT
     ============================ */
     const handleSubmit = async (e) => {
+      if (!validateQuizBeforeSubmit_MR()) return;
       e.preventDefault();
   
       
   
-      if (quiz.topics.length === 0) {
-        alert("Please generate at least one topic.");
-        return;
-      }
+      
   
-      if (totalQuestions !== 35) {
-        alert("Total questions must be 35.");
-        return;
-      }
+      
   
       const payload = {
         class_name: quiz.className,
@@ -345,10 +419,22 @@ fetchTopics();
         num_topics: quiz.topics.length,
         topics: quiz.topics.map((t) => ({
           name: t.name.trim(),
-          easy: t.easy,
-          medium: t.medium,
-          hard: t.hard,
-          total: t.total
+          easy: {
+            enabled: t.easy.enabled,
+            ai: Number(t.easy.ai),
+            db: Number(t.easy.db)
+          },
+          medium: {
+            enabled: t.medium.enabled,
+            ai: Number(t.medium.ai),
+            db: Number(t.medium.db)
+          },
+          hard: {
+            enabled: t.hard.enabled,
+            ai: Number(t.hard.ai),
+            db: Number(t.hard.db)
+          },
+          total: Number(t.total)
         })),
       };
   
@@ -423,6 +509,9 @@ fetchTopics();
             style={{ marginLeft: "10px" }}
           >
             View Question Bank
+          </button>
+          <button type="button" onClick={handleResetUsedQuestions_MR}>
+            Reset Used Questions
           </button>
           <button
             type="button"
@@ -626,16 +715,21 @@ fetchTopics();
               </div>
             ))}
           </div>
-  
-          {/* TOTAL */}
-          <div className="total-section">
-            <h3>Total Questions: {totalQuestions}</h3>
-            {totalQuestions > 40 && (
-              <div className="warning">Total cannot exceed 40!</div>
+          <div className="summary-box">
+            <div>Total Questions: {totalQuestions} / 35</div>
+
+            {totalQuestions === 35 && (
+              <div className="ready-text">✔ Ready to Create Exam</div>
+            )}
+
+            {totalQuestions > 35 && (
+              <div className="warning">Total cannot exceed 35!</div>
             )}
           </div>
   
-          <button type="submit" disabled={totalQuestions > 40}>
+          
+  
+          <button type="submit" disabled={totalQuestions !== 35}>
             Create Mathematical Reasoning Exam
           </button>
           
@@ -643,7 +737,7 @@ fetchTopics();
           <button
             type="button"
             onClick={handleHomeworkSubmit}
-            disabled={totalQuestions > 40}
+            disabled={totalQuestions !== 35}
             style={{ marginLeft: "10px", backgroundColor: "#28a745", color: "white" }}
           >
             Create Homework Exam

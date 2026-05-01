@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+const BACKEND_URL = process.env.REACT_APP_API_URL;
 
 export default function GenerateExam_mathematical_reasoning() {
   const [availableClasses, setAvailableClasses] = useState([]);
