@@ -1,20 +1,21 @@
   import React, { useState, useEffect } from "react";
   
   import "./QuizSetup.css";
-  const BACKEND_URL = "https://web-production-481a5.up.railway.app";
-  //const BACKEND_URL = "http://127.0.0.1:8000";
+
+  const BACKEND_URL = process.env.REACT_APP_API_URL;
+
 
   export default function QuizSetup_MathematicalReasoning() {
     const [availableTopics, setAvailableTopics] = useState([]);
     const [questionBank, setQuestionBank] = useState([]);
     const [showQuestionBank, setShowQuestionBank] = useState(false);
     const [qbLoading, setQbLoading] = useState(false);
+    const [availableCounts, setAvailableCounts] = useState({});
 
     const [quiz, setQuiz] = useState({
       className: "selective",
       subject: "mathematical_reasoning",
       classYear: "",   // 👈 ADD THIS
-      difficulty: "",
       numTopics: 1,
       topics: [],
     });
@@ -26,17 +27,56 @@
   
   
     const [totalQuestions, setTotalQuestions] = useState(0);
+    
   
     /* ============================
        HANDLERS
     ============================ */
+    
+    const toggleDifficulty = (index, level) => {
+  setQuiz((prev) => {
+    const topics = prev.topics.map((t, i) => {
+      if (i !== index) return t;
+
+      const enabled = !t[level].enabled;
+
+      return {
+        ...t,
+        [level]: {
+          ...t[level],
+          enabled,
+          ai: enabled ? t[level].ai : 0,
+          db: enabled ? t[level].db : 0
+        }
+      };
+    });
+
+    return { ...prev, topics };
+  });
+};
+    const fetchQuestionCounts = async (topicName) => {
+  const params = new URLSearchParams({
+    topic: topicName,
+    class_year: quiz.classYear,
+    class_name: quiz.className,
+    subject: quiz.subject
+  });
+
+  const res = await fetch(
+    `${BACKEND_URL}/api/question-count?${params.toString()}`
+  );
+
+  const data = await res.json();
+
+  setAvailableCounts(prev => ({
+    ...prev,
+    [topicName]: data
+  }));
+};
     const handleHomeworkSubmit = async (e) => {
   e.preventDefault();
 
-  if (!quiz.difficulty) {
-    alert("Please select difficulty level.");
-    return;
-  }
+  
 
   if (quiz.topics.length === 0) {
     alert("Please generate at least one topic.");
@@ -52,13 +92,14 @@
     class_name: quiz.className,
     subject: quiz.subject,
     class_year: quiz.classYear,
-    difficulty: quiz.difficulty,
+    difficulty: "mixed",
     num_topics: quiz.topics.length,
     topics: quiz.topics.map((t) => ({
       name: t.name.trim(),
-      ai: Number(t.ai),
-      db: Number(t.db),
-      total: Number(t.total),
+      easy: t.easy,
+      medium: t.medium,
+      hard: t.hard,
+      total: t.total
     })),
   };
 
@@ -84,6 +125,40 @@
     console.error(error);
     alert("Error saving homework exam. Please try again.");
   }
+};
+  const handleDifficultyChange = (index, level, field, value) => {
+  setQuiz((prev) => {
+    const topics = [...prev.topics];
+    const num = Number(value) || 0;
+
+    const topic = topics[index];
+
+    topics[index] = {
+      ...topic,
+      [level]: {
+        ...topic[level],
+        [field]: num
+      }
+    };
+
+    const t = topics[index];
+
+    // ✅ Recalculate topic total
+    t.total =
+      t.easy.ai + t.easy.db +
+      t.medium.ai + t.medium.db +
+      t.hard.ai + t.hard.db;
+
+    // ✅ Recalculate global total
+    const grandTotal = topics.reduce(
+      (sum, item) => sum + item.total,
+      0
+    );
+
+    setTotalQuestions(grandTotal);
+
+    return { ...prev, topics };
+  });
 };
     const handleDeleteAllQuestions = async () => {
   const confirmed = window.confirm(
@@ -160,46 +235,29 @@
 
     const handleInputChange = (e) => {
       const { name, value } = e.target;
-      setQuiz((prev) => ({ ...prev, [name]: value }));
+
+      setQuiz((prev) => ({
+        ...prev,
+        [name]: name === "classYear" ? Number(value) : value
+      }));
     };
   
     const generateTopics = () => {
       const num = parseInt(quiz.numTopics) || 1;
-  
+
       const topicsArray = Array.from({ length: num }, () => ({
         name: "",
-        ai: 0,
-        db: 0,
-        total: 0,
+        easy: { enabled: false, ai: 0, db: 0 },
+        medium: { enabled: false, ai: 0, db: 0 },
+        hard: { enabled: false, ai: 0, db: 0 },
+        total: 0
       }));
-  
+
       setQuiz((prev) => ({ ...prev, topics: topicsArray }));
       setTotalQuestions(0);
     };
   
-    const handleTopicChange = (index, field, value) => {
-      setQuiz((prev) => {
-        const topics = [...prev.topics];
-        const numValue = Number(value) || 0;
-  
-        topics[index][field] = numValue;
-  
-        const total =
-          Number(topics[index].ai || 0) +
-          Number(topics[index].db || 0);
-  
-        topics[index].total = total;
-        topics[index].warning = total > 35;
-  
-        const globalTotal = topics.reduce(
-          (sum, t) => sum + (Number(t.total) || 0),
-          0
-        );
-  
-        setTotalQuestions(globalTotal);
-        return { ...prev, topics };
-      });
-    };
+    
   
     const handleTopicNameChange = (index, value) => {
       setQuiz((prev) => {
@@ -207,10 +265,14 @@
         topics[index].name = value;
         return { ...prev, topics };
       });
+
+      if (value) {
+        fetchQuestionCounts(value);
+      }
     };
     useEffect(() => {
     // Do not fetch until difficulty is selected
-    if (!quiz.difficulty || !quiz.classYear) {
+    if (!quiz.classYear) {
       setAvailableTopics([]);
       return;
     }
@@ -225,7 +287,7 @@
       classYearValue = match ? Number(match[0]) : null;
     }
 
-    if (!quiz.className || !quiz.subject || !quiz.difficulty || !classYearValue) {
+    if (!quiz.className || !quiz.subject || !classYearValue) {
       setAvailableTopics([]);
       return;
     }
@@ -234,7 +296,7 @@
       class_name: quiz.className,
       subject: quiz.subject,
       class_year: String(classYearValue),   // ✅ NEW
-      difficulty: quiz.difficulty,
+      
     });
 
     const res = await fetch(
@@ -256,7 +318,7 @@
 
 fetchTopics();
 
-}, [quiz.className, quiz.subject, quiz.classYear, quiz.difficulty]);  // ✅ added classYear dependency
+}, [quiz.className, quiz.subject, quiz.classYear]);  // ✅ added classYear dependency
 
     /* ============================
        SUBMIT
@@ -264,10 +326,7 @@ fetchTopics();
     const handleSubmit = async (e) => {
       e.preventDefault();
   
-      if (!quiz.difficulty) {
-        alert("Please select difficulty level.");
-        return;
-      }
+      
   
       if (quiz.topics.length === 0) {
         alert("Please generate at least one topic.");
@@ -282,14 +341,14 @@ fetchTopics();
       const payload = {
         class_name: quiz.className,
         subject: quiz.subject,
-        difficulty: quiz.difficulty,
         class_year: quiz.classYear,   
         num_topics: quiz.topics.length,
         topics: quiz.topics.map((t) => ({
           name: t.name.trim(),
-          ai: Number(t.ai),
-          db: Number(t.db),
-          total: Number(t.total),
+          easy: t.easy,
+          medium: t.medium,
+          hard: t.hard,
+          total: t.total
         })),
       };
   
@@ -338,24 +397,13 @@ fetchTopics();
             required
           >
             <option value="">Select Year</option>
-            <option value="Year 4">Year 4</option>
-            <option value="Year 5">Year 5</option>
-            <option value="Year 6">Year 6</option>
+            <option value={4}>Year 4</option>
+            <option value={5}>Year 5</option>
+            <option value={6}>Year 6</option>
           </select>
   
           {/* CONFIGURABLE */}
-          <label>Difficulty Level:</label>
-          <select
-            name="difficulty"
-            value={quiz.difficulty}
-            onChange={handleInputChange}
-            required
-          >
-            <option value="">Select Difficulty</option>
-            <option value="Easy">Easy</option>
-            <option value="Medium">Medium</option>
-            <option value="Hard">Hard</option>
-          </select>
+          
   
           <label>Number of Topics:</label>
           <input
@@ -443,27 +491,138 @@ fetchTopics();
   
                 </select>
   
-                <label>AI Questions:</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={topic.ai}
-                  onChange={(e) =>
-                    handleTopicChange(index, "ai", e.target.value)
-                  }
-                  required
-                />
-  
-                <label>DB Questions:</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={topic.db}
-                  onChange={(e) =>
-                    handleTopicChange(index, "db", e.target.value)
-                  }
-                  required
-                />
+                <div className="difficulty-block">
+
+                {/* EASY */}
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={topic.easy.enabled}
+                    onChange={() => toggleDifficulty(index, "easy")}
+                  />
+                  Easy
+                </label>
+
+                {topic.easy.enabled && (
+                  <div className="grid-2">
+                    <div>
+                      <label>AI Questions:</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={topic.easy.ai}
+                        onChange={(e) =>
+                          handleDifficultyChange(index, "easy", "ai", e.target.value)
+                        }
+                      />
+                    </div>
+
+                    <div>
+                      <label>
+                        DB Questions
+                        <div style={{ color: "blue", fontSize: "12px" }}>
+                          Available: {availableCounts[topic.name]?.easy ?? "-"}
+                        </div>
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={topic.easy.db}
+                        onChange={(e) =>
+                          handleDifficultyChange(index, "easy", "db", e.target.value)
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* MEDIUM */}
+                <label style={{ marginTop: "10px" }}>
+                  <input
+                    type="checkbox"
+                    checked={topic.medium.enabled}
+                    onChange={() => toggleDifficulty(index, "medium")}
+                  />
+                  Medium
+                </label>
+
+                {topic.medium.enabled && (
+                  <div className="grid-2">
+                    <div>
+                      <label>AI Questions:</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={topic.medium.ai}
+                        onChange={(e) =>
+                          handleDifficultyChange(index, "medium", "ai", e.target.value)
+                        }
+                      />
+                    </div>
+
+                    <div>
+                      <label>
+                        DB Questions
+                        <div style={{ color: "blue", fontSize: "12px" }}>
+                          Available: {availableCounts[topic.name]?.medium ?? "-"}
+                        </div>
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={topic.medium.db}
+                        onChange={(e) =>
+                          handleDifficultyChange(index, "medium", "db", e.target.value)
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* HARD */}
+                <label style={{ marginTop: "10px" }}>
+                  <input
+                    type="checkbox"
+                    checked={topic.hard.enabled}
+                    onChange={() => toggleDifficulty(index, "hard")}
+                  />
+                  Hard
+                </label>
+
+                {topic.hard.enabled && (
+                  <div className="grid-2">
+                    <div>
+                      <label>AI Questions:</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={topic.hard.ai}
+                        onChange={(e) =>
+                          handleDifficultyChange(index, "hard", "ai", e.target.value)
+                        }
+                      />
+                    </div>
+
+                    <div>
+                      <label>
+                        DB Questions
+                        <div style={{ color: "blue", fontSize: "12px" }}>
+                          Available: {availableCounts[topic.name]?.hard ?? "-"}
+                        </div>
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={topic.hard.db}
+                        onChange={(e) =>
+                          handleDifficultyChange(index, "hard", "db", e.target.value)
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
+
+              </div>
               </div>
             ))}
           </div>

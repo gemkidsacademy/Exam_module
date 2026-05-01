@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./AddStudentForm.css";
-
+const BACKEND_URL = process.env.REACT_APP_API_URL;
 export default function AddStudentForm() {
   const API_BASE = process.env.REACT_APP_API_URL 
   const [id, setId] = useState(""); // Non-editable ID from backend
@@ -40,11 +40,13 @@ const CLASS_DAY_OPTIONS = [
 ];
 
   useEffect(() => {
-  const fetchNextId = async () => {
-    try {
-      const response = await fetch(
-        `${API_BASE}/get_next_user_id_exam_module`
-      );
+    const fetchNextId = async () => {
+      try {
+        const response = await fetch(
+          `${BACKEND_URL}/get_next_user_id_exam_module`
+        );
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

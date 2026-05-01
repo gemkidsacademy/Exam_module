@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./SelectiveDashboard.css";
 import { useLocation } from "react-router-dom";
+
 // EXAM COMPONENTS (UNCHANGED)
 import ExamPageThinkingSkills from "./ExamPageThinkingSkills";
 import ExamPageMathematicalReasoning from "./ExamPageMathematicalReasoning";
@@ -40,6 +41,7 @@ const SUBJECTS = [
 ];
 
 const SelectiveDashboard = () => {
+  const BACKEND_URL = process.env.REACT_APP_API_URL;
   const [activeSubject, setActiveSubject] = useState(null);
   const [examInProgress, setExamInProgress] = useState(false);
   const [examPhase, setExamPhase] = useState("mode_selection");

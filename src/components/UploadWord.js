@@ -10,7 +10,6 @@ export default function UploadWord() {
   const [deletingDuplicates, setDeletingDuplicates] = useState(false);
   
   const BACKEND_URL = process.env.REACT_APP_API_URL;
-  
   // -----------------------------
   // File selection
   // -----------------------------
@@ -30,7 +29,7 @@ export default function UploadWord() {
 
   try {
     const res = await fetch(
-      "BACKEND_URL/delete-duplicate-questions",
+      `${BACKEND_URL}/delete-duplicate-questions`,
       {
         method: "POST",
       }
