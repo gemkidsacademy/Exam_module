@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./QuizSetup.css";
 
-const BACKEND_URL = "https://web-production-481a5.up.railway.app";
-//const BACKEND_URL = "http://127.0.0.1:8000";
+
+const BACKEND_URL = process.env.REACT_APP_API_URL;
 
 
 export default function QuizSetup_reading() {
@@ -10,7 +10,6 @@ export default function QuizSetup_reading() {
     className: "selective",
     classYear: "", // ✅ NEW
     subject: "reading_comprehension",
-    difficulty: "",
     numTopics: 1,
     topics: [],
   });
@@ -37,6 +36,35 @@ export default function QuizSetup_reading() {
   const [questionBank, setQuestionBank] = useState([]);
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
+  const DIFFICULTY_OPTIONS = ["easy", "medium", "hard"];
+  const [difficultyMap, setDifficultyMap] = useState({});
+  const getQuestionCount = (topicName) => {
+  if (topicName === "Main Idea and Summary") return 6;
+  if (topicName === "Gapped Text") return 6;
+
+  if (topicName === "Comparative Analysis") {
+    return 8; // later we can make this dynamic (8 or 10)
+  }
+
+  return 0;
+};
+  const buildDifficultyMap_reading = (data) => {
+  const map = {};
+
+  data.forEach((row) => {
+    if (!map[row.topic]) {
+      map[row.topic] = new Set();
+    }
+    map[row.topic].add(row.difficulty);
+  });
+
+  // convert sets → arrays
+  Object.keys(map).forEach((key) => {
+    map[key] = Array.from(map[key]);
+  });
+
+  return map;
+};
   
   const handleCreateHomework = async () => {
   if (!quiz.classYear) {
@@ -48,11 +76,21 @@ export default function QuizSetup_reading() {
     class_name: quiz.className.trim(),
     class_year: quiz.classYear,
     subject: quiz.subject,
-    difficulty: quiz.difficulty,
-    topics: quiz.topics.map((t) => ({
-      name: t.name.trim(),
-      num_questions: Number(t.num_questions),
-    })),
+    difficulty: "mixed",
+    topics: quiz.topics.map((t) => {
+      let numQuestions = t.num_questions;
+
+      // ✅ FIXED TOPICS
+      if (FIXED_TOPIC_QUESTION_RULES[t.name] !== undefined) {
+        numQuestions = FIXED_TOPIC_QUESTION_RULES[t.name];
+      }
+
+      return {
+        name: t.name.trim(),
+        difficulty: t.difficulty, // ✅ ADD THIS (important for backend)
+        num_questions: Number(numQuestions),
+      };
+    }),
   };
 
   try {
@@ -194,6 +232,9 @@ export default function QuizSetup_reading() {
   // ---------------------------------------
   // HANDLE FORM INPUTS
   // ---------------------------------------
+  
+  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setQuiz((prev) => ({ ...prev, [name]: value }));
@@ -204,66 +245,85 @@ export default function QuizSetup_reading() {
 
     const topicsArray = Array.from({ length: num }, () => ({
       name: "",
-      num_questions: 0,
+      difficulty: "",
+      available_difficulties: [],
+      num_questions: 0,   // ✅ ADD THIS
+      total: 0
     }));
 
     setQuiz((prev) => ({ ...prev, topics: topicsArray }));
     setTotalQuestions(0);
   };
 
-  const handleTopicSelect = (index, value) => {
-  setQuiz((prev) => {
-    const topics = [...prev.topics];
-    topics[index].name = value;
-
-    // Fixed topics → auto set
-    if (FIXED_TOPIC_QUESTION_RULES[value] !== undefined) {
-      topics[index].num_questions = FIXED_TOPIC_QUESTION_RULES[value];
-    }
-
-    // Choice-based topics → default to first option
-    if (CHOICE_TOPIC_QUESTION_RULES[value]) {
-      topics[index].num_questions = CHOICE_TOPIC_QUESTION_RULES[value][0];
-    }
-
-    const globalTotal = topics.reduce(
-      (sum, t) => sum + (Number(t.num_questions) || 0),
-      0
-    );
-
-    setTotalQuestions(globalTotal);
-    return { ...prev, topics };
-  });
-};
+  
 
 
-  const handleTopicTotalChange = (index, value) => {
-    const numValue = Number(value) || 0;
-
+  const handleTopicSelect = async (index, value) => {
+  try {
+    // Step 1: update topic + reset dependent fields
     setQuiz((prev) => {
       const topics = [...prev.topics];
-      topics[index].num_questions = numValue;
 
-      const globalTotal = topics.reduce(
-        (sum, t) => sum + (Number(t.num_questions) || 0),
+      const updatedTopic = {
+        ...topics[index],
+        name: value,
+        difficulty: "",
+        available_difficulties: [],
+        num_questions: 0,
+        total:
+          value === "Comparative Analysis"
+            ? 0
+            : getQuestionCount(value), // ✅ FIX: set total immediately for fixed topics
+      };
+
+      topics[index] = updatedTopic;
+
+      // ✅ Recalculate total here as well
+      const grandTotal = topics.reduce(
+        (sum, t) => sum + (t.total || 0),
         0
       );
 
-      setTotalQuestions(globalTotal);
+      setTotalQuestions(grandTotal);
+
       return { ...prev, topics };
     });
-  };
+
+    // Step 2: fetch difficulties from backend
+    const params = new URLSearchParams({
+      class_year: quiz.classYear,
+      topic: value,
+    });
+
+    const res = await fetch(
+      `${BACKEND_URL}/api/reading/topic-difficulties?${params.toString()}`
+    );
+
+    const data = await res.json();
+
+    // Step 3: update available difficulties
+    setQuiz((prev) => {
+      const topics = [...prev.topics];
+
+      topics[index] = {
+        ...topics[index],
+        available_difficulties: data || [],
+      };
+
+      return { ...prev, topics };
+    });
+
+  } catch (error) {
+    console.error("Error fetching difficulties:", error);
+  }
+};
 
   // ---------------------------------------
   // FETCH TOPICS
   // ---------------------------------------
-  useEffect(() => {
-  console.log("Triggered useEffect");
-  console.log("quiz.classYear =", quiz.classYear);
-  console.log("quiz.difficulty =", quiz.difficulty);
 
-  if (!quiz.classYear || !quiz.difficulty) {
-    console.log("Blocked: missing values");
+  useEffect(() => {
+  if (!quiz.classYear) {
     setAvailableTopics([]);
     return;
   }
@@ -271,24 +331,18 @@ export default function QuizSetup_reading() {
   const fetchReadingTopics = async () => {
     try {
       const params = new URLSearchParams({
-        difficulty: quiz.difficulty,
         class_year: quiz.classYear,
       });
 
-      const url =
-        `${BACKEND_URL}/api/reading/topics?${params.toString()}`;
-
-      console.log("Calling:", url);
-
-      const res = await fetch(url);
-
-      console.log("Status:", res.status);
+      const res = await fetch(
+        `${BACKEND_URL}/api/reading/topics?${params.toString()}`
+      );
 
       const data = await res.json();
 
-      console.log("Received:", data);
-
+      // ✅ ONLY this
       setAvailableTopics(data);
+
     } catch (error) {
       console.error(error);
       setAvailableTopics([]);
@@ -296,15 +350,15 @@ export default function QuizSetup_reading() {
   };
 
   fetchReadingTopics();
-}, [quiz.classYear, quiz.difficulty]);
 
+}, [quiz.classYear]);
   // ---------------------------------------
   // SUBMIT
   // ---------------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!quiz.className || !quiz.subject || !quiz.difficulty) {
+    if (!quiz.className || !quiz.subject) {
       alert("Please select class, subject, and difficulty.");
       return;
     }
@@ -326,12 +380,26 @@ export default function QuizSetup_reading() {
       class_name: quiz.className.trim(),
       class_year: quiz.classYear,   // ✅ ADD THIS LINE
       subject: quiz.subject,
-      difficulty: quiz.difficulty,
-      topics: quiz.topics.map((t) => ({
-        name: t.name.trim(),
-        num_questions: Number(t.num_questions), 
-      })),
+      difficulty: "mixed",
+      topics: quiz.topics.map((t) => {
+        let numQuestions = t.num_questions;
+
+        // ✅ FIXED TOPICS
+        if (FIXED_TOPIC_QUESTION_RULES[t.name] !== undefined) {
+          numQuestions = FIXED_TOPIC_QUESTION_RULES[t.name];
+        }
+
+        return {
+          name: t.name.trim(),
+          difficulty: t.difficulty, // ✅ ADD THIS (important for backend)
+          num_questions: Number(numQuestions),
+        };
+      }),
     };
+    // 🔍 DEBUG HERE
+    console.log("=========== FINAL EXAM PAYLOAD ===========");
+    console.log(JSON.stringify(payload, null, 2));
+    console.log("==========================================");
 
     try {
       setLoading(true);
@@ -387,18 +455,7 @@ export default function QuizSetup_reading() {
         <label>Subject:</label>
         <input value="Reading Comprehension" readOnly />
 
-        <label>Difficulty Level:</label>
-        <select
-          name="difficulty"
-          value={quiz.difficulty}
-          onChange={handleInputChange}
-          required
-        >
-          <option value="">Select Difficulty</option>
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-        </select>
+        
 
         <label>Number of Topics:</label>
         <input
@@ -415,7 +472,7 @@ export default function QuizSetup_reading() {
         <button
           type="button"
           onClick={handleViewQuestionBank}
-          disabled={!quiz.difficulty}
+          disabled={!quiz.classYear}
         >
           View Question Bank
         </button>
@@ -429,6 +486,7 @@ export default function QuizSetup_reading() {
         <div className="topics-container">
           {quiz.topics.map((topic, index) => (
             <div className="topic" key={index}>
+
               <h4>Topic {index + 1}</h4>
 
               <label>Topic Name:</label>
@@ -469,40 +527,83 @@ export default function QuizSetup_reading() {
 
               </select>
 
-              <label>Total Questions for this Topic:</label>
-              
-              {/* Comparative Analysis → dropdown */}
-              {CHOICE_TOPIC_QUESTION_RULES[topic.name] ? (
+              <label>Difficulty:</label>
                 <select
-                  value={topic.num_questions}
-                  onChange={(e) =>
-                    handleTopicTotalChange(index, e.target.value)
-                  }
+                  value={topic.difficulty || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;   // ✅ keep as string
+
+                    setQuiz((prev) => {
+                      const topics = [...prev.topics];
+                      const current = topics[index];   // stable reference
+
+                      topics[index] = {
+                        ...current,
+                        difficulty: val,   // ✅ ONLY update difficulty
+                      };
+
+                      return { ...prev, topics };
+                    });
+                  }}
+                  required
                 >
-                  {CHOICE_TOPIC_QUESTION_RULES[topic.name].map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
+                  <option value="">Select Difficulty</option>
+
+                  {topic.available_difficulties.map((d) => (
+                    <option key={d} value={d}>
+                      {d.charAt(0).toUpperCase() + d.slice(1)}
                     </option>
                   ))}
                 </select>
-              ) : (
-                /* Fixed or free numeric input */
-                <input
-                  type="number"
-                  min="0"
-                  value={topic.num_questions}
-                  onChange={(e) =>
-                    handleTopicTotalChange(index, e.target.value)
-                  }
-                  disabled={FIXED_TOPIC_QUESTION_RULES[topic.name] !== undefined}
-                  style={
-                    FIXED_TOPIC_QUESTION_RULES[topic.name] !== undefined
-                      ? { backgroundColor: "#f3f3f3", cursor: "not-allowed" }
-                      : {}
-                  }
-                  required
-                />
-              )}
+                {topic.name === "Comparative Analysis" && (
+                  <div>
+                    <label>Number of Questions:</label>
+                    <select
+                      value={topic.num_questions || ""}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+
+                        setQuiz((prev) => {
+                          const topics = [...prev.topics];
+                          const current = topics[index];   // ✅ capture once
+
+                          topics[index] = {
+                            ...current,                   // ✅ use stable reference
+                            num_questions: val,
+                            total: val,
+                          };
+
+                          const grandTotal = topics.reduce(
+                            (sum, t) => sum + (t.total || 0),
+                            0
+                          );
+
+                          setTotalQuestions(grandTotal);
+
+                          return { ...prev, topics };
+                        });
+                      }}
+                    >
+                      <option value="">Select</option>
+                      <option value={8}>8</option>
+                      <option value={10}>10</option>
+                    </select>
+                  </div>
+                )}
+                {topic.name !== "Comparative Analysis" && (
+                  <div className="topic-total">
+                    Total Questions: {getQuestionCount(topic.name)}
+                  </div>
+                )}
+
+                {topic.name === "Comparative Analysis" && topic.num_questions && (
+                  <div className="topic-total">
+                    Total Questions: {topic.num_questions}
+                  </div>
+                )}
+
+              
+              
 
             </div>
           ))}

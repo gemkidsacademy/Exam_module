@@ -3,6 +3,7 @@ import "./UploadPDF.css";
 
 export default function UploadWordReadingUnified() {
   const [wordFile, setWordFile] = useState(null);
+  const BACKEND_URL = process.env.REACT_APP_API_URL;
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState(null);
 
@@ -35,7 +36,7 @@ export default function UploadWordReadingUnified() {
 
     try {
       const res = await fetch(
-        "https://web-production-481a5.up.railway.app/upload-word-reading-unified",
+        `${BACKEND_URL}/upload-word-reading-unified`,
         {
           method: "POST",
           body: formData,
