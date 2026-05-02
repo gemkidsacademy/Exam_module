@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./QuizSetup.css";
-const BACKEND_URL = "https://web-production-481a5.up.railway.app";
-//const BACKEND_URL = "http://127.0.0.1:8000";
+
+const BACKEND_URL = process.env.REACT_APP_API_URL;
 
 
 export default function QuizSetup_OC_MathematicalReasoning() {
@@ -9,17 +9,63 @@ export default function QuizSetup_OC_MathematicalReasoning() {
   const [questionBank, setQuestionBank] = useState([]);
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [qbLoading, setQbLoading] = useState(false);
+  const [availableCounts, setAvailableCounts] = useState({});
 
   const [quiz, setQuiz] = useState({
     className: "oc", // ✅ OC
     subject: "mathematical_reasoning", // ⚠️ keep consistent with backend
     classYear: "",
-    difficulty: "",
     numTopics: 1,
     topics: [],
   });
+  const fetchQuestionCounts_OC_MR = async (topicName) => {
+  try {
+    const params = new URLSearchParams({
+      topic: topicName,
+      class_year: quiz.classYear,
+      class_name: quiz.className,
+      subject: quiz.subject
+    });
+
+    const res = await fetch(
+      `${BACKEND_URL}/api/question-count?${params.toString()}`
+    );
+
+    const data = await res.json();
+
+    setAvailableCounts(prev => ({
+      ...prev,
+      [topicName]: data
+    }));
+
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const [totalQuestions, setTotalQuestions] = useState(0);
+  const toggleDifficulty_OC_MR = (index, level) => {
+  setQuiz((prev) => {
+    const topics = [...prev.topics];
+
+    const currentTopic = topics[index];
+    const currentLevel = currentTopic[level];
+
+    const newEnabled = !currentLevel.enabled;
+
+    topics[index] = {
+      ...currentTopic,
+      [level]: {
+        ...currentLevel,
+        enabled: newEnabled,
+        ai: newEnabled ? currentLevel.ai : 0,
+        db: newEnabled ? currentLevel.db : 0
+      }
+    };
+
+    return { ...prev, topics };
+  });
+};
 
   const getUsedTopicNames_OC_MR = (currentIndex) => {
     return quiz.topics
@@ -85,6 +131,40 @@ export default function QuizSetup_OC_MathematicalReasoning() {
     setQbLoading(false);
   }
 };
+const handleResetUsedQuestions = async () => {
+  if (!quiz.classYear) {
+    alert("Please select class year first");
+    return;
+  }
+
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/api/admin/reset-used-questions-oc-mr`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          class_year: quiz.classYear, // "Year 4"
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.json();
+      console.error(err);
+      throw new Error(err.detail || "Failed to reset used questions");
+    }
+
+    const data = await res.json();
+
+    alert(`✅ ${data.reset_count} questions reset for ${data.class_year}`);
+  } catch (err) {
+    console.error(err);
+    alert("❌ Error resetting used questions");
+  }
+};
   const handleInputChange_OC_MR = (e) => {
     const { name, value } = e.target;
     setQuiz((prev) => ({ ...prev, [name]: value }));
@@ -95,8 +175,9 @@ export default function QuizSetup_OC_MathematicalReasoning() {
 
     const topicsArray = Array.from({ length: num }, () => ({
       name: "",
-      ai: 0,
-      db: 0,
+      easy: { enabled: false, ai: 0, db: 0 },
+      medium: { enabled: false, ai: 0, db: 0 },
+      hard: { enabled: false, ai: 0, db: 0 },
       total: 0,
     }));
 
@@ -104,47 +185,62 @@ export default function QuizSetup_OC_MathematicalReasoning() {
     setTotalQuestions(0);
   };
 
-  const handleTopicChange_OC_MR = (index, field, value) => {
-    setQuiz((prev) => {
-      const topics = [...prev.topics];
-      const numValue = Number(value) || 0;
+  const handleDifficultyChange_OC_MR = (index, difficulty, field, value) => {
+  setQuiz((prev) => {
+    const topics = [...prev.topics];
+    const numValue = Number(value) || 0;
 
-      topics[index][field] = numValue;
+    topics[index][difficulty][field] =
+      field === "enabled" ? value : numValue;
 
-      const total =
-        Number(topics[index].ai || 0) +
-        Number(topics[index].db || 0);
+    // recalc topic total
+    const t = topics[index];
 
-      topics[index].total = total;
-      topics[index].warning = total > 35;
+    const total =
+      (t.easy.enabled ? t.easy.ai + t.easy.db : 0) +
+      (t.medium.enabled ? t.medium.ai + t.medium.db : 0) +
+      (t.hard.enabled ? t.hard.ai + t.hard.db : 0);
 
-      const globalTotal = topics.reduce(
-        (sum, t) => sum + (Number(t.total) || 0),
-        0
-      );
+    t.total = total;
 
-      setTotalQuestions(globalTotal);
-      return { ...prev, topics };
-    });
-  };
+    // global total
+    const globalTotal = topics.reduce((sum, t) => sum + t.total, 0);
+    setTotalQuestions(globalTotal);
+
+    return { ...prev, topics };
+  });
+};
 
   const handleTopicNameChange_OC_MR = (index, value) => {
     setQuiz((prev) => {
       const topics = [...prev.topics];
       topics[index].name = value;
+
+      if (value) {
+        fetchQuestionCounts_OC_MR(value);
+      }
+
       return { ...prev, topics };
     });
   };
-
+  /* ============================
+    HELPER: DB COUNT
+  ============================ */
+  const getDBCount = (topicName, difficulty) => {
+    const row = questionBank.find(
+      (q) =>
+        q.topic === topicName &&
+        q.difficulty.toLowerCase() === difficulty
+    );
+    return row ? row.total_questions : 0;
+  };
   /* ============================
      FETCH TOPICS
   ============================ */
 
   useEffect(() => {
-    if (!quiz.difficulty) {
-      setAvailableTopics([]);
-      return;
-    }
+    
+    
 
     const fetchTopics_OC_MR = async () => {
       try {
@@ -156,7 +252,6 @@ export default function QuizSetup_OC_MathematicalReasoning() {
         const params = new URLSearchParams({
           class_name: quiz.className,
           subject: quiz.subject,
-          difficulty: quiz.difficulty,
           class_year: quiz.classYear,   // ✅ added
         });
 
@@ -180,16 +275,13 @@ export default function QuizSetup_OC_MathematicalReasoning() {
     };
 
     fetchTopics_OC_MR();
-  }, [quiz.className, quiz.subject, quiz.difficulty]);
+  }, [quiz.className, quiz.subject, quiz.classYear]);
 
   /* ============================
      SUBMIT
   ============================ */
   const handleSubmitHomework_OC_MR = async () => {
-  if (!quiz.difficulty) {
-    alert("Select difficulty");
-    return;
-  }
+  
 
   if (!quiz.classYear) {
     alert("Select class year");
@@ -210,13 +302,14 @@ export default function QuizSetup_OC_MathematicalReasoning() {
     class_name: quiz.className,
     subject: quiz.subject,
     class_year: quiz.classYear, // ✅ included
-    difficulty: quiz.difficulty,
+    difficulty: "mixed",
     num_topics: quiz.topics.length,
     topics: quiz.topics.map((t) => ({
       name: t.name.trim(),
-      ai: Number(t.ai),
-      db: Number(t.db),
-      total: Number(t.total),
+      easy: t.easy,
+      medium: t.medium,
+      hard: t.hard,
+      total: t.total,
     })),
   };
 
@@ -246,10 +339,7 @@ export default function QuizSetup_OC_MathematicalReasoning() {
   const handleSubmit_OC_MR = async (e) => {
   e.preventDefault();
 
-  if (!quiz.difficulty) {
-    alert("Select difficulty");
-    return;
-  }
+  
 
   if (!quiz.classYear) {
     alert("Select class year");   // ✅ add this validation
@@ -270,14 +360,15 @@ export default function QuizSetup_OC_MathematicalReasoning() {
     class_name: quiz.className,
     subject: quiz.subject,
     class_year: quiz.classYear,   // ✅ THIS IS THE FIX
-    difficulty: quiz.difficulty,
+    difficulty: "mixed",
     num_topics: quiz.topics.length,
     topics: quiz.topics.map((t) => ({
-      name: t.name.trim(),
-      ai: Number(t.ai),
-      db: Number(t.db),
-      total: Number(t.total),
-    })),
+    name: t.name.trim(),
+    easy: t.easy,
+    medium: t.medium,
+    hard: t.hard,
+    total: t.total,
+  })),
   };
 
   console.log("📤 Sending quiz payload:", payload); // ✅ debug
@@ -326,23 +417,12 @@ export default function QuizSetup_OC_MathematicalReasoning() {
           required
         >
           <option value="">Select Class Year</option>
-          <option value="Year 3">Year 3</option>
-          <option value="Year 4">Year 4</option>
+          <option value="3">Year 3</option>
+          <option value="4">Year 4</option>
           
         </select>
 
-        <label>Difficulty Level:</label>
-        <select
-          name="difficulty"
-          value={quiz.difficulty}
-          onChange={handleInputChange_OC_MR}
-          required
-        >
-          <option value="">Select Difficulty</option>
-          <option value="Easy">Easy</option>
-          <option value="Medium">Medium</option>
-          <option value="Hard">Hard</option>
-        </select>
+        
 
         <label>Number of Topics:</label>
         <input
@@ -364,7 +444,21 @@ export default function QuizSetup_OC_MathematicalReasoning() {
         >
           View Question Bank
         </button>
-
+        <button
+          type="button"
+          style={{
+            width: "100%",
+            marginBottom: "10px",
+            backgroundColor: "#2563eb",
+            color: "white",
+            padding: "10px",
+            borderRadius: "6px",
+            border: "none"
+          }}
+          onClick={handleResetUsedQuestions}
+        >
+          Reset Used Questions
+        </button>
         <button
           type="button"
           onClick={handleDeleteAllQuestions_OC_MR}
@@ -404,9 +498,22 @@ export default function QuizSetup_OC_MathematicalReasoning() {
 
         <div className="topics-container">
           {quiz.topics.map((topic, index) => (
-            <div className="topic" key={index}>
-              <h4>Topic {index + 1}</h4>
-
+            <div
+              className="topic-card"
+              key={index}
+              style={{
+                border: "1px solid #ddd",
+                borderRadius: "10px",
+                padding: "15px",
+                marginBottom: "15px",
+                backgroundColor: "#fff",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.05)"
+              }}
+            >
+              <h4 style={{ marginBottom: "10px", color: "#333" }}>
+                Topic {index + 1}
+              </h4>
+              <div style={{ marginBottom: "10px" }}>
               <select
                 value={topic.name}
                 onChange={(e) =>
@@ -414,6 +521,7 @@ export default function QuizSetup_OC_MathematicalReasoning() {
                 }
                 required
               >
+              
                 <option value="">Select topic</option>
                 {availableTopics
                   .filter(
@@ -426,24 +534,83 @@ export default function QuizSetup_OC_MathematicalReasoning() {
                     </option>
                   ))}
               </select>
+              </div>
 
-              <input
-                type="number"
-                min="0"
-                value={topic.ai}
-                onChange={(e) =>
-                  handleTopicChange_OC_MR(index, "ai", e.target.value)
-                }
-              />
+              {["easy", "medium", "hard"].map((level) => (
+                <div key={level} style={{ marginTop: "5px" }}>
 
-              <input
-                type="number"
-                min="0"
-                value={topic.db}
-                onChange={(e) =>
-                  handleTopicChange_OC_MR(index, "db", e.target.value)
-                }
-              />
+                  <label style={{ display: "block" }}>
+                    <input
+                      type="checkbox"
+                      checked={topic[level].enabled}
+                      onChange={() => toggleDifficulty_OC_MR(index, level)}
+                    />
+                    {" "}{level.charAt(0).toUpperCase() + level.slice(1)}
+                  </label>
+
+                  {topic[level].enabled && (
+                    <div
+                      style={{
+                        marginTop: "8px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px"
+                      }}
+                    >
+
+                      {/* AI INPUT */}
+                      <input
+                        type="number"
+                        min="0"
+                        value={topic[level].ai}
+                        onChange={(e) =>
+                          handleDifficultyChange_OC_MR(
+                            index,
+                            level,
+                            "ai",
+                            e.target.value
+                          )
+                        }
+                        style={{ width: "200px" }}   // ✅ wider like TS
+                      />
+
+                      {/* DB LABEL */}
+                      <span style={{ fontSize: "12px" }}>
+                        DB <span style={{ color: "blue" }}>
+                          Available: {availableCounts[topic.name]?.[level] ?? 0}
+                        </span>
+                      </span>
+
+                      {/* DB INPUT */}
+                      <input
+                        type="number"
+                        min="0"
+                        value={topic[level].db}
+                        onChange={(e) =>
+                          handleDifficultyChange_OC_MR(
+                            index,
+                            level,
+                            "db",
+                            e.target.value
+                          )
+                        }
+                        style={{ width: "200px" }}   // ✅ match width
+                      />
+
+                    </div>
+                  )}
+                </div>
+              ))}
+              <p
+                style={{
+                  fontWeight: "bold",
+                  marginTop: "12px",
+                  paddingTop: "8px",
+                  borderTop: "1px solid #eee"
+                }}
+              >
+                Topic Total: {topic.total}
+              </p>
             </div>
           ))}
         </div>

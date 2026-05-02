@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./QuizSetup.css";
 
-const BACKEND_URL = "https://web-production-481a5.up.railway.app";
-//const BACKEND_URL = "http://127.0.0.1:8000";
+
+const BACKEND_URL = process.env.REACT_APP_API_URL;
 
 
 /* ============================
@@ -11,18 +11,43 @@ const BACKEND_URL = "https://web-production-481a5.up.railway.app";
 
 export default function QuizSetupOCThinkingSkills() {
   const [availableTopics, setAvailableTopics] = useState([]);
-  const MAX_QUESTIONS = 30;
+  const MAX_QUESTIONS = 40;
   const [questionBank, setQuestionBank] = useState([]);
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [qbLoading, setQbLoading] = useState(false);
+  const [availableCounts, setAvailableCounts] = useState({});
 
   const [totalQuestions, setTotalQuestions] = useState(0);
+  const fetchQuestionCounts = async (topicName) => {
+  try {
+    const params = new URLSearchParams({
+      topic: topicName,
+      class_year: quiz.classYear,
+      class_name: quiz.className,
+      subject: quiz.subject
+    });
+
+    const res = await fetch(
+      `${BACKEND_URL}/api/question-count?${params.toString()}`
+    );
+
+    const data = await res.json();
+
+    setAvailableCounts(prev => ({
+      ...prev,
+      [topicName]: data
+    }));
+
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const [quiz, setQuiz] = useState({
     className: "oc",
     classYear: "", // ✅ NEW
     subject: "thinking_skills",
-    difficulty: "",
+    difficulty: "mixed",
     numTopics: 1,
     topics: [],
   });
@@ -36,10 +61,7 @@ export default function QuizSetupOCThinkingSkills() {
       return;
     }
 
-    if (!quiz.difficulty) {
-      alert("Please select difficulty.");
-      return;
-    }
+    
 
     if (quiz.topics.length === 0) {
       alert("Generate topics first.");
@@ -55,19 +77,20 @@ export default function QuizSetupOCThinkingSkills() {
       class_name: quiz.className,
       class_year: quiz.classYear,
       subject: quiz.subject,
-      difficulty: quiz.difficulty,
+      difficulty: "mixed",
       num_topics: quiz.topics.length,
       topics: quiz.topics.map((t) => ({
         name: t.name.trim(),
-        ai: Number(t.ai),
-        db: Number(t.db),
-        total: Number(t.total),
+        easy: t.easy,
+        medium: t.medium,
+        hard: t.hard,
+        total: t.total
       })),
     };
 
     try {
       const res = await fetch(
-        "https://web-production-481a5.up.railway.app/api/quizzes/oc-thinking-skills-homework", // ✅ NEW ENDPOINT
+        `${BACKEND_URL}/api/quizzes/oc-thinking-skills-homework`, // ✅ NEW ENDPOINT
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -104,44 +127,80 @@ export default function QuizSetupOCThinkingSkills() {
 
     const topicsArray = Array.from({ length: num }, () => ({
       name: "",
-      ai: 0,
-      db: 0,
+      easy: { enabled: false, ai: 0, db: 0 },
+      medium: { enabled: false, ai: 0, db: 0 },
+      hard: { enabled: false, ai: 0, db: 0 },
       total: 0,
-    }));
+    }));;
 
     setQuiz((prev) => ({ ...prev, topics: topicsArray }));
     setTotalQuestions(0);
   };
 
-  const handleTopicChange = (index, field, value) => {
-    setQuiz((prev) => {
-      const topics = [...prev.topics];
+  const toggleDifficulty = (index, level) => {
+  setQuiz((prev) => {
+    const topics = [...prev.topics];
 
-      const numValue = Number(value) || 0;
-      topics[index][field] = numValue;
+    const currentTopic = topics[index];
+    const currentLevel = currentTopic[level];
 
-      const total =
-        Number(topics[index].ai || 0) +
-        Number(topics[index].db || 0);
+    const newEnabled = !currentLevel.enabled;
 
-      topics[index].total = total;
-      topics[index].warning = total > MAX_QUESTIONS;
+    topics[index] = {
+      ...currentTopic,
+      [level]: {
+        ...currentLevel,
+        enabled: newEnabled,
+        ai: newEnabled ? currentLevel.ai : 0,
+        db: newEnabled ? currentLevel.db : 0
+      }
+    };
 
-      const globalTotal = topics.reduce(
-        (sum, t) => sum + (Number(t.total) || 0),
-        0
-      );
+    return { ...prev, topics };
+  });
+};
+  const handleDifficultyChange = (index, level, field, value) => {
+  setQuiz((prev) => {
+    const topics = [...prev.topics];
+    const num = Number(value) || 0;
 
-      setTotalQuestions(globalTotal);
+    const topic = topics[index];
 
-      return { ...prev, topics };
-    });
-  };
+    topics[index] = {
+      ...topic,
+      [level]: {
+        ...topic[level],
+        [field]: num
+      }
+    };
+
+    const t = topics[index];
+
+    t.total =
+      t.easy.ai + t.easy.db +
+      t.medium.ai + t.medium.db +
+      t.hard.ai + t.hard.db;
+
+    const grandTotal = topics.reduce(
+      (sum, item) => sum + item.total,
+      0
+    );
+
+    setTotalQuestions(grandTotal);
+
+    return { ...prev, topics };
+  });
+};
 
   const handleTopicNameChange = (index, value) => {
     setQuiz((prev) => {
       const topics = [...prev.topics];
       topics[index].name = value;
+
+      // fetch counts when topic selected
+      if (value) {
+        fetchQuestionCounts(value);
+      }
       return { ...prev, topics };
     });
   };
@@ -230,8 +289,8 @@ export default function QuizSetupOCThinkingSkills() {
   if (
     !quiz.className ||
     !quiz.classYear ||
-    !quiz.subject ||
-    !quiz.difficulty
+    !quiz.subject 
+    
   ) {
     console.log("Blocked: missing required values");
     setAvailableTopics([]);
@@ -244,7 +303,7 @@ export default function QuizSetupOCThinkingSkills() {
         class_name: quiz.className,
         class_year: quiz.classYear,
         subject: quiz.subject,
-        difficulty: quiz.difficulty,
+        
       });
 
       const url = `${BACKEND_URL}/api/topics?${params.toString()}`;
@@ -271,7 +330,7 @@ export default function QuizSetupOCThinkingSkills() {
   quiz.className,
   quiz.classYear,
   quiz.subject,
-  quiz.difficulty
+  
 ]);
 
   /* ============================
@@ -281,10 +340,7 @@ export default function QuizSetupOCThinkingSkills() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!quiz.difficulty) {
-      alert("Please select difficulty.");
-      return;
-    }
+    
 
     if (quiz.topics.length === 0) {
       alert("Generate topics first.");
@@ -301,13 +357,14 @@ export default function QuizSetupOCThinkingSkills() {
       class_name: quiz.className,
       class_year: quiz.classYear,   // ✅ ADD HERE
       subject: quiz.subject,
-      difficulty: quiz.difficulty,
+      difficulty: "mixed",
       num_topics: quiz.topics.length,
       topics: quiz.topics.map((t) => ({
         name: t.name.trim(),
-        ai: Number(t.ai),
-        db: Number(t.db),
-        total: Number(t.total),
+        easy: t.easy,
+        medium: t.medium,
+        hard: t.hard,
+        total: t.total
       })),
     };
 
@@ -355,18 +412,7 @@ export default function QuizSetupOCThinkingSkills() {
         <label>Subject:</label>
         <input type="text" value="Thinking Skills" readOnly />
 
-        <label>Difficulty:</label>
-        <select
-          name="difficulty"
-          value={quiz.difficulty}
-          onChange={handleInputChange}
-          required
-        >
-          <option value="">Select</option>
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-        </select>
+        
 
         <label>Number of Topics:</label>
         <input
@@ -445,23 +491,138 @@ export default function QuizSetupOCThinkingSkills() {
                   ))}
               </select>
 
-              <input
-                type="number"
-                placeholder="AI"
-                value={topic.ai}
-                onChange={(e) =>
-                  handleTopicChange(index, "ai", e.target.value)
-                }
-              />
+              {/* EASY */}
+              <div className="difficulty-block">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={topic.easy.enabled}
+                    onChange={() => toggleDifficulty(index, "easy")}
+                  />
+                  Easy
+                </label>
 
-              <input
-                type="number"
-                placeholder="DB"
-                value={topic.db}
-                onChange={(e) =>
-                  handleTopicChange(index, "db", e.target.value)
-                }
-              />
+                {topic.easy.enabled && (
+                  <div className="grid-2">
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="AI"
+                      value={topic.easy.ai}
+                      onChange={(e) =>
+                        handleDifficultyChange(index, "easy", "ai", e.target.value)
+                      }
+                    />
+
+                    <div>
+                      <label>
+                        DB
+                        <div style={{ color: "blue", fontSize: "12px" }}>
+                          Available: {availableCounts[topic.name]?.easy ?? "-"}
+                        </div>
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={topic.easy.db}
+                        onChange={(e) =>
+                          handleDifficultyChange(index, "easy", "db", e.target.value)
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* MEDIUM */}
+              <div className="difficulty-block">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={topic.medium.enabled}
+                    onChange={() => toggleDifficulty(index, "medium")}
+                  />
+                  Medium
+                </label>
+
+                {topic.medium.enabled && (
+                  <div className="grid-2">
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="AI"
+                      value={topic.medium.ai}
+                      onChange={(e) =>
+                        handleDifficultyChange(index, "medium", "ai", e.target.value)
+                      }
+                    />
+                    <div>
+                      <label>
+                        DB
+                        <div style={{ color: "blue", fontSize: "12px" }}>
+                          Available: {availableCounts[topic.name]?.medium ?? "-"}
+                        </div>
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={topic.medium.db}
+                        onChange={(e) =>
+                          handleDifficultyChange(index, "medium", "db", e.target.value)
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* HARD */}
+              <div className="difficulty-block">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={topic.hard.enabled}
+                    onChange={() => toggleDifficulty(index, "hard")}
+                  />
+                  Hard
+                </label>
+
+                {topic.hard.enabled && (
+                  <div className="grid-2">
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="AI"
+                      value={topic.hard.ai}
+                      onChange={(e) =>
+                        handleDifficultyChange(index, "hard", "ai", e.target.value)
+                      }
+                    />
+
+                   <div>
+                    <label>
+                      DB
+                      <div style={{ color: "blue", fontSize: "12px" }}>
+                        Available: {availableCounts[topic.name]?.hard ?? "-"}
+                      </div>
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={topic.hard.db}
+                      onChange={(e) =>
+                        handleDifficultyChange(index, "hard", "db", e.target.value)
+                      }
+                    />
+                  </div>
+                  </div>
+                )}
+              </div>
+
+              {/* TOPIC TOTAL */}
+              <div style={{ marginTop: "8px", fontWeight: "bold" }}>
+                Topic Total: {topic.total}
+              </div>
             </div>
           ))}
         </div>

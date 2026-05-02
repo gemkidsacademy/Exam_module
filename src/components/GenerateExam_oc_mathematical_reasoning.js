@@ -7,8 +7,8 @@ export default function GenerateExam_oc_mathematical_reasoning() {
   const [error, setError] = useState("");
   const [classYear, setClassYear] = useState("");
 
-  const BACKEND_URL = "https://web-production-481a5.up.railway.app";
-  //const BACKEND_URL = "http://127.0.0.1:8000";
+  const BACKEND_URL = process.env.REACT_APP_API_URL;
+
 
   /* ===========================
      Generate OC Mathematical Reasoning Exam
