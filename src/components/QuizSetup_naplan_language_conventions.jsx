@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./QuizSetup.css";
-const BACKEND_URL = "https://web-production-481a5.up.railway.app";
-//const BACKEND_URL = "http://127.0.0.1:8000";
+
+const BACKEND_URL = process.env.REACT_APP_API_URL;
 
 export default function QuizSetup_naplan_language_conventions() {
   const [availableTopics, setAvailableTopics] = useState([]);
@@ -12,7 +12,7 @@ export default function QuizSetup_naplan_language_conventions() {
   const [qbLoading, setQbLoading] = useState(false);
 
   /* ============================
-     NAPLAN Rules
+    NAPLAN Rules
   ============================ */
   const getAllowedRange = (year) => {
     if (year === "3") return { min: 40, max: 45 };
@@ -25,7 +25,6 @@ export default function QuizSetup_naplan_language_conventions() {
     className: "naplan",
     subject: "language_conventions",
     year: "",
-    difficulty: "",
     numTopics: 1,
     topics: [],
   });
@@ -37,8 +36,30 @@ export default function QuizSetup_naplan_language_conventions() {
     totalQuestions <= allowedRange.max;
 
   /* ============================
-     Input Handlers
+    Input Handlers
   ============================ */
+  const handleDifficultyToggle = (topicIndex, level) => {
+  setQuiz(prev => {
+    const topics = [...prev.topics];
+
+    // 🔥 clone deeply (important)
+    const topic = { ...topics[topicIndex] };
+    const difficulty = { ...topic.difficulty };
+
+    const currentLevel = difficulty[level];
+
+    difficulty[level] = {
+      ...currentLevel,
+      enabled: !currentLevel.enabled
+    };
+
+    topic.difficulty = difficulty;
+    topics[topicIndex] = topic;
+
+    return { ...prev, topics };
+  });
+};
+
   const handleReusedQuestions = async () => {
   const confirmed = window.confirm(
     "Are you sure you want to reset used questions?"
@@ -46,7 +67,7 @@ export default function QuizSetup_naplan_language_conventions() {
 
   if (!confirmed) return;
 
-  if (!quiz.year || !quiz.difficulty) {
+  if (!quiz.year) {
     alert("Please select Year and Difficulty first.");
     return;
   }
@@ -54,7 +75,7 @@ export default function QuizSetup_naplan_language_conventions() {
   try {
     const params = new URLSearchParams({
       year: quiz.year,
-      difficulty: quiz.difficulty,
+      difficulty: "mixed",
     });
 
     const response = await fetch(
@@ -95,16 +116,19 @@ export default function QuizSetup_naplan_language_conventions() {
   };
 
   /* ============================
-     Generate Topics
+    Generate Topics
   ============================ */
   const generateTopics = () => {
     const num = parseInt(quiz.numTopics) || 1;
 
     const topicsArray = Array.from({ length: num }, () => ({
       name: "",
-      ai: 0,
-      db: 0,
       total: 0,
+      difficulty: {
+        easy: { enabled: false, ai: 0, db: 0, available: 0 },
+        medium: { enabled: false, ai: 0, db: 0, available: 0 },
+        hard: { enabled: false, ai: 0, db: 0, available: 0 },
+      },
     }));
 
 
@@ -113,26 +137,73 @@ export default function QuizSetup_naplan_language_conventions() {
   };
 
   /* ============================
-     Topic Handlers
+    Topic Handlers
   ============================ */
-  const handleTopicNameChange = (index, value) => {
+  const handleTopicNameChange = async (index, value) => {
+  setQuiz((prev) => {
+    const topics = [...prev.topics];
+    topics[index].name = value;
+    return { ...prev, topics };
+  });
+
+  // 🔥 CALL BACKEND
+  if (!value || !quiz.year) return;
+
+  try {
+    const params = new URLSearchParams({
+      subject: "language_conventions",
+      year: quiz.year,
+      topic: value,
+    });
+
+    const res = await fetch(
+      `${BACKEND_URL}/api/topic-question-counts-lc?${params.toString()}`
+    );
+
+    if (!res.ok) throw new Error("Failed to fetch counts");
+
+    const data = await res.json();
+
+    // 🔥 UPDATE AVAILABLE COUNTS
     setQuiz((prev) => {
       const topics = [...prev.topics];
-      topics[index].name = value;
+
+      const topic = { ...topics[index] };
+
+      topic.difficulty.easy.available = data.easy || 0;
+      topic.difficulty.medium.available = data.medium || 0;
+      topic.difficulty.hard.available = data.hard || 0;
+
+      topics[index] = topic;
+
       return { ...prev, topics };
     });
-  };
 
-  const handleTopicChange = (index, field, value) => {
+  } catch (err) {
+    console.error("Error fetching topic counts:", err);
+  }
+};
+
+  const handleDifficultyChange = (index, level, field, value) => {
   setQuiz((prev) => {
     const topics = [...prev.topics];
     const num = Number(value) || 0;
 
-    topics[index][field] = num;
-    topics[index].total =
-      Number(topics[index].ai || 0) +
-      Number(topics[index].db || 0);
+    topics[index].difficulty[level][field] = num;
 
+    // ✅ Recalculate topic total
+    let topicTotal = 0;
+
+    ["easy", "medium", "hard"].forEach((lvl) => {
+      const d = topics[index].difficulty[lvl];
+      if (d.enabled) {
+        topicTotal += (d.ai || 0) + (d.db || 0);
+      }
+    });
+
+    topics[index].total = topicTotal;
+
+    // ✅ Global total
     const globalTotal = topics.reduce(
       (sum, t) => sum + (t.total || 0),
       0
@@ -140,23 +211,22 @@ export default function QuizSetup_naplan_language_conventions() {
 
     const range = getAllowedRange(prev.year);
     if (range && globalTotal > range.max) {
-      alert(
-        `Total questions cannot exceed ${range.max} for Year ${prev.year}`
-      );
+      alert(`Total cannot exceed ${range.max}`);
       return prev;
     }
 
     setTotalQuestions(globalTotal);
+
     return { ...prev, topics };
   });
 };
 
 
   /* ============================
-     Fetch Available Topics
+    Fetch Available Topics
   ============================ */
   useEffect(() => {
-    if (!quiz.year || !quiz.difficulty) {
+    if (!quiz.year) {
       setAvailableTopics([]);
       return;
     }
@@ -166,7 +236,7 @@ export default function QuizSetup_naplan_language_conventions() {
         const params = new URLSearchParams({
           subject: "language_conventions",
           year: quiz.year,
-          difficulty: quiz.difficulty,
+          
         });
 
         const res = await fetch(
@@ -184,16 +254,16 @@ export default function QuizSetup_naplan_language_conventions() {
     };
 
     fetchTopics();
-  }, [quiz.year, quiz.difficulty]);
+  }, [quiz.year]);
 
 /* ============================
-   Selected Topics
+  Selected Topics
 ============================ */
 const selectedTopicNames = quiz.topics
   .map((t) => t.name)
   .filter((name) => name !== "");
   /* ============================
-     View Question Bank
+    View Question Bank
   ============================ */
   const handleDeleteAllQuestions = async () => {
   const confirmed = window.confirm(
@@ -250,7 +320,7 @@ const selectedTopicNames = quiz.topics
   };
 
   /* ============================
-     Create Exam
+    Create Exam
   ============================ */
   const handleGenerateHomeWorkExam = async () => {
   if (!isTotalValid) {
@@ -267,13 +337,25 @@ const selectedTopicNames = quiz.topics
     class_name: "naplan",
     subject: "Language Conventions",
     year: Number(quiz.year),
-    difficulty: quiz.difficulty,
+    difficulty: "mixed",
     num_topics: quiz.topics.length,
     topics: quiz.topics.map((t) => ({
       name: t.name,
-      ai: t.ai,
-      db: t.db,
       total: t.total,
+      difficulty: {
+        easy: {
+          ai: t.difficulty.easy.enabled ? t.difficulty.easy.ai : 0,
+          db: t.difficulty.easy.enabled ? t.difficulty.easy.db : 0,
+        },
+        medium: {
+          ai: t.difficulty.medium.enabled ? t.difficulty.medium.ai : 0,
+          db: t.difficulty.medium.enabled ? t.difficulty.medium.db : 0,
+        },
+        hard: {
+          ai: t.difficulty.hard.enabled ? t.difficulty.hard.ai : 0,
+          db: t.difficulty.hard.enabled ? t.difficulty.hard.db : 0,
+        },
+      },
     })),
 
     total_questions: totalQuestions,
@@ -325,13 +407,25 @@ const selectedTopicNames = quiz.topics
       class_name: "naplan",
       subject: "Language Conventions",
       year: Number(quiz.year),
-      difficulty: quiz.difficulty,
+      difficulty: "mixed",
       num_topics: quiz.topics.length,
       topics: quiz.topics.map((t) => ({
         name: t.name,
-        ai: t.ai,
-        db: t.db,
         total: t.total,
+        difficulty: {
+          easy: {
+            ai: t.difficulty.easy.enabled ? t.difficulty.easy.ai : 0,
+            db: t.difficulty.easy.enabled ? t.difficulty.easy.db : 0,
+          },
+          medium: {
+            ai: t.difficulty.medium.enabled ? t.difficulty.medium.ai : 0,
+            db: t.difficulty.medium.enabled ? t.difficulty.medium.db : 0,
+          },
+          hard: {
+            ai: t.difficulty.hard.enabled ? t.difficulty.hard.ai : 0,
+            db: t.difficulty.hard.enabled ? t.difficulty.hard.db : 0,
+          },
+        },
       })),
 
       total_questions: totalQuestions,
@@ -359,7 +453,7 @@ const selectedTopicNames = quiz.topics
   };
 
   /* ============================
-     Render
+    Render
   ============================ */
   return (
     <div className="quiz-setup-container">
@@ -372,17 +466,7 @@ const selectedTopicNames = quiz.topics
         <option value="5">Year 5</option>
       </select>
 
-      <label>Difficulty:</label>
-      <select
-        name="difficulty"
-        value={quiz.difficulty}
-        onChange={handleInputChange}
-      >
-        <option value="">Select Difficulty</option>
-        <option value="easy">Easy</option>
-        <option value="medium">Medium</option>
-        <option value="hard">Hard</option>
-      </select>
+      
 
       <label>Number of Topics:</label>
       <input
@@ -396,7 +480,7 @@ const selectedTopicNames = quiz.topics
       <button
         type="button"
         onClick={generateTopics}
-        disabled={!quiz.year || !quiz.difficulty}
+        disabled={!quiz.year}
       >
         Generate Topics
       </button>
@@ -425,25 +509,58 @@ const selectedTopicNames = quiz.topics
                 ))}
             </select>
 
-            <label>AI Questions:</label>
-              <input
-                type="number"
-                min="0"
-                value={topic.ai}
-                onChange={(e) =>
-                  handleTopicChange(index, "ai", e.target.value)
-                }
-              />
-              
-              <label>DB Questions:</label>
-              <input
-                type="number"
-                min="0"
-                value={topic.db}
-                onChange={(e) =>
-                  handleTopicChange(index, "db", e.target.value)
-                }
-              />
+            {["easy", "medium", "hard"].map((level) => (
+              <div key={level} style={{ marginTop: "10px" }}>
+                
+                {/* TOGGLE */}
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={topic.difficulty[level].enabled}
+                    onChange={() => handleDifficultyToggle(index, level)}
+                  />
+                  {level.toUpperCase()}
+                </label>
+
+                {/* INPUTS */}
+                {topic.difficulty[level].enabled && (
+                  <div className="difficulty-grid">
+  
+                  {/* LEFT: AI */}
+                  <div>
+                    <label>Questions Generated by AI</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={topic.difficulty[level].ai}
+                      onChange={(e) =>
+                        handleDifficultyChange(index, level, "ai", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  {/* RIGHT: DB */}
+                  <div>
+                    <label>
+                      Questions from Database{" "}
+                      <span style={{ color: "blue" }}>
+                        Available in DB: {topic.difficulty[level].available || 0}
+                      </span>
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={topic.difficulty[level].db}
+                      onChange={(e) =>
+                        handleDifficultyChange(index, level, "db", e.target.value)
+                      }
+                    />
+                  </div>
+
+                </div>
+                )}
+              </div>
+            ))}
 
 
           </div>
