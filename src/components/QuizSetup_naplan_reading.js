@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./QuizSetup.css";
-const BACKEND_URL = "https://web-production-481a5.up.railway.app";
-//const BACKEND_URL = "http://127.0.0.1:8000";
+
+
+const BACKEND_URL = process.env.REACT_APP_API_URL;
 
 
 export default function QuizSetup_naplan_reading({ examType }) {
@@ -11,6 +12,7 @@ export default function QuizSetup_naplan_reading({ examType }) {
   const [questionBank, setQuestionBank] = useState([]);
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [qbLoading, setQbLoading] = useState(false);
+  const [availability, setAvailability] = useState({});
 
   const getAllowedRange = (year) => {
     if (year === "3") {
@@ -28,7 +30,6 @@ export default function QuizSetup_naplan_reading({ examType }) {
     className: "naplan",
     subject: "reading",
     year: "",
-    difficulty: "",
     numTopics: 1,
     topics: [],
   });
@@ -39,6 +40,33 @@ export default function QuizSetup_naplan_reading({ examType }) {
     totalQuestions >= allowedRange.min &&
     totalQuestions <= allowedRange.max;
 
+
+  useEffect(() => {
+  if (!quiz.year) return;
+
+  const fetchAvailability = async () => {
+    try {
+      const res = await fetch(
+        `${BACKEND_URL}/api/reading-availability?class_year=${quiz.year}`
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch availability");
+      }
+
+      const data = await res.json();
+
+      console.log("📊 Availability:", data); // debug
+      setAvailability(data);
+
+    } catch (err) {
+      console.error("Availability error:", err);
+      setAvailability({});
+    }
+  };
+
+  fetchAvailability();
+}, [quiz.year]);
   /* ============================
      Sync subject on mount
   ============================ */
@@ -71,7 +99,7 @@ export default function QuizSetup_naplan_reading({ examType }) {
   try {
     const params = new URLSearchParams({
       year: quiz.year,
-      difficulty: quiz.difficulty || "",
+      
     });
 
     const response = await fetch(
@@ -147,9 +175,12 @@ export default function QuizSetup_naplan_reading({ examType }) {
 
     const topicsArray = Array.from({ length: num }, () => ({
       name: "",
-      ai: 0,
-      db: 0,
       total: 0,
+      difficulty: {
+        easy: { enabled: false, ai: 0, db: 0 },
+        medium: { enabled: false, ai: 0, db: 0 },
+        hard: { enabled: false, ai: 0, db: 0 },
+      },
     }));
 
     setQuiz((prev) => ({ ...prev, topics: topicsArray }));
@@ -167,34 +198,75 @@ export default function QuizSetup_naplan_reading({ examType }) {
     });
   };
 
-  const handleTopicChange = (index, field, value) => {
-    setQuiz((prev) => {
-      const topics = [...prev.topics];
-      const num = Number(value) || 0;
+  const handleDifficultyToggle = (topicIndex, level) => {
+  setQuiz((prev) => {
+    const topics = [...prev.topics];
 
-      topics[index][field] = num;
-      topics[index].total =
-        Number(topics[index].ai || 0) +
-        Number(topics[index].db || 0);
+    const topic = { ...topics[topicIndex] };
 
-      const globalTotal = topics.reduce(
-        (sum, t) => sum + (t.total || 0),
-        0
-      );
+    const difficulty = {
+      ...topic.difficulty,
+      [level]: {
+        ...topic.difficulty[level],
+        enabled: !topic.difficulty[level].enabled,
+      },
+    };
 
-      const range = getAllowedRange(prev.year);
+    topic.difficulty = difficulty;
+    topics[topicIndex] = topic;
 
-      if (range && globalTotal > range.max) {
-        alert(
-          `Total questions cannot exceed ${range.max} for Year ${prev.year}`
-        );
-        return prev;
-      }
+    // 🔥 recompute totals (same as before)
+    const topicTotal = Object.values(difficulty).reduce((sum, d) => {
+      if (!d.enabled) return sum;
+      return sum + (d.ai || 0) + (d.db || 0);
+    }, 0);
 
-      setTotalQuestions(globalTotal);
-      return { ...prev, topics };
-    });
-  };
+    topic.total = topicTotal;
+
+    const globalTotal = topics.reduce(
+      (sum, t) => sum + (t.total || 0),
+      0
+    );
+
+    setTotalQuestions(globalTotal);
+
+    return { ...prev, topics };
+  });
+};
+  const handleDifficultyChange = (topicIndex, level, field, value) => {
+  setQuiz((prev) => {
+    const topics = [...prev.topics];
+    const num = Number(value) || 0;
+
+    topics[topicIndex].difficulty[level][field] = num;
+
+    // 🔥 recompute topic total
+    const topicTotal = Object.values(
+      topics[topicIndex].difficulty
+    ).reduce((sum, d) => {
+      if (!d.enabled) return sum;
+      return sum + (d.ai || 0) + (d.db || 0);
+    }, 0);
+
+    topics[topicIndex].total = topicTotal;
+
+    // 🔥 recompute global total
+    const globalTotal = topics.reduce(
+      (sum, t) => sum + (t.total || 0),
+      0
+    );
+
+    const range = getAllowedRange(prev.year);
+
+    if (range && globalTotal > range.max) {
+      alert(`Total cannot exceed ${range.max}`);
+      return prev;
+    }
+
+    setTotalQuestions(globalTotal);
+    return { ...prev, topics };
+  });
+};
 
   /* ============================
      View Question Bank
@@ -244,13 +316,25 @@ export default function QuizSetup_naplan_reading({ examType }) {
       class_name: quiz.className,
       subject: "reading",
       year: Number(quiz.year),
-      difficulty: quiz.difficulty,
+      difficulty: "mixed",
       num_topics: quiz.topics.length,
       topics: quiz.topics.map((t) => ({
         name: t.name,
-        ai: t.ai,
-        db: t.db,
         total: t.total,
+        difficulty: {
+          easy: {
+            ai: t.difficulty.easy.ai,
+            db: t.difficulty.easy.db,
+          },
+          medium: {
+            ai: t.difficulty.medium.ai,
+            db: t.difficulty.medium.db,
+          },
+          hard: {
+            ai: t.difficulty.hard.ai,
+            db: t.difficulty.hard.db,
+          },
+        },
       })),
       total_questions: totalQuestions,
     };
@@ -296,13 +380,25 @@ const handleGenerateExamHomeWork = async () => {
     class_name: quiz.className,
     subject: "reading",
     year: Number(quiz.year),
-    difficulty: quiz.difficulty,
+    difficulty: "mixed",
     num_topics: quiz.topics.length,
     topics: quiz.topics.map((t) => ({
       name: t.name,
-      ai: t.ai,
-      db: t.db,
       total: t.total,
+      difficulty: {
+        easy: {
+          ai: t.difficulty.easy.ai,
+          db: t.difficulty.easy.db,
+        },
+        medium: {
+          ai: t.difficulty.medium.ai,
+          db: t.difficulty.medium.db,
+        },
+        hard: {
+          ai: t.difficulty.hard.ai,
+          db: t.difficulty.hard.db,
+        },
+      },
     })),
     total_questions: totalQuestions,
   };
@@ -354,7 +450,7 @@ const handleGenerateExamHomeWork = async () => {
      Fetch available topics
   ============================ */
   useEffect(() => {
-    if (!quiz.year || !quiz.difficulty) {
+    if (!quiz.year ) {
       setAvailableTopics([]);
       return;
     }
@@ -364,7 +460,7 @@ const handleGenerateExamHomeWork = async () => {
         const params = new URLSearchParams({
           subject: "reading",
           year: quiz.year,
-          difficulty: quiz.difficulty,
+          
         });
 
         const res = await fetch(
@@ -382,7 +478,7 @@ const handleGenerateExamHomeWork = async () => {
     };
 
     fetchTopics();
-  }, [quiz.year, quiz.difficulty]);
+  }, [quiz.year]);
   /* ============================
    Selected Topics
 ============================ */
@@ -412,17 +508,7 @@ const selectedTopicNames = quiz.topics
         <option value="5">Year 5</option>
       </select>
 
-      <label>Difficulty:</label>
-      <select
-        name="difficulty"
-        value={quiz.difficulty}
-        onChange={handleInputChange}
-      >
-        <option value="">Select Difficulty</option>
-        <option value="easy">Easy</option>
-        <option value="medium">Medium</option>
-        <option value="hard">Hard</option>
-      </select>
+      
 
       <label>Number of Topics:</label>
       <input
@@ -436,7 +522,7 @@ const selectedTopicNames = quiz.topics
       <button
         type="button"
         onClick={generateTopics}
-        disabled={!quiz.year || !quiz.difficulty}
+        disabled={!quiz.year}
       >
         Generate Topics
       </button>
@@ -469,25 +555,68 @@ const selectedTopicNames = quiz.topics
                   </option>
                 ))}            </select>
 
-            <label>AI Questions:</label>
-            <input
-              type="number"
-              min="0"
-              value={topic.ai}
-              onChange={(e) =>
-                handleTopicChange(index, "ai", e.target.value)
-              }
-            />
+            {["easy", "medium", "hard"].map((level) => (
+              <div key={level} style={{ marginTop: "10px" }}>
 
-            <label>DB Questions:</label>
-            <input
-              type="number"
-              min="0"
-              value={topic.db}
-              onChange={(e) =>
-                handleTopicChange(index, "db", e.target.value)
-              }
-            />
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={topic.difficulty[level].enabled}
+                    onChange={() =>
+                      handleDifficultyToggle(index, level)
+                    }
+                  />
+                  {level.toUpperCase()}
+                </label>
+
+                {topic.difficulty[level].enabled && (
+                  <div style={{ marginLeft: "20px", marginTop: "5px" }}>
+
+                    {/* HEADERS */}
+                    <div style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      fontSize: "12px",
+                      marginBottom: "5px"
+                    }}>
+                      <span>Questions Generated by AI</span>
+                      <span>
+                        Questions from Database{" "}
+                        <span style={{ color: "blue" }}>
+                          (Available in DB: {
+                            availability[topic.name?.toLowerCase()]?.[level] || 0
+                          })
+                        </span>
+                      </span>
+                    </div>
+
+                    {/* INPUTS */}
+                    <div style={{ display: "flex", gap: "10px" }}>
+                      <input
+                        type="number"
+                        min="0"
+                        value={topic.difficulty[level].ai}
+                        onChange={(e) =>
+                          handleDifficultyChange(index, level, "ai", e.target.value)
+                        }
+                        style={{ flex: 1 }}
+                      />
+
+                      <input
+                        type="number"
+                        min="0"
+                        value={topic.difficulty[level].db}
+                        onChange={(e) =>
+                          handleDifficultyChange(index, level, "db", e.target.value)
+                        }
+                        style={{ flex: 1 }}
+                      />
+                    </div>
+
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         ))}
       </div>

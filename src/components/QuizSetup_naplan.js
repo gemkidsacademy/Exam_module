@@ -38,7 +38,7 @@ export default function QuizSetup_naplan({ examType }) {
     className: "naplan",
     subject: examType.replace("naplan_", ""),
     year: "",
-    difficulty: "",
+    difficulty: "mixed", 
     numTopics: 1,
     topics: [],
   });
@@ -102,7 +102,7 @@ useEffect(() => {
   try {
     const params = new URLSearchParams({
       year: quiz.year,
-      difficulty: quiz.difficulty,
+      
     });
 
     const response = await fetch(
@@ -597,17 +597,7 @@ useEffect(() => {
           );
         })}
       </select>
-      <label>Difficulty:</label>
-      <select
-        name="difficulty"
-        value={quiz.difficulty}
-        onChange={handleInputChange}
-      >
-        <option value="">Select Difficulty</option>
-        <option value="easy">Easy</option>
-        <option value="medium">Medium</option>
-        <option value="hard">Hard</option>
-      </select>
+      
 
       <label>Number of Topics:</label>
       <input
