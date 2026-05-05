@@ -17,44 +17,42 @@ export default function GenerateExam_thinking_skills({ mode }) {
      Generate Exam Handler
   =========================== */
   const handleGenerateThinkingSkillsHomework = async () => {
-    setLoading(true);
-    setErrorMessage("");
-    setGeneratedExam(null);
+  setLoading(true);
+  setErrorMessage("");
+  setGeneratedExam(null);
 
-    try {
-      const response = await fetch(
-        `${BACKEND_URL}/api/exams/generate-thinking-skills-homework`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            class_year: selectedClassYear
-          })
-        }
-      );
+  try {
+    // ✅ decide endpoint based on mode
+    const endpoint =
+      mode === "latest"
+        ? "/api/exams/generate-thinking-skills-homework-latest"
+        : "/api/exams/generate-thinking-skills-homework";
 
-      const data = await response.json();
+    const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        class_year: selectedClassYear
+      })
+    });
 
-      if (!response.ok) {
-        console.error("Backend returned:", data);
-        throw new Error(data.detail || "Failed to generate homework exam");
-      }
+    const data = await response.json();
 
-      console.log("Homework exam generated:", data);
-
-      setGeneratedExam(data); // ✅ keep consistent with main flow
-      alert("✅ Homework exam generated successfully!");
-    } catch (error) {
-      console.error("❌ Homework exam error:", error);
-      setErrorMessage(
-        error.message || "Something went wrong while generating homework exam"
-      );
-    } finally {
-      setLoading(false);
+    if (!response.ok) {
+      throw new Error(data.detail || "Failed to generate homework exam");
     }
-  };
+
+    setGeneratedExam(data);
+    alert("✅ Homework exam generated successfully!");
+  } catch (error) {
+    console.error(error);
+    setErrorMessage(error.message);
+  } finally {
+    setLoading(false);
+  }
+};
   const handleGenerateThinkingSkillsExam = async () => {
     setLoading(true);
     setErrorMessage("");
@@ -114,16 +112,7 @@ export default function GenerateExam_thinking_skills({ mode }) {
           <option value={6}>Year 6</option>
         </select>
       </div>
-      {mode === "latest" && (
-        <div className="form-group">
-          <label>Number of Questions:</label>
-          <input
-            type="number"
-            value={40}
-            disabled
-          />
-        </div>
-      )}
+      
 
       {errorMessage && <p className="error-text">{errorMessage}</p>}
       <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>

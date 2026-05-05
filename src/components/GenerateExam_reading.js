@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./generateexam_reading.css";
 
-export default function GenerateExam_reading() {
+export default function GenerateExam_reading({ mode }) {
   const [quizzes, setQuizzes] = useState([]);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
   const [selectedClass, setSelectedClass] = useState("");
@@ -66,9 +66,7 @@ export default function GenerateExam_reading() {
 }, [selectedClassYear]); // ✅ IMPORTANT dependency
 
   const handleGenerateHomeworkExam = async () => {
-  console.log(
-    "\n================ GENERATE HOMEWORK DEBUG ================="
-  );
+  console.log("\n================ GENERATE HOMEWORK DEBUG =================");
 
   console.log("📦 selectedClassYear:", selectedClassYear);
 
@@ -84,23 +82,27 @@ export default function GenerateExam_reading() {
   setGeneratedExam(null);
 
   try {
+    // ✅ Decide endpoint based on mode
+    const endpoint =
+      mode === "latest"
+        ? "/api/exams/generate-reading-homework-latest"
+        : "/api/exams/generate-reading-homework";
+
     const payload = {
       class_name: "Selective",
       class_year: selectedClassYear,
     };
 
     console.log("🚀 REQUEST PAYLOAD:", payload);
+    console.log("🌐 ENDPOINT:", endpoint);
 
-    const res = await fetch(
-      `${BACKEND_URL}/api/exams/generate-reading-homework`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      }
-    );
+    const res = await fetch(`${BACKEND_URL}${endpoint}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
 
     console.log("📡 RESPONSE STATUS:", res.status);
 
@@ -117,42 +119,34 @@ export default function GenerateExam_reading() {
     }
 
     setGeneratedExam(data);
-    setSuccessMessage(
-      "Homework exam created successfully."
-    );
+    setSuccessMessage("Homework exam created successfully.");
 
     console.log("✅ HOMEWORK GENERATED SUCCESSFULLY");
 
   } catch (error) {
-    console.error(
-      "💥 GENERATE HOMEWORK ERROR:",
-      error
-    );
+    console.error("💥 GENERATE HOMEWORK ERROR:", error);
 
     setError(
-      error.message ||
-      "Failed to generate homework exam."
+      error.message || "Failed to generate homework exam."
     );
 
   } finally {
     setLoading(false);
-
-    console.log(
-      "================ END HOMEWORK DEBUG =================\n"
-    );
+    console.log("================ END HOMEWORK DEBUG =================\n");
   }
 };
+
   /* ---------------------------
      GENERATE EXAM
   --------------------------- */
-  const handleGenerateExam = async () => {
+const handleGenerateExam = async () => {
   console.log("\n================ GENERATE EXAM DEBUG =================");
 
   console.log("📦 selectedClass:", selectedClass);
   console.log("📦 selectedDifficulty:", selectedDifficulty);
   console.log("📦 selectedClassYear:", selectedClassYear);
 
-  if ( !selectedClassYear) {
+  if (!selectedClassYear) {
     console.log("❌ Missing required fields");
     alert("Please select class year.");
     return;
@@ -165,22 +159,25 @@ export default function GenerateExam_reading() {
   setGeneratedExam(null);
 
   try {
+    // ✅ Decide endpoint based on mode
+    const endpoint =
+      mode === "latest"
+        ? "/api/exams/generate-reading-latest"
+        : "/api/exams/generate-reading";
+
     const payload = {
       class_name: "Selective",
-      class_year: selectedClassYear // ✅ ADDED
-      
+      class_year: selectedClassYear
     };
 
     console.log("🚀 REQUEST PAYLOAD:", payload);
+    console.log("🌐 ENDPOINT:", endpoint);
 
-    const res = await fetch(
-      `${BACKEND_URL}/api/exams/generate-reading`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      }
-    );
+    const res = await fetch(`${BACKEND_URL}${endpoint}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
 
     console.log("📡 RESPONSE STATUS:", res.status);
 
@@ -193,7 +190,6 @@ export default function GenerateExam_reading() {
       throw new Error(data.detail || "Exam generation failed");
     }
 
-    // ✅ success only AFTER backend response
     setGeneratedExam(data);
     setSuccessMessage("Exam created successfully.");
 
@@ -201,7 +197,7 @@ export default function GenerateExam_reading() {
 
   } catch (err) {
     console.error("💥 GENERATE EXAM ERROR:", err);
-    setError("Failed to generate exam. Check console for details.");
+    setError(err.message || "Failed to generate exam.");
   } finally {
     setLoading(false);
     console.log("================ END GENERATE EXAM =================\n");

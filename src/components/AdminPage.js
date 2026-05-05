@@ -656,7 +656,7 @@
                             setGenerateExamStep("generate");
                           }}
                         >
-                          Generate from Random Questions
+                          Generate Exam
                         </button>
 
                         <button
@@ -666,7 +666,7 @@
                             setGenerateExamStep("generate");
                           }}
                         >
-                          Generate from Latest Uploaded Questions
+                          Generate Exam from Latest Questions
                         </button>
 
                       </div>

@@ -4,7 +4,7 @@ import "./generateexam_MR.css";
 
 const BACKEND_URL = process.env.REACT_APP_API_URL;
 
-export default function GenerateExam() {
+export default function GenerateExam({ mode }) {
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
@@ -46,17 +46,20 @@ const handleGenerateExam = async () => {
   try {
     console.log("Sending class_year:", parsedYear, typeof parsedYear);
 
-    const response = await fetch(
-      `${BACKEND_URL}/generate-new-mr`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          difficulty: "medium",
-          class_year: parsedYear   // ✅ FIXED
-        })
-      }
-    );
+    // ✅ decide endpoint based on mode
+    const endpoint =
+      mode === "latest"
+        ? "/generate-new-mr-latest"
+        : "/generate-new-mr";
+
+    const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        difficulty: "medium",
+        class_year: parsedYear
+      })
+    });
 
     const data = await response.json();
     console.log("Diagnostic response:", data);
@@ -73,13 +76,12 @@ const handleGenerateExam = async () => {
     setLoading(false);
   }
 };
-
   /* -------------------------------------------
      GENERATE HOMEWORK EXAM
   ------------------------------------------- */
   const handleGenerateHomeworkExam = async () => {
   if (!selectedYear) {
-    alert("Please select a class year.");
+    setError("Please select a class year first");
     return;
   }
 
@@ -95,29 +97,33 @@ const handleGenerateExam = async () => {
   setGeneratedExam(null);
 
   try {
-    const response = await fetch(
-      `${BACKEND_URL}/generate-new-mr-homework`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          class_year: parsedYear   // ✅ FIXED
-        })
-      }
-    );
+    console.log("Sending class_year:", parsedYear, typeof parsedYear);
+
+    // ✅ decide endpoint based on mode
+    const endpoint =
+      mode === "latest"
+        ? "/generate-new-mr-homework-latest"
+        : "/generate-new-mr-homework";
+
+    const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        difficulty: "medium",
+        class_year: parsedYear
+      })
+    });
 
     const data = await response.json();
-    console.log("Homework response:", data);
+    console.log("Diagnostic response:", data);
 
     if (!response.ok) {
-      throw new Error(data?.detail || "Failed to generate homework exam");
+      throw new Error(data?.detail || "Failed to generate exam");
     }
 
     setGeneratedExam(data);
-    alert("✅ Homework exam generated!");
-
   } catch (err) {
-    console.error("Homework generation failed:", err);
+    console.error("Exam generation failed:", err);
     setError(err.message || "Unexpected error occurred");
   } finally {
     setLoading(false);
