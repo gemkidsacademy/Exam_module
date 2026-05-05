@@ -4,10 +4,11 @@ import "./generate_exam.css";
 
 const BACKEND_URL = process.env.REACT_APP_API_URL;
 
-export default function GenerateExam_thinking_skills() {
+export default function GenerateExam_thinking_skills({ mode }) {
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [questionCount, setQuestionCount] = useState(40);
 
   // ✅ NEW: class year state
   const [selectedClassYear, setSelectedClassYear] = useState(5);
@@ -15,40 +16,78 @@ export default function GenerateExam_thinking_skills() {
   /* ===========================
      Generate Exam Handler
   =========================== */
-  const handleGenerateThinkingSkillsExam = async () => {
+  const handleGenerateThinkingSkillsHomework = async () => {
     setLoading(true);
     setErrorMessage("");
     setGeneratedExam(null);
 
     try {
       const response = await fetch(
-        `${BACKEND_URL}/api/exams/generate-thinking-skills`,
+        `${BACKEND_URL}/api/exams/generate-thinking-skills-homework`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            class_year: selectedClassYear   // ✅ KEY CHANGE
+            class_year: selectedClassYear
           })
         }
       );
 
       const data = await response.json();
 
-      console.log("Generate exam response:", data);
+      if (!response.ok) {
+        console.error("Backend returned:", data);
+        throw new Error(data.detail || "Failed to generate homework exam");
+      }
+
+      console.log("Homework exam generated:", data);
+
+      setGeneratedExam(data); // ✅ keep consistent with main flow
+      alert("✅ Homework exam generated successfully!");
+    } catch (error) {
+      console.error("❌ Homework exam error:", error);
+      setErrorMessage(
+        error.message || "Something went wrong while generating homework exam"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleGenerateThinkingSkillsExam = async () => {
+    setLoading(true);
+    setErrorMessage("");
+    setGeneratedExam(null);
+
+    try {
+      // ✅ decide endpoint based on mode
+      const endpoint =
+        mode === "latest"
+          ? "/api/exams/generate-thinking-skills-latest"
+          : "/api/exams/generate-thinking-skills";
+
+      const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          class_year: selectedClassYear
+        })
+      });
+
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.detail || "Failed to generate Thinking Skills exam");
+        throw new Error(data.detail || "Failed to generate exam");
       }
 
       setGeneratedExam(data);
       alert("✅ Exam generated successfully!");
     } catch (error) {
-      console.error("❌ Generate exam failed:", error);
-      setErrorMessage(
-        error.message || "Something went wrong while generating the exam"
-      );
+      console.error(error);
+      setErrorMessage(error.message);
     } finally {
       setLoading(false);
     }
@@ -60,6 +99,7 @@ export default function GenerateExam_thinking_skills() {
   return (
     <div className="generate-exam-container">
       <h2>Generate Thinking Skills Exam</h2>
+
 
       {/* ✅ NEW: Class Year Selector */}
       <div className="form-group">
@@ -74,6 +114,16 @@ export default function GenerateExam_thinking_skills() {
           <option value={6}>Year 6</option>
         </select>
       </div>
+      {mode === "latest" && (
+        <div className="form-group">
+          <label>Number of Questions:</label>
+          <input
+            type="number"
+            value={40}
+            disabled
+          />
+        </div>
+      )}
 
       {errorMessage && <p className="error-text">{errorMessage}</p>}
       <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
@@ -85,41 +135,15 @@ export default function GenerateExam_thinking_skills() {
         {loading ? "Generating..." : "Generate Exam"}
       </button>
       <button
-  className="generate-btn blue-btn"
-  type="button"
-  onClick={async () => {
-    try {
-      const res = await fetch(
-        `${BACKEND_URL}/api/exams/generate-thinking-skills-homework`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            class_year: selectedClassYear
-          }),
-        }
-      );
-
-      if (!res.ok) {
-        const err = await res.json();
-        console.error("Backend returned:", err);
-        throw new Error("Failed to generate homework exam");
-      }
-
-      const data = await res.json();
-      console.log("Homework exam generated:", data);
-
-      alert("Homework exam generated successfully!");
-    } catch (error) {
-      console.error(error);
-      alert("Error generating homework exam.");
-    }
-  }}
-  style={{ marginLeft: "10px" }}
->
-  Generate Exam (Homework)
-</button>
-</div>
+        className="generate-btn blue-btn"
+        type="button"
+        onClick={handleGenerateThinkingSkillsHomework}
+        disabled={loading}
+        style={{ marginLeft: "10px" }}
+      >
+        {loading ? "Generating..." : "Generate Exam (Homework)"}
+      </button>
+    </div>
 
       {/* RESULT */}
       {generatedExam && (

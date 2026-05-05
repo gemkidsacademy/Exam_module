@@ -1,5 +1,11 @@
   import React, { useState, useEffect } from "react";
+  import { useEditor, EditorContent } from "@tiptap/react";
+  import StarterKit from "@tiptap/starter-kit";
   import { useNavigate } from "react-router-dom";
+  import { TextStyle } from "@tiptap/extension-text-style";
+  import { Bold, Italic, List, AlignLeft, AlignCenter, AlignRight } from "lucide-react";
+  
+  import TextAlign from "@tiptap/extension-text-align";
   import useVariant from "../hooks/useVariant";
   import "./WritingComponent.css";
   
@@ -47,6 +53,22 @@
     const variant = useVariant(parentVariant);
     const [examActive, setExamActive] = useState(false);
     const navigate = useNavigate();
+    const CustomTextStyle = TextStyle.extend({
+      addAttributes() {
+        return {
+          fontSize: {
+            default: null,
+            parseHTML: element => element.style.fontSize,
+            renderHTML: attributes => {
+              if (!attributes.fontSize) return {};
+              return {
+                style: `font-size: ${attributes.fontSize}`,
+              };
+            },
+          },
+        };
+      },
+    });
 
     const CATEGORY_LABELS = {
       audience_purpose_form: "Audience, Purpose & Form",
@@ -134,11 +156,23 @@
         });
     }, [result?.attempt_id, variant]);
     
-    //useEffect(() => {
-      //document.addEventListener("contextmenu", e => e.preventDefault());
-     // document.addEventListener("copy", e => e.preventDefault());
-      //document.addEventListener("cut", e => e.preventDefault());
-    //}, []);
+    useEffect(() => {
+      if (!examActive) return;
+
+      const prevent = (e) => e.preventDefault();
+
+      document.addEventListener("copy", prevent);
+      document.addEventListener("cut", prevent);
+      document.addEventListener("paste", prevent);
+      document.addEventListener("contextmenu", prevent);
+
+      return () => {
+        document.removeEventListener("copy", prevent);
+        document.removeEventListener("cut", prevent);
+        document.removeEventListener("paste", prevent);
+        document.removeEventListener("contextmenu", prevent);
+      };
+    }, [examActive]);
     useEffect(() => {
       document.documentElement.style.height = "auto";
       document.body.style.height = "auto";
@@ -459,7 +493,7 @@
         }
       }
     };
-
+    
     /* -----------------------------------------------------------
        HELPERS
     ----------------------------------------------------------- */
@@ -468,7 +502,28 @@
       const s = String(sec % 60).padStart(2, "0");
       return `${m}:${s}`;
     };
-  
+    const editor = useEditor({
+      extensions: [
+        StarterKit,
+        CustomTextStyle,
+        TextAlign.configure({
+          types: ["heading", "paragraph"],
+        }),
+      ],
+      content: "",
+      editable: !submitting,
+      
+      editorProps: {
+          handlePaste(view, event) {
+            event.preventDefault();
+            return true;
+          },
+        },
+
+      onUpdate: ({ editor }) => {
+        setAnswerText(editor.getHTML());
+      },
+    });
     /* -----------------------------------------------------------
        LOADING STATE
     ----------------------------------------------------------- */
@@ -611,7 +666,9 @@
       marginTop: "8px"
     }}
   >
-    {result?.answer_text || "No response found"}
+    <div
+      dangerouslySetInnerHTML={{ __html: result.answer_text }}
+    />
   </div>
 </div>
     {evalData && (
@@ -658,99 +715,190 @@
     console.log("🧠 Rendering ACTIVE writing exam");
   
     return (
-      <div
-        style={{
-          position: "fixed",     // 👈 detach from parent
-          inset: 0,              // 👈 full screen
-          overflowY: "auto",     // 👈 enable vertical scroll
-          background: "#f9fafb",
-          padding: "32px",
-          boxSizing: "border-box"
-        }}
-      >
-    <div className="writing-header">
-      <div className="timer">Time Left: {formatTime(timeLeft)}</div>
+  <div className="writing-layout">
+
+    {/* LEFT PANEL */}
+    <div className="writing-left">
+
+      <div className="writing-header">
+        <div className="timer">
+          Time Left: {formatTime(timeLeft)}
+        </div>
+      </div>
+
+      <div className="writing-question-box">
+        <div
+          className="prompt-header"
+          onClick={() => setShowPrompt(!showPrompt)}
+        >
+          <span>Writing Prompt</span>
+          <span>{showPrompt ? "▼ Hide" : "▶ Show"}</span>
+        </div>
+
+        {showPrompt && (
+          <div className="writing-text">
+
+            {parsedPrompt.title && (
+              <h2 className="writing-title">
+                {parsedPrompt.title}
+              </h2>
+            )}
+
+            {parsedPrompt.task && (
+              <p className="writing-task">
+                {parsedPrompt.task}
+              </p>
+            )}
+
+            {/* ✅ KEEP THIS (you removed it by mistake) */}
+            {parsedPrompt.statement && (
+              <blockquote className="writing-statement">
+                {parsedPrompt.statement}
+              </blockquote>
+            )}
+
+            {parsedPrompt.instructions && (
+              <p className="writing-instructions">
+                {parsedPrompt.instructions}
+              </p>
+            )}
+
+            {parsedPrompt.opening_sentence && (
+              <p className="opening-sentence">
+                <em>{parsedPrompt.opening_sentence}</em>
+              </p>
+            )}
+
+            {parsedPrompt.guidelines && (
+              <ul className="writing-guidelines">
+                {parsedPrompt.guidelines
+                  .split("\n")
+                  .map((line, idx) => (
+                    <li key={idx}>{line}</li>
+                  ))}
+              </ul>
+            )}
+
+          </div>
+        )}
+      </div>
+
     </div>
 
-    <div className="writing-question-box">
-  <div
-    className="prompt-header"
-    onClick={() => setShowPrompt(!showPrompt)}
-  >
-    <span>Writing Prompt</span>
-    <span>{showPrompt ? "▼ Hide" : "▶ Show"}</span>
-  </div>
+    {/* RIGHT PANEL */}
+    <div className="writing-right">
 
-  {showPrompt && (
-    <div className="writing-text">
+      <div className="editor-wrapper">
 
-      {parsedPrompt.title && (
-        <h2 className="writing-title">
-          {parsedPrompt.title}
-        </h2>
-      )}
+        {/* TOOLBAR */}
+        <div className="toolbar">
 
-      {parsedPrompt.task && (
-        <p>
-          <strong>Task:</strong> {parsedPrompt.task}
-        </p>
-      )}
+          {/* FONT SIZE */}
+          <select
+            onChange={(e) =>
+              editor?.chain().focus().setMark("textStyle", {
+                fontSize: e.target.value,
+              }).run()
+            }
+            defaultValue=""
+          >
+            <option value="">Font Sizes</option>
+            <option value="14px">Small</option>
+            <option value="18px">Normal</option>
+            <option value="22px">Large</option>
+          </select>
 
-      {parsedPrompt.statement && (
-        <blockquote className="writing-statement">
-          {parsedPrompt.statement}
-        </blockquote>
-      )}
+          <div className="toolbar-divider" />
 
-      {parsedPrompt.instructions && (
-        <p>
-          <strong>Instructions:</strong> {parsedPrompt.instructions}
-        </p>
-      )}
+          {/* BOLD */}
+          <button
+            type="button"
+            className={editor?.isActive("bold") ? "active" : ""}
+            onClick={(e) => {
+              e.preventDefault();
+              editor?.chain().focus().toggleBold().run();
+            }}
+          >
+            <Bold size={16} />
+          </button>
 
-      {parsedPrompt.opening_sentence && (
-        <p className="opening-sentence">
-          <em>{parsedPrompt.opening_sentence}</em>
-        </p>
-      )}
+          {/* ITALIC */}
+          <button
+            type="button"
+            className={editor?.isActive("italic") ? "active" : ""}
+            onClick={(e) => {
+              e.preventDefault();
+              editor?.chain().focus().toggleItalic().run();
+            }}
+          >
+            <Italic size={16} />
+          </button>
 
-      {parsedPrompt.guidelines && (
-        <>
-          <strong>Guidelines:</strong>
-          <ul>
-            {parsedPrompt.guidelines
-              .split("\n")
-              .map((line, idx) => (
-                <li key={idx}>{line}</li>
-              ))}
-          </ul>
-        </>
-      )}
+          <div className="toolbar-divider" />
+
+          {/* ALIGN */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              editor?.chain().focus().setTextAlign("left").run();
+            }}
+          >
+            <AlignLeft size={16} />
+          </button>
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              editor?.chain().focus().setTextAlign("center").run();
+            }}
+          >
+            <AlignCenter size={16} />
+          </button>
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              editor?.chain().focus().setTextAlign("right").run();
+            }}
+          >
+            <AlignRight size={16} />
+          </button>
+
+          <div className="toolbar-divider" />
+
+          {/* LIST */}
+          <button
+            type="button"
+            className={editor?.isActive("bulletList") ? "active" : ""}
+            onClick={(e) => {
+              e.preventDefault();
+              editor?.chain().focus().toggleBulletList().run();
+            }}
+          >
+            <List size={16} />
+          </button>
+
+        </div>
+
+          {/* EDITOR */}
+          {editor && <EditorContent editor={editor} />}
+
+        </div>
+
+        <button
+          className="submit-writing-btn"
+          onClick={() => setShowConfirmFinish(true)}
+          disabled={submitting}
+        >
+          Submit Writing
+        </button>
 
     </div>
-  )}
-</div>
 
-    <textarea
-      className="writing-answer-box"
-      spellCheck={false}
-      value={answerText}
-      disabled={submitting || timeLeft === 0}
-      onChange={(e) => setAnswerText(e.target.value)}
-      //onPaste={(e) => e.preventDefault()}
-      //onCopy={(e) => e.preventDefault()}
-      //onCut={(e) => e.preventDefault()}
-      onContextMenu={(e) => e.preventDefault()}
-    />
-
-    <button
-      className="submit-writing-btn"
-      onClick={() => setShowConfirmFinish(true)}
-      disabled={submitting}
-    >
-      Submit Writing
-    </button>
-
+    {/* ✅ KEEP PROCESSING OVERLAY */}
     {submitting && (
       <div className="processing-overlay">
         <div className="spinner" />
@@ -758,7 +906,7 @@
       </div>
     )}
 
-    {/* ✅ CONFIRM SUBMIT MODAL — HERE */}
+    {/* ✅ KEEP CONFIRM MODAL */}
     {showConfirmFinish && (
       <div className="confirm-overlay">
         <div className="confirm-modal">
@@ -790,6 +938,7 @@
         </div>
       </div>
     )}
+
   </div>
 );
 }
