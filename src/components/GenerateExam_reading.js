@@ -9,6 +9,8 @@ export default function GenerateExam_reading({ mode }) {
 
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [availableDates, setAvailableDates] = useState([]);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [selectedClassYear, setSelectedClassYear] = useState("");
@@ -18,6 +20,42 @@ export default function GenerateExam_reading({ mode }) {
   /* ---------------------------
      LOAD QUIZ CONFIGS
   --------------------------- */
+  useEffect(() => {
+  const fetchDates = async () => {
+    try {
+      if (!selectedClassYear || mode !== "latest") return;
+
+      const params = new URLSearchParams({
+        class_year: selectedClassYear,
+      });
+
+      const url = `${BACKEND_URL}/api/available-reading-dates?${params.toString()}`;
+
+      console.log("📅 FETCH DATES URL:", url);
+
+      const res = await fetch(url);
+
+      if (!res.ok) throw new Error("Failed to load dates");
+
+      const data = await res.json();
+
+      console.log("📅 DATES RESPONSE:", data);
+
+      setAvailableDates(data);
+
+      // Optional: auto-select latest date
+      if (data.length > 0) {
+        setSelectedDate(data[0]); // assuming backend sends latest first
+      }
+
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load dates.");
+    }
+  };
+
+  fetchDates();
+}, [selectedClassYear, mode]);
   useEffect(() => {
   const load = async () => {
     try {
@@ -75,6 +113,11 @@ export default function GenerateExam_reading({ mode }) {
     alert("Please select class year.");
     return;
   }
+    if (mode === "latest" && !selectedDate) {
+    console.log("❌ Missing date");
+    alert("Please select a date.");
+    return;
+  }
 
   setLoading(true);
   setError("");
@@ -91,6 +134,7 @@ export default function GenerateExam_reading({ mode }) {
     const payload = {
       class_name: "Selective",
       class_year: selectedClassYear,
+      ...(mode === "latest" && { date: selectedDate })
     };
 
     console.log("🚀 REQUEST PAYLOAD:", payload);
@@ -151,6 +195,11 @@ const handleGenerateExam = async () => {
     alert("Please select class year.");
     return;
   }
+  if (mode === "latest" && !selectedDate) {
+    console.log("❌ Missing date");
+    alert("Please select a date.");
+    return;
+  }
 
   // Reset UI before request
   setLoading(true);
@@ -167,7 +216,8 @@ const handleGenerateExam = async () => {
 
     const payload = {
       class_name: "Selective",
-      class_year: selectedClassYear
+      class_year: selectedClassYear,
+      ...(mode === "latest" && { date: selectedDate })
     };
 
     console.log("🚀 REQUEST PAYLOAD:", payload);
@@ -222,6 +272,23 @@ const handleGenerateExam = async () => {
         <option value="Year 5">Year 5</option>
         <option value="Year 6">Year 6</option>
       </select>
+          {mode === "latest" && (
+      <>
+        <label>Select Date:</label>
+        <select
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+        >
+          <option value="">Select Date</option>
+
+          {availableDates.map((date, index) => (
+            <option key={index} value={date}>
+              {date}
+            </option>
+          ))}
+        </select>
+      </>
+    )}
 
       <h2>Generate Reading Exam</h2>
       <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>

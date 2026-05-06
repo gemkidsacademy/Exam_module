@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./generate_exam.css";
 
 
@@ -9,14 +9,57 @@ export default function GenerateExam_thinking_skills({ mode }) {
   const [generatedExam, setGeneratedExam] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [questionCount, setQuestionCount] = useState(40);
+  const [availableDates, setAvailableDates] = useState([]);
+  const [selectedDate, setSelectedDate] = useState("");
 
   // ✅ NEW: class year state
   const [selectedClassYear, setSelectedClassYear] = useState(5);
+  
+
+useEffect(() => {
+  const fetchDates = async () => {
+    try {
+      if (!selectedClassYear || mode !== "latest") return;
+
+      const params = new URLSearchParams({
+        class_year: `Year ${selectedClassYear}`,
+      });
+
+      const url = `${BACKEND_URL}/api/available-thinking-dates?${params.toString()}`;
+
+      console.log("📅 FETCH THINKING DATES:", url);
+
+      const res = await fetch(url);
+
+      if (!res.ok) throw new Error("Failed to load dates");
+
+      const data = await res.json();
+
+      console.log("📅 DATES RESPONSE:", data);
+
+      setAvailableDates(data);
+
+      if (data.length > 0) {
+        setSelectedDate(data[0]); // auto-select latest
+      }
+
+    } catch (err) {
+      console.error(err);
+      setErrorMessage("Failed to load dates.");
+    }
+  };
+
+  fetchDates();
+}, [selectedClassYear, mode]);
 
   /* ===========================
      Generate Exam Handler
   =========================== */
   const handleGenerateThinkingSkillsHomework = async () => {
+    if (mode === "latest" && !selectedDate) {
+      setErrorMessage("Please select a date.");
+      return;
+    }
   setLoading(true);
   setErrorMessage("");
   setGeneratedExam(null);
@@ -34,7 +77,8 @@ export default function GenerateExam_thinking_skills({ mode }) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        class_year: selectedClassYear
+        class_year: selectedClassYear,
+        ...(mode === "latest" && { date: selectedDate })
       })
     });
 
@@ -54,6 +98,10 @@ export default function GenerateExam_thinking_skills({ mode }) {
   }
 };
   const handleGenerateThinkingSkillsExam = async () => {
+    if (mode === "latest" && !selectedDate) {
+      setErrorMessage("Please select a date.");
+      return;
+    }
     setLoading(true);
     setErrorMessage("");
     setGeneratedExam(null);
@@ -71,7 +119,8 @@ export default function GenerateExam_thinking_skills({ mode }) {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          class_year: selectedClassYear
+          class_year: selectedClassYear,
+          ...(mode === "latest" && { date: selectedDate })
         })
       });
 
@@ -112,6 +161,23 @@ export default function GenerateExam_thinking_skills({ mode }) {
           <option value={6}>Year 6</option>
         </select>
       </div>
+      {mode === "latest" && (
+        <div className="form-group">
+          <label>Select Date:</label>
+          <select
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+          >
+            <option value="">Select Date</option>
+
+            {availableDates.map((date, index) => (
+              <option key={index} value={date}>
+                {date}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       
 
       {errorMessage && <p className="error-text">{errorMessage}</p>}

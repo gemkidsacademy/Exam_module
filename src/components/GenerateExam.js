@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./generateexam_MR.css";
 
 
@@ -8,7 +8,49 @@ export default function GenerateExam({ mode }) {
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
+  const [availableDates, setAvailableDates] = useState([]);
+  const [selectedDate, setSelectedDate] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
+
+  
+
+useEffect(() => {
+  const fetchDates = async () => {
+    try {
+      if (!selectedYear || mode !== "latest") return;
+
+      const parsedYear = extractYearNumber(selectedYear);
+
+      const params = new URLSearchParams({
+        class_year: `Year ${parsedYear}`,
+      });
+
+      const url = `${BACKEND_URL}/api/available-MR-dates?${params.toString()}`;
+
+      console.log("📅 FETCH THINKING DATES:", url);
+
+      const res = await fetch(url);
+
+      if (!res.ok) throw new Error("Failed to load dates");
+
+      const data = await res.json();
+
+      console.log("📅 DATES RESPONSE:", data);
+
+      setAvailableDates(data);
+
+      if (data.length > 0) {
+        setSelectedDate(data[0]); // auto select latest
+      }
+
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load dates.");
+    }
+  };
+
+  fetchDates();
+}, [selectedYear, mode]);
 
   const renderText = (value) => {
     if (!value) return "";
@@ -29,6 +71,10 @@ export default function GenerateExam({ mode }) {
 const handleGenerateExam = async () => {
   if (!selectedYear) {
     setError("Please select a class year first");
+    return;
+  }
+  if (mode === "latest" && !selectedDate) {
+    setError("Please select a date.");
     return;
   }
 
@@ -57,7 +103,8 @@ const handleGenerateExam = async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         difficulty: "medium",
-        class_year: parsedYear
+        class_year: parsedYear,
+        ...(mode === "latest" && { date: selectedDate })
       })
     });
 
@@ -82,6 +129,10 @@ const handleGenerateExam = async () => {
   const handleGenerateHomeworkExam = async () => {
   if (!selectedYear) {
     setError("Please select a class year first");
+    return;
+  }
+  if (mode === "latest" && !selectedDate) {
+    setError("Please select a date.");
     return;
   }
 
@@ -110,7 +161,8 @@ const handleGenerateExam = async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         difficulty: "medium",
-        class_year: parsedYear
+        class_year: parsedYear,
+        ...(mode === "latest" && { date: selectedDate })
       })
     });
 
@@ -156,6 +208,28 @@ const handleGenerateExam = async () => {
         <option value="Year 5">Year 5</option>
         <option value="Year 6">Year 6</option>
       </select>
+      {mode === "latest" && (
+      <>
+        <label>Select Date:</label>
+        <select
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+          style={{
+            padding: "10px",
+            width: "100%",
+            marginBottom: "15px"
+          }}
+        >
+          <option value="">-- Select Date --</option>
+
+          {availableDates.map((date, index) => (
+            <option key={index} value={date}>
+              {date}
+            </option>
+          ))}
+        </select>
+      </>
+    )}
 
       {/* NORMAL EXAM BUTTON */}
       <button

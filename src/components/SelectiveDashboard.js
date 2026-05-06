@@ -224,21 +224,23 @@ useEffect(() => {
 
             <div className="subject-buttons">
               {SUBJECTS.map((subject) => {
-                const subjectData = subjectAvailability[subject.key];
+                console.log("---- SUBJECT DEBUG ----");
+                console.log("Subject key:", subject.key);
+                console.log("Full availability:", subjectAvailability);
+                console.log("Subject data:", subjectAvailability?.[subject.key]);
+                console.log("Exam mode:", examMode);
+                console.log("Report variant:", reportVariant);
+                const subjectData = subjectAvailability?.[subject.key];
 
-                let isEnabled = false;  // 🔥 default to false
+                let isEnabled = false;
 
                 if (examMode === "report") {
                   isEnabled = true;
-                } else if (subjectAvailability && subjectAvailability[subject.key]) {
-                  const subjectData = subjectAvailability[subject.key];
-
-                  if (examMode === "exam") {
-                    isEnabled =
-                      reportVariant === "homework"
-                        ? subjectData.homework
-                        : subjectData.exam;
-                  }
+                } else if (examMode === "exam" && subjectData) {
+                  isEnabled =
+                    reportVariant === "homework"
+                      ? subjectData.homework
+                      : subjectData.exam;
                 }
 
                 return (
