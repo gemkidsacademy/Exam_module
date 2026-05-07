@@ -1,279 +1,311 @@
 import React, { useState, useEffect } from "react";
-import "./generate_exam.css";
 
-export default function GenerateExam_oc_mathematical_reasoning({
-  examType,
-  mode
-}) {
+const BACKEND_URL = process.env.REACT_APP_API_URL;
+
+const GenerateExam_oc_reading = ({ mode }) => {
+
   const [loading, setLoading] = useState(false);
-  const [generatedExam, setGeneratedExam] = useState(null);
-  const [availableDates, setAvailableDates] = useState([]);
-  const [selectedDate, setSelectedDate] = useState("");
+
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
   const [classYear, setClassYear] = useState("");
 
-  const BACKEND_URL = process.env.REACT_APP_API_URL;
+  const [availableDates, setAvailableDates] = useState([]);
+  const [selectedDate, setSelectedDate] = useState("");
 
-  /* ===========================
-     Fetch Available Dates
-  =========================== */
+  const [generatedExam, setGeneratedExam] = useState(null);
+
+  /* ==================================================
+     FETCH AVAILABLE DATES
+  ================================================== */
   useEffect(() => {
-    const fetchDates = async () => {
-      try {
-        if (!classYear || mode !== "latest") return;
 
-        const response = await fetch(
-          `${BACKEND_URL}/api/exams/oc-mathematical-reasoning-dates/${classYear}`
+    const fetchDates = async () => {
+
+      if (!classYear || mode !== "latest") {
+        return;
+      }
+
+      try {
+
+        console.log(
+          "📅 Fetching OC Reading dates for:",
+          classYear
         );
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch dates");
-        }
+        const response = await fetch(
+          `${BACKEND_URL}/api/exams/oc-reading-dates/${classYear}`
+        );
 
         const data = await response.json();
 
-        console.log("📅 OC MR Dates Response:", data);
+        console.log("📅 Dates response:", data);
 
         setAvailableDates(data.dates || []);
 
-        // auto select latest date
+        // auto-select latest date
         if (data.dates?.length > 0) {
           setSelectedDate(data.dates[0]);
         }
 
       } catch (error) {
-        console.error("❌ Failed to fetch dates:", error);
+
+        console.error(
+          "❌ Failed to fetch dates:",
+          error
+        );
+
         setError("Failed to load dates");
       }
     };
 
     fetchDates();
+
   }, [classYear, mode]);
 
-  /* ===========================
-     Generate Homework
-  =========================== */
-  const handleGenerateHomework_oc_mathematical_reasoning = async () => {
+  /* ==================================================
+     GENERATE HOMEWORK
+  ================================================== */
+  const handleGenerateHomeworkExam = async () => {
 
     if (!classYear) {
-      setError("Please select class year");
+      setMessage(
+        "Config not loaded yet or class year missing..."
+      );
       return;
     }
 
     if (mode === "latest" && !selectedDate) {
-      setError("Please select a date");
+      setMessage("Please select a date");
       return;
     }
 
-    setLoading(true);
-    setError("");
-    setGeneratedExam(null);
-
     try {
 
+      setLoading(true);
+      setMessage("");
+      setGeneratedExam(null);
+
       const payload = {
-        class_year: Number(classYear),
+        class_year: classYear,
+        class_name: "OC",
+
         ...(mode === "latest" && {
           selected_date: selectedDate
         })
       };
 
       console.log(
-        "📤 Sending payload (OC MR homework):",
+        "📤 Homework payload:",
         payload
       );
 
       const endpoint =
         mode === "latest"
-          ? "/api/exams/generate-oc-mathematical-reasoning-homework-latest"
-          : "/api/exams/generate-oc-mathematical-reasoning-homework";
+          ? "/api/exams/generate-oc-reading-homework-latest"
+          : "/api/exams/generate-oc-reading-homework";
 
       const response = await fetch(
         `${BACKEND_URL}${endpoint}`,
         {
           method: "POST",
+
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(payload)
+
+          body: JSON.stringify(payload),
         }
       );
 
-      const responseText = await response.text();
-      const data = responseText
-        ? JSON.parse(responseText)
-        : {};
+      const data = await response.json();
 
-      console.log("📥 OC MR homework response:", data);
+      console.log(
+        "📥 Homework response:",
+        data
+      );
 
-      if (!response.ok) {
-        throw new Error(
-          data.detail || "Failed to generate homework"
+      if (response.ok) {
+
+        setGeneratedExam(data);
+
+        setMessage(
+          mode === "latest"
+            ? "✅ OC Reading Latest Homework generated successfully"
+            : "✅ OC Reading Homework generated successfully"
+        );
+
+      } else {
+
+        setMessage(
+          data.detail || "❌ Failed to generate homework"
         );
       }
 
-      setGeneratedExam(data);
-
-      alert(
-        mode === "latest"
-          ? "Latest OC Mathematical Reasoning homework generated!"
-          : "OC Mathematical Reasoning homework generated!"
-      );
-
     } catch (error) {
 
-      console.error(
-        "❌ OC MR homework generation failed:",
-        error
-      );
+      console.error(error);
 
-      setError(
-        error.message ||
-        "Something went wrong while generating homework"
+      setMessage(
+        "❌ Server error while generating homework"
       );
 
     } finally {
+
       setLoading(false);
     }
   };
 
-  /* ===========================
-     Generate Exam
-  =========================== */
-  const handleGenerateExam_oc_mathematical_reasoning = async () => {
+  /* ==================================================
+     GENERATE EXAM
+  ================================================== */
+  const handleGenerateExam = async () => {
 
     if (!classYear) {
-      setError("Please select class year");
+      setMessage(
+        "Config not loaded yet or class year missing..."
+      );
       return;
     }
 
     if (mode === "latest" && !selectedDate) {
-      setError("Please select a date");
+      setMessage("Please select a date");
       return;
     }
 
-    setLoading(true);
-    setError("");
-    setGeneratedExam(null);
-
     try {
 
+      setLoading(true);
+      setMessage("");
+      setGeneratedExam(null);
+
       const payload = {
-        class_year: Number(classYear),
+        class_year: classYear,
+        class_name: "OC",
+
         ...(mode === "latest" && {
           selected_date: selectedDate
         })
       };
 
       console.log(
-        "📤 Sending payload (OC MR exam):",
+        "📤 Exam payload:",
         payload
       );
 
       const endpoint =
         mode === "latest"
-          ? "/api/exams/generate-oc-mathematical-reasoning-latest"
-          : "/api/exams/generate-oc-mathematical-reasoning";
+          ? "/api/exams/generate-oc-reading-latest"
+          : "/api/exams/generate-oc-reading";
 
       const response = await fetch(
         `${BACKEND_URL}${endpoint}`,
         {
           method: "POST",
+
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(payload)
+
+          body: JSON.stringify(payload),
         }
       );
 
-      const responseText = await response.text();
+      const data = await response.json();
 
-      const data = responseText
-        ? JSON.parse(responseText)
-        : {};
+      console.log(
+        "📥 Exam response:",
+        data
+      );
 
-      console.log("📥 OC MR exam response:", data);
+      if (response.ok) {
 
-      if (!response.ok) {
-        throw new Error(
-          data.detail ||
-          "Failed to generate OC Mathematical Reasoning exam"
+        setGeneratedExam(data);
+
+        setMessage(
+          mode === "latest"
+            ? "✅ OC Reading Latest Exam generated successfully"
+            : "✅ OC Reading Exam generated successfully"
+        );
+
+      } else {
+
+        setMessage(
+          data.detail || "❌ Failed to generate exam"
         );
       }
 
-      setGeneratedExam(data);
-
-      alert(
-        mode === "latest"
-          ? "Latest OC Mathematical Reasoning exam generated!"
-          : "OC Mathematical Reasoning exam generated successfully!"
-      );
-
     } catch (error) {
 
-      console.error(
-        "❌ OC MR exam generation failed:",
-        error
-      );
+      console.error(error);
 
-      setError(
-        error.message ||
-        "Something went wrong while generating the exam"
+      setMessage(
+        "❌ Server error while generating exam"
       );
 
     } finally {
+
       setLoading(false);
     }
   };
 
-  /* ===========================
-     UI
-  =========================== */
   return (
-    <div className="generate-exam-container">
+    <div
+      style={{
+        maxWidth: "700px",
+        margin: "0 auto"
+      }}
+    >
 
       <h2>
-        Generate OC Mathematical Reasoning Exam
+        Generate OC Reading Exam
       </h2>
 
       {error && (
-        <p className="error-text">
+        <p style={{ color: "red" }}>
           {error}
         </p>
       )}
 
       {/* CLASS YEAR */}
-      <div className="input-group">
+      <label>
+        Class Year:
+      </label>
 
-        <label>Select Class Year</label>
+      <select
+        value={classYear}
+        onChange={(e) =>
+          setClassYear(e.target.value)
+        }
+      >
+        <option value="">
+          Select
+        </option>
 
-        <select
-          value={classYear}
-          onChange={(e) => setClassYear(e.target.value)}
-        >
-          <option value="">
-            -- Select Year --
-          </option>
+        <option value="Year 3">
+          Year 3
+        </option>
 
-          <option value="3">
-            Year 3
-          </option>
+        <option value="Year 4">
+          Year 4
+        </option>
 
-          <option value="4">
-            Year 4
-          </option>
-
-        </select>
-
-      </div>
+      </select>
 
       {/* DATE DROPDOWN */}
       {mode === "latest" &&
         availableDates.length > 0 && (
 
-        <div className="input-group">
-
-          <label>Select Upload Date</label>
+        <>
+          <label
+            style={{
+              marginTop: "15px",
+              display: "block"
+            }}
+          >
+            Select Upload Date:
+          </label>
 
           <select
             value={selectedDate}
@@ -282,7 +314,7 @@ export default function GenerateExam_oc_mathematical_reasoning({
             }
           >
             <option value="">
-              -- Select Date --
+              Select Date
             </option>
 
             {availableDates.map((date) => (
@@ -295,17 +327,14 @@ export default function GenerateExam_oc_mathematical_reasoning({
             ))}
 
           </select>
-
-        </div>
+        </>
       )}
 
       {/* GENERATE EXAM */}
       <button
-        className="generate-btn blue-btn"
-        onClick={
-          handleGenerateExam_oc_mathematical_reasoning
-        }
-        disabled={loading}
+        className="dashboard-button"
+        onClick={handleGenerateExam}
+        disabled={loading || !classYear}
       >
         {loading
           ? "Generating..."
@@ -314,23 +343,33 @@ export default function GenerateExam_oc_mathematical_reasoning({
 
       {/* GENERATE HOMEWORK */}
       <button
-        className="generate-btn green-btn"
-        onClick={
-          handleGenerateHomework_oc_mathematical_reasoning
-        }
-        disabled={loading}
-        style={{ marginTop: "10px" }}
+        className="dashboard-button"
+        onClick={handleGenerateHomeworkExam}
+        disabled={loading || !classYear}
       >
         {loading
           ? "Generating..."
-          : "Generate Homework"}
+          : "Generate Exam (Homework)"}
       </button>
 
-      {/* GENERATED OUTPUT */}
-      {generatedExam && (
-        <div className="generated-output">
+      {/* MESSAGE */}
+      {message && (
+        <p style={{ marginTop: "15px" }}>
+          {message}
+        </p>
+      )}
 
-          <h3>Generated Exam</h3>
+      {/* GENERATED EXAM */}
+      {generatedExam && (
+        <div
+          style={{
+            marginTop: "30px"
+          }}
+        >
+
+          <h3>
+            Generated Exam
+          </h3>
 
           <p>
             <strong>Exam ID:</strong>{" "}
@@ -342,9 +381,86 @@ export default function GenerateExam_oc_mathematical_reasoning({
             {generatedExam.total_questions}
           </p>
 
+          {/* QUESTIONS */}
+          {generatedExam.questions?.map(
+            (question, index) => (
+
+            <div
+              key={index}
+              style={{
+                border: "1px solid #ccc",
+                borderRadius: "10px",
+                padding: "20px",
+                marginBottom: "20px"
+              }}
+            >
+
+              <h4>
+                Question {question.q_id}
+              </h4>
+
+              {/* BLOCKS */}
+              {question.blocks?.map(
+                (block, blockIndex) => {
+
+                if (block.type === "text") {
+                  return (
+                    <p key={blockIndex}>
+                      {block.content}
+                    </p>
+                  );
+                }
+
+                if (block.type === "image") {
+                  return (
+                    <img
+                      key={blockIndex}
+                      src={block.content}
+                      alt="question"
+                      style={{
+                        maxWidth: "100%",
+                        marginBottom: "10px"
+                      }}
+                    />
+                  );
+                }
+
+                return null;
+              })}
+
+              {/* OPTIONS */}
+              <div>
+
+                {question.options &&
+                  Object.entries(question.options).map(
+                    ([key, value]) => (
+
+                    <div key={key}>
+                      <strong>{key}.</strong> {value}
+                    </div>
+                  ))}
+
+              </div>
+
+              {/* ANSWER */}
+              <div
+                style={{
+                  marginTop: "10px",
+                  color: "green",
+                  fontWeight: "bold"
+                }}
+              >
+                Correct Answer: {question.correct}
+              </div>
+
+            </div>
+          ))}
+
         </div>
       )}
 
     </div>
   );
-}
+};
+
+export default GenerateExam_oc_reading;
