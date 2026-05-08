@@ -330,7 +330,7 @@ html, body {
 }
 .writing-layout {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
   background: #f9fafb;
 }
 /* LEFT PANEL */
@@ -376,13 +376,24 @@ html, body {
 }
 /* RIGHT PANEL */
 .writing-right {
-  flex: 1;         /* 🔥 take remaining space */
+  flex: 1;
   padding: 20px;
+
   display: flex;
   flex-direction: column;
+
+  box-sizing: border-box;
 }
 
 .editor-wrapper {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  min-height: 0;
+}
+.editor-wrapper .tiptap {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -393,16 +404,6 @@ html, body {
 
 
 
-.ProseMirror {
-  min-height: 400px;
-  padding: 16px;
-  border: 1px solid #ccc;
-  border-top: none;
-  border-radius: 0 0 8px 8px;
-
-  font-family: Georgia, "Times New Roman", serif;
-  line-height: 1.7;
-}
 .ProseMirror span[style*="font-size"] {
   font-size: inherit;
 }
@@ -445,19 +446,26 @@ html, body {
   color: #1d4ed8;
 }
 .ProseMirror {
-  min-height: 400px;
+  flex: 1;
+  height: 100%;
+
   padding: 16px;
+
   border: 1px solid #ddd;
   border-top: none;
   border-radius: 0 0 8px 8px;
+
+  background: #ffffff;
 
   font-family: Georgia, "Times New Roman", serif;
   font-size: 18px;
   line-height: 1.7;
 
-  background: #ffffff;
+  overflow-y: auto;
 }
-
+.ProseMirror:focus {
+  outline: none;
+}
 .ProseMirror:focus {
   outline: none;
 }

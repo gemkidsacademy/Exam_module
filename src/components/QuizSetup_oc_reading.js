@@ -39,6 +39,88 @@ export default function QuizSetup_oc_reading() {
   const [questionBank, setQuestionBank] = useState([]);
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedQuestionId, setSelectedQuestionId] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [showDeleteQuestionSection, setShowDeleteQuestionSection] = useState(false);
+  const handleSearchQuestions_OC_Reading = async () => {
+  if (!searchText.trim()) {
+    alert("Please enter search text.");
+    return;
+  }
+
+  if (!quiz.classYear) {
+    alert("Please select class year.");
+    return;
+  }
+
+  try {
+    setSearchLoading(true);
+
+    const params = new URLSearchParams({
+      query: searchText,
+      class_year: quiz.classYear,
+    });
+
+    const res = await fetch(
+      `${BACKEND_URL}/api/admin/search-questions-oc-reading?${params.toString()}`
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to search questions");
+    }
+
+    const data = await res.json();
+
+    setSearchResults(data);
+
+  } catch (err) {
+    console.error(err);
+    alert("Error searching questions.");
+  } finally {
+    setSearchLoading(false);
+  }
+};
+  const handleDeleteSingleQuestion_OC_Reading = async () => {
+  if (!selectedQuestionId) {
+    alert("Please select a question.");
+    return;
+  }
+
+  const confirmDelete = window.confirm(
+    `Delete question ID ${selectedQuestionId}?`
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/api/admin/delete-question-oc-reading/${selectedQuestionId}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to delete question");
+    }
+
+    const data = await res.json();
+
+    alert(data.message);
+
+    setSearchResults((prev) =>
+      prev.filter((q) => q.id !== Number(selectedQuestionId))
+    );
+
+    setSelectedQuestionId("");
+
+  } catch (err) {
+    console.error(err);
+    alert("Error deleting question.");
+  }
+};
 
   const handleDeleteAllQuestions = async () => {
     const confirmed = window.confirm(
@@ -362,6 +444,141 @@ export default function QuizSetup_oc_reading() {
         >
           Delete All Questions
         </button>
+        <div className="section-card">
+
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      cursor: "pointer",
+      marginTop: "20px",
+    }}
+    onClick={() =>
+      setShowDeleteQuestionSection((prev) => !prev)
+    }
+  >
+    <h2 style={{ margin: 0 }}>
+      Delete Single Question
+    </h2>
+
+    <span style={{ fontSize: "20px" }}>
+      {showDeleteQuestionSection ? "−" : "+"}
+    </span>
+  </div>
+
+  {showDeleteQuestionSection && (
+    <>
+
+      <div className="grid-2" style={{ marginTop: "20px" }}>
+        <div>
+          <label>Search Question</label>
+
+          <input
+            type="text"
+            placeholder="Search by topic or question text..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+          />
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "end",
+          }}
+        >
+          <button
+            type="button"
+            onClick={handleSearchQuestions_OC_Reading}
+          >
+            Search Questions
+          </button>
+        </div>
+      </div>
+
+      {searchLoading && (
+        <p>Searching questions...</p>
+      )}
+
+      {searchResults.length > 0 && (
+        <>
+          <div style={{ marginTop: "20px" }}>
+            <label>Select Question</label>
+
+            <select
+              value={selectedQuestionId}
+              onChange={(e) =>
+                setSelectedQuestionId(e.target.value)
+              }
+            >
+              <option value="">
+                Select a Question
+              </option>
+
+              {searchResults.map((q) => (
+                <option key={q.id} value={q.id}>
+                  ID {q.id} | {q.preview?.slice(0, 80)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div
+            style={{
+              marginTop: "20px",
+              border: "1px solid #ddd",
+              padding: "12px",
+              borderRadius: "8px",
+              background: "#fafafa",
+            }}
+          >
+            {searchResults
+              .filter(
+                (q) => q.id === Number(selectedQuestionId)
+              )
+              .map((q) => (
+                <div key={q.id}>
+                  <strong>Preview:</strong>
+
+                  <p
+                    style={{
+                      marginTop: "10px",
+                      lineHeight: "1.6",
+                    }}
+                  >
+                    {q.preview}
+                  </p>
+                </div>
+              ))}
+          </div>
+
+          <div style={{ marginTop: "20px" }}>
+            <button
+              type="button"
+              onClick={handleDeleteSingleQuestion_OC_Reading}
+              style={{
+                backgroundColor: "#d9534f",
+                color: "white",
+              }}
+            >
+              Delete Selected Question
+            </button>
+          </div>
+        </>
+      )}
+
+      {!searchLoading &&
+        searchText &&
+        searchResults.length === 0 && (
+          <p style={{ marginTop: "15px" }}>
+            No matching questions found.
+          </p>
+      )}
+
+    </>
+  )}
+</div>
 
         {/* Topics */}
         <div className="topics-container">

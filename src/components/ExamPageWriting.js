@@ -3,7 +3,19 @@
   import StarterKit from "@tiptap/starter-kit";
   import { useNavigate } from "react-router-dom";
   import { TextStyle } from "@tiptap/extension-text-style";
-  import { Bold, Italic, List, AlignLeft, AlignCenter, AlignRight } from "lucide-react";
+  import {
+  Bold,
+  Italic,
+  Underline as UnderlineIcon,
+  List,
+  ListOrdered,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Undo2,
+  Redo2
+} from "lucide-react";
+  import Underline from "@tiptap/extension-underline";
   
   import TextAlign from "@tiptap/extension-text-align";
   import useVariant from "../hooks/useVariant";
@@ -506,6 +518,7 @@
       extensions: [
         StarterKit,
         CustomTextStyle,
+        Underline,
         TextAlign.configure({
           types: ["heading", "paragraph"],
         }),
@@ -514,11 +527,21 @@
       editable: !submitting,
       
       editorProps: {
-          handlePaste(view, event) {
-            event.preventDefault();
-            return true;
-          },
+        attributes: {
+          style: `
+            flex: 1;
+            height: 100%;
+            min-height: calc(100vh - 220px);
+            overflow-y: auto;
+            padding: 16px;
+          `,
         },
+
+        handlePaste(view, event) {
+          event.preventDefault();
+          return true;
+        },
+      },
 
       onUpdate: ({ editor }) => {
         setAnswerText(editor.getHTML());
@@ -788,11 +811,43 @@
     {/* RIGHT PANEL */}
     <div className="writing-right">
 
-      <div className="editor-wrapper">
+      <div
+        className="editor-wrapper"
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "calc(100vh - 140px)",
+        }}
+      >
 
         {/* TOOLBAR */}
         <div className="toolbar">
+          {/* UNDO */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              editor?.chain().focus().undo().run();
+            }}
+            disabled={!editor?.can().undo()}
+          >
+            <Undo2 size={16} />
+          </button>
 
+          {/* REDO */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              editor?.chain().focus().redo().run();
+            }}
+            disabled={!editor?.can().redo()}
+          >
+            <Redo2 size={16} />
+          </button>
+
+          <div className="toolbar-divider" />
           {/* FONT SIZE */}
           <select
             onChange={(e) =>
@@ -803,9 +858,16 @@
             defaultValue=""
           >
             <option value="">Font Sizes</option>
-            <option value="14px">Small</option>
-            <option value="18px">Normal</option>
-            <option value="22px">Large</option>
+             <option value="14px">14pt</option>
+            <option value="16px">16pt</option>
+            <option value="18px">18pt</option>
+            <option value="20px">20pt</option>
+            <option value="22px">22pt</option>
+            <option value="24px">24pt</option>
+            <option value="26px">26pt</option>
+            <option value="28px">28pt</option>
+            <option value="36px">36pt</option>
+            <option value="48px">48pt</option>
           </select>
 
           <div className="toolbar-divider" />
@@ -832,6 +894,17 @@
             }}
           >
             <Italic size={16} />
+          </button>
+          {/* UNDERLINE */}
+          <button
+            type="button"
+            className={editor?.isActive("underline") ? "active" : ""}
+            onClick={(e) => {
+              e.preventDefault();
+              editor?.chain().focus().toggleUnderline().run();
+            }}
+          >
+            <UnderlineIcon size={16} />
           </button>
 
           <div className="toolbar-divider" />
@@ -880,11 +953,32 @@
           >
             <List size={16} />
           </button>
+          {/* NUMBERED LIST */}
+          <button
+            type="button"
+            className={editor?.isActive("orderedList") ? "active" : ""}
+            onClick={(e) => {
+              e.preventDefault();
+              editor?.chain().focus().toggleOrderedList().run();
+            }}
+          >
+            <ListOrdered size={16} />
+          </button>
 
         </div>
 
           {/* EDITOR */}
-          {editor && <EditorContent editor={editor} />}
+          {editor && (
+            <EditorContent
+              editor={editor}
+              style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                minHeight: "100%",
+              }}
+            />
+          )}
 
         </div>
 

@@ -14,7 +14,12 @@
     const [availableTopics, setAvailableTopics] = useState([]);
     const [availableCounts, setAvailableCounts] = useState({});
     const [questionBank, setQuestionBank] = useState([]);
+    const [searchText, setSearchText] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
+    const [selectedQuestionId, setSelectedQuestionId] = useState("");
+    const [searchLoading, setSearchLoading] = useState(false);
     const [showQuestionBank, setShowQuestionBank] = useState(false);
+    const [showDeleteQuestionSection, setShowDeleteQuestionSection] = useState(false);
     const [qbLoading, setQbLoading] = useState(false);
     const validateQuizBeforeSubmit = () => {
     if (!quiz.className || !quiz.subject) {
@@ -48,6 +53,82 @@
 
     return true;
   };
+  const handleSearchQuestions = async () => {
+  if (!searchText.trim()) {
+    alert("Please enter search text.");
+    return;
+  }
+
+  try {
+    setSearchLoading(true);
+
+    const params = new URLSearchParams({
+      query: searchText,
+      class_year: quiz.classYear,
+    });
+
+    const res = await fetch(
+      `${BACKEND_URL}/api/admin/search-questions-selective-ts?${params.toString()}`
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to search questions");
+    }
+
+    const data = await res.json();
+
+    setSearchResults(data);
+
+  } catch (err) {
+    console.error(err);
+    alert("Error searching questions.");
+  } finally {
+    setSearchLoading(false);
+  }
+};
+
+
+const handleDeleteSingleQuestion = async () => {
+  if (!selectedQuestionId) {
+    alert("Please select a question.");
+    return;
+  }
+
+  const confirmDelete = window.confirm(
+    `Are you sure you want to delete question ID ${selectedQuestionId}?`
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/api/admin/delete-question-selective-ts/${selectedQuestionId}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || "Failed to delete question");
+    }
+
+    const data = await res.json();
+
+    alert(data.message);
+
+    // remove deleted question from UI
+    setSearchResults((prev) =>
+      prev.filter((q) => q.id !== Number(selectedQuestionId))
+    );
+
+    setSelectedQuestionId("");
+
+  } catch (err) {
+    console.error(err);
+    alert("Error deleting question.");
+  }
+};
   const fetchQuestionCounts = async (topicName) => {
     try {
       const params = new URLSearchParams({
@@ -484,10 +565,143 @@
                 type="button"
                 onClick={handleDeletePreviousQuestions}
               >
-                Delete Previous Questions
+                Delete All Questions
               </button>
             </div>
           </div>
+          <div className="section-card">
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                cursor: "pointer",
+              }}
+              onClick={() =>
+                setShowDeleteQuestionSection((prev) => !prev)
+              }
+            >
+              <h2 style={{ margin: 0 }}>
+                Delete Single Question
+              </h2>
+
+              <span style={{ fontSize: "20px" }}>
+                {showDeleteQuestionSection ? "−" : "+"}
+              </span>
+            </div>
+
+            {showDeleteQuestionSection && (
+              <>
+
+            <div className="grid-2">
+              <div>
+                <label>Search Question</label>
+
+                <input
+                  type="text"
+                  placeholder="Search by topic or question text..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                />
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "end",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={handleSearchQuestions}
+                >
+                  Search Questions
+                </button>
+              </div>
+            </div>
+
+        {searchLoading && (
+          <p>Searching questions...</p>
+        )}
+
+        {searchResults.length > 0 && (
+          <>
+            <div style={{ marginTop: "20px" }}>
+              <label>Select Question</label>
+
+              <select
+                value={selectedQuestionId}
+                onChange={(e) =>
+                  setSelectedQuestionId(e.target.value)
+                }
+              >
+                <option value="">
+                  Select a Question
+                </option>
+
+                {searchResults.map((q) => (
+                  <option key={q.id} value={q.id}>
+                    ID {q.id} | {q.topic} | {q.preview?.slice(0, 80)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div
+              style={{
+                marginTop: "20px",
+                border: "1px solid #ddd",
+                padding: "12px",
+                borderRadius: "8px",
+                background: "#fafafa",
+              }}
+            >
+              {searchResults
+                .filter(
+                  (q) => q.id === Number(selectedQuestionId)
+                )
+                .map((q) => (
+                  <div key={q.id}>
+                    <strong>Preview:</strong>
+
+                    <p
+                      style={{
+                        marginTop: "10px",
+                        lineHeight: "1.6",
+                      }}
+                    >
+                      {q.preview}
+                    </p>
+                  </div>
+                ))}
+            </div>
+
+            <div style={{ marginTop: "20px" }}>
+              <button
+                type="button"
+                onClick={handleDeleteSingleQuestion}
+                style={{
+                  backgroundColor: "#d9534f",
+                  color: "white",
+                }}
+              >
+                Delete Selected Question
+              </button>
+            </div>
+          </>
+        )}
+
+      {!searchLoading &&
+        searchText &&
+        searchResults.length === 0 && (
+          <p style={{ marginTop: "15px" }}>
+            No matching questions found.
+          </p>
+      )}
+       </>
+        )}
+    </div>
         {showQuestionBank && (
               <div className="question-bank">
                 <h3>Question Bank (Thinking Skills)</h3>
