@@ -4,6 +4,7 @@ import "./UploadPDF.css";
 export default function UploadWordReadingUnified() {
   const [wordFile, setWordFile] = useState(null);
   const BACKEND_URL = process.env.REACT_APP_API_URL;
+  console.log("BACKEND_URL:", BACKEND_URL);
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState(null);
 

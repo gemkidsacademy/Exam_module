@@ -6,6 +6,7 @@ export default function UploadWordNaplanLanguageConventions() {
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const BACKEND_URL = process.env.REACT_APP_API_URL;
   const [deletingDuplicates, setDeletingDuplicates] = useState(false);
   const handleDeleteDuplicates = async () => {
   if (uploading) {
@@ -22,7 +23,7 @@ export default function UploadWordNaplanLanguageConventions() {
 
   try {
     const res = await fetch(
-      "https://web-production-481a5.up.railway.app/delete-all-naplan-numeracy-questions",
+      `${BACKEND_URL}/delete-all-naplan-numeracy-questions`,
       {
         method: "POST",
       }
@@ -79,7 +80,7 @@ export default function UploadWordNaplanLanguageConventions() {
 
     try {
       const res = await fetch(
-        "https://web-production-481a5.up.railway.app/upload-word-naplan",
+        `${BACKEND_URL}/upload-word-naplan`,
         {
           method: "POST",
           body: formData,

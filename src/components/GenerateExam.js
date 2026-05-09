@@ -11,9 +11,56 @@ export default function GenerateExam({ mode }) {
   const [availableDates, setAvailableDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
+  const [availableBatches, setAvailableBatches] = useState([]);
+  const [selectedBatchId, setSelectedBatchId] = useState("");
 
   
+useEffect(() => {
+  const fetchBatchIds = async () => {
+    try {
 
+      if (
+        !selectedYear ||
+        !selectedDate ||
+        mode !== "latest"
+      ) return;
+
+      const parsedYear = extractYearNumber(selectedYear);
+
+      const params = new URLSearchParams({
+        class_year: `Year ${parsedYear}`,
+        date: selectedDate
+      });
+
+      const url = `${BACKEND_URL}/api/available-mr-batches?${params.toString()}`;
+
+      console.log("📦 FETCH BATCH IDS:", url);
+
+      const res = await fetch(url);
+
+      if (!res.ok) {
+        throw new Error("Failed to load batch ids");
+      }
+
+      const data = await res.json();
+
+      console.log("📦 BATCH RESPONSE:", data);
+
+      setAvailableBatches(data);
+
+      if (data.length > 0) {
+        setSelectedBatchId(data[0]);
+      }
+
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load batch ids.");
+    }
+  };
+
+  fetchBatchIds();
+
+}, [selectedYear, selectedDate, mode]);
 useEffect(() => {
   const fetchDates = async () => {
     try {
@@ -69,12 +116,19 @@ useEffect(() => {
 };
 
 const handleGenerateExam = async () => {
+
   if (!selectedYear) {
     setError("Please select a class year first");
     return;
   }
+
   if (mode === "latest" && !selectedDate) {
     setError("Please select a date.");
+    return;
+  }
+
+  if (mode === "latest" && !selectedBatchId) {
+    setError("Please select a batch.");
     return;
   }
 
@@ -90,49 +144,89 @@ const handleGenerateExam = async () => {
   setGeneratedExam(null);
 
   try {
-    console.log("Sending class_year:", parsedYear, typeof parsedYear);
 
-    // ✅ decide endpoint based on mode
+    console.log(
+      "Sending payload:",
+      {
+        class_year: parsedYear,
+        batch_id: selectedBatchId,
+        date: selectedDate
+      }
+    );
+
+    // Decide endpoint based on mode
     const endpoint =
       mode === "latest"
         ? "/generate-new-mr-latest"
         : "/generate-new-mr";
 
-    const response = await fetch(`${BACKEND_URL}${endpoint}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        difficulty: "medium",
-        class_year: parsedYear,
-        ...(mode === "latest" && { date: selectedDate })
+    const payload = {
+      difficulty: "medium",
+      class_year: parsedYear,
+
+      // send batch id only in latest mode
+      ...(mode === "latest" && {
+        batch_id: selectedBatchId,
+        date: selectedDate
       })
-    });
+    };
+
+    const response = await fetch(
+      `${BACKEND_URL}${endpoint}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      }
+    );
 
     const data = await response.json();
+
     console.log("Diagnostic response:", data);
 
     if (!response.ok) {
-      throw new Error(data?.detail || "Failed to generate exam");
+      throw new Error(
+        data?.detail || "Failed to generate exam"
+      );
     }
 
     setGeneratedExam(data);
+
   } catch (err) {
-    console.error("Exam generation failed:", err);
-    setError(err.message || "Unexpected error occurred");
+
+    console.error(
+      "Exam generation failed:",
+      err
+    );
+
+    setError(
+      err.message || "Unexpected error occurred"
+    );
+
   } finally {
+
     setLoading(false);
+
   }
-};
-  /* -------------------------------------------
+};  /* -------------------------------------------
      GENERATE HOMEWORK EXAM
   ------------------------------------------- */
   const handleGenerateHomeworkExam = async () => {
+
   if (!selectedYear) {
     setError("Please select a class year first");
     return;
   }
+
   if (mode === "latest" && !selectedDate) {
     setError("Please select a date.");
+    return;
+  }
+
+  if (mode === "latest" && !selectedBatchId) {
+    setError("Please select a batch.");
     return;
   }
 
@@ -148,39 +242,74 @@ const handleGenerateExam = async () => {
   setGeneratedExam(null);
 
   try {
-    console.log("Sending class_year:", parsedYear, typeof parsedYear);
 
-    // ✅ decide endpoint based on mode
+    console.log(
+      "Sending payload:",
+      {
+        class_year: parsedYear,
+        batch_id: selectedBatchId,
+        date: selectedDate
+      }
+    );
+
+    // Decide endpoint based on mode
     const endpoint =
       mode === "latest"
         ? "/generate-new-mr-homework-latest"
         : "/generate-new-mr-homework";
 
-    const response = await fetch(`${BACKEND_URL}${endpoint}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        difficulty: "medium",
-        class_year: parsedYear,
-        ...(mode === "latest" && { date: selectedDate })
+    const payload = {
+      difficulty: "medium",
+      class_year: parsedYear,
+
+      // send batch id only in latest mode
+      ...(mode === "latest" && {
+        batch_id: selectedBatchId,
+        date: selectedDate
       })
-    });
+    };
+
+    const response = await fetch(
+      `${BACKEND_URL}${endpoint}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      }
+    );
 
     const data = await response.json();
+
     console.log("Diagnostic response:", data);
 
     if (!response.ok) {
-      throw new Error(data?.detail || "Failed to generate exam");
+      throw new Error(
+        data?.detail || "Failed to generate exam"
+      );
     }
 
     setGeneratedExam(data);
+
   } catch (err) {
-    console.error("Exam generation failed:", err);
-    setError(err.message || "Unexpected error occurred");
+
+    console.error(
+      "Exam generation failed:",
+      err
+    );
+
+    setError(
+      err.message || "Unexpected error occurred"
+    );
+
   } finally {
+
     setLoading(false);
+
   }
 };
+
   return (
     <div className="generate-exam-container">
       <h2>Generate Mathematical Reasoning Exam</h2>
@@ -230,6 +359,29 @@ const handleGenerateExam = async () => {
         </select>
       </>
     )}
+      {mode === "latest" && (
+        <>
+          <label>Select Batch ID:</label>
+
+          <select
+            value={selectedBatchId}
+            onChange={(e) => setSelectedBatchId(e.target.value)}
+            style={{
+              padding: "10px",
+              width: "100%",
+              marginBottom: "15px"
+            }}
+          >
+            <option value="">-- Select Batch --</option>
+
+            {availableBatches.map((batchId, index) => (
+              <option key={index} value={batchId}>
+                Batch #{batchId}
+              </option>
+            ))}
+          </select>
+        </>
+      )}
 
       {/* NORMAL EXAM BUTTON */}
       <button

@@ -15,6 +15,8 @@ const GenerateExam_oc_reading = ({ mode }) => {
   const [availableDates, setAvailableDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [generatedExam, setGeneratedExam] = useState(null);
+  const [availableBatches, setAvailableBatches] = useState([]);
+  const [selectedBatchId, setSelectedBatchId] = useState("");
   /* ==================================================
      FETCH AVAILABLE DATES
   ================================================== */
@@ -32,6 +34,10 @@ const GenerateExam_oc_reading = ({ mode }) => {
           "📅 Fetching OC Reading dates for:",
           classYear
         );
+        setAvailableDates([]);
+        setSelectedDate("");
+        setAvailableBatches([]);
+        setSelectedBatchId("");
 
         const response = await fetch(
           `${BACKEND_URL}/api/exams/oc-reading-dates/${classYear}`
@@ -62,7 +68,68 @@ const GenerateExam_oc_reading = ({ mode }) => {
     fetchDates();
 
   }, [classYear, mode]);
+  useEffect(() => {
 
+  const fetchBatchIds = async () => {
+
+    try {
+
+      if (
+        !classYear ||
+        !selectedDate ||
+        mode !== "latest"
+      ) return;
+
+      setSelectedBatchId("");
+      setAvailableBatches([]);
+
+      const params = new URLSearchParams({
+        class_year: classYear,
+        date: selectedDate
+      });
+
+      const url =
+        `${BACKEND_URL}/api/available-oc-reading-batches?${params.toString()}`;
+
+      console.log(
+        "📦 FETCH OC READING BATCHES:",
+        url
+      );
+
+      const res = await fetch(url);
+
+      if (!res.ok) {
+        throw new Error(
+          "Failed to load batch ids"
+        );
+      }
+
+      const data = await res.json();
+
+      console.log(
+        "📦 OC READING BATCH RESPONSE:",
+        data
+      );
+
+      setAvailableBatches(data);
+
+      if (data.length > 0) {
+        setSelectedBatchId(data[0]);
+      }
+
+    } catch (err) {
+
+      console.error(err);
+
+      setError(
+        "Failed to load batch ids."
+      );
+    }
+  };
+
+  fetchBatchIds();
+
+}, [classYear, selectedDate, mode]);
 
   
   const handleGenerateHomeworkExam = async () => {
@@ -71,6 +138,10 @@ const GenerateExam_oc_reading = ({ mode }) => {
       setMessage(
         "Config not loaded yet or class year missing..."
       );
+      return;
+    }
+    if (mode === "latest" && !selectedBatchId) {
+      setMessage("Please select a batch");
       return;
     }
 
@@ -90,7 +161,8 @@ const GenerateExam_oc_reading = ({ mode }) => {
         class_name: "OC",
 
         ...(mode === "latest" && {
-          selected_date: selectedDate
+          selected_date: selectedDate,
+          batch_id: Number(selectedBatchId)
         })
       };
 
@@ -165,6 +237,10 @@ const GenerateExam_oc_reading = ({ mode }) => {
       );
       return;
     }
+    if (mode === "latest" && !selectedBatchId) {
+      setMessage("Please select a batch");
+      return;
+    }
 
     if (mode === "latest" && !selectedDate) {
       setMessage("Please select a date");
@@ -182,7 +258,8 @@ const GenerateExam_oc_reading = ({ mode }) => {
         class_name: "OC",
 
         ...(mode === "latest" && {
-          selected_date: selectedDate
+          selected_date: selectedDate,
+          batch_id: Number(selectedBatchId)
         })
       };
 
@@ -295,6 +372,42 @@ const GenerateExam_oc_reading = ({ mode }) => {
                 {date}
               </option>
             ))}
+
+          </select>
+        </>
+      )}
+      {mode === "latest" && (
+
+        <>
+          <label
+            style={{
+              marginTop: "15px",
+              display: "block"
+            }}
+          >
+            Select Batch ID:
+          </label>
+
+          <select
+            value={selectedBatchId}
+            onChange={(e) =>
+              setSelectedBatchId(e.target.value)
+            }
+          >
+            <option value="">
+              Select Batch
+            </option>
+
+            {availableBatches.map(
+              (batchId, index) => (
+                <option
+                  key={index}
+                  value={batchId}
+                >
+                  Batch #{batchId}
+                </option>
+              )
+            )}
 
           </select>
         </>
@@ -443,10 +556,11 @@ const GenerateExam_oc_reading = ({ mode }) => {
 
                   <p
                     style={{
-                      lineHeight: "1.6"
+                      lineHeight: "1.6",
+                      whiteSpace: "pre-wrap"
                     }}
                   >
-                    {question.question}
+                    {question.question_text}
                   </p>
 
                   {/* OPTIONS */}
@@ -457,7 +571,9 @@ const GenerateExam_oc_reading = ({ mode }) => {
                   >
 
                     {Object.entries(
-                      question.options || {}
+                      question.answer_options ||
+                      section.answer_options ||
+                      {}
                     ).map(([key, value]) => (
 
                       <div

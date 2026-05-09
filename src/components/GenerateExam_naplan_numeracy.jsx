@@ -9,13 +9,55 @@ const GenerateExamNaplanNumeracy = ({ mode }) => {
   const [generatedExam, setGeneratedExam] = useState(null);
   const [availableDates, setAvailableDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
+  const [availableBatches, setAvailableBatches] = useState([]);
+  const [selectedBatchId, setSelectedBatchId] = useState("");
 
   const [classYears, setClassYears] = useState([]);
   const [selectedYear, setSelectedYear] = useState("");
 
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
+  useEffect(() => {
+  if (
+    !selectedYear ||
+    !selectedDate ||
+    mode !== "latest"
+  ) return;
 
+  const fetchAvailableBatches = async () => {
+    try {
+      const response = await fetch(
+        `${BACKEND_URL}/naplan/numeracy/available-batches` +
+        `?class_year=${selectedYear}` +
+        `&date=${selectedDate}`
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail || "Failed to fetch batches"
+        );
+      }
+
+      setAvailableBatches(data.batches || []);
+
+      if (data.batches?.length > 0) {
+        setSelectedBatchId(data.batches[0]);
+      }
+
+    } catch (err) {
+      console.error("Batch fetch error:", err);
+
+      setError(
+        err.message || "Failed to load batches"
+      );
+    }
+  };
+
+  fetchAvailableBatches();
+
+}, [selectedYear, selectedDate, mode]);
   useEffect(() => {
   if (!selectedYear || mode !== "latest") return;
 
@@ -84,7 +126,12 @@ const GenerateExamNaplanNumeracy = ({ mode }) => {
   // ---------------------------------------
   const handleGenerateHomeWork = async () => {
   try {
+    if (mode === "latest" && !selectedBatchId) {
+      setError("Please select a batch.");
+      return;
+    }
     if (loading || yearsLoading) return;
+    
 
     if (!selectedYear) {
       setError("Please select a year first.");
@@ -106,6 +153,7 @@ const GenerateExamNaplanNumeracy = ({ mode }) => {
 
       ...(mode === "latest" && {
         selected_date: selectedDate,
+        batch_id: Number(selectedBatchId),
       }),
     };
 
@@ -175,6 +223,7 @@ const GenerateExamNaplanNumeracy = ({ mode }) => {
 
       ...(mode === "latest" && {
         selected_date: selectedDate,
+        batch_id: Number(selectedBatchId),
       }),
     };
 
@@ -262,6 +311,27 @@ const GenerateExamNaplanNumeracy = ({ mode }) => {
             {availableDates.map((date) => (
               <option key={date} value={date}>
                 {date}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+      {mode === "latest" && availableBatches.length > 0 && (
+        <div style={{ marginBottom: "12px" }}>
+          <label>Select Upload Batch</label>
+
+          <select
+            value={selectedBatchId}
+            onChange={(e) => setSelectedBatchId(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "8px",
+              marginTop: "6px",
+            }}
+          >
+            {availableBatches.map((batchId) => (
+              <option key={batchId} value={batchId}>
+                Batch {batchId}
               </option>
             ))}
           </select>
@@ -376,7 +446,10 @@ const GenerateExamNaplanNumeracy = ({ mode }) => {
                           padding: "6px 0",
                         }}
                       >
-                        <strong>{key}.</strong> {value}
+                        <strong>{key}.</strong>{" "}
+                        {typeof value === "object"
+                          ? JSON.stringify(value)
+                          : value}
                       </div>
                     )
                   )}
@@ -393,7 +466,9 @@ const GenerateExamNaplanNumeracy = ({ mode }) => {
               >
                 Correct Answer:{" "}
                 {Array.isArray(question.correct_answer)
-                  ? question.correct_answer.join(", ")
+                ? question.correct_answer.join(", ")
+                : typeof question.correct_answer === "object"
+                  ? JSON.stringify(question.correct_answer)
                   : question.correct_answer}
               </div>
             </div>

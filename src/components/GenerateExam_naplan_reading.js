@@ -14,10 +14,81 @@ const GenerateExamNaplanReading = ({ mode }) => {
 
   const [availableDates, setAvailableDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
+  const [availableBatches, setAvailableBatches] = useState([]);
+  const [selectedBatchId, setSelectedBatchId] = useState("");
 
   // --------------------------------------
   // Fetch available exam years from backend
   // --------------------------------------
+  useEffect(() => {
+
+  if (
+    !selectedYear ||
+    !selectedDate ||
+    mode !== "latest"
+  ) return;
+
+  const fetchAvailableBatches = async () => {
+
+    try {
+
+      console.log("\n==============================");
+      console.log("📦 FETCH NAPLAN READING BATCHES");
+      console.log("==============================");
+
+      console.log("selectedYear:", selectedYear);
+      console.log("selectedDate:", selectedDate);
+
+      const response = await fetch(
+        `${BACKEND_URL}/naplan/reading/available-batches` +
+        `?year=${selectedYear}` +
+        `&date=${selectedDate}`
+      );
+
+      const data = await response.json();
+
+      console.log("📥 Batch response:", data);
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail || "Failed to fetch batches"
+        );
+      }
+
+      setAvailableBatches(data.batches || []);
+
+      if (data.batches?.length > 0) {
+
+        setSelectedBatchId(data.batches[0]);
+
+        console.log(
+          "✅ Auto-selected batch:",
+          data.batches[0]
+        );
+
+      } else {
+
+        setSelectedBatchId("");
+
+        console.log("⚠️ No batches returned");
+      }
+
+    } catch (err) {
+
+      console.error(
+        "❌ Batch fetch error:",
+        err
+      );
+
+      setError(
+        err.message || "Failed to fetch batches"
+      );
+    }
+  };
+
+  fetchAvailableBatches();
+
+}, [selectedYear, selectedDate, mode]);
   useEffect(() => {
   if (!selectedYear || mode !== "latest") return;
 
@@ -79,6 +150,10 @@ const GenerateExamNaplanReading = ({ mode }) => {
   // Generate exam
   // --------------------------------------
   const handleGenerate = async () => {
+  if (mode === "latest" && !selectedBatchId) {
+  setError("Please select a batch");
+  return;
+}
   if (!selectedYear) {
     setError("Please select a year first");
     return;
@@ -100,6 +175,7 @@ const GenerateExamNaplanReading = ({ mode }) => {
 
       ...(mode === "latest" && {
         selected_date: selectedDate,
+        batch_id: Number(selectedBatchId),
       }),
     };
 
@@ -152,6 +228,10 @@ const GenerateExamNaplanReading = ({ mode }) => {
   }
 };
   const handleGenerateHomeWork = async () => {
+  if (mode === "latest" && !selectedBatchId) {
+  setError("Please select a batch");
+  return;
+  }
   if (!selectedYear) {
     setError("Please select a year first");
     return;
@@ -173,6 +253,7 @@ const GenerateExamNaplanReading = ({ mode }) => {
 
       ...(mode === "latest" && {
         selected_date: selectedDate,
+        batch_id: Number(selectedBatchId),
       }),
     };
 
@@ -257,6 +338,38 @@ const GenerateExamNaplanReading = ({ mode }) => {
             {availableDates.map((date) => (
               <option key={date} value={date}>
                 {date}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+      {mode === "latest" &&
+        availableBatches.length > 0 && (
+
+        <div style={{ marginBottom: "12px" }}>
+          <label>Select Upload Batch</label>
+
+          <select
+            value={selectedBatchId}
+            onChange={(e) => {
+              console.log(
+                "📦 Selected batch:",
+                e.target.value
+              );
+
+              setSelectedBatchId(e.target.value);
+            }}
+            style={{
+              width: "100%",
+              marginBottom: "12px"
+            }}
+          >
+            {availableBatches.map((batchId) => (
+              <option
+                key={batchId}
+                value={batchId}
+              >
+                Batch {batchId}
               </option>
             ))}
           </select>
@@ -409,7 +522,10 @@ const GenerateExamNaplanReading = ({ mode }) => {
                       padding: "6px 0",
                     }}
                   >
-                    <strong>{key}.</strong> {value}
+                    <strong>{key}.</strong>{" "}
+                    {typeof value === "object"
+                      ? JSON.stringify(value)
+                      : value}
                   </div>
                 )
               )}
@@ -427,6 +543,8 @@ const GenerateExamNaplanReading = ({ mode }) => {
             Correct Answer:{" "}
             {Array.isArray(bundle.correct_answer)
               ? bundle.correct_answer.join(", ")
+              : typeof bundle.correct_answer === "object"
+              ? JSON.stringify(bundle.correct_answer)
               : bundle.correct_answer}
           </div>
         </div>

@@ -14,7 +14,8 @@ export default function GenerateExam_reading({ mode }) {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [selectedClassYear, setSelectedClassYear] = useState("");
-
+  const [availableBatches, setAvailableBatches] = useState([]);
+  const [selectedBatchId, setSelectedBatchId] = useState("");
   const BACKEND_URL = process.env.REACT_APP_API_URL;
 
   /* ---------------------------
@@ -56,6 +57,72 @@ export default function GenerateExam_reading({ mode }) {
 
   fetchDates();
 }, [selectedClassYear, mode]);
+useEffect(() => {
+
+  const fetchBatchIds = async () => {
+
+    try {
+
+      if (
+        !selectedClassYear ||
+        !selectedDate ||
+        mode !== "latest"
+      ) return;
+
+      setSelectedBatchId("");
+      setAvailableBatches([]);
+
+      const params = new URLSearchParams({
+        class_year: selectedClassYear,
+        date: selectedDate
+      });
+
+      const url =
+        `${BACKEND_URL}/api/available-reading-batches?${params.toString()}`;
+
+      console.log(
+        "📦 FETCH READING BATCHES:",
+        url
+      );
+
+      const res = await fetch(url);
+
+      if (!res.ok) {
+        throw new Error(
+          "Failed to load batch ids"
+        );
+      }
+
+      const data = await res.json();
+
+      console.log(
+        "📦 READING BATCH RESPONSE:",
+        data
+      );
+
+      setAvailableBatches(data);
+
+      if (data.length > 0) {
+        setSelectedBatchId(data[0]);
+      }
+
+    } catch (err) {
+
+      console.error(err);
+
+      setError(
+        "Failed to load batch ids."
+      );
+    }
+  };
+
+  fetchBatchIds();
+
+}, [
+  selectedClassYear,
+  selectedDate,
+  mode
+]);
   useEffect(() => {
   const load = async () => {
     try {
@@ -104,6 +171,11 @@ export default function GenerateExam_reading({ mode }) {
 }, [selectedClassYear]); // ✅ IMPORTANT dependency
 
   const handleGenerateHomeworkExam = async () => {
+    if (mode === "latest" && !selectedBatchId) {
+      console.log("❌ Missing batch");
+      alert("Please select a batch.");
+      return;
+    }
   console.log("\n================ GENERATE HOMEWORK DEBUG =================");
 
   console.log("📦 selectedClassYear:", selectedClassYear);
@@ -134,7 +206,10 @@ export default function GenerateExam_reading({ mode }) {
     const payload = {
       class_name: "Selective",
       class_year: selectedClassYear,
-      ...(mode === "latest" && { date: selectedDate })
+      ...(mode === "latest" && {
+        selected_date: selectedDate,
+        batch_id: Number(selectedBatchId)
+      })
     };
 
     console.log("🚀 REQUEST PAYLOAD:", payload);
@@ -184,6 +259,11 @@ export default function GenerateExam_reading({ mode }) {
      GENERATE EXAM
   --------------------------- */
 const handleGenerateExam = async () => {
+  if (mode === "latest" && !selectedBatchId) {
+    console.log("❌ Missing batch");
+    alert("Please select a batch.");
+    return;
+  }
   console.log("\n================ GENERATE EXAM DEBUG =================");
 
   console.log("📦 selectedClass:", selectedClass);
@@ -217,7 +297,10 @@ const handleGenerateExam = async () => {
     const payload = {
       class_name: "Selective",
       class_year: selectedClassYear,
-      ...(mode === "latest" && { date: selectedDate })
+      ...(mode === "latest" && {
+        selected_date: selectedDate,
+        batch_id: Number(selectedBatchId)
+      })
     };
 
     console.log("🚀 REQUEST PAYLOAD:", payload);
@@ -289,6 +372,34 @@ const handleGenerateExam = async () => {
         </select>
       </>
     )}
+    {mode === "latest" && (
+
+  <>
+    <label>Select Batch ID:</label>
+
+    <select
+      value={selectedBatchId}
+      onChange={(e) =>
+        setSelectedBatchId(e.target.value)
+      }
+    >
+      <option value="">
+        Select Batch
+      </option>
+
+      {availableBatches.map(
+        (batchId, index) => (
+          <option
+            key={index}
+            value={batchId}
+          >
+            Batch #{batchId}
+          </option>
+        )
+      )}
+    </select>
+  </>
+)}
 
       <h2>Generate Reading Exam</h2>
       <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
@@ -441,10 +552,15 @@ const handleGenerateExam = async () => {
                           </p>
 
                           {/* Per Question Options */}
-                          {question.options && (
+                          {(
+                            question.answer_options ||
+                            section.answer_options
+                          ) && (
                             <ul>
                               {Object.entries(
-                                question.options
+                                question.answer_options ||
+                                section.answer_options ||
+                                {}
                               ).map(
                                 ([key, value]) => (
                                   <li key={key}>

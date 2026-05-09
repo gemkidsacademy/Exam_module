@@ -4,6 +4,8 @@ import "./UploadPDF.css";
 export default function UploadWordNaplanReading() {
   const [wordFile, setWordFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  
+  const BACKEND_URL = process.env.REACT_APP_API_URL;
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
@@ -38,7 +40,7 @@ export default function UploadWordNaplanReading() {
 
     try {
       const res = await fetch(
-        "https://web-production-481a5.up.railway.app/upload-word-naplan-reading",
+        `${BACKEND_URL}/upload-word-naplan-reading`,
         {
           method: "POST",
           body: formData,

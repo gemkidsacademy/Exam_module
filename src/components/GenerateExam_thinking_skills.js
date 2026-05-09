@@ -11,10 +11,63 @@ export default function GenerateExam_thinking_skills({ mode }) {
   const [questionCount, setQuestionCount] = useState(40);
   const [availableDates, setAvailableDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
+  const [availableBatches, setAvailableBatches] = useState([]);
+  const [selectedBatchId, setSelectedBatchId] = useState("");
 
   // ✅ NEW: class year state
   const [selectedClassYear, setSelectedClassYear] = useState(5);
   
+useEffect(() => {
+
+  const fetchBatchIds = async () => {
+
+    try {
+
+      if (
+        !selectedClassYear ||
+        !selectedDate ||
+        mode !== "latest"
+      ) return;
+
+      const params = new URLSearchParams({
+        class_year: `Year ${selectedClassYear}`,
+        date: selectedDate
+      });
+
+      const url =
+        `${BACKEND_URL}/api/available-thinking-batches?${params.toString()}`;
+
+      console.log("📦 FETCH THINKING BATCHES:", url);
+
+      const res = await fetch(url);
+
+      if (!res.ok) {
+        throw new Error("Failed to load batch ids");
+      }
+
+      const data = await res.json();
+
+      console.log("📦 BATCH RESPONSE:", data);
+
+      setAvailableBatches(data);
+
+      if (data.length > 0) {
+        setSelectedBatchId(data[0]);
+      }
+
+    } catch (err) {
+
+      console.error(err);
+
+      setErrorMessage(
+        "Failed to load batch ids."
+      );
+    }
+  };
+
+  fetchBatchIds();
+
+}, [selectedClassYear, selectedDate, mode]);
 
 useEffect(() => {
   const fetchDates = async () => {
@@ -60,6 +113,10 @@ useEffect(() => {
       setErrorMessage("Please select a date.");
       return;
     }
+    if (mode === "latest" && !selectedBatchId) {
+      setErrorMessage("Please select a batch.");
+      return;
+    }
   setLoading(true);
   setErrorMessage("");
   setGeneratedExam(null);
@@ -78,7 +135,11 @@ useEffect(() => {
       },
       body: JSON.stringify({
         class_year: selectedClassYear,
-        ...(mode === "latest" && { date: selectedDate })
+
+        ...(mode === "latest" && {
+          date: selectedDate,
+          batch_id: selectedBatchId
+        })
       })
     });
 
@@ -102,6 +163,10 @@ useEffect(() => {
       setErrorMessage("Please select a date.");
       return;
     }
+    if (mode === "latest" && !selectedBatchId) {
+      setErrorMessage("Please select a batch.");
+      return;
+    }
     setLoading(true);
     setErrorMessage("");
     setGeneratedExam(null);
@@ -120,7 +185,11 @@ useEffect(() => {
         },
         body: JSON.stringify({
           class_year: selectedClassYear,
-          ...(mode === "latest" && { date: selectedDate })
+
+          ...(mode === "latest" && {
+            date: selectedDate,
+            batch_id: selectedBatchId
+          })
         })
       });
 
@@ -178,7 +247,35 @@ useEffect(() => {
           </select>
         </div>
       )}
-      
+      {mode === "latest" && (
+      <div className="form-group">
+
+        <label>Select Batch ID:</label>
+
+        <select
+          value={selectedBatchId}
+          onChange={(e) =>
+            setSelectedBatchId(e.target.value)
+          }
+        >
+          <option value="">
+            Select Batch
+          </option>
+
+          {availableBatches.map(
+            (batchId, index) => (
+              <option
+                key={index}
+                value={batchId}
+              >
+                Batch #{batchId}
+              </option>
+            )
+          )}
+        </select>
+
+      </div>
+    )}
 
       {errorMessage && <p className="error-text">{errorMessage}</p>}
       <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>

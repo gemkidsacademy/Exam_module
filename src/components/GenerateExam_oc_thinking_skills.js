@@ -9,6 +9,8 @@ export default function GenerateExam_oc_thinking_skills({ mode }) {
   const [classYear, setClassYear] = useState("");
   const [error, setError] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
+  const [availableBatches, setAvailableBatches] = useState([]);
+  const [selectedBatchId, setSelectedBatchId] = useState("");
 
   
   const BACKEND_URL = process.env.REACT_APP_API_URL;
@@ -19,6 +21,10 @@ export default function GenerateExam_oc_thinking_skills({ mode }) {
   const handleGenerateHomework_oc_thinking_skills = async () => {
   if (!classYear) {
     setError("Please select class year");
+    return;
+  }
+  if (mode === "latest" && !selectedBatchId) {
+    setError("Please select a batch");
     return;
   }
 
@@ -34,7 +40,10 @@ export default function GenerateExam_oc_thinking_skills({ mode }) {
   try {
     const payload = {
       class_year: Number(classYear),
-      ...(mode === "latest" && { selected_date: selectedDate })
+      ...(mode === "latest" && {
+      selected_date: selectedDate,
+      batch_id: selectedBatchId
+    })
     };
 
     console.log("📤 Sending payload (homework generation):", payload);
@@ -91,6 +100,10 @@ export default function GenerateExam_oc_thinking_skills({ mode }) {
     setError("Please select class year");
     return;
   }
+  if (mode === "latest" && !selectedBatchId) {
+    setError("Please select a batch");
+    return;
+  }
 
   if (mode === "latest" && !selectedDate) {
     setError("Please select a date");
@@ -104,7 +117,10 @@ export default function GenerateExam_oc_thinking_skills({ mode }) {
   try {
     const payload = {
       class_year: Number(classYear),
-      ...(mode === "latest" && { selected_date: selectedDate })
+      ...(mode === "latest" && {
+      selected_date: selectedDate,
+      batch_id: selectedBatchId
+    })
     };
 
     console.log("📤 Sending payload (exam generation):", payload);
@@ -156,6 +172,68 @@ export default function GenerateExam_oc_thinking_skills({ mode }) {
     setLoading(false);
   }
 };
+useEffect(() => {
+
+  const fetchBatchIds = async () => {
+
+    try {
+
+      if (
+        !classYear ||
+        !selectedDate ||
+        mode !== "latest"
+      ) return;
+
+      setSelectedBatchId("");
+      setAvailableBatches([]);
+
+      const params = new URLSearchParams({
+        class_year: `Year ${classYear}`,
+        date: selectedDate
+      });
+
+      const url =
+        `${BACKEND_URL}/api/available-oc-thinking-batches?${params.toString()}`;
+
+      console.log(
+        "📦 FETCH OC THINKING BATCHES:",
+        url
+      );
+
+      const res = await fetch(url);
+
+      if (!res.ok) {
+        throw new Error(
+          "Failed to load batch ids"
+        );
+      }
+
+      const data = await res.json();
+
+      console.log(
+        "📦 OC THINKING BATCH RESPONSE:",
+        data
+      );
+
+      setAvailableBatches(data);
+
+      if (data.length > 0) {
+        setSelectedBatchId(data[0]);
+      }
+
+    } catch (err) {
+
+      console.error(err);
+
+      setError(
+        "Failed to load batch ids."
+      );
+    }
+  };
+
+  fetchBatchIds();
+
+}, [classYear, selectedDate, mode]);
 useEffect(() => {
   const fetchDates = async () => {
     try {
@@ -226,6 +304,35 @@ console.log("CLASS YEAR:", classYear);
             </option>
           ))}
         </select>
+      </div>
+    )}
+    {mode === "latest" && (
+      <div className="input-group">
+
+        <label>Select Batch ID</label>
+
+        <select
+          value={selectedBatchId}
+          onChange={(e) =>
+            setSelectedBatchId(e.target.value)
+          }
+        >
+          <option value="">
+            -- Select Batch --
+          </option>
+
+          {availableBatches.map(
+            (batchId, index) => (
+              <option
+                key={index}
+                value={batchId}
+              >
+                Batch #{batchId}
+              </option>
+            )
+          )}
+        </select>
+
       </div>
     )}
       

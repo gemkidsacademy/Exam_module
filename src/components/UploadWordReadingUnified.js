@@ -6,6 +6,7 @@ export default function UploadWordReadingUnified() {
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState(null);
   const [deletingDuplicates, setDeletingDuplicates] = useState(false);
+  const BACKEND_URL = process.env.REACT_APP_API_URL;
   const [error, setError] = useState(null);
   const handleDeleteDuplicates_readingUnified = async () => {
   if (!window.confirm("Are you sure you want to delete duplicate questions?")) {
@@ -17,7 +18,7 @@ export default function UploadWordReadingUnified() {
 
   try {
     const res = await fetch(
-      "https://web-production-481a5.up.railway.app/delete-duplicate-questions-selective-reading",
+      `${BACKEND_URL}/delete-duplicate-questions-selective-reading`,
       {
         method: "POST",
       }
@@ -74,7 +75,7 @@ export default function UploadWordReadingUnified() {
 
     try {
       const res = await fetch(
-        "https://web-production-481a5.up.railway.app/upload-word-reading-unified",
+        `${BACKEND_URL}/upload-word-reading-unified`,
         {
           method: "POST",
           body: formData,

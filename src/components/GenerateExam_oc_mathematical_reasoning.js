@@ -11,6 +11,8 @@ export default function GenerateExam_oc_mathematical_reasoning({
   const [classYear, setClassYear] = useState("");
   const [availableDates, setAvailableDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
+  const [availableBatches, setAvailableBatches] = useState([]);
+  const [selectedBatchId, setSelectedBatchId] = useState("");
 
   const BACKEND_URL = process.env.REACT_APP_API_URL;
 
@@ -21,6 +23,10 @@ export default function GenerateExam_oc_mathematical_reasoning({
     const fetchDates = async () => {
       try {
         if (!classYear || mode !== "latest") return;
+        setAvailableDates([]);
+        setSelectedDate("");
+        setAvailableBatches([]);
+        setSelectedBatchId("");
 
         const response = await fetch(
           `${BACKEND_URL}/api/exams/oc-mathematical-reasoning-dates/${classYear}`
@@ -49,6 +55,68 @@ export default function GenerateExam_oc_mathematical_reasoning({
 
     fetchDates();
   }, [classYear, mode]);
+  useEffect(() => {
+
+  const fetchBatchIds = async () => {
+
+    try {
+
+      if (
+        !classYear ||
+        !selectedDate ||
+        mode !== "latest"
+      ) return;
+
+      setSelectedBatchId("");
+      setAvailableBatches([]);
+
+      const params = new URLSearchParams({
+        class_year: classYear,
+        date: selectedDate
+      });
+
+      const url =
+        `${BACKEND_URL}/api/available-oc-mr-batches?${params.toString()}`;
+
+      console.log(
+        "📦 FETCH OC MR BATCHES:",
+        url
+      );
+
+      const res = await fetch(url);
+
+      if (!res.ok) {
+        throw new Error(
+          "Failed to load batch ids"
+        );
+      }
+
+      const data = await res.json();
+
+      console.log(
+        "📦 OC MR BATCH RESPONSE:",
+        data
+      );
+
+      setAvailableBatches(data);
+
+      if (data.length > 0) {
+        setSelectedBatchId(data[0]);
+      }
+
+    } catch (err) {
+
+      console.error(err);
+
+      setError(
+        "Failed to load batch ids."
+      );
+    }
+  };
+
+  fetchBatchIds();
+
+}, [classYear, selectedDate, mode]);
 
   /* ===========================
      Generate OC Mathematical Reasoning Exam
@@ -57,6 +125,10 @@ export default function GenerateExam_oc_mathematical_reasoning({
 
     if (!classYear) {
       setError("Please select class year");
+      return;
+    }
+    if (mode === "latest" && !selectedBatchId) {
+      setError("Please select a batch");
       return;
     }
 
@@ -74,7 +146,8 @@ export default function GenerateExam_oc_mathematical_reasoning({
       const payload = {
         class_year: classYear,
         ...(mode === "latest" && {
-          selected_date: selectedDate
+          selected_date: selectedDate,
+          batch_id: selectedBatchId
         })
       };
 
@@ -144,6 +217,10 @@ export default function GenerateExam_oc_mathematical_reasoning({
       setError("Please select class year");
       return;
     }
+    if (mode === "latest" && !selectedBatchId) {
+      setError("Please select a batch");
+      return;
+    }
 
     if (mode === "latest" && !selectedDate) {
       setError("Please select a date");
@@ -159,7 +236,8 @@ export default function GenerateExam_oc_mathematical_reasoning({
       const payload = {
         class_year: classYear,
         ...(mode === "latest" && {
-          selected_date: selectedDate
+          selected_date: selectedDate,
+          batch_id: selectedBatchId
         })
       };
 
@@ -271,6 +349,35 @@ export default function GenerateExam_oc_mathematical_reasoning({
                 </option>
               ))}
 
+            </select>
+
+          </div>
+        )}
+        {mode === "latest" && (
+          <div className="input-group">
+
+            <label>Select Batch ID</label>
+
+            <select
+              value={selectedBatchId}
+              onChange={(e) =>
+                setSelectedBatchId(e.target.value)
+              }
+            >
+              <option value="">
+                -- Select Batch --
+              </option>
+
+              {availableBatches.map(
+                (batchId, index) => (
+                  <option
+                    key={index}
+                    value={batchId}
+                  >
+                    Batch #{batchId}
+                  </option>
+                )
+              )}
             </select>
 
           </div>
