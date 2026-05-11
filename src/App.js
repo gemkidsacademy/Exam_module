@@ -34,8 +34,10 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
     throw new Error("❌ REACT_APP_API_URL is not defined");
   }
 
-  const handleLogin = async (e) => {
+  /*
+const handleLogin = async (e) => {
   e.preventDefault(); 
+
   try {
     setError(null);
 
@@ -76,7 +78,7 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
       navigate("/NAPLAN");
     } else if (data?.class_name === "Selective") {
       navigate("/SelectiveDashboard");
-    }else if (data?.class_name === "OC") {
+    } else if (data?.class_name === "OC") {
       navigate("/OCDashboard");
     } else {
       navigate("/selectiveFoundational");
@@ -86,6 +88,209 @@ function LoginPage({ setIsLoggedIn, setDoctorData, setSessionToken }) {
     console.error("Login error:", err);
     setError("Login failed. Please try again.");
   }
+};
+*/
+const handleLogin = async (e) => {
+
+  e.preventDefault();
+
+  try {
+
+    setError(null);
+
+    if (!username || !password) {
+
+      setError(
+        "Please enter username and password"
+      );
+
+      return;
+
+    }
+
+    const response = await fetch(
+      `${server}/login-exam-module`,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        credentials: "include",
+
+        body: JSON.stringify({
+
+          student_id: username,
+
+          password: password,
+
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+
+      console.log("Login response:", data);
+
+      let errorMessage = "Invalid credentials";
+
+      if (typeof data?.detail === "string") {
+
+        errorMessage = data.detail;
+
+      }
+      else if (Array.isArray(data?.detail)) {
+
+        errorMessage =
+          data.detail[0]?.msg || "Validation error";
+
+      }
+
+      setError(errorMessage);
+
+      return;
+
+    }
+
+    // =========================
+    // Successful Login
+    // =========================
+
+    setIsLoggedIn(true);
+
+    setDoctorData(data);
+
+    setSessionToken(
+      data.session_token || null
+    );
+
+    // Save common session info
+    sessionStorage.setItem(
+      "user_type",
+      data.user_type
+    );
+
+    sessionStorage.setItem(
+      "name",
+      data.name || ""
+    );
+
+    // =========================
+    // SUPER ADMIN
+    // =========================
+
+    if (
+      data.user_type === "SUPER_ADMIN"
+    ) {
+
+      navigate("/AdminPanel");
+
+      return;
+
+    }
+
+    // =========================
+    // CENTER ADMIN
+    // =========================
+
+    if (
+      data.user_type === "CENTER_ADMIN"
+    ) {
+
+      sessionStorage.setItem(
+        "center_code",
+        data.center_code
+      );
+      
+
+      navigate("/AdminPanel");
+
+      return;
+
+    }
+
+    // =========================
+    // STUDENT
+    // =========================
+
+    if (
+      data.user_type === "STUDENT"
+    ) {
+
+      sessionStorage.setItem(
+        "student_id",
+        data.student_id
+      );
+
+      sessionStorage.setItem(
+        "student_class",
+        data.class_name
+      );
+
+      sessionStorage.setItem(
+        "student_name",
+        data.name
+      );
+
+      if (
+        data.class_name === "NAPLAN"
+      ) {
+
+        navigate("/NAPLAN");
+
+      }
+      else if (
+        data.class_name === "Selective"
+      ) {
+
+        navigate(
+          "/SelectiveDashboard"
+        );
+
+      }
+      else if (
+        data.class_name === "OC"
+      ) {
+
+        navigate("/OCDashboard");
+
+      }
+      else {
+
+        navigate(
+          "/selectiveFoundational"
+        );
+
+      }
+
+      return;
+
+    }
+
+    // =========================
+    // Unknown Role
+    // =========================
+
+    setError(
+      "Unknown user type"
+    );
+
+  } catch (err) {
+
+    console.error(
+      "Login error:",
+      err
+    );
+
+    setError(
+      "Login failed. Please try again."
+    );
+
+  }
+
 };
 
 
@@ -231,7 +436,11 @@ function App() {
             path="/adminpanel"
             element={
               <PrivateRoute isLoggedIn={isLoggedIn}>
-                <AdminPanel />
+                <AdminPanel
+                  userType={
+                    sessionStorage.getItem("user_type")
+                  }
+                />
               </PrivateRoute>
             }
           />

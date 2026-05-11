@@ -7,15 +7,20 @@ export default function EditUserForm() {
   const [id, setId] = useState(""); // Non-editable backend ID of selected student
   const [name, setName] = useState("");
   const [className, setClassName] = useState("");
+  const centerCode = sessionStorage.getItem(
+    "center_code"
+  );
   const [classDay, setClassDay] = useState("");
+  const [gender, setGender] = useState("");
   const [parentEmail, setParentEmail] = useState("");
+  const BACKEND_URL = process.env.REACT_APP_API_URL;
 
   // Fetch all students for dropdown
   useEffect(() => {
   const fetchStudents = async () => {
     try {
       const response = await fetch(
-        "https://web-production-481a5.up.railway.app/get_all_students_exam_module"
+        `${BACKEND_URL}/students/by-center/${centerCode}`
       );
 
       if (!response.ok) {
@@ -25,7 +30,7 @@ export default function EditUserForm() {
       const data = await response.json();
 
       // ✅ Backend returns array directly
-      setStudentOptions(data);
+      setStudentOptions(data.students || []);
 
     } catch (err) {
       console.error(err);
@@ -42,28 +47,37 @@ export default function EditUserForm() {
     if (!selectedStudentId) return;
     const student = studentOptions.find(s => s.student_id === selectedStudentId);
     if (student) {
+
       setId(student.id);
+
       setName(student.name);
+
       setClassName(student.class_name);
+
       setClassDay(student.class_day);
+
       setParentEmail(student.parent_email);
+
+      setGender(student.gender || "");
+
     }
   }, [selectedStudentId, studentOptions]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
-      id,               // Backend ID, non-editable
-      student_id: selectedStudentId, // Admin-selected student_id
+      id,
+      student_id: selectedStudentId,
       name,
       class_name: className,
       class_day: classDay,
       parent_email: parentEmail,
+      gender,
     };
 
     try {
       const response = await fetch(
-        "https://web-production-481a5.up.railway.app/edit_student_exam_module",
+        `${BACKEND_URL}/edit_student_exam_module`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -132,6 +146,20 @@ export default function EditUserForm() {
           onChange={(e) => setParentEmail(e.target.value)}
           required
         />
+        <label>Gender</label>
+
+        <select
+          value={gender}
+          onChange={(e) => setGender(e.target.value)}
+          required
+        >
+          <option value="">-- Select Gender --</option>
+
+          <option value="Male">Male</option>
+
+          <option value="Female">Female</option>
+
+        </select>
 
         <button type="submit">Update Student</button>
       </form>

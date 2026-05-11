@@ -11,13 +11,17 @@ function DeleteUserModal({ onClose, onUserDeleted }) {
   const [parentEmail, setParentEmail] = useState("");
   const [className, setClassName] = useState("");
   const [classDay, setClassDay] = useState("");
+  const centerCode = sessionStorage.getItem(
+    "center_code"
+  );
+  const BACKEND_URL = process.env.REACT_APP_API_URL;
 
   // 1️⃣ Fetch all students once (same as Edit)
   useEffect(() => {
     const fetchStudents = async () => {
       try {
         const res = await fetch(
-          "https://web-production-481a5.up.railway.app/get_all_students_exam_module"
+          `${BACKEND_URL}/students/by-center/${centerCode}`
         );
 
         if (!res.ok) {
@@ -25,7 +29,7 @@ function DeleteUserModal({ onClose, onUserDeleted }) {
         }
 
         const data = await res.json();
-        setStudentOptions(data);
+        setStudentOptions(data.students || []);
       } catch (err) {
         console.error(err);
         alert("Unable to load students");
@@ -74,7 +78,7 @@ function DeleteUserModal({ onClose, onUserDeleted }) {
 
     try {
       const res = await fetch(
-        `https://web-production-481a5.up.railway.app/delete_student_exam_module/${id}`,
+        `${BACKEND_URL}/delete_student_exam_module/${id}`,
         { method: "DELETE" }
       );
 

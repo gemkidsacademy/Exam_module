@@ -3,13 +3,17 @@ import "./AddStudentForm.css";
 
 export default function ViewUserModal({ onClose }) {
   const [students, setStudents] = useState([]);
+  const BACKEND_URL = process.env.REACT_APP_API_URL;
   const [loading, setLoading] = useState(true);
+  const centerCode = sessionStorage.getItem(
+    "center_code"
+  );
 
   useEffect(() => {
     const fetchStudents = async () => {
       try {
         const res = await fetch(
-          "https://web-production-481a5.up.railway.app/get_all_students_exam_module"
+          `${BACKEND_URL}/students/by-center/${centerCode}`
         );
 
         if (!res.ok) {
@@ -17,7 +21,7 @@ export default function ViewUserModal({ onClose }) {
         }
 
         const data = await res.json();
-        setStudents(data);
+        setStudents(data.students || []);
       } catch (err) {
         console.error(err);
         alert("Unable to load students");

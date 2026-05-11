@@ -26,6 +26,7 @@
   import QuizSetup_oc_reading from "./QuizSetup_oc_reading";
   import GenerateExam_oc_reading from "./GenerateExam_oc_reading";
   import GenerateExam_naplan_writing from "./GenerateExam_naplan_writing";
+  import CenterManagement from "./CenterManagement";
      
   
   
@@ -80,13 +81,23 @@
   
   import GenerateExam_foundational from "./GenerateExam_foundational";
   
-  const AdminPanel = () => {
+
+  const AdminPanel = ({ userType }) => {
+    console.log("User Type:", userType);
     const navigate = useNavigate();
   
     /* ============================
       Tabs
     ============================ */
-    const [activeTab, setActiveTab] = useState("database");
+    
+
+    const [activeTab, setActiveTab] = useState(
+
+      userType === "SUPER_ADMIN"
+        ? "center-management"
+        : "database"
+
+    );
   
     /* ============================
       User Modals
@@ -101,6 +112,8 @@
     
     const [createExamType, setCreateExamType] = useState(null);
     const [generateExamType, setGenerateExamType] = useState(null);
+    const [centerId, setCenterId] = useState("");
+    const [centerName, setCenterName] = useState("");
   
     /* ============================
       Exam Flow State
@@ -133,20 +146,99 @@
   
   
     /* ============================
-      Tabs Config
-    ============================ */
-    const tabs = [
-    { id: "database", label: "Exam Module User Management" },
-    /*{ id: "exam-type-selector", label: "Upload Questions Word Document" },*/
-    { id: "exam-type-selector", label: "Upload Questions Word Document" },   
-    { id: "upload-image-folder", label: "Exam Image Folder" },
-    { id: "add-quiz", label: "Create Exam" },
-    { id: "generate-exam", label: "Generate Exam" },
-    { id: "student-exam-reports", label: "Student Exam Reports" },
-    
-    { id: "topic-report-limited-2", label: "Topic Report " },
-    { id: "selective-readiness-overall", label: "Selective Readiness (Overall)" },
-  ];
+   Tabs Config
+============================ */
+
+const allTabs = [
+
+  {
+    id: "database",
+    label: "Exam Module User Management",
+  },
+
+  {
+    id: "center-management",
+    label: "Center Management",
+  },
+
+  {
+    id: "exam-type-selector",
+    label: "Upload Questions Word Document",
+  },
+
+  {
+    id: "upload-image-folder",
+    label: "Exam Image Folder",
+  },
+
+  {
+    id: "add-quiz",
+    label: "Create Exam",
+  },
+
+  {
+    id: "generate-exam",
+    label: "Generate Exam",
+  },
+
+  {
+    id: "student-exam-reports",
+    label: "Student Exam Reports",
+  },
+
+  {
+    id: "topic-report-limited-2",
+    label: "Topic Report",
+  },
+
+  {
+    id: "selective-readiness-overall",
+    label: "Selective Readiness (Overall)",
+  },
+
+];
+
+/* ============================
+   Role-Based Tabs
+============================ */
+
+const tabs = allTabs.filter((tab) => {
+
+  // =========================
+  // SUPER ADMIN
+  // =========================
+
+  if (userType === "SUPER_ADMIN") {
+
+    return [
+
+      "center-management",
+
+      "exam-type-selector",
+
+      "upload-image-folder",
+
+    ].includes(tab.id);
+
+  }
+
+  // =========================
+  // CENTER ADMIN
+  // =========================
+
+  if (userType === "CENTER_ADMIN") {
+
+    return ![
+      "center-management",
+      "exam-type-selector",
+      "upload-image-folder",
+    ].includes(tab.id);
+
+  }
+
+  return true;
+
+});
   
   
     /* ============================
@@ -257,6 +349,9 @@
           )}
         
           </div>
+        )}
+        {activeTab === "center-management" && (
+          <CenterManagement />
         )}
   
         {/* ===== UPLOAD WORD QUESTIONS ===== 

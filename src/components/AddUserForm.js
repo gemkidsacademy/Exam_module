@@ -6,9 +6,20 @@ export default function AddStudentForm() {
   const [id, setId] = useState(""); // Non-editable ID from backend
   const [studentId, setStudentId] = useState(""); // Editable Student ID entered by admin
   const [name, setName] = useState("");
+  const [gender, setGender] = useState("");
   const [className, setClassName] = useState("");
   const [classDay, setClassDay] = useState("");
   const [parentEmail, setParentEmail] = useState("");
+  const rawCenterCode =
+    sessionStorage.getItem("center_code") || "";
+
+  // Handle old corrupted values like:
+  // "Rouse hill | CENTER-101"
+
+  const centerCode =
+    rawCenterCode.includes("|")
+      ? rawCenterCode.split("|")[1].trim()
+      : rawCenterCode;
   const [studentYear, setStudentYear] = useState("");
   const STUDENT_YEAR_OPTIONS = [
         "Year 4",    
@@ -37,6 +48,11 @@ const CLASS_DAY_OPTIONS = [
   "Wednesday",
   "Thursday",
   "Friday",
+];
+const GENDER_OPTIONS = [
+  "Male",
+  "Female",
+  "Other",
 ];
 
   useEffect(() => {
@@ -71,10 +87,12 @@ const CLASS_DAY_OPTIONS = [
       id,                    // Backend-suggested ID
       student_id: studentId, // Admin-entered student ID
       name,
+      gender,
       student_year: studentYear, // ✅ NEW
       class_name: className,
       class_day: classDay,
       parent_email: parentEmail,
+      center_code: centerCode,
     };
 
     try {
@@ -126,6 +144,26 @@ const CLASS_DAY_OPTIONS = [
           onChange={(e) => setName(e.target.value)}
           required
         />
+        <label>Gender</label>
+
+        <select
+          value={gender}
+          onChange={(e) => setGender(e.target.value)}
+          required
+        >
+          <option value="">
+            Select gender
+          </option>
+
+          {GENDER_OPTIONS.map((item) => (
+            <option
+              key={item}
+              value={item}
+            >
+              {item}
+            </option>
+          ))}
+        </select>
 
         <label>Class Name</label>
           <select
