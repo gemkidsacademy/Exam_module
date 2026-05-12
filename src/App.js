@@ -172,6 +172,10 @@ const handleLogin = async (e) => {
       "user_type",
       data.user_type
     );
+    sessionStorage.setItem(
+      "center_code",
+      data.center_code || ""
+    );
 
     sessionStorage.setItem(
       "name",
@@ -439,6 +443,9 @@ function App() {
                 <AdminPanel
                   userType={
                     sessionStorage.getItem("user_type")
+                  }
+                  centerCode={
+                    sessionStorage.getItem("center_code")
                   }
                 />
               </PrivateRoute>

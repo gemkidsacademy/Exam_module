@@ -332,6 +332,15 @@ console.log("CLASS YEAR:", classYear);
             )
           )}
         </select>
+        <p
+          style={{
+            color: "red",
+            marginTop: "8px",
+            fontWeight: "500",
+          }}
+        >
+          Make sure none of the questions are part of previously generated exam
+        </p>
 
       </div>
     )}

@@ -10,7 +10,14 @@
     ============================ */
 
 
-  export default function QuizSetup() {
+  export default function QuizSetup({
+    userType,
+    centerCode
+  }) {
+     console.log(
+      "[QuizSetup] Accessed by userType:",
+      userType
+    );
     const [availableTopics, setAvailableTopics] = useState([]);
     const [availableCounts, setAvailableCounts] = useState({});
     const [questionBank, setQuestionBank] = useState([]);
@@ -46,8 +53,8 @@
       }
     }
 
-    if (totalQuestions !== 40) {
-      alert("Total questions across all topics must be 40.");
+    if (totalQuestions !== 2) {
+      alert("Total questions across all topics must be 2.");
       return false;
     }
 
@@ -129,31 +136,54 @@ const handleDeleteSingleQuestion = async () => {
     alert("Error deleting question.");
   }
 };
-  const fetchQuestionCounts = async (topicName) => {
-    try {
-      const params = new URLSearchParams({
-        topic: topicName,
-        class_year: quiz.classYear,
-        class_name: quiz.className,
-        subject: quiz.subject
-      });
+  const fetchQuestionCounts = async (
+  topicName
+) => {
 
-      const res = await fetch(
-        `${BACKEND_URL}/api/question-count?${params.toString()}`
+  try {
+
+    const params = new URLSearchParams({
+
+      topic: topicName,
+
+      class_year: quiz.classYear,
+
+      class_name: quiz.className,
+
+      subject: quiz.subject,
+
+      center_code: centerCode,
+
+    });
+
+    const res = await fetch(
+      `${BACKEND_URL}/api/question-count?${params.toString()}`
+    );
+
+    if (!res.ok) {
+
+      throw new Error(
+        "Failed to fetch question counts"
       );
-
-      const data = await res.json();
-
-      setAvailableCounts(prev => ({
-        ...prev,
-        [topicName]: data
-      }));
-
-    } catch (err) {
-      console.error(err);
     }
-  };
+
+    const data = await res.json();
+
+    setAvailableCounts((prev) => ({
+
+      ...prev,
+
+      [topicName]: data
+
+    }));
+
+  } catch (err) {
+
+    console.error(err);
+  }
+};
     const handleResetUsedQuestions = async () => {
+
   const confirmReset = window.confirm(
     "Are you sure you want to reset used questions for this class, subject, and year?"
   );
@@ -161,33 +191,58 @@ const handleDeleteSingleQuestion = async () => {
   if (!confirmReset) return;
 
   try {
+
     const res = await fetch(
       `${BACKEND_URL}/api/admin/reset-used-questions`,
       {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify({
+
           class_name: quiz.className,
+
           subject: quiz.subject,
+
           class_year: quiz.classYear,
+
+          center_code: centerCode,
+
         }),
       }
     );
 
     if (!res.ok) {
+
       const err = await res.json();
-      throw new Error(err.detail || "Failed to reset used questions");
+
+      throw new Error(
+        err.detail ||
+        "Failed to reset used questions"
+      );
     }
 
     const data = await res.json();
-    console.log("Reset success:", data);
 
-    alert(`Reset successful! ${data.updated_count} questions updated.`);
+    console.log(
+      "Reset success:",
+      data
+    );
+
+    alert(
+      `Reset successful! ${data.deleted_count} question usages removed.`
+    );
+
   } catch (err) {
+
     console.error(err);
-    alert("Error resetting used questions.");
+
+    alert(
+      "Error resetting used questions."
+    );
   }
 };
     const handleTopicNameChange = (index, value) => {
@@ -314,27 +369,45 @@ const handleDeleteSingleQuestion = async () => {
 
       
     const handleViewQuestionBank = async () => {
-    try {
-      setQbLoading(true);
 
-      const res = await fetch(
-        `${BACKEND_URL}/api/admin/question-bank-thinking-skills?class_year=${quiz.classYear}`
+  try {
+
+    setQbLoading(true);
+
+    const params = new URLSearchParams({
+      class_year: quiz.classYear,
+      center_code: centerCode,
+    });
+
+    const res = await fetch(
+      `${BACKEND_URL}/api/admin/question-bank-thinking-skills?${params.toString()}`
+    );
+
+    if (!res.ok) {
+      throw new Error(
+        "Failed to load question bank"
       );
-
-      if (!res.ok) {
-        throw new Error("Failed to load question bank");
-      }
-
-      const data = await res.json();
-      setQuestionBank(data);
-      setShowQuestionBank(true);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to fetch question bank data.");
-    } finally {
-      setQbLoading(false);
     }
-  };
+
+    const data = await res.json();
+
+    setQuestionBank(data);
+
+    setShowQuestionBank(true);
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert(
+      "Failed to fetch question bank data."
+    );
+
+  } finally {
+
+    setQbLoading(false);
+  }
+};
 
 
     const handleDeletePreviousQuestions = () => {
@@ -426,15 +499,16 @@ const handleDeleteSingleQuestion = async () => {
         }
       }
 
-      if (totalQuestions !== 40) {
-        alert("Total questions across all topics must be 40.");
+      if (totalQuestions !== 2) {
+        alert("Total questions across all topics must be 2.");
         return;
       }
 
       const payload = {
         class_name: quiz.className.trim(),
         subject: quiz.subject.trim(),
-        class_year: Number(quiz.classYear),   // ✅ fix 1
+        class_year: Number(quiz.classYear),
+        center_code: centerCode,
         num_topics: quiz.topics.length,
         topics: quiz.topics.map((t) => ({
           name: t.name.trim(),
@@ -529,9 +603,11 @@ const handleDeleteSingleQuestion = async () => {
           
 
           <div className="section-card">
+
             <h2>Topic Controls</h2>
 
             <label>Number of Topics</label>
+
             <input
               type="number"
               name="numTopics"
@@ -541,34 +617,38 @@ const handleDeleteSingleQuestion = async () => {
             />
 
             <div className="button-row">
-              <button
-                type="button"
-                onClick={generateTopics}
-              >
-                Generate Topics
-              </button>
 
-              <button
-                type="button"
-                onClick={handleViewQuestionBank}
-              >
-                View Question Bank
-              </button>
-              <button
-                type="button"
-                onClick={handleResetUsedQuestions}
-              >
-                Reset Used Questions
-              </button>
+              {userType !== "SUPER_ADMIN" && (
+                <>
+                  <button
+                    type="button"
+                    onClick={generateTopics}
+                  >
+                    Generate Topics
+                  </button>
 
-              <button
-                type="button"
-                onClick={handleDeletePreviousQuestions}
-              >
-                Delete All Questions
-              </button>
+                  <button
+                    type="button"
+                    onClick={handleViewQuestionBank}
+                  >
+                    View Question Bank
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleResetUsedQuestions}
+                  >
+                    Reset Used Questions
+                  </button>
+                </>
+              )}
+
+              
+
             </div>
+
           </div>
+          {userType === "SUPER_ADMIN" && (
           <div className="section-card">
 
             <div
@@ -590,6 +670,7 @@ const handleDeleteSingleQuestion = async () => {
                 {showDeleteQuestionSection ? "−" : "+"}
               </span>
             </div>
+            
 
             {showDeleteQuestionSection && (
               <>
@@ -621,87 +702,99 @@ const handleDeleteSingleQuestion = async () => {
               </div>
             </div>
 
-        {searchLoading && (
-          <p>Searching questions...</p>
-        )}
+            {searchLoading && (
+              <p>Searching questions...</p>
+            )}
 
-        {searchResults.length > 0 && (
-          <>
-            <div style={{ marginTop: "20px" }}>
-              <label>Select Question</label>
+            {searchResults.length > 0 && (
+              <>
+                <div style={{ marginTop: "20px" }}>
+                  <label>Select Question</label>
 
-              <select
-                value={selectedQuestionId}
-                onChange={(e) =>
-                  setSelectedQuestionId(e.target.value)
-                }
-              >
-                <option value="">
-                  Select a Question
-                </option>
+                  <select
+                    value={selectedQuestionId}
+                    onChange={(e) =>
+                      setSelectedQuestionId(e.target.value)
+                    }
+                  >
+                    <option value="">
+                      Select a Question
+                    </option>
 
-                {searchResults.map((q) => (
-                  <option key={q.id} value={q.id}>
-                    ID {q.id} | {q.topic} | {q.preview?.slice(0, 80)}
-                  </option>
-                ))}
-              </select>
-            </div>
+                    {searchResults.map((q) => (
+                      <option key={q.id} value={q.id}>
+                        ID {q.id} | {q.topic} | {q.preview?.slice(0, 80)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-            <div
-              style={{
-                marginTop: "20px",
-                border: "1px solid #ddd",
-                padding: "12px",
-                borderRadius: "8px",
-                background: "#fafafa",
-              }}
-            >
-              {searchResults
-                .filter(
-                  (q) => q.id === Number(selectedQuestionId)
-                )
-                .map((q) => (
-                  <div key={q.id}>
-                    <strong>Preview:</strong>
+                <div
+                  style={{
+                    marginTop: "20px",
+                    border: "1px solid #ddd",
+                    padding: "12px",
+                    borderRadius: "8px",
+                    background: "#fafafa",
+                  }}
+                >
+                  {searchResults
+                    .filter(
+                      (q) => q.id === Number(selectedQuestionId)
+                    )
+                    .map((q) => (
+                      <div key={q.id}>
+                        <strong>Preview:</strong>
 
-                    <p
-                      style={{
-                        marginTop: "10px",
-                        lineHeight: "1.6",
-                      }}
-                    >
-                      {q.preview}
-                    </p>
-                  </div>
-                ))}
-            </div>
+                        <p
+                          style={{
+                            marginTop: "10px",
+                            lineHeight: "1.6",
+                          }}
+                        >
+                          {q.preview}
+                        </p>
+                      </div>
+                    ))}
+                </div>
 
+                <div style={{ marginTop: "20px" }}>
+                  <button
+                    type="button"
+                    onClick={handleDeleteSingleQuestion}
+                    style={{
+                      backgroundColor: "#d9534f",
+                      color: "white",
+                    }}
+                  >
+                    Delete Selected Question
+                  </button>
+                </div>
+              </>
+            )}
+
+          {!searchLoading &&
+            searchText &&
+            searchResults.length === 0 && (
+              <p style={{ marginTop: "15px" }}>
+                No matching questions found.
+              </p>
+          )}
+          {userType === "SUPER_ADMIN" && (
             <div style={{ marginTop: "20px" }}>
               <button
                 type="button"
-                onClick={handleDeleteSingleQuestion}
-                style={{
-                  backgroundColor: "#d9534f",
-                  color: "white",
-                }}
+                onClick={handleDeletePreviousQuestions}
               >
-                Delete Selected Question
+                Delete All Questions
               </button>
-            </div>
-          </>
+      </div>
         )}
-
-      {!searchLoading &&
-        searchText &&
-        searchResults.length === 0 && (
-          <p style={{ marginTop: "15px" }}>
-            No matching questions found.
-          </p>
-      )}
-       </>
+        </>
         )}
     </div>
+  )}
+  
         {showQuestionBank && (
               <div className="question-bank">
                 <h3>Question Bank (Thinking Skills)</h3>
@@ -946,70 +1039,109 @@ const handleDeleteSingleQuestion = async () => {
           </div>
 
           <div className="summary-box">
-            <div>Total Questions: {totalQuestions} / 40</div>
+            <div>Total Questions: {totalQuestions} / 2</div>
 
-            {totalQuestions === 40 && (
-              <div className="ready-text">✔ Ready to Create Exam</div>
+            {totalQuestions === 2 && (
+              <div className="ready-text">
+                ✔ Ready to Create Exam
+              </div>
             )}
 
-            {totalQuestions > 40 && (
-              <div className="warning">Total cannot exceed 40!</div>
+            {totalQuestions > 2 && (
+              <div className="warning">
+                Total cannot exceed 2!
+              </div>
             )}
           </div>
-          <div className="button-row final-actions">    
-          <button type="submit" disabled={totalQuestions > 40}>
-            Create Exam
-          </button>
-          <button
-    type="button"
-    className="homework-btn"
-    disabled={totalQuestions > 40}
-    onClick={async () => {
-    if (!validateQuizBeforeSubmit()) {
-      return false;
-    }
-      const payload = {
-        class_name: quiz.className.trim(),
-        subject: quiz.subject.trim(),
-        class_year: Number(quiz.classYear),
-        num_topics: quiz.topics.length,
-        topics: quiz.topics.map((t) => ({
-          name: t.name.trim(),
-          easy: t.easy,
-          medium: t.medium,
-          hard: t.hard,
-          total: t.total
-        })),
-      };
 
-      try {
-        const res = await fetch(
-          `${BACKEND_URL}/api/quizzes-homework`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          }
-        );
+          {userType !== "SUPER_ADMIN" && (
+            <div className="button-row final-actions">
 
-        if (!res.ok) {
-          const err = await res.json();
-          console.error("Backend returned:", err);
-          throw new Error("Failed to save homework");
-        }
+              <button
+                type="submit"
+                disabled={totalQuestions > 2}
+              >
+                Create Exam
+              </button>
 
-        const data = await res.json();
-        console.log("Homework saved:", data);
-        alert("Homework created successfully!");
-      } catch (error) {
-        console.error(error);
-        alert("Error creating homework.");
-      }
-    }}
-  >
-    Create Exam (Homework)
-  </button>
+              <button
+                type="button"
+                className="homework-btn"
+                disabled={totalQuestions > 2}
+                onClick={async () => {
+
+                  if (!validateQuizBeforeSubmit()) {
+                    return false;
+                  }
+
+                  const payload = {
+                    class_name: quiz.className.trim(),
+                    subject: quiz.subject.trim(),
+                    class_year: Number(quiz.classYear),
+                    center_code: centerCode,
+                    num_topics: quiz.topics.length,
+                    topics: quiz.topics.map((t) => ({
+                      name: t.name.trim(),
+                      easy: t.easy,
+                      medium: t.medium,
+                      hard: t.hard,
+                      total: t.total
+                    })),
+                  };
+
+                  try {
+
+                    const res = await fetch(
+                      `${BACKEND_URL}/api/quizzes-homework`,
+                      {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(payload),
+                      }
+                    );
+
+                    if (!res.ok) {
+
+                      const err = await res.json();
+
+                      console.error(
+                        "Backend returned:",
+                        err
+                      );
+
+                      throw new Error(
+                        "Failed to save homework"
+                      );
+                    }
+
+                    const data = await res.json();
+
+                    console.log(
+                      "Homework saved:",
+                      data
+                    );
+
+                    alert(
+                      "Homework created successfully!"
+                    );
+
+                  } catch (error) {
+
+                    console.error(error);
+
+                    alert(
+                      "Error creating homework."
+                    );
+                  }
+                }}
+              >
+                Create Exam (Homework)
+              </button>
+
             </div>
+          )}
             </form>
       </div>
     </div>

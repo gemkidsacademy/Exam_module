@@ -82,7 +82,10 @@
   import GenerateExam_foundational from "./GenerateExam_foundational";
   
 
-  const AdminPanel = ({ userType }) => {
+  const AdminPanel = ({
+    userType,
+    centerCode
+  }) => {
     console.log("User Type:", userType);
     const navigate = useNavigate();
   
@@ -218,6 +221,8 @@ const tabs = allTabs.filter((tab) => {
 
       "upload-image-folder",
 
+      "add-quiz",
+
     ].includes(tab.id);
 
   }
@@ -228,18 +233,27 @@ const tabs = allTabs.filter((tab) => {
 
   if (userType === "CENTER_ADMIN") {
 
-    return ![
-      "center-management",
-      "exam-type-selector",
-      "upload-image-folder",
+    return [
+
+      "database",
+
+      "add-quiz",
+
+      "generate-exam",
+
+      "student-exam-reports",
+
+      "topic-report-limited-2",
+
+      "selective-readiness-overall",
+
     ].includes(tab.id);
 
   }
 
-  return true;
+  return false;
 
-});
-  
+});  
   
     /* ============================
       User Callbacks
@@ -537,7 +551,12 @@ const tabs = allTabs.filter((tab) => {
               )}
           
               {/* STEP 3: FORMS */}
-              {createExamType === "thinking_skills" && <QuizSetup />}
+              {createExamType === "thinking_skills" && (
+                <QuizSetup
+                  userType={userType}
+                  centerCode={centerCode}
+                />
+              )}
               {createExamType === "oc_thinking_skills" && (
                   <QuizSetupOCThinkingSkills />
                 )}
@@ -773,8 +792,11 @@ const tabs = allTabs.filter((tab) => {
                         
                 
                         {generateExamCategory === "selective" &&
-                        generateExamType === "thinking_skills" && (
-                          <GenerateExam_thinking_skills mode={generateMode} />
+                          generateExamType === "thinking_skills" && (
+                            <GenerateExam_thinking_skills
+                              mode={generateMode}
+                              centerCode={centerCode}
+                            />
                         )}
 
                         {generateExamCategory === "selective" &&

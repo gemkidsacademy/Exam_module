@@ -4,7 +4,11 @@ import "./generate_exam.css";
 
 const BACKEND_URL = process.env.REACT_APP_API_URL;
 
-export default function GenerateExam_thinking_skills({ mode }) {
+export default function GenerateExam_thinking_skills({
+  mode,
+  centerCode
+}) {
+
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
@@ -135,6 +139,7 @@ useEffect(() => {
       },
       body: JSON.stringify({
         class_year: selectedClassYear,
+        center_code: centerCode,
 
         ...(mode === "latest" && {
           date: selectedDate,
@@ -185,6 +190,7 @@ useEffect(() => {
         },
         body: JSON.stringify({
           class_year: selectedClassYear,
+          center_code: centerCode,
 
           ...(mode === "latest" && {
             date: selectedDate,
@@ -273,6 +279,16 @@ useEffect(() => {
             )
           )}
         </select>
+         <p
+          style={{
+            color: "red",
+            marginTop: "8px",
+            fontWeight: "500",
+          }}
+        >
+          Make sure none of the questions are part of previously generated exam
+        </p>
+
 
       </div>
     )}
