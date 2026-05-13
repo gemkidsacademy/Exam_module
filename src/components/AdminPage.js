@@ -566,7 +566,12 @@ const tabs = allTabs.filter((tab) => {
               {createExamType === "oc_reading" && (
                 <QuizSetup_oc_reading />
               )}
-              {createExamType === "mathematical_reasoning" && <QuizSetup_MathematicalReasoning />}
+              {createExamType === "mathematical_reasoning" && (
+                <QuizSetup_MathematicalReasoning
+                  userType={userType}
+                  centerCode={centerCode}
+                />
+              )}
               {createExamType === "foundational" && <QuizSetup_foundational />}
               {createExamType === "reading" && <QuizSetup_reading />}
               {createExamType === "writing" && <QuizSetup_writing />}
@@ -800,8 +805,12 @@ const tabs = allTabs.filter((tab) => {
                         )}
 
                         {generateExamCategory === "selective" &&
-                        generateExamType === "mathematical_reasoning" && (
-                          <GenerateExam examType="mathematical_reasoning" mode={generateMode} />
+                          generateExamType === "mathematical_reasoning" && (
+                            <GenerateExam
+                              examType="mathematical_reasoning"
+                              mode={generateMode}
+                              centerCode={centerCode}
+                            />
                         )}
 
                         {generateExamCategory === "selective" &&

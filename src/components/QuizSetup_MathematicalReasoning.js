@@ -5,7 +5,16 @@
   const BACKEND_URL = process.env.REACT_APP_API_URL;
 
 
-  export default function QuizSetup_MathematicalReasoning() {
+  export default function QuizSetup_MathematicalReasoning({
+  userType,
+  centerCode
+}) {
+
+    console.log("QuizSetup_MathematicalReasoning props:", {
+      userType,
+      centerCode
+    });
+
     const [availableTopics, setAvailableTopics] = useState([]);
     const [questionBank, setQuestionBank] = useState([]);
     const [showQuestionBank, setShowQuestionBank] = useState(false);
@@ -57,6 +66,7 @@
     const params = new URLSearchParams({
       query: searchText,
       class_year: quiz.classYear,
+      
     });
 
     const res = await fetch(
@@ -143,6 +153,12 @@
   if (!confirmReset) return;
 
   try {
+    console.log("RESET PAYLOAD", {
+      class_name: quiz.className,
+      subject: quiz.subject,
+      class_year: quiz.classYear,
+      center_code: centerCode,
+    });
     const res = await fetch(
       `${BACKEND_URL}/api/admin/reset-used-questions`,
       {
@@ -152,6 +168,7 @@
           class_name: quiz.className,
           subject: quiz.subject,
           class_year: quiz.classYear,
+          center_code: centerCode,
         }),
       }
     );
@@ -159,7 +176,7 @@
     if (!res.ok) throw new Error("Failed");
 
     const data = await res.json();
-    alert(`Reset successful! ${data.updated_count} updated.`);
+    alert(`Reset successful! ${data.deleted_count} deleted.`);
   } catch (err) {
     console.error(err);
     alert("Error resetting.");
@@ -189,8 +206,8 @@
     }
   }
 
-  if (totalQuestions !== 35) {
-    alert("Total questions must be 35.");
+  if (totalQuestions !== 2) {
+    alert("Total questions must be 2.");
     return false;
   }
 
@@ -204,7 +221,8 @@
       topic: topicName,
       class_year: quiz.classYear,
       class_name: quiz.className,
-      subject: quiz.subject
+      subject: quiz.subject,
+      center_code: centerCode
     });
 
     const response = await fetch(
@@ -240,6 +258,7 @@
     class_name: quiz.className,
     subject: quiz.subject,
     class_year: quiz.classYear,
+    center_code: centerCode,
     difficulty: "mixed",
     num_topics: quiz.topics.length,
     topics: quiz.topics.map((t) => ({
@@ -371,6 +390,7 @@
     const params = new URLSearchParams({
       class_name: quiz.className,
       class_year: String(classYearValue),
+      center_code: centerCode
     });
 
     const res = await fetch(
@@ -455,7 +475,8 @@
     const params = new URLSearchParams({
       class_name: quiz.className,
       subject: quiz.subject,
-      class_year: String(classYearValue),   // ✅ NEW
+      class_year: String(classYearValue),
+      center_code: centerCode   // ✅ NEW
       
     });
 
@@ -478,25 +499,20 @@
 
 fetchTopics();
 
-}, [quiz.className, quiz.subject, quiz.classYear]);  // ✅ added classYear dependency
+}, [quiz.className, quiz.subject, quiz.classYear,centerCode]);  // ✅ added classYear dependency
 
     /* ============================
        SUBMIT
     ============================ */
-    const handleSubmit = async (e) => {
+    const handleSubmit = async () => {
       if (!validateQuizBeforeSubmit_MR()) return;
-      e.preventDefault();
-  
-      
-  
-      
-  
-      
+        
   
       const payload = {
         class_name: quiz.className,
         subject: quiz.subject,
-        class_year: quiz.classYear,   
+        class_year: quiz.classYear,  
+        center_code: centerCode,
         num_topics: quiz.topics.length,
         topics: quiz.topics.map((t) => ({
           name: t.name.trim(),
@@ -551,28 +567,34 @@ fetchTopics();
         <form onSubmit={handleSubmit}>
   
           {/* FIXED FIELDS */}
-          <label>Class:</label>
-          <input type="text" value="Selective" disabled />
-  
-          <label>Subject:</label>
-          <input type="text" value="Mathematical Reasoning" disabled />
-          <label>Class Year:</label>
-          <select
-            name="classYear"
-            value={quiz.classYear}
-            onChange={handleInputChange}
-            required
-          >
-            <option value="">Select Year</option>
-            <option value={4}>Year 4</option>
-            <option value={5}>Year 5</option>
-            <option value={6}>Year 6</option>
-          </select>
+          <div className="section-card">
+            <h2>Exam Information</h2>
+            <label>Class:</label>
+            <input type="text" value="Selective" disabled />
+    
+            <label>Subject:</label>
+            <input type="text" value="Mathematical Reasoning" disabled />
+            <label>Class Year:</label>
+            <select
+              name="classYear"
+              value={quiz.classYear}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="">Select Year</option>
+              <option value={4}>Year 4</option>
+              <option value={5}>Year 5</option>
+              <option value={6}>Year 6</option>
+            </select>
+          </div>
   
           {/* CONFIGURABLE */}
           
   
+        <div className="section-card">  
+          <h2>Topic Controls</h2>
           <label>Number of Topics:</label>
+          
           <input
             type="number"
             name="numTopics"
@@ -584,158 +606,171 @@ fetchTopics();
           <button type="button" onClick={generateTopics}>
             Generate Topics
           </button>
-          <button
-            type="button"
-            onClick={handleViewQuestionBank}
-            style={{ marginLeft: "10px" }}
-          >
-            View Question Bank
-          </button>
-          <button type="button" onClick={handleResetUsedQuestions_MR}>
-            Reset Used Questions
-          </button>
-          <button
-            type="button"
-            onClick={handleDeleteAllQuestions}
-            style={{ marginLeft: "10px" }}
-          >
-            Delete All Questions
-          </button>
-          <div className="section-card">
+        </div>  
+          {userType !== "SUPER_ADMIN" && (
+            <>
+              <button
+                type="button"
+                onClick={handleViewQuestionBank}
+                style={{ marginLeft: "10px" }}
+              >
+                View Question Bank
+              </button>
 
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                cursor: "pointer",
-                marginTop: "20px",
-              }}
-              onClick={() =>
-                setShowDeleteQuestionSection((prev) => !prev)
-              }
+              <button
+                type="button"
+                onClick={handleResetUsedQuestions_MR}
+              >
+                Reset Used Questions
+              </button>
+            </>
+          )}
+          {userType === "SUPER_ADMIN" && (
+            <button
+              type="button"
+              onClick={handleDeleteAllQuestions}
+              style={{ marginLeft: "10px" }}
             >
-              <h2 style={{ margin: 0 }}>
-                Delete Single Question
-              </h2>
+              Delete All Questions
+            </button>
+          )}
+          {userType === "SUPER_ADMIN" && (
+            <div className="section-card">
 
-              <span style={{ fontSize: "20px" }}>
-                {showDeleteQuestionSection ? "−" : "+"}
-              </span>
-            </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  cursor: "pointer",
+                  marginTop: "20px",
+                }}
+                onClick={() =>
+                  setShowDeleteQuestionSection((prev) => !prev)
+                }
+              >
+                <h2 style={{ margin: 0 }}>
+                  Delete Single Question
+                </h2>
 
-            {showDeleteQuestionSection && (
-              <>
+                <span style={{ fontSize: "20px" }}>
+                  {showDeleteQuestionSection ? "−" : "+"}
+                </span>
+              </div>
 
-                <div className="grid-2" style={{ marginTop: "20px" }}>
-                  <div>
-                    <label>Search Question</label>
+              {showDeleteQuestionSection && (
+                <>
 
-                    <input
-                      type="text"
-                      placeholder="Search by topic or question text..."
-                      value={searchText}
-                      onChange={(e) => setSearchText(e.target.value)}
-                    />
-                  </div>
+                  <div className="grid-2" style={{ marginTop: "20px" }}>
+                    <div>
+                      <label>Search Question</label>
 
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "end",
-                    }}
-                  >
-                    <button
-                      type="button"
-                      onClick={handleSearchQuestions_MR}
-                    >
-                      Search Questions
-                    </button>
-                  </div>
-                </div>
-
-                {searchLoading && (
-                  <p>Searching questions...</p>
-                )}
-
-                {searchResults.length > 0 && (
-                  <>
-                    <div style={{ marginTop: "20px" }}>
-                      <label>Select Question</label>
-
-                      <select
-                        value={selectedQuestionId}
-                        onChange={(e) =>
-                          setSelectedQuestionId(e.target.value)
-                        }
-                      >
-                        <option value="">
-                          Select a Question
-                        </option>
-
-                        {searchResults.map((q) => (
-                          <option key={q.id} value={q.id}>
-                            ID {q.id} | {q.preview?.slice(0, 80)}
-                          </option>
-                        ))}
-                      </select>
+                      <input
+                        type="text"
+                        placeholder="Search by topic or question text..."
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                      />
                     </div>
 
                     <div
                       style={{
-                        marginTop: "20px",
-                        border: "1px solid #ddd",
-                        padding: "12px",
-                        borderRadius: "8px",
-                        background: "#fafafa",
+                        display: "flex",
+                        alignItems: "end",
                       }}
                     >
-                      {searchResults
-                        .filter(
-                          (q) => q.id === Number(selectedQuestionId)
-                        )
-                        .map((q) => (
-                          <div key={q.id}>
-                            <strong>Preview:</strong>
-
-                            <p
-                              style={{
-                                marginTop: "10px",
-                                lineHeight: "1.6",
-                              }}
-                            >
-                              {q.preview}
-                            </p>
-                          </div>
-                        ))}
-                    </div>
-
-                    <div style={{ marginTop: "20px" }}>
                       <button
                         type="button"
-                        onClick={handleDeleteSingleQuestion_MR}
-                        style={{
-                          backgroundColor: "#d9534f",
-                          color: "white",
-                        }}
+                        onClick={handleSearchQuestions_MR}
                       >
-                        Delete Selected Question
+                        Search Questions
                       </button>
                     </div>
-                  </>
-                )}
+                  </div>
 
-                {!searchLoading &&
-                  searchText &&
-                  searchResults.length === 0 && (
-                    <p style={{ marginTop: "15px" }}>
-                      No matching questions found.
-                    </p>
-                )}
+                  {searchLoading && (
+                    <p>Searching questions...</p>
+                  )}
 
-              </>
-            )}
-          </div>
+                  {searchResults.length > 0 && (
+                    <>
+                      <div style={{ marginTop: "20px" }}>
+                        <label>Select Question</label>
+
+                        <select
+                          value={selectedQuestionId}
+                          onChange={(e) =>
+                            setSelectedQuestionId(e.target.value)
+                          }
+                        >
+                          <option value="">
+                            Select a Question
+                          </option>
+
+                          {searchResults.map((q) => (
+                            <option key={q.id} value={q.id}>
+                              ID {q.id} | {q.preview?.slice(0, 80)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div
+                        style={{
+                          marginTop: "20px",
+                          border: "1px solid #ddd",
+                          padding: "12px",
+                          borderRadius: "8px",
+                          background: "#fafafa",
+                        }}
+                      >
+                        {searchResults
+                          .filter(
+                            (q) => q.id === Number(selectedQuestionId)
+                          )
+                          .map((q) => (
+                            <div key={q.id}>
+                              <strong>Preview:</strong>
+
+                              <p
+                                style={{
+                                  marginTop: "10px",
+                                  lineHeight: "1.6",
+                                }}
+                              >
+                                {q.preview}
+                              </p>
+                            </div>
+                          ))}
+                      </div>
+
+                      <div style={{ marginTop: "20px" }}>
+                        <button
+                          type="button"
+                          onClick={handleDeleteSingleQuestion_MR}
+                          style={{
+                            backgroundColor: "#d9534f",
+                            color: "white",
+                          }}
+                        >
+                          Delete Selected Question
+                        </button>
+                      </div>
+                    </>
+                  )}
+
+                  {!searchLoading &&
+                    searchText &&
+                    searchResults.length === 0 && (
+                      <p style={{ marginTop: "15px" }}>
+                        No matching questions found.
+                      </p>
+                  )}
+
+                </>
+              )}
+            </div>
+          )}
           {showQuestionBank && (
             <div className="question-bank">
               <h3>Question Bank (Mathematical Reasoning)</h3>
@@ -932,32 +967,43 @@ fetchTopics();
             ))}
           </div>
           <div className="summary-box">
-            <div>Total Questions: {totalQuestions} / 35</div>
+            <div>Total Questions: {totalQuestions} / 2</div>
 
-            {totalQuestions === 35 && (
+            {totalQuestions === 2 && (
               <div className="ready-text">✔ Ready to Create Exam</div>
             )}
 
-            {totalQuestions > 35 && (
-              <div className="warning">Total cannot exceed 35!</div>
+            {totalQuestions > 2 && (
+              <div className="warning">Total cannot exceed 2!</div>
             )}
           </div>
   
           
   
-          <button type="submit" disabled={totalQuestions !== 35}>
-            Create Mathematical Reasoning Exam
-          </button>
-          
+          {userType !== "SUPER_ADMIN" && (
+            <>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={totalQuestions !== 2}
+              >
+                Create Mathematical Reasoning Exam
+              </button>
 
-          <button
-            type="button"
-            onClick={handleHomeworkSubmit}
-            disabled={totalQuestions !== 35}
-            style={{ marginLeft: "10px", backgroundColor: "#28a745", color: "white" }}
-          >
-            Create Homework Exam
-          </button>
+              <button
+                type="button"
+                onClick={handleHomeworkSubmit}
+                disabled={totalQuestions !== 2}
+                style={{
+                  marginLeft: "10px",
+                  backgroundColor: "#28a745",
+                  color: "white"
+                }}
+              >
+                Create Homework Exam
+              </button>
+            </>
+            )}
 
         </form>
       </div>

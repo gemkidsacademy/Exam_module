@@ -4,7 +4,15 @@ import "./generateexam_MR.css";
 
 const BACKEND_URL = process.env.REACT_APP_API_URL;
 
-export default function GenerateExam({ mode }) {
+export default function GenerateExam({
+  mode,
+  centerCode
+}) {
+
+  console.log("GenerateExam props:", {
+    mode,
+    centerCode
+  });
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [error, setError] = useState("");
@@ -163,6 +171,7 @@ const handleGenerateExam = async () => {
     const payload = {
       difficulty: "medium",
       class_year: parsedYear,
+      center_code: centerCode,
 
       // send batch id only in latest mode
       ...(mode === "latest" && {
@@ -261,6 +270,7 @@ const handleGenerateExam = async () => {
     const payload = {
       difficulty: "medium",
       class_year: parsedYear,
+      center_code: centerCode,
 
       // send batch id only in latest mode
       ...(mode === "latest" && {
