@@ -5,7 +5,18 @@ import "./QuizSetup.css";
 const BACKEND_URL = process.env.REACT_APP_API_URL;
 
 
-export default function QuizSetup_reading() {
+export default function QuizSetup_reading({
+  userType,
+  centerCode
+}) {
+
+  console.log(
+    "📥 Reading Component Props:",
+    {
+      userType,
+      centerCode
+    }
+  );
   const [quiz, setQuiz] = useState({
     className: "selective",
     classYear: "", // ✅ NEW
@@ -70,6 +81,62 @@ export default function QuizSetup_reading() {
 
   return map;
 };
+ const handleResetUsedQuestions_Reading = async () => {
+
+  const confirmReset = window.confirm(
+    "Reset used reading questions?"
+  );
+
+  if (!confirmReset) return;
+
+  try {
+
+    const payload = {
+
+      class_name: quiz.className,
+
+      subject: quiz.subject,
+
+      class_year: Number(quiz.classYear),
+
+      center_code: centerCode,
+    };
+
+    console.log(
+      "📤 RESET PAYLOAD:",
+      payload
+    );
+
+    const res = await fetch(
+      `${BACKEND_URL}/api/admin/reset-used-reading-questions`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed");
+    }
+
+    const data = await res.json();
+
+    alert(
+      `Reset successful! `
+      + `${data.deleted_count} deleted.`
+    );
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert("Error resetting.");
+  }
+};
   
   const handleCreateHomework = async () => {
   if (!quiz.classYear) {
@@ -81,6 +148,7 @@ export default function QuizSetup_reading() {
     class_name: quiz.className.trim(),
     class_year: quiz.classYear,
     subject: quiz.subject,
+    center_code: centerCode,
     difficulty: "mixed",
     topics: quiz.topics.map((t) => {
       let numQuestions = t.num_questions;
@@ -144,6 +212,7 @@ export default function QuizSetup_reading() {
     const params = new URLSearchParams({
       query: searchText,
       class_year: quiz.classYear,
+      
     });
 
     const res = await fetch(
@@ -282,6 +351,8 @@ export default function QuizSetup_reading() {
       subject: quiz.subject,
       class_name: quiz.className,
       class_year: quiz.classYear, // ✅ added
+      center_code: centerCode,
+
     });
 
     const res = await fetch(
@@ -462,6 +533,7 @@ export default function QuizSetup_reading() {
       class_name: quiz.className.trim(),
       class_year: quiz.classYear,   // ✅ ADD THIS LINE
       subject: quiz.subject,
+      center_code: centerCode,
       difficulty: "mixed",
       topics: quiz.topics.map((t) => {
         let numQuestions = t.num_questions;
@@ -551,155 +623,169 @@ export default function QuizSetup_reading() {
         <button type="button" onClick={generateTopics}>
           Generate Topics
         </button>
-        <button
-          type="button"
-          onClick={handleViewQuestionBank}
-          disabled={!quiz.classYear}
-        >
-          View Question Bank
-        </button>
-        <button
-          type="button"
-          onClick={handleDeleteAllQuestions}
-          
-        >
-          Delete All Questions
-        </button>
-        <div className="section-card">
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              cursor: "pointer",
-              marginTop: "20px",
-            }}
-            onClick={() =>
-              setShowDeleteQuestionSection((prev) => !prev)
-            }
+        {userType !== "SUPER_ADMIN" && (
+          <button
+            type="button"
+            onClick={handleViewQuestionBank}
+            disabled={!quiz.classYear}
           >
-            <h2 style={{ margin: 0 }}>
-              Delete Single Question
-            </h2>
+            View Question Bank
+          </button>
+        )}
+        {userType !== "SUPER_ADMIN" && (
+          <button
+            type="button"
+            onClick={handleResetUsedQuestions_Reading}
+            disabled={!quiz.classYear}
+          >
+            Reset Used Questions
+          </button>
+        )}
+        {userType === "SUPER_ADMIN" && (
+          <button
+            type="button"
+            onClick={handleDeleteAllQuestions}
+          >
+            Delete All Questions
+          </button>
+        )}
+        {userType === "SUPER_ADMIN" && (
+          <div className="section-card">
 
-            <span style={{ fontSize: "20px" }}>
-              {showDeleteQuestionSection ? "−" : "+"}
-            </span>
-          </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                cursor: "pointer",
+                marginTop: "20px",
+              }}
+              onClick={() =>
+                setShowDeleteQuestionSection((prev) => !prev)
+              }
+            >
+              <h2 style={{ margin: 0 }}>
+                Delete Single Question
+              </h2>
 
-          {showDeleteQuestionSection && (
-            <>
+              <span style={{ fontSize: "20px" }}>
+                {showDeleteQuestionSection ? "−" : "+"}
+              </span>
+            </div>
 
-              <div className="grid-2" style={{ marginTop: "20px" }}>
-                <div>
-                  <label>Search Question</label>
+            {showDeleteQuestionSection && (
+              <>
 
-                  <input
-                    type="text"
-                    placeholder="Search by topic or question text..."
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
-                  />
-                </div>
+                <div className="grid-2" style={{ marginTop: "20px" }}>
+                  <div>
+                    <label>Search Question</label>
 
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "end",
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={handleSearchQuestions_Reading}
-                  >
-                    Search Questions
-                  </button>
-                </div>
-              </div>
-
-              {searchLoading && (
-                <p>Searching questions...</p>
-              )}
-
-              {searchResults.length > 0 && (
-                <>
-                  <div style={{ marginTop: "20px" }}>
-                    <label>Select Question</label>
-
-                    <select
-                      value={selectedQuestionId}
-                      onChange={(e) =>
-                        setSelectedQuestionId(e.target.value)
-                      }
-                    >
-                      <option value="">
-                        Select a Question
-                      </option>
-
-                      {searchResults.map((q) => (
-                        <option key={q.id} value={q.id}>
-                          ID {q.id} | {q.preview?.slice(0, 80)}
-                        </option>
-                      ))}
-                    </select>
+                    <input
+                      type="text"
+                      placeholder="Search by topic or question text..."
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value)}
+                    />
                   </div>
 
                   <div
                     style={{
-                      marginTop: "20px",
-                      border: "1px solid #ddd",
-                      padding: "12px",
-                      borderRadius: "8px",
-                      background: "#fafafa",
+                      display: "flex",
+                      alignItems: "end",
                     }}
                   >
-                    {searchResults
-                      .filter(
-                        (q) => q.id === Number(selectedQuestionId)
-                      )
-                      .map((q) => (
-                        <div key={q.id}>
-                          <strong>Preview:</strong>
-
-                          <p
-                            style={{
-                              marginTop: "10px",
-                              lineHeight: "1.6",
-                            }}
-                          >
-                            {q.preview}
-                          </p>
-                        </div>
-                      ))}
-                  </div>
-
-                  <div style={{ marginTop: "20px" }}>
                     <button
                       type="button"
-                      onClick={handleDeleteSingleQuestion_Reading}
-                      style={{
-                        backgroundColor: "#d9534f",
-                        color: "white",
-                      }}
+                      onClick={handleSearchQuestions_Reading}
                     >
-                      Delete Selected Question
+                      Search Questions
                     </button>
                   </div>
-                </>
-              )}
+                </div>
 
-              {!searchLoading &&
-                searchText &&
-                searchResults.length === 0 && (
-                  <p style={{ marginTop: "15px" }}>
-                    No matching questions found.
-                  </p>
-              )}
+                {searchLoading && (
+                  <p>Searching questions...</p>
+                )}
 
-            </>
-          )}
-        </div>
+                {searchResults.length > 0 && (
+                  <>
+                    <div style={{ marginTop: "20px" }}>
+                      <label>Select Question</label>
+
+                      <select
+                        value={selectedQuestionId}
+                        onChange={(e) =>
+                          setSelectedQuestionId(e.target.value)
+                        }
+                      >
+                        <option value="">
+                          Select a Question
+                        </option>
+
+                        {searchResults.map((q) => (
+                          <option key={q.id} value={q.id}>
+                            ID {q.id} | {q.preview?.slice(0, 80)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div
+                      style={{
+                        marginTop: "20px",
+                        border: "1px solid #ddd",
+                        padding: "12px",
+                        borderRadius: "8px",
+                        background: "#fafafa",
+                      }}
+                    >
+                      {searchResults
+                        .filter(
+                          (q) => q.id === Number(selectedQuestionId)
+                        )
+                        .map((q) => (
+                          <div key={q.id}>
+                            <strong>Preview:</strong>
+
+                            <p
+                              style={{
+                                marginTop: "10px",
+                                lineHeight: "1.6",
+                              }}
+                            >
+                              {q.preview}
+                            </p>
+                          </div>
+                        ))}
+                    </div>
+
+                    <div style={{ marginTop: "20px" }}>
+                      <button
+                        type="button"
+                        onClick={handleDeleteSingleQuestion_Reading}
+                        style={{
+                          backgroundColor: "#d9534f",
+                          color: "white",
+                        }}
+                      >
+                        Delete Selected Question
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {!searchLoading &&
+                  searchText &&
+                  searchResults.length === 0 && (
+                    <p style={{ marginTop: "15px" }}>
+                      No matching questions found.
+                    </p>
+                )}
+
+              </>
+            )}
+          </div>
+        )}
         <div className="topics-container">
           {quiz.topics.map((topic, index) => (
             <div className="topic" key={index}>
@@ -860,38 +946,52 @@ export default function QuizSetup_reading() {
           </div>
         )}
 
-        <div className="total-section">
-          <h3>Total Questions: {totalQuestions}</h3>
+        {userType !== "SUPER_ADMIN" && (
+          <>
 
-          {(totalQuestions < 29 || totalQuestions > 38) && (
-            <div className="warning">
-              Total must be between 29 and 38 questions.
+            <div className="total-section">
+              <h3>Total Questions: {totalQuestions}</h3>
+
+              {(totalQuestions < 29 || totalQuestions > 38) && (
+                <div className="warning">
+                  Total must be between 29 and 38 questions.
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-        <div style={{ display: "flex", gap: "10px" }}>
-        {/* Exam */}
-        <button
-          type="submit"
-          disabled={
-            loading || totalQuestions < 29 || totalQuestions > 38
-          }
-        >
-          {loading ? "Saving..." : "Create Reading Exam"}
-        </button>
+            <div style={{ display: "flex", gap: "10px" }}>
 
-        {/* Homework */}
-        <button
-          type="button"
-          onClick={handleCreateHomework}
-          disabled={
-            loading || totalQuestions < 29 || totalQuestions > 38
-          }
-        >
-          {loading ? "Saving..." : "Create Reading Homework"}
-        </button>
-      </div>
+              <button
+                type="submit"
+                disabled={
+                  loading ||
+                  totalQuestions < 29 ||
+                  totalQuestions > 38
+                }
+              >
+                {loading
+                  ? "Saving..."
+                  : "Create Reading Exam"}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleCreateHomework}
+                disabled={
+                  loading ||
+                  totalQuestions < 29 ||
+                  totalQuestions > 38
+                }
+              >
+                {loading
+                  ? "Saving..."
+                  : "Create Reading Homework"}
+              </button>
+
+            </div>
+
+          </>
+        )}
       </form>
     </div>
   );

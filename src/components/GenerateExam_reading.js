@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from "react";
 import "./generateexam_reading.css";
 
-export default function GenerateExam_reading({ mode }) {
+export default function GenerateExam_reading({
+  mode,
+  centerCode
+}) {
+
+  console.log(
+    "📥 GenerateExam_reading Props:",
+    {
+      mode,
+      centerCode
+    }
+  );
   const [quizzes, setQuizzes] = useState([]);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
   const [selectedClass, setSelectedClass] = useState("");
@@ -133,7 +144,8 @@ useEffect(() => {
       }
 
       const params = new URLSearchParams({
-        class_year: selectedClassYear, // ✅ ADD THIS
+        class_year: selectedClassYear,
+        center_code: centerCode,
       });
 
       const url = `${BACKEND_URL}/api/quizzes-reading?${params.toString()}`;
@@ -202,10 +214,11 @@ useEffect(() => {
       mode === "latest"
         ? "/api/exams/generate-reading-homework-latest"
         : "/api/exams/generate-reading-homework";
-
+    console.log("🏢 centerCode:", centerCode);
     const payload = {
       class_name: "Selective",
       class_year: selectedClassYear,
+      center_code: centerCode,
       ...(mode === "latest" && {
         selected_date: selectedDate,
         batch_id: Number(selectedBatchId)
@@ -297,6 +310,7 @@ const handleGenerateExam = async () => {
     const payload = {
       class_name: "Selective",
       class_year: selectedClassYear,
+      center_code: centerCode,
       ...(mode === "latest" && {
         selected_date: selectedDate,
         batch_id: Number(selectedBatchId)
