@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./generate_exam.css";
 
-export default function GenerateExam_oc_thinking_skills({ mode }) {
+export default function GenerateExam_oc_thinking_skills({
+  mode,
+  centerCode,
+}) {
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
   const [availableDates, setAvailableDates] = useState([]);
@@ -40,6 +43,7 @@ export default function GenerateExam_oc_thinking_skills({ mode }) {
   try {
     const payload = {
       class_year: Number(classYear),
+      center_code: centerCode,
       ...(mode === "latest" && {
       selected_date: selectedDate,
       batch_id: selectedBatchId
@@ -117,6 +121,7 @@ export default function GenerateExam_oc_thinking_skills({ mode }) {
   try {
     const payload = {
       class_year: Number(classYear),
+      center_code: centerCode,
       ...(mode === "latest" && {
       selected_date: selectedDate,
       batch_id: selectedBatchId

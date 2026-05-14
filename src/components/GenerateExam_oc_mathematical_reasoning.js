@@ -3,7 +3,8 @@ import "./generate_exam.css";
 
 export default function GenerateExam_oc_mathematical_reasoning({
   examType,
-  mode
+  mode,
+  centerCode,
 }) {
   const [loading, setLoading] = useState(false);
   const [generatedExam, setGeneratedExam] = useState(null);
@@ -145,6 +146,8 @@ export default function GenerateExam_oc_mathematical_reasoning({
 
       const payload = {
         class_year: classYear,
+        center_code: centerCode,
+
         ...(mode === "latest" && {
           selected_date: selectedDate,
           batch_id: selectedBatchId
@@ -235,11 +238,13 @@ export default function GenerateExam_oc_mathematical_reasoning({
 
       const payload = {
         class_year: classYear,
+        center_code: centerCode,
+
         ...(mode === "latest" && {
           selected_date: selectedDate,
           batch_id: selectedBatchId
         })
-      };
+        };
 
       console.log(
         "📤 Sending payload (OC MR exam):",

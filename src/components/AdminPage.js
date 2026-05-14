@@ -558,10 +558,16 @@ const tabs = allTabs.filter((tab) => {
                 />
               )}
               {createExamType === "oc_thinking_skills" && (
-                  <QuizSetupOCThinkingSkills />
+                <QuizSetupOCThinkingSkills
+                  userType={userType}
+                  centerCode={centerCode}
+                />
                 )}
               {createExamType === "oc_mathematical_reasoning" && (
-                <QuizSetup_OC_MathematicalReasoning />
+                <QuizSetup_OC_MathematicalReasoning
+                  userType={userType}
+                  centerCode={centerCode}
+                />
               )}
               {createExamType === "oc_reading" && (
                 <QuizSetup_oc_reading />
@@ -833,8 +839,11 @@ const tabs = allTabs.filter((tab) => {
                         )}
 
                         {generateExamCategory === "oc" &&
-                        generateExamType === "oc_thinking_skills" && (
-                          <GenerateExam_oc_thinking_skills mode={generateMode} />
+                          generateExamType === "oc_thinking_skills" && (
+                            <GenerateExam_oc_thinking_skills
+                              mode={generateMode}
+                              centerCode={centerCode}
+                            />
                         )}
 
                         {generateExamCategory === "oc" &&
@@ -842,6 +851,7 @@ const tabs = allTabs.filter((tab) => {
                           <GenerateExam_oc_mathematical_reasoning
                             examType="oc_mathematical_reasoning"
                             mode={generateMode}
+                            centerCode={centerCode}
                           />
                         )}
 
