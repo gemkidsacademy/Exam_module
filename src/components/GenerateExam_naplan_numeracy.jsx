@@ -3,7 +3,10 @@ import React, { useState, useEffect } from "react";
 
 const BACKEND_URL = process.env.REACT_APP_API_URL;
 
-const GenerateExamNaplanNumeracy = ({ mode }) => {
+const GenerateExamNaplanNumeracy = ({ 
+  mode,
+  centerCode,
+   }) => {
   const [loading, setLoading] = useState(false);
   const [yearsLoading, setYearsLoading] = useState(true);
   const [generatedExam, setGeneratedExam] = useState(null);
@@ -150,6 +153,7 @@ const GenerateExamNaplanNumeracy = ({ mode }) => {
 
     const payload = {
       class_year: selectedYear,
+      center_code: centerCode,
 
       ...(mode === "latest" && {
         selected_date: selectedDate,
@@ -220,6 +224,7 @@ const GenerateExamNaplanNumeracy = ({ mode }) => {
 
     const payload = {
       class_year: selectedYear,
+      center_code: centerCode,
 
       ...(mode === "latest" && {
         selected_date: selectedDate,

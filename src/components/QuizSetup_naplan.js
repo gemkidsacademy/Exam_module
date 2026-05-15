@@ -3,7 +3,11 @@ import "./QuizSetup.css";
 
 const BACKEND_URL = process.env.REACT_APP_API_URL;
 
-export default function QuizSetup_naplan({ examType }) {
+export default function QuizSetup_naplan({
+  examType,
+  userType,
+  centerCode
+}) {
   const [availableTopics, setAvailableTopics] = useState([]);
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [availableYears, setAvailableYears] = useState([]);
@@ -186,6 +190,7 @@ useEffect(() => {
   try {
     const params = new URLSearchParams({
       year: quiz.year,
+      center_code: centerCode,
       
     });
 
@@ -205,8 +210,7 @@ useEffect(() => {
     }
 
     alert(
-      data.message ||
-      "Used questions have been reset successfully."
+      `${data.deleted_count} used question(s) were reset successfully.`
     );
 
   } catch (error) {
@@ -408,32 +412,35 @@ useEffect(() => {
   /* ============================
      View Question Bank
   ============================ */
-  const handleViewQuestionBank = async () => {
-    if (!quiz.year) {
-      alert("Please select year first.");
-      return;
-    }
+    const handleViewQuestionBank = async () => {
+      if (!quiz.year) {
+        alert("Please select year first.");
+        return;
+      }
 
-    try {
-      setQbLoading(true);
-      setShowQuestionBank(false);
+      try {
+        setQbLoading(true);
+        setShowQuestionBank(false);
 
-      const res = await fetch(
-        `${BACKEND_URL}/api/admin/question-bank/naplan?subject=${quiz.subject}&year=${quiz.year}`
-      );
+        const res = await fetch(
+          `${BACKEND_URL}/api/admin/question-bank/naplan` +
+          `?subject=${quiz.subject}` +
+          `&year=${quiz.year}` +
+          `&center_code=${centerCode}`
+        );
 
-      if (!res.ok) throw new Error("Failed to load question bank");
+        if (!res.ok) throw new Error("Failed to load question bank");
 
-      const data = await res.json();
-      setQuestionBank(data);
-      setShowQuestionBank(true);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to fetch question bank.");
-    } finally {
-      setQbLoading(false);
-    }
-  };
+        const data = await res.json();
+        setQuestionBank(data);
+        setShowQuestionBank(true);
+      } catch (err) {
+        console.error(err);
+        alert("Failed to fetch question bank.");
+      } finally {
+        setQbLoading(false);
+      }
+    };
   const handleGenerateHomeworkExam = async () => {
   if (isGeneratingHomework) return;
 
@@ -455,6 +462,7 @@ useEffect(() => {
       subject: quiz.subject,
       year: Number(quiz.year),
       difficulty: quiz.difficulty,
+      center_code: centerCode,
       total_questions: totalQuestions,
       num_topics: quiz.topics.length,
 
@@ -530,6 +538,7 @@ useEffect(() => {
       class_name: quiz.className,      // "naplan"
       subject: quiz.subject,           // "numeracy"
       year: Number(quiz.year),         // 3 or 5
+      center_code: centerCode,
       difficulty: quiz.difficulty,     // easy | medium | hard
       total_questions: totalQuestions,
       num_topics: quiz.topics.length,
@@ -951,30 +960,38 @@ useEffect(() => {
           flexWrap: "wrap",
         }}
       >
-        <button
-          type="button"
-          onClick={handleViewQuestionBank}
-          disabled={!quiz.year}
-        >
-          View Question Bank
-        </button>
-        <button
-          type="button"
-          onClick={handleReuseUsedQuestions}
-          disabled={!quiz.year || !quiz.difficulty}
-          style={{
-            backgroundColor:
-              !quiz.year || !quiz.difficulty
-                ? "#ccc"
-                : "#0d6efd",
-            cursor:
-              !quiz.year || !quiz.difficulty
-                ? "not-allowed"
-                : "pointer",
-          }}
-        >
-          Reuse Used Questions
-        </button>
+        {userType !== "SUPER_ADMIN" && (
+        <>
+          <button
+            type="button"
+            onClick={handleViewQuestionBank}
+            disabled={!quiz.year}
+          >
+            View Question Bank
+          </button>
+
+          <button
+            type="button"
+            onClick={handleReuseUsedQuestions}
+            disabled={!quiz.year || !quiz.difficulty}
+            style={{
+              backgroundColor:
+                !quiz.year || !quiz.difficulty
+                  ? "#ccc"
+                  : "#0d6efd",
+
+              cursor:
+                !quiz.year || !quiz.difficulty
+                  ? "not-allowed"
+                  : "pointer",
+            }}
+          >
+            Reuse Used Questions
+          </button>
+        </>
+      )}
+    {userType === "SUPER_ADMIN" && (
+      <>   
         <button
           type="button"
           onClick={handleDeleteAllQuestions}
@@ -1004,148 +1021,154 @@ useEffect(() => {
     </span>
   </div>
 
-  {showDeleteQuestionSection && (
-    <>
-
-      <div className="grid-2" style={{ marginTop: "20px" }}>
-        <div>
-          <label>Search Question</label>
-
-          <input
-            type="text"
-            placeholder="Search by topic or question text..."
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            alignItems: "end",
-          }}
-        >
-          <button
-            type="button"
-            onClick={handleSearchQuestions_NAPLAN}
-          >
-            Search Questions
-          </button>
-        </div>
-      </div>
-
-      {searchLoading && (
-        <p>Searching questions...</p>
-      )}
-
-      {searchResults.length > 0 && (
+      {showDeleteQuestionSection && (
         <>
-          <div style={{ marginTop: "20px" }}>
-            <label>Select Question</label>
 
-            <select
-              value={selectedQuestionId}
-              onChange={(e) =>
-                setSelectedQuestionId(e.target.value)
-              }
-            >
-              <option value="">
-                Select a Question
-              </option>
+          <div className="grid-2" style={{ marginTop: "20px" }}>
+            <div>
+              <label>Search Question</label>
 
-              {searchResults.map((q) => (
-                <option key={q.id} value={q.id}>
-                  ID {q.id} | {q.preview?.slice(0, 80)}
-                </option>
-              ))}
-            </select>
-          </div>
+              <input
+                type="text"
+                placeholder="Search by topic or question text..."
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+              />
+            </div>
 
-          <div
-            style={{
-              marginTop: "20px",
-              border: "1px solid #ddd",
-              padding: "12px",
-              borderRadius: "8px",
-              background: "#fafafa",
-            }}
-          >
-            {searchResults
-              .filter(
-                (q) => q.id === Number(selectedQuestionId)
-              )
-              .map((q) => (
-                <div key={q.id}>
-                  <strong>Preview:</strong>
-
-                  <p
-                    style={{
-                      marginTop: "10px",
-                      lineHeight: "1.6",
-                    }}
-                  >
-                    {q.preview}
-                  </p>
-                </div>
-              ))}
-          </div>
-
-          <div style={{ marginTop: "20px" }}>
-            <button
-              type="button"
-              onClick={handleDeleteSingleQuestion_NAPLAN}
+            <div
               style={{
-                backgroundColor: "#d9534f",
-                color: "white",
+                display: "flex",
+                alignItems: "end",
               }}
             >
-              Delete Selected Question
-            </button>
+              <button
+                type="button"
+                onClick={handleSearchQuestions_NAPLAN}
+              >
+                Search Questions
+              </button>
+            </div>
           </div>
+
+          {searchLoading && (
+            <p>Searching questions...</p>
+          )}
+
+          {searchResults.length > 0 && (
+            <>
+              <div style={{ marginTop: "20px" }}>
+                <label>Select Question</label>
+
+                <select
+                  value={selectedQuestionId}
+                  onChange={(e) =>
+                    setSelectedQuestionId(e.target.value)
+                  }
+                >
+                  <option value="">
+                    Select a Question
+                  </option>
+
+                  {searchResults.map((q) => (
+                    <option key={q.id} value={q.id}>
+                      ID {q.id} | {q.preview?.slice(0, 80)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div
+                style={{
+                  marginTop: "20px",
+                  border: "1px solid #ddd",
+                  padding: "12px",
+                  borderRadius: "8px",
+                  background: "#fafafa",
+                }}
+              >
+                {searchResults
+                  .filter(
+                    (q) => q.id === Number(selectedQuestionId)
+                  )
+                  .map((q) => (
+                    <div key={q.id}>
+                      <strong>Preview:</strong>
+
+                      <p
+                        style={{
+                          marginTop: "10px",
+                          lineHeight: "1.6",
+                        }}
+                      >
+                        {q.preview}
+                      </p>
+                    </div>
+                  ))}
+              </div>
+
+              <div style={{ marginTop: "20px" }}>
+                <button
+                  type="button"
+                  onClick={handleDeleteSingleQuestion_NAPLAN}
+                  style={{
+                    backgroundColor: "#d9534f",
+                    color: "white",
+                  }}
+                >
+                  Delete Selected Question
+                </button>
+              </div>
+            </>
+          )}
+
+          {!searchLoading &&
+            searchText &&
+            searchResults.length === 0 && (
+              <p style={{ marginTop: "15px" }}>
+                No matching questions found.
+              </p>
+          )}
+
         </>
       )}
+    </div>
+</>
+)}
 
-      {!searchLoading &&
-        searchText &&
-        searchResults.length === 0 && (
-          <p style={{ marginTop: "15px" }}>
-            No matching questions found.
-          </p>
+        {userType !== "SUPER_ADMIN" && (
+        <>
+          <button
+            type="button"
+            onClick={handleGenerateExam}
+            disabled={
+              !quiz.topics.length ||
+              !isTotalValid
+            }
+            style={{
+              backgroundColor: isTotalValid ? "#0d6efd" : "#ccc",
+              cursor: isTotalValid ? "pointer" : "not-allowed",
+            }}
+          >
+            Create Exam
+          </button>
+
+          <button
+            type="button"
+            onClick={handleGenerateHomeworkExam}
+            disabled={
+              !quiz.topics.length ||
+              !isTotalValid
+            }
+            style={{
+              backgroundColor: isTotalValid ? "#198754" : "#ccc",
+              cursor: isTotalValid ? "pointer" : "not-allowed",
+            }}
+          >
+            Create Exam (Homework)
+          </button>
+        </>
       )}
-
-    </>
-  )}
-</div>
-
-        <button
-          type="button"
-          onClick={handleGenerateExam}
-          disabled={
-            !quiz.topics.length ||
-            !isTotalValid
-          }
-          style={{
-            backgroundColor: isTotalValid ? "#0d6efd" : "#ccc",
-            cursor: isTotalValid ? "pointer" : "not-allowed",
-          }}
-        >
-          Generate Exam
-        </button>
-
-        <button
-          type="button"
-          onClick={handleGenerateHomeworkExam}
-          disabled={
-            !quiz.topics.length ||
-            !isTotalValid
-          }
-          style={{
-            backgroundColor: isTotalValid ? "#198754" : "#ccc",
-            cursor: isTotalValid ? "pointer" : "not-allowed",
-          }}
-        >
-          Generate Exam (Homework)
-        </button>
       </div>
       
 

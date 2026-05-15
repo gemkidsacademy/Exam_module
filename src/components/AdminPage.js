@@ -591,8 +591,12 @@ const tabs = allTabs.filter((tab) => {
               )}
               {createExamType === "writing" && <QuizSetup_writing />}
               {createExamCategory === "naplan" &&
-              createExamType === "naplan_numeracy" && (
-                <QuizSetup_naplan examType="naplan_numeracy" />
+                createExamType === "naplan_numeracy" && (
+                  <QuizSetup_naplan
+                    examType="naplan_numeracy"
+                    userType={userType} 
+                    centerCode={centerCode}
+                  />
               )}
               
               {createExamCategory === "naplan" &&
@@ -872,7 +876,10 @@ const tabs = allTabs.filter((tab) => {
 
                         {generateExamCategory === "naplan" &&
                         generateExamType === "naplan_numeracy" && (
-                          <GenerateExam_naplan_numeracy mode={generateMode} />
+                          <GenerateExam_naplan_numeracy
+                           mode={generateMode}
+                           centerCode={centerCode}
+                           />
                         )}
 
                         {generateExamCategory === "naplan" &&
