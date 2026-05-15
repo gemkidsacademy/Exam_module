@@ -5,7 +5,10 @@ const BACKEND_URL = process.env.REACT_APP_API_URL;
 //const BACKEND_URL = "http://127.0.0.1:8000";
 
 
-const GenerateExam_oc_reading = ({ mode }) => {
+const GenerateExam_oc_reading = ({ 
+  mode,
+  centerCode,
+ }) => {
   const [className, setClassName] = useState("");
   const [difficulty, setDifficulty] = useState("");
   const [loading, setLoading] = useState(false);
@@ -159,6 +162,7 @@ const GenerateExam_oc_reading = ({ mode }) => {
       const payload = {
         class_year: classYear,
         class_name: "OC",
+        center_code: centerCode,
 
         ...(mode === "latest" && {
           selected_date: selectedDate,
@@ -256,6 +260,7 @@ const GenerateExam_oc_reading = ({ mode }) => {
       const payload = {
         class_year: classYear,
         class_name: "OC",
+        center_code: centerCode,
 
         ...(mode === "latest" && {
           selected_date: selectedDate,
@@ -339,6 +344,7 @@ const GenerateExam_oc_reading = ({ mode }) => {
         <option value="">Select</option>
         <option value="Year 3">Year 3</option>
         <option value="Year 4">Year 4</option>
+        <option value="Year 6">Year 6</option>
       </select>
       {/* DATE DROPDOWN */}
       {mode === "latest" &&

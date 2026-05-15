@@ -3,7 +3,10 @@ import "./QuizSetup.css";
 
 const BACKEND_URL = process.env.REACT_APP_API_URL;
 
-export default function QuizSetup_oc_reading() {
+export default function QuizSetup_oc_reading({
+  userType,
+  centerCode,
+}) {
   const [quiz, setQuiz] = useState({
     className: "oc",
     subject: "reading_comprehension",
@@ -44,6 +47,62 @@ export default function QuizSetup_oc_reading() {
   const [selectedQuestionId, setSelectedQuestionId] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [showDeleteQuestionSection, setShowDeleteQuestionSection] = useState(false);
+  const handleResetUsedQuestions_Reading = async () => {
+
+  const confirmReset = window.confirm(
+    "Reset used reading questions?"
+  );
+
+  if (!confirmReset) return;
+
+  try {
+
+    const payload = {
+
+      class_name: quiz.className,
+
+      subject: quiz.subject,
+
+      class_year: Number(quiz.classYear),
+
+      center_code: centerCode,
+    };
+
+    console.log(
+      "📤 RESET PAYLOAD:",
+      payload
+    );
+
+    const res = await fetch(
+      `${BACKEND_URL}/api/admin/reset-used-oc-reading-questions`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed");
+    }
+
+    const data = await res.json();
+
+    alert(
+      `Reset successful! `
+      + `${data.deleted_count} deleted.`
+    );
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert("Error resetting.");
+  }
+};
   const handleSearchQuestions_OC_Reading = async () => {
   if (!searchText.trim()) {
     alert("Please enter search text.");
@@ -60,7 +119,7 @@ export default function QuizSetup_oc_reading() {
 
     const params = new URLSearchParams({
       query: searchText,
-      class_year: quiz.classYear,
+      class_year: quiz.classYear, 
     });
 
     const res = await fetch(
@@ -291,6 +350,7 @@ export default function QuizSetup_oc_reading() {
 
     const params = new URLSearchParams({
       class_year: quiz.classYear,
+      center_code: centerCode,
     });
 
     const res = await fetch(
@@ -353,6 +413,7 @@ export default function QuizSetup_oc_reading() {
       class_name: "oc",
       class_year: quiz.classYear,
       subject: quiz.subject,
+      center_code: centerCode,
       difficulty: "mixed",   // ✅ ADD THIS
       topics: quiz.topics.map((t) => ({
         name: t.name.trim(),
@@ -414,6 +475,7 @@ export default function QuizSetup_oc_reading() {
           <option value="">Select</option>
           <option value="3">Year 3</option>
           <option value="4">Year 4</option>
+          <option value="6">Year 6</option>
         </select>
 
         
@@ -437,36 +499,47 @@ export default function QuizSetup_oc_reading() {
         >
           View Question Bank
         </button>
-        <button
-          type="button"
-          onClick={handleDeleteAllQuestions}
-          
-        >
-          Delete All Questions
-        </button>
+        {userType !== "SUPER_ADMIN" && (
+          <button
+            type="button"
+            onClick={handleResetUsedQuestions_Reading}
+            disabled={!quiz.classYear}
+          >
+            Reset Used Questions
+          </button>
+        )}
+        {userType === "SUPER_ADMIN" && (
+          <button
+            type="button"
+            onClick={handleDeleteAllQuestions}
+            
+          >
+            Delete All Questions
+          </button>
+        )}
         <div className="section-card">
+  {userType === "SUPER_ADMIN" && (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        cursor: "pointer",
+        marginTop: "20px",
+      }}
+      onClick={() =>
+        setShowDeleteQuestionSection((prev) => !prev)
+      }
+    >
+      <h2 style={{ margin: 0 }}>
+        Delete Single Question
+      </h2>
 
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      cursor: "pointer",
-      marginTop: "20px",
-    }}
-    onClick={() =>
-      setShowDeleteQuestionSection((prev) => !prev)
-    }
-  >
-    <h2 style={{ margin: 0 }}>
-      Delete Single Question
-    </h2>
-
-    <span style={{ fontSize: "20px" }}>
-      {showDeleteQuestionSection ? "−" : "+"}
-    </span>
-  </div>
-
+      <span style={{ fontSize: "20px" }}>
+        {showDeleteQuestionSection ? "−" : "+"}
+      </span>
+    </div>
+  )}
   {showDeleteQuestionSection && (
     <>
 
@@ -704,74 +777,78 @@ export default function QuizSetup_oc_reading() {
             Total must be between 29 and 38 questions.
           </div>
         )}
+      {userType !== "SUPER_ADMIN" && (
+        <>
+          <button type="submit" disabled={loading}>
+            {loading ? "Saving..." : "Create OC Reading Exam"}
+          </button>
+          <button
+          type="button"
+          onClick={async () => {
+            
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Saving..." : "Create OC Reading Exam"}
-        </button>
-        <button
-        type="button"
-        onClick={async () => {
-          
-
-          if (!quiz.classYear) {
-            alert("Please select class year.");
-            return;
-          }
-
-          if (quiz.topics.length === 0) {
-            alert("Generate topics first.");
-            return;
-          }
-
-          if (totalQuestions < 29 || totalQuestions > 38) {
-            alert(
-              `OC Reading must be between 29 and 38 questions. Current: ${totalQuestions}`
-            );
-            return;
-          }
-
-          const payload = {
-            class_name: "oc",
-            subject: quiz.subject,
-            class_year: quiz.classYear,
-            difficulty: "mixed",   // ✅ REQUIRED
-            topics: quiz.topics.map((t) => ({
-              name: t.name.trim(),
-              difficulty: t.difficulty,
-              num_questions: Number(t.num_questions),
-            })),
-          };
-
-          try {
-            setLoading(true);
-
-            const res = await fetch(
-              `${BACKEND_URL}/api/admin/create-reading-homework-config`,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-              }
-            );
-
-            const data = await res.json();
-            setLoading(false);
-
-            if (!res.ok) {
-              alert(data.detail);
+            if (!quiz.classYear) {
+              alert("Please select class year.");
               return;
             }
 
-            alert(`OC Reading Homework Created! ID: ${data.config_id}`);
-          } catch (err) {
-            setLoading(false);
-            console.error(err);
-            alert("Error creating homework");
-          }
-        }}
-      >
-        {loading ? "Saving..." : "Create OC Reading Exam (Homework)"}
-      </button>
+            if (quiz.topics.length === 0) {
+              alert("Generate topics first.");
+              return;
+            }
+
+            if (totalQuestions < 29 || totalQuestions > 38) {
+              alert(
+                `OC Reading must be between 29 and 38 questions. Current: ${totalQuestions}`
+              );
+              return;
+            }
+
+            const payload = {
+              class_name: "oc",
+              subject: quiz.subject,
+              class_year: quiz.classYear,
+              center_code: centerCode,
+              difficulty: "mixed",   // ✅ REQUIRED
+              topics: quiz.topics.map((t) => ({
+                name: t.name.trim(),
+                difficulty: t.difficulty,
+                num_questions: Number(t.num_questions),
+              })),
+            };
+
+            try {
+              setLoading(true);
+
+              const res = await fetch(
+                `${BACKEND_URL}/api/admin/create-oc-reading-homework-config`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payload),
+                }
+              );
+
+              const data = await res.json();
+              setLoading(false);
+
+              if (!res.ok) {
+                alert(data.detail);
+                return;
+              }
+
+              alert(`OC Reading Homework Created! ID: ${data.config_id}`);
+            } catch (err) {
+              setLoading(false);
+              console.error(err);
+              alert("Error creating homework");
+            }
+          }}
+        >
+          {loading ? "Saving..." : "Create OC Reading Exam (Homework)"}
+        </button>
+      </>
+)}
       </form>
     </div>
   );

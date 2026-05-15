@@ -570,7 +570,10 @@ const tabs = allTabs.filter((tab) => {
                 />
               )}
               {createExamType === "oc_reading" && (
-                <QuizSetup_oc_reading />
+                <QuizSetup_oc_reading
+                  userType={userType}
+                  centerCode={centerCode}
+                />
               )}
               {createExamType === "mathematical_reasoning" && (
                 <QuizSetup_MathematicalReasoning
@@ -857,7 +860,10 @@ const tabs = allTabs.filter((tab) => {
 
                         {generateExamCategory === "oc" &&
                         generateExamType === "oc_reading" && (
-                          <GenerateExam_oc_reading mode={generateMode} />
+                          <GenerateExam_oc_reading
+                           mode={generateMode}
+                           centerCode={centerCode}                           
+                           />
                         )}
 
                         {generateExamCategory === "foundational" && (
