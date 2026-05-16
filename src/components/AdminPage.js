@@ -589,7 +589,13 @@ const tabs = allTabs.filter((tab) => {
                   centerCode={centerCode}
                 />
               )}
-              {createExamType === "writing" && <QuizSetup_writing />}
+              {createExamType === "writing" && (
+                <QuizSetup_writing
+                  userType={userType}
+                  centerCode={centerCode}
+                />
+              )}
+
               {createExamCategory === "naplan" &&
                 createExamType === "naplan_numeracy" && (
                   <QuizSetup_naplan
@@ -601,11 +607,19 @@ const tabs = allTabs.filter((tab) => {
               
               {createExamCategory === "naplan" &&
               createExamType === "naplan_language_conventions" && (
-                <QuizSetup_naplan_language_conventions />
+                <QuizSetup_naplan_language_conventions
+                  userType={userType} 
+                  centerCode={centerCode}              
+                
+                />
               )}        
               {createExamCategory === "naplan" &&
               createExamType === "naplan_reading" && (
-                <QuizSetup_naplan_reading examType="naplan_reading" />
+                <QuizSetup_naplan_reading
+                  examType="naplan_reading"
+                  userType={userType} 
+                  centerCode={centerCode}
+                 />
               )}
               
               
@@ -842,7 +856,9 @@ const tabs = allTabs.filter((tab) => {
 
                         {generateExamCategory === "selective" &&
                         generateExamType === "writing" && (
-                          <GenerateExam_writing mode={generateMode} />
+                          <GenerateExam_writing
+                           mode={generateMode}
+                           centerCode={centerCode} />
                         )}
 
                         {generateExamCategory === "oc" &&
@@ -884,12 +900,18 @@ const tabs = allTabs.filter((tab) => {
 
                         {generateExamCategory === "naplan" &&
                         generateExamType === "naplan_language_conventions" && (
-                          <GenerateExam_naplan_language_conventions mode={generateMode} />
+                          <GenerateExam_naplan_language_conventions
+                           mode={generateMode}
+                           centerCode={centerCode}
+                           />
                         )}
 
                         {generateExamCategory === "naplan" &&
                         generateExamType === "naplan_reading" && (
-                          <GenerateExam_naplan_reading mode={generateMode} />
+                          <GenerateExam_naplan_reading
+                           mode={generateMode}
+                           centerCode={centerCode}
+                           />
                         )}
                         {generateExamCategory === "naplan" &&
                         generateExamType === "naplan_writing" && (

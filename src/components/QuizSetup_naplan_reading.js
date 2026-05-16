@@ -5,7 +5,11 @@ import "./QuizSetup.css";
 const BACKEND_URL = process.env.REACT_APP_API_URL;
 
 
-export default function QuizSetup_naplan_reading({ examType }) {
+export default function QuizSetup_naplan_reading({ 
+  examType,
+  userType,
+  centerCode
+}) {
   const [availableTopics, setAvailableTopics] = useState([]);
   const [totalQuestions, setTotalQuestions] = useState(0);
 
@@ -51,8 +55,12 @@ export default function QuizSetup_naplan_reading({ examType }) {
 
   const fetchAvailability = async () => {
     try {
+      const params = new URLSearchParams({
+        class_year: quiz.year,
+        center_code: centerCode,
+      });
       const res = await fetch(
-        `${BACKEND_URL}/api/reading-availability?class_year=${quiz.year}`
+        `${BACKEND_URL}/api/reading-availability?${params.toString()}`
       );
 
       if (!res.ok) {
@@ -104,6 +112,7 @@ export default function QuizSetup_naplan_reading({ examType }) {
   try {
     const params = new URLSearchParams({
       year: quiz.year,
+      center_code: centerCode,
       
     });
 
@@ -124,8 +133,7 @@ export default function QuizSetup_naplan_reading({ examType }) {
     }
 
     alert(
-      data.message ||
-      "Used questions reset successfully."
+      `${data.deleted_count} question(s) reset successfully.`
     );
 
   } catch (error) {
@@ -354,32 +362,58 @@ export default function QuizSetup_naplan_reading({ examType }) {
      View Question Bank
   ============================ */
   const handleViewQuestionBank = async () => {
-    if (!quiz.year) {
-      alert("Please select year first.");
-      return;
-    }
 
-    try {
-      setQbLoading(true);
-      setShowQuestionBank(false);
+  if (!quiz.year) {
+    alert("Please select year first.");
+    return;
+  }
 
-      const res = await fetch(
-        `${BACKEND_URL}/api/admin/question-bank-reading/naplan?subject=reading&year=${quiz.year}`
+  try {
+
+    setQbLoading(true);
+    setShowQuestionBank(false);
+
+    const normalizedCenterCode =
+      centerCode?.trim()?.toUpperCase();
+
+    const params = new URLSearchParams({
+      subject: "reading",
+      year: quiz.year,
+      center_code: normalizedCenterCode,
+    });
+
+    const res = await fetch(
+      `${BACKEND_URL}/api/admin/question-bank-reading/naplan?${params.toString()}`
+    );
+
+    if (!res.ok) {
+      throw new Error(
+        "Failed to load question bank"
       );
-
-      if (!res.ok) throw new Error("Failed to load question bank");
-
-      const data = await res.json();
-      setQuestionBank(data);
-      setShowQuestionBank(true);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to fetch question bank.");
-    } finally {
-      setQbLoading(false);
     }
-  };
 
+    const data = await res.json();
+
+    setQuestionBank(data);
+    setShowQuestionBank(true);
+
+  } catch (err) {
+
+    console.error(
+      "Question bank fetch error:",
+      err
+    );
+
+    alert(
+      "Failed to fetch question bank."
+    );
+
+  } finally {
+
+    setQbLoading(false);
+
+  }
+};
   /* ============================
      Generate Exam
   ============================ */
@@ -398,6 +432,7 @@ export default function QuizSetup_naplan_reading({ examType }) {
       class_name: quiz.className,
       subject: "reading",
       year: Number(quiz.year),
+      center_code: centerCode,
       difficulty: "mixed",
       num_topics: quiz.topics.length,
       topics: quiz.topics.map((t) => ({
@@ -463,6 +498,7 @@ const handleGenerateExamHomeWork = async () => {
     subject: "reading",
     year: Number(quiz.year),
     difficulty: "mixed",
+    center_code: centerCode,
     num_topics: quiz.topics.length,
     topics: quiz.topics.map((t) => ({
       name: t.name,
@@ -723,49 +759,57 @@ const selectedTopicNames = quiz.topics
          Actions
       ============================ */}
       <div style={{ marginTop: "15px" }}>
-        <button
-          type="button"
-          onClick={handleViewQuestionBank}
-          disabled={!quiz.year}
-        >
-          View Question Bank
-        </button>
-        <button
-          type="button"
-          onClick={handleResetQuestions}
-          disabled={!quiz.year}
-        >
-          Reset used Questions
-        </button>
-        <button
-          type="button"
-          onClick={handleDeleteAllQuestions}
-          
-        >
-          Delete All Questions
-        </button>
+        {userType !== "SUPER_ADMIN" && (
+          <>
+            <button
+              type="button"
+              onClick={handleViewQuestionBank}
+              disabled={!quiz.year}
+            >
+              View Question Bank
+            </button>
+
+            <button
+              type="button"
+              onClick={handleResetQuestions}
+              disabled={!quiz.year}
+            >
+              Reset used Questions
+            </button>
+          </>
+        )}
+        {userType !== "CENTER_ADMIN" && (
+          <button
+            type="button"
+            onClick={handleDeleteAllQuestions}
+          >
+            Delete All Questions
+          </button>
+        )}
         <div className="section-card">
 
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      cursor: "pointer",
-      marginTop: "20px",
-    }}
-    onClick={() =>
-      setShowDeleteQuestionSection((prev) => !prev)
-    }
-  >
-    <h2 style={{ margin: 0 }}>
-      Delete Single Question
-    </h2>
+      {userType !== "CENTER_ADMIN" && (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          cursor: "pointer",
+          marginTop: "20px",
+        }}
+        onClick={() =>
+          setShowDeleteQuestionSection((prev) => !prev)
+        }
+      >
+        <h2 style={{ margin: 0 }}>
+          Delete Single Question
+        </h2>
 
-    <span style={{ fontSize: "20px" }}>
-      {showDeleteQuestionSection ? "−" : "+"}
-    </span>
-  </div>
+        <span style={{ fontSize: "20px" }}>
+          {showDeleteQuestionSection ? "−" : "+"}
+        </span>
+      </div>
+    )}
 
   {showDeleteQuestionSection && (
     <>
@@ -879,28 +923,43 @@ const selectedTopicNames = quiz.topics
     </>
   )}
 </div>
-        <button
-          type="button"
-          onClick={handleGenerateExam}
-          disabled={!quiz.topics.length || !isTotalValid}
-          style={{
-            backgroundColor: isTotalValid ? "#0d6efd" : "#ccc",
-            cursor: isTotalValid ? "pointer" : "not-allowed",
-          }}
-        >
-          Generate Exam
-        </button>
-        <button
-          type="button"
-          onClick={handleGenerateExamHomeWork}
-          disabled={!quiz.topics.length || !isTotalValid}
-          style={{
-            backgroundColor: isTotalValid ? "#0d6efd" : "#ccc",
-            cursor: isTotalValid ? "pointer" : "not-allowed",
-          }}
-        >
-          Generate Exam (Homework)
-        </button>
+        {userType !== "SUPER_ADMIN" && (
+        <>
+          <button
+            type="button"
+            onClick={handleGenerateExam}
+            disabled={!quiz.topics.length || !isTotalValid}
+            style={{
+              backgroundColor: isTotalValid
+                ? "#0d6efd"
+                : "#ccc",
+
+              cursor: isTotalValid
+                ? "pointer"
+                : "not-allowed",
+            }}
+          >
+            Create Exam
+          </button>
+
+          <button
+            type="button"
+            onClick={handleGenerateExamHomeWork}
+            disabled={!quiz.topics.length || !isTotalValid}
+            style={{
+              backgroundColor: isTotalValid
+                ? "#0d6efd"
+                : "#ccc",
+
+              cursor: isTotalValid
+                ? "pointer"
+                : "not-allowed",
+            }}
+          >
+            Create Exam (Homework)
+          </button>
+        </>
+      )}
       </div>
 
       {showQuestionBank && (

@@ -3,7 +3,10 @@ import "./QuizSetup.css";
 
 const BACKEND_URL = process.env.REACT_APP_API_URL;
 
-export default function QuizSetup_naplan_language_conventions() {
+export default function QuizSetup_naplan_language_conventions({
+  userType,
+  centerCode
+}) {
   const [availableTopics, setAvailableTopics] = useState([]);
   const [totalQuestions, setTotalQuestions] = useState(0);
 
@@ -19,8 +22,8 @@ export default function QuizSetup_naplan_language_conventions() {
     NAPLAN Rules
   ============================ */
   const getAllowedRange = (year) => {
-    if (year === "3") return { min: 40, max: 45 };
-    if (year === "5") return { min: 45, max: 50 };
+    if (year === "3") return { min: 2, max: 5 };
+    if (year === "5") return { min: 2, max: 5 };
     return null;
   };
 
@@ -65,6 +68,10 @@ export default function QuizSetup_naplan_language_conventions() {
 };
 
   const handleReusedQuestions = async () => {
+    if (!centerCode) {
+      alert("Center code missing.");
+      return;
+      }
   const confirmed = window.confirm(
     "Are you sure you want to reset used questions?"
   );
@@ -80,6 +87,7 @@ export default function QuizSetup_naplan_language_conventions() {
     const params = new URLSearchParams({
       year: quiz.year,
       difficulty: "mixed",
+      center_code: centerCode,
     });
 
     const response = await fetch(
@@ -99,8 +107,7 @@ export default function QuizSetup_naplan_language_conventions() {
     }
 
     alert(
-      data.message ||
-      "Used questions reset successfully."
+      `${data.deleted_count || 0} question(s) were reset and are now reusable.`
     );
 
   } catch (error) {
@@ -156,6 +163,7 @@ export default function QuizSetup_naplan_language_conventions() {
   try {
     const params = new URLSearchParams({
       subject: "language_conventions",
+      center_code: centerCode,
       year: quiz.year,
       topic: value,
     });
@@ -384,9 +392,14 @@ const selectedTopicNames = quiz.topics
     try {
       setQbLoading(true);
       setShowQuestionBank(false);
+      const params = new URLSearchParams({
+        subject: "language_conventions",
+        year: quiz.year,
+        center_code: centerCode,
+      });
 
       const res = await fetch(
-        `${BACKEND_URL}/api/admin/question-bank/naplan?subject=language_conventions&year=${quiz.year}`
+        `${BACKEND_URL}/api/admin/question-bank/naplan?${params.toString()}`
       );
 
       if (!res.ok) throw new Error("Failed to load question bank");
@@ -406,6 +419,10 @@ const selectedTopicNames = quiz.topics
     Create Exam
   ============================ */
   const handleGenerateHomeWorkExam = async () => {
+    if (!centerCode) {
+      alert("Center code missing.");
+      return;
+    }
   if (!isTotalValid) {
     alert("Total questions do not meet NAPLAN requirements.");
     return;
@@ -419,6 +436,7 @@ const selectedTopicNames = quiz.topics
   const payload = {
     class_name: "naplan",
     subject: "Language Conventions",
+    center_code: centerCode,
     year: Number(quiz.year),
     difficulty: "mixed",
     num_topics: quiz.topics.length,
@@ -476,6 +494,10 @@ const selectedTopicNames = quiz.topics
   }
 };
   const handleGenerateExam = async () => {
+    if (!centerCode) {
+      alert("Center code missing.");
+      return;
+    }
     if (!isTotalValid) {
       alert("Total questions do not meet NAPLAN requirements.");
       return;
@@ -489,6 +511,7 @@ const selectedTopicNames = quiz.topics
     const payload = {
       class_name: "naplan",
       subject: "Language Conventions",
+      center_code: centerCode,
       year: Number(quiz.year),
       difficulty: "mixed",
       num_topics: quiz.topics.length,
@@ -664,33 +687,46 @@ const selectedTopicNames = quiz.topics
         </p>
       )}
       
-      <button onClick={handleViewQuestionBank}>View Question Bank</button>
-      <button onClick={handleReusedQuestions}>Reset used questions</button>
-      <button onClick={handleDeleteAllQuestions}>
-        Delete All Questions
-      </button>
+      {userType !== "SUPER_ADMIN" && (
+        <>
+          <button onClick={handleViewQuestionBank}>
+            View Question Bank
+          </button>
+
+          <button onClick={handleReusedQuestions}>
+            Reset used questions
+          </button>
+        </>
+      )}
+      {userType === "SUPER_ADMIN" && (
+        <button onClick={handleDeleteAllQuestions}>
+          Delete All Questions
+        </button>
+      )}
       <div className="section-card">
 
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      cursor: "pointer",
-      marginTop: "20px",
-    }}
-    onClick={() =>
-      setShowDeleteQuestionSection((prev) => !prev)
-    }
-  >
-    <h2 style={{ margin: 0 }}>
-      Delete Single Question
-    </h2>
+    {userType === "SUPER_ADMIN" && (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          cursor: "pointer",
+          marginTop: "20px",
+        }}
+        onClick={() =>
+          setShowDeleteQuestionSection((prev) => !prev)
+        }
+      >
+        <h2 style={{ margin: 0 }}>
+          Delete Single Question
+        </h2>
 
-    <span style={{ fontSize: "20px" }}>
-      {showDeleteQuestionSection ? "−" : "+"}
-    </span>
-  </div>
+        <span style={{ fontSize: "20px" }}>
+          {showDeleteQuestionSection ? "−" : "+"}
+        </span>
+      </div>
+    )}
 
   {showDeleteQuestionSection && (
     <>
@@ -804,26 +840,31 @@ const selectedTopicNames = quiz.topics
     </>
   )}
 </div>
-      <button
-        onClick={handleGenerateExam}
-        disabled={!isTotalValid}
-        style={{
-          backgroundColor: isTotalValid ? "#0d6efd" : "#ccc",
-          cursor: isTotalValid ? "pointer" : "not-allowed",
-        }}
-      >
-        Create Exam
-      </button>
-      <button
-        onClick={handleGenerateHomeWorkExam}
-        disabled={!isTotalValid}
-        style={{
-          backgroundColor: isTotalValid ? "#0d6efd" : "#ccc",
-          cursor: isTotalValid ? "pointer" : "not-allowed",
-        }}
-      >
-        Create Exam (homework)
-      </button>
+      {userType !== "SUPER_ADMIN" && (
+        <>
+          <button
+            onClick={handleGenerateExam}
+            disabled={!isTotalValid}
+            style={{
+              backgroundColor: isTotalValid ? "#0d6efd" : "#ccc",
+              cursor: isTotalValid ? "pointer" : "not-allowed",
+            }}
+          >
+            Create Exam
+          </button>
+
+          <button
+            onClick={handleGenerateHomeWorkExam}
+            disabled={!isTotalValid}
+            style={{
+              backgroundColor: isTotalValid ? "#0d6efd" : "#ccc",
+              cursor: isTotalValid ? "pointer" : "not-allowed",
+            }}
+          >
+            Create Exam (homework)
+          </button>
+        </>
+      )}
 
 
       {showQuestionBank && (

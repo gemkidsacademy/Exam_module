@@ -380,10 +380,10 @@ useEffect(() => {
 
   const startExamNaplanLanguageConventions =
     async () => {
-
+     
     const startUrl =
       isHomework
-        ? `${API_BASE}/api/student/start-homework-exam/naplan-language-conventions`
+        ? `${API_BASE}/api/student/start-homework/naplan-language-conventions`
         : `${API_BASE}/api/student/start-exam/naplan-language-conventions`;
 
     try {

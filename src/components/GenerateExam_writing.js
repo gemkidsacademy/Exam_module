@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./generateexam_writing.css";
 
-export default function GenerateExam_writing({ mode }) {
+export default function GenerateExam_writing({
+   mode,
+  centerCode
+   }) {
   const [quizzes, setQuizzes] = useState([]);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
   const [selectedClass, setSelectedClass] = useState("");
@@ -11,6 +14,9 @@ export default function GenerateExam_writing({ mode }) {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [selectedClassYear, setSelectedClassYear] = useState("Year 6");
+  const [availableBatches, setAvailableBatches] = useState([]);
+
+  const [selectedBatchId, setSelectedBatchId] = useState("");
   
 
   const [availableDates, setAvailableDates] = useState([]);
@@ -21,6 +27,102 @@ export default function GenerateExam_writing({ mode }) {
   const BACKEND_URL = process.env.REACT_APP_API_URL;
 
   /* ---------------- Load Writing Quiz Configs ---------------- */
+  useEffect(() => {
+
+  if (
+    !selectedClassYear ||
+    !selectedDate ||
+    mode !== "latest"
+  ) {
+    return;
+  }
+
+  const fetchAvailableBatches = async () => {
+
+    try {
+
+      console.log("\n==============================");
+
+      console.log("📦 FETCH WRITING BATCHES");
+
+      console.log("==============================");
+
+      console.log(
+        "selectedClassYear:",
+        selectedClassYear
+      );
+
+      console.log(
+        "selectedDate:",
+        selectedDate
+      );
+
+      const response = await fetch(
+        `${BACKEND_URL}/api/writing/available-batches` +
+        `?class_year=${encodeURIComponent(selectedClassYear)}` +
+        `&date=${selectedDate}`
+      );
+
+      const data = await response.json();
+
+      console.log(
+        "📥 Batch response:",
+        data
+      );
+
+      if (!response.ok) {
+
+        throw new Error(
+          data.detail ||
+          "Failed to fetch batches"
+        );
+      }
+
+      setAvailableBatches(
+        data.batches || []
+      );
+
+      if (data.batches?.length > 0) {
+
+        setSelectedBatchId(
+          data.batches[0]
+        );
+
+        console.log(
+          "✅ Auto-selected batch:",
+          data.batches[0]
+        );
+
+      } else {
+
+        setSelectedBatchId("");
+
+        console.log(
+          "⚠️ No batches returned"
+        );
+      }
+
+    } catch (err) {
+
+      console.error(
+        "❌ Batch fetch error:",
+        err
+      );
+
+      setError(
+        err.message ||
+        "Failed to fetch batches"
+      );
+    }
+  };
+
+  fetchAvailableBatches();
+
+}, [
+  selectedClassYear,
+  selectedDate,
+  mode
+]); 
   useEffect(() => {
 
   console.log("🔥 DATE EFFECT TRIGGERED");
@@ -116,6 +218,16 @@ export default function GenerateExam_writing({ mode }) {
     load();
   }, []);
   const handleGenerateHomeworkExam = async () => {
+    if (
+      mode === "latest" &&
+      !selectedBatchId
+    ) {
+      setError(
+        "Please select a batch"
+      );
+
+      return;
+    }
 
   if (!selectedClassYear) {
     setError("Please select a class year");
@@ -128,8 +240,11 @@ export default function GenerateExam_writing({ mode }) {
   }
 
   setLoading(true);
+
   setError("");
+
   setGeneratedExam(null);
+
   setSuccessMessage("");
 
   try {
@@ -143,19 +258,25 @@ export default function GenerateExam_writing({ mode }) {
       mode === "latest"
         ? {
             class_year: selectedClassYear,
-            selected_date: selectedDate
+            selected_date: selectedDate,
+            batch_id: Number(selectedBatchId),
+            center_code: centerCode
+
           }
         : {
-            class_year: selectedClassYear
+            class_year: selectedClassYear,
+            center_code: centerCode
           };
 
     const res = await fetch(
       `${BACKEND_URL}${endpoint}`,
       {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json"
         },
+
         body: JSON.stringify(body)
       }
     );
@@ -163,6 +284,7 @@ export default function GenerateExam_writing({ mode }) {
     const data = await res.json();
 
     if (!res.ok) {
+
       throw new Error(
         data.detail ||
         "Failed to generate homework exam"
@@ -192,6 +314,16 @@ export default function GenerateExam_writing({ mode }) {
 };
   /* ---------------- Generate Writing Exam ---------------- */
   const handleGenerateExam = async () => {
+  if (
+    mode === "latest" &&
+    !selectedBatchId
+  ) {
+    setError(
+      "Please select a batch"
+    );
+
+    return;
+  }
 
   if (!selectedClassYear) {
     setError("Please select a class year");
@@ -204,8 +336,11 @@ export default function GenerateExam_writing({ mode }) {
   }
 
   setLoading(true);
+
   setError("");
+
   setGeneratedExam(null);
+
   setSuccessMessage("");
 
   try {
@@ -219,19 +354,24 @@ export default function GenerateExam_writing({ mode }) {
       mode === "latest"
         ? {
             class_year: selectedClassYear,
-            selected_date: selectedDate
+            selected_date: selectedDate,
+            batch_id: Number(selectedBatchId),
+            center_code: centerCode
           }
         : {
-            class_year: selectedClassYear
+            class_year: selectedClassYear,
+            center_code: centerCode
           };
 
     const res = await fetch(
       `${BACKEND_URL}${endpoint}`,
       {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json"
         },
+
         body: JSON.stringify(body)
       }
     );
@@ -239,6 +379,7 @@ export default function GenerateExam_writing({ mode }) {
     const data = await res.json();
 
     if (!res.ok) {
+
       throw new Error(
         data.detail || "Failed to generate exam"
       );
@@ -287,27 +428,88 @@ export default function GenerateExam_writing({ mode }) {
         
       </select>
       {mode === "latest" && (
-        <>
-          <label>Select Upload Date:</label>
+      <>
+        {/* Upload Date Dropdown */}
+        <label>Select Upload Date:</label>
 
-          <select
-            value={selectedDate}
-            onChange={(e) =>
-              setSelectedDate(e.target.value)
-            }
-          >
-            <option value="">
-              Select Upload Date
+        <select
+          value={selectedDate}
+          onChange={(e) =>
+            setSelectedDate(e.target.value)
+          }
+          style={{
+            width: "100%",
+            marginBottom: "12px"
+          }}
+        >
+          <option value="">
+            Select Upload Date
+          </option>
+
+          {availableDates.map((date) => (
+            <option
+              key={date}
+              value={date}
+            >
+              {date}
             </option>
+          ))}
+        </select>
 
-            {availableDates.map((date) => (
-              <option key={date} value={date}>
-                {date}
+        {/* Batch Dropdown */}
+        {availableBatches.length > 0 && (
+          <>
+            <label>Select Upload Batch:</label>
+
+            <select
+              value={selectedBatchId}
+              onChange={(e) => {
+
+                console.log(
+                  "📦 Selected batch:",
+                  e.target.value
+                );
+
+                setSelectedBatchId(
+                  e.target.value
+                );
+              }}
+              style={{
+                width: "100%",
+                marginBottom: "12px"
+              }}
+            >
+              <option value="">
+                Select Batch
               </option>
-            ))}
-          </select>
-        </>
-      )}
+
+              {availableBatches.map(
+                (batchId) => (
+                  <option
+                    key={batchId}
+                    value={batchId}
+                  >
+                    Batch {batchId}
+                  </option>
+                )
+              )}
+            </select>
+
+            <p
+              style={{
+                color: "red",
+                marginTop: "8px",
+                fontWeight: "500",
+              }}
+            >
+              Make sure none of the
+              questions are part of
+              previously generated exams
+            </p>
+          </>
+        )}
+      </>
+    )}
       <h2>Generate Writing Exam</h2>
 
       <button
@@ -325,6 +527,56 @@ export default function GenerateExam_writing({ mode }) {
       >
         {loading ? "Generating..." : "Generate Writing Exam (Homework)"}
       </button>
+      
+
+{generatedExam && (
+  <div
+    style={{
+      marginTop: "20px",
+      padding: "16px",
+      border: "1px solid #ccc",
+      borderRadius: "8px",
+      background: "#fafafa"
+    }}
+  >
+    <h3>Generated Writing Exam</h3>
+
+    <p>
+      <strong>Exam ID:</strong>{" "}
+      {generatedExam.exam_id}
+    </p>
+
+    <p>
+      <strong>Topic:</strong>{" "}
+      {generatedExam.topic}
+    </p>
+
+    <p>
+      <strong>Difficulty:</strong>{" "}
+      {generatedExam.difficulty}
+    </p>
+
+    <p>
+      <strong>Batch ID:</strong>{" "}
+      {generatedExam.batch_id}
+    </p>
+
+    <p>
+      <strong>Center Code:</strong>{" "}
+      {generatedExam.center_code}
+    </p>
+
+    <pre
+      style={{
+        whiteSpace: "pre-wrap",
+        lineHeight: "1.6",
+        marginTop: "16px"
+      }}
+    >
+      {generatedExam.exam_text}
+    </pre>
+  </div>
+)}
     </div>
   );
 }

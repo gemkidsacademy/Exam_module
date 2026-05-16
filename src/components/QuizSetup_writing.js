@@ -4,14 +4,17 @@ import "./QuizSetup_writing.css";
 
 
 const BACKEND_URL = process.env.REACT_APP_API_URL;
-export default function QuizSetup_writing() {
+export default function QuizSetup_writing({
+  userType,
+  centerCode
+}) {
   const [form, setForm] = useState({
     className: "selective",
     classYear: "",
     topic: "",
     difficulty: ""
   });
-
+  console.log("userType:", userType);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -19,6 +22,59 @@ export default function QuizSetup_writing() {
   const [searchLoading, setSearchLoading] = useState(false);
   const [showDeleteQuestionSection, setShowDeleteQuestionSection] = useState(false);
   const [availableTopics, setAvailableTopics] = useState([]);
+  const handleResetAllQuestions = async () => {
+
+  const confirmed = window.confirm(
+    "Are you sure you want to reset all writing questions?"
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+
+    setLoading(true);
+
+    const params = new URLSearchParams({
+      center_code: centerCode,
+    });
+
+    const res = await fetch(
+      `${BACKEND_URL}/api/admin/reset-writing-questions?${params.toString()}`,
+      {
+        method: "PUT",
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+
+      throw new Error(
+        data.detail ||
+        "Failed to reset questions"
+      );
+    }
+
+    alert(
+      `${data.deleted_count} question(s) reset successfully.`
+    );
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert(
+      err.message ||
+      "Failed to reset questions."
+    );
+
+  } finally {
+
+    setLoading(false);
+  }
+};
   const handleSearchWritingQuestions = async () => {
   if (!searchText.trim()) {
     alert("Please enter search text.");
@@ -139,7 +195,8 @@ export default function QuizSetup_writing() {
       class_year: form.classYear,
       subject: "writing",
       topic: form.topic.trim(),
-      difficulty: form.difficulty
+      difficulty: form.difficulty,
+      center_code: centerCode
     };
 
     try {
@@ -192,7 +249,8 @@ export default function QuizSetup_writing() {
       class_year: form.classYear,   // ✅ already included
       subject: "writing",
       topic: form.topic.trim(),
-      difficulty: form.difficulty
+      difficulty: form.difficulty,
+      center_code: centerCode
     };
 
 
@@ -333,51 +391,93 @@ export default function QuizSetup_writing() {
         </select>
 
         {/* SUBMIT */}
-        <button type="submit" disabled={loading}>
-          {loading ? "Saving..." : "Save Writing Exam"}
-        </button>
+        {userType !== "SUPER_ADMIN" && (
+          <>
+            <button
+              type="submit"
+              disabled={loading}
+            >
+              {loading
+                ? "Saving..."
+                : "Save Writing Exam"}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleHomeworkSubmit}
+              disabled={loading}
+              style={{
+                marginTop: "10px",
+                backgroundColor: "#6c63ff",
+                color: "white"
+              }}
+            >
+              {loading
+                ? "Saving..."
+                : "Save Writing Exam (Homework)"}
+            </button>
+          </>
+        )}
+        {userType !== "SUPER_ADMIN" && (
         <button
           type="button"
-          onClick={handleHomeworkSubmit}
-          disabled={loading}
-          style={{ marginTop: "10px", backgroundColor: "#6c63ff", color: "white" }}
-        >
-          {loading ? "Saving..." : "Save Writing Exam (Homework)"}
-        </button>
-        <button
-          type="button"
-          onClick={handleDeleteAllWritingHomework}
+          onClick={handleResetAllQuestions}
           disabled={loading}
           style={{
             marginTop: "10px",
-            backgroundColor: "#ff4d4f",
+            backgroundColor: "#dc3545",
             color: "white"
           }}
         >
-          {loading ? "Deleting..." : "Delete All Writing Questions"}
+          {loading
+            ? "Resetting..."
+            : "Reset All Questions"}
         </button>
+      )}
+        {userType !== "CENTER_ADMIN" && (
+          <button
+            type="button"
+            onClick={handleDeleteAllWritingHomework}
+            disabled={loading}
+            style={{
+              marginTop: "10px",
+              backgroundColor: "#ff4d4f",
+              color: "white"
+            }}
+          >
+            {loading
+              ? "Deleting..."
+              : "Delete All Writing Questions"}
+          </button>
+        )}
         <div className="section-card">
 
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      cursor: "pointer",
-      marginTop: "20px",
-    }}
-    onClick={() =>
-      setShowDeleteQuestionSection((prev) => !prev)
-    }
-  >
-    <h2 style={{ margin: 0 }}>
-      Delete Single Question
-    </h2>
+        {userType !== "CENTER_ADMIN" && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            cursor: "pointer",
+            marginTop: "20px",
+          }}
+          onClick={() =>
+            setShowDeleteQuestionSection(
+              (prev) => !prev
+            )
+          }
+        >
+          <h2 style={{ margin: 0 }}>
+            Delete Single Question
+          </h2>
 
-    <span style={{ fontSize: "20px" }}>
-      {showDeleteQuestionSection ? "−" : "+"}
-    </span>
-  </div>
+          <span style={{ fontSize: "20px" }}>
+            {showDeleteQuestionSection
+              ? "−"
+              : "+"}
+          </span>
+        </div>
+      )}
 
   {showDeleteQuestionSection && (
     <>

@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 
 const BACKEND_URL = process.env.REACT_APP_API_URL;
 
-const GenerateExam_naplan_language_conventions = ({ mode }) => {
+const GenerateExam_naplan_language_conventions = ({
+   mode,
+  centerCode }) => {
   const [years, setYears] = useState([]);
   const [selectedYear, setSelectedYear] = useState("");
 
@@ -180,6 +182,7 @@ const GenerateExam_naplan_language_conventions = ({ mode }) => {
 
     const payload = {
       year: selectedYear,
+      center_code: centerCode,
 
       ...(mode === "latest" && {
         selected_date: selectedDate,
@@ -252,11 +255,12 @@ const GenerateExam_naplan_language_conventions = ({ mode }) => {
 
     const payload = {
       year: selectedYear,
+      center_code: centerCode,
 
       ...(mode === "latest" && {
-      selected_date: selectedDate,
-      batch_id: Number(selectedBatchId),
-    }),
+        selected_date: selectedDate,
+        batch_id: Number(selectedBatchId),
+      }),
     };
 
     console.log("Generate exam payload:", payload);
