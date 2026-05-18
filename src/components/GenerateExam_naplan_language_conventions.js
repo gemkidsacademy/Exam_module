@@ -5,6 +5,11 @@ const BACKEND_URL = process.env.REACT_APP_API_URL;
 const GenerateExam_naplan_language_conventions = ({
    mode,
   centerCode }) => {
+  console.log("\n======================");
+  console.log("COMPONENT RENDER");
+  console.log("======================");
+  console.log("mode:", mode);
+  console.log("centerCode:", centerCode);
   const [years, setYears] = useState([]);
   const [selectedYear, setSelectedYear] = useState("");
 
