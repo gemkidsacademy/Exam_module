@@ -81,6 +81,15 @@ export default function ReadingReviewOC({
     currentQuestion.section_ref?.passage_style ||
     "informational";
 
+  const currentQuestionType =
+    currentQuestion.question_type ||
+    currentQuestion.section_ref?.question_type ||
+    currentQuestion.topic?.toLowerCase().replace(/\s+/g, "_") ||
+    "";
+
+  const isDropdownCloze =
+    currentQuestionType === "dropdown_cloze";
+
   /* =============================
      HELPERS
   ============================= */
@@ -251,7 +260,110 @@ export default function ReadingReviewOC({
           )}
         
           {rm?.content && (
-            <p className="reading-content">{rm.content}</p>
+
+            isDropdownCloze ? (
+
+              <div className="reading-content dropdown-cloze-passage">
+
+                {(() => {
+
+                  const questionMap = {};
+
+                  questions.forEach((q) => {
+                    questionMap[q.placeholder] = q;
+                  });
+
+                  const normalizedContent = rm.content
+                    .replace(/\n+/g, " ")
+                    .replace(/\s+/g, " ")
+                    .trim();
+
+                  const parts = normalizedContent.split(
+                    /(\[GAP_\d+\])/
+                  );
+
+                  return parts.map((part, idx) => {
+
+                    const gapMatch = part.match(
+                      /\[(GAP_\d+)\]/
+                    );
+
+                    // NORMAL TEXT
+                    if (!gapMatch) {
+                      return (
+                        <span key={idx}>
+                          {part}
+                        </span>
+                      );
+                    }
+
+                    // GAP
+                    const placeholder = gapMatch[1];
+
+                    const gapQuestion =
+                      questionMap[placeholder];
+
+                    if (!gapQuestion) {
+                      return (
+                        <span key={idx}>
+                          {part}
+                        </span>
+                      );
+                    }
+
+                    const selected =
+                      gapQuestion.student_answer;
+
+                    const correct =
+                      gapQuestion.correct_answer;
+
+                    let cls =
+                      "dropdown-cloze-review";
+
+                    if (!selected) {
+                      cls += " skipped";
+                    }
+                    else if (selected === correct) {
+                      cls += " correct";
+                    }
+                    else {
+                      cls += " wrong";
+                    }
+
+                    return (
+                      <select
+                        key={idx}
+                        disabled
+                        className={cls}
+                        value={selected || ""}
+                      >
+                        <option value="">
+                          Select
+                        </option>
+
+                        {Object.entries(
+                          gapQuestion.answer_options || {}
+                        ).map(([k, v]) => (
+                          <option key={k} value={k}>
+                            {v}
+                          </option>
+                        ))}
+                      </select>
+                    );
+                  });
+
+                })()}
+
+              </div>
+
+            ) : (
+
+              <p className="reading-content">
+                {rm.content}
+              </p>
+
+            )
+
           )}
         
           {rm?.paragraphs &&
@@ -265,10 +377,12 @@ export default function ReadingReviewOC({
         {/* QUESTION */}
         <div className="question-pane">
           <div className="question-header-row">
+            
             <p className="question-text">
               Q{currentQuestion.question_number || index + 1}.{" "}
               {currentQuestion.question_text}
             </p>
+            
 
             {!explanations[qid] && (
               <button
@@ -282,7 +396,8 @@ export default function ReadingReviewOC({
           </div>
 
           {/* OPTIONS */}
-          <div className="options">
+          
+          <div className="options">     
             {Object.keys(options).length === 0 && (
               <div className="no-options-warning">
                 ⚠️ No answer options available
@@ -290,22 +405,49 @@ export default function ReadingReviewOC({
             )}
 
             {Object.entries(options).map(([k, v]) => {
+              console.log(currentQuestion);
+
               let cls = "option-btn";
 
-              if (k === currentQuestion.correct_answer) {
-                cls += " option-correct";
-              } else if (k === currentQuestion.student_answer) {
-                cls += " option-wrong";
-              }
+                const studentAnswer =
+                  currentQuestion.student_answer;
+
+                const correctAnswer =
+                  currentQuestion.correct_answer;
+
+                // ✅ Student selected correct answer
+                if (
+                  k === correctAnswer &&
+                  studentAnswer === correctAnswer
+                ) {
+                  cls += " option-correct";
+                }
+
+                // ❌ Correct answer (when student got it wrong)
+                else if (
+                  k === correctAnswer &&
+                  studentAnswer !== correctAnswer
+                ) {
+                  cls += " option-correct";
+                }
+
+                // ❌ Wrong selected answer
+                else if (
+                  k === studentAnswer &&
+                  studentAnswer !== correctAnswer
+                ) {
+                  cls += " option-wrong";
+                }
 
               return (
                 <button key={k} disabled className={cls}>
                   <strong>{k}.</strong> {v}
                 </button>
               );
+
             })}
           </div>
-
+        
           {/* EXPLANATION */}
           {explanations[qid] && (
             <div className="ai-explanation-box">

@@ -26,10 +26,12 @@ export default function QuizSetup_oc_reading({
 
   const CHOICE_TOPIC_QUESTION_RULES_OC = {
     "Comparative Analysis": [8, 10],
+    "Dropdown Cloze": [4, 5, 6, 7, 8],
   };
 
   const MAX_TOPIC_USAGE_OC = {
     "Comparative Analysis": 2,
+    "Dropdown Cloze": 1,
   };
 
   // ---------------------------------------
@@ -282,7 +284,21 @@ export default function QuizSetup_oc_reading({
       topics[index] = {
         ...topics[index],
         available_difficulties: data || [],
+        num_questions:
+          topics[index].num_questions ||
+          (
+            FIXED_TOPIC_QUESTION_RULES_OC[value] !== undefined
+              ? FIXED_TOPIC_QUESTION_RULES_OC[value]
+              : 0
+          ),
       };
+
+      const total = topics.reduce(
+        (sum, t) => sum + (Number(t.num_questions) || 0),
+        0
+      );
+
+      setTotalQuestions(total);
 
       return { ...prev, topics };
     });
@@ -719,7 +735,9 @@ export default function QuizSetup_oc_reading({
                   }
                 >
                   {CHOICE_TOPIC_QUESTION_RULES_OC[topic.name].map((opt) => (
-                    <option key={opt}>{opt}</option>
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
                   ))}
                 </select>
               ) : (

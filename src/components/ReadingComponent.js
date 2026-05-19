@@ -434,6 +434,7 @@
         main_idea_and_summary: "Main Idea and Summary",
         literary: "Main Idea and Summary",   // ✅ ADD THIS
         comparative_analysis: "Comparative Analysis",
+        dropdown_cloze: "Dropdown Cloze",
         gapped_text: "Gapped Text",
       };
 
@@ -1000,6 +1001,11 @@
     const hasOptions = Object.keys(options).length > 0;
 
     const rm = currentQuestion.section_ref?.reading_material || {};
+    const currentQuestionType =
+      currentQuestion.section_ref?.question_type || "";
+
+    const isDropdownCloze =
+      currentQuestionType === "dropdown_cloze";
 
     
     const passageStyle =
@@ -1097,11 +1103,104 @@
 
               {rm.content && (
                 <div className="reading-content">
-                  {rm.content.split("\n\n").map((block, i) => (
-                    <div key={i} className="stanza">
-                      {block}
+
+                  {/* -------------------------------- */}
+                  {/* DROPDOWN CLOZE RENDERING */}
+                  {/* -------------------------------- */}
+                  {isDropdownCloze ? (
+
+                    <div className="dropdown-cloze-passage">
+
+                      {(() => {
+
+                        const questionMap = {};
+
+                        questions.forEach((q) => {
+                          questionMap[q.placeholder] = q;
+                        });
+                        const normalizedContent = rm.content
+                          .replace(/\n+/g, " ")
+                          .replace(/\s+/g, " ")
+                          .trim();
+                        const parts = normalizedContent.split(
+                          /(\[GAP_\d+\])/
+                        );
+
+                        return parts.map((part, idx) => {
+
+                          const gapMatch = part.match(
+                            /\[(GAP_\d+)\]/
+                          );
+
+                          // NORMAL TEXT
+                          if (!gapMatch) {
+                            return (
+                              <span key={idx}>
+                                {part}
+                              </span>
+                            );
+                          }
+
+                          // GAP
+                          const placeholder = gapMatch[1];
+
+                          const gapQuestion =
+                            questionMap[placeholder];
+
+                          if (!gapQuestion) {
+                            return (
+                              <span key={idx}>
+                                {part}
+                              </span>
+                            );
+                          }
+
+                          return (
+                            <select
+                              key={idx}
+                              className="dropdown-cloze-select"
+                              value={
+                                answers[gapQuestion.question_id] || ""
+                              }
+                              onChange={(e) =>
+                                setAnswers((prev) => ({
+                                  ...prev,
+                                  [gapQuestion.question_id]:
+                                    e.target.value
+                                }))
+                              }
+                            >
+                              <option value="">
+                                Select
+                              </option>
+
+                              {Object.entries(
+                                gapQuestion.answer_options || {}
+                              ).map(([k, v]) => (
+                                <option key={k} value={k}>
+                                  {v}
+                                </option>
+                              ))}
+                            </select>
+                          );
+                        });
+
+                      })()}
+
                     </div>
-                  ))}
+
+                  ) : (
+
+                    <>
+                      {rm.content.split("\n\n").map((block, i) => (
+                        <div key={i} className="stanza">
+                          {block}
+                        </div>
+                      ))}
+                    </>
+
+                  )}
+
                 </div>
               )}
               {rm.paragraphs &&
@@ -1115,32 +1214,36 @@
         </div>
 
         <div className="question-pane">
-          <p className="question-text">
-            Q{currentQuestion.question_number}.{" "}
-            {String(currentQuestion.question_text).replace(/^\s*\d+\.\s*/, "")}
-          </p>
+          {!isDropdownCloze && (
+            <p className="question-text">
+              Q{currentQuestion.question_number}.{" "}
+              {String(currentQuestion.question_text).replace(/^\s*\d+\.\s*/, "")}
+            </p>
+          )}
 
-          <div className="options">
-            {!hasOptions && (
-              <div className="no-options-warning">
-                ⚠️ No answer options available for this question
-              </div>
-            )}
+          {!isDropdownCloze && (
+            <div className="options">
+              {!hasOptions && (
+                <div className="no-options-warning">
+                  ⚠️ No answer options available for this question
+                </div>
+              )}
 
-            {Object.entries(options).map(([k, v]) => (
-              <button
-                key={k}
-                className={`option-btn ${
-                  answers[currentQuestion.question_id] === k
-                    ? "selected"
-                    : ""
-                }`}
-                onClick={() => handleSelect(k)}
-              >
-                <strong>{k}.</strong> {v}
-              </button>
-            ))}
-          </div>
+              {Object.entries(options).map(([k, v]) => (
+                <button
+                  key={k}
+                  className={`option-btn ${
+                    answers[currentQuestion.question_id] === k
+                      ? "selected"
+                      : ""
+                  }`}
+                  onClick={() => handleSelect(k)}
+                >
+                  <strong>{k}.</strong> {v}
+                </button>
+              ))}
+            </div>
+          )}
 
           <div className="nav-buttons">
             <button disabled={index === 0} onClick={() => goTo(index - 1)}>

@@ -584,3 +584,68 @@
   font-size: 16px;
   color: #6b7280;
 }
+.dropdown-cloze-passage {
+  font-size: 16px;
+  line-height: 2.2;
+  color: #222;
+}
+
+.dropdown-cloze-select {
+  display: inline-block;
+
+  width: auto;
+  min-width: 120px;
+
+  margin: 0 4px;
+
+  padding: 4px 8px;
+
+  font-size: 14px;
+
+  vertical-align: middle;
+
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+
+  background: white;
+}
+.dropdown-cloze-review {
+  display: inline-block;
+
+  width: auto;
+  min-width: 120px;
+
+  margin: 0 4px;
+
+  padding: 4px 8px;
+
+  font-size: 14px;
+
+  vertical-align: middle;
+
+  border-radius: 4px;
+
+  background: white;
+}
+
+.dropdown-cloze-review.correct {
+  border: 2px solid #22c55e;
+}
+
+.dropdown-cloze-review.wrong {
+  border: 2px solid #ef4444;
+}
+.dropdown-cloze-review.correct {
+  border: 2px solid #22c55e;
+  background-color: #f0fdf4;
+}
+
+.dropdown-cloze-review.wrong {
+  border: 2px solid #ef4444;
+  background-color: #fef2f2;
+}
+
+.dropdown-cloze-review.skipped {
+  border: 2px solid #cbd5e1;
+  background-color: #f8fafc;
+}

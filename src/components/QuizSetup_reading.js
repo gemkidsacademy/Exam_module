@@ -38,6 +38,7 @@ export default function QuizSetup_reading({
   
   const CHOICE_TOPIC_QUESTION_RULES = {
     "Comparative Analysis": [8, 10],
+    "Dropdown Cloze": [4, 5, 6, 7, 8],
   };
 
 
@@ -858,7 +859,7 @@ export default function QuizSetup_reading({
                     </option>
                   ))}
                 </select>
-                {topic.name === "Comparative Analysis" && (
+                {CHOICE_TOPIC_QUESTION_RULES[topic.name] && (
                   <div>
                     <label>Number of Questions:</label>
                     <select
@@ -888,18 +889,21 @@ export default function QuizSetup_reading({
                       }}
                     >
                       <option value="">Select</option>
-                      <option value={8}>8</option>
-                      <option value={10}>10</option>
+                      {CHOICE_TOPIC_QUESTION_RULES[topic.name].map((num) => (
+                        <option key={num} value={num}>
+                          {num}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 )}
-                {topic.name !== "Comparative Analysis" && (
+                {!CHOICE_TOPIC_QUESTION_RULES[topic.name] && (
                   <div className="topic-total">
                     Total Questions: {getQuestionCount(topic.name)}
                   </div>
                 )}
 
-                {topic.name === "Comparative Analysis" && topic.num_questions && (
+                {CHOICE_TOPIC_QUESTION_RULES[topic.name] && topic.num_questions && (
                   <div className="topic-total">
                     Total Questions: {topic.num_questions}
                   </div>
