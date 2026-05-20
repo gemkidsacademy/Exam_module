@@ -14,6 +14,7 @@
     console.log("🧪 studentId:", studentId);
     
     const API_BASE = process.env.REACT_APP_API_URL;
+    const [activeExtract, setActiveExtract] = useState(0);
     //const API_BASE = "http://127.0.0.1:8000";
     const startReadingHomework = async () => {
     try {
@@ -435,6 +436,7 @@
         literary: "Main Idea and Summary",   // ✅ ADD THIS
         comparative_analysis: "Comparative Analysis",
         dropdown_cloze: "Dropdown Cloze",
+        extract_matching: "Extract Matching",
         gapped_text: "Gapped Text",
       };
 
@@ -999,8 +1001,15 @@
     });  
     const options = currentQuestion.answer_options || {};
     const hasOptions = Object.keys(options).length > 0;
+    console.log(currentQuestion.section_ref);
 
     const rm = currentQuestion.section_ref?.reading_material || {};
+    console.log("RM DEBUG:", rm);
+
+    console.log(
+      "QUESTION TYPE:",
+      currentQuestion.section_ref?.question_type
+    );
     const currentQuestionType =
       currentQuestion.section_ref?.question_type || "";
 
@@ -1061,45 +1070,163 @@
         onContextMenu={(e) => e.preventDefault()}
         onDoubleClick={(e) => e.preventDefault()}
       >        {/* LITERARY PASSAGE */}
-          {/* LITERARY PASSAGE (Main Idea & Summary) */}
-          {passageStyle === "literary" && rm && typeof rm === "object" && (
-            <div className="literary-passage">
-          
-              {rm.title && <h3>{rm.title}</h3>}
-          
-              {rm.instructions && (
-                <ul className="instructions">
-                  {rm.instructions.map((line, i) => (
-                    <li key={i}>{line}</li>
-                  ))}
-                </ul>
-              )}
-          
-              {rm.paragraphs &&
-                Object.entries(rm.paragraphs).map(([num, text]) => (
-                  <p key={num} className="reading-paragraph">
-                    <strong>{num}.</strong> {text}
-                  </p>
-                ))}
-            </div>
-          )}
+                {/* LITERARY PASSAGE (Main Idea & Summary) */}
+                {passageStyle === "literary" && rm && typeof rm === "object" && (
+                  <div className="literary-passage">
+                
+                    {rm.title && <h3>{rm.title}</h3>}
+                
+                    {rm.instructions && (
+                      <ul className="instructions">
+                        {rm.instructions.map((line, i) => (
+                          <li key={i}>{line}</li>
+                        ))}
+                      </ul>
+                    )}
+                
+                    {rm.paragraphs &&
+                      Object.entries(rm.paragraphs).map(([num, text]) => (
+                        <p key={num} className="reading-paragraph">
+                          <strong>{num}.</strong> {text}
+                        </p>
+                      ))}
+                  </div>
+                )}
 
 
 
-          {/* NON-LITERARY PASSAGE */}
-          {passageStyle !== "literary" && (
-            <>
-              {rm.title && <h3>{rm.title}</h3>}
+                {/* NON-LITERARY PASSAGE */}
+                {passageStyle !== "literary" && (
+                  <>
+                    {rm.title && <h3>{rm.title}</h3>}
 
-              {rm.extracts && (
-                <div className="extracts">
-                  {Object.entries(rm.extracts).map(([key, text]) => (
-                    <div key={key} className="extract">
-                      <strong>{key}.</strong> {text}
+                {/* ===================================== */}
+                {/* EXTRACT MATCHING (NEW ARRAY FORMAT) */}
+                {/* ===================================== */}
+
+                {Array.isArray(rm?.extracts) ? (
+
+                  <div className="extract-matching-container">
+
+                    {/* ========================= */}
+                    {/* EXTRACT TABS */}
+                    {/* ========================= */}
+
+                    <div className="extract-tabs">
+
+                      {rm.extracts.map((extract, idx) => (
+
+                        <button
+                          key={extract.label}
+                          className={`extract-tab ${
+                            activeExtract === idx
+                              ? "active"
+                              : ""
+                          }`}
+                          onClick={() =>
+                            setActiveExtract(idx)
+                          }
+                        >
+                          Extract {extract.label}
+                        </button>
+
+                      ))}
+
                     </div>
-                  ))}
-                </div>
-              )}
+
+                    {/* ========================= */}
+                    {/* ACTIVE EXTRACT */}
+                    {/* ========================= */}
+
+                    <div className="extract-panel">
+
+                      <h3>
+                        Extract {
+                          rm.extracts[activeExtract]?.label
+                        }
+                      </h3>
+
+                      {rm.extracts[activeExtract]?.title && (
+                        <h4>
+                          {
+                            rm.extracts[activeExtract].title
+                          }
+                        </h4>
+                      )}
+
+                      <p>
+                        {
+                          rm.extracts[activeExtract]?.content
+                        }
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                ) :
+
+                /* ===================================== */
+                /* COMPARATIVE ANALYSIS (OLD OBJECT FORMAT) */
+                /* ===================================== */
+
+                rm?.extracts ? (
+
+                  <div className="extracts">
+
+                    {Object.entries(rm.extracts).map(
+                      ([key, text]) => (
+
+                        <div
+                          key={key}
+                          className="extract"
+                        >
+
+                          <strong>
+                            Extract {key}
+                          </strong>
+
+                          <p>{text}</p>
+
+                        </div>
+                      )
+                    )}
+
+                  </div>
+
+                ) :
+
+                /* ===================================== */
+                /* STANDARD PASSAGES */
+                /* ===================================== */
+
+                (
+
+                  <>
+
+                    {rm?.title && (
+                      <h3>{rm.title}</h3>
+                    )}
+
+                    {rm?.paragraphs ? (
+
+                      rm.paragraphs.map((p, idx) => (
+                        <p key={idx}>
+                          {p}
+                        </p>
+                      ))
+
+                    ) : (
+
+                      <p>
+                        {rm?.content || ""}
+                      </p>
+
+                    )}
+
+                  </>
+
+                )}
 
               {rm.content && (
                 <div className="reading-content">

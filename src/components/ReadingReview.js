@@ -17,6 +17,7 @@ export default function ReadingReview({
   onDateChange,
   onExit
 }) {
+  const [activeExtract, setActiveExtract] = useState(0);
   const [index, setIndex] = useState(0);
   const groupedQuestions = useMemo(() => {
     const g = {};
@@ -267,28 +268,159 @@ if (typeof rm === "string") {
             )}
 
 
-          {/* Non-literary / Gapped */}
+          {/* Non-literary / Gapped / Extract Matching */}
           {passageStyle !== "literary" && (
             <>
-              {rm?.title && <h3>{rm.title}</h3>}
 
-              {rm?.extracts &&
-                Object.entries(rm.extracts).map(([k, v]) => (
-                  <div key={k} className="extract">
-                    <strong>{k}.</strong> {v}
+              {/* ===================================== */}
+              {/* NEW EXTRACT MATCHING FORMAT */}
+              {/* ===================================== */}
+
+              {Array.isArray(rm?.extracts) ? (
+
+                <div className="extract-matching-container">
+
+                  {/* ========================= */}
+                  {/* TABS */}
+                  {/* ========================= */}
+
+                  <div className="extract-tabs">
+
+                    {rm.extracts.map((extract, idx) => (
+
+                      <button
+                        key={extract.label}
+                        className={`extract-tab ${
+                          activeExtract === idx
+                            ? "active"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          setActiveExtract(idx)
+                        }
+                      >
+                        Extract {extract.label}
+                      </button>
+
+                    ))}
+
                   </div>
-                ))}
 
-              {rm?.content && (
-                <p className="reading-content">{rm.content}</p>
+                  {/* ========================= */}
+                  {/* ACTIVE EXTRACT */}
+                  {/* ========================= */}
+
+                  <div className="extract-panel">
+
+                    <h3>
+                      Extract {
+                        rm.extracts[
+                          activeExtract
+                        ]?.label
+                      }
+                    </h3>
+
+                    {rm.extracts[
+                      activeExtract
+                    ]?.title && (
+
+                      <h4>
+                        {
+                          rm.extracts[
+                            activeExtract
+                          ].title
+                        }
+                      </h4>
+
+                    )}
+
+                    <p className="reading-content">
+                      {
+                        rm.extracts[
+                          activeExtract
+                        ]?.content
+                      }
+                    </p>
+
+                  </div>
+
+                </div>
+
+              ) :
+
+              /* ===================================== */
+              /* LEGACY COMPARATIVE ANALYSIS */
+              /* ===================================== */
+
+              rm?.extracts ? (
+
+                <>
+
+                  {Object.entries(
+                    rm.extracts
+                  ).map(([k, v]) => (
+
+                    <div
+                      key={k}
+                      className="extract"
+                    >
+
+                      <strong>
+                        {k}.
+                      </strong>{" "}
+
+                      {v}
+
+                    </div>
+
+                  ))}
+
+                </>
+
+              ) :
+
+              /* ===================================== */
+              /* STANDARD PASSAGES */
+              /* ===================================== */
+
+              (
+
+                <>
+
+                  {rm?.title && (
+                    <h3>{rm.title}</h3>
+                  )}
+
+                  {rm?.content && (
+                    <p className="reading-content">
+                      {rm.content}
+                    </p>
+                  )}
+
+                  {rm?.paragraphs &&
+                    Object.entries(
+                      rm.paragraphs
+                    ).map(([k, v]) => (
+
+                      <p
+                        key={k}
+                        className="reading-paragraph"
+                      >
+
+                        <strong>
+                          {k}.
+                        </strong>{" "}
+
+                        {v}
+
+                      </p>
+
+                    ))}
+
+                </>
+
               )}
 
-              {rm?.paragraphs &&
-                Object.entries(rm.paragraphs).map(([k, v]) => (
-                  <p key={k} className="reading-paragraph">
-                    <strong>{k}.</strong> {v}
-                  </p>
-                ))}
             </>
           )}
         </div>

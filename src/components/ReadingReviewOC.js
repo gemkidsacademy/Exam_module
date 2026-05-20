@@ -19,6 +19,7 @@ export default function ReadingReviewOC({
   const [index, setIndex] = useState(0);
   const [explanations, setExplanations] = useState({});
   const [loadingExplanation, setLoadingExplanation] = useState(null);
+  const [activeExtract, setActiveExtract] = useState(0);
   console.log("📅 REVIEW attemptDates:", attemptDates);
 
   const API_BASE = process.env.REACT_APP_API_URL;
@@ -249,15 +250,104 @@ export default function ReadingReviewOC({
         <div className={`passage-pane ${passageStyle}`}>
           {rm?.title && <h3>{rm.title}</h3>}
         
-          {rm?.extracts && Object.keys(rm.extracts).length > 0 && (
-            <div className="extracts">
-              {Object.entries(rm.extracts).map(([key, text]) => (
-                <div key={key} className="extract">
-                  <strong>{key}.</strong> {text}
-                </div>
-              ))}
+          {/* ===================================== */}
+          {/* EXTRACT MATCHING (NEW ARRAY FORMAT) */}
+          {/* ===================================== */}
+
+          {Array.isArray(rm?.extracts) &&
+          rm.extracts.length > 0 ? (
+
+            <div className="extract-matching-container">
+
+              {/* ========================= */}
+              {/* EXTRACT TABS */}
+              {/* ========================= */}
+
+              <div className="extract-tabs">
+
+                {rm.extracts.map((extract, idx) => (
+
+                  <button
+                    key={extract.label}
+                    className={`extract-tab ${
+                      activeExtract === idx
+                        ? "active"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      setActiveExtract(idx)
+                    }
+                  >
+                    Extract {extract.label}
+                  </button>
+
+                ))}
+
+              </div>
+
+              {/* ========================= */}
+              {/* ACTIVE EXTRACT */}
+              {/* ========================= */}
+
+              <div className="extract-panel">
+
+                <h3>
+                  Extract {
+                    rm.extracts[activeExtract]?.label
+                  }
+                </h3>
+
+                {rm.extracts[activeExtract]?.title && (
+                  <h4>
+                    {
+                      rm.extracts[activeExtract].title
+                    }
+                  </h4>
+                )}
+
+                <p>
+                  {
+                    rm.extracts[activeExtract]?.content
+                  }
+                </p>
+
+              </div>
+
             </div>
-          )}
+
+          ) :
+
+          /* ===================================== */
+          /* LEGACY OBJECT FORMAT SUPPORT */
+          /* ===================================== */
+
+          rm?.extracts &&
+          typeof rm.extracts === "object" &&
+          !Array.isArray(rm.extracts) ? (
+
+            <div className="extracts">
+
+              {Object.entries(rm.extracts).map(
+                ([key, text]) => (
+
+                  <div
+                    key={key}
+                    className="extract"
+                  >
+
+                    <strong>
+                      Extract {key}
+                    </strong>
+
+                    <p>{text}</p>
+
+                  </div>
+                )
+              )}
+
+            </div>
+
+          ) : null}
         
           {rm?.content && (
 

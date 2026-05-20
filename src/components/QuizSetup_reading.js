@@ -39,6 +39,7 @@ export default function QuizSetup_reading({
   const CHOICE_TOPIC_QUESTION_RULES = {
     "Comparative Analysis": [8, 10],
     "Dropdown Cloze": [4, 5, 6, 7, 8],
+    "Extract Matching": [4, 5, 6, 7, 8],
   };
 
 

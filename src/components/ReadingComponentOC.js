@@ -24,6 +24,12 @@ export default function ReadingComponentOC({
   const [exam, setExam] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
+  const [activeExtract, setActiveExtract] = useState(0);
+  useEffect(() => {
+
+    setActiveExtract(0);
+
+  }, [index]);
   const [attemptDates, setAttemptDates] = useState([]);
   const [selectedSessionId, setSelectedSessionId] = useState(null);
 
@@ -232,6 +238,7 @@ export default function ReadingComponentOC({
       main_idea_and_summary: "Main Idea and Summary",
       literary: "Main Idea and Summary",   // ✅ ADD THIS
       comparative_analysis: "Comparative Analysis",
+      extract_matching: "Extract Matching",
       dropdown_cloze: "Dropdown Cloze",
       gapped_text: "Gapped Text",
     };
@@ -367,6 +374,14 @@ export default function ReadingComponentOC({
     sections.forEach((section, i) => {
       console.log(`🧱 SECTION ${i} KEYS:`, Object.keys(section));
     });
+    console.log(
+      "FULL EXAM JSON:",
+      JSON.stringify(
+        examData.exam_json,
+        null,
+        2
+      )
+    );
 
 
 console.log("🧩 FLATTEN: sections =", sections);
@@ -384,11 +399,28 @@ const flatQuestions = sections.flatMap((section, idx) => {
     [];
 
   return qs.map((q) => ({
+
     ...q,
-    topic: TOPIC_LABELS[section.question_type] || "Other",
-    passage_style: section.passage_style || "informational",
-    answer_options: q.answer_options || section.answer_options || {},
-    section_ref: section
+
+    question_type:
+      section.question_type,
+
+    topic:
+      TOPIC_LABELS[
+        section.question_type
+      ] || "Other",
+
+    passage_style:
+      section.passage_style ||
+      "informational",
+
+    answer_options:
+      q.answer_options ||
+      section.answer_options ||
+      {},
+
+    section_ref:
+      section
   }));
 });
 
@@ -786,10 +818,32 @@ console.log("EXTRACTS:", currentQuestion?.reading_material?.extracts);
   const options = currentQuestion.answer_options || {};
   const hasOptions = Object.keys(options).length > 0;
 
-  const rm =
-  currentQuestion.reading_material ||
-  currentQuestion.section_ref?.reading_material ||
-  {};
+  const rm = (
+
+    currentQuestion.section_ref?.reading_material ||
+
+    currentQuestion.reading_material ||
+
+    {}
+  );
+  console.log(
+    "OC RM:",
+    JSON.stringify(rm, null, 2)
+  );
+  console.log(
+    "QUESTION TYPE:",
+    currentQuestion.question_type
+  );
+
+  console.log(
+    "SECTION REF:",
+    currentQuestion.section_ref
+  );
+
+  console.log(
+    "READING MATERIAL:",
+    currentQuestion.section_ref?.reading_material
+  );
   const currentQuestionType =
     currentQuestion.section_ref?.question_type || "";
 
@@ -876,125 +930,250 @@ console.log("EXTRACTS:", currentQuestion?.reading_material?.extracts);
 
 
         {/* NON-LITERARY PASSAGE */}
-        {passageStyle !== "literary" && (
-          <>
-            {rm.title && <h3>{rm.title}</h3>}
+                {passageStyle !== "literary" && (
+                  <>
+                    {rm.title && <h3>{rm.title}</h3>}
 
-            {rm.extracts && (
-              <div className="extracts">
-                {Object.entries(rm.extracts).map(([key, text]) => (
-                  <div key={key} className="extract">
-                    <strong>{key}.</strong> {text}
-                  </div>
-                ))}
-              </div>
-            )}
+                {/* ===================================== */}
+                {/* EXTRACT MATCHING (NEW ARRAY FORMAT) */}
+                {/* ===================================== */}
 
-            {rm.content && (
+                {Array.isArray(rm?.extracts) &&
+                  rm.extracts.length > 0 ? (
 
-              isDropdownCloze ? (
+                  <div className="extract-matching-container">
 
-                <div className="reading-content dropdown-cloze-passage">
+                    {/* ========================= */}
+                    {/* EXTRACT TABS */}
+                    {/* ========================= */}
 
-                  {(() => {
+                    <div className="extract-tabs">
 
-                    const questionMap = {};
+                      {rm.extracts.map((extract, idx) => (
 
-                    questions.forEach((q) => {
-                      questionMap[q.placeholder] = q;
-                    });
-
-                    const normalizedContent = rm.content
-                      .replace(/\n+/g, " ")
-                      .replace(/\s+/g, " ")
-                      .trim();
-
-                    const parts = normalizedContent.split(
-                      /(\[GAP_\d+\])/
-                    );
-
-                    return parts.map((part, idx) => {
-
-                      const gapMatch = part.match(
-                        /\[(GAP_\d+)\]/
-                      );
-
-                      // NORMAL TEXT
-                      if (!gapMatch) {
-                        return (
-                          <span key={idx}>
-                            {part}
-                          </span>
-                        );
-                      }
-
-                      // GAP
-                      const placeholder = gapMatch[1];
-
-                      const gapQuestion =
-                        questionMap[placeholder];
-
-                      if (!gapQuestion) {
-                        return (
-                          <span key={idx}>
-                            {part}
-                          </span>
-                        );
-                      }
-
-                      return (
-                        <select
-                          key={idx}
-                          className="dropdown-cloze-select"
-                          value={
-                            answers[gapQuestion.question_id] || ""
-                          }
-                          onChange={(e) =>
-                            setAnswers((prev) => ({
-                              ...prev,
-                              [gapQuestion.question_id]:
-                                e.target.value
-                            }))
+                        <button
+                          key={extract.label}
+                          className={`extract-tab ${
+                            activeExtract === idx
+                              ? "active"
+                              : ""
+                          }`}
+                          onClick={() =>
+                            setActiveExtract(idx)
                           }
                         >
-                          <option value="">
-                            Select
-                          </option>
+                          Extract {extract.label}
+                        </button>
 
-                          {Object.entries(
-                            gapQuestion.answer_options || {}
-                          ).map(([k, v]) => (
-                            <option key={k} value={k}>
-                              {v}
-                            </option>
-                          ))}
-                        </select>
-                      );
-                    });
+                      ))}
 
-                  })()}
+                    </div>
+
+                    {/* ========================= */}
+                    {/* ACTIVE EXTRACT */}
+                    {/* ========================= */}
+
+                    <div className="extract-panel">
+
+                      <h3>
+                        Extract {
+                          rm.extracts[activeExtract]?.label
+                        }
+                      </h3>
+
+                      {rm.extracts[activeExtract]?.title && (
+                        <h4>
+                          {
+                            rm.extracts[activeExtract].title
+                          }
+                        </h4>
+                      )}
+
+                      <p>
+                        {
+                          rm.extracts[activeExtract]?.content
+                        }
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                ) :
+
+                /* ===================================== */
+                /* COMPARATIVE ANALYSIS (OLD OBJECT FORMAT) */
+                /* ===================================== */
+
+                rm?.extracts ? (
+
+                  <div className="extracts">
+
+                    {Object.entries(rm.extracts).map(
+                      ([key, text]) => (
+
+                        <div
+                          key={key}
+                          className="extract"
+                        >
+
+                          <strong>
+                            Extract {key}
+                          </strong>
+
+                          <p>{text}</p>
+
+                        </div>
+                      )
+                    )}
+
+                  </div>
+
+                ) :
+
+                /* ===================================== */
+                /* STANDARD PASSAGES */
+                /* ===================================== */
+
+                (
+
+                  <>
+
+                    {rm?.title && (
+                      <h3>{rm.title}</h3>
+                    )}
+
+                    {rm?.paragraphs ? (
+
+                      rm.paragraphs.map((p, idx) => (
+                        <p key={idx}>
+                          {p}
+                        </p>
+                      ))
+
+                    ) : (
+
+                      <p>
+                        {rm?.content || ""}
+                      </p>
+
+                    )}
+
+                  </>
+
+                )}
+
+              {rm.content && (
+                <div className="reading-content">
+
+                  {/* -------------------------------- */}
+                  {/* DROPDOWN CLOZE RENDERING */}
+                  {/* -------------------------------- */}
+                  {isDropdownCloze ? (
+
+                    <div className="dropdown-cloze-passage">
+
+                      {(() => {
+
+                        const questionMap = {};
+
+                        questions.forEach((q) => {
+                          questionMap[q.placeholder] = q;
+                        });
+                        const normalizedContent = rm.content
+                          .replace(/\n+/g, " ")
+                          .replace(/\s+/g, " ")
+                          .trim();
+                        const parts = normalizedContent.split(
+                          /(\[GAP_\d+\])/
+                        );
+
+                        return parts.map((part, idx) => {
+
+                          const gapMatch = part.match(
+                            /\[(GAP_\d+)\]/
+                          );
+
+                          // NORMAL TEXT
+                          if (!gapMatch) {
+                            return (
+                              <span key={idx}>
+                                {part}
+                              </span>
+                            );
+                          }
+
+                          // GAP
+                          const placeholder = gapMatch[1];
+
+                          const gapQuestion =
+                            questionMap[placeholder];
+
+                          if (!gapQuestion) {
+                            return (
+                              <span key={idx}>
+                                {part}
+                              </span>
+                            );
+                          }
+
+                          return (
+                            <select
+                              key={idx}
+                              className="dropdown-cloze-select"
+                              value={
+                                answers[gapQuestion.question_id] || ""
+                              }
+                              onChange={(e) =>
+                                setAnswers((prev) => ({
+                                  ...prev,
+                                  [gapQuestion.question_id]:
+                                    e.target.value
+                                }))
+                              }
+                            >
+                              <option value="">
+                                Select
+                              </option>
+
+                              {Object.entries(
+                                gapQuestion.answer_options || {}
+                              ).map(([k, v]) => (
+                                <option key={k} value={k}>
+                                  {v}
+                                </option>
+                              ))}
+                            </select>
+                          );
+                        });
+
+                      })()}
+
+                    </div>
+
+                  ) : (
+
+                    <>
+                      {rm.content.split("\n\n").map((block, i) => (
+                        <div key={i} className="stanza">
+                          {block}
+                        </div>
+                      ))}
+                    </>
+
+                  )}
 
                 </div>
-
-              ) : (
-
-                <p className="reading-content">
-                  {rm.content}
-                </p>
-
-              )
-
-            )}
-
-            {rm.paragraphs &&
-              Object.entries(rm.paragraphs).map(([num, text]) => (
-                <p key={num} className="reading-paragraph">
-                  <strong>{num}.</strong> {text}
-                </p>
-              ))}
-          </>
-        )}
-      </div>
+              )}
+              {rm.paragraphs &&
+                Object.entries(rm.paragraphs).map(([num, text]) => (
+                  <p key={num} className="reading-paragraph">
+                    <strong>{num}.</strong> {text}
+                  </p>
+                ))}
+            </>
+          )}
+        </div>
 
       <div className="question-pane">
         {!isDropdownCloze && (
