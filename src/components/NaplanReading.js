@@ -12,7 +12,7 @@ import NaplanReadingReport from "./NaplanReadingReport";
 import NaplanReadingReview from "./NaplanReadingReview";
 
 /* ============================================================
-   MAIN COMPONENT
+   MAIN COMPONENTa
 ============================================================ */
 export default function NaplanReading({
   onExamStart,
@@ -20,12 +20,15 @@ export default function NaplanReading({
   mode: parentMode // 🔥 ADD THIS
 }) {
   const studentId = sessionStorage.getItem("student_id");
+  const [flaggedQuestions, setFlaggedQuestions] =
+    useState({});
   const [activeExtract, setActiveExtract] = useState(0);
   const API_BASE = process.env.REACT_APP_API_URL;
   
   //const API_BASE = "http://127.0.0.1:8000";
   const [examDates, setExamDates] = useState([]);
-  
+  const [showQuestionNavigator, setShowQuestionNavigator] =
+    useState(false);
   const [selectedExamId, setSelectedExamId] = useState(null);
   const TYPE_2_MAX_SELECTIONS = 2;
   const [explanations, setExplanations] = useState({});
@@ -792,7 +795,18 @@ useEffect(() => {
   
     setVisited(prev => ({ ...prev, [qid]: true }));
   };
+  const toggleFlagQuestion = () => {
 
+  const qid = String(currentQ.question_id);
+
+  setFlaggedQuestions(prev => ({
+
+    ...prev,
+
+    [qid]: !prev[qid]
+
+  }));
+};
   const goToQuestion = (idx) => {
     if (idx < 0 || idx >= flatQuestions.length) return;
 
@@ -1060,42 +1074,179 @@ useEffect(() => {
 
         {/* HEADER */}
         <div className="exam-header">
-          {!isReview && <div className="timer">⏳ {formatTime(timeLeft)}</div>}
-          <div className="counter">
-            Question {currentIndex + 1} / {flatQuestions.length}
+
+          {!isReview && (
+            <div className="timer">
+              ⏳ {formatTime(timeLeft)}
+            </div>
+          )}
+
+          <div className="question-counter-inline">
+
+            <span className="question-counter-text">
+              Question {currentIndex + 1} of {flatQuestions.length}
+            </span>
+
+            <button
+              className="question-grid-toggle"
+              onClick={() =>
+                setShowQuestionNavigator(prev => !prev)
+              }
+            >
+              ▦
+            </button>
+
           </div>
+
+          
+
         </div>
          {/* QUESTION INDEX BAR */}
-        <div className="question-index-bar">
-          {flatQuestions.map((q, idx) => {
-            const isAnswered = hasAnswered(q, answers);
-            const isCurrent = idx === currentIndex;
-        
-            let reviewClass = "";
-        
-            if (mode === "review") {
-              const correctFlag = correctness[String(q.question_id)];
-              reviewClass = correctFlag ? "correct" : "incorrect";
-            }        
-            return (
-              <button
-                key={q.question_id}
-                className={[
-                "question-index-item",
-                mode === "review"
-                  ? reviewClass
-                  : isAnswered
-                  ? "answered"
-                  : "unanswered",
-                isCurrent ? "current" : ""
-              ].join(" ")}
-                onClick={() => goToQuestion(idx)}
-              >
-                {idx + 1}
-              </button>
-            );
-          })}
-        </div>
+        {
+          showQuestionNavigator && (
+
+            <div className="question-index-wrapper">
+              <div className="question-summary-row">
+
+                <div className="summary-item">
+                  <span className="summary-count">
+                    {flatQuestions.filter(q =>
+                      hasAnswered(q, answers)
+                    ).length}
+                  </span>
+
+                  <span className="summary-label">
+                    Answered
+                  </span>
+                </div>
+
+                <div className="summary-item">
+                  <span className="summary-count">
+                    {
+                      flatQuestions.length -
+                      flatQuestions.filter(q =>
+                        hasAnswered(q, answers)
+                      ).length
+                    }
+                  </span>
+
+                  <span className="summary-label">
+                    Not answered
+                  </span>
+                </div>
+
+                <div className="summary-item">
+                  <span className="summary-count">
+                    {
+                      flatQuestions.filter(q =>
+                        !visited[String(q.question_id)]
+                      ).length
+                    }
+                  </span>
+
+                  <span className="summary-label">
+                    Not read
+                  </span>
+                </div>
+
+                <div className="summary-item">
+                  <span className="summary-count">
+                    {
+                      Object.values(flaggedQuestions)
+                        .filter(Boolean)
+                        .length
+                    }
+                  </span>
+
+                  <span className="summary-label">
+                    Flagged
+                  </span>
+                </div>
+
+              </div>
+              <div className="question-index-bar">
+
+                {flatQuestions.map((q, idx) => {
+
+                  const isAnswered = hasAnswered(
+                    q,
+                    answers
+                  );
+
+                  const isCurrent =
+                    idx === currentIndex;
+
+                  let reviewClass = "";
+
+                  if (mode === "review") {
+
+                    const correctFlag =
+                      correctness[
+                        String(q.question_id)
+                      ];
+
+                    reviewClass =
+                      correctFlag
+                        ? "correct"
+                        : "incorrect";
+                  }
+
+                  return (
+                    <button
+                      key={q.question_id}
+                      className={[
+                        "question-index-item",
+
+                        mode === "review"
+                          ? reviewClass
+                          : isAnswered
+                          ? "answered"
+                          : "unanswered",
+
+                        isCurrent
+                          ? "current"
+                          : ""
+
+                      ].join(" ")}
+
+                      onClick={() => {
+
+                        goToQuestion(idx);
+
+                        setShowQuestionNavigator(
+                          false
+                        );
+                      }}
+                    >
+
+                      <div className="question-index-content">
+
+                        <span>
+                          {idx + 1}
+                        </span>
+
+                        {
+                          flaggedQuestions[
+                            String(q.question_id)
+                          ] && (
+                            <span className="question-flag">
+                              🚩
+                            </span>
+                          )
+                        }
+
+                      </div>
+
+                    </button>
+                  );
+                })}
+
+              </div>
+
+            </div>
+
+          )
+        }
         <div className="exam-body reading-mode">
 
         {/* LEFT: PASSAGE(S) */}
@@ -1228,22 +1379,46 @@ useEffect(() => {
                       </p>
 
                       {/* Word bank (if present) */}
-                      {block.word_bank?.length > 0 && (
-                        <select
-                          className="gap-dropdown"
-                          value={answers[qid] || ""}
-                          disabled={isReview}
-                          onChange={(e) => handleAnswer(e.target.value)}
-                        >
-                          <option value="">Select an answer</option>
+                      {
+                        block.word_bank?.length > 0 && (
 
-                          {block.word_bank.map(word => (
-                            <option key={word} value={word}>
-                              {word}
+                          <select
+                            className="gap-dropdown"
+
+                            value={
+                              answers[qid] || ""
+                            }
+
+                            disabled={isReview}
+
+                            onChange={(e) =>
+                              handleAnswer(
+                                e.target.value
+                              )
+                            }
+                          >
+
+                            <option value="">
+                              Select an answer
                             </option>
-                          ))}
-                        </select>
-                      )}
+
+                            {
+                              block.word_bank.map(
+                                (word) => (
+                                  <option
+                                    key={word}
+                                    value={word}
+                                  >
+                                    {word}
+                                  </option>
+                                )
+                              )
+                            }
+
+                          </select>
+
+                        )
+                      }
 
                       {/* Free-text fallback */}
                       {!block.word_bank?.length && (
@@ -1657,19 +1832,63 @@ useEffect(() => {
 
         {/* NAVIGATION */}
         <div className="nav-buttons">
-          <button disabled={currentIndex === 0} onClick={() => goToQuestion(currentIndex - 1)}>
+
+          <button
+            disabled={currentIndex === 0}
+            onClick={() =>
+              goToQuestion(currentIndex - 1)
+            }
+          >
             Previous
           </button>
 
+          {!isReview && (
+            <button
+              className={`flag-btn ${
+                flaggedQuestions[
+                  String(currentQ.question_id)
+                ]
+                  ? "flagged"
+                  : ""
+              }`}
+              onClick={toggleFlagQuestion}
+            >
+              🚩
+
+              {
+                flaggedQuestions[
+                  String(currentQ.question_id)
+                ]
+                  ? "Unflag"
+                  : "Flag"
+              }
+            </button>
+          )}
+
           {currentIndex < flatQuestions.length - 1 ? (
-            <button onClick={() => goToQuestion(currentIndex + 1)}>Next</button>
+
+            <button
+              onClick={() =>
+                goToQuestion(currentIndex + 1)
+              }
+            >
+              Next
+            </button>
+
           ) : (
+
             !isReview && (
-              <button onClick={() => setShowConfirmFinish(true)}>
+              <button
+                onClick={() =>
+                  setShowConfirmFinish(true)
+                }
+              >
                 Finish Exam
               </button>
             )
+
           )}
+
         </div>
       </div>
 
