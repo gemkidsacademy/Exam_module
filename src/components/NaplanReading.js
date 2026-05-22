@@ -20,6 +20,7 @@ export default function NaplanReading({
   mode: parentMode // 🔥 ADD THIS
 }) {
   const studentId = sessionStorage.getItem("student_id");
+  const [activeExtract, setActiveExtract] = useState(0);
   const API_BASE = process.env.REACT_APP_API_URL;
   
   //const API_BASE = "http://127.0.0.1:8000";
@@ -516,20 +517,106 @@ startExam();
     const map = {};
 
     questions.forEach(q => {
+
+    // --------------------------------------------------
+    // TYPE 8: Extract Matching
+    // --------------------------------------------------
+
+    if (q.question_type === 8) {
+
+      const extractBlock = q.exam_bundle.question_blocks.find(
+        b => b.type === "extract_matching"
+      );
+
+      if (!extractBlock) {
+        return;
+      }
+
+      const sharedReadingBlock = {
+        type: "reading",
+        extracts: Object.entries(
+          extractBlock.extracts || {}
+        ).map(([key, value]) => ({
+          extract_id: key,
+          title: `Extract ${key}`,
+          content: value
+        }))
+      };
+
       if (!map[q.passage_id]) {
-        const readingBlock = q.exam_bundle.question_blocks.find(
-          b => b.type === "reading"
-        );
 
         map[q.passage_id] = {
           passage_id: q.passage_id,
-          reading_block: readingBlock,
+          reading_block: sharedReadingBlock,
           questions: []
         };
       }
 
-      map[q.passage_id].questions.push(q);
-    });
+      // ----------------------------------------
+      // Expand internal questions
+      // ----------------------------------------
+
+      extractBlock.questions.forEach(
+        (internalQ, idx) => {
+
+          map[q.passage_id].questions.push({
+
+            ...q,
+
+            // unique frontend id
+            question_id:
+              `${q.question_id}_${idx}`,
+
+            // internal question becomes normal MCQ
+            question_type: 1,
+
+            exam_bundle: {
+
+              question_type: 1,
+
+              question_blocks: [
+                {
+                  type: "text",
+                  content: internalQ.question
+                }
+              ],
+
+              options: {
+                A: "Extract A",
+                B: "Extract B",
+                C: "Extract C",
+                D: "Extract D"
+              },
+
+              correct_answer:
+                internalQ.correct[0]
+            }
+          });
+        }
+      );
+
+      return;
+    }
+
+    // --------------------------------------------------
+    // NORMAL QUESTION TYPES
+    // --------------------------------------------------
+
+    if (!map[q.passage_id]) {
+
+      const readingBlock = q.exam_bundle.question_blocks.find(
+        b => b.type === "reading"
+      );
+
+      map[q.passage_id] = {
+        passage_id: q.passage_id,
+        reading_block: readingBlock,
+        questions: []
+      };
+    }
+
+    map[q.passage_id].questions.push(q);
+  });
 
     setPassages(Object.values(map));
   }, [questions]);
@@ -845,6 +932,41 @@ useEffect(() => {
             ans || {}
           ).forEach(
             ([qid, obj]) => {
+
+              // ----------------------------------------
+              // TYPE 8 grouped answers
+              // ----------------------------------------
+
+              if (
+                Array.isArray(obj.answer)
+              ) {
+
+                obj.answer.forEach(
+                  (internalAnswer, idx) => {
+
+                    const internalId =
+                      `${qid}_${idx}`;
+
+                    cleanedAnswers[
+                      internalId
+                    ] = internalAnswer;
+
+                    correctnessMap[
+                      internalId
+                    ] =
+                      Array.isArray(obj.is_correct)
+                        ? obj.is_correct[idx]
+                        : false;
+                  }
+                );
+
+                return;
+              }
+
+              // ----------------------------------------
+              // Normal question types
+              // ----------------------------------------
+
               cleanedAnswers[qid] =
                 obj.answer;
 
@@ -978,19 +1100,70 @@ useEffect(() => {
 
         {/* LEFT: PASSAGE(S) */}
         {currentPassage?.reading_block && (
-          <div className="passage-pane">
-            {currentPassage.reading_block.extracts.map(ext => (
-              <div key={ext.extract_id} className="extract">
-                <h3>{ext.title}</h3>
-                <p>{ext.content}</p>
+          <div className="passage-pane extract-matching-pane">
 
-                {ext.images?.map(img => (
-                  <img key={img} src={img} alt="" />
-                ))}
-              </div>
-            ))}
+            {/* ---------------------------------- */}
+            {/* Extract Tabs */}
+            {/* ---------------------------------- */}
+
+            <div className="extract-tabs">
+
+              {currentPassage.reading_block.extracts.map(
+                (ext, idx) => (
+
+                  <button
+                    key={ext.extract_id}
+                    className={`extract-tab ${
+                      activeExtract === idx ? "active" : ""
+                    }`}
+                    onClick={() => setActiveExtract(idx)}
+                  >
+                    Extract {ext.extract_id}
+                  </button>
+                )
+              )}
+
+            </div>
+
+            {/* ---------------------------------- */}
+            {/* Active Extract */}
+            {/* ---------------------------------- */}
+
+            {currentPassage.reading_block.extracts[
+              activeExtract
+            ] && (() => {
+
+              const ext =
+                currentPassage.reading_block.extracts[
+                  activeExtract
+                ];
+
+              return (
+                <div className="extract-content">
+
+                  <h2>
+                    Extract {ext.extract_id}
+                  </h2>
+
+                  <p className="extract-text">
+                    {ext.content}
+                  </p>
+
+                  {ext.images?.map(img => (
+                    <img
+                      key={img}
+                      src={img}
+                      alt=""
+                      className="extract-image"
+                    />
+                  ))}
+
+                </div>
+              );
+            })()}
+
           </div>
-        )}
+          )}
 
         {/* RIGHT: SINGLE QUESTION */}
         <div

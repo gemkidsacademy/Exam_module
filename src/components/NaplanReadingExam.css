@@ -676,3 +676,37 @@
   font-size: 14px;
   line-height: 1.6;
 }
+.extract-matching-pane {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.extract-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.extract-tab {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.extract-tab.active {
+  background: #1d4ed8;
+}
+
+.extract-content h2 {
+  margin-bottom: 15px;
+}
+
+.extract-text {
+  line-height: 1.7;
+  white-space: pre-wrap;
+}

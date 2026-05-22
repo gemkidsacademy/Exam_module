@@ -59,18 +59,143 @@ export default function NaplanReadingReview({
       const data =
         await res.json();
 
-      const qs =
+      const rawQs =
         data.questions || [];
 
-      const ans =
+      const qs = [];
+
+      rawQs.forEach(q => {
+
+        // ----------------------------------------
+        // TYPE 8
+        // ----------------------------------------
+
+        if (q.question_type === 8) {
+
+          const extractBlock =
+            q.exam_bundle?.question_blocks?.find(
+              b => b.type === "extract_matching"
+            );
+
+          if (!extractBlock) {
+            return;
+          }
+
+          const sharedReadingBlock = {
+            type: "reading",
+            extracts: Object.entries(
+              extractBlock.extracts || {}
+            ).map(([key, value]) => ({
+              extract_id: key,
+              title: `Extract ${key}`,
+              content: value
+            }))
+          };
+
+          extractBlock.questions.forEach(
+            (internalQ, idx) => {
+
+              qs.push({
+
+                ...q,
+
+                question_id:
+                  `${q.question_id}_${idx}`,
+
+                question_type: 1,
+
+                exam_bundle: {
+
+                  question_type: 1,
+
+                  question_blocks: [
+                    sharedReadingBlock,
+                    {
+                      type: "text",
+                      content:
+                        internalQ.question
+                    }
+                  ],
+
+                  options: {
+                    A: "Extract A",
+                    B: "Extract B",
+                    C: "Extract C",
+                    D: "Extract D"
+                  },
+
+                  correct_answer:
+                    internalQ.correct[0]
+                }
+              });
+            }
+          );
+
+          return;
+        }
+
+        // ----------------------------------------
+        // NORMAL TYPES
+        // ----------------------------------------
+
+        qs.push(q);
+      });
+
+      const rawAnswers =
         data.student_answers || {};
 
+      const transformedAnswers = {};
+
+      Object.entries(
+        rawAnswers
+      ).forEach(
+        ([qid, obj]) => {
+
+          // ----------------------------------------
+          // TYPE 8 grouped answers
+          // ----------------------------------------
+
+          if (
+            Array.isArray(obj.answer)
+          ) {
+
+            obj.answer.forEach(
+              (internalAnswer, idx) => {
+
+                transformedAnswers[
+                  `${qid}_${idx}`
+                ] = {
+
+                  answer:
+                    internalAnswer,
+
+                  is_correct:
+                    Array.isArray(
+                      obj.is_correct
+                    )
+                      ? obj.is_correct[idx]
+                      : false
+                };
+              }
+            );
+
+            return;
+          }
+
+          // ----------------------------------------
+          // NORMAL TYPES
+          // ----------------------------------------
+
+          transformedAnswers[qid] = obj;
+        }
+      );
+
       setQuestions(qs);
-      setAnswers(ans);
+      setAnswers(transformedAnswers);
 
       onLoaded?.(
         qs,
-        ans
+        transformedAnswers
       );
 
     } catch (err) {
@@ -246,6 +371,61 @@ export default function NaplanReadingReview({
                 {normalize(correctAnswer)}
               </div>
             </div>
+            {/* ================= OPTION REVIEW ================= */}
+
+            {q.exam_bundle?.options && (
+
+              <div className="review-options">
+
+                {Object.entries(
+                  q.exam_bundle.options
+                ).map(([key, value]) => {
+
+                  const selected =
+                    normalize(studentAnswer) === key;
+
+                  const correct =
+                    normalize(correctAnswer) === key;
+                  console.log("---- REVIEW OPTION DEBUG ----");
+
+                  console.log({
+                    qid,
+                    optionKey: key,
+                    studentAnswer,
+                    normalizedStudent:
+                      normalize(studentAnswer),
+                    correctAnswer,
+                    normalizedCorrect:
+                      normalize(correctAnswer),
+                    selected:
+                      normalize(studentAnswer) === key,
+                    correct:
+                      normalize(correctAnswer) === key
+                  });
+                  return (
+
+
+                    <div
+                      key={key}
+                      className={`
+                        review-option
+                        ${correct ? "correct-option" : ""}
+                        ${
+                          selected && !correct
+                            ? "incorrect-option"
+                            : ""
+                        }
+                      `}
+                    >
+
+                      <strong>{key}.</strong> {value}
+
+                    </div>
+                  );
+                })}
+
+              </div>
+            )}
 
             {/* ================= AI BUTTON ================= */}
             {!explanations[qid] && (

@@ -198,3 +198,23 @@
   border-left: 6px solid #dc2626;
   background: #fef2f2;
 }
+.review-options {
+  margin-top: 15px;
+}
+
+.review-option {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+}
+
+.correct-option {
+  background: #d4edda;
+  border: 1px solid #28a745;
+}
+
+.incorrect-option {
+  background: #f8d7da;
+  border: 1px solid #dc3545;
+}
