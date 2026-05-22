@@ -12,6 +12,11 @@ export default function ReadingComponentOC({
   process.env.REACT_APP_API_URL || "http://localhost:3000";
   const isPopNavigationRef = useRef(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+  const [showQuestionNavigator, setShowQuestionNavigator] =
+    useState(false);
+
+  const [flaggedQuestions, setFlaggedQuestions] =
+    useState({});
   console.log("🔗 API_BASE:", API_BASE);
 
   if (!API_BASE) {
@@ -613,6 +618,21 @@ useEffect(() => {
   /* =============================
      ANSWER HANDLING
   ============================= */
+  const toggleFlagQuestion = () => {
+
+  const qid =
+    questions[index]?.question_id;
+
+  if (!qid) return;
+
+  setFlaggedQuestions(prev => ({
+
+    ...prev,
+
+    [qid]: !prev[qid]
+
+  }));
+};
   const handleSelect = (letter) => {
     const q = questions[index];
     setAnswers((prev) => ({
@@ -865,38 +885,217 @@ console.log("EXTRACTS:", currentQuestion?.reading_material?.extracts);
   return (
   <div className="exam-container">
     <div className="exam-header">
-      <div>Reading Comprehension Exam</div>
-      <div className="timer-box">Time Left: {formatTime(timeLeft)}</div>
-      <div className="counter">
-        Question {index + 1} / {questions.length}
+
+      <div className="timer">
+        ⏳ {formatTime(timeLeft)}
       </div>
+
+      <div className="question-counter-inline">
+
+        <span className="question-counter-text">
+          Question {index + 1} of {questions.length}
+        </span>
+
+        <button
+          className="question-grid-toggle"
+
+          onClick={() =>
+            setShowQuestionNavigator(prev => !prev)
+          }
+        >
+          ▦
+        </button>
+
+      </div>
+
+      <div className="reading-title">
+        Reading Comprehension Exam
+      </div>
+
     </div>
 
-    <div className="question-index-grouped">
-      {Object.entries(groupedQuestions).map(([sectionId, data]) => (
-        <div key={sectionId} className="topic-group">
-          <div className="topic-title">
-            {prettyTopic(data.topic)}
+    {
+      showQuestionNavigator && (
+
+        <div className="question-index-wrapper">
+
+          <div className="question-summary-row">
+
+            <div className="summary-item">
+
+              <span className="summary-count">
+                {
+                  questions.filter(q =>
+                    answers[q.question_id]
+                  ).length
+                }
+              </span>
+
+              <span className="summary-label">
+                Answered
+              </span>
+
+            </div>
+
+            <div className="summary-item">
+
+              <span className="summary-count">
+                {
+                  questions.length -
+
+                  questions.filter(q =>
+                    answers[q.question_id]
+                  ).length
+                }
+              </span>
+
+              <span className="summary-label">
+                Not answered
+              </span>
+
+            </div>
+
+            <div className="summary-item">
+
+              <span className="summary-count">
+                {
+                  questions.filter((_, i) =>
+                    !visited[i]
+                  ).length
+                }
+              </span>
+
+              <span className="summary-label">
+                Not read
+              </span>
+
+            </div>
+
+            <div className="summary-item">
+
+              <span className="summary-count">
+                {
+                  Object.values(
+                    flaggedQuestions
+                  )
+                    .filter(Boolean)
+                    .length
+                }
+              </span>
+
+              <span className="summary-label">
+                Flagged
+              </span>
+
+            </div>
+
           </div>
 
-          <div className="topic-circles">
-            {data.indexes.map((i) => (
+          {
+            Object.entries(
+              groupedQuestions
+            ).map(([sectionId, data]) => (
+
               <div
-                key={questions[i].question_id}
-                className={`index-circle
-                  ${visited[i] ? "visited" : ""}
-                  ${answers[questions[i].question_id] ? "answered" : ""}
-                  ${i === index ? "active" : ""}
-                `}
-                onClick={() => goTo(i)}
+                key={sectionId}
+                className="topic-group"
               >
-                {i + 1}
+
+                <div className="topic-title">
+                  {
+                    prettyTopic(
+                      data.topic
+                    )
+                  }
+                </div>
+
+                <div className="question-index-bar">
+
+                  {
+                    data.indexes.map((i) => {
+
+                      const q =
+                        questions[i];
+
+                      let cls =
+                        "question-index-item";
+
+                      if (
+                        answers[
+                          q.question_id
+                        ]
+                      ) {
+
+                        cls += " answered";
+
+                      } else if (
+                        visited[i]
+                      ) {
+
+                        cls += " visited";
+
+                      } else {
+
+                        cls += " unanswered";
+                      }
+
+                      if (
+                        i === index
+                      ) {
+
+                        cls += " current";
+                      }
+
+                      return (
+
+                        <button
+                          key={q.question_id}
+
+                          className={cls}
+
+                          onClick={() => {
+
+                            goTo(i);
+
+                            setShowQuestionNavigator(
+                              false
+                            );
+                          }}
+                        >
+
+                          <div className="question-index-content">
+
+                            <span>
+                              {i + 1}
+                            </span>
+
+                            {
+                              flaggedQuestions[
+                                q.question_id
+                              ] && (
+                                <span className="question-flag">
+                                  🚩
+                                </span>
+                              )
+                            }
+
+                          </div>
+
+                        </button>
+                      );
+                    })
+                  }
+
+                </div>
+
               </div>
-            ))}
-          </div>
+            ))
+          }
+
         </div>
-      ))}
-    </div>
+
+      )
+    }
 
     <div className="exam-body">
       <div
@@ -1208,24 +1407,73 @@ console.log("EXTRACTS:", currentQuestion?.reading_material?.extracts);
         )}
 
         <div className="nav-buttons">
-          <button disabled={index === 0} onClick={() => goTo(index - 1)}>
+
+          <button
+            disabled={index === 0}
+
+            onClick={() =>
+              goTo(index - 1)
+            }
+          >
             Previous
           </button>
 
-          {index < questions.length - 1 ? (
-            <button onClick={() => goTo(index + 1)}>Next</button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                console.log("Finish clicked");
-                setShowSubmitConfirm(true);
-              }}
-            >
-              Finish
-            </button>
+          <button
+            className={`flag-btn ${
+              flaggedQuestions[
+                questions[index]
+                  ?.question_id
+              ]
+                ? "flagged"
+                : ""
+            }`}
 
-          )}
+            onClick={
+              toggleFlagQuestion
+            }
+          >
+            🚩
+
+            {
+              flaggedQuestions[
+                questions[index]
+                  ?.question_id
+              ]
+                ? "Unflag"
+                : "Flag"
+            }
+
+          </button>
+
+          {
+            index <
+            questions.length - 1 ? (
+
+              <button
+                onClick={() =>
+                  goTo(index + 1)
+                }
+              >
+                Next
+              </button>
+
+            ) : (
+
+              <button
+                type="button"
+
+                onClick={() => {
+                  setShowSubmitConfirm(
+                    true
+                  );
+                }}
+              >
+                Finish
+              </button>
+
+            )
+          }
+
         </div>
   
       </div>

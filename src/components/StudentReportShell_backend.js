@@ -9,7 +9,9 @@
          
   import "./Reports.css";
   
-  export default function StudentReportShell_backend() {
+  export default function StudentReportShell_backend({
+  centerCode
+}) {
     const [reportType, setReportType] = useState("class");
     const [topic, setTopic] = useState("");
     const [availableExamDates, setAvailableExamDates] = useState([]);
@@ -573,26 +575,43 @@
     }, [studentId, exam, reportType]);
   
     useEffect(() => {
-        fetch(`${API_BASE}/api/admin/students`)
-          .then(res => {
-            if (!res.ok) {
-              throw new Error("Failed to fetch students");
-            }
-            return res.json();
-          })
-          .then(data => {
-            const normalized = data.map(s => ({
-              id: s.student_id,
-              label: `${s.student_id} – ${s.name}`   // ✅ ID is now displayed
-            }));
-            setStudents(normalized);
-          })
-          .catch(err => {
-            console.error("Error loading students:", err);
-            setStudents([]);
-          });
-      }, []);
-  
+
+      fetch(
+        `${API_BASE}/api/admin/students_center_specific?center_code=${centerCode}`
+      )
+        .then(res => {
+
+          if (!res.ok) {
+            throw new Error("Failed to fetch students");
+          }
+
+          return res.json();
+        })
+
+        .then(data => {
+
+          const normalized = data.map(s => ({
+
+            id: s.student_id,
+
+            label: `${s.student_id} – ${s.name}`
+
+          }));
+
+          setStudents(normalized);
+        })
+
+        .catch(err => {
+
+          console.error(
+            "Error loading students:",
+            err
+          );
+
+          setStudents([]);
+        });
+
+    }, [centerCode]);
   
   
     

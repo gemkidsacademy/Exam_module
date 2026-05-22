@@ -25,6 +25,11 @@ mode: parentMode // 🔥 THIS
   
   const [examDates, setExamDates] = useState([]);
   const [selectedExamId, setSelectedExamId] = useState(null);
+  const [showQuestionNavigator, setShowQuestionNavigator] =
+    useState(false);
+
+  const [flaggedQuestions, setFlaggedQuestions] =
+    useState({});
   const TYPE_2_MAX_SELECTIONS = 2;
 
   if (!API_BASE) {
@@ -542,6 +547,18 @@ try {
   setLoadingExplanation(null);
 }
 };
+const toggleFlagQuestion = () => {
+
+  const qid = String(currentQ.id);
+
+  setFlaggedQuestions(prev => ({
+
+    ...prev,
+
+    [qid]: !prev[qid]
+
+  }));
+};
   /* ============================================================
     ANSWERS
   ============================================================ */
@@ -689,92 +706,260 @@ return (
     
       <div className={`exam-container ${styles.examContainer}`}>
         {/* HEADER */}
-        <div className={styles.examHeader}>
-          {!isReview && <div className="timer">⏳ {formatTime(timeLeft)}</div>}
-          <div className="counter">
-            Question {currentIndex + 1} / {questions.length}
+        <div className="exam-header">
+
+          {!isReview && (
+            <div className="timer">
+              ⏳ {formatTime(timeLeft)}
+            </div>
+          )}
+
+          <div className="question-counter-inline">
+
+            <span className="question-counter-text">
+              Question {currentIndex + 1} of {questions.length}
+            </span>
+
+            <button
+              className="question-grid-toggle"
+              onClick={() =>
+                setShowQuestionNavigator(prev => !prev)
+              }
+            >
+              ▦
+            </button>
+
           </div>
+
         </div>
 
         {/* QUESTION INDEX */}
-        <div className={styles.indexRow}>
-          {questions.map((q, i) => {
-            let cls = styles.indexCircle;
-            const qid = String(q.id);
+        {
+          showQuestionNavigator && (
 
-            const studentAnswer = answers[qid];
+            <div className="question-index-wrapper">
 
-            const correctAnswer = normalizeCorrectAnswer(
-              q.correct_answer,
-              q.question_type
-            );
+              <div className="question-summary-row">
 
-            const normalizedStudentAnswer = normalizeStudentAnswer(
-              studentAnswer,
-              q.question_type
-            );
+                <div className="summary-item">
 
-            let isCorrect = false;
+                  <span className="summary-count">
+                    {
+                      questions.filter(q =>
+                        answers[String(q.id)] !== undefined
+                      ).length
+                    }
+                  </span>
 
-            if (isReview) {
-              if (q.question_type === 2) {
-                if (
-                  Array.isArray(normalizedStudentAnswer) &&
-                  Array.isArray(correctAnswer)
-                ) {
-                  isCorrect =
-                    normalizedStudentAnswer.length === correctAnswer.length &&
-                    normalizedStudentAnswer.every((v) =>
-                      correctAnswer.includes(v)
-                    );
-                }
-              }
-              
-              // ✅ ADD THIS BLOCK
-              else if (q.question_type === 3) {
-                console.log("TYPE 3 CHECK");
-                  console.log("Student:", studentAnswer);
-                  console.log("Correct:", q.correct_answer);
-                  console.log("Equal?:", areNumbersEqual(studentAnswer, q.correct_answer));
+                  <span className="summary-label">
+                    Answered
+                  </span>
 
-                isCorrect = areNumbersEqual(studentAnswer, q.correct_answer);
-              }
-              
-              // Default for Type 1, 4, 6
-              else {
-                isCorrect = normalizedStudentAnswer === correctAnswer;
-              }
+                </div>
 
-              if (isCorrect) {
-                cls += ` ${styles.indexCorrect}`;
-              } else {
-                cls += ` ${styles.indexWrong}`;
-              }
-            } else {
-              if (
-                studentAnswer !== undefined &&
-                (typeof studentAnswer !== "object" ||
-                  studentAnswer.length > 0)
-              ) {
-                cls += ` ${styles.indexAnswered}`;
-              } else if (visited[qid]) {
-                cls += ` ${styles.indexVisited}`;
-              } else {
-                cls += ` ${styles.indexNotVisited}`;
-              }
-            }
+                <div className="summary-item">
 
-            return (
-              <div
-                key={q.id}
-                className={cls}
-                onClick={() => goToQuestion(i)}
-              >
-                {i + 1}
+                  <span className="summary-count">
+                    {
+                      questions.length -
+
+                      questions.filter(q =>
+                        answers[String(q.id)] !== undefined
+                      ).length
+                    }
+                  </span>
+
+                  <span className="summary-label">
+                    Not answered
+                  </span>
+
+                </div>
+
+                <div className="summary-item">
+
+                  <span className="summary-count">
+                    {
+                      questions.filter(q =>
+                        !visited[String(q.id)]
+                      ).length
+                    }
+                  </span>
+
+                  <span className="summary-label">
+                    Not read
+                  </span>
+
+                </div>
+
+                <div className="summary-item">
+
+                  <span className="summary-count">
+                    {
+                      Object.values(
+                        flaggedQuestions
+                      )
+                        .filter(Boolean)
+                        .length
+                    }
+                  </span>
+
+                  <span className="summary-label">
+                    Flagged
+                  </span>
+
+                </div>
+
               </div>
-            );
-          })}
-        </div>
+
+              <div className="question-index-bar">
+
+                {
+                  questions.map((q, i) => {
+
+                    let cls =
+                      "question-index-item";
+
+                    const qid =
+                      String(q.id);
+
+                    const studentAnswer =
+                      answers[qid];
+
+                    const correctAnswer =
+                      normalizeCorrectAnswer(
+                        q.correct_answer,
+                        q.question_type
+                      );
+
+                    const normalizedStudentAnswer =
+                      normalizeStudentAnswer(
+                        studentAnswer,
+                        q.question_type
+                      );
+
+                    let isCorrect = false;
+
+                    if (isReview) {
+
+                      if (
+                        q.question_type === 2
+                      ) {
+
+                        if (
+                          Array.isArray(
+                            normalizedStudentAnswer
+                          ) &&
+                          Array.isArray(
+                            correctAnswer
+                          )
+                        ) {
+
+                          isCorrect =
+                            normalizedStudentAnswer.length ===
+                            correctAnswer.length &&
+
+                            normalizedStudentAnswer.every(
+                              (v) =>
+                                correctAnswer.includes(v)
+                            );
+                        }
+
+                      } else if (
+                        q.question_type === 3
+                      ) {
+
+                        isCorrect =
+                          areNumbersEqual(
+                            studentAnswer,
+                            q.correct_answer
+                          );
+
+                      } else {
+
+                        isCorrect =
+                          normalizedStudentAnswer ===
+                          correctAnswer;
+                      }
+
+                      cls += isCorrect
+                        ? " correct"
+                        : " incorrect";
+
+                    } else {
+
+                      if (
+                        studentAnswer !== undefined &&
+                        (
+                          typeof studentAnswer !== "object" ||
+                          studentAnswer.length > 0
+                        )
+                      ) {
+
+                        cls += " answered";
+
+                      } else if (
+                        visited[qid]
+                      ) {
+
+                        cls += " visited";
+
+                      } else {
+
+                        cls += " unanswered";
+                      }
+                    }
+
+                    if (
+                      i === currentIndex
+                    ) {
+
+                      cls += " current";
+                    }
+
+                    return (
+
+                      <button
+                        key={q.id}
+
+                        className={cls}
+
+                        onClick={() => {
+
+                          goToQuestion(i);
+
+                          setShowQuestionNavigator(
+                            false
+                          );
+                        }}
+                      >
+
+                        <div className="question-index-content">
+
+                          <span>
+                            {i + 1}
+                          </span>
+
+                          {
+                            flaggedQuestions[qid] && (
+                              <span className="question-flag">
+                                🚩
+                              </span>
+                            )
+                          }
+
+                        </div>
+
+                      </button>
+                    );
+                  })
+                }
+
+              </div>
+
+            </div>
+
+          )
+        }
 
         {/* QUESTION CARD */}
         <div className="question-card">
@@ -1334,34 +1519,92 @@ return (
       </div> {/* closes question-content-centered */}
       </div> {/* closes question-card */}
       
-      <div className="exam-navigation">
-      
+      <div className="nav-buttons">
+
         <button
           className="nav-btn prev"
-          disabled={currentIndex === 0}
-          onClick={() => goToQuestion(currentIndex - 1)}
+
+          disabled={
+            currentIndex === 0
+          }
+
+          onClick={() =>
+            goToQuestion(
+              currentIndex - 1
+            )
+          }
         >
           Previous
         </button>
-      
-        {currentIndex < questions.length - 1 && (
-          <button
-            className="nav-btn next"
-            onClick={() => goToQuestion(currentIndex + 1)}
-          >
-            Next
-          </button>
-        )}
-      
-        {currentIndex === questions.length - 1 && !isReview && (
-          <button
-            className="nav-btn finish"
-            onClick={() => setShowConfirmFinish(true)}
-          >
-            Finish Exam
-          </button>
-        )}
-      
+
+        {
+          !isReview && (
+
+            <button
+              className={`flag-btn ${
+                flaggedQuestions[
+                  String(currentQ.id)
+                ]
+                  ? "flagged"
+                  : ""
+              }`}
+
+              onClick={
+                toggleFlagQuestion
+              }
+            >
+              🚩
+
+              {
+                flaggedQuestions[
+                  String(currentQ.id)
+                ]
+                  ? "Unflag"
+                  : "Flag"
+              }
+
+            </button>
+
+          )
+        }
+
+        {
+          currentIndex <
+          questions.length - 1 ? (
+
+            <button
+              className="nav-btn next"
+
+              onClick={() =>
+                goToQuestion(
+                  currentIndex + 1
+                )
+              }
+            >
+              Next
+            </button>
+
+          ) : (
+
+            !isReview && (
+
+              <button
+                className="nav-btn finish"
+
+                onClick={() =>
+                  setShowConfirmFinish(
+                    true
+                  )
+                }
+              >
+                Finish Exam
+              </button>
+
+            )
+
+          )
+        }
+
       </div>
 
       {showConfirmFinish && (

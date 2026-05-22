@@ -191,6 +191,11 @@ const normalizeOptionContent = (content) => {
 // ---------------- EXAM STATE ----------------
 const [questions, setQuestions] = useState([]);
 const [showConfirmFinish, setShowConfirmFinish] = useState(false);
+const [showQuestionNavigator, setShowQuestionNavigator] =
+  useState(false);
+
+const [flaggedQuestions, setFlaggedQuestions] =
+  useState({});
 
 
 const [reviewQuestions, setReviewQuestions] = useState([]);
@@ -525,6 +530,21 @@ const handleGenerateExplanation = async () => {
 
   setLoadingExplanation(false);
 };
+const toggleFlagQuestion = () => {
+
+  const qid =
+    activeQuestions[currentIndex]?.q_id;
+
+  if (!qid) return;
+
+  setFlaggedQuestions(prev => ({
+
+    ...prev,
+
+    [qid]: !prev[qid]
+
+  }));
+};
 const handleAnswer = (optionKey) => {
   if (mode === "review") return;
   const qid = activeQuestions[currentIndex]?.q_id;
@@ -623,86 +643,272 @@ return (
   
     {/* HEADER */}
     <div className="exam-header">
-  
-    {mode === "exam" && (
-      <div className="timer">⏳ {formatTime(timeLeft)}</div>
-    )}
-  
-    <div className="counter">
-      Question {currentIndex + 1} / {activeQuestions.length}
-    </div>
-  
-    {mode === "review" && (
-      <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-        
-        {/* 🔽 DATE DROPDOWN */}
-        <select
-          value={selectedExamId || ""}
-          onChange={handleDateChange}
-          style={{
-            padding: "6px 10px",
-            borderRadius: "6px",
-            border: "1px solid #d1d5db"
-          }}
-        >
-          {examDates.map((d) => (
-            <option key={d.exam_id} value={d.exam_id}>
-              {new Date(d.date).toLocaleDateString()}
-            </option>
-          ))}
-        </select>
-  
-        {/* 🔙 EXIT BUTTON */}
-        <button
-          className="exit-review-btn"
-          onClick={handleExitReview}
-        >
-          Exit Review
-        </button>
-           
-  
-      </div>
-    )}
-  </div>
-    {/* QUESTION INDEX */}
-    <div className="index-row">
-  {activeQuestions.map((q, i) => {
-    let cls = "index-circle";
 
-    if (isReview) {
-        const student = q.student_answer?.trim().toUpperCase();
-        const correct = q.correct_answer?.trim().toUpperCase();
-      
-        if (!student) {
-          cls += " index-not-visited";   // skipped → grey
-        } else if (student === correct) {
-          cls += " index-answered";      // correct → green
-        } else {
-          cls += " index-wrong";         // incorrect → red
-        }
-      } else {
-      // 🔵 exam mode (unchanged behavior)
-      if (answers[q.q_id]) {
-        cls += " index-answered";
-      } else if (visited[q.q_id]) {
-        cls += " index-visited";
-      } else {
-        cls += " index-not-visited";
+      {
+        mode === "exam" && (
+          <div className="timer">
+            ⏳ {formatTime(timeLeft)}
+          </div>
+        )
       }
-    }
-    
 
-    return (
-      <div
-        key={q.q_id}
-        className={cls}
-        onClick={() => goToQuestion(i)}
-      >
-        {i + 1}
+      <div className="question-counter-inline">
+
+        <span className="question-counter-text">
+          Question {currentIndex + 1} of {activeQuestions.length}
+        </span>
+
+        <button
+          className="question-grid-toggle"
+
+          onClick={() =>
+            setShowQuestionNavigator(prev => !prev)
+          }
+        >
+          ▦
+        </button>
+
       </div>
-    );
-  })}
-</div>
+
+      {
+        mode === "review" && (
+
+          <div
+            style={{
+              display: "flex",
+              gap: "12px",
+              alignItems: "center"
+            }}
+          >
+
+            <select
+              value={selectedExamId || ""}
+
+              onChange={handleDateChange}
+
+              style={{
+                padding: "6px 10px",
+                borderRadius: "6px",
+                border: "1px solid #d1d5db"
+              }}
+            >
+              {
+                examDates.map((d) => (
+                  <option
+                    key={d.exam_id}
+                    value={d.exam_id}
+                  >
+                    {
+                      new Date(
+                        d.date
+                      ).toLocaleDateString()
+                    }
+                  </option>
+                ))
+              }
+            </select>
+
+            <button
+              className="exit-review-btn"
+
+              onClick={
+                handleExitReview
+              }
+            >
+              Exit Review
+            </button>
+
+          </div>
+        )
+      }
+
+    </div>
+    {/* QUESTION INDEX */}
+    {
+      showQuestionNavigator && (
+
+        <div className="question-index-wrapper">
+
+          <div className="question-summary-row">
+
+            <div className="summary-item">
+
+              <span className="summary-count">
+                {
+                  activeQuestions.filter(q =>
+                    answers[q.q_id]
+                  ).length
+                }
+              </span>
+
+              <span className="summary-label">
+                Answered
+              </span>
+
+            </div>
+
+            <div className="summary-item">
+
+              <span className="summary-count">
+                {
+                  activeQuestions.length -
+
+                  activeQuestions.filter(q =>
+                    answers[q.q_id]
+                  ).length
+                }
+              </span>
+
+              <span className="summary-label">
+                Not answered
+              </span>
+
+            </div>
+
+            <div className="summary-item">
+
+              <span className="summary-count">
+                {
+                  activeQuestions.filter(q =>
+                    !visited[q.q_id]
+                  ).length
+                }
+              </span>
+
+              <span className="summary-label">
+                Not read
+              </span>
+
+            </div>
+
+            <div className="summary-item">
+
+              <span className="summary-count">
+                {
+                  Object.values(
+                    flaggedQuestions
+                  )
+                    .filter(Boolean)
+                    .length
+                }
+              </span>
+
+              <span className="summary-label">
+                Flagged
+              </span>
+
+            </div>
+
+          </div>
+
+          <div className="question-index-bar">
+
+            {
+              activeQuestions.map((q, i) => {
+
+                let cls =
+                  "question-index-item";
+
+                if (isReview) {
+
+                  const student =
+                    q.student_answer
+                      ?.trim()
+                      .toUpperCase();
+
+                  const correct =
+                    q.correct_answer
+                      ?.trim()
+                      .toUpperCase();
+
+                  if (!student) {
+
+                    cls += " unanswered";
+
+                  } else if (
+                    student === correct
+                  ) {
+
+                    cls += " correct";
+
+                  } else {
+
+                    cls += " incorrect";
+                  }
+
+                } else {
+
+                  if (
+                    answers[q.q_id]
+                  ) {
+
+                    cls += " answered";
+
+                  } else if (
+                    visited[q.q_id]
+                  ) {
+
+                    cls += " visited";
+
+                  } else {
+
+                    cls += " unanswered";
+                  }
+                }
+
+                if (
+                  i === currentIndex
+                ) {
+
+                  cls += " current";
+                }
+
+                return (
+
+                  <button
+                    key={q.q_id}
+
+                    className={cls}
+
+                    onClick={() => {
+
+                      goToQuestion(i);
+
+                      setShowQuestionNavigator(
+                        false
+                      );
+                    }}
+                  >
+
+                    <div className="question-index-content">
+
+                      <span>
+                        {i + 1}
+                      </span>
+
+                      {
+                        flaggedQuestions[
+                          q.q_id
+                        ] && (
+                          <span className="question-flag">
+                            🚩
+                          </span>
+                        )
+                      }
+
+                    </div>
+
+                  </button>
+                );
+              })
+            }
+
+          </div>
+
+        </div>
+
+      )
+    }
 
     {/* QUESTION CARD */}
 <div className="question-card">
@@ -830,33 +1036,96 @@ return (
 
     {/* NAVIGATION */}
     <div className="nav-buttons">
+
       <button
         className="nav-btn prev"
-        onClick={() => goToQuestion(currentIndex - 1)}
-        disabled={currentIndex === 0}
+
+        onClick={() =>
+          goToQuestion(
+            currentIndex - 1
+          )
+        }
+
+        disabled={
+          currentIndex === 0
+        }
       >
         Previous
       </button>
 
-      {currentIndex < activeQuestions.length - 1 && (
-        <button
-          className="nav-btn next"
-          onClick={() => goToQuestion(currentIndex + 1)}
-        >
-          Next
-        </button>
-      )}
+      {
+        mode !== "review" && (
 
-      {mode !== "review" &&
-        currentIndex === activeQuestions.length - 1 && (
           <button
-           className="nav-btn finish"
-           onClick={() => setShowConfirmFinish(true)}
-         >
-           Finish Exam
-         </button>
+            className={`flag-btn ${
+              flaggedQuestions[
+                activeQuestions[
+                  currentIndex
+                ]?.q_id
+              ]
+                ? "flagged"
+                : ""
+            }`}
 
-        )}
+            onClick={
+              toggleFlagQuestion
+            }
+          >
+            🚩
+
+            {
+              flaggedQuestions[
+                activeQuestions[
+                  currentIndex
+                ]?.q_id
+              ]
+                ? "Unflag"
+                : "Flag"
+            }
+
+          </button>
+
+        )
+      }
+
+      {
+        currentIndex <
+        activeQuestions.length - 1 && (
+
+          <button
+            className="nav-btn next"
+
+            onClick={() =>
+              goToQuestion(
+                currentIndex + 1
+              )
+            }
+          >
+            Next
+          </button>
+        )
+      }
+
+      {
+        mode !== "review" &&
+
+        currentIndex ===
+        activeQuestions.length - 1 && (
+
+          <button
+            className="nav-btn finish"
+
+            onClick={() =>
+              setShowConfirmFinish(
+                true
+              )
+            }
+          >
+            Finish Exam
+          </button>
+        )
+      }
+
     </div>
   </div> 
   {showConfirmFinish && (

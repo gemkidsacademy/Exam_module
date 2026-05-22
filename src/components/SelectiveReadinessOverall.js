@@ -14,10 +14,13 @@ import { useReactToPrint } from "react-to-print";
 
 import "./SelectiveReadinessOverall.css";
 
-const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+//const BACKEND_URL = "https://web-production-481a5.up.railway.app";
+const BACKEND_URL = process.env.REACT_APP_API_URL;
 //const BACKEND_URL = "http://localhost:8000";
 
-export default function SelectiveReadinessOverall() {
+export default function SelectiveReadinessOverall({
+  centerCode
+}) {
   const [error, setError] = useState(null);
 
   const [students, setStudents] = useState([]);
@@ -144,10 +147,21 @@ const MAX_SCORES = {
      Load students
   ============================ */
   useEffect(() => {
-    fetch(`${BACKEND_URL}/api/admin/students`)
+
+    fetch(
+      `${BACKEND_URL}/api/admin/students_center_specific?center_code=${centerCode}`
+    )
       .then(res => res.json())
-      .then(data => setStudents(Array.isArray(data) ? data : []));
-  }, []);
+
+      .then(data =>
+        setStudents(
+          Array.isArray(data)
+            ? data
+            : []
+        )
+      );
+
+  }, [centerCode]);
 
   /* ============================
      Load available exam dates

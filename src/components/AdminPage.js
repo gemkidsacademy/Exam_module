@@ -927,19 +927,28 @@ const tabs = allTabs.filter((tab) => {
                 {/* ===== STUDENT EXAM REPORTS ===== */}
                 {activeTab === "student-exam-reports" && (
                   <div className="tab-panel">
-                    <StudentExamReports />
+                    <StudentExamReports
+                      centerCode={centerCode}
+                    />
                   </div>
                 )}
                 {/* ===== SELECTIVE READINESS (OVERALL) ===== */}
                 {activeTab === "selective-readiness-overall" && (
                   <div className="tab-panel">
-                    <SelectiveReadinessOverall />
+                    <SelectiveReadinessOverall
+                      centerCode={centerCode}
+                    
+                    />
                   </div>
                 )}
                 
                 {activeTab === "topic-report-limited-2" && (
                   <div className="tab-panel">
-                    <StudentReportShell_backend />
+
+                    <StudentReportShell_backend
+                      centerCode={centerCode}
+                    />
+
                   </div>
                 )}
   

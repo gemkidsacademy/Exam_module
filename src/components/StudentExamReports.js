@@ -44,7 +44,11 @@ const SECTION_GRADE_MAP = {
    COMPONENT
 ============================ */
 
-export default function StudentExamReports() {
+export default function StudentExamReports({
+  centerCode
+}) {
+
+  console.log(centerCode);
   const [students, setStudents] = useState([]);
   const [selectedStudentId, setSelectedStudentId] = useState("");
   const [studentDetails, setStudentDetails] = useState(null);
@@ -76,10 +80,20 @@ export default function StudentExamReports() {
   ============================ */
 
   useEffect(() => {
-    fetch(`${BACKEND_URL}/api/admin/students`)
+
+    fetch(
+      `${BACKEND_URL}/api/admin/students_center_specific?center_code=${centerCode}`
+    )
       .then(res => res.json())
-      .then(data => setStudents(Array.isArray(data) ? data : []));
-  }, []);
+      .then(data =>
+        setStudents(
+          Array.isArray(data)
+            ? data
+            : []
+        )
+      );
+
+  }, [centerCode]);
 
   useEffect(() => {
     if (!selectedStudentId) return;

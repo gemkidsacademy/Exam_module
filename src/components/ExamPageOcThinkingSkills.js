@@ -206,6 +206,12 @@ const [answers, setAnswers] = useState({});
 const [visited, setVisited] = useState({});
 const [timeLeft, setTimeLeft] = useState(null);
 const [showConfirmFinish, setShowConfirmFinish] = useState(false);
+const [showQuestionNavigator, setShowQuestionNavigator] =
+  useState(false);
+
+const [flaggedQuestions, setFlaggedQuestions] =
+  useState({});
+
 
 
 // ---------------- REPORT ----------------
@@ -512,7 +518,21 @@ useEffect(() => {
 
   return () => clearInterval(interval);
 }, [timeLeft, mode, showConfirmFinish, finishExam]);
+const toggleFlagQuestion = () => {
 
+  const qid =
+    activeQuestions[currentIndex]?.q_id;
+
+  if (!qid) return;
+
+  setFlaggedQuestions(prev => ({
+
+    ...prev,
+
+    [qid]: !prev[qid]
+
+  }));
+};
 /* ============================================================
    ANSWER HANDLING
 ============================================================ */
@@ -646,56 +666,248 @@ return (
 )}
 
     {/* HEADER */}
-    <div className={styles.examHeader}>
+    <div className="exam-header">
+
       {!isReview && (
-        <div className="timer">⏳ {formatTime(timeLeft)}</div>
+        <div className="timer">
+          ⏳ {formatTime(timeLeft)}
+        </div>
       )}
 
-      <div className="counter">
-        Question {activeQuestions.length ? currentIndex + 1 : 0} / {activeQuestions.length}
+      <div className="question-counter-inline">
+
+        <span className="question-counter-text">
+          Question {
+            activeQuestions.length
+              ? currentIndex + 1
+              : 0
+          } of {activeQuestions.length}
+        </span>
+
+        <button
+          className="question-grid-toggle"
+
+          onClick={() =>
+            setShowQuestionNavigator(prev => !prev)
+          }
+        >
+          ▦
+        </button>
+
       </div>
+
+      {
+        isReview && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end"
+            }}
+          >
+            <button
+              className="nav-btn finish"
+
+              onClick={() => {
+                setMode("report");
+                setExplanation(null);
+              }}
+            >
+              Exit Review
+            </button>
+          </div>
+        )
+      }
+
     </div>
 
     {/* QUESTION INDEX */}
-    <div className={styles.indexRow}>
-      {activeQuestions.map((q, i) => {
-        let cls = styles.indexCircle;
+    {
+      showQuestionNavigator && (
 
-        if (isReview) {
-          if (!q.student_answer) {
-            cls += ` ${styles.indexSkipped}`;
-          } else if (q.student_answer === q.correct_answer) {
-            cls += ` ${styles.indexCorrect}`;
-          } else {
-            cls += ` ${styles.indexIncorrect}`;
-          }
-        } else {
-          const qid = String(q.q_id);
+        <div className="question-index-wrapper">
 
-          if (answers[qid]) {
-            cls += ` ${styles.indexAnswered}`;
-          } else if (visited[qid]) {
-            cls += ` ${styles.indexVisited}`;
-          } else {
-            cls += ` ${styles.indexNotVisited}`;
-          }
+          <div className="question-summary-row">
 
-        }
-        // 🔍 DEBUG LOG (temporary)
-        const qid = String(q.q_id);
-        
+            <div className="summary-item">
 
-        return (
-          <div
-            key={q.q_id}
-            className={cls}
-            onClick={() => goToQuestion(i)}
-          >
-            {i + 1}
+              <span className="summary-count">
+                {
+                  activeQuestions.filter(q =>
+                    answers[
+                      String(q.q_id)
+                    ]
+                  ).length
+                }
+              </span>
+
+              <span className="summary-label">
+                Answered
+              </span>
+
+            </div>
+
+            <div className="summary-item">
+
+              <span className="summary-count">
+                {
+                  activeQuestions.length -
+
+                  activeQuestions.filter(q =>
+                    answers[
+                      String(q.q_id)
+                    ]
+                  ).length
+                }
+              </span>
+
+              <span className="summary-label">
+                Not answered
+              </span>
+
+            </div>
+
+            <div className="summary-item">
+
+              <span className="summary-count">
+                {
+                  activeQuestions.filter(q =>
+                    !visited[
+                      String(q.q_id)
+                    ]
+                  ).length
+                }
+              </span>
+
+              <span className="summary-label">
+                Not read
+              </span>
+
+            </div>
+
+            <div className="summary-item">
+
+              <span className="summary-count">
+                {
+                  Object.values(
+                    flaggedQuestions
+                  )
+                    .filter(Boolean)
+                    .length
+                }
+              </span>
+
+              <span className="summary-label">
+                Flagged
+              </span>
+
+            </div>
+
           </div>
-        );
-      })}
-    </div>
+
+          <div className="question-index-bar">
+
+            {
+              activeQuestions.map((q, i) => {
+
+                let cls =
+                  "question-index-item";
+
+                if (isReview) {
+
+                  if (
+                    !q.student_answer
+                  ) {
+
+                    cls += " unanswered";
+
+                  } else if (
+                    q.student_answer ===
+                    q.correct_answer
+                  ) {
+
+                    cls += " correct";
+
+                  } else {
+
+                    cls += " incorrect";
+                  }
+
+                } else {
+
+                  const qid =
+                    String(q.q_id);
+
+                  if (
+                    answers[qid]
+                  ) {
+
+                    cls += " answered";
+
+                  } else if (
+                    visited[qid]
+                  ) {
+
+                    cls += " visited";
+
+                  } else {
+
+                    cls += " unanswered";
+                  }
+                }
+
+                if (
+                  i === currentIndex
+                ) {
+
+                  cls += " current";
+                }
+
+                return (
+
+                  <button
+                    key={q.q_id}
+
+                    className={cls}
+
+                    onClick={() => {
+
+                      goToQuestion(i);
+
+                      setShowQuestionNavigator(
+                        false
+                      );
+                    }}
+                  >
+
+                    <div className="question-index-content">
+
+                      <span>
+                        {i + 1}
+                      </span>
+
+                      {
+                        flaggedQuestions[
+                          String(q.q_id)
+                        ] && (
+                          <span className="question-flag">
+                            🚩
+                          </span>
+                        )
+                      }
+
+                    </div>
+
+                  </button>
+                );
+              })
+            }
+
+          </div>
+
+        </div>
+
+      )
+    }
 
 
     {/* QUESTION CARD */}
@@ -856,43 +1068,111 @@ return (
     {/* NAVIGATION */}
     <div className="nav-buttons">
 
-      {isReview && (
-        <button
-          className="nav-btn finish"
-          onClick={() => {
-            setMode("report");
-            setExplanation(null);
-          }}
-        >
-          Exit Review
-        </button>
-      )}
+      {
+        isReview && (
+
+          <button
+            className="nav-btn finish"
+
+            onClick={() => {
+              setMode("report");
+              setExplanation(null);
+            }}
+          >
+            Exit Review
+          </button>
+
+        )
+      }
 
       <button
         className="nav-btn prev"
-        onClick={() => goToQuestion(currentIndex - 1)}
-        disabled={currentIndex === 0}
+
+        onClick={() =>
+          goToQuestion(
+            currentIndex - 1
+          )
+        }
+
+        disabled={
+          currentIndex === 0
+        }
       >
         Previous
       </button>
 
-      {currentIndex < activeQuestions.length - 1 && (
-        <button
-          className="nav-btn next"
-          onClick={() => goToQuestion(currentIndex + 1)}
-        >
-          Next
-        </button>
-      )}
+      {
+        !isReview && (
 
-      {currentIndex === activeQuestions.length - 1 && !isReview && (
-        <button
-          className="nav-btn finish"
-          onClick={() => setShowConfirmFinish(true)}
-        >
-          Finish Exam
-        </button>
-      )}
+          <button
+            className={`flag-btn ${
+              flaggedQuestions[
+                activeQuestions[
+                  currentIndex
+                ]?.q_id
+              ]
+                ? "flagged"
+                : ""
+            }`}
+
+            onClick={
+              toggleFlagQuestion
+            }
+          >
+            🚩
+
+            {
+              flaggedQuestions[
+                activeQuestions[
+                  currentIndex
+                ]?.q_id
+              ]
+                ? "Unflag"
+                : "Flag"
+            }
+
+          </button>
+
+        )
+      }
+
+      {
+        currentIndex <
+        activeQuestions.length - 1 && (
+
+          <button
+            className="nav-btn next"
+
+            onClick={() =>
+              goToQuestion(
+                currentIndex + 1
+              )
+            }
+          >
+            Next
+          </button>
+        )
+      }
+
+      {
+        currentIndex ===
+        activeQuestions.length - 1 &&
+
+        !isReview && (
+
+          <button
+            className="nav-btn finish"
+
+            onClick={() =>
+              setShowConfirmFinish(
+                true
+              )
+            }
+          >
+            Finish Exam
+          </button>
+        )
+      }
 
     </div>
 
