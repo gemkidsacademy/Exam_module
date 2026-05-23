@@ -14,7 +14,10 @@ import "./StudentCurrentExamReport.css";
 
 const COLORS = ["#22c55e", "#ef4444", "#94a3b8"];
 
-export default function StudentCurrentExamReport({ data }) {
+export default function StudentCurrentExamReport({
+  data,
+  centerCode
+}) {
   if (!data) return null;
 
   const {

@@ -576,43 +576,59 @@
   
     useEffect(() => {
 
-      fetch(
-        `${API_BASE}/api/admin/students_center_specific?center_code=${centerCode}`
-      )
-        .then(res => {
+  if (!centerCode) {
+    setStudents([]);
+    return;
+  }
 
-          if (!res.ok) {
-            throw new Error("Failed to fetch students");
-          }
+  console.log(
+    "📡 Fetching students for center:",
+    centerCode
+  );
 
-          return res.json();
-        })
+  fetch(
+    `${API_BASE}/students/by-center/${encodeURIComponent(centerCode)}`
+  )
+    .then(res => {
 
-        .then(data => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch students");
+      }
 
-          const normalized = data.map(s => ({
+      return res.json();
+    })
 
-            id: s.student_id,
+    .then(data => {
 
-            label: `${s.student_id} – ${s.name}`
+      console.log(
+        "✅ Students received:",
+        data
+      );
 
-          }));
+      const normalized = (
+        data.students || []
+      ).map(student => ({
 
-          setStudents(normalized);
-        })
+        id: student.student_id,
 
-        .catch(err => {
+        label: `${student.student_id} – ${student.name}`
 
-          console.error(
-            "Error loading students:",
-            err
-          );
+      }));
 
-          setStudents([]);
-        });
+      setStudents(normalized);
+    })
 
-    }, [centerCode]);
-  
+    .catch(err => {
+
+      console.error(
+        "❌ Error loading students:",
+        err
+      );
+
+      setStudents([]);
+    });
+
+}, [centerCode]);
   
     
   
@@ -889,9 +905,14 @@
           onClick={() => {
       
             if (reportType === "cumulative") {
-              // handled inside component
-              return;
-            }
+
+                if (!topic) {
+                  return;
+                }
+
+                setShouldGenerate(true);
+                return;
+              }
       
             if (reportType === "student" && !date) {
               setDateWarning("Please select a date before generating the report.");
@@ -933,7 +954,10 @@
   
   
   {reportData && reportType === "student" && (
-    <StudentCurrentExamReport data={reportData} />
+    <StudentCurrentExamReport
+      data={reportData}
+      centerCode={centerCode}
+    />
   )}
   {loadingCumulative && !cumulativeError && (reportType === "cumulative" || reportType === "topic") && (
     <p>Loading cumulative progress…</p>
