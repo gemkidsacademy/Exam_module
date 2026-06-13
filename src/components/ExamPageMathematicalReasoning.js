@@ -652,23 +652,24 @@ return (
         )
       }
 
-      <div className="question-counter-inline">
+      {!isReview && (
+        <div className="question-counter-inline">
 
-        <span className="question-counter-text">
-          Question {currentIndex + 1} of {activeQuestions.length}
-        </span>
+          <span className="question-counter-text">
+            Question {currentIndex + 1} of {activeQuestions.length}
+          </span>
 
-        <button
-          className="question-grid-toggle"
+          <button
+            className="question-grid-toggle"
+            onClick={() =>
+              setShowQuestionNavigator(prev => !prev)
+            }
+          >
+            ▦
+          </button>
 
-          onClick={() =>
-            setShowQuestionNavigator(prev => !prev)
-          }
-        >
-          ▦
-        </button>
-
-      </div>
+        </div>
+      )}
 
       {
         mode === "review" && (
@@ -701,7 +702,7 @@ return (
                     {
                       new Date(
                         d.date
-                      ).toLocaleDateString()
+                      ).toLocaleString()
                     }
                   </option>
                 ))
@@ -726,8 +727,9 @@ return (
     {/* QUESTION INDEX */}
     {
       showQuestionNavigator && (
-
+      
         <div className="question-index-wrapper">
+        
 
           <div className="question-summary-row">
 
@@ -1263,7 +1265,7 @@ function MathematicalReasoningReport({
             >
               {examDates.map((d) => (
                 <option key={d.exam_id} value={d.exam_id}>
-                  {new Date(d.date).toLocaleDateString()}
+                  {new Date(d.date).toLocaleString()}
                 </option>
               ))}
             </select>

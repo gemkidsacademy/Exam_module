@@ -22,7 +22,8 @@ export default function AddStudentForm() {
       : rawCenterCode;
   const [studentYear, setStudentYear] = useState("");
   const STUDENT_YEAR_OPTIONS = [
-        "Year 4",    
+        "Year 4",
+        "Year 2",    
         "Year 3",
         "Year 5",
         "Year 6",       

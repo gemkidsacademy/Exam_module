@@ -29,6 +29,7 @@ const loadAttempts = useCallback(async () => {
         : "/api/student/exam-attempts/oc-thinking-skills";
 
     console.log("📡 Fetching attempts from:", endpoint);
+    console.log("ATTEMPT OBJECT", attempts[0]);
 
     const res = await fetch(
       `${API_BASE}${endpoint}?student_id=${studentId}`
@@ -674,27 +675,28 @@ return (
         </div>
       )}
 
-      <div className="question-counter-inline">
+      {!isReview && (
+        <div className="question-counter-inline">
 
-        <span className="question-counter-text">
-          Question {
-            activeQuestions.length
-              ? currentIndex + 1
-              : 0
-          } of {activeQuestions.length}
-        </span>
+          <span className="question-counter-text">
+            Question {
+              activeQuestions.length
+                ? currentIndex + 1
+                : 0
+            } of {activeQuestions.length}
+          </span>
 
-        <button
-          className="question-grid-toggle"
+          <button
+            className="question-grid-toggle"
+            onClick={() =>
+              setShowQuestionNavigator(prev => !prev)
+            }
+          >
+            ▦
+          </button>
 
-          onClick={() =>
-            setShowQuestionNavigator(prev => !prev)
-          }
-        >
-          ▦
-        </button>
-
-      </div>
+        </div>
+      )}
 
       {
         isReview && (

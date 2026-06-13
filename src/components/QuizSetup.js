@@ -53,8 +53,8 @@
       }
     }
 
-    if (totalQuestions !== 2) {
-      alert("Total questions across all topics must be 2.");
+    if (totalQuestions > 40) {
+      alert("Total questions cannot exceed 40.");
       return false;
     }
 
@@ -499,8 +499,8 @@ const handleDeleteSingleQuestion = async () => {
         }
       }
 
-      if (totalQuestions !== 2) {
-        alert("Total questions across all topics must be 2.");
+      if (totalQuestions > 40) {
+        alert("Total questions cannot exceed 40.");
         return;
       }
 
@@ -1039,17 +1039,17 @@ const handleDeleteSingleQuestion = async () => {
           </div>
 
           <div className="summary-box">
-            <div>Total Questions: {totalQuestions} / 2</div>
+            <div>Total Questions: {totalQuestions} / 40</div>
 
-            {totalQuestions === 2 && (
+            {totalQuestions > 0 && totalQuestions <= 40 && (
               <div className="ready-text">
                 ✔ Ready to Create Exam
               </div>
             )}
 
-            {totalQuestions > 2 && (
+            {totalQuestions > 40 && (
               <div className="warning">
-                Total cannot exceed 2!
+                Total cannot exceed 40!
               </div>
             )}
           </div>
@@ -1059,7 +1059,7 @@ const handleDeleteSingleQuestion = async () => {
 
               <button
                 type="submit"
-                disabled={totalQuestions > 2}
+                disabled={totalQuestions > 40}
               >
                 Create Exam
               </button>
@@ -1067,7 +1067,7 @@ const handleDeleteSingleQuestion = async () => {
               <button
                 type="button"
                 className="homework-btn"
-                disabled={totalQuestions > 2}
+                disabled={totalQuestions > 40}
                 onClick={async () => {
 
                   if (!validateQuizBeforeSubmit()) {

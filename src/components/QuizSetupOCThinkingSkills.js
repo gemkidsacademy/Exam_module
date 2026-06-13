@@ -18,7 +18,7 @@ export default function QuizSetupOCThinkingSkills({
     userType
   );
   const [availableTopics, setAvailableTopics] = useState([]);
-  const MAX_QUESTIONS = 2;
+  const MAX_QUESTIONS = 40;
   const [questionBank, setQuestionBank] = useState([]);
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [qbLoading, setQbLoading] = useState(false);
@@ -421,8 +421,14 @@ export default function QuizSetupOCThinkingSkills({
       { method: "DELETE" }
     )
       .then((res) => res.json())
-      .then(() => {
-        alert("Previous questions deleted successfully.");
+      .then((data) => {
+
+        console.log("DELETE RESPONSE:", data);
+
+        alert(
+          `${data.message}\n\nDeleted ${data.deleted_count} questions.`
+        );
+
       })
       .catch((err) => {
         console.error(err);

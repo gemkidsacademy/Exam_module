@@ -206,8 +206,8 @@
     }
   }
 
-  if (totalQuestions !== 2) {
-    alert("Total questions must be 2.");
+  if (totalQuestions !== 35) {
+    alert("Total questions must be 35.");
     return false;
   }
 
@@ -967,14 +967,14 @@ fetchTopics();
             ))}
           </div>
           <div className="summary-box">
-            <div>Total Questions: {totalQuestions} / 2</div>
+            <div>Total Questions: {totalQuestions} / 35</div>
 
-            {totalQuestions === 2 && (
+            {totalQuestions === 35 && (
               <div className="ready-text">✔ Ready to Create Exam</div>
             )}
 
-            {totalQuestions > 2 && (
-              <div className="warning">Total cannot exceed 2!</div>
+            {totalQuestions > 35 && (
+              <div className="warning">Total cannot exceed 35!</div>
             )}
           </div>
   
@@ -985,7 +985,7 @@ fetchTopics();
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={totalQuestions !== 2}
+                disabled={totalQuestions !== 35}
               >
                 Create Mathematical Reasoning Exam
               </button>
@@ -993,7 +993,7 @@ fetchTopics();
               <button
                 type="button"
                 onClick={handleHomeworkSubmit}
-                disabled={totalQuestions !== 2}
+                disabled={totalQuestions !== 35}
                 style={{
                   marginLeft: "10px",
                   backgroundColor: "#28a745",

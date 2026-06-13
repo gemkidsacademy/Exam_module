@@ -271,12 +271,18 @@ useEffect(() => {
     );
 
     const data = await response.json();
+    console.log("DELETE RESPONSE:", data);
 
     if (!response.ok) {
       throw new Error(data.detail || "Failed to delete questions");
     }
 
-    alert(data.message || "All questions deleted successfully.");
+    alert(
+      `${data.message}
+
+    Questions deleted: ${data.deleted_count}
+    Usage rows deleted: ${data.usage_rows_deleted}`
+    );
   } catch (error) {
     console.error("Error deleting questions:", error);
     alert("Something went wrong while deleting the questions.");

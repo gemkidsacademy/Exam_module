@@ -667,22 +667,24 @@ return (
         </div>
       )}
 
-      <div className="question-counter-inline">
+      {!isReview && (
+        <div className="question-counter-inline">
 
-        <span className="question-counter-text">
-          Question {currentIndex + 1} of {activeQuestions.length}
-        </span>
+          <span className="question-counter-text">
+            Question {currentIndex + 1} of {activeQuestions.length}
+          </span>
 
-        <button
-          className="question-grid-toggle"
-          onClick={() =>
-            setShowQuestionNavigator(prev => !prev)
-          }
-        >
-          ▦
-        </button>
+          <button
+            className="question-grid-toggle"
+            onClick={() =>
+              setShowQuestionNavigator(prev => !prev)
+            }
+          >
+            ▦
+          </button>
 
-      </div>
+        </div>
+      )}
 
       {
         isReview && (
@@ -717,7 +719,7 @@ return (
                     {
                       new Date(
                         a.completed_at
-                      ).toLocaleDateString()
+                      ).toLocaleString()
                     }
                   </option>
                 ))
@@ -1274,8 +1276,11 @@ return (
       }}
     >
       {attempts.map((a) => (
-        <option key={a.exam_attempt_id} value={a.exam_attempt_id}>
-          {new Date(a.completed_at).toLocaleDateString()}
+        <option
+          key={a.exam_attempt_id}
+          value={a.exam_attempt_id}
+        >
+          {new Date(a.completed_at).toLocaleString()}
         </option>
       ))}
     </select>

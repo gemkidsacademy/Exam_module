@@ -51,6 +51,7 @@ export default function ViewUserModal({ onClose }) {
                 <th>Student ID</th>
                 <th>Name</th>
                 <th>Class</th>
+                <th>Year</th>
                 <th>Day</th>
                 <th>Parent Email</th>
               </tr>
@@ -62,6 +63,7 @@ export default function ViewUserModal({ onClose }) {
                   <td>{s.student_id}</td>
                   <td>{s.name}</td>
                   <td>{s.class_name}</td>
+                  <td>{s.student_year}</td>
                   <td>{s.class_day}</td>
                   <td>{s.parent_email}</td>
                 </tr>

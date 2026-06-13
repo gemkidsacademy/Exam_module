@@ -164,29 +164,52 @@ export default function QuizSetup_OC_MathematicalReasoning({
   ============================ */
 
   const handleDeleteAllQuestions_OC_MR = async () => {
-    const confirmed = window.confirm(
-      "Delete ALL OC Mathematical Reasoning questions?"
+  const confirmed = window.confirm(
+    "Delete ALL OC Mathematical Reasoning questions?"
+  );
+
+  if (!confirmed) return;
+
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/api/admin/delete-all-questions-OC-MR`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     );
-    if (!confirmed) return;
 
-    try {
-      const res = await fetch(
-        `${BACKEND_URL}/api/admin/delete-all-questions-OC-MR`,
-        {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-        }
+    const data = await res.json();
+
+    console.log("DELETE RESPONSE:", data);
+
+    if (!res.ok) {
+      throw new Error(
+        data.error || "Failed"
       );
-
-      if (!res.ok) throw new Error("Failed");
-
-      const data = await res.json();
-      alert(data.message || "Deleted successfully");
-    } catch (err) {
-      console.error(err);
-      alert("Error deleting questions");
     }
-  };
+
+    if (data.error) {
+      alert(data.error);
+      return;
+    }
+
+    alert(
+      `${data.message}\n\nDeleted ${data.deleted_count} questions.`
+    );
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert(
+      err.message ||
+      "Error deleting questions"
+    );
+  }
+};
 
   const handleViewQuestionBank_OC_MR = async () => {
   try {
@@ -383,8 +406,8 @@ const handleResetUsedQuestions = async () => {
     return;
   }
 
-  if (totalQuestions !== 2) {
-    alert("Total must be 2");
+  if (totalQuestions !== 35) {
+    alert("Total must be 35");
     return;
   }
 
@@ -442,8 +465,8 @@ const handleResetUsedQuestions = async () => {
     return;
   }
 
-  if (totalQuestions !== 2) {
-    alert("Total must be 2");
+  if (totalQuestions !== 35) {
+    alert("Total must be 35");
     return;
   }
 
@@ -847,17 +870,21 @@ const handleResetUsedQuestions = async () => {
           ))}
         </div>
 
-        <h3>Total Questions: {totalQuestions}</h3>
+        <h3>Total Questions: {totalQuestions} / 35</h3>
 
         {userType !== "SUPER_ADMIN" && (
           <>
-            <button type="submit">
+            <button
+              type="submit"
+              disabled={totalQuestions !== 35}
+            >
               Create OC Mathematical Reasoning Exam
             </button>
 
             <button
               type="button"
               onClick={handleSubmitHomework_OC_MR}
+              disabled={totalQuestions !== 35}
               style={{
                 marginTop: "10px",
                 backgroundColor: "#28a745",
