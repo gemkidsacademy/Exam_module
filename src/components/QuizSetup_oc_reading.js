@@ -201,7 +201,11 @@ export default function QuizSetup_oc_reading({
         throw new Error(data.detail || "Failed to delete questions");
       }
   
-      alert(data.message || "All Reading questions deleted.");
+      alert(
+        `${data.message}\n\n` +
+        `Questions Deleted: ${data.questions_deleted}\n` +
+        `Usage Rows Deleted: ${data.usage_rows_deleted}`
+      );
     } catch (error) {
       console.error("Error deleting questions:", error);
       alert("Something went wrong while deleting the questions.");

@@ -410,27 +410,43 @@ const handleDeleteSingleQuestion = async () => {
 };
 
 
-    const handleDeletePreviousQuestions = () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete all previous questions?"
+    const handleDeletePreviousQuestions = async () => {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete all previous questions?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    const response = await fetch(
+      `${BACKEND_URL}/api/admin/delete-previous-questions-TS`,
+      {
+        method: "DELETE",
+      }
     );
 
-    if (!confirmDelete) return;
+    const data = await response.json();
 
-    // call backend API
-    fetch(`${BACKEND_URL}/api/admin/delete-previous-questions-TS`, {
-      method: "DELETE",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        alert("Previous questions deleted successfully.");
-        console.log(data);
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("Error deleting questions.");
-      });
-  };
+    if (!response.ok) {
+      throw new Error(
+        data.detail || "Failed to delete questions"
+      );
+    }
+
+    alert(
+      `✅ Previous questions deleted successfully.\n\n` +
+      `Questions Deleted: ${data.questions_deleted}`
+    );
+
+  } catch (err) {
+    console.error(err);
+
+    alert(
+      err.message ||
+      "Error deleting questions."
+    );
+  }
+};
     
 
     
