@@ -179,8 +179,35 @@ export default function ReadingReviewOC({
         </div>
 
         {onExit && (
-          <button className="exit-review-btn" onClick={onExit}>
-            Exit Review
+          <button
+            onClick={onExit}
+            style={{
+              width: "auto",
+              minWidth: "140px",
+              maxWidth: "180px",
+              flex: "0 0 auto",
+              display: "inline-block",
+
+              padding: "10px 18px",
+
+              background: "#2563eb",
+              color: "#ffffff",
+
+              border: "none",
+              borderRadius: "8px",
+
+              fontWeight: "600",
+              fontSize: "14px",
+
+              cursor: "pointer",
+
+              whiteSpace: "nowrap",
+
+              margin: "0",
+              marginLeft: "auto"
+            }}
+          >
+            ← Back to Report
           </button>
         )}
       </div>

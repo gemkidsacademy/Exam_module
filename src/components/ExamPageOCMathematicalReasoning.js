@@ -675,10 +675,10 @@ if (!currentQ) {
       )}
       {/* QUESTION INDEX */}
       {
-        showQuestionNavigator && (
+        (isReview || showQuestionNavigator) && (
 
           <div className="question-index-wrapper">
-
+          {!isReview && (
             <div className="question-summary-row">
 
               <div className="summary-item">
@@ -750,6 +750,7 @@ if (!currentQ) {
               </div>
 
             </div>
+          )}
 
             <div className="question-index-bar">
 

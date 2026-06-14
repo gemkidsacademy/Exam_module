@@ -681,9 +681,13 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
           key={item.exam_id}
           value={item.exam_id}
         >
-          {new Date(
-            item.date
-          ).toLocaleDateString()}
+          {new Date(item.date).toLocaleString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+          })}
         </option>
       ))}
     </select>
@@ -704,14 +708,16 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
               Question {currentIndex + 1} of {questions.length}
             </span>
 
-            <button
-              className="question-grid-toggle"
-              onClick={() =>
-                setShowQuestionNavigator(prev => !prev)
-              }
-            >
-              ▦
-            </button>
+            {!isReview && (
+              <button
+                className="question-grid-toggle"
+                onClick={() =>
+                  setShowQuestionNavigator(prev => !prev)
+                }
+              >
+                ▦
+              </button>
+            )}
 
           </div>
 
@@ -719,10 +725,10 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
 
         {/* QUESTION INDEX (same as Thinking Skills) */}
         {
-          showQuestionNavigator && (
+          (isReview || showQuestionNavigator) && (
 
             <div className="question-index-wrapper">
-
+            {!isReview && (
               <div className="question-summary-row">
 
                 <div className="summary-item">
@@ -783,6 +789,7 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
                 </div>
 
               </div>
+            )}
 
               <div className="question-index-bar">
 
@@ -830,7 +837,9 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
 
                         goToQuestion(i);
 
-                        setShowQuestionNavigator(false);
+                        if (!isReview) {
+                          setShowQuestionNavigator(false);
+                        }
                       }}
                     >
 

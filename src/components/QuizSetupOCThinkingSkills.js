@@ -18,7 +18,7 @@ export default function QuizSetupOCThinkingSkills({
     userType
   );
   const [availableTopics, setAvailableTopics] = useState([]);
-  const MAX_QUESTIONS = 40;
+  const MAX_QUESTIONS = 30;
   const [questionBank, setQuestionBank] = useState([]);
   const [showQuestionBank, setShowQuestionBank] = useState(false);
   const [qbLoading, setQbLoading] = useState(false);

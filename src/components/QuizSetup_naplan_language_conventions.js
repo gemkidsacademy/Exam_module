@@ -98,6 +98,7 @@ export default function QuizSetup_naplan_language_conventions({
     );
 
     const data = await response.json();
+    console.log( "RESET USED QUESTIONS RESPONSE:", data );
 
     if (!response.ok) {
       throw new Error(
@@ -376,8 +377,17 @@ const selectedTopicNames = quiz.topics
     if (!response.ok) {
       throw new Error(data.detail || "Failed to delete questions");
     }
+    console.log(
+      "DELETE ALL LC RESPONSE:",
+      data
+    );
+    alert(
+      `${data.message}
 
-    alert(data.message || "All Language Conventions questions deleted successfully.");
+    Questions Deleted: ${data.questions_deleted || 0}
+    Usage Records Deleted: ${data.usage_records_deleted || 0}
+    Remaining Questions: ${data.remaining_questions || 0}`
+    );
   } catch (error) {
     console.error("Error deleting questions:", error);
     alert("Something went wrong while deleting the questions.");

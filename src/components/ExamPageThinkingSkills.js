@@ -628,6 +628,12 @@ if (mode === "review" && questions.length === 0) {
 
 // ---------------- EXAM UI ----------------
 const currentQ = activeQuestions[currentIndex];
+console.log(
+  "CURRENT INDEX:",
+  currentIndex,
+  "CURRENT QUESTION:",
+  currentQ?.q_id
+);
 
 if (!currentQ) {
   console.log("❌ currentQ is missing", {
@@ -750,94 +756,96 @@ return (
 
     {/* QUESTION INDEX */}
     {
-      showQuestionNavigator && (
+      (isReview || showQuestionNavigator) && (
 
         <div className="question-index-wrapper">
 
-          <div className="question-summary-row">
+          {!isReview && (
+  <div className="question-summary-row">
 
-            <div className="summary-item">
+    <div className="summary-item">
 
-              <span className="summary-count">
-                {
-                  activeQuestions.filter(q => {
+      <span className="summary-count">
+        {
+          activeQuestions.filter(q => {
 
-                    const qid =
-                      String(q.q_id);
+            const qid =
+              String(q.q_id);
 
-                    return answers[qid];
-                  }).length
-                }
-              </span>
+            return answers[qid];
+          }).length
+        }
+      </span>
 
-              <span className="summary-label">
-                Answered
-              </span>
+      <span className="summary-label">
+        Answered
+      </span>
 
-            </div>
+    </div>
 
-            <div className="summary-item">
+    <div className="summary-item">
 
-              <span className="summary-count">
-                {
-                  activeQuestions.length -
+      <span className="summary-count">
+        {
+          activeQuestions.length -
 
-                  activeQuestions.filter(q => {
+          activeQuestions.filter(q => {
 
-                    const qid =
-                      String(q.q_id);
+            const qid =
+              String(q.q_id);
 
-                    return answers[qid];
-                  }).length
-                }
-              </span>
+            return answers[qid];
+          }).length
+        }
+      </span>
 
-              <span className="summary-label">
-                Not answered
-              </span>
+      <span className="summary-label">
+        Not answered
+      </span>
 
-            </div>
+    </div>
 
-            <div className="summary-item">
+    <div className="summary-item">
 
-              <span className="summary-count">
-                {
-                  activeQuestions.filter(q => {
+      <span className="summary-count">
+        {
+          activeQuestions.filter(q => {
 
-                    const qid =
-                      String(q.q_id);
+            const qid =
+              String(q.q_id);
 
-                    return !visited[qid];
+            return !visited[qid];
 
-                  }).length
-                }
-              </span>
+          }).length
+        }
+      </span>
 
-              <span className="summary-label">
-                Not read
-              </span>
+      <span className="summary-label">
+        Not read
+      </span>
 
-            </div>
+    </div>
 
-            <div className="summary-item">
+    <div className="summary-item">
 
-              <span className="summary-count">
-                {
-                  Object.values(
-                    flaggedQuestions
-                  )
-                    .filter(Boolean)
-                    .length
-                }
-              </span>
+      <span className="summary-count">
+        {
+          Object.values(
+            flaggedQuestions
+          )
+            .filter(Boolean)
+            .length
+        }
+      </span>
 
-              <span className="summary-label">
-                Flagged
-              </span>
+      <span className="summary-label">
+        Flagged
+      </span>
 
-            </div>
+    </div>
 
-          </div>
+  </div>
+)}
 
           <div className="question-index-bar">
 
@@ -906,11 +914,11 @@ return (
 
                     onClick={() => {
 
-                      goToQuestion(i);
+                      console.log("CLICKED INDEX", i);
 
-                      setShowQuestionNavigator(
-                        false
-                      );
+                      setCurrentIndex(i);
+
+                      setShowQuestionNavigator(false);
                     }}
                   >
 

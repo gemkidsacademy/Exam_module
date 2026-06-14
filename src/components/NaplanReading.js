@@ -864,9 +864,14 @@ useEffect(() => {
                   key={item.exam_id}
                   value={item.exam_id}
                 >
-                  {new Date(
-                    item.date
-                  ).toLocaleDateString()}
+                  {new Date(item.date).toLocaleString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true
+                  })}
                 </option>
               )
             )}
@@ -921,9 +926,14 @@ useEffect(() => {
                 key={item.exam_id}
                 value={item.exam_id}
               >
-                {new Date(
-                  item.date
-                ).toLocaleDateString()}
+                {new Date(item.date).toLocaleString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true
+                })}
               </option>
             ))}
           </select>
@@ -1061,7 +1071,14 @@ useEffect(() => {
                     key={item.exam_id}
                     value={item.exam_id}
                   >
-                    {new Date(item.date).toLocaleDateString()}
+                    {new Date(item.date).toLocaleString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true
+                    })}
                   </option>
                 ))}
               </select>
@@ -1087,14 +1104,16 @@ useEffect(() => {
               Question {currentIndex + 1} of {flatQuestions.length}
             </span>
 
-            <button
-              className="question-grid-toggle"
-              onClick={() =>
-                setShowQuestionNavigator(prev => !prev)
-              }
-            >
-              ▦
-            </button>
+            {!isReview && (
+              <button
+                className="question-grid-toggle"
+                onClick={() =>
+                  setShowQuestionNavigator(prev => !prev)
+                }
+              >
+                ▦
+              </button>
+            )}
 
           </div>
 
@@ -1103,9 +1122,10 @@ useEffect(() => {
         </div>
          {/* QUESTION INDEX BAR */}
         {
-          showQuestionNavigator && (
+          (isReview || showQuestionNavigator) && (
 
             <div className="question-index-wrapper">
+              {!isReview && (
               <div className="question-summary-row">
 
                 <div className="summary-item">
@@ -1164,6 +1184,7 @@ useEffect(() => {
                 </div>
 
               </div>
+            )}
               <div className="question-index-bar">
 
                 {flatQuestions.map((q, idx) => {
@@ -1213,9 +1234,9 @@ useEffect(() => {
 
                         goToQuestion(idx);
 
-                        setShowQuestionNavigator(
-                          false
-                        );
+                        if (!isReview) {
+                          setShowQuestionNavigator(false);
+                        }
                       }}
                     >
 

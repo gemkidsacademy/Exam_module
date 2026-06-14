@@ -654,18 +654,14 @@
 ========================================================= */
 
 .exam-header {
-  display: grid;
-
-  grid-template-columns: 1fr auto 1fr;
-
+  display: flex;
   align-items: center;
+  justify-content: space-between;
 
   padding: 14px 20px;
-
   margin-bottom: 18px;
 
   border-bottom: 1px solid #dcdcdc;
-
   background: #f8f9fb;
 }
 
@@ -1067,4 +1063,34 @@
 
     justify-content: center;
   }
+}
+.exit-review-btn {
+  background: #2563eb;
+  color: white;
+
+  border: none;
+  border-radius: 8px;
+
+  padding: 10px 18px;
+
+  font-weight: 600;
+  cursor: pointer;
+
+  width: auto;
+  flex: 0 0 auto;
+}
+
+.exit-review-btn:hover {
+  background: #1d4ed8;
+}
+.exam-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 20px;
+  margin-bottom: 18px;
+
+  border-bottom: 1px solid #dcdcdc;
+  background: #f8f9fb;
 }

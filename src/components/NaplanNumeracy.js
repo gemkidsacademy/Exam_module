@@ -655,7 +655,7 @@ return (
       >
         {examDates.map((d) => (
           <option key={d.exam_id} value={d.exam_id}>
-            {new Date(d.date).toLocaleDateString()}
+            {new Date(d.date).toLocaleString()}
           </option>
         ))}
       </select>
@@ -720,14 +720,16 @@ return (
               Question {currentIndex + 1} of {questions.length}
             </span>
 
-            <button
-              className="question-grid-toggle"
-              onClick={() =>
-                setShowQuestionNavigator(prev => !prev)
-              }
-            >
-              ▦
-            </button>
+            {!isReview && (
+              <button
+                className="question-grid-toggle"
+                onClick={() =>
+                  setShowQuestionNavigator(prev => !prev)
+                }
+              >
+                ▦
+              </button>
+            )}
 
           </div>
 
@@ -735,10 +737,10 @@ return (
 
         {/* QUESTION INDEX */}
         {
-          showQuestionNavigator && (
+          (isReview || showQuestionNavigator) && (
 
             <div className="question-index-wrapper">
-
+            {!isReview && (
               <div className="question-summary-row">
 
                 <div className="summary-item">
@@ -810,6 +812,7 @@ return (
                 </div>
 
               </div>
+            )}
 
               <div className="question-index-bar">
 
@@ -927,9 +930,9 @@ return (
 
                           goToQuestion(i);
 
-                          setShowQuestionNavigator(
-                            false
-                          );
+                          if (!isReview) {
+                            setShowQuestionNavigator(false);
+                          }
                         }}
                       >
 

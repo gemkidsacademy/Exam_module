@@ -127,7 +127,14 @@ export default function WritingReview() {
       >
         {history.map(item => (
           <option key={item.attempt_id} value={item.attempt_id}>
-            {item.date} — Score: {item.score}
+            {new Date(item.date).toLocaleString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true
+            })} — Score: {item.score}
           </option>
         ))}
       </select>

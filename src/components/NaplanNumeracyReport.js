@@ -28,7 +28,13 @@ if (!report || report.status === "no_data" || !report.overall) {
         >
           {examDates.map((d) => (
             <option key={d.exam_id} value={d.exam_id}>
-              {new Date(d.date).toLocaleDateString()}
+              {new Date(d.date).toLocaleString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+              })}
             </option>
           ))}
         </select>
@@ -63,7 +69,13 @@ if (!report || report.status === "no_data" || !report.overall) {
           >
             {examDates.map((d) => (
               <option key={d.exam_id} value={d.exam_id}>
-                {new Date(d.date).toLocaleDateString()}
+                {new Date(d.date).toLocaleString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit"
+                })}
               </option>
             ))}
           </select>
