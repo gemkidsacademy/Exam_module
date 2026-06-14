@@ -10,10 +10,11 @@ const GenerateExam_naplan_language_conventions = ({
   console.log("======================");
   console.log("mode:", mode);
   console.log("centerCode:", centerCode);
-  const [years, setYears] = useState([]);
-  const [selectedYear, setSelectedYear] = useState("");
+  const [years] = useState([2,3,4,5,6,7,8,9]);
+  const [loadingYears] = useState(false);
+  const [selectedYear, setSelectedYear] = useState(3);
 
-  const [loadingYears, setLoadingYears] = useState(true);
+  
   const [loadingExam, setLoadingExam] = useState(false);
 
   const [message, setMessage] = useState(null);
@@ -132,34 +133,33 @@ const GenerateExam_naplan_language_conventions = ({
   fetchAvailableDates();
 
 }, [selectedYear, mode]);
-  useEffect(() => {
-    const fetchYears = async () => {
-      try {
-        const response = await fetch(
-          `${BACKEND_URL}/naplan/language-conventions/available-years`
-        );
+  // useEffect(() => {
+//   const fetchYears = async () => {
+//     try {
+//       const response = await fetch(
+//         `${BACKEND_URL}/naplan/language-conventions/available-years`
+//       );
 
-        const data = await response.json();
+//       const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error(data.detail || "Failed to load years");
-        }
+//       if (!response.ok) {
+//         throw new Error(data.detail || "Failed to load years");
+//       }
 
-        setYears(data.years);
+//       setYears(data.years);
 
-        if (data.years.length > 0) {
-          setSelectedYear(data.years[0]);
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoadingYears(false);
-      }
-    };
+//       if (data.years.length > 0) {
+//         setSelectedYear(data.years[0]);
+//       }
+//     } catch (err) {
+//       setError(err.message);
+//     } finally {
+//       setLoadingYears(false);
+//     }
+//   };
 
-    fetchYears();
-  }, []);
-
+//   fetchYears();
+// }, []);
   /* ----------------------------------------------------
      Generate exam
   ---------------------------------------------------- */

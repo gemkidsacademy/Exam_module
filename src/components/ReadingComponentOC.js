@@ -1378,7 +1378,7 @@ console.log("EXTRACTS:", currentQuestion?.reading_material?.extracts);
         {!isDropdownCloze && (
           <p className="question-text">
             Q{currentQuestion.question_number}.{" "}
-            {currentQuestion.question_text}
+            {(currentQuestion.question_text || "").replace(/^\d+\.\s*/, "")}
           </p>
         )}
 

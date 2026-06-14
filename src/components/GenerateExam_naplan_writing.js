@@ -71,10 +71,14 @@ export default function GenerateExam_naplan_writing({ mode }) {
           value={selectedClassYear}
           onChange={(e) => setSelectedClassYear(Number(e.target.value))}
         >
+          <option value={3}>Year 2</option>
           <option value={3}>Year 3</option>
           <option value={4}>Year 4</option>
           <option value={5}>Year 5</option>
           <option value={6}>Year 6</option>
+          <option value={3}>Year 7</option>
+          <option value={3}>Year 8</option>
+          <option value={3}>Year 9</option>
         </select>
       </div>
 

@@ -15,7 +15,7 @@ const GenerateExamNaplanNumeracy = ({
   const [availableBatches, setAvailableBatches] = useState([]);
   const [selectedBatchId, setSelectedBatchId] = useState("");
 
-  const [classYears, setClassYears] = useState([]);
+  const [classYears] = useState([2,3,4,5,6,7,8,9]);
   const [selectedYear, setSelectedYear] = useState("");
 
   const [message, setMessage] = useState(null);
@@ -100,30 +100,32 @@ const GenerateExamNaplanNumeracy = ({
   // ---------------------------------------
   // Fetch available class years
   // ---------------------------------------
-  const fetchClassYears = async () => {
-    try {
-      const response = await fetch(
-        `${BACKEND_URL}/naplan/numeracy/class-years`
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.detail || "Failed to fetch class years");
-      }
-
-      setClassYears(data.class_years || []);
-    } catch (err) {
-      setError(err.message || "Failed to load class years");
-    } finally {
-      setYearsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchClassYears();
+    setYearsLoading(false);
   }, []);
+  // const fetchClassYears = async () => {
+//   try {
+//     const response = await fetch(
+//       `${BACKEND_URL}/naplan/numeracy/class-years`
+//     );
 
+//     const data = await response.json();
+
+//     if (!response.ok) {
+//       throw new Error(data.detail || "Failed to fetch class years");
+//     }
+
+//     setClassYears(data.class_years || []);
+//   } catch (err) {
+//     setError(err.message || "Failed to load class years");
+//   } finally {
+//     setYearsLoading(false);
+//   }
+// };
+
+// useEffect(() => {
+//   fetchClassYears();
+// }, []);
   // ---------------------------------------
   // Generate exam
   // ---------------------------------------

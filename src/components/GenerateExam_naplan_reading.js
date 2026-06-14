@@ -9,8 +9,8 @@ const GenerateExamNaplanReading = ({
    centerCode
    }) => {
   const [loading, setLoading] = useState(false);
-  const [years, setYears] = useState([]);
-  const [selectedYear, setSelectedYear] = useState("");
+  const [years] = useState([2,3,4,5,6,7,8,9]);
+const [selectedYear, setSelectedYear] = useState(3);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [generatedExam, setGeneratedExam] = useState(null);
@@ -127,28 +127,27 @@ const GenerateExamNaplanReading = ({
   fetchAvailableDates();
 
 }, [selectedYear, mode]);
-  useEffect(() => {
-    const fetchAvailableYears = async () => {
-      try {
-        const response = await fetch(
-          `${BACKEND_URL}/naplan/reading/available-years`
-        );
+  // useEffect(() => {
+//   const fetchAvailableYears = async () => {
+//     try {
+//       const response = await fetch(
+//         `${BACKEND_URL}/naplan/reading/available-years`
+//       );
 
-        const data = await response.json();
+//       const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error(data.detail || "Failed to load available years");
-        }
+//       if (!response.ok) {
+//         throw new Error(data.detail || "Failed to load available years");
+//       }
 
-        setYears(data.years || []);
-      } catch (err) {
-        setError(err.message);
-      }
-    };
+//       setYears(data.years || []);
+//     } catch (err) {
+//       setError(err.message);
+//     }
+//   };
 
-    fetchAvailableYears();
-  }, []);
-
+//   fetchAvailableYears();
+// }, []);
   // --------------------------------------
   // Generate exam
   // --------------------------------------
