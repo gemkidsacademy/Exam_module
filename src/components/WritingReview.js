@@ -63,11 +63,24 @@ export default function WritingReview() {
   fetch(`${API_BASE}${reviewEndpoint}`)
     .then(res => res.json())
     .then(data => {
-      console.log("🧪 Essay response:", data);  // ADD
 
-      setEssay(data.answer_text || "");
-      setLoading(false);
-    })
+  console.log(
+    "Writing review response:",
+    data
+  );
+
+  console.log(
+    "Essay HTML:",
+    data.answer_text
+  );
+
+  setEssay(
+    data.answer_text || ""
+  );
+
+  setLoading(false);
+
+})
     .catch(() => setLoading(false));
 }, [selectedAttempt, variant]);
 
@@ -79,78 +92,100 @@ export default function WritingReview() {
   // --------------------------------------------------
   // UI
   // --------------------------------------------------
-  return (
-    <div style={{ padding: "32px", maxWidth: "800px", margin: "auto" }}>
+  // --------------------------------------------------
+// UI
+// --------------------------------------------------
 
-      <div
+console.log(
+  "CURRENT ESSAY STATE:",
+  essay
+);
+
+return (
+  <div
+    style={{
+      padding: "32px",
+      maxWidth: "800px",
+      margin: "auto"
+    }}
+  >
+
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "20px"
+      }}
+    >
+      <h1 style={{ margin: 0 }}>
+        Your Writing
+      </h1>
+
+      <button
+        onClick={() =>
+          navigate("/SelectiveDashboard", {
+            state: { tab: "historical" }
+          })
+        }
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "20px"
+          background: "#2E7D32",
+          color: "white",
+          border: "none",
+          padding: "10px 14px",
+          borderRadius: "8px",
+          cursor: "pointer",
+          fontWeight: 600
         }}
       >
-        <h1 style={{ margin: 0 }}>Your Writing</h1>
+        Exit Review
+      </button>
+    </div>
 
-        <button
-          onClick={() =>
-            navigate("/SelectiveDashboard", {
-              state: { tab: "historical" }
-            })
-          }
-          style={{
-            background: "#2E7D32",
-            color: "white",
-            border: "none",
-            padding: "10px 14px",
-            borderRadius: "8px",
-            cursor: "pointer",
-            fontWeight: 600
-          }}
+    <select
+      value={selectedAttempt || ""}
+      onChange={(e) => {
+        const id = Number(e.target.value);
+        setSelectedAttempt(id);
+      }}
+      style={{
+        padding: "8px",
+        marginBottom: "16px",
+        borderRadius: "6px"
+      }}
+    >
+      {history.map(item => (
+        <option
+          key={item.attempt_id}
+          value={item.attempt_id}
         >
-          Exit Review
-        </button>
-      </div>
-
-      {/* ✅ Dropdown */}
-      <select
-        value={selectedAttempt || ""}
-        onChange={(e) => {
-          const id = Number(e.target.value);
-          setSelectedAttempt(id);
-        }}
-        style={{
-          padding: "8px",
-          marginBottom: "16px",
-          borderRadius: "6px"
-        }}
-      >
-        {history.map(item => (
-          <option key={item.attempt_id} value={item.attempt_id}>
-            {new Date(item.date).toLocaleString("en-US", {
+          {new Date(item.date).toLocaleString(
+            "en-US",
+            {
               year: "numeric",
               month: "short",
               day: "numeric",
               hour: "2-digit",
               minute: "2-digit",
               hour12: true
-            })} — Score: {item.score}
-          </option>
-        ))}
-      </select>
+            }
+          )} — Score: {item.score}
+        </option>
+      ))}
+    </select>
 
-      {/* ✅ Essay Display */}
-      <div
-        style={{
-          background: "white",
-          padding: "20px",
-          borderRadius: "8px",
-          lineHeight: "1.7",
-          whiteSpace: "pre-wrap"
-        }}
-      >
-        {essay}
-      </div>
-    </div>
-  );
+    <div
+      style={{
+        background: "white",
+        padding: "20px",
+        borderRadius: "8px",
+        lineHeight: "1.7"
+      }}
+      dangerouslySetInnerHTML={{
+        __html: essay
+      }}
+    />
+
+  </div>
+);
 }

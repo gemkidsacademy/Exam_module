@@ -27,6 +27,8 @@ export default function NaplanReading({
   
   //const API_BASE = "http://127.0.0.1:8000";
   const [examDates, setExamDates] = useState([]);
+  const [showReviewTools, setShowReviewTools] =
+  useState(false);
   const [showQuestionNavigator, setShowQuestionNavigator] =
     useState(false);
   const [selectedExamId, setSelectedExamId] = useState(null);
@@ -446,6 +448,20 @@ if (questionType === 5) {
 
     const data =
       await res.json();
+        data.questions.forEach(q => {
+        const block = q.exam_bundle?.question_blocks?.find(
+          b =>
+            b.type === "extract_matching" ||
+            b.extracts
+        );
+
+        if (block) {
+          console.log(
+            "FOUND EXTRACT BLOCK",
+            block
+          );
+        }
+      });
 
     if (
       data.completed === true
@@ -1036,8 +1052,9 @@ useEffect(() => {
   return (
     <div className={`exam-shell ${mode === "review" ? "review-mode" : ""}`}>
 
-      {mode === "review" && (
-        <div className="review-top-bar">
+      {mode === "review" &&
+        showReviewTools && (
+          <div className="review-top-bar">
 
           <button
             className="exit-review-btn"
@@ -1107,14 +1124,23 @@ useEffect(() => {
               Question {currentIndex + 1} of {flatQuestions.length}
             </span>
 
-            {!isReview && (
+            <button
+              className="question-grid-toggle"
+              onClick={() =>
+                setShowQuestionNavigator(prev => !prev)
+              }
+            >
+              ▦
+            </button>
+
+            {isReview && (
               <button
-                className="question-grid-toggle"
+                className="review-tools-toggle"
                 onClick={() =>
-                  setShowQuestionNavigator(prev => !prev)
+                  setShowReviewTools(prev => !prev)
                 }
               >
-                ▦
+                🛠 Review Tools
               </button>
             )}
 
@@ -1124,8 +1150,7 @@ useEffect(() => {
 
         </div>
          {/* QUESTION INDEX BAR */}
-        {
-          (isReview || showQuestionNavigator) && (
+        {showQuestionNavigator && (
 
             <div className="question-index-wrapper">
               {!isReview && (
@@ -1293,7 +1318,7 @@ useEffect(() => {
                     }`}
                     onClick={() => setActiveExtract(idx)}
                   >
-                    Extract {ext.extract_id}
+                    {ext.title || `Extract ${ext.extract_id}`}
                   </button>
                 )
               )}
@@ -1317,7 +1342,7 @@ useEffect(() => {
                 <div className="extract-content">
 
                   <h2>
-                    Extract {ext.extract_id}
+                    {ext.title || `Extract ${ext.extract_id}`}
                   </h2>
 
                   <p className="extract-text">
@@ -1346,7 +1371,7 @@ useEffect(() => {
           style={{
             flex: 1,
             paddingRight: "8px",
-            overflowY: "auto"
+            overflowY: isReview ? "visible" : "auto"
           }}
         >
           

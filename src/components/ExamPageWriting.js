@@ -538,10 +538,10 @@
           `,
         },
 
-        handlePaste(view, event) {
-          event.preventDefault();
-          return true;
-        },
+        //handlePaste(view, event) {
+          ///event.preventDefault();
+          //return true;
+        //},
       },
 
       onUpdate: ({ editor }) => {
@@ -582,10 +582,15 @@
       );
     }
     if (completed && result) {
-  const evalData = result.evaluation;
-  const attemptId = result?.attempt_id || selectedAttempt;
+    const evalData = result.evaluation;
+    const attemptId = result?.attempt_id || selectedAttempt;
 
-  return (
+    console.log(
+      "ANSWER TEXT:",
+      result.answer_text
+    );
+
+    return (
     <div
   style={{
     position: "fixed",
