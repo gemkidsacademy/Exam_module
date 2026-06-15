@@ -994,6 +994,19 @@
           className="submit-writing-btn"
           onClick={() => setShowConfirmFinish(true)}
           disabled={submitting}
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            right: "20px",
+            zIndex: 999999,
+            background: "#4a90e2",
+            color: "#fff",
+            border: "none",
+            padding: "12px 18px",
+            borderRadius: "6px",
+            cursor: "pointer",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.2)"
+          }}
         >
           Submit Writing
         </button>
