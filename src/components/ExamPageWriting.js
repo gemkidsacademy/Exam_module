@@ -167,7 +167,7 @@
           console.error("❌ Failed to load history:", err);
         });
     }, [result?.attempt_id, variant]);
-    
+   /* 
     useEffect(() => {
       if (!examActive) return;
 
@@ -185,6 +185,7 @@
         document.removeEventListener("contextmenu", prevent);
       };
     }, [examActive]);
+    */
     useEffect(() => {
       document.documentElement.style.height = "auto";
       document.body.style.height = "auto";
