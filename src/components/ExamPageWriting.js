@@ -991,25 +991,32 @@
         </div>
 
         <button
-          className="submit-writing-btn"
-          onClick={() => setShowConfirmFinish(true)}
-          disabled={submitting}
-          style={{
-            position: "fixed",
-            bottom: "20px",
-            right: "20px",
-            zIndex: 999999,
-            background: "#4a90e2",
-            color: "#fff",
-            border: "none",
-            padding: "12px 18px",
-            borderRadius: "6px",
-            cursor: "pointer",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.2)"
-          }}
-        >
-          Submit Writing
-        </button>
+  className="submit-writing-btn"
+  onClick={() => setShowConfirmFinish(true)}
+  disabled={submitting}
+  style={{
+    width: "100%",
+    height: "42px",
+    marginTop: "12px",
+    marginBottom: "0",
+    flexShrink: 0,
+
+    background: "#4a90e2",
+    color: "#fff",
+    border: "none",
+    borderRadius: "4px",
+
+    cursor: "pointer",
+    fontSize: "14px",
+    fontWeight: "500",
+
+    display: "block",
+    position: "relative",
+    zIndex: 10
+  }}
+>
+  Submit Writing
+</button>
 
     </div>
 
