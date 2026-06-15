@@ -578,8 +578,14 @@ const selectedTopicNames = quiz.topics
       <label>Year:</label>
       <select name="year" value={quiz.year} onChange={handleInputChange}>
         <option value="">Select Year</option>
+        <option value="3">Year 2</option>
         <option value="3">Year 3</option>
+        <option value="3">Year 4</option>
         <option value="5">Year 5</option>
+        <option value="3">Year 6</option>
+        <option value="3">Year 7</option>
+        <option value="3">Year 8</option>
+        <option value="3">Year 9</option>
       </select>
 
       

@@ -646,19 +646,47 @@ const toggleFlagQuestion = () => {
 return (
 <div className={`exam-shell ${styles.examShell}`}>
   {/* ✅ DATE DROPDOWN */}
-  {examDates?.length > 0 && (
-    <div style={{ marginBottom: "12px" }}>
-      <select
-        className="exam-dropdown"
-        value={selectedExamId || ""}
-        onChange={(e) => setSelectedExamId(Number(e.target.value))}
+  {isReview && (
+    <div className="review-top-bar">
+
+      <button
+        className="exit-review-btn"
+        onClick={() => {
+          setQuestions([]);
+          setAnswers({});
+          setVisited({});
+          setCurrentIndex(0);
+          setMode("report");
+        }}
       >
-        {examDates.map((d) => (
-          <option key={d.exam_id} value={d.exam_id}>
-            {new Date(d.date).toLocaleString()}
-          </option>
-        ))}
-      </select>
+        ← Exit Review
+      </button>
+
+      {examDates?.length > 0 && (
+        <div style={{ marginBottom: "12px" }}>
+          <select
+            className="exam-dropdown"
+            value={selectedExamId || ""}
+            onChange={(e) => {
+              setQuestions([]);
+              setAnswers({});
+              setVisited({});
+              setCurrentIndex(0);
+              setSelectedExamId(Number(e.target.value));
+            }}
+          >
+            {examDates.map((d) => (
+              <option
+                key={d.exam_id}
+                value={d.exam_id}
+              >
+                {new Date(d.date).toLocaleString()}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
     </div>
   )}
 

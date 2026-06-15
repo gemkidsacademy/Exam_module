@@ -384,7 +384,10 @@ if (questionType === 5) {
   if (!studentId) return;
   if (mode !== "loading") return;
 
-  if (parentMode === "actual") {
+  if (
+    parentMode === "report_actual" ||
+    parentMode === "report_homework"
+  ) {
     setMode("report");
     return;
   }

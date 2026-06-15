@@ -660,39 +660,65 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
   return (
     <div className={`exam-shell ${styles.examShell}`}>
       <div className={`exam-container ${styles.examContainer}`}>
-        {mode === "review" && examDates.length > 0 && (
-  <div className="report-filter-row">
-    <label className="report-label">
-      Select Date:
-    </label>
+        {mode === "review" && (
+          <div className="review-top-bar">
 
-    <select
-      className="report-select"
-      value={selectedExamId || ""}
-      onChange={(e) => {
-        setQuestions([]);
-        setSelectedExamId(
-          Number(e.target.value)
-        );
-      }}
-    >
-      {examDates.map((item) => (
-        <option
-          key={item.exam_id}
-          value={item.exam_id}
-        >
-          {new Date(item.date).toLocaleString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-          })}
-        </option>
-      ))}
-    </select>
-  </div>
-)}
+            <button
+              className="exit-review-btn"
+              onClick={() => {
+                setQuestions([]);
+                setAnswers({});
+                setVisited({});
+                setCurrentIndex(0);
+                setMode("report");
+              }}
+            >
+              ← Exit Review
+            </button>
+
+            {examDates.length > 0 && (
+              <div className="report-filter-row">
+                <label className="report-label">
+                  Select Date:
+                </label>
+
+                <select
+                  className="report-select"
+                  value={selectedExamId || ""}
+                  onChange={(e) => {
+                    setQuestions([]);
+                    setAnswers({});
+                    setVisited({});
+                    setCurrentIndex(0);
+
+                    setSelectedExamId(
+                      Number(e.target.value)
+                    );
+                  }}
+                >
+                  {examDates.map((item) => (
+                    <option
+                      key={item.exam_id}
+                      value={item.exam_id}
+                    >
+                      {new Date(item.date).toLocaleString(
+                        "en-US",
+                        {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit"
+                        }
+                      )}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+          </div>
+        )}
         {/* HEADER */}
         <div className="exam-header">
 

@@ -10,7 +10,7 @@ export default function QuizSetup_naplan({
 }) {
   const [availableTopics, setAvailableTopics] = useState([]);
   const [totalQuestions, setTotalQuestions] = useState(0);
-  const [availableYears, setAvailableYears] = useState([]);
+  const [availableYears] = useState([2,3,4,5,6,7,8,9]);
   const [isGeneratingHomework, setIsGeneratingHomework] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -153,25 +153,25 @@ export default function QuizSetup_naplan({
   /* ============================
    Fetch available years
 ============================ */
-useEffect(() => {
-  const fetchYears = async () => {
-    try {
-      const res = await fetch(
-        `${BACKEND_URL}/api/naplan-years`
-      );
+//useEffect(() => {
+  //const fetchYears = async () => {
+   // try {
+     // const res = await fetch(
+     //   `${BACKEND_URL}/api/naplan-years`
+      //);
 
-      if (!res.ok) throw new Error("Failed to fetch years");
+      //if (!res.ok) throw new Error("Failed to fetch years");
 
-      const data = await res.json();
-      setAvailableYears(data);
-    } catch (err) {
-      console.error("❌ Failed to load years:", err);
-      setAvailableYears([]);
-    }
-  };
+      //const data = await res.json();
+      //setAvailableYears(data);
+    //} catch (err) {
+      //console.error("❌ Failed to load years:", err);
+      //setAvailableYears([]);
+   // }
+  //};
 
-  fetchYears();
-}, []);
+  //fetchYears();
+//}, []);
   /* ============================
      Input handlers
   ============================ */
