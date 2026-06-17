@@ -34,6 +34,7 @@
    * - report  → completed attempt
    */
   const [mode, setMode] = useState("loading");
+  const isReview = mode === "review";
   const handleReviewLoaded = useCallback((questions) => {
   console.log("✅ Review questions received:", questions.length);
 
@@ -181,6 +182,11 @@
     console.error(`❌ loadReport (${parentMode}) error:`, err);
   }
 }, [studentId, parentMode]);
+useEffect(() => {
+  if (isReview) {
+    setShowQuestionNavigator(true);
+  }
+}, [isReview]);
   useEffect(() => {
   if (!studentId) return;
 
@@ -573,7 +579,7 @@
   // ---------------- EXAM UI ----------------
   
 
-  const isReview = mode === "review";
+  
 
 const reviewLoader = isReview && (
   <OC_MathematicalReasoningReview
@@ -616,24 +622,55 @@ if (!currentQ) {
           )
         }
 
-        {!isReview && (
-          <div className="question-counter-inline">
+        <div className="question-counter-inline">
 
-            <span className="question-counter-text">
-              Question {currentIndex + 1} of {activeQuestions.length}
-            </span>
+  <span className="question-counter-text">
+    Question {currentIndex + 1} of {activeQuestions.length}
+  </span>
 
-            <button
-              className="question-grid-toggle"
-              onClick={() =>
-                setShowQuestionNavigator(prev => !prev)
-              }
-            >
-              ▦
-            </button>
+  <button
+    className="question-grid-toggle"
+    onClick={() =>
+      setShowQuestionNavigator(prev => !prev)
+    }
+  >
+    ▦
+  </button>
 
-          </div>
-        )}
+  {isReview && (
+    <>
+      <button
+        className="nav-btn finish"
+        onClick={() => {
+          setMode("report");
+          setExplanation(null);
+        }}
+      >
+        Exit Review
+      </button>
+
+      <select
+        className="review-exam-dropdown"
+        value={selectedAttemptId || ""}
+        onChange={(e) => {
+          const id = Number(e.target.value);
+
+          setSelectedAttemptId(id);
+        }}
+      >
+        {attempts.map((a) => (
+          <option
+            key={a.attempt_id}
+            value={a.attempt_id}
+          >
+            {new Date(a.completed_at).toLocaleString()}
+          </option>
+        ))}
+      </select>
+    </>
+  )}
+
+</div>
 
         {
           mode === "review" && (
@@ -658,24 +695,9 @@ if (!currentQ) {
         }
 
       </div>
-      {/* ✅ ADD DROPDOWN HERE */}
-      {mode === "review" && (
-        <div style={{ marginBottom: "16px" }}>
-          <select
-            value={selectedAttemptId || ""}
-            onChange={(e) => setSelectedAttemptId(Number(e.target.value))}
-          >
-            {attempts.map((a) => (
-              <option key={a.attempt_id} value={a.attempt_id}>
-                {new Date(a.completed_at).toLocaleString()}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+      
       {/* QUESTION INDEX */}
-      {
-        (isReview || showQuestionNavigator) && (
+      {showQuestionNavigator && (
 
           <div className="question-index-wrapper">
           {!isReview && (
@@ -1233,7 +1255,7 @@ if (!currentQ) {
               boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
             }}
           >
-            <h3>Overall Accuracy</h3>
+            <h3>Overall Score</h3>
 
             <div style={{ display: "flex", justifyContent: "center", margin: "24px 0" }}>
               <svg width="160" height="160" viewBox="0 0 160 160">
@@ -1279,7 +1301,7 @@ if (!currentQ) {
               <p>Correct: {overall.correct}</p>
               <p>Incorrect: {overall.incorrect}</p>
               <p>Not Attempted: {overall.not_attempted}</p>
-              <p>Score: {overall.score_percent}%</p>
+              <p>Accuracy: {overall.score_percent}%</p>
             </div>
           </div>
 

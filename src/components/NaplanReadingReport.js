@@ -37,13 +37,13 @@ export default function NaplanReadingReport({
 
         {/* ================= OVERALL ACCURACY ================= */}
         <div className="report-card overall-card">
-          <h3 className="card-title">Overall Accuracy</h3>
+          <h3 className="card-title">Overall Score</h3>
 
           <div className="overall-content">
             {/* Donut */}
             <div className="donut">
-              <span>{overall.accuracy_percent ?? 0}%</span>
-            </div>
+            <span>{overall.score_percent ?? 0}%</span>
+          </div>
 
             {/* Stats */}
             <div className="overall-stats">
@@ -68,12 +68,9 @@ export default function NaplanReadingReport({
                 <strong>{overall.not_attempted ?? 0}</strong>
               </div>
               <div className="score-row">
-                <span>Accuracy</span>
+                <span>Score</span>
                 <strong>
-                  {overall.attempted > 0
-                    ? ((overall.correct / overall.attempted) * 100).toFixed(2)
-                    : 0}
-                  %
+                  {overall.score_percent ?? 0}%
                 </strong>
               </div>
             </div>

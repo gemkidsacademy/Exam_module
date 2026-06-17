@@ -1653,3 +1653,8 @@ progress::-moz-progress-bar {
     height: 38px;
   }
 }
+.review-exam-dropdown {
+  width: 260px;
+  min-width: 260px;
+  flex-shrink: 0;
+}

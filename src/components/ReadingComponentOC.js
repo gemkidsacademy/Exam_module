@@ -722,7 +722,7 @@ useEffect(() => {
 
         {/* OVERALL ACCURACY */}
         <div className="card overall-card">
-          <h3>Overall Accuracy</h3>
+          <h3>Overall Score</h3>
 
           <div className="overall-content">
             <div

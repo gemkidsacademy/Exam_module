@@ -268,6 +268,17 @@ const loadReport = useCallback(async (attemptId = null) => {
   loadAttempts
 ]);
 useEffect(() => {
+  if (!isReview) return;
+  if (!examAttemptId) return;
+
+  setReviewLoading(true);
+}, [examAttemptId, isReview]);
+useEffect(() => {
+  if (isReview) {
+    setShowQuestionNavigator(true);
+  }
+}, [isReview]);
+useEffect(() => {
   document.addEventListener("contextmenu", e => e.preventDefault());
   document.addEventListener("copy", e => e.preventDefault());
   document.addEventListener("cut", e => e.preventDefault());
@@ -638,33 +649,7 @@ return (
     onLoaded={handleReviewLoaded}
   />
 )}
- {isReview && (
-  <div style={{ marginBottom: "12px" }}>
-    <select
-      value={examAttemptId || ""}
-      onChange={(e) => {
-        const id = Number(e.target.value);
-      
-        console.log("📅 REVIEW DROPDOWN:", id);
-      
-        setExamAttemptId(id);     // set FIRST
-        setQuestions([]);         // then clear (optional)
-      }}
-      style={{
-        padding: "8px",
-        borderRadius: "6px"
-      }}
-    >
-      <option value="">Select Attempt</option>
-
-      {attempts.map((a) => (
-        <option key={a.exam_attempt_id} value={a.exam_attempt_id}>
-          {new Date(a.completed_at).toLocaleString()}
-        </option>
-      ))}
-    </select>
-  </div>
-)}
+ 
 
     {/* HEADER */}
     <div className="exam-header">
@@ -675,56 +660,71 @@ return (
         </div>
       )}
 
-      {!isReview && (
-        <div className="question-counter-inline">
+      <div className="question-counter-inline">
 
-          <span className="question-counter-text">
-            Question {
-              activeQuestions.length
-                ? currentIndex + 1
-                : 0
-            } of {activeQuestions.length}
-          </span>
+  <span className="question-counter-text">
+    Question {activeQuestions.length
+      ? currentIndex + 1
+      : 0}
+    {" "}of{" "}
+    {activeQuestions.length}
+  </span>
 
-          <button
-            className="question-grid-toggle"
-            onClick={() =>
-              setShowQuestionNavigator(prev => !prev)
-            }
+  <button
+    className="question-grid-toggle"
+    onClick={() =>
+      setShowQuestionNavigator(prev => !prev)
+    }
+  >
+    ▦
+  </button>
+
+  {isReview && (
+    <>
+      <button
+        className="nav-btn finish"
+        onClick={() => {
+          setMode("report");
+          setExplanation(null);
+        }}
+      >
+        Exit Review
+      </button>
+
+      <select
+        className="review-exam-dropdown"
+        value={examAttemptId || ""}
+        onChange={(e) => {
+          const id = Number(e.target.value);
+
+          setExamAttemptId(id);
+          setQuestions([]);
+        }}
+      >
+        <option value="">
+          Select Attempt
+        </option>
+
+        {attempts.map((a) => (
+          <option
+            key={a.exam_attempt_id}
+            value={a.exam_attempt_id}
           >
-            ▦
-          </button>
+            {new Date(
+              a.completed_at
+            ).toLocaleString()}
+          </option>
+        ))}
+      </select>
+    </>
+  )}
 
-        </div>
-      )}
-
-      {
-        isReview && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end"
-            }}
-          >
-            <button
-              className="nav-btn finish"
-
-              onClick={() => {
-                setMode("report");
-                setExplanation(null);
-              }}
-            >
-              Exit Review
-            </button>
-          </div>
-        )
-      }
+</div>
 
     </div>
 
     {/* QUESTION INDEX */}
-    {
-      (isReview || showQuestionNavigator) && (
+    {showQuestionNavigator && (
 
         <div className="question-index-wrapper">
         {!isReview && (
@@ -1302,7 +1302,7 @@ return (
         OVERALL ACCURACY (B)
     =============================== */}
     <div className="report-card">
-      <h3>Overall Accuracy</h3>
+      <h3>Overall Score</h3>
     
       {(() => {
         const accuracy = Math.round(
@@ -1338,7 +1338,7 @@ return (
         <p>Correct: {overall.correct}</p>
         <p>Incorrect: {overall.incorrect}</p>
         <p>Not Attempted: {overall.not_attempted}</p>
-        <p>Score: {overall.score_percent}%</p>
+        <p>Accuracy: {overall.score_percent}%</p>
       </div>
     </div>
 

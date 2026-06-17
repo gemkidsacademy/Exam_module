@@ -23,6 +23,7 @@
     const [examOptions, setExamOptions] = useState([]);
     const [loadingExams, setLoadingExams] = useState(false);
     const API_BASE = process.env.REACT_APP_API_URL;
+    
 
 
     if (!API_BASE) {
@@ -43,6 +44,9 @@
   
     const [studentId, setStudentId] = useState("");
     const [className, setClassName] = useState("");
+    const [classYear, setClassYear] = useState("");
+    const [availableYears, setAvailableYears] = useState([]);
+
    
   
     const [exam, setExam] = useState("");
@@ -101,6 +105,19 @@
       setLoadingExams(false);
     });
 
+}, [className, reportType]);
+useEffect(() => {
+  if (reportType !== "class" || !className) {
+    return;
+  }
+
+  fetch(
+    `${API_BASE}/api/classes/years?category=${encodeURIComponent(className)}`
+  )
+    .then(res => res.json())
+    .then(data => {
+      setAvailableYears(data.years || []);
+    });
 }, [className, reportType]);
     
     useEffect(() => {
@@ -378,6 +395,7 @@
       !shouldGenerate ||
       reportType !== "class" ||
       !className ||    
+      !classYear ||
       !exam ||
       !date
     ) {
@@ -388,9 +406,13 @@
     setClassReportError(null);
     setClassReportData(null);
   
-    const url = `${API_BASE}/api/reports/class?class_name=${encodeURIComponent(
-    className
-  )}&exam=${exam}&date=${date}`;
+    const url =
+      `${API_BASE}/api/reports/class?` +
+      `class_name=${encodeURIComponent(className)}` +
+      `&class_year=${encodeURIComponent(classYear)}` +
+      `&center_code=${encodeURIComponent(centerCode)}` +
+      `&exam=${encodeURIComponent(exam)}` +
+      `&date=${encodeURIComponent(date)}`;
   
     fetch(url)
       .then(res => {
@@ -410,7 +432,15 @@
         setLoadingClassReport(false);
         setShouldGenerate(false);
       });
-  }, [shouldGenerate, reportType, className, exam, date]);
+  }, [
+  shouldGenerate,
+  reportType,
+  className,
+  classYear,
+  centerCode,
+  exam,
+  date
+]);
   
   
     
@@ -753,34 +783,54 @@
   
       {/* Class Context */}
       {reportType === "class" && (
-        <div className="filter-group">
-          <label>Class</label>
-          <select
-            value={className}
-            onChange={e => {
-              const selectedClass = e.target.value;
-            
-              setClassName(selectedClass);
-            
-              setExam("");                  // reset exam
-              setDate("");                  // reset date
-              setAvailableClassDates([]);   // reset dates list
-            
-              setShouldGenerate(false);     // stop any pending generation
-            }}
-          >
-            <option value="">Select class</option>
-            {classes.map(cls => (
-              <option key={cls} value={cls}>
-                {cls}
-              </option>
-            ))}
-          </select>
-  
-  
-          
-        </div>
-      )}
+  <>
+    <div className="filter-group">
+      <label>Class</label>
+
+      <select
+        value={className}
+        onChange={e => {
+          const selectedClass = e.target.value;
+
+          setClassName(selectedClass);
+
+          setClassYear("");
+          setExam("");
+          setDate("");
+
+          setAvailableYears([]);
+          setAvailableClassDates([]);
+        }}
+      >
+        <option value="">Select class</option>
+
+        {classes.map(cls => (
+          <option key={cls} value={cls}>
+            {cls}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <div className="filter-group">
+      <label>Class Year</label>
+
+      <select
+        value={classYear}
+        onChange={e => setClassYear(e.target.value)}
+        disabled={!className}
+      >
+        <option value="">Select year</option>
+
+        {availableYears.map(year => (
+          <option key={year} value={year}>
+            {year}
+          </option>
+        ))}
+      </select>
+    </div>
+  </>
+)}
   
       {/* Exam + Topics + Actions */} 
   <div className="exam-topics-actions-row">
@@ -898,7 +948,13 @@
           className="secondary-btn"
           disabled={
             (reportType === "student" && !studentId) ||
-            (reportType === "class" && !exam) ||
+            (reportType === "class" &&
+              (
+                !className ||
+                !classYear ||
+                !exam ||
+                !date
+              )) ||
             (reportType === "cumulative" &&
               (!studentId || selectedAttemptDates.length === 0))
           }

@@ -86,7 +86,7 @@ export default function NaplanLanguageConventionsReport({
             OVERALL ACCURACY
         =============================== */}
         <div className="report-card">
-          <h3>Overall Accuracy</h3>
+          <h3>Overall Score</h3>
 
           {(() => {
             const accuracy = Math.round(
@@ -143,7 +143,7 @@ export default function NaplanLanguageConventionsReport({
               {overall.not_attempted}
             </p>
             <p>
-              Score:{" "}
+              Accuracy:{" "}
               {overall.score_percent}%
             </p>
           </div>

@@ -1285,7 +1285,7 @@ function MathematicalReasoningReport({
             boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
           }}
         >
-          <h3>Overall Accuracy</h3>
+          <h3>Overall Score</h3>
 
           <div style={{ display: "flex", justifyContent: "center", margin: "24px 0" }}>
             <svg width="160" height="160" viewBox="0 0 160 160">
@@ -1331,7 +1331,7 @@ function MathematicalReasoningReport({
             <p>Correct: {overall.correct}</p>
             <p>Incorrect: {overall.incorrect}</p>
             <p>Not Attempted: {overall.not_attempted}</p>
-            <p>Score: {overall.score_percent}%</p>
+            <p>Accuracy: {overall.score_percent}%</p>
           </div>
         </div>
 

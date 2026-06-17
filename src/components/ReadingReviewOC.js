@@ -17,6 +17,8 @@ export default function ReadingReviewOC({
   onExit
 }) {
   const [index, setIndex] = useState(0);
+  const [showQuestionNavigator, setShowQuestionNavigator] =
+  useState(true);
   const [explanations, setExplanations] = useState({});
   const [loadingExplanation, setLoadingExplanation] = useState(null);
   const [activeExtract, setActiveExtract] = useState(0);
@@ -172,72 +174,67 @@ export default function ReadingReviewOC({
     <div className="exam-container review-mode">
       {/* HEADER */}
       <div className="exam-header">
-        <div>OC Reading Review</div>
 
-        <div className="counter">
-          Question {index + 1} / {questions.length}
-        </div>
+  <div>OC Reading Review</div>
 
-        {onExit && (
-          <button
-            onClick={onExit}
-            style={{
-              width: "auto",
-              minWidth: "140px",
-              maxWidth: "180px",
-              flex: "0 0 auto",
-              display: "inline-block",
+  <div
+    className="question-counter-inline"
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "10px"
+    }}
+  >
+    <span className="question-counter-text">
+      Question {index + 1} of {questions.length}
+    </span>
 
-              padding: "10px 18px",
+    <button
+      className="question-grid-toggle"
+      onClick={() =>
+        setShowQuestionNavigator(prev => !prev)
+      }
+    >
+      ▦
+    </button>
 
-              background: "#2563eb",
-              color: "#ffffff",
+    {onExit && (
+      <button
+        className="exit-review-btn"
+        onClick={onExit}
+      >
+        ← Back to Report
+      </button>
+    )}
 
-              border: "none",
-              borderRadius: "8px",
+    <select
+      className="review-exam-dropdown"
+      value={selectedSessionId || ""}
+      onChange={(e) => {
+        const sessionId = e.target.value;
 
-              fontWeight: "600",
-              fontSize: "14px",
-
-              cursor: "pointer",
-
-              whiteSpace: "nowrap",
-
-              margin: "0",
-              marginLeft: "auto"
-            }}
-          >
-            ← Back to Report
-          </button>
-        )}
-      </div>
-      {/* 🔥 ADD DROPDOWN HERE */}
-      <div style={{ padding: "12px 16px" }}>
-        <select
-          value={selectedSessionId || ""}
-          onChange={(e) => {
-            const sessionId = e.target.value;
-            setSelectedSessionId(sessionId);
-      
-            // ✅ reload review for selected attempt
-            onSessionChange(sessionId);
-          }}
-          style={{
-            padding: "8px",
-            marginBottom: "12px",
-            display: "block"
-          }}
+        setSelectedSessionId(sessionId);
+        onSessionChange(sessionId);
+      }}
+    >
+      {attemptDates.map((a) => (
+        <option
+          key={a.session_id}
+          value={a.session_id}
         >
-          <option value="">Select attempt date</option>
+          {new Date(
+            a.created_at
+          ).toLocaleString()}
+        </option>
+      ))}
+    </select>
+
+  </div>
+
+</div>  
       
-          {attemptDates.map((a) => (
-            <option key={a.session_id} value={a.session_id}>
-              {new Date(a.created_at).toLocaleString()}
-            </option>
-          ))}
-        </select>
-      </div>
       {/* QUESTION INDEX */}
+      {showQuestionNavigator && (
       <div className="question-index-grouped">
         {Object.entries(groupedQuestions).map(([key, data]) => (
           <div key={key} className="topic-group">
@@ -270,6 +267,7 @@ export default function ReadingReviewOC({
           </div>
         ))}
       </div>
+      )}
 
       {/* BODY */}
       <div className="exam-body">

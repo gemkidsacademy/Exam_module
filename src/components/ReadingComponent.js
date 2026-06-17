@@ -914,7 +914,7 @@
             OVERALL ACCURACY
         ============================= */}
         <div className="card">
-          <h3>Accuracy</h3>
+          <h3>Score</h3>
 
           <div
             className="accuracy-circle"

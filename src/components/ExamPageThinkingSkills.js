@@ -1286,7 +1286,7 @@ return (
         OVERALL ACCURACY (B)
     =============================== */}
     <div className="report-card">
-      <h3>Overall Accuracy</h3>
+      <h3>Overall Score</h3>
     
       {(() => {
         const accuracy = Math.round(
@@ -1322,7 +1322,7 @@ return (
         <p>Correct: {overall.correct}</p>
         <p>Incorrect: {overall.incorrect}</p>
         <p>Not Attempted: {overall.not_attempted}</p>
-        <p>Score: {overall.score_percent}%</p>
+        <p>Accuracy: {overall.score_percent}%</p>
       </div>
     </div>
 
