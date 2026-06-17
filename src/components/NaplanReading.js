@@ -1047,6 +1047,17 @@ useEffect(() => {
   const currentPassage = passages.find(p =>
     p.questions.some(q => q.question_id === currentQ.question_id)
   );
+  console.log(
+    "READING BLOCK:",
+    currentPassage?.reading_block
+  );
+  currentQ?.exam_bundle?.question_blocks?.forEach((block, i) => {
+    console.log("BLOCK", i, {
+      type: block.type,
+      content: block.content,
+      text: block.text
+    });
+  });
   console.log("🧠 ACTUAL RENDER answers:", answers);
 
   return (
@@ -1227,6 +1238,7 @@ useEffect(() => {
                         ? "correct"
                         : "incorrect";
                   }
+                  
 
                   return (
                     <button
@@ -1325,7 +1337,7 @@ useEffect(() => {
                 currentPassage.reading_block.extracts[
                   activeExtract
                 ];
-
+                console.log("ACTIVE EXTRACT", ext);
               return (
                 <div className="extract-content">
 

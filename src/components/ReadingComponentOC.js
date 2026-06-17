@@ -1142,7 +1142,10 @@ console.log("EXTRACTS:", currentQuestion?.reading_material?.extracts);
         {passageStyle === "literary" && rm && typeof rm === "object" && (
           <div className="literary-passage">
         
-            {rm.title && <h3>{rm.title}</h3>}
+            {rm.title &&
+              rm.title !== currentQuestion.section_ref?.topic && (
+                <h3>{rm.title}</h3>
+              )}
         
             {rm.instructions && (
               <ul className="instructions">
@@ -1166,7 +1169,10 @@ console.log("EXTRACTS:", currentQuestion?.reading_material?.extracts);
         {/* NON-LITERARY PASSAGE */}
                 {passageStyle !== "literary" && (
                   <>
-                    {rm.title && <h3>{rm.title}</h3>}
+                    {rm.title &&
+                      rm.title !== currentQuestion.section_ref?.topic && (
+                        <h3>{rm.title}</h3>
+                      )}
 
                 {/* ===================================== */}
                 {/* EXTRACT MATCHING (NEW ARRAY FORMAT) */}

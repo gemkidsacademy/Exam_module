@@ -281,6 +281,9 @@ useEffect(() => {
       return res.json();
     })
     .then(data => {
+      console.log("CLASS DATES RECEIVED:", data);
+      console.log("CLASS DATES ARRAY:", data.dates);
+
       setAvailableClassDates(data.dates || []);
     })
     .catch(err => {
@@ -925,7 +928,13 @@ useEffect(() => {
         : availableExamDates
       ).map(d => (
         <option key={d} value={d}>
-          {new Date(d).toLocaleDateString()}
+          {new Date(d).toLocaleString("en-AU", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </option>
       ))}
     </select>
