@@ -219,6 +219,7 @@ if (!API_BASE) {
 // ---------------- REPORT ----------------
 const [report, setReport] = useState(null);
 
+
 /* ============================================================
    LOAD REPORT (ONLY WHEN EXAM IS COMPLETED)
 ============================================================ */
@@ -652,81 +653,54 @@ return (
         )
       }
 
-      {!isReview && (
-        <div className="question-counter-inline">
+      <div className="question-counter-inline">
 
-          <span className="question-counter-text">
-            Question {currentIndex + 1} of {activeQuestions.length}
-          </span>
+        <span className="question-counter-text">
+          Question {currentIndex + 1} of {activeQuestions.length}
+        </span>
 
-          <button
-            className="question-grid-toggle"
-            onClick={() =>
-              setShowQuestionNavigator(prev => !prev)
-            }
-          >
-            ▦
-          </button>
+        <button
+          className="question-grid-toggle"
+          onClick={() =>
+            setShowQuestionNavigator(prev => !prev)
+          }
+        >
+          ▦
+        </button>
 
-        </div>
-      )}
-
-      {
-        mode === "review" && (
-
-          <div
-            style={{
-              display: "flex",
-              gap: "12px",
-              alignItems: "center"
-            }}
-          >
-
-            <select
-              value={selectedExamId || ""}
-
-              onChange={handleDateChange}
-
-              style={{
-                padding: "6px 10px",
-                borderRadius: "6px",
-                border: "1px solid #d1d5db"
-              }}
-            >
-              {
-                examDates.map((d) => (
-                  <option
-                    key={d.exam_id}
-                    value={d.exam_id}
-                  >
-                    {
-                      new Date(
-                        d.date
-                      ).toLocaleString()
-                    }
-                  </option>
-                ))
-              }
-            </select>
-
+        {isReview && (
+          <>
             <button
               className="exit-review-btn"
-
-              onClick={
-                handleExitReview
-              }
+              onClick={handleExitReview}
             >
               Exit Review
             </button>
 
-          </div>
-        )
-      }
+            <select
+              className="review-exam-dropdown"
+              value={selectedExamId || ""}
+              onChange={handleDateChange}
+            >
+              {examDates.map((d) => (
+                <option
+                  key={d.exam_id}
+                  value={d.exam_id}
+                >
+                  {new Date(d.date).toLocaleString()}
+                </option>
+              ))}
+            </select>
+          </>
+        )}
+
+      </div>
+
+      
 
     </div>
     {/* QUESTION INDEX */}
-    {
-      (isReview || showQuestionNavigator) && (
+    {showQuestionNavigator && (
       
         <div className="question-index-wrapper">
         

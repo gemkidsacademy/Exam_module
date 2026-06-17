@@ -42,6 +42,8 @@ export default function ReadingReview({
   const currentQuestion = questions[index];
   const qid = String(currentQuestion.question_id);
   const [explanations, setExplanations] = useState({});
+  const [showQuestionNavigator, setShowQuestionNavigator] =
+  useState(true);
   const [loadingExplanation, setLoadingExplanation] = useState(null);
   
   const formatExplanation = (text) => {
@@ -161,56 +163,75 @@ if (typeof rm === "string") {
       ============================= */}
       <div className="exam-header">
 
-      {/* 🔽 LEFT: DATE DROPDOWN */}
-      <div>
-        <select
-          value={selectedExamId || ""}
-          onChange={(e) => {
-            const examId = Number(e.target.value);
-            onDateChange?.(examId);
-          }}
-          style={{
-            padding: "6px 10px",
-            borderRadius: "6px",
-            border: "1px solid #d1d5db"
-          }}
+  <div>Reading Exam Review</div>
+
+    <div
+      className="question-counter-inline"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "10px"
+      }}
+    >
+
+      <span className="question-counter-text">
+        Question {index + 1} of {questions.length}
+      </span>
+       <button
+        className="question-grid-toggle"
+        onClick={() =>
+          setShowQuestionNavigator(prev => !prev)
+        }
+      >
+        ▦
+      </button>
+
+
+      {onExit && (
+        <button
+          className="exit-review-btn"
+          onClick={onExit}
         >
-          {examDates.map((d) => (
-            <option key={d.exam_id} value={d.exam_id}>
-              {new Date(d.date).toLocaleString("en-US", {
+          Exit Review
+        </button>
+      )}
+
+      <select
+        className="review-exam-dropdown"
+        value={selectedExamId || ""}
+        onChange={(e) => {
+          const examId = Number(e.target.value);
+          onDateChange?.(examId);
+        }}
+      >
+        {examDates.map((d) => (
+          <option
+            key={d.exam_id}
+            value={d.exam_id}
+          >
+            {new Date(d.date).toLocaleString(
+              "en-US",
+              {
                 year: "numeric",
                 month: "short",
                 day: "numeric",
                 hour: "2-digit",
                 minute: "2-digit",
                 hour12: true
-              })}
-            </option>
-          ))}
-        </select>
-      </div>
-    
-      {/* 🔹 CENTER */}
-      <div>Reading Exam Review</div>
-    
-      {/* 🔹 RIGHT */}
-      <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-        <div className="counter">
-          Question {index + 1} / {questions.length}
-        </div>
-    
-        {onExit && (
-          <button className="exit-review-btn" onClick={onExit}>
-            Exit Review
-          </button>
-        )}
-      </div>
-    
+              }
+            )}
+          </option>
+        ))}
+      </select>
+
     </div>
+
+  </div>
 
       {/* =============================
          QUESTION INDEX
       ============================= */}
+      {showQuestionNavigator && (
       <div className="question-index-grouped">
         {Object.entries(groupedQuestions).map(([key, data]) => (
           <div key={key} className="topic-group">
@@ -243,6 +264,7 @@ if (typeof rm === "string") {
           </div>
         ))}
       </div>
+      )}
 
       {/* =============================
          BODY

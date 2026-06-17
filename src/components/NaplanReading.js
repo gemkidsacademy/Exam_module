@@ -1052,61 +1052,7 @@ useEffect(() => {
   return (
     <div className={`exam-shell ${mode === "review" ? "review-mode" : ""}`}>
 
-      {mode === "review" &&
-        showReviewTools && (
-          <div className="review-top-bar">
-
-          <button
-            className="exit-review-btn"
-            onClick={() => {
-              setQuestions([]);
-              setAnswers({});
-              setVisited({});
-              setCurrentIndex(0);
-              setMode("report");
-            }}
-          >
-            ← Exit Review
-          </button>
-
-          {examDates.length > 0 && (
-            <div className="report-filter-row">
-              <label className="report-label">
-                Select Date:
-              </label>
-
-              <select
-                className="report-select"
-                value={selectedExamId || ""}
-                onChange={(e) => {
-                  setQuestions([]);
-                  setAnswers({});
-                  setVisited({});
-                  setCurrentIndex(0);
-                  setSelectedExamId(Number(e.target.value));
-                }}
-              >
-                {examDates.map((item) => (
-                  <option
-                    key={item.exam_id}
-                    value={item.exam_id}
-                  >
-                    {new Date(item.date).toLocaleString("en-US", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: true
-                    })}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-        </div>
-      )}
+      
       <div className="exam-container">
 
         {/* HEADER */}
@@ -1120,31 +1066,73 @@ useEffect(() => {
 
           <div className="question-counter-inline">
 
-            <span className="question-counter-text">
-              Question {currentIndex + 1} of {flatQuestions.length}
-            </span>
+  <span className="question-counter-text">
+    Question {currentIndex + 1} of {flatQuestions.length}
+  </span>
 
-            <button
-              className="question-grid-toggle"
-              onClick={() =>
-                setShowQuestionNavigator(prev => !prev)
-              }
+  <button
+    className="question-grid-toggle"
+    onClick={() =>
+      setShowQuestionNavigator(prev => !prev)
+    }
+  >
+    ▦
+  </button>
+
+  {isReview && (
+    <>
+      <button
+        className="exit-review-btn"
+        onClick={() => {
+          setQuestions([]);
+          setAnswers({});
+          setVisited({});
+          setCurrentIndex(0);
+          setMode("report");
+        }}
+      >
+        ← Exit Review
+      </button>
+
+      {examDates.length > 0 && (
+        <select
+          className="review-exam-dropdown"
+          value={selectedExamId || ""}
+          onChange={(e) => {
+            setQuestions([]);
+            setAnswers({});
+            setVisited({});
+            setCurrentIndex(0);
+
+            setSelectedExamId(
+              Number(e.target.value)
+            );
+          }}
+        >
+          {examDates.map((item) => (
+            <option
+              key={item.exam_id}
+              value={item.exam_id}
             >
-              ▦
-            </button>
-
-            {isReview && (
-              <button
-                className="review-tools-toggle"
-                onClick={() =>
-                  setShowReviewTools(prev => !prev)
+              {new Date(item.date).toLocaleString(
+                "en-US",
+                {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true
                 }
-              >
-                🛠 Review Tools
-              </button>
-            )}
+              )}
+            </option>
+          ))}
+        </select>
+      )}
+    </>
+  )}
 
-          </div>
+</div>
 
           
 

@@ -855,3 +855,23 @@
     height: 38px;
   }
 }
+.review-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.question-counter-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.review-exam-dropdown {
+  width: 220px;
+  min-width: 220px;
+}
+
+.exit-review-btn-small {
+  padding: 6px 10px;
+  font-size: 14px;
+}

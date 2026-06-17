@@ -270,6 +270,11 @@ console.error("🔥 loadReport error:", err);
     return numA === numB;
   }
   useEffect(() => {
+  if (isReview) {
+    setShowQuestionNavigator(true);
+  }
+}, [isReview]);
+  useEffect(() => {
 if (!studentId) return;
 if (mode !== "loading") return;
 
@@ -645,51 +650,7 @@ const toggleFlagQuestion = () => {
     
 return (
 <div className={`exam-shell ${styles.examShell}`}>
-  {/* ✅ DATE DROPDOWN */}
-  {isReview && (
-    <div className="review-top-bar">
-
-      <button
-        className="exit-review-btn"
-        onClick={() => {
-          setQuestions([]);
-          setAnswers({});
-          setVisited({});
-          setCurrentIndex(0);
-          setMode("report");
-        }}
-      >
-        ← Exit Review
-      </button>
-
-      {examDates?.length > 0 && (
-        <div style={{ marginBottom: "12px" }}>
-          <select
-            className="exam-dropdown"
-            value={selectedExamId || ""}
-            onChange={(e) => {
-              setQuestions([]);
-              setAnswers({});
-              setVisited({});
-              setCurrentIndex(0);
-              setSelectedExamId(Number(e.target.value));
-            }}
-          >
-            {examDates.map((d) => (
-              <option
-                key={d.exam_id}
-                value={d.exam_id}
-              >
-                {new Date(d.date).toLocaleString()}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
-    </div>
-  )}
-
+  
   {/* 🔥 ALWAYS FETCH DATA */}
   <NaplanNumeracyReview
     studentId={studentId}
@@ -748,15 +709,62 @@ return (
               Question {currentIndex + 1} of {questions.length}
             </span>
 
-            {!isReview && (
-              <button
-                className="question-grid-toggle"
-                onClick={() =>
-                  setShowQuestionNavigator(prev => !prev)
-                }
-              >
-                ▦
-              </button>
+            <button
+              className="question-grid-toggle"
+              onClick={() =>
+                setShowQuestionNavigator(prev => !prev)
+              }
+            >
+              ▦
+            </button>
+
+            {isReview && (
+              <>
+                <button
+                  className="exit-review-btn-small"
+                  onClick={() => {
+                    setQuestions([]);
+                    setAnswers({});
+                    setVisited({});
+                    setCurrentIndex(0);
+                    setMode("report");
+                  }}
+                >
+                  Exit Review
+                </button>
+
+                {examDates?.length > 0 && (
+                  <select
+                    className="review-exam-dropdown"
+                    value={selectedExamId || ""}
+                    onChange={(e) => {
+                      setQuestions([]);
+                      setAnswers({});
+                      setVisited({});
+                      setCurrentIndex(0);
+                      setSelectedExamId(
+                        Number(e.target.value)
+                      );
+                    }}
+                  >
+                    {examDates.map((d) => (
+                      <option
+                        key={d.exam_id}
+                        value={d.exam_id}
+                      >
+                        {new Date(d.date).toLocaleString("en-AU", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true
+                        })}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </>
             )}
 
           </div>
@@ -765,7 +773,7 @@ return (
 
         {/* QUESTION INDEX */}
         {
-          (isReview || showQuestionNavigator) && (
+          showQuestionNavigator && (
 
             <div className="question-index-wrapper">
             {!isReview && (

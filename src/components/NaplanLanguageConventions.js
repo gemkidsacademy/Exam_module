@@ -270,7 +270,11 @@ export default function NaplanLanguageConventions({
   }
 
 }, [API_BASE, studentId, parentMode]);
-
+  useEffect(() => {
+  if (isReview) {
+    setShowQuestionNavigator(true);
+  }
+}, [isReview]);
   useEffect(() => {
   if (mode !== "report") return;
 
@@ -660,65 +664,7 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
   return (
     <div className={`exam-shell ${styles.examShell}`}>
       <div className={`exam-container ${styles.examContainer}`}>
-        {mode === "review" && (
-          <div className="review-top-bar">
-
-            <button
-              className="exit-review-btn"
-              onClick={() => {
-                setQuestions([]);
-                setAnswers({});
-                setVisited({});
-                setCurrentIndex(0);
-                setMode("report");
-              }}
-            >
-              ← Exit Review
-            </button>
-
-            {examDates.length > 0 && (
-              <div className="report-filter-row">
-                <label className="report-label">
-                  Select Date:
-                </label>
-
-                <select
-                  className="report-select"
-                  value={selectedExamId || ""}
-                  onChange={(e) => {
-                    setQuestions([]);
-                    setAnswers({});
-                    setVisited({});
-                    setCurrentIndex(0);
-
-                    setSelectedExamId(
-                      Number(e.target.value)
-                    );
-                  }}
-                >
-                  {examDates.map((item) => (
-                    <option
-                      key={item.exam_id}
-                      value={item.exam_id}
-                    >
-                      {new Date(item.date).toLocaleString(
-                        "en-US",
-                        {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit"
-                        }
-                      )}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-          </div>
-        )}
+        
         {/* HEADER */}
         <div className="exam-header">
 
@@ -730,28 +676,78 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
 
           <div className="question-counter-inline">
 
-            <span className="question-counter-text">
-              Question {currentIndex + 1} of {questions.length}
-            </span>
+  <span className="question-counter-text">
+    Question {currentIndex + 1} of {questions.length}
+  </span>
 
-            {!isReview && (
-              <button
-                className="question-grid-toggle"
-                onClick={() =>
-                  setShowQuestionNavigator(prev => !prev)
+  <button
+    className="question-grid-toggle"
+    onClick={() =>
+      setShowQuestionNavigator(prev => !prev)
+    }
+  >
+    ▦
+  </button>
+
+  {isReview && (
+    <>
+      <button
+        className="exit-review-btn"
+        onClick={() => {
+          setQuestions([]);
+          setAnswers({});
+          setVisited({});
+          setCurrentIndex(0);
+          setMode("report");
+        }}
+      >
+        ← Exit Review
+      </button>
+
+      {examDates.length > 0 && (
+        <select
+          className="review-exam-dropdown"
+          value={selectedExamId || ""}
+          onChange={(e) => {
+            setQuestions([]);
+            setAnswers({});
+            setVisited({});
+            setCurrentIndex(0);
+
+            setSelectedExamId(
+              Number(e.target.value)
+            );
+          }}
+        >
+          {examDates.map((item) => (
+            <option
+              key={item.exam_id}
+              value={item.exam_id}
+            >
+              {new Date(item.date).toLocaleString(
+                "en-US",
+                {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit"
                 }
-              >
-                ▦
-              </button>
-            )}
+              )}
+            </option>
+          ))}
+        </select>
+      )}
+    </>
+  )}
 
-          </div>
+</div>
 
         </div>
 
         {/* QUESTION INDEX (same as Thinking Skills) */}
         {
-          (isReview || showQuestionNavigator) && (
+          showQuestionNavigator && (
 
             <div className="question-index-wrapper">
             {!isReview && (

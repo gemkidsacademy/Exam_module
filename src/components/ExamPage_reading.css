@@ -1094,3 +1094,14 @@
   border-bottom: 1px solid #dcdcdc;
   background: #f8f9fb;
 }
+.review-exam-dropdown {
+  width: 260px;
+  min-width: 260px;
+  flex-shrink: 0;
+}
+
+.question-counter-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
