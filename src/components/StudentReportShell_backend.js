@@ -107,19 +107,37 @@
 
 }, [className, reportType]);
 useEffect(() => {
+  console.log("YEARS EFFECT FIRED", {
+    reportType,
+    className,
+    centerCode
+  });
+
   if (reportType !== "class" || !className) {
+    console.log("ABORTED");
     return;
   }
 
+  console.log("FETCHING YEARS");
+
   fetch(
-    `${API_BASE}/api/classes/years?category=${encodeURIComponent(className)}`
+    `${API_BASE}/api/classes/years?` +
+    `category=${encodeURIComponent(className)}` +
+    `&center_code=${encodeURIComponent(centerCode)}`
   )
-    .then(res => res.json())
+    .then(res => {
+      console.log("STATUS", res.status);
+      return res.json();
+    })
     .then(data => {
+      console.log("YEARS RECEIVED", data);
       setAvailableYears(data.years || []);
+    })
+    .catch(err => {
+      console.error(err);
     });
-}, [className, reportType]);
-    
+
+}, [className, reportType]);    
     useEffect(() => {
   // Guard conditions
       if (!date || !studentId) return;
@@ -240,7 +258,9 @@ useEffect(() => {
   if (
     reportType !== "class" ||
     !className ||
-    !exam
+    !classYear ||
+    !exam ||
+    !centerCode
   ) {
     setAvailableClassDates([]);
     return;
@@ -249,7 +269,10 @@ useEffect(() => {
   fetch(
     `${API_BASE}/api/classes/${encodeURIComponent(
       className
-    )}/exam-dates?exam=${exam}`
+    )}/exam-dates?` +
+    `exam=${encodeURIComponent(exam)}` +
+    `&student_year=${encodeURIComponent(classYear)}` +
+    `&center_code=${encodeURIComponent(centerCode)}`
   )
     .then(res => {
       if (!res.ok) {
@@ -264,7 +287,13 @@ useEffect(() => {
       console.error("Error loading class dates:", err);
       setAvailableClassDates([]);
     });
-}, [reportType, className, exam]);
+}, [
+  reportType,
+  className,
+  classYear,
+  centerCode,
+  exam
+]);
 
     useEffect(() => {
   console.log("🟡 CUMULATIVE EFFECT CHECK", {
