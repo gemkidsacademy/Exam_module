@@ -496,7 +496,6 @@ export default function ReadingReviewOC({
           <div className="question-header-row">
             
             <p className="question-text">
-              Q{currentQuestion.question_number || index + 1}.{" "}
               {currentQuestion.question_text}
             </p>
             

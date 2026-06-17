@@ -1378,10 +1378,6 @@ useEffect(() => {
           <div className="question-card">
             
             <div className="question-header">
-              <h3>
-                Q{currentIndex + 1}.
-              </h3>
-            
               {mode === "review" && (
                 <button
                   className="explain-btn-inline"

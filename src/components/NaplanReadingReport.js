@@ -68,8 +68,13 @@ export default function NaplanReadingReport({
                 <strong>{overall.not_attempted ?? 0}</strong>
               </div>
               <div className="score-row">
-                <span>Score</span>
-                <strong>{overall.score_percent ?? 0}%</strong>
+                <span>Accuracy</span>
+                <strong>
+                  {overall.attempted > 0
+                    ? ((overall.correct / overall.attempted) * 100).toFixed(2)
+                    : 0}
+                  %
+                </strong>
               </div>
             </div>
           </div>

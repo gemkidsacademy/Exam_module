@@ -915,11 +915,44 @@
         ============================= */}
         <div className="card">
           <h3>Accuracy</h3>
+
           <div
             className="accuracy-circle"
-            style={{ "--p": normalizedReport.accuracy }}
-          >
-            <span>{normalizedReport.accuracy}%</span>
+            style={{ "--p": normalizedReport.score }}
+            >
+            <span>{normalizedReport.score}%</span>
+            </div>
+
+          <div className="stats-grid">
+            <div>
+              <span>Total Questions</span>
+              <strong>{normalizedReport.total}</strong>
+            </div>
+
+            <div>
+              <span>Attempted</span>
+              <strong>{normalizedReport.attempted}</strong>
+            </div>
+
+            <div>
+              <span>Correct</span>
+              <strong>{normalizedReport.correct}</strong>
+            </div>
+
+            <div>
+              <span>Incorrect</span>
+              <strong>{normalizedReport.incorrect}</strong>
+            </div>
+
+            <div>
+              <span>Not Attempted</span>
+              <strong>{normalizedReport.not_attempted}</strong>
+            </div>
+
+            <div>
+              <span>Accuracy</span>
+              <strong>{normalizedReport.accuracy}%</strong>
+            </div>
           </div>
         </div>
 
@@ -1548,8 +1581,10 @@
         <div className="question-pane">
           {!isDropdownCloze && (
             <p className="question-text">
-              Q{currentQuestion.question_number}.{" "}
-              {String(currentQuestion.question_text).replace(/^\s*\d+\.\s*/, "")}
+              {String(currentQuestion.question_text).replace(
+                /^Q?\d+\.\s*/i,
+                ""
+              )}
             </p>
           )}
 

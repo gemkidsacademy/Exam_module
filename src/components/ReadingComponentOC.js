@@ -721,13 +721,48 @@ useEffect(() => {
       <div className="report-grid">
 
         {/* OVERALL ACCURACY */}
-        <div className="card">
-          <h3>Accuracy</h3>
-          <div
-            className="accuracy-circle"
-            style={{ "--p": normalizedReport.accuracy }}
-          >
-            <span>{normalizedReport.accuracy}%</span>
+        <div className="card overall-card">
+          <h3>Overall Accuracy</h3>
+
+          <div className="overall-content">
+            <div
+              className="accuracy-circle"
+              style={{ "--p": normalizedReport.accuracy }}
+            >
+              <span>{normalizedReport.accuracy}%</span>
+            </div>
+
+            <div className="overall-stats">
+              <div>
+                <span>Total Questions</span>
+                <strong>{normalizedReport.total}</strong>
+              </div>
+
+              <div>
+                <span>Attempted</span>
+                <strong>{normalizedReport.attempted}</strong>
+              </div>
+
+              <div>
+                <span>Correct</span>
+                <strong>{normalizedReport.correct}</strong>
+              </div>
+
+              <div>
+                <span>Incorrect</span>
+                <strong>{normalizedReport.incorrect}</strong>
+              </div>
+
+              <div>
+                <span>Not Attempted</span>
+                <strong>{normalizedReport.not_attempted}</strong>
+              </div>
+
+              <div className="score-row">
+                <span>Accuracy</span>
+                <strong>{normalizedReport.accuracy}%</strong>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1377,8 +1412,7 @@ console.log("EXTRACTS:", currentQuestion?.reading_material?.extracts);
       <div className="question-pane">
         {!isDropdownCloze && (
           <p className="question-text">
-            Q{currentQuestion.question_number}.{" "}
-            {(currentQuestion.question_text || "").replace(/^\d+\.\s*/, "")}
+            {currentQuestion.question_text}
           </p>
         )}
 

@@ -320,9 +320,8 @@ export default function NaplanReadingReview({
 
             {/* ================= HEADER ================= */}
             <div className="review-header">
-              <span>Question {idx + 1}</span>
-              <span>{isCorrect ? "✔ Correct" : "✖ Incorrect"}</span>
-            </div>
+            <span>{isCorrect ? "✔ Correct" : "✖ Incorrect"}</span>
+          </div>
 
             {/* ================= QUESTION ================= */}
             {q.exam_bundle?.question_blocks?.map((block, i) => {

@@ -457,8 +457,10 @@ if (typeof rm === "string") {
           {/* ✅ HEADER FIRST */}
           <div className="question-header-row">
             <p className="question-text">
-              Q{currentQuestion.question_number}.{" "}
-              {String(currentQuestion.question_text).replace(/^\s*\d+\.\s*/, "")}
+              {String(currentQuestion.question_text).replace(
+                /^Q?\d+\.\s*/i,
+                ""
+              )}
             </p>
 
             {!explanations[qid] && (
