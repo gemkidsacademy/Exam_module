@@ -167,7 +167,23 @@
           console.error("❌ Failed to load history:", err);
         });
     }, [result?.attempt_id, variant]);
-   /* 
+    useEffect(() => {
+  const blockKeys = (e) => {
+    if (
+      (e.ctrlKey || e.metaKey) &&
+      ["c", "v", "x"].includes(e.key.toLowerCase())
+    ) {
+      e.preventDefault();
+    }
+  };
+
+  document.addEventListener("keydown", blockKeys);
+
+  return () => {
+    document.removeEventListener("keydown", blockKeys);
+  };
+}, []);
+   
     useEffect(() => {
       if (!examActive) return;
 
@@ -185,7 +201,7 @@
         document.removeEventListener("contextmenu", prevent);
       };
     }, [examActive]);
-    */
+    
     useEffect(() => {
       document.documentElement.style.height = "auto";
       document.body.style.height = "auto";
@@ -984,6 +1000,7 @@
           {editor && (
             <EditorContent
               editor={editor}
+              spellCheck={false}
               style={{
                 flex: 1,
                 display: "flex",

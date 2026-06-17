@@ -1442,9 +1442,7 @@
 
                   <>
 
-                    {rm?.title && (
-                      <h3>{rm.title}</h3>
-                    )}
+                    
 
                     {rm?.paragraphs ? (
 

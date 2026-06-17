@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 
 import "./DeleteUserExamAttempt.css";
-const DeleteUserExamAttempt = ({ onClose }) => {
+const DeleteUserExamAttempt = ({
+  onClose,
+  centerCode
+}) => {
   const [studentsList, setStudentsList] = useState([]);
 
   const [selectedStudentId, setSelectedStudentId] = useState("");
@@ -22,10 +25,12 @@ const DeleteUserExamAttempt = ({ onClose }) => {
   const fetchStudentsFromBackend = async () => {
     try {
       
-      const response = await fetch("https://web-production-481a5.up.railway.app/api/students/basic"); // adjust later
+      const response = await fetch(
+        `https://web-production-481a5.up.railway.app/students/by-center/${encodeURIComponent(centerCode)}`
+      ); 
       const data = await response.json();
 
-      setStudentsList(data);
+      setStudentsList(data.students || []);
     } catch (error) {
       console.error("❌ Failed to fetch students", error);
     }

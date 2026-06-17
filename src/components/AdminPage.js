@@ -359,8 +359,11 @@ const tabs = allTabs.filter((tab) => {
               <DeleteUserModal onClose={() => setUserMode("menu")} />
             )}
             {userMode === "delete-exam-attempt" && (
-            <DeleteUserExamAttempt onClose={() => setUserMode("menu")} />
-          )}
+              <DeleteUserExamAttempt
+                centerCode={centerCode}
+                onClose={() => setUserMode("menu")}
+              />
+            )}
         
           </div>
         )}
