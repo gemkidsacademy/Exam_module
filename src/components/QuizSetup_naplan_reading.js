@@ -24,12 +24,10 @@ export default function QuizSetup_naplan_reading({
   const [showDeleteQuestionSection, setShowDeleteQuestionSection] = useState(false);
 
   const getAllowedRange = (year) => {
-    if (year === "3") {
-      return { min: 30, max: 40 };
-    }
+    const yearNum = Number(year);
 
-    if (year === "5") {
-      return { min: 30, max: 45 };
+    if (yearNum >= 2 && yearNum <= 9) {
+      return { min: 35, max: 45 };
     }
 
     return null;
@@ -622,14 +620,14 @@ const selectedTopicNames = quiz.topics
       <label>Year:</label>
       <select name="year" value={quiz.year} onChange={handleInputChange}>
         <option value="">Select Year</option>
-        <option value="3">Year 2</option>
+        <option value="2">Year 2</option>
         <option value="3">Year 3</option>
-        <option value="3">Year 4</option>
+        <option value="4">Year 4</option>
         <option value="5">Year 5</option>
-        <option value="3">Year 6</option>
-        <option value="3">Year 7</option>
-        <option value="3">Year 8</option>
-        <option value="3">Year 9</option>
+        <option value="6">Year 6</option>
+        <option value="7">Year 7</option>
+        <option value="8">Year 8</option>
+        <option value="9">Year 9</option>
 
       </select>
 

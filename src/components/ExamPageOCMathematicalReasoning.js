@@ -672,27 +672,7 @@ if (!currentQ) {
 
 </div>
 
-        {
-          mode === "review" && (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end"
-              }}
-            >
-              <button
-                className="nav-btn finish"
-
-                onClick={() => {
-                  setMode("report");
-                  setExplanation(null);
-                }}
-              >
-                Exit Review
-              </button>
-            </div>
-          )
-        }
+        
 
       </div>
       
@@ -1005,22 +985,7 @@ if (!currentQ) {
       {/* NAVIGATION */}
       <div className="nav-buttons">
 
-        {
-          isReview && (
-
-            <button
-              className="nav-btn finish"
-
-              onClick={() => {
-                setMode("report");
-                setExplanation(null);
-              }}
-            >
-              Exit Review
-            </button>
-
-          )
-        }
+        
 
         <button
           className="nav-btn prev"

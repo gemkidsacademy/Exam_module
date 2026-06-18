@@ -1071,22 +1071,7 @@ return (
     {/* NAVIGATION */}
     <div className="nav-buttons">
 
-      {
-        isReview && (
-
-          <button
-            className="nav-btn finish"
-
-            onClick={() => {
-              setMode("report");
-              setExplanation(null);
-            }}
-          >
-            Exit Review
-          </button>
-
-        )
-      }
+      
 
       <button
         className="nav-btn prev"

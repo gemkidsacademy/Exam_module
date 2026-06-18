@@ -413,14 +413,13 @@ useEffect(() => {
 ]);
 
     useEffect(() => {
-    if (
-      reportType === "class" &&
-      classReportData?.reports?.length > 0 &&
-      !selectedClassDay
-    ) {
-      setSelectedClassDay(classReportData.reports[0].class_day);
-    }
-  }, [classReportData, reportType, selectedClassDay]);
+      if (
+        reportType === "class" &&
+        classReportData?.reports?.length > 0
+      ) {
+        setSelectedClassDay(null);
+      }
+    }, [classReportData, reportType]);
   
     useEffect(() => {
     if (
@@ -1068,9 +1067,13 @@ useEffect(() => {
       <div className="filter-group">
         <label>Class Day</label>
         <select
-          value={selectedClassDay}
+          value={selectedClassDay || ""}
           onChange={e => setSelectedClassDay(e.target.value)}
         >
+          <option value="">
+            All Class Days
+          </option>
+
           {classReportData.reports.map(r => (
             <option key={r.class_day} value={r.class_day}>
               {r.class_day}
@@ -1091,23 +1094,28 @@ useEffect(() => {
   )}
   
   {reportType === "class" &&
-    classReportData?.reports
-      ?.filter(r => r.class_day === selectedClassDay)
-      .map(report => (
-        <div key={report.class_day} className="class-day-section">
-          <div className="class-day-label">
-            {report.class_day}
-          </div>
-  
-          <ClassCurrentExamReport
-            data={{
-              class_name: classReportData.class_name,
-              exam: classReportData.exam,
-              date: classReportData.date,
-              ...report
-            }}
-          />
+    classReportData?.reports &&
+    (
+      selectedClassDay
+        ? classReportData.reports.filter(
+            r => r.class_day === selectedClassDay
+          )
+        : classReportData.reports
+    ).map(report => (
+      <div key={report.class_day} className="class-day-section">
+        <div className="class-day-label">
+          {report.class_day}
         </div>
+
+        <ClassCurrentExamReport
+          data={{
+            class_name: classReportData.class_name,
+            exam: classReportData.exam,
+            date: classReportData.date,
+            ...report
+          }}
+        />
+      </div>
   ))}
   
   {reportType === "cumulative" && cumulativeReportData && (

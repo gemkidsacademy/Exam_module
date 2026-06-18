@@ -21,9 +21,13 @@ export default function QuizSetup_naplan_language_conventions({
   /* ============================
     NAPLAN Rules
   ============================ */
-  const getAllowedRange = (year) => {
-    if (year === "3") return { min: 2, max: 5 };
-    if (year === "5") return { min: 2, max: 5 };
+ const getAllowedRange = (year) => {
+    const y = Number(year);
+
+    if (y >= 2 && y <= 9) {
+      return { min: 45, max: 60 };
+    }
+
     return null;
   };
 

@@ -1418,8 +1418,8 @@ console.log("EXTRACTS:", currentQuestion?.reading_material?.extracts);
       <div className="question-pane">
         {!isDropdownCloze && (
           <p className="question-text">
-            {currentQuestion.question_text}
-          </p>
+          {currentQuestion.question_text.replace(/^\d+\.\s*/, "")}
+        </p>
         )}
 
         {!isDropdownCloze && (

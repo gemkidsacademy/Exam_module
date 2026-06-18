@@ -1033,7 +1033,11 @@ return (
             src={optionValue.src}
             alt={`Option ${optionKey}`}
             className="option-image"
-            style={{ maxWidth: "150px" }}
+            style={{
+              maxWidth: "80px",
+              maxHeight: "80px",
+              objectFit: "contain"
+            }}
           />
         )}
       </button>

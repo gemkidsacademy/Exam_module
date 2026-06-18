@@ -101,24 +101,14 @@ export default function QuizSetup_naplan({
 };
 
   const getAllowedRange = (year) => {
-  if (year === "3") {
-    return { min: 1, max: 40 };
-  }
+    const yearNum = Number(year);
 
-  if (year === "5") {
-    return { min: 1, max: 45 };
-  }
+    if (yearNum >= 2 && yearNum <= 9) {
+      return { min: 35, max: 45 };
+    }
 
-  if (year === "7") {
-    return { min: 1, max: 45 };
-  }
-
-  if (year === "9") {
-    return { min: 1, max: 45 };
-  }
-
-  return null;
-};
+    return null;
+  };
 
   
 
