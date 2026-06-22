@@ -18,7 +18,7 @@ export default function ReadingReviewOC({
 }) {
   const [index, setIndex] = useState(0);
   const [showQuestionNavigator, setShowQuestionNavigator] =
-  useState(true);
+  useState(false);
   const [explanations, setExplanations] = useState({});
   const [loadingExplanation, setLoadingExplanation] = useState(null);
   const [activeExtract, setActiveExtract] = useState(0);
@@ -494,7 +494,10 @@ export default function ReadingReviewOC({
           <div className="question-header-row">
             
             <p className="question-text">
-              {currentQuestion.question_text}
+              {String(currentQuestion.question_text).replace(
+                /^Q?\d+\.\s*/i,
+                ""
+              )}
             </p>
             
 

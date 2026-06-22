@@ -184,7 +184,7 @@
 }, [studentId, parentMode]);
 useEffect(() => {
   if (isReview) {
-    setShowQuestionNavigator(true);
+    setShowQuestionNavigator(false);
   }
 }, [isReview]);
   useEffect(() => {

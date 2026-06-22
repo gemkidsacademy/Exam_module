@@ -271,7 +271,7 @@ console.error("🔥 loadReport error:", err);
   }
   useEffect(() => {
   if (isReview) {
-    setShowQuestionNavigator(true);
+    setShowQuestionNavigator(false);
   }
 }, [isReview]);
   useEffect(() => {

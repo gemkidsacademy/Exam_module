@@ -272,7 +272,7 @@ export default function NaplanLanguageConventions({
 }, [API_BASE, studentId, parentMode]);
   useEffect(() => {
   if (isReview) {
-    setShowQuestionNavigator(true);
+    setShowQuestionNavigator(false);
   }
 }, [isReview]);
   useEffect(() => {

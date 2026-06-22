@@ -275,7 +275,7 @@ useEffect(() => {
 }, [examAttemptId, isReview]);
 useEffect(() => {
   if (isReview) {
-    setShowQuestionNavigator(true);
+    setShowQuestionNavigator(false);
   }
 }, [isReview]);
 useEffect(() => {
