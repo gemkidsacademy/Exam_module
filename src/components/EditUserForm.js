@@ -7,6 +7,7 @@ export default function EditUserForm() {
   const [id, setId] = useState(""); // Non-editable backend ID of selected student
   const [name, setName] = useState("");
   const [className, setClassName] = useState("");
+  const [classYear, setClassYear] = useState("");
   const centerCode = sessionStorage.getItem(
     "center_code"
   );
@@ -60,6 +61,8 @@ export default function EditUserForm() {
 
       setGender(student.gender || "");
 
+      setClassYear(student.student_year || "");
+
     }
   }, [selectedStudentId, studentOptions]);
 
@@ -70,6 +73,7 @@ export default function EditUserForm() {
       student_id: selectedStudentId,
       name,
       class_name: className,
+      student_year: classYear,
       class_day: classDay,
       parent_email: parentEmail,
       gender,
@@ -130,6 +134,22 @@ export default function EditUserForm() {
           onChange={(e) => setClassName(e.target.value)}
           required
         />
+        <label>Class Year</label>
+        <select
+          value={classYear}
+          onChange={(e) => setClassYear(e.target.value)}
+          required
+        >
+          <option value="">-- Select Year --</option>
+          <option value="Year 2">Year 2</option>
+          <option value="Year 3">Year 3</option>
+          <option value="Year 4">Year 4</option>
+          <option value="Year 5">Year 5</option>
+          <option value="Year 6">Year 6</option>
+          <option value="Year 7">Year 7</option>
+          <option value="Year 8">Year 8</option>
+          <option value="Year 9">Year 9</option>
+        </select>
 
         <label>Class Day</label>
         <input

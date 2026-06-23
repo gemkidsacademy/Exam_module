@@ -412,65 +412,62 @@ useEffect(() => {
   selectedAttemptDates
 ]);
 
-    useEffect(() => {
-      if (
-        reportType === "class" &&
-        classReportData?.reports?.length > 0
-      ) {
-        setSelectedClassDay(null);
+   useEffect(() => {
+  if (
+    !shouldGenerate ||
+    reportType !== "class" ||
+    !className ||
+    !classYear ||
+    !exam ||
+    !date
+  ) {
+    return;
+  }
+
+  setLoadingClassReport(true);
+  setClassReportError(null);
+  setClassReportData(null);
+  console.log("selectedClassDay =", selectedClassDay);
+
+  const endpoint = "/api/reports/class";
+
+  const url =
+    `${API_BASE}${endpoint}` +
+    `?class_name=${encodeURIComponent(className)}` +
+    `&class_year=${encodeURIComponent(classYear)}` +
+    `&center_code=${encodeURIComponent(centerCode)}` +
+    `&exam=${encodeURIComponent(exam)}` +
+    `&date=${encodeURIComponent(date)}`;
+
+  console.log("CLASS REPORT URL:", url);
+  fetch(url)
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to load class report");
       }
-    }, [classReportData, reportType]);
-  
-    useEffect(() => {
-    if (
-      !shouldGenerate ||
-      reportType !== "class" ||
-      !className ||    
-      !classYear ||
-      !exam ||
-      !date
-    ) {
-      return;
-    }
-  
-    setLoadingClassReport(true);
-    setClassReportError(null);
-    setClassReportData(null);
-  
-    const url =
-      `${API_BASE}/api/reports/class?` +
-      `class_name=${encodeURIComponent(className)}` +
-      `&class_year=${encodeURIComponent(classYear)}` +
-      `&center_code=${encodeURIComponent(centerCode)}` +
-      `&exam=${encodeURIComponent(exam)}` +
-      `&date=${encodeURIComponent(date)}`;
-  
-    fetch(url)
-      .then(res => {
-        if (!res.ok) {
-          throw new Error("Failed to load class report");
-        }
-        return res.json();
-      })
-      .then(data => {
-        setClassReportData(data);
-      })
-      .catch(err => {
-        console.error("Class report load error:", err);
-        setClassReportError(err.message);
-      })
-      .finally(() => {
-        setLoadingClassReport(false);
-        setShouldGenerate(false);
-      });
-  }, [
+      return res.json();
+    })
+    .then(data => {
+      setClassReportData(data);
+    })
+    .catch(err => {
+      console.error("Class report load error:", err);
+      setClassReportError(err.message);
+    })
+    .finally(() => {
+      setLoadingClassReport(false);
+      setShouldGenerate(false);
+    });
+
+}, [
   shouldGenerate,
   reportType,
   className,
   classYear,
   centerCode,
   exam,
-  date
+  date,
+  selectedClassDay
 ]);
   
   
@@ -1100,7 +1097,7 @@ useEffect(() => {
         ? classReportData.reports.filter(
             r => r.class_day === selectedClassDay
           )
-        : classReportData.reports
+        : [classReportData.combined_report]
     ).map(report => (
       <div key={report.class_day} className="class-day-section">
         <div className="class-day-label">

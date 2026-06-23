@@ -19,7 +19,7 @@ export default function OC_MathematicalReasoningReview({
     const loadReviewOCMR = async () => {
       try {
         const endpoint =
-          mode === "homework"
+          mode === "report_homework"
             ? "/api/student/homework-review/oc-mathematical-reasoning"
             : "/api/student/exam-review/oc-mathematical-reasoning";
 

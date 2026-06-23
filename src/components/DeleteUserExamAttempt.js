@@ -8,6 +8,7 @@ const DeleteUserExamAttempt = ({
   const [studentsList, setStudentsList] = useState([]);
 
   const [selectedStudentId, setSelectedStudentId] = useState("");
+  const BACKEND_URL = process.env.REACT_APP_API_URL;
   
 
   const [selectedClassType, setSelectedClassType] = useState("");
@@ -26,8 +27,8 @@ const DeleteUserExamAttempt = ({
     try {
       
       const response = await fetch(
-        `https://web-production-481a5.up.railway.app/students/by-center/${encodeURIComponent(centerCode)}`
-      ); 
+        `${BACKEND_URL}/students/by-center/${encodeURIComponent(centerCode)}`
+      );
       const data = await response.json();
 
       setStudentsList(data.students || []);
@@ -91,7 +92,7 @@ const DeleteUserExamAttempt = ({
   const handleDeleteHomeworkAttemptClick = async () => {
   try {
     const response = await fetch(
-      "https://web-production-481a5.up.railway.app/api/delete-homework-exam-attempt",
+  `${BACKEND_URL}/api/delete-homework-exam-attempt`,
       {
         method: "DELETE",
         headers: {
@@ -128,7 +129,7 @@ const DeleteUserExamAttempt = ({
     });
 
     const response = await fetch(
-      "https://web-production-481a5.up.railway.app/api/delete-exam-attempt",
+  `${BACKEND_URL}/api/delete-exam-attempt`,
       {
         method: "DELETE",
         headers: {
