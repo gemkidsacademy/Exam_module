@@ -122,7 +122,7 @@
   const loadAttempts = async () => {
   try {
     const endpoint =
-      parentMode === "homework"
+      parentMode?.includes("homework")
         ? "/api/student/homework-attempts/oc-mathematical-reasoning"
         : "/api/student/exam-attempts/oc-mathematical-reasoning";
 

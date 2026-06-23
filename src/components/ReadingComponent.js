@@ -1444,21 +1444,7 @@
 
                     
 
-                    {rm?.paragraphs ? (
-
-                      rm.paragraphs.map((p, idx) => (
-                        <p key={idx}>
-                          {p}
-                        </p>
-                      ))
-
-                    ) : (
-
-                      <p>
-                        {rm?.content || ""}
-                      </p>
-
-                    )}
+                    
 
                   </>
 

@@ -220,16 +220,24 @@
   justify-items: center;
   margin-top: 24px;
 }
+.image-mcq-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
 
 .image-mcq-card {
-  width: 200px;
-  padding: 16px;
-  border: 2px solid #d0d7de;
-  border-radius: 14px;
-  background: #ffffff;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
+    width: 200px;
+    padding: 16px;
+    border: 2px solid #d0d7de;
+    border-radius: 14px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    box-sizing: border-box;
+    overflow: hidden;
+  }
 
 .image-mcq-card.selected {
   border-color: #2563eb;

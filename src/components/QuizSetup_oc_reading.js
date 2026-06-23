@@ -257,6 +257,8 @@ export default function QuizSetup_oc_reading({
         num_questions:
           FIXED_TOPIC_QUESTION_RULES_OC[value] !== undefined
             ? FIXED_TOPIC_QUESTION_RULES_OC[value]
+            : CHOICE_TOPIC_QUESTION_RULES_OC[value]
+            ? CHOICE_TOPIC_QUESTION_RULES_OC[value][0]
             : 0,
       };
       const total = topics.reduce(
