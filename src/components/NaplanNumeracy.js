@@ -1316,7 +1316,16 @@ return (
           )}
 
             {currentQ.question_type === 6 && (
-              <div className="image-mcq-grid">
+              <div
+                className="image-mcq-grid"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, minmax(420px, 1fr))",
+                  gap: "24px",
+                  justifyItems: "center",
+                  marginTop: "20px"
+                }}
+              >
                 {Object.entries(currentQ.options || {}).map(
                   ([key, imgUrl]) => {
                     const qid = String(currentQ.id);
@@ -1346,6 +1355,15 @@ return (
                         className={`image-mcq-card ${
                           isSelected ? "selected" : ""
                         } ${reviewClass}`}
+                        style={{
+                          width: "420px",
+                          padding: "16px",
+                          border: "2px solid #d0d7de",
+                          borderRadius: "14px",
+                          background: "#fff",
+                          boxSizing: "border-box",
+                          overflow: "visible"
+                        }}
                         onClick={() => {
                           if (!isReview) {
                             handleAnswerForQuestion(currentQ.id, key);
@@ -1355,7 +1373,12 @@ return (
                         <img
                           src={imgUrl}
                           alt={`Option ${key}`}
-                          className="image-mcq-image"
+                          style={{
+                            width: "100%",
+                            height: "auto",
+                            display: "block",
+                            objectFit: "contain"
+                          }}
                         />
                         <div className="image-mcq-label">{key}</div>
                       </div>
