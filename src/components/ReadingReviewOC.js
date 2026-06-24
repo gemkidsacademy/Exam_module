@@ -49,6 +49,12 @@ export default function ReadingReviewOC({
   }, [questions]);
 
   const currentQuestion = questions[index];
+  console.log(
+    "📚 REVIEW QUESTIONS",
+    questions.length,
+    questions[0]?.question_id,
+    selectedSessionId
+  );
 
   if (!currentQuestion) {
     return <div>No review data available.</div>;
@@ -246,6 +252,13 @@ export default function ReadingReviewOC({
               {data.indexes.map((i) => {
                 const q = questions[i];
 
+                console.log(
+                  "🟢 REVIEW STATUS",
+                  q.question_id,
+                  q.student_answer,
+                  q.is_correct,
+                  getQuestionStatus(q)
+                );
                 const cls = [
                   "index-circle",
                   "review",

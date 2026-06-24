@@ -30,6 +30,7 @@ export default function ReadingComponentOC({
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
   const [activeExtract, setActiveExtract] = useState(0);
+  
   useEffect(() => {
 
     setActiveExtract(0);
@@ -92,6 +93,18 @@ export default function ReadingComponentOC({
     console.error("❌ loadAttemptDates error:", err);
   }
 };
+useEffect(() => {
+    console.log(
+      "🔄 reviewQuestions STATE UPDATED",
+      {
+        count: reviewQuestions?.length,
+        firstQuestion:
+          reviewQuestions?.[0]?.question_id,
+        firstAnswer:
+          reviewQuestions?.[0]?.student_answer
+      }
+    );
+  }, [reviewQuestions]);
   const formatExplanation = (text) => {
       if (!text) return "";
     
@@ -147,7 +160,23 @@ export default function ReadingComponentOC({
       }
     };
   const handleReviewExam = async (sid) => {
-  const sessionToUse = selectedSessionId || attemptId;
+
+  console.log("====================================");
+  console.log("🚀 HANDLE REVIEW EXAM START");
+  console.log("====================================");
+
+  const sessionToUse =
+    sid ||
+    selectedSessionId ||
+    attemptId;
+
+  console.log("🧪 REVIEW INPUTS", {
+    sid,
+    sidType: typeof sid,
+    selectedSessionId,
+    attemptId,
+    sessionToUse
+  });
 
   if (!sessionToUse) {
     console.error("❌ No session_id available for review");
@@ -155,10 +184,25 @@ export default function ReadingComponentOC({
     return;
   }
 
+  console.log(
+    "📡 FETCHING REVIEW FOR SESSION:",
+    sessionToUse
+  );
+
   try {
-    const res = await fetch(
-      `${API_BASE}${REVIEW_ENDPOINT}?session_id=${sessionToUse}`
-    );
+
+    const url =
+      `${API_BASE}${REVIEW_ENDPOINT}?session_id=${sessionToUse}`;
+
+    console.log("🌐 URL:", url);
+
+    const res = await fetch(url);
+
+    console.log("📥 RESPONSE STATUS", {
+      sessionToUse,
+      status: res.status,
+      ok: res.ok
+    });
 
     if (!res.ok) {
       throw new Error("Failed to load review");
@@ -166,28 +210,85 @@ export default function ReadingComponentOC({
 
     const data = await res.json();
 
-    console.log("🧪 REVIEW PAYLOAD:", data);
+    console.log("📚 REVIEW SUMMARY", {
+      sessionToUse,
+      questionCount: data.questions?.length,
+      firstQuestionId:
+        data.questions?.[0]?.question_id
+    });
 
-    setReviewQuestions(
+    console.log(
+      "🧪 FIRST QUESTION",
+      sessionToUse,
+      {
+        question_id:
+          data.questions?.[0]?.question_id,
+        student_answer:
+          data.questions?.[0]?.student_answer,
+        correct_answer:
+          data.questions?.[0]?.correct_answer,
+        is_correct:
+          data.questions?.[0]?.is_correct
+      }
+    );
+
+    console.log(
+      "🧪 FIRST 5 ANSWERS",
+      sessionToUse,
+      (data.questions || [])
+        .slice(0, 5)
+        .map(q => ({
+          id: q.question_id,
+          answer: q.student_answer,
+          correct: q.is_correct
+        }))
+    );
+
+    const mappedQuestions =
       (data.questions || []).map((q) => ({
         ...q,
         answer_options:
-          (q.answer_options && Object.keys(q.answer_options).length > 0)
+          (q.answer_options &&
+           Object.keys(q.answer_options).length > 0)
             ? q.answer_options
             : q.section_ref?.answer_options ||
               q.section?.answer_options ||
               {}
-      }))
+      }));
+
+    console.log(
+      "💾 SETTING REVIEW QUESTIONS",
+      {
+        sessionToUse,
+        firstQuestion:
+          mappedQuestions?.[0]?.question_id,
+        firstAnswer:
+          mappedQuestions?.[0]?.student_answer
+      }
+    );
+
+    setReviewQuestions(mappedQuestions);
+
+    console.log(
+      "✅ REVIEW QUESTIONS SET",
+      sessionToUse
     );
 
     setMode("review");
 
+    console.log(
+      "🏁 HANDLE REVIEW EXAM END",
+      sessionToUse
+    );
+
   } catch (err) {
-    console.error("❌ Review exam error:", err);
+    console.error(
+      "❌ Review exam error:",
+      err
+    );
     alert("Unable to load exam review.");
   }
 };
-
   const loadReportBySession = async (sessionId) => {
   try {
     setLoadingReport(true);
@@ -317,6 +418,9 @@ export default function ReadingComponentOC({
 //}, []);
     
   useEffect(() => {
+  console.log("LOAD EXAM EFFECT");
+  console.log("parentMode =", parentMode);
+  console.log("mode =", mode);
   if (!studentId) return;
   // 🔥 HARD BLOCK REPORT
   if (parentMode?.startsWith("report")) return;
@@ -713,7 +817,7 @@ useEffect(() => {
       {/* REVIEW BUTTON */}
       <button
         className="review-exam-btn"
-        onClick={handleReviewExam}
+        onClick={() => handleReviewExam()}
       >
         Review Exam
       </button>
