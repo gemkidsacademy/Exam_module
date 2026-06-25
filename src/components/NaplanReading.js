@@ -311,9 +311,15 @@ if (questionType === 5) {
     examId != null
       ? `&exam_id=${examId}`
       : "";
-
+  console.log("🧪 REPORT MODE DEBUG", {
+    parentMode,
+    studentId,
+    examId,
+    selectedExamId
+  });
   const reportUrl =
-    parentMode === "homework"
+    parentMode === "report_homework"
+    
       ? `${API_BASE}/api/student/exam-report/naplan-reading-homework?student_id=${studentId}${examParam}`
       : `${API_BASE}/api/student/exam-report/naplan-reading?student_id=${studentId}${examParam}`;
 
@@ -339,7 +345,7 @@ if (questionType === 5) {
   const loadDates = async () => {
     try {
       const url =
-        parentMode === "homework"
+        parentMode === "report_homework"
           ? `${API_BASE}/api/student/exam-dates/naplan-reading-homework?student_id=${studentId}`
           : `${API_BASE}/api/student/exam-dates/naplan-reading?student_id=${studentId}`;
 

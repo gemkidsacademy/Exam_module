@@ -149,6 +149,15 @@ const studentRaw = answers[String(currentQ.id)];
 if (currentQ.question_type === 2) {
 const correct = normalizeCorrectAnswer(correctRaw, currentQ.question_type);
 const student = normalizeStudentAnswer(studentRaw, currentQ.question_type);
+const {
+  overall,
+  topic_wise_performance,
+  improvement_areas
+} = report;
+console.log(
+  "📊 IMPROVEMENT AREAS DATA",
+  improvement_areas
+);
 
 return (
   Array.isArray(student) &&

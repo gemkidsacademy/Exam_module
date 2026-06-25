@@ -48,6 +48,11 @@ if (!report || report.status === "no_data" || !report.overall) {
     topic_wise_performance,
     improvement_areas
   } = report;
+  
+console.log(
+  "📊 IMPROVEMENT AREAS DATA",
+  improvement_areas
+);
 
   return (
     <div className="report-page">
@@ -197,7 +202,7 @@ if (!report || report.status === "no_data" || !report.overall) {
                 />
               </div>
 
-              <span>{t.accuracy_percent}%</span>
+              <span>{t.score_percent}%</span>
 
               {t.limited_data && (
                 <small className="warning">

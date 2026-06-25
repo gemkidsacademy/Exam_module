@@ -94,24 +94,88 @@ export default function NaplanReadingReport({
           ) : (
             topic_wise_performance.map((topic, idx) => (
               <div key={idx} className="topic-row">
-                <div className="topic-name">
-                  {topic.topic || "Unknown Topic"}
+
+                <div
+                style={{
+                  marginBottom: "20px",
+                  paddingBottom: "16px",
+                  borderBottom: "1px solid #e5e7eb"
+                }}
+              >
+                <div
+                  style={{
+                    fontWeight: "600",
+                    fontSize: "14px",
+                    marginBottom: "6px"
+                  }}
+                >
+                  {topic.topic}
+                </div>
+
+                <div
+                  style={{
+                    color: "#22c55e",
+                    fontWeight: "700",
+                    marginBottom: "10px"
+                  }}
+                >
+                  {topic.correct}/{topic.total} Correct
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "10px"
+                  }}
+                >
+                  <span className="pill neutral">
+                    Attempted {topic.attempted}
+                  </span>
+
+                  <span className="pill success">
+                    Correct {topic.correct}
+                  </span>
+
+                  <span className="pill danger">
+                    Incorrect {topic.incorrect}
+                  </span>
+
+                  <span className="pill muted">
+                    Not Attempted {topic.not_attempted}
+                  </span>
+                </div>
+              </div>
+
+                <div className="topic-progress">
+                  <div
+                    className="topic-progress-fill"
+                    style={{
+                      width: `${
+                        (topic.correct / topic.total) * 100
+                      }%`
+                    }}
+                  />
                 </div>
 
                 <div className="pill-row">
                   <span className="pill neutral">
-                    Attempted {topic.attempted ?? 0}
+                    Attempted {topic.attempted}
                   </span>
+
                   <span className="pill success">
-                    Correct {topic.correct ?? 0}
+                    Correct {topic.correct}
                   </span>
+
                   <span className="pill danger">
-                    Incorrect {topic.incorrect ?? 0}
+                    Incorrect {topic.incorrect}
                   </span>
+
                   <span className="pill muted">
-                    Not Attempted {topic.not_attempted ?? 0}
+                    Not Attempted {topic.not_attempted}
                   </span>
                 </div>
+
               </div>
             ))
           )}
@@ -130,12 +194,41 @@ export default function NaplanReadingReport({
           </p>
         ) : (
           improvement_areas.map((area, idx) => (
-            <div key={idx} className="improvement-row">
-              <span className="improve-label">
+            <div
+              key={idx}
+              className="improvement-row"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px"
+              }}
+            >
+              <span
+                className="improve-label"
+                style={{
+                  minWidth: "180px",
+                  fontWeight: "600"
+                }}
+              >
                 {area.topic || "Unknown Topic"}
               </span>
 
-              <div className="progress">
+              <span
+                className="percent"
+                style={{
+                  color: "#dc2626",
+                  fontWeight: "600"
+                }}
+              >
+                {area.accuracy_percent ?? 0}%
+              </span>
+
+              <div
+                className="progress"
+                style={{
+                  flex: 1
+                }}
+              >
                 <div
                   className="progress-fill"
                   style={{
@@ -143,10 +236,6 @@ export default function NaplanReadingReport({
                   }}
                 />
               </div>
-
-              <span className="percent">
-                {area.accuracy_percent ?? 0}%
-              </span>
             </div>
           ))
         )}

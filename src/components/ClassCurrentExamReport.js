@@ -61,27 +61,53 @@ export default function ClassCurrentExamReport({ data }) {
       {/* Score Distribution */}
         <div className="score-distribution">
           <h3>Score Distribution</h3>
-        
+
           {score_distribution.map(bucket => {
-            const maxCount = Math.max(
-              ...score_distribution.map(b => b.count)
+
+            const percentage =
+              summary.students_attempted === 0
+                ? 0
+                : (bucket.count / summary.students_attempted) * 100;
+
+            console.log(
+              bucket.range,
+              bucket.count,
+              summary.students_attempted,
+              percentage
             );
-        
-            const widthPercent =
-              maxCount === 0 ? 0 : (bucket.count / maxCount) * 100;
-        
+
             return (
-              <div key={bucket.range} className="score-row">
-                <div className="score-label">{bucket.range}</div>
-        
-                <div className="score-bar-wrapper">
+              <div
+                key={bucket.range}
+                className="score-row"
+              >
+                <div className="score-label">
+                  {bucket.range}
+                </div>
+
                   <div
-                    className="score-bar"
-                    style={{ width: `${widthPercent}%` }}
+                  style={{
+                    background: "#e5e7eb",
+                    height: "14px",
+                    borderRadius: "999px",
+                    overflow: "hidden",
+                    width: "100%"
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${percentage}%`,
+                      height: "100%",
+                      background: "#2563eb",
+                      borderRadius: "999px",
+                      transition: "width 0.4s ease"
+                    }}
                   />
                 </div>
-        
-                <div className="score-count">{bucket.count}</div>
+
+                <div className="score-count">
+                  {percentage.toFixed(0)}% ({bucket.count})
+                </div>
               </div>
             );
           })}
