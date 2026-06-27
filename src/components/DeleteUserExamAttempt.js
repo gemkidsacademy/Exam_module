@@ -91,17 +91,25 @@ const DeleteUserExamAttempt = ({
   ============================ */
   const handleDeleteHomeworkAttemptClick = async () => {
   try {
+    console.log({
+      exam: selectedClassType.toLowerCase(),
+      mode: "homework",
+      subject: selectedExamType,
+      student_id: selectedStudentId,
+    });
+
     const response = await fetch(
-  `${BACKEND_URL}/api/delete-homework-exam-attempt`,
+      `${BACKEND_URL}/api/admin/delete-exam-attempt-2`,
       {
-        method: "DELETE",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          exam: selectedClassType.toLowerCase(), // selective / oc / naplan
+          mode: "homework",
+          subject: selectedExamType,             // thinking_skills, reading, etc.
           student_id: selectedStudentId,
-          exam_type: selectedExamType,
-          class_name: selectedClassType,
         }),
       }
     );
@@ -113,10 +121,11 @@ const DeleteUserExamAttempt = ({
       return;
     }
 
-    alert(`✅ ${data.message || "Homework attempt deleted"}`);
+    alert(`✅ ${data.message || "Homework attempt deleted successfully."}`);
     onClose();
 
   } catch (error) {
+    console.error("❌ Delete failed", error);
     alert("❌ Network error. Please try again.");
   }
 };
@@ -129,16 +138,17 @@ const DeleteUserExamAttempt = ({
     });
 
     const response = await fetch(
-  `${BACKEND_URL}/api/delete-exam-attempt`,
+  `${BACKEND_URL}/api/admin/delete-exam-attempt-2`,
       {
-        method: "DELETE",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           student_id: selectedStudentId,
-          exam_type: selectedExamType,
-          class_name: selectedClassType,
+          exam: selectedClassType.toLowerCase(),
+          mode: "exam",
+          subject: selectedExamType,
         }),
       }
     );

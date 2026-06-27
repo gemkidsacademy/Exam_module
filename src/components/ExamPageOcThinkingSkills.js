@@ -23,10 +23,16 @@ console.log("🔥 parentMode (child):", parentMode);
 const [attempts, setAttempts] = useState([]);
 const loadAttempts = useCallback(async () => {
   try {
-    const endpoint =
-      parentMode === "homework"
-        ? "/api/student/homework-attempts/oc-thinking-skills"
-        : "/api/student/exam-attempts/oc-thinking-skills";
+    const isHomework = parentMode?.includes("homework");
+
+    console.log("📌 parentMode:", parentMode);
+    console.log("📌 isHomework:", isHomework);
+
+    const endpoint = isHomework
+      ? "/api/student/homework-attempts/oc-thinking-skills"
+      : "/api/student/exam-attempts/oc-thinking-skills";
+
+    console.log("🌐 Attempts endpoint:", endpoint);
 
     console.log("📡 Fetching attempts from:", endpoint);
     console.log("ATTEMPT OBJECT", attempts[0]);
@@ -223,16 +229,30 @@ const [report, setReport] = useState(null);
 ============================================================ */
 const loadReport = useCallback(async (attemptId = null) => {
   try {
-    let url =
-      parentMode === "homework"
-        ? `${API_BASE}/api/student/homework-report/oc-thinking-skills?student_id=${studentId}`
-        : `${API_BASE}/api/student/exam-report/oc-thinking-skills?student_id=${studentId}`;
+    console.log("========== loadReport ==========");
+    console.log("📌 parentMode:", parentMode);
+    console.log("📌 attemptId:", attemptId);
+    console.log("📌 studentId:", studentId);
+
+    const isHomework =
+      parentMode === "homework" ||
+      parentMode === "report_homework";
+
+    console.log("📌 isHomework:", isHomework);
+
+    let url = isHomework
+      ? `${API_BASE}/api/student/homework-report/oc-thinking-skills?student_id=${studentId}`
+      : `${API_BASE}/api/student/exam-report/oc-thinking-skills?student_id=${studentId}`;
 
     if (attemptId !== null && attemptId !== undefined) {
       url += `&exam_attempt_id=${attemptId}`;
     }
 
+    console.log("🌐 Report URL:", url);
+
     const res = await fetch(url);
+
+    console.log("📡 Response status:", res.status);
 
     if (!res.ok) {
       console.warn("⚠️ Report not available yet");
@@ -241,8 +261,8 @@ const loadReport = useCallback(async (attemptId = null) => {
 
     const data = await res.json();
 
-    console.log("REVIEW API RESPONSE", data);
-    console.log("📊 report loaded:", data);
+    console.log("✅ REVIEW API RESPONSE:", data);
+    console.log("📊 Report loaded:", data);
 
     setReport(data);
 
@@ -278,11 +298,7 @@ useEffect(() => {
     setShowQuestionNavigator(false);
   }
 }, [isReview]);
-useEffect(() => {
-  document.addEventListener("contextmenu", e => e.preventDefault());
-  document.addEventListener("copy", e => e.preventDefault());
-  document.addEventListener("cut", e => e.preventDefault());
-}, []);
+
 useEffect(() => {
   if (mode !== "exam") return;
 

@@ -171,7 +171,7 @@ return student === correct;
   const loadExamDates = useCallback(async () => {
 try {
 const examDatesUrl =
-  parentMode === "homework"
+  parentMode === "report_homework"
     ? `${API_BASE}/api/student/exam-dates/naplan-numeracy-homework?student_id=${studentId}`
     : `${API_BASE}/api/student/exam-dates/naplan-numeracy?student_id=${studentId}`;
 
@@ -197,46 +197,49 @@ console.error("Failed to load exam dates", err);
     LOAD REPORT
   ============================================================ */
   const loadReport = useCallback(async (examId) => {
-console.log("🚀 loadReport called with examId:", examId);
+  console.log("🚀 loadReport called with examId:", examId);
+  console.log("📌 parentMode:", parentMode);
+  console.log("📌 parentMode === 'homework' ?", parentMode === "homework");
 
-if (!examId) {
-console.warn("⚠️ loadReport aborted: examId is missing");
-return;
-}
+  if (!examId) {
+    console.warn("⚠️ loadReport aborted: examId is missing");
+    return;
+  }
 
-const reportUrl =
-parentMode === "homework"
-  ? `${API_BASE}/api/student/exam-report/naplan-numeracy-homework?student_id=${studentId}&exam_id=${examId}`
-  : `${API_BASE}/api/student/exam-report/naplan-numeracy?student_id=${studentId}&exam_id=${examId}`;
+  const isHomeworkMode = parentMode?.includes("homework");
 
-console.log("🌐 Fetching URL:", reportUrl);
+  console.log("📌 parentMode:", parentMode);
+  console.log("📌 isHomeworkMode:", isHomeworkMode);
 
-try {
-const res = await fetch(reportUrl);
+  const reportUrl = isHomeworkMode
+    ? `${API_BASE}/api/student/exam-report/naplan-numeracy-homework?student_id=${studentId}&exam_id=${examId}`
+    : `${API_BASE}/api/student/exam-report/naplan-numeracy?student_id=${studentId}&exam_id=${examId}`;
 
-console.log("📡 Response status:", res.status);
+  console.log("🌐 Fetching URL:", reportUrl);
 
-if (!res.ok) {
-  console.error("❌ API request failed");
-  return;
-}
+  try {
+    const res = await fetch(reportUrl);
 
-const data = await res.json();
+    console.log("📡 Response status:", res.status);
 
-console.log("📦 Response data:", data);
+    if (!res.ok) {
+      console.error("❌ API request failed");
+      return;
+    }
 
-setReport(data);
-setExamAttemptId(data.exam_attempt_id);
-setMode("report");
+    const data = await res.json();
 
-console.log("✅ Report state updated");
+    console.log("📦 Response data:", data);
 
-} catch (err) {
-console.error("🔥 loadReport error:", err);
-}
+    setReport(data);
+    setExamAttemptId(data.exam_attempt_id);
+    setMode("report");
 
+    console.log("✅ Report state updated");
+  } catch (err) {
+    console.error("🔥 loadReport error:", err);
+  }
 }, [API_BASE, studentId, parentMode]);
-
   function normalizeNumericValue(raw) {
     if (raw == null) return null;
   
