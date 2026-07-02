@@ -8,6 +8,7 @@ import "./NaplanNumeracyExam.css";
 
 //import "./ExamPage.css";
 import styles from "./ExamPageThinkingSkills.module.css";
+import NaplanCalculator from "./NaplanCalculator";
 
 import NaplanNumeracyReview from "./NaplanNumeracyReview";
 import NaplanNumeracyReport from "./NaplanNumeracyReport";
@@ -28,6 +29,7 @@ mode: parentMode // 🔥 THIS
   const [showQuestionNavigator, setShowQuestionNavigator] =
     useState(false);
 
+  const [showCalculator, setShowCalculator] = useState(false);  
   const [flaggedQuestions, setFlaggedQuestions] =
     useState({});
   const TYPE_2_MAX_SELECTIONS = 2;
@@ -273,6 +275,11 @@ console.error("Failed to load exam dates", err);
   
     return numA === numB;
   }
+  useEffect(() => {
+  if (isReview) {
+    setShowCalculator(false);
+  }
+}, [isReview]);
   useEffect(() => {
   if (isReview) {
     setShowQuestionNavigator(false);
@@ -722,6 +729,15 @@ return (
               ▦
             </button>
 
+            {!isReview && (
+              <button
+                className={`calculator-toggle-btn ${showCalculator ? "active" : ""}`}
+                onClick={() => setShowCalculator(prev => !prev)}
+              >
+                Calculator
+              </button>
+            )}
+
             {isReview && (
               <>
                 <button
@@ -1004,9 +1020,11 @@ return (
           )
         }
 
-        {/* QUESTION CARD */}
-        <div className="question-card">
-          <div className="question-content-centered">
+        {/* QUESTION + CALCULATOR LAYOUT */}
+        <div className={`question-layout ${showCalculator ? "calculator-open" : ""}`}>
+          
+          <div className="question-card">
+            <div className="question-content-centered">
             {!currentQ.question_blocks?.some(b => b.type === "text") &&
               currentQ.question_text && (
                 <p className="question-text">
@@ -1582,8 +1600,15 @@ return (
 
 </div>
 )}
-      </div> {/* closes question-content-centered */}
-      </div> {/* closes question-card */}
+            </div> {/* closes question-content-centered */}
+          </div> {/* closes question-card */}
+
+          {!isReview && showCalculator && (
+            <div className="calculator-panel">
+              <NaplanCalculator />
+            </div>
+          )}
+      </div> {/* closes question-layout */}
       
       <div className="nav-buttons">
 

@@ -35,12 +35,7 @@ export default function AddStudentForm() {
   "NAPLAN",
   "Selective",
   "OC",
-  "Year 1",
-  "Year 2",
-  "Year 3",
-  "Year 4",
-  "Year 5",
-  "Year 6",
+  "Foundational",
 ];
 
 const CLASS_DAY_OPTIONS = [

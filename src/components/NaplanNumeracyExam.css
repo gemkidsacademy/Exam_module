@@ -884,3 +884,58 @@
   padding: 6px 10px;
   font-size: 14px;
 }
+.question-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  width: 100%;
+}
+
+.question-layout .question-card {
+  flex: 1;
+  min-width: 0;
+}
+
+.calculator-toggle-btn {
+  border: none;
+  outline: none;
+  background: #0ea5e9;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.calculator-toggle-btn:hover {
+  opacity: 0.95;
+}
+
+.calculator-toggle-btn.active {
+  background: #0284c7;
+}
+
+.calculator-panel {
+  width: 290px;
+  flex-shrink: 0;
+}
+
+.calculator-placeholder {
+  background: #0b6ea8;
+  border-radius: 14px;
+  padding: 16px;
+  min-height: 420px;
+  color: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.calculator-placeholder h3 {
+  margin: 0 0 12px;
+  font-size: 20px;
+}
+
+.calculator-placeholder p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
