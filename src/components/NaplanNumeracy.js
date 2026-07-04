@@ -704,7 +704,14 @@ return (
   {/* 🔥 FULL UI */}
   {currentQ && (
     
-      <div className={`exam-container ${styles.examContainer}`}>
+      <div
+        className={`exam-container ${styles.examContainer}`}
+        style={{
+          maxHeight: "100vh",
+          overflowY: "auto",
+          overflowX: "hidden"
+        }}
+      >
         {/* HEADER */}
         <div className="exam-header">
 

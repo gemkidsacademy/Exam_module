@@ -857,9 +857,15 @@ useEffect(() => {
       </div>
     );
   }
-  if (mode === "report") {
+ if (mode === "report") {
   return (
-    <>
+    <div
+      style={{
+        height: "100vh",
+        overflowY: "auto",
+        overflowX: "hidden"
+      }}
+    >
       {examDates.length > 0 && (
         <div className="report-filter-row">
           <label className="report-label">
@@ -883,23 +889,21 @@ useEffect(() => {
               setSelectedExamId(newId);
             }}
           >
-            {examDates.map(
-              (item) => (
-                <option
-                  key={item.exam_id}
-                  value={item.exam_id}
-                >
-                  {new Date(item.date).toLocaleString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true
-                  })}
-                </option>
-              )
-            )}
+            {examDates.map((item) => (
+              <option
+                key={item.exam_id}
+                value={item.exam_id}
+              >
+                {new Date(item.date).toLocaleString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true
+                })}
+              </option>
+            ))}
           </select>
         </div>
       )}
@@ -914,7 +918,7 @@ useEffect(() => {
           setMode("review");
         }}
       />
-    </>
+    </div>
   );
 }
 
@@ -977,60 +981,38 @@ useEffect(() => {
           const cleanedAnswers = {};
           const correctnessMap = {};
 
-          Object.entries(
-            ans || {}
-          ).forEach(
-            ([qid, obj]) => {
+          Object.entries(ans || {}).forEach(([qid, obj]) => {
+            const question = qs.find(
+              q => String(q.question_id) === String(qid)
+            );
 
-              // ----------------------------------------
-              // TYPE 8 grouped answers
-              // ----------------------------------------
+            // TYPE 8 grouped answers only
+            if (question?.question_type === 8 && Array.isArray(obj.answer)) {
+              obj.answer.forEach((internalAnswer, idx) => {
+                const internalId = `${qid}_${idx}`;
 
-              if (
-                Array.isArray(obj.answer)
-              ) {
+                cleanedAnswers[internalId] = internalAnswer;
 
-                obj.answer.forEach(
-                  (internalAnswer, idx) => {
+                correctnessMap[internalId] =
+                  Array.isArray(obj.is_correct)
+                    ? obj.is_correct[idx]
+                    : false;
+              });
 
-                    const internalId =
-                      `${qid}_${idx}`;
-
-                    cleanedAnswers[
-                      internalId
-                    ] = internalAnswer;
-
-                    correctnessMap[
-                      internalId
-                    ] =
-                      Array.isArray(obj.is_correct)
-                        ? obj.is_correct[idx]
-                        : false;
-                  }
-                );
-
-                return;
-              }
-
-              // ----------------------------------------
-              // Normal question types
-              // ----------------------------------------
-
-              cleanedAnswers[qid] =
-                obj.answer;
-
-              correctnessMap[qid] =
-                obj.is_correct;
+              return;
             }
-          );
 
-          setAnswers(
-            cleanedAnswers
-          );
+            // NORMAL QUESTION TYPES
+            cleanedAnswers[qid] = normalizeStudentAnswer(
+              obj.answer,
+              question?.question_type
+            );
 
-          setCorrectness(
-            correctnessMap
-          );
+            correctnessMap[qid] = obj.is_correct;
+          });
+
+          setAnswers(cleanedAnswers);
+          setCorrectness(correctnessMap);
         }}
       />
     </>
@@ -1074,7 +1056,6 @@ useEffect(() => {
 
         {/* HEADER */}
         <div className="exam-header">
-
           {!isReview && (
             <div className="timer">
               ⏳ {formatTime(timeLeft)}
@@ -1082,77 +1063,139 @@ useEffect(() => {
           )}
 
           <div className="question-counter-inline">
+            <span className="question-counter-text">
+              Question {currentIndex + 1} of {flatQuestions.length}
+            </span>
 
-  <span className="question-counter-text">
-    Question {currentIndex + 1} of {flatQuestions.length}
-  </span>
-
-  <button
-    className="question-grid-toggle"
-    onClick={() =>
-      setShowQuestionNavigator(prev => !prev)
-    }
-  >
-    ▦
-  </button>
-
-  {isReview && (
-    <>
-      <button
-        className="exit-review-btn"
-        onClick={() => {
-          setQuestions([]);
-          setAnswers({});
-          setVisited({});
-          setCurrentIndex(0);
-          setMode("report");
-        }}
-      >
-        ← Exit Review
-      </button>
-
-      {examDates.length > 0 && (
-        <select
-          className="review-exam-dropdown"
-          value={selectedExamId || ""}
-          onChange={(e) => {
-            setQuestions([]);
-            setAnswers({});
-            setVisited({});
-            setCurrentIndex(0);
-
-            setSelectedExamId(
-              Number(e.target.value)
-            );
-          }}
-        >
-          {examDates.map((item) => (
-            <option
-              key={item.exam_id}
-              value={item.exam_id}
+            <button
+              className="question-grid-toggle"
+              onClick={() =>
+                setShowQuestionNavigator(prev => !prev)
+              }
             >
-              {new Date(item.date).toLocaleString(
-                "en-US",
-                {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: true
-                }
+              ▦
+            </button>
+
+            {isReview && (
+              <>
+                <button
+                  className="exit-review-btn"
+                  onClick={() => {
+                    setQuestions([]);
+                    setAnswers({});
+                    setVisited({});
+                    setCurrentIndex(0);
+                    setMode("report");
+                  }}
+                >
+                  ← Exit Review
+                </button>
+
+                {examDates.length > 0 && (
+                  <select
+                    className="review-exam-dropdown"
+                    value={selectedExamId || ""}
+                    onChange={(e) => {
+                      setQuestions([]);
+                      setAnswers({});
+                      setVisited({});
+                      setCurrentIndex(0);
+
+                      setSelectedExamId(Number(e.target.value));
+                    }}
+                  >
+                    {examDates.map((item) => (
+                      <option
+                        key={item.exam_id}
+                        value={item.exam_id}
+                      >
+                        {new Date(item.date).toLocaleString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true
+                          }
+                        )}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </>
+            )}
+          </div>
+
+          {!isReview ? (
+            <div
+              style={{
+                display: "flex",
+                gap: "12px",
+                alignItems: "center",
+                marginLeft: "auto"
+              }}
+            >
+              <button
+                disabled={currentIndex === 0}
+                onClick={() => goToQuestion(currentIndex - 1)}
+              >
+                Previous
+              </button>
+
+              <button
+                className={`flag-btn ${
+                  flaggedQuestions[String(currentQ.question_id)]
+                    ? "flagged"
+                    : ""
+                }`}
+                onClick={toggleFlagQuestion}
+              >
+                🚩{" "}
+                {flaggedQuestions[String(currentQ.question_id)]
+                  ? "Unflag"
+                  : "Flag"}
+              </button>
+
+              {currentIndex < flatQuestions.length - 1 ? (
+                <button
+                  onClick={() => goToQuestion(currentIndex + 1)}
+                >
+                  Next
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowConfirmFinish(true)}
+                >
+                  Finish Exam
+                </button>
               )}
-            </option>
-          ))}
-        </select>
-      )}
-    </>
-  )}
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                gap: "12px",
+                alignItems: "center",
+                marginLeft: "auto"
+              }}
+            >
+              <button
+                disabled={currentIndex === 0}
+                onClick={() => goToQuestion(currentIndex - 1)}
+              >
+                Previous
+              </button>
 
-</div>
-
-          
-
+              <button
+                disabled={currentIndex === flatQuestions.length - 1}
+                onClick={() => goToQuestion(currentIndex + 1)}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
          {/* QUESTION INDEX BAR */}
         {showQuestionNavigator && (
@@ -1302,7 +1345,12 @@ useEffect(() => {
 
           )
         }
-        <div className="exam-body reading-mode">
+        <div
+          className="exam-body reading-mode"
+          style={{
+            alignItems: "flex-start"
+          }}
+        >
 
         {/* LEFT: PASSAGE(S) */}
         {currentPassage?.reading_block && (
@@ -1377,11 +1425,18 @@ useEffect(() => {
           style={{
             flex: 1,
             paddingRight: "8px",
-            overflowY: isReview ? "visible" : "auto"
+            overflowY: "visible",
+            alignSelf: "flex-start"
           }}
         >
           
-          <div className="question-card">
+          <div
+            className="question-card"
+            style={{
+              height: "auto",
+              minHeight: "unset"
+            }}
+          >
             
             <div className="question-header">
               {mode === "review" && (
@@ -1646,7 +1701,13 @@ useEffect(() => {
                 );
 
                 return (
-                  <div className="mcq-options list">
+                  <div
+                    className="mcq-options list"
+                    style={{
+                      maxHeight: "none",
+                      overflowY: "visible"
+                    }}
+                  >
                     {Object.entries(optionsSource).map(([k, v]) => {
                       const isSelected = selected.includes(k);
 
@@ -1729,7 +1790,13 @@ useEffect(() => {
 
               // 📝 TEXT OPTIONS → radio list
               return (
-                <div className="mcq-options list">
+                <div
+                  className="mcq-options list"
+                  style={{
+                    maxHeight: "none",
+                    overflowY: "visible"
+                  }}
+                >
                   {Object.entries(textOptions).map(([k, v]) => {
                     const isSelected = selected === k;
 
@@ -1881,66 +1948,7 @@ useEffect(() => {
          
         })()}
 
-        {/* NAVIGATION */}
-        <div className="nav-buttons">
-
-          <button
-            disabled={currentIndex === 0}
-            onClick={() =>
-              goToQuestion(currentIndex - 1)
-            }
-          >
-            Previous
-          </button>
-
-          {!isReview && (
-            <button
-              className={`flag-btn ${
-                flaggedQuestions[
-                  String(currentQ.question_id)
-                ]
-                  ? "flagged"
-                  : ""
-              }`}
-              onClick={toggleFlagQuestion}
-            >
-              🚩
-
-              {
-                flaggedQuestions[
-                  String(currentQ.question_id)
-                ]
-                  ? "Unflag"
-                  : "Flag"
-              }
-            </button>
-          )}
-
-          {currentIndex < flatQuestions.length - 1 ? (
-
-            <button
-              onClick={() =>
-                goToQuestion(currentIndex + 1)
-              }
-            >
-              Next
-            </button>
-
-          ) : (
-
-            !isReview && (
-              <button
-                onClick={() =>
-                  setShowConfirmFinish(true)
-                }
-              >
-                Finish Exam
-              </button>
-            )
-
-          )}
-
-        </div>
+        
       </div>
 
       {showConfirmFinish && (

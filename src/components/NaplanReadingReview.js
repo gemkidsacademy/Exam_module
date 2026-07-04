@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./NaplanReadingReview.css";
 
 /* ============================================================
-   NAPLAN READING REVIEW
+  NAPLAN READING REVIEW
 ============================================================ */
 export default function NaplanReadingReview({
   studentId,
@@ -23,7 +23,7 @@ export default function NaplanReadingReview({
   const [loadingExplanation, setLoadingExplanation] = useState(null);
 
   /* ============================================================
-     LOAD REVIEW DATA
+    LOAD REVIEW DATA
   ============================================================ */
   useEffect(() => {
     if (!studentId) {
@@ -146,49 +146,28 @@ export default function NaplanReadingReview({
 
       const transformedAnswers = {};
 
-      Object.entries(
-        rawAnswers
-      ).forEach(
-        ([qid, obj]) => {
+      Object.entries(rawAnswers).forEach(([qid, obj]) => {
+        const question = qs.find(
+          q => String(q.question_id) === String(qid)
+        );
 
-          // ----------------------------------------
-          // TYPE 8 grouped answers
-          // ----------------------------------------
+        // TYPE 8 grouped answers only
+        if (question?.question_type === 8 && Array.isArray(obj.answer)) {
+          obj.answer.forEach((internalAnswer, idx) => {
+            transformedAnswers[`${qid}_${idx}`] = {
+              answer: internalAnswer,
+              is_correct: Array.isArray(obj.is_correct)
+                ? obj.is_correct[idx]
+                : false
+            };
+          });
 
-          if (
-            Array.isArray(obj.answer)
-          ) {
-
-            obj.answer.forEach(
-              (internalAnswer, idx) => {
-
-                transformedAnswers[
-                  `${qid}_${idx}`
-                ] = {
-
-                  answer:
-                    internalAnswer,
-
-                  is_correct:
-                    Array.isArray(
-                      obj.is_correct
-                    )
-                      ? obj.is_correct[idx]
-                      : false
-                };
-              }
-            );
-
-            return;
-          }
-
-          // ----------------------------------------
-          // NORMAL TYPES
-          // ----------------------------------------
-
-          transformedAnswers[qid] = obj;
+          return;
         }
-      );
+
+        // NORMAL TYPES
+        transformedAnswers[qid] = obj;
+      });
 
       setQuestions(qs);
       setAnswers(transformedAnswers);
@@ -218,7 +197,7 @@ export default function NaplanReadingReview({
 ]);
 
   /* ============================================================
-     AI EXPLANATION HANDLER
+    AI EXPLANATION HANDLER
   ============================================================ */
   const handleGenerateExplanation = async (q) => {
     const qid = String(q.question_id);
@@ -274,7 +253,7 @@ export default function NaplanReadingReview({
   };
 
   /* ============================================================
-     FORMAT EXPLANATION
+    FORMAT EXPLANATION
   ============================================================ */
   const formatExplanation = (text) => {
     if (!text) return "";
@@ -286,7 +265,7 @@ export default function NaplanReadingReview({
   };
 
   /* ============================================================
-     HELPERS
+    HELPERS
   ============================================================ */
   const normalize = (val) => {
     if (val == null) return "";
@@ -295,7 +274,7 @@ export default function NaplanReadingReview({
   };
 
   /* ============================================================
-     RENDER
+    RENDER
   ============================================================ */
   if (loading) return <p className="loading">Loading review…</p>;
   if (!questions.length) return <p>No questions to review.</p>;
