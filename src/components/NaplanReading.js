@@ -187,7 +187,7 @@ export default function NaplanReading({
   /* ============================================================
      NORMALIZATION HELPERS (REUSED FROM NUMERACY)
   ============================================================ */
-  function isAnswerCorrect(question, answers) {
+ function isAnswerCorrect(question, answers) {
   const correct = normalizeCorrectAnswer(
     question.exam_bundle.correct_answer,
     question.question_type
@@ -198,25 +198,26 @@ export default function NaplanReading({
     question.question_type
   );
 
-  // Multi select
   if (question.question_type === 2) {
+    console.log("TYPE 2 CHECK", {
+      qid: question.question_id,
+      correct,
+      student
+    });
+
     if (!Array.isArray(student) || !Array.isArray(correct)) return false;
-
-    if (student.length !== correct.length) return false;
-
-    return student.every(v => correct.includes(v));
-  }
-
-  // True / False matrix
-  if (question.question_type === 5) {
-    if (!Array.isArray(student) || !Array.isArray(correct)) return false;
-
     if (student.length !== correct.length) return false;
 
     return student.every((v, i) => v === correct[i]);
   }
 
-  // All other types
+  if (question.question_type === 5) {
+    if (!Array.isArray(student) || !Array.isArray(correct)) return false;
+    if (student.length !== correct.length) return false;
+
+    return student.every((v, i) => v === correct[i]);
+  }
+
   return student === correct;
 }
   const normalizeCorrectAnswer = (correctAnswer, questionType) => {
@@ -242,17 +243,21 @@ if (questionType === 5) {
 
   // multi select
   if (questionType === 2) {
-    if (Array.isArray(correctAnswer)) return correctAnswer;
+    let parsed = [];
 
-    if (typeof correctAnswer === "string") {
+    if (Array.isArray(correctAnswer)) {
+      parsed = correctAnswer;
+    } else if (typeof correctAnswer === "string") {
       try {
-        return JSON.parse(correctAnswer.replace(/'/g, '"'));
+        parsed = JSON.parse(correctAnswer.replace(/'/g, '"'));
       } catch {
-        return [];
+        parsed = [];
       }
     }
 
-    return [];
+    return parsed
+      .map(v => String(v).trim())
+      .sort();
   }
 
   // word select
@@ -269,24 +274,24 @@ if (questionType === 5) {
   const normalizeStudentAnswer = (answer, questionType) => {
   if (answer == null) return null;
 
-  // MULTI SELECT
   if (questionType === 2) {
-    if (Array.isArray(answer)) {
-      return [...answer].sort();
-    }
+    let parsed = [];
 
-    if (typeof answer === "string") {
+    if (Array.isArray(answer)) {
+      parsed = answer;
+    } else if (typeof answer === "string") {
       try {
-        return JSON.parse(answer.replace(/'/g, '"')).sort();
+        parsed = JSON.parse(answer.replace(/'/g, '"'));
       } catch {
-        return [];
+        parsed = [];
       }
     }
 
-    return [];
+    return parsed
+      .map(v => String(v).trim())
+      .sort();
   }
 
-  // TRUE / FALSE MATRIX
   if (questionType === 5) {
     if (Array.isArray(answer)) return answer;
 
@@ -297,7 +302,6 @@ if (questionType === 5) {
         return [];
       }
     }
-
     return [];
   }
 
@@ -993,6 +997,7 @@ useEffect(() => {
 
                 cleanedAnswers[internalId] = internalAnswer;
 
+                // If you trust backend for type 8, keep this
                 correctnessMap[internalId] =
                   Array.isArray(obj.is_correct)
                     ? obj.is_correct[idx]
@@ -1003,12 +1008,18 @@ useEffect(() => {
             }
 
             // NORMAL QUESTION TYPES
-            cleanedAnswers[qid] = normalizeStudentAnswer(
+            const normalizedAnswer = normalizeStudentAnswer(
               obj.answer,
               question?.question_type
             );
 
-            correctnessMap[qid] = obj.is_correct;
+            cleanedAnswers[qid] = normalizedAnswer;
+
+            correctnessMap[qid] = question
+              ? isAnswerCorrect(question, {
+                  [String(qid)]: normalizedAnswer
+                })
+              : false;
           });
 
           setAnswers(cleanedAnswers);
@@ -1026,7 +1037,7 @@ useEffect(() => {
   ============================================================ */
   const isCorrect =
   mode === "review"
-    ? correctness[String(currentQ.question_id)]
+    ? isAnswerCorrect(currentQ, answers)
     : null;
   const qid = String(currentQ.question_id);
   /* ============================================================
@@ -1693,7 +1704,11 @@ useEffect(() => {
               // MULTI SELECT
               // MULTI SELECT — checkbox list (vertical) #here
               if (currentQ.question_type === 2) {
-                const selected = answers[String(currentQ.question_id)] || [];
+                const selected =
+                  normalizeStudentAnswer(
+                    answers[String(currentQ.question_id)],
+                    currentQ.question_type
+                  ) || [];
 
                 const correct = normalizeCorrectAnswer(
                   currentQ.exam_bundle.correct_answer,
