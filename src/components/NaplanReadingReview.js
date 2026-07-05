@@ -17,6 +17,10 @@ export default function NaplanReadingReview({
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(true);
+  const isHomeworkMode =
+  parentMode === "homework" ||
+  parentMode === "report_homework" ||
+  parentMode === "review_homework";
 
   // ✅ AI STATE
   const [explanations, setExplanations] = useState({});
@@ -41,10 +45,13 @@ export default function NaplanReadingReview({
   setLoading(true);
   const loadReview = async () => {
     try {
-      const reviewUrl =
-        parentMode === "homework"
-          ? `${API_BASE}/api/student/exam-review/naplan-reading-homework?student_id=${studentId}&exam_id=${selectedExamId}`
-          : `${API_BASE}/api/student/exam-review/naplan-reading?student_id=${studentId}&exam_id=${selectedExamId}`;
+      const isHomeworkMode =
+        parentMode === "homework" ||
+        parentMode === "report_homework";
+
+      const reviewUrl = isHomeworkMode
+        ? `${API_BASE}/api/student/exam-review/naplan-reading-homework?student_id=${studentId}&exam_id=${selectedExamId}`
+        : `${API_BASE}/api/student/exam-review/naplan-reading?student_id=${studentId}&exam_id=${selectedExamId}`;
 
       const res = await fetch(
         reviewUrl
@@ -268,10 +275,16 @@ export default function NaplanReadingReview({
     HELPERS
   ============================================================ */
   const normalize = (val) => {
-    if (val == null) return "";
-    if (Array.isArray(val)) return val.join(", ");
-    return String(val);
-  };
+  if (val == null) return "";
+
+  if (Array.isArray(val)) {
+    return val
+      .map(v => String(v).trim().toUpperCase())
+      .join(", ");
+  }
+
+  return String(val).trim().toUpperCase();
+};
 
   /* ============================================================
     RENDER
@@ -351,60 +364,65 @@ export default function NaplanReadingReview({
             </div>
             {/* ================= OPTION REVIEW ================= */}
 
-            {q.exam_bundle?.options && (
+            {/* ================= OPTION REVIEW ================= */}
 
-              <div className="review-options">
+{/* TEXT OPTIONS */}
+{q.exam_bundle?.options && (
+  <div className="review-options">
+    {Object.entries(q.exam_bundle.options).map(([key, value]) => {
+      const normalizedKey = normalize(key);
+      const selected = normalize(studentAnswer) === normalizedKey;
+      const correct = normalize(correctAnswer) === normalizedKey;
 
-                {Object.entries(
-                  q.exam_bundle.options
-                ).map(([key, value]) => {
+      return (
+        <div
+          key={key}
+          className={`
+            review-option
+            ${correct ? "correct-option" : ""}
+            ${selected && !correct ? "incorrect-option" : ""}
+          `}
+        >
+          <strong>{key}.</strong> {value}
+        </div>
+      );
+    })}
+  </div>
+)}
 
-                  const selected =
-                    normalize(studentAnswer) === key;
+{/* IMAGE OPTIONS */}
+{q.exam_bundle?.image_options && (
+  <div className="review-options image-review-options">
+    {Object.entries(q.exam_bundle.image_options).map(([key, value]) => {
+      const normalizedKey = normalize(key);
+      const selected = normalize(studentAnswer) === normalizedKey;
+      const correct = normalize(correctAnswer) === normalizedKey;
 
-                  const correct =
-                    normalize(correctAnswer) === key;
-                  console.log("---- REVIEW OPTION DEBUG ----");
+      return (
+        <div
+          key={key}
+          className={`
+            review-option image-review-option
+            ${correct ? "correct-option" : ""}
+            ${selected && !correct ? "incorrect-option" : ""}
+          `}
+        >
+          <div className="image-option-label">
+            <strong>{key}.</strong>
+          </div>
 
-                  console.log({
-                    qid,
-                    optionKey: key,
-                    studentAnswer,
-                    normalizedStudent:
-                      normalize(studentAnswer),
-                    correctAnswer,
-                    normalizedCorrect:
-                      normalize(correctAnswer),
-                    selected:
-                      normalize(studentAnswer) === key,
-                    correct:
-                      normalize(correctAnswer) === key
-                  });
-                  return (
+          <img
+            src={value}
+            alt={`Option ${key}`}
+            className="review-option-image"
+          />
+        </div>
+      );
+    })}
+  </div>
+)}
 
-
-                    <div
-                      key={key}
-                      className={`
-                        review-option
-                        ${correct ? "correct-option" : ""}
-                        ${
-                          selected && !correct
-                            ? "incorrect-option"
-                            : ""
-                        }
-                      `}
-                    >
-
-                      <strong>{key}.</strong> {value}
-
-                    </div>
-                  );
-                })}
-
-              </div>
-            )}
-
+            
             {/* ================= AI BUTTON ================= */}
             {!explanations[qid] && (
               <button

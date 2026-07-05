@@ -662,8 +662,22 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
   );
 
   return (
-    <div className={`exam-shell ${styles.examShell}`}>
-      <div className={`exam-container ${styles.examContainer}`}>
+    <div
+      className={`exam-shell ${styles.examShell}`}
+      style={{
+        height: "100vh",
+        overflow: "hidden"
+      }}
+    >
+      <div
+        className={`exam-container ${styles.examContainer}`}
+        style={{
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden"
+        }}
+      >
         
         {/* HEADER */}
         <div className="exam-header">
@@ -674,74 +688,78 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
             </div>
           )}
 
-          <div className="question-counter-inline">
+          <div className="question-header-center">
+            <div className="question-counter-inline">
 
-  <span className="question-counter-text">
-    Question {currentIndex + 1} of {questions.length}
-  </span>
+              <span className="question-counter-text">
+                Question {currentIndex + 1} of {questions.length}
+              </span>
 
-  <button
-    className="question-grid-toggle"
-    onClick={() =>
-      setShowQuestionNavigator(prev => !prev)
-    }
-  >
-    ▦
-  </button>
-
-  {isReview && (
-    <>
-      <button
-        className="exit-review-btn"
-        onClick={() => {
-          setQuestions([]);
-          setAnswers({});
-          setVisited({});
-          setCurrentIndex(0);
-          setMode("report");
-        }}
-      >
-        ← Exit Review
-      </button>
-
-      {examDates.length > 0 && (
-        <select
-          className="review-exam-dropdown"
-          value={selectedExamId || ""}
-          onChange={(e) => {
-            setQuestions([]);
-            setAnswers({});
-            setVisited({});
-            setCurrentIndex(0);
-
-            setSelectedExamId(
-              Number(e.target.value)
-            );
-          }}
-        >
-          {examDates.map((item) => (
-            <option
-              key={item.exam_id}
-              value={item.exam_id}
-            >
-              {new Date(item.date).toLocaleString(
-                "en-US",
-                {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit"
+              <button
+                className="question-grid-toggle"
+                onClick={() =>
+                  setShowQuestionNavigator(prev => !prev)
                 }
-              )}
-            </option>
-          ))}
-        </select>
-      )}
-    </>
-  )}
+              >
+                ▦
+              </button>
 
-</div>
+              {isReview && (
+                <>
+                  <button
+                    className="exit-review-btn"
+                    onClick={() => {
+                      setQuestions([]);
+                      setAnswers({});
+                      setVisited({});
+                      setCurrentIndex(0);
+                      setMode("report");
+                    }}
+                  >
+                    ← Exit Review
+                  </button>
+
+                  {examDates.length > 0 && (
+                    <select
+                      className="review-exam-dropdown"
+                      value={selectedExamId || ""}
+                      onChange={(e) => {
+                        setQuestions([]);
+                        setAnswers({});
+                        setVisited({});
+                        setCurrentIndex(0);
+                        setSelectedExamId(Number(e.target.value));
+                      }}
+                    >
+                      {examDates.map((item) => (
+                        <option key={item.exam_id} value={item.exam_id}>
+                          {new Date(item.date).toLocaleString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit"
+                          })}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </>
+              )}
+
+            </div>
+
+            {!isReview && (
+              <div className="exam-progress">
+                <div
+                  className="exam-progress-fill"
+                  style={{
+                    width: `${((currentIndex + 1) / questions.length) * 100}%`
+                  }}
+                />
+              </div>
+            )}
+          </div>
 
         </div>
 
@@ -893,7 +911,15 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
         }
 
         {/* QUESTION */}
-<div className="question-card">
+    <div
+      className="question-card"
+      style={{
+        flex: 1,
+        minHeight: 0,
+        overflowY: "auto",
+        paddingRight: "6px"
+      }}
+    >
   <div className="question-content-centered">
     {currentQ.question_blocks?.map((block, idx) => {
 
@@ -970,30 +996,32 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
         const sentenceWords = block.sentence.split(" ");
 
         return (
-          <div key={idx} className="sentence-container">
-            {sentenceWords.map((word, i) => {
-              const cleanWord = word.replace(/[.,!?]/g, "");
-              const isSelectable = block.selectable_words.includes(cleanWord);
-              const isSelected =
-                answers[String(currentQ.id)] === cleanWord;
+          <div key={idx} className="word-selection-panel">
+            <div className="sentence-container">
+              {sentenceWords.map((word, i) => {
+                const cleanWord = word.replace(/[.,!?]/g, "");
+                const isSelectable = block.selectable_words.includes(cleanWord);
+                const isSelected =
+                  answers[String(currentQ.id)] === cleanWord;
 
-              return (
-                <span
-                  key={i}
-                  className={`sentence-word
-                    ${isSelectable ? "selectable" : "non-selectable"}
-                    ${isSelected ? "selected" : ""}
-                  `}
-                  onClick={() => {
-                    if (!isReview && isSelectable) {
-                      handleAnswer(cleanWord);
-                    }
-                  }}
-                >
-                  {word + " "}
-                </span>
-              );
-            })}
+                return (
+                  <span
+                    key={i}
+                    className={`sentence-word
+                      ${isSelectable ? "selectable" : "non-selectable"}
+                      ${isSelected ? "selected" : ""}
+                    `}
+                    onClick={() => {
+                      if (!isReview && isSelectable) {
+                        handleAnswer(cleanWord);
+                      }
+                    }}
+                  >
+                    {word}
+                  </span>
+                );
+              })}
+            </div>
           </div>
         );
       }

@@ -218,3 +218,72 @@
   background: #f8d7da;
   border: 1px solid #dc3545;
 }
+.image-review-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.image-review-option {
+  padding: 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.review-option-image {
+  display: block;
+  max-width: 220px;
+  max-height: 180px;
+  object-fit: contain;
+  margin-top: 10px;
+}
+
+.image-review-option.correct-option {
+  background: #ecfdf5;
+  border-color: #22c55e;
+}
+
+.image-review-option.incorrect-option {
+  background: #fef2f2;
+  border-color: #ef4444;
+}
+.image-review-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.image-review-option {
+  padding: 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.image-option-label {
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.review-option-image {
+  display: block;
+  max-width: 220px;
+  max-height: 180px;
+  object-fit: contain;
+}
+
+/* correct answer in review */
+.image-review-option.correct-option {
+  background: #ecfdf5;
+  border-color: #22c55e;
+}
+
+/* wrong selected answer in review */
+.image-review-option.incorrect-option {
+  background: #fef2f2;
+  border-color: #ef4444;
+}

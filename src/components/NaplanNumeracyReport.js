@@ -197,7 +197,7 @@ console.log(
                 <div
                   className="bar-fill"
                   style={{
-                    width: `${t.accuracy_percent}%`
+                    width: `${t.score_percent}%`
                   }}
                 />
               </div>

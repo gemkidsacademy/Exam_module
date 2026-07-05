@@ -177,28 +177,32 @@ const student = normalizeStudentAnswer(studentRaw, currentQ.question_type);
 return student === correct;
 })();
   const loadExamDates = useCallback(async () => {
-try {
-const examDatesUrl =
-  parentMode === "report_homework"
-    ? `${API_BASE}/api/student/exam-dates/naplan-numeracy-homework?student_id=${studentId}`
-    : `${API_BASE}/api/student/exam-dates/naplan-numeracy?student_id=${studentId}`;
+  try {
+    const examDatesUrl =
+      parentMode === "report_homework" || parentMode === "homework"
+        ? `${API_BASE}/api/student/exam-dates/naplan-numeracy-homework?student_id=${studentId}`
+        : `${API_BASE}/api/student/exam-dates/naplan-numeracy?student_id=${studentId}`;
 
-const res = await fetch(examDatesUrl);
+    const res = await fetch(examDatesUrl);
 
-if (!res.ok) return;
+    if (!res.ok) {
+      console.error("Failed to load exam dates:", res.status);
+      return [];
+    }
 
-const data = await res.json();
+    const data = await res.json();
 
-setExamDates(data || []);
+    setExamDates(data || []);
 
-// always select latest after refresh
-if (data?.length > 0) {
-  setSelectedExamId(data[0].exam_id);
-}
+    if (data?.length > 0) {
+      setSelectedExamId(data[0].exam_id);
+    }
 
-} catch (err) {
-console.error("Failed to load exam dates", err);
-}
+    return data || [];
+  } catch (err) {
+    console.error("Failed to load exam dates", err);
+    return [];
+  }
 }, [API_BASE, studentId, parentMode]);
 
   /* ============================================================
@@ -433,6 +437,22 @@ return () => {
   window.removeEventListener("popstate", handlePopState);
 };
 }, [mode, currentIndex, showConfirmFinish]);
+
+useEffect(() => {
+  if (mode !== "exam") return;
+
+  const handleBeforeUnload = (e) => {
+    e.preventDefault();
+    e.returnValue = "";
+    return "";
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, [mode]);
   
   
   /* ============================================================
@@ -527,13 +547,12 @@ onExamStart
         answers
       })
     });
+    const latestDates = await loadExamDates();
 
-    await loadExamDates();
-    // 🔥 Immediately select latest exam
-    if (examDates?.length > 0) {
-      setSelectedExamId(examDates[0].exam_id);
+    if (latestDates?.length > 0) {
+      setSelectedExamId(latestDates[0].exam_id);
     }
-    // 🔥 THIS LINE FIXES YOUR ISSUE
+
     setMode("report");
 
     onExamFinish?.();
@@ -702,6 +721,9 @@ const toggleFlagQuestion = () => {
     EXAM UI
   ============================================================ */
   if (mode === "exam" || mode === "review") {
+    const hasClozeDropdownBlock = (currentQ?.question_blocks || []).some(
+      b => b.type === "cloze-dropdown"
+    );
     
     
 return (
@@ -766,80 +788,82 @@ return (
             </div>
           )}
 
-          <div className="question-counter-inline">
+          <div className="question-header-center">
+  <div className="question-counter-inline">
+    <span className="question-counter-text">
+      Question {currentIndex + 1} of {questions.length}
+    </span>
 
-            <span className="question-counter-text">
-              Question {currentIndex + 1} of {questions.length}
-            </span>
+    <button
+      className="question-grid-toggle"
+      onClick={() => setShowQuestionNavigator(prev => !prev)}
+    >
+      ▦
+    </button>
 
-            <button
-              className="question-grid-toggle"
-              onClick={() =>
-                setShowQuestionNavigator(prev => !prev)
-              }
-            >
-              ▦
-            </button>
+    {!isReview && canUseCalculator && (
+      <button
+        className={`calculator-toggle-btn ${showCalculator ? "active" : ""}`}
+        onClick={() => setShowCalculator(prev => !prev)}
+      >
+        Calculator
+      </button>
+    )}
 
-            {!isReview && canUseCalculator && (
-              <button
-                className={`calculator-toggle-btn ${showCalculator ? "active" : ""}`}
-                onClick={() => setShowCalculator(prev => !prev)}
-              >
-                Calculator
-              </button>
-            )}
+    {isReview && (
+      <>
+        <button
+          className="exit-review-btn-small"
+          onClick={() => {
+            setQuestions([]);
+            setAnswers({});
+            setVisited({});
+            setCurrentIndex(0);
+            setMode("report");
+          }}
+        >
+          Exit Review
+        </button>
 
-            {isReview && (
-              <>
-                <button
-                  className="exit-review-btn-small"
-                  onClick={() => {
-                    setQuestions([]);
-                    setAnswers({});
-                    setVisited({});
-                    setCurrentIndex(0);
-                    setMode("report");
-                  }}
-                >
-                  Exit Review
-                </button>
+        {examDates?.length > 0 && (
+          <select
+            className="review-exam-dropdown"
+            value={selectedExamId || ""}
+            onChange={(e) => {
+              setQuestions([]);
+              setAnswers({});
+              setVisited({});
+              setCurrentIndex(0);
+              setSelectedExamId(Number(e.target.value));
+            }}
+          >
+            {examDates.map((d) => (
+              <option key={d.exam_id} value={d.exam_id}>
+                {new Date(d.date).toLocaleString("en-AU", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true
+                })}
+              </option>
+            ))}
+          </select>
+        )}
+      </>
+    )}
+  </div>
 
-                {examDates?.length > 0 && (
-                  <select
-                    className="review-exam-dropdown"
-                    value={selectedExamId || ""}
-                    onChange={(e) => {
-                      setQuestions([]);
-                      setAnswers({});
-                      setVisited({});
-                      setCurrentIndex(0);
-                      setSelectedExamId(
-                        Number(e.target.value)
-                      );
-                    }}
-                  >
-                    {examDates.map((d) => (
-                      <option
-                        key={d.exam_id}
-                        value={d.exam_id}
-                      >
-                        {new Date(d.date).toLocaleString("en-AU", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: true
-                        })}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </>
-            )}
-
-          </div>
+  <div className="exam-progress">
+    <div
+      className="exam-progress-fill"
+      style={{
+        width: `${((currentIndex + 1) / questions.length) * 100}%`
+      }}
+    />
+  </div>
+</div>
 
         </div>
 
@@ -1091,17 +1115,23 @@ return (
             
 
               
-
+              
               {(currentQ.question_blocks || []).map((block, idx) => {
               
               if (block.type === "text") {
+                const text = block.content || "";
+
+                if (text.includes("{{dropdown}}")) {
+                  return null;
+                }
+
                 return (
                   <p
                     key={idx}
                     className="question-text"
                     style={{ color: "black", fontSize: "18px" }}
                   >
-                    {block.content}
+                    {text}
                   </p>
                 );
               }
@@ -1795,5 +1825,6 @@ return (
   )}
 
 </div>
-)};
+)
+};
 }

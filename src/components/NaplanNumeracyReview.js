@@ -15,12 +15,15 @@ export default function NaplanNumeracyReview({
 
     const fetchNaplanNumeracyReviewData = async () => {
       try {
-        const reviewUrl =
-          mode === "homework"
-            ? `${API_BASE}/api/student/exam-review/naplan-numeracy-homework?student_id=${studentId}&exam_id=${examId}`
-            : `${API_BASE}/api/student/exam-review/naplan-numeracy?student_id=${studentId}&exam_id=${examId}`;
+        const isHomeworkMode =
+          mode === "homework" || mode === "report_homework";
+
+        const reviewUrl = isHomeworkMode
+          ? `${API_BASE}/api/student/exam-review/naplan-numeracy-homework?student_id=${studentId}&exam_id=${examId}`
+          : `${API_BASE}/api/student/exam-review/naplan-numeracy?student_id=${studentId}&exam_id=${examId}`;
 
         console.log("📘 Loading review for examId:", examId);
+        console.log("📘 Review mode:", mode);
         console.log("🌐 Request URL:", reviewUrl);
 
         const response = await fetch(reviewUrl, {
@@ -28,38 +31,27 @@ export default function NaplanNumeracyReview({
         });
 
         if (!response.ok) {
-          throw new Error(
-            `Review fetch failed: ${response.status}`
-          );
+          throw new Error(`Review fetch failed: ${response.status}`);
         }
 
         const data = await response.json();
 
-        const safeQuestions = Array.isArray(
-          data.questions
-        )
+        const safeQuestions = Array.isArray(data.questions)
           ? data.questions
           : [];
 
         const safeStudentAnswers =
-          data.student_answers &&
-          typeof data.student_answers === "object"
+          data.student_answers && typeof data.student_answers === "object"
             ? data.student_answers
             : {};
 
         console.log("✅ Review loaded successfully");
         console.log("📦 Questions:", safeQuestions);
-        console.log(
-          "📝 Student Answers:",
-          safeStudentAnswers
-        );
+        console.log("📝 Student Answers:", safeStudentAnswers);
 
-        onLoaded?.(
-          safeQuestions,
-          safeStudentAnswers
-        );
+        onLoaded?.(safeQuestions, safeStudentAnswers);
 
-      } catch (error) {
+      }  catch (error) {
         if (error.name === "AbortError") {
           console.log(
             "⏹️ Review request aborted"

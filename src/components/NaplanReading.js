@@ -20,6 +20,9 @@ export default function NaplanReading({
   mode: parentMode // 🔥 ADD THIS
 }) {
   const studentId = sessionStorage.getItem("student_id");
+  const isHomeworkMode =
+  parentMode === "homework" ||
+  parentMode === "report_homework";
   const [flaggedQuestions, setFlaggedQuestions] =
     useState({});
   const [activeExtract, setActiveExtract] = useState(0);
@@ -321,11 +324,9 @@ if (questionType === 5) {
     examId,
     selectedExamId
   });
-  const reportUrl =
-    parentMode === "report_homework"
-    
-      ? `${API_BASE}/api/student/exam-report/naplan-reading-homework?student_id=${studentId}${examParam}`
-      : `${API_BASE}/api/student/exam-report/naplan-reading?student_id=${studentId}${examParam}`;
+  const reportUrl = isHomeworkMode
+  ? `${API_BASE}/api/student/exam-report/naplan-reading-homework?student_id=${studentId}${examParam}`
+  : `${API_BASE}/api/student/exam-report/naplan-reading?student_id=${studentId}${examParam}`;
 
   const res = await fetch(reportUrl);
 
@@ -348,10 +349,9 @@ if (questionType === 5) {
 
   const loadDates = async () => {
     try {
-      const url =
-        parentMode === "report_homework"
-          ? `${API_BASE}/api/student/exam-dates/naplan-reading-homework?student_id=${studentId}`
-          : `${API_BASE}/api/student/exam-dates/naplan-reading?student_id=${studentId}`;
+      const url = isHomeworkMode
+        ? `${API_BASE}/api/student/exam-dates/naplan-reading-homework?student_id=${studentId}`
+        : `${API_BASE}/api/student/exam-dates/naplan-reading?student_id=${studentId}`;
 
       const res = await fetch(url);
 
@@ -1157,16 +1157,11 @@ useEffect(() => {
 
               <button
                 className={`flag-btn ${
-                  flaggedQuestions[String(currentQ.question_id)]
-                    ? "flagged"
-                    : ""
+                  flaggedQuestions[String(currentQ.question_id)] ? "flagged" : ""
                 }`}
                 onClick={toggleFlagQuestion}
               >
-                🚩{" "}
-                {flaggedQuestions[String(currentQ.question_id)]
-                  ? "Unflag"
-                  : "Flag"}
+                🚩 {flaggedQuestions[String(currentQ.question_id)] ? "Unflag" : "Flag"}
               </button>
 
               {currentIndex < flatQuestions.length - 1 ? (
@@ -1743,7 +1738,7 @@ useEffect(() => {
                       return (
                         <label
                           key={k}
-                          className={`mcq-option-row ${optionClass}`}
+                          className={`mcq-option-row ${isSelected && !isReview ? "selected" : ""} ${optionClass}`}
                         >
                           <input
                             type="checkbox"
@@ -1778,15 +1773,36 @@ useEffect(() => {
 
               // 🖼️ IMAGE OPTIONS → cards
               if (imageOptions) {
+                const correct = normalizeCorrectAnswer(
+                  currentQ.exam_bundle.correct_answer,
+                  currentQ.question_type
+                );
+
+                const student = normalizeStudentAnswer(
+                  answers[String(currentQ.question_id)],
+                  currentQ.question_type
+                );
+
                 return (
                   <div className="mcq-options image-list">
                     {Object.entries(imageOptions).map(([k, v]) => {
                       const isSelected = selected === k;
 
+                      const isCorrectOption =
+                        mode === "review" && k === correct;
+
+                      const isWrongSelection =
+                        mode === "review" && k === student && student !== correct;
+
                       return (
                         <label
                           key={k}
-                          className={`mcq-option-card ${isSelected ? "selected" : ""}`}
+                          className={[
+                            "mcq-option-card",
+                            isSelected && mode !== "review" ? "selected" : "",
+                            isCorrectOption ? "option-correct" : "",
+                            isWrongSelection ? "option-wrong" : ""
+                          ].join(" ")}
                         >
                           <input
                             type="radio"
@@ -1834,6 +1850,7 @@ useEffect(() => {
                         key={k}
                         className={[
                           "mcq-option-row",
+                          isSelected && mode !== "review" ? "selected" : "",
                           isCorrectOption ? "option-correct" : "",
                           isWrongSelection ? "option-wrong" : ""
                         ].join(" ")}
