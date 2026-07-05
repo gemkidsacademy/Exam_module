@@ -28,6 +28,8 @@ mode: parentMode // 🔥 THIS
   const [selectedExamId, setSelectedExamId] = useState(null);
   const [showQuestionNavigator, setShowQuestionNavigator] =
     useState(false);
+    const [classYear, setClassYear] = useState(null);
+    const canUseCalculator = Number(classYear) >= 7;
 
   const [showCalculator, setShowCalculator] = useState(false);  
   const [flaggedQuestions, setFlaggedQuestions] =
@@ -57,6 +59,10 @@ mode: parentMode // 🔥 THIS
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentQ = questions[currentIndex];
   console.log("MODE →", mode);
+
+  if (currentQ) {
+    console.log("QUESTION BLOCKS FOR CURRENT Q:", currentQ.question_blocks);
+  }
   
   const [answers, setAnswers] = useState({});
   const [visited, setVisited] = useState({});
@@ -276,6 +282,44 @@ console.error("Failed to load exam dates", err);
     return numA === numB;
   }
   useEffect(() => {
+  if (!studentId) {
+    console.log("❌ No studentId found in sessionStorage");
+    return;
+  }
+
+  const loadStudentClassYear = async () => {
+    const url = `${API_BASE}/api/student/profile?student_id=${studentId}`;
+    console.log("📘 ABOUT TO FETCH STUDENT PROFILE:", url);
+
+    try {
+      const res = await fetch(url);
+      console.log("📘 STUDENT PROFILE STATUS:", res.status);
+
+      const text = await res.text();
+      console.log("📘 STUDENT PROFILE RAW RESPONSE:", text);
+
+      if (!res.ok) {
+        console.error("❌ Failed to load student class year");
+        return;
+      }
+
+      const data = JSON.parse(text);
+      console.log("📘 STUDENT PROFILE JSON:", data);
+
+      setClassYear(data.class_year);
+    } catch (err) {
+      console.error("❌ Failed to fetch student class year", err);
+    }
+  };
+
+  loadStudentClassYear();
+}, [API_BASE, studentId]);
+useEffect(() => {
+  if (!canUseCalculator) {
+    setShowCalculator(false);
+  }
+}, [canUseCalculator]);
+  useEffect(() => {
   if (isReview) {
     setShowCalculator(false);
   }
@@ -419,6 +463,7 @@ const startExam = async () => {
 
   const data = await res.json();
   console.log("START EXAM RESPONSE →", data);
+  
 
   if (data.completed === true) {
     await loadExamDates();
@@ -736,7 +781,7 @@ return (
               ▦
             </button>
 
-            {!isReview && (
+            {!isReview && canUseCalculator && (
               <button
                 className={`calculator-toggle-btn ${showCalculator ? "active" : ""}`}
                 onClick={() => setShowCalculator(prev => !prev)}
@@ -1028,7 +1073,11 @@ return (
         }
 
         {/* QUESTION + CALCULATOR LAYOUT */}
-        <div className={`question-layout ${showCalculator ? "calculator-open" : ""}`}>
+        <div
+        className={`question-layout ${
+          canUseCalculator && showCalculator ? "calculator-open" : ""
+        }`}
+      >
           
           <div className="question-card">
             <div className="question-content-centered">
@@ -1038,11 +1087,13 @@ return (
                   {currentQ.question_text}
                 </p>
               )}
-
+              
             
 
-            {(currentQ.question_blocks || []).map((block, idx) => {
+              
 
+              {(currentQ.question_blocks || []).map((block, idx) => {
+              
               if (block.type === "text") {
                 return (
                   <p
@@ -1086,8 +1137,9 @@ return (
               }
 
               if (block.type === "cloze-dropdown") {
-                const parts = block.sentence.split("{{dropdown}}");
                 const qid = String(currentQ.id);
+                const sentence = block.sentence || block.content || "";
+                const parts = sentence.split("{{dropdown}}");
 
                 const correctAnswer = normalizeCorrectAnswer(
                   currentQ.correct_answer,
@@ -1102,8 +1154,12 @@ return (
                 const isCorrectCloze = studentAnswer === correctAnswer;
 
                 return (
-                  <div key={idx} className="cloze-sentence">
-                    {parts[0]}
+                  <div
+                    key={idx}
+                    className="question-text cloze-inline-text"
+                    style={{ color: "black", fontSize: "18px" }}
+                  >
+                    <span>{parts[0]}</span>
 
                     <select
                       className={`cloze-dropdown ${
@@ -1120,19 +1176,21 @@ return (
                       <option value="" disabled>
                         Select
                       </option>
-                      {block.options.map((opt) => (
+                      {(block.options || []).map((opt) => (
                         <option key={opt} value={opt}>
                           {opt}
                         </option>
                       ))}
                     </select>
 
-                    {parts[1]}
+                    <span>{parts[1]}</span>
 
-                    {/* Review feedback */}
                     {isReview && !isCorrectCloze && (
-                      <div className="correct-answer-text">
-                        Correct answer: {currentQ.options?.[correctAnswer] || correctAnswer}
+                      <div
+                        className="correct-answer-text"
+                        style={{ marginTop: "10px" }}
+                      >
+                        Correct answer: {correctAnswer}
                       </div>
                     )}
                   </div>
@@ -1610,7 +1668,7 @@ return (
             </div> {/* closes question-content-centered */}
           </div> {/* closes question-card */}
 
-          {!isReview && showCalculator && (
+          {!isReview && canUseCalculator && showCalculator && (
             <div className="calculator-panel">
               <NaplanCalculator />
             </div>
