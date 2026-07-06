@@ -780,92 +780,141 @@ return (
         }}
       >
         {/* HEADER */}
-        <div className="exam-header">
+        {/* HEADER */}
+{/* HEADER */}
+{/* HEADER */}
+<div className="exam-header">
+  {/* LEFT: TIMER */}
+  {!isReview ? (
+    <div className="exam-header-left">
+      <div className="timer">
+        ⏳ {formatTime(timeLeft)}
+      </div>
+    </div>
+  ) : (
+    <div className="exam-header-left" />
+  )}
 
-          {!isReview && (
-            <div className="timer">
-              ⏳ {formatTime(timeLeft)}
-            </div>
-          )}
+  {/* CENTER: QUESTION + PROGRESS */}
+  <div className="question-header-center">
+    <div className="question-counter-inline">
+      <span className="question-counter-text">
+        Question {currentIndex + 1} of {questions.length}
+      </span>
 
-          <div className="question-header-center">
-  <div className="question-counter-inline">
-    <span className="question-counter-text">
-      Question {currentIndex + 1} of {questions.length}
-    </span>
-
-    <button
-      className="question-grid-toggle"
-      onClick={() => setShowQuestionNavigator(prev => !prev)}
-    >
-      ▦
-    </button>
-
-    {!isReview && canUseCalculator && (
       <button
-        className={`calculator-toggle-btn ${showCalculator ? "active" : ""}`}
-        onClick={() => setShowCalculator(prev => !prev)}
+        className="question-grid-toggle"
+        onClick={() => setShowQuestionNavigator(prev => !prev)}
       >
-        Calculator
+        ▦
       </button>
-    )}
 
-    {isReview && (
-      <>
+      {!isReview && canUseCalculator && (
         <button
-          className="exit-review-btn-small"
-          onClick={() => {
-            setQuestions([]);
-            setAnswers({});
-            setVisited({});
-            setCurrentIndex(0);
-            setMode("report");
-          }}
+          className={`calculator-toggle-btn ${showCalculator ? "active" : ""}`}
+          onClick={() => setShowCalculator(prev => !prev)}
         >
-          Exit Review
+          Calculator
         </button>
+      )}
 
-        {examDates?.length > 0 && (
-          <select
-            className="review-exam-dropdown"
-            value={selectedExamId || ""}
-            onChange={(e) => {
+      {isReview && (
+        <>
+          <button
+            className="exit-review-btn-small"
+            onClick={() => {
               setQuestions([]);
               setAnswers({});
               setVisited({});
               setCurrentIndex(0);
-              setSelectedExamId(Number(e.target.value));
+              setMode("report");
             }}
           >
-            {examDates.map((d) => (
-              <option key={d.exam_id} value={d.exam_id}>
-                {new Date(d.date).toLocaleString("en-AU", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: true
-                })}
-              </option>
-            ))}
-          </select>
+            Exit Review
+          </button>
+
+          {examDates?.length > 0 && (
+            <select
+              className="review-exam-dropdown"
+              value={selectedExamId || ""}
+              onChange={(e) => {
+                setQuestions([]);
+                setAnswers({});
+                setVisited({});
+                setCurrentIndex(0);
+                setSelectedExamId(Number(e.target.value));
+              }}
+            >
+              {examDates.map((d) => (
+                <option key={d.exam_id} value={d.exam_id}>
+                  {new Date(d.date).toLocaleString("en-AU", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true
+                  })}
+                </option>
+              ))}
+            </select>
+          )}
+        </>
+      )}
+    </div>
+
+    <div className="exam-progress">
+      <div
+        className="exam-progress-fill"
+        style={{
+          width: `${((currentIndex + 1) / questions.length) * 100}%`
+        }}
+      />
+    </div>
+  </div>
+
+  {/* RIGHT: NAV BUTTONS */}
+  {!isReview ? (
+    <div className="exam-header-actions">
+      <div className="header-nav-buttons">
+        <button
+          className="nav-btn prev"
+          disabled={currentIndex === 0}
+          onClick={() => goToQuestion(currentIndex - 1)}
+        >
+          Previous
+        </button>
+
+        <button
+          className={`flag-btn ${
+            flaggedQuestions[String(currentQ.id)] ? "flagged" : ""
+          }`}
+          onClick={toggleFlagQuestion}
+        >
+          🚩 {flaggedQuestions[String(currentQ.id)] ? "Unflag" : "Flag"}
+        </button>
+
+        {currentIndex < questions.length - 1 ? (
+          <button
+            className="nav-btn next"
+            onClick={() => goToQuestion(currentIndex + 1)}
+          >
+            Next
+          </button>
+        ) : (
+          <button
+            className="nav-btn finish"
+            onClick={() => setShowConfirmFinish(true)}
+          >
+            Finish Exam
+          </button>
         )}
-      </>
-    )}
-  </div>
-
-  <div className="exam-progress">
-    <div
-      className="exam-progress-fill"
-      style={{
-        width: `${((currentIndex + 1) / questions.length) * 100}%`
-      }}
-    />
-  </div>
+      </div>
+    </div>
+  ) : (
+    <div className="exam-header-right-placeholder" />
+  )}
 </div>
-
-        </div>
 
         {/* QUESTION INDEX */}
         {
@@ -1409,13 +1458,24 @@ return (
                       reviewClass = "review-wrong";
                     }
                   }
+                  // 🔍 DEBUG LOGS
+                  console.log("--------------------------------------------------");
+                  console.log("QUESTION ID:", currentQ.id);
+                  console.log("OPTION KEY:", key);
+                  console.log("OPTION VALUE:", value);
+                  console.log("RAW correct_answer:", currentQ.correct_answer);
+                  console.log("NORMALIZED correctAnswer:", correctAnswer);
+                  console.log("STUDENT ANSWER:", studentAnswer);
+                  console.log("isSelected:", isSelected);
+                  console.log("isCorrectOption:", isCorrectOption);
+                  console.log("reviewClass:", reviewClass);
+                  console.log("mode:", mode);
+                  
           
                   return (
                     <label
                       key={key}
-                      className={`mcq-option-card ${
-                        isSelected ? "selected" : ""
-                      } ${reviewClass}`}
+                      className={`mcq-option-card ${isSelected && mode !== "review" ? "selected" : ""} ${reviewClass}`}
                     >
                       <input
                         type="radio"
@@ -1705,93 +1765,6 @@ return (
           )}
       </div> {/* closes question-layout */}
       
-      <div className="nav-buttons">
-
-        <button
-          className="nav-btn prev"
-
-          disabled={
-            currentIndex === 0
-          }
-
-          onClick={() =>
-            goToQuestion(
-              currentIndex - 1
-            )
-          }
-        >
-          Previous
-        </button>
-
-        {
-          !isReview && (
-
-            <button
-              className={`flag-btn ${
-                flaggedQuestions[
-                  String(currentQ.id)
-                ]
-                  ? "flagged"
-                  : ""
-              }`}
-
-              onClick={
-                toggleFlagQuestion
-              }
-            >
-              🚩
-
-              {
-                flaggedQuestions[
-                  String(currentQ.id)
-                ]
-                  ? "Unflag"
-                  : "Flag"
-              }
-
-            </button>
-
-          )
-        }
-
-        {
-          currentIndex <
-          questions.length - 1 ? (
-
-            <button
-              className="nav-btn next"
-
-              onClick={() =>
-                goToQuestion(
-                  currentIndex + 1
-                )
-              }
-            >
-              Next
-            </button>
-
-          ) : (
-
-            !isReview && (
-
-              <button
-                className="nav-btn finish"
-
-                onClick={() =>
-                  setShowConfirmFinish(
-                    true
-                  )
-                }
-              >
-                Finish Exam
-              </button>
-
-            )
-
-          )
-        }
-
-      </div>
 
       {showConfirmFinish && (
         <div className="confirm-overlay">

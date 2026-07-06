@@ -808,6 +808,24 @@ useEffect(() => {
   }, [timeLeft, mode, showConfirmFinish, finishExam]);
 
   /* ============================================================
+   WARN BEFORE REFRESH / TAB CLOSE
+============================================================ */
+useEffect(() => {
+  if (mode !== "exam") return;
+
+  const handleBeforeUnload = (e) => {
+    e.preventDefault();
+    e.returnValue = "";
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, [mode]);
+
+  /* ============================================================
      ANSWERS
   ============================================================ */
   const handleAnswer = (value) => {
@@ -1366,48 +1384,57 @@ useEffect(() => {
             {/* Extract Tabs */}
             {/* ---------------------------------- */}
 
-            <div className="extract-tabs">
+            <div className="extract-tabs-wrapper">
+              <div className="extract-tabs-label">
+                Reading texts
+              </div>
 
-              {currentPassage.reading_block.extracts.map(
-                (ext, idx) => (
+              <div className="extract-tabs" role="tablist" aria-label="Reading texts">
+                {currentPassage.reading_block.extracts.map((ext, idx) => {
+                  const isActive = activeExtract === idx;
 
-                  <button
-                    key={ext.extract_id}
-                    className={`extract-tab ${
-                      activeExtract === idx ? "active" : ""
-                    }`}
-                    onClick={() => setActiveExtract(idx)}
-                  >
-                    {ext.title || `Extract ${ext.extract_id}`}
-                  </button>
-                )
-              )}
+                  return (
+                    <button
+                      key={ext.extract_id}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      className={`extract-tab ${isActive ? "active" : "inactive"}`}
+                      onClick={() => setActiveExtract(idx)}
+                    >
+                      <span className="extract-tab-badge">
+                        Text {String.fromCharCode(65 + idx)}
+                      </span>
 
+                      <span className="extract-tab-title">
+                        {ext.title || `Extract ${ext.extract_id}`}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* ---------------------------------- */}
             {/* Active Extract */}
             {/* ---------------------------------- */}
 
-            {currentPassage.reading_block.extracts[
-              activeExtract
-            ] && (() => {
+            {currentPassage.reading_block.extracts[activeExtract] && (() => {
+              const ext = currentPassage.reading_block.extracts[activeExtract];
 
-              const ext =
-                currentPassage.reading_block.extracts[
-                  activeExtract
-                ];
-                console.log("ACTIVE EXTRACT", ext);
               return (
                 <div className="extract-content">
+                  <div className="extract-active-indicator">
+                    Now viewing: <strong>Text {String.fromCharCode(65 + activeExtract)}</strong>
+                  </div>
 
-                  <h2>
+                  <h2 className="extract-heading">
                     {ext.title || `Extract ${ext.extract_id}`}
                   </h2>
 
-                  <p className="extract-text">
+                  <div className="extract-text">
                     {ext.content}
-                  </p>
+                  </div>
 
                   {ext.images?.map(img => (
                     <img
@@ -1417,7 +1444,6 @@ useEffect(() => {
                       className="extract-image"
                     />
                   ))}
-
                 </div>
               );
             })()}
@@ -1786,13 +1812,23 @@ useEffect(() => {
                 return (
                   <div className="mcq-options image-list">
                     {Object.entries(imageOptions).map(([k, v]) => {
-                      const isSelected = selected === k;
+                      const optionKey = String(k).trim().toUpperCase();
+
+                      const normalizedCorrect =
+                        correct != null ? String(correct).trim().toUpperCase() : "";
+
+                      const normalizedStudent =
+                        student != null ? String(student).trim().toUpperCase() : "";
+
+                      const isSelected = normalizedStudent === optionKey;
 
                       const isCorrectOption =
-                        mode === "review" && k === correct;
+                        mode === "review" && optionKey === normalizedCorrect;
 
                       const isWrongSelection =
-                        mode === "review" && k === student && student !== correct;
+                        mode === "review" &&
+                        optionKey === normalizedStudent &&
+                        normalizedStudent !== normalizedCorrect;
 
                       return (
                         <label
@@ -1829,7 +1865,7 @@ useEffect(() => {
                   }}
                 >
                   {Object.entries(textOptions).map(([k, v]) => {
-                    const isSelected = selected === k;
+                    const optionKey = String(k).trim().toUpperCase();
 
                     const correct = normalizeCorrectAnswer(
                       currentQ.exam_bundle.correct_answer,
@@ -1841,9 +1877,21 @@ useEffect(() => {
                       currentQ.question_type
                     );
 
-                    const isCorrectOption = mode === "review" && k === correct;
+                    const normalizedCorrect =
+                      correct != null ? String(correct).trim().toUpperCase() : "";
+
+                    const normalizedStudent =
+                      student != null ? String(student).trim().toUpperCase() : "";
+
+                    const isSelected = normalizedStudent === optionKey;
+
+                    const isCorrectOption =
+                      mode === "review" && optionKey === normalizedCorrect;
+
                     const isWrongSelection =
-                      mode === "review" && k === student && student !== correct;
+                      mode === "review" &&
+                      optionKey === normalizedStudent &&
+                      normalizedStudent !== normalizedCorrect;
 
                     return (
                       <label

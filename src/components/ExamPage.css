@@ -1661,3 +1661,14 @@ progress::-moz-progress-bar {
   min-width: 260px;
   flex-shrink: 0;
 }
+.mcq-options .mcq-option-card.review-correct {
+  border: 2px solid #22c55e !important;
+  background: #ecfdf5 !important;
+  color: #166534 !important;
+}
+
+.mcq-options .mcq-option-card.review-wrong {
+  border: 2px solid #ef4444 !important;
+  background: #fef2f2 !important;
+  color: #b91c1c !important;
+}

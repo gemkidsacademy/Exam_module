@@ -197,12 +197,12 @@ console.log(
                 <div
                   className="bar-fill"
                   style={{
-                    width: `${t.score_percent}%`
+                    width: `${t.mastery_percent}%`
                   }}
                 />
               </div>
 
-              <span>{t.score_percent}%</span>
+              <span>{t.mastery_percent}%</span>
 
               {t.limited_data && (
                 <small className="warning">

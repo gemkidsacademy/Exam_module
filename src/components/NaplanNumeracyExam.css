@@ -1505,3 +1505,36 @@
   justify-content: flex-start;
   padding-top: 24px;
 }
+.exam-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.question-header-center {
+  flex: 1;
+  min-width: 0;
+}
+
+.exam-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.header-nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.timer {
+  white-space: nowrap;
+}
