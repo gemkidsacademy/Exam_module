@@ -10,6 +10,7 @@ export default function AddStudentForm() {
   const [className, setClassName] = useState("");
   const [classDay, setClassDay] = useState("");
   const [parentEmail, setParentEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const rawCenterCode =
     sessionStorage.getItem("center_code") || "";
 
@@ -78,43 +79,53 @@ const GENDER_OPTIONS = [
 }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const payload = {
-      id,                    // Backend-suggested ID
-      student_id: studentId, // Admin-entered student ID
-      name,
-      gender,
-      student_year: studentYear, // ✅ NEW
-      class_name: className,
-      class_day: classDay,
-      parent_email: parentEmail,
-      center_code: centerCode,
-    };
+  e.preventDefault();
 
-    try {
-      const response = await fetch(
-        `${API_BASE}/add_student_exam_module`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
-      if (!response.ok) throw new Error("Failed to add student");
-      alert("Student added successfully!");
+  if (isSubmitting) return;
 
-      // Reset form
-      setStudentId("");
-      setName("");
-      setClassName("");
-      setClassDay("");
-      setParentEmail("");
-      setStudentYear("");
-    } catch (err) {
-      console.error(err);
-      alert("Error adding student");
-    }
+  const payload = {
+    id,
+    student_id: studentId,
+    name,
+    gender,
+    student_year: studentYear,
+    class_name: className,
+    class_day: classDay,
+    parent_email: parentEmail,
+    center_code: centerCode,
   };
+
+  try {
+    setIsSubmitting(true);
+
+    const response = await fetch(
+      `${API_BASE}/add_student_exam_module`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!response.ok) throw new Error("Failed to add student");
+
+    alert("Student added successfully!");
+
+    // Reset form
+    setStudentId("");
+    setName("");
+    setGender("");
+    setClassName("");
+    setClassDay("");
+    setParentEmail("");
+    setStudentYear("");
+  } catch (err) {
+    console.error(err);
+    alert("Error adding student");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="add-student-container">
@@ -210,7 +221,13 @@ const GENDER_OPTIONS = [
           required
         />
 
-        <button type="submit">Add Student</button>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className={isSubmitting ? "submit-btn disabled" : "submit-btn"}
+        >
+          {isSubmitting ? "Adding Student..." : "Add Student"}
+        </button>
       </form>
     </div>
   );

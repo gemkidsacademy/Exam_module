@@ -1551,72 +1551,163 @@ useEffect(() => {
                   );
                 }
                 if (block.type === "single_gap") {
-                  const qid = String(currentQ.question_id);
+  const qid = String(currentQ.question_id);
+  const [before, after] = block.content.split("[BLANK]");
 
-                  const [before, after] = block.content.split("[BLANK]");
+  const correct = normalizeCorrectAnswer(
+    currentQ.exam_bundle.correct_answer,
+    currentQ.question_type
+  );
 
-                  return (
-                    <div key={idx} className="gap-fill-block">
-                      <p className="gap-fill-text inline-gap">
-                        {before}
-                        <select
-                          className="gap-dropdown inline"
-                          value={answers[qid] || ""}
-                          disabled={isReview}
-                          onChange={(e) => handleAnswer(e.target.value)}
-                        >
-                          <option value="">Select an answer</option>
-                          {Object.entries(block.options).map(([key, label]) => (
-                            <option key={key} value={key}>
-                              {label}
-                            </option>
-                          ))}
-                        </select>
-                        {after}
-                      </p>
-                    </div>
-                  );
-                }
+  const student = normalizeStudentAnswer(
+    answers[qid],
+    currentQ.question_type
+  );
+
+  const correctLabel = block.options?.[correct] || correct || "—";
+  const studentLabel = block.options?.[student] || student || "—";
+
+  const isCorrect =
+    String(student || "").trim().toUpperCase() ===
+    String(correct || "").trim().toUpperCase();
+
+  return (
+    <div key={idx} className="gap-fill-block">
+      <p className="gap-fill-text inline-gap">
+        {before}
+
+        {isReview ? (
+          <span
+            style={{
+              display: "inline-block",
+              minWidth: "140px",
+              padding: "8px 12px",
+              margin: "0 6px",
+              borderRadius: "8px",
+              border: isCorrect
+                ? "2px solid #22c55e"
+                : "2px solid #ef4444",
+              backgroundColor: isCorrect ? "#dcfce7" : "#fee2e2",
+              fontWeight: 600,
+              color: "#111827",
+              textAlign: "center"
+            }}
+          >
+            {studentLabel}
+          </span>
+        ) : (
+          <select
+            className="gap-dropdown inline"
+            value={answers[qid] || ""}
+            disabled={isReview}
+            onChange={(e) => handleAnswer(e.target.value)}
+          >
+            <option value="">Select an answer</option>
+            {Object.entries(block.options).map(([key, label]) => (
+              <option key={key} value={key}>
+                {label}
+              </option>
+            ))}
+          </select>
+        )}
+
+        {after}
+      </p>
+
+      {isReview && !isCorrect && (
+        <div
+          style={{
+            marginTop: "10px",
+            padding: "10px 12px",
+            borderRadius: "8px",
+            background: "#f0fdf4",
+            border: "1px solid #22c55e",
+            color: "#166534",
+            fontWeight: 500
+          }}
+        >
+          Correct answer: {correctLabel}
+        </div>
+      )}
+    </div>
+  );
+}
                 if (block.type === "word_select") {
-                    const qid = String(currentQ.question_id);
-                    const selected = answers[qid] || null;
+  const qid = String(currentQ.question_id);
+  const selected = answers[qid] || null;
 
-                    // Clean up text issues from backend
-                    const text = block.text
-                      .replace("/n", "\n")
-                      .replace("eat pies,plums", "eats pies, plums")
-                      .replace("off bug", "odd bug");
+  const correct = normalizeCorrectAnswer(
+    currentQ.exam_bundle.correct_answer,
+    currentQ.question_type
+  );
 
-                    const tokens = text.split(/(\s+)/); // keep spaces
+  // Clean up text issues from backend
+  const text = block.text
+    .replace("/n", "\n")
+    .replace("eat pies,plums", "eats pies, plums")
+    .replace("off bug", "odd bug");
 
-                    return (
-                      <p key={idx} className="word-select-text">
-                        {tokens.map((token, i) => {
-                          const clean = token.replace(/[.,]/g, "");
-                          const isOption = block.options.includes(clean);
-                          const isSelected = selected === clean;
+  const tokens = text.split(/(\s+)/); // keep spaces
 
-                          if (!isOption) {
-                            return <span key={i}>{token}</span>;
-                          }
+  return (
+    <p key={idx} className="word-select-text">
+      {tokens.map((token, i) => {
+        const clean = token.replace(/[.,]/g, "").trim();
+        const isOption = block.options.includes(clean);
+        const isSelected = selected === clean;
 
-                          return (
-                            <span
-                              key={i}
-                              className={`word-select-option ${isSelected ? "selected" : ""}`}
-                              onClick={() => {
-                                if (!isReview) {
-                                  handleAnswer(clean);
-                                }
-                              }}
-                            >
-                              {token}
-                            </span>
-                          );
-                        })}
-                      </p>
-                    );
-                  }
+        const isCorrectOption =
+          isReview && String(clean).trim() === String(correct).trim();
+
+        const isWrongSelection =
+          isReview &&
+          isSelected &&
+          String(clean).trim() !== String(correct).trim();
+
+        if (!isOption) {
+          return <span key={i}>{token}</span>;
+        }
+
+        return (
+          <span
+            key={i}
+            onClick={() => {
+              if (!isReview) {
+                handleAnswer(clean);
+              }
+            }}
+            style={{
+              display: "inline-block",
+              padding: "2px 8px",
+              margin: "0 2px",
+              borderRadius: "6px",
+              cursor: isReview ? "default" : "pointer",
+              fontWeight:
+                isCorrectOption || isWrongSelection || isSelected ? "600" : "400",
+              backgroundColor: isCorrectOption
+                ? "#dcfce7"   // green
+                : isWrongSelection
+                ? "#fee2e2"   // red
+                : isSelected
+                ? "#dbeafe"   // blue during normal selection
+                : "transparent",
+              border: isCorrectOption
+                ? "1px solid #22c55e"
+                : isWrongSelection
+                ? "1px solid #ef4444"
+                : isSelected
+                ? "1px solid #3b82f6"
+                : "1px solid transparent",
+              color: "#111827"
+            }}
+          >
+            {token}
+          </span>
+        );
+      })}
+    </p>
+  );
+}
 
                 if (block.type === "true_false") {
                   const qid = String(currentQ.question_id);

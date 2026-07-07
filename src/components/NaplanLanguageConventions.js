@@ -1027,35 +1027,79 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
       }
 
       if (block.type === "cloze-dropdown") {
-        const parts = block.sentence.split("{{dropdown}}");
-        const qid = String(currentQ.id);
+  const parts = block.sentence.split("{{dropdown}}");
+  const qid = String(currentQ.id);
 
-        return (
-          <div key={idx} className="cloze-sentence">
-            {parts[0]}
-            <select
-              className="cloze-dropdown"
-              value={answers[qid] || ""}
-              onChange={(e) => handleAnswer(e.target.value)}
-              disabled={isReview}
-            >
-              <option value="" disabled>
-                Select
-              </option>
-              {block.options.map((opt, i) => {
-                const key = String.fromCharCode(65 + i); // still used for display if needed
-              
-                return (
-                  <option key={key} value={opt}>
-                    {opt}
-                  </option>
-                );
-              })}
-            </select>
-            {parts[1]}
-          </div>
-        );
-      }
+  const studentAnswer =
+    normalizeStudentAnswer(answers[qid], currentQ.question_type) || "";
+
+  const correctAnswer =
+    normalizeCorrectAnswer(currentQ.correct_answer, currentQ.question_type) || "";
+
+  const isClozeCorrect =
+    String(studentAnswer).trim().toLowerCase() ===
+    String(correctAnswer).trim().toLowerCase();
+
+  return (
+    <div key={idx} className="cloze-sentence">
+      {parts[0]}
+
+      <select
+        className="cloze-dropdown"
+        value={studentAnswer}
+        onChange={(e) => handleAnswer(e.target.value)}
+        disabled={isReview}
+        style={{
+          backgroundColor: isReview
+            ? isClozeCorrect
+              ? "#dcfce7"
+              : "#fee2e2"
+            : "#fff",
+          border: isReview
+            ? isClozeCorrect
+              ? "2px solid #22c55e"
+              : "2px solid #ef4444"
+            : "1px solid #d1d5db",
+          color: "#111827",
+          fontWeight: isReview ? 600 : 400,
+          borderRadius: "10px",
+          padding: "8px 12px"
+        }}
+      >
+        <option value="" disabled>
+          Select
+        </option>
+
+        {block.options.map((opt, i) => {
+          const key = String.fromCharCode(65 + i);
+          return (
+            <option key={key} value={opt}>
+              {opt}
+            </option>
+          );
+        })}
+      </select>
+
+      {parts[1]}
+
+      {isReview && !isClozeCorrect && (
+        <div
+          style={{
+            marginTop: "10px",
+            padding: "10px 12px",
+            borderRadius: "8px",
+            background: "#f0fdf4",
+            border: "1px solid #22c55e",
+            color: "#166534",
+            fontWeight: 500
+          }}
+        >
+          <strong>Correct answer:</strong> {correctAnswer}
+        </div>
+      )}
+    </div>
+  );
+}
 
       if (block.type === "word-selection") {
         const sentenceWords = block.sentence.split(" ");
@@ -1173,25 +1217,68 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
     {/* =========================
       TYPE 4 — TEXT INPUT
     ========================= */}
-    {currentQ.question_type === 4 && (
+    {currentQ.question_type === 4 && (() => {
+  const studentAnswer =
+    normalizeStudentAnswer(answers[qid], currentQ.question_type) || "";
+
+  const correctAnswer =
+    normalizeCorrectAnswer(currentQ.correct_answer, currentQ.question_type) || "";
+
+  const isTextCorrect =
+    studentAnswer.trim().toLowerCase() ===
+    String(correctAnswer).trim().toLowerCase();
+
+  return (
+    <>
       <textarea
         className="text-input"
         rows={2}
         placeholder="Type your answer here"
-        value={answers[qid] || ""}
+        value={studentAnswer}
         onChange={(e) => {
           const cleanedValue = e.target.value
             .replace(/[^a-zA-Z]/g, "")
             .toLowerCase();
-    
+
           handleAnswer(cleanedValue);
         }}
         disabled={isReview}
         spellCheck={false}
         autoComplete="off"
         onContextMenu={(e) => e.preventDefault()}
+        style={{
+          backgroundColor: isReview
+            ? isTextCorrect
+              ? "#dcfce7"
+              : "#fee2e2"
+            : "#fff",
+          border: isReview
+            ? isTextCorrect
+              ? "2px solid #22c55e"
+              : "2px solid #ef4444"
+            : "1px solid #d1d5db",
+          color: "#111827"
+        }}
       />
-    )}
+
+      {isReview && !isTextCorrect && (
+        <div
+          style={{
+            marginTop: "10px",
+            padding: "10px 12px",
+            borderRadius: "8px",
+            background: "#f0fdf4",
+            border: "1px solid #22c55e",
+            color: "#166534",
+            fontWeight: 500
+          }}
+        >
+          <strong>Correct answer:</strong> {correctAnswer}
+        </div>
+      )}
+    </>
+  );
+})()}
     {/* =========================
       TYPE 1 — SINGLE CHOICE (MCQ)
     ========================= */}
