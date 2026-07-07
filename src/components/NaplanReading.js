@@ -1157,69 +1157,53 @@ useEffect(() => {
             )}
           </div>
 
-          {!isReview ? (
-            <div
-              style={{
-                display: "flex",
-                gap: "12px",
-                alignItems: "center",
-                marginLeft: "auto"
-              }}
-            >
-              <button
-                disabled={currentIndex === 0}
-                onClick={() => goToQuestion(currentIndex - 1)}
-              >
-                Previous
-              </button>
+          <div className="exam-header-actions">
+  <div className="header-nav-buttons">
+    <button
+      className="nav-btn prev"
+      disabled={currentIndex === 0}
+      onClick={() => goToQuestion(currentIndex - 1)}
+    >
+      Previous
+    </button>
 
-              <button
-                className={`flag-btn ${
-                  flaggedQuestions[String(currentQ.question_id)] ? "flagged" : ""
-                }`}
-                onClick={toggleFlagQuestion}
-              >
-                🚩 {flaggedQuestions[String(currentQ.question_id)] ? "Unflag" : "Flag"}
-              </button>
+    {!isReview && (
+      <button
+        className={`flag-btn ${
+          flaggedQuestions[String(currentQ.question_id)] ? "flagged" : ""
+        }`}
+        onClick={toggleFlagQuestion}
+      >
+        🚩 {flaggedQuestions[String(currentQ.question_id)] ? "Unflag" : "Flag"}
+      </button>
+    )}
 
-              {currentIndex < flatQuestions.length - 1 ? (
-                <button
-                  onClick={() => goToQuestion(currentIndex + 1)}
-                >
-                  Next
-                </button>
-              ) : (
-                <button
-                  onClick={() => setShowConfirmFinish(true)}
-                >
-                  Finish Exam
-                </button>
-              )}
-            </div>
-          ) : (
-            <div
-              style={{
-                display: "flex",
-                gap: "12px",
-                alignItems: "center",
-                marginLeft: "auto"
-              }}
-            >
-              <button
-                disabled={currentIndex === 0}
-                onClick={() => goToQuestion(currentIndex - 1)}
-              >
-                Previous
-              </button>
-
-              <button
-                disabled={currentIndex === flatQuestions.length - 1}
-                onClick={() => goToQuestion(currentIndex + 1)}
-              >
-                Next
-              </button>
-            </div>
-          )}
+    {isReview ? (
+      <button
+        className="nav-btn next"
+        disabled={currentIndex === flatQuestions.length - 1}
+        onClick={() => goToQuestion(currentIndex + 1)}
+      >
+        Next
+      </button>
+    ) : currentIndex < flatQuestions.length - 1 ? (
+      <button
+        className="nav-btn next"
+        onClick={() => goToQuestion(currentIndex + 1)}
+      >
+        Next
+      </button>
+    ) : (
+      <button
+        className="nav-btn finish"
+        disabled={mode === "submitting"}
+        onClick={() => setShowConfirmFinish(true)}
+      >
+        Finish Exam
+      </button>
+    )}
+  </div>
+</div>
         </div>
          {/* QUESTION INDEX BAR */}
         {showQuestionNavigator && (

@@ -708,7 +708,9 @@ return (
             onChange={(e) => {
               const id = Number(e.target.value);
               setExamAttemptId(id);
+              setCurrentIndex(0);
               setQuestions([]);
+              setExplanation(null);
             }}
           >
             <option value="">
@@ -729,49 +731,59 @@ return (
     </div>
   </div>
 
-  {!isReview && (
+  
     <div className="exam-header-actions">
-      <div className="header-nav-buttons">
-        <button
-          className="nav-btn prev"
-          onClick={() => goToQuestion(currentIndex - 1)}
-          disabled={currentIndex === 0}
-        >
-          Previous
-        </button>
+  <div className="header-nav-buttons">
+    <button
+      className="nav-btn prev"
+      onClick={() => goToQuestion(currentIndex - 1)}
+      disabled={currentIndex === 0}
+    >
+      Previous
+    </button>
 
-        <button
-          className={`flag-btn ${
-            flaggedQuestions[activeQuestions[currentIndex]?.q_id]
-              ? "flagged"
-              : ""
-          }`}
-          onClick={toggleFlagQuestion}
-        >
-          🚩{" "}
-          {flaggedQuestions[activeQuestions[currentIndex]?.q_id]
-            ? "Unflag"
-            : "Flag"}
-        </button>
+    {!isReview && (
+      <button
+        className={`flag-btn ${
+          flaggedQuestions[activeQuestions[currentIndex]?.q_id]
+            ? "flagged"
+            : ""
+        }`}
+        onClick={toggleFlagQuestion}
+      >
+        🚩{" "}
+        {flaggedQuestions[activeQuestions[currentIndex]?.q_id]
+          ? "Unflag"
+          : "Flag"}
+      </button>
+    )}
 
-        {currentIndex < activeQuestions.length - 1 ? (
-          <button
-            className="nav-btn next"
-            onClick={() => goToQuestion(currentIndex + 1)}
-          >
-            Next
-          </button>
-        ) : (
-          <button
-            className="nav-btn finish"
-            onClick={() => setShowConfirmFinish(true)}
-          >
-            Finish Exam
-          </button>
-        )}
-      </div>
-    </div>
-  )}
+    {isReview ? (
+      <button
+        className="nav-btn next"
+        onClick={() => goToQuestion(currentIndex + 1)}
+        disabled={currentIndex === activeQuestions.length - 1}
+      >
+        Next
+      </button>
+    ) : currentIndex < activeQuestions.length - 1 ? (
+      <button
+        className="nav-btn next"
+        onClick={() => goToQuestion(currentIndex + 1)}
+      >
+        Next
+      </button>
+    ) : (
+      <button
+        className="nav-btn finish"
+        onClick={() => setShowConfirmFinish(true)}
+      >
+        Finish Exam
+      </button>
+    )}
+  </div>
+</div>
+  
 </div>
 
     {/* QUESTION INDEX */}

@@ -778,47 +778,54 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
   </div>
 
   {/* RIGHT: NAV BUTTONS */}
-  {!isReview ? (
-    <div className="exam-header-actions">
-      <div className="header-nav-buttons">
-        <button
-          className="nav-btn prev"
-          disabled={currentIndex === 0}
-          onClick={() => goToQuestion(currentIndex - 1)}
-        >
-          Previous
-        </button>
+  {/* RIGHT: NAV BUTTONS */}
+<div className="exam-header-actions">
+  <div className="header-nav-buttons">
+    <button
+      className="nav-btn prev"
+      disabled={currentIndex === 0}
+      onClick={() => goToQuestion(currentIndex - 1)}
+    >
+      Previous
+    </button>
 
-        <button
-          className={`flag-btn ${
-            flaggedQuestions[String(currentQ.id)] ? "flagged" : ""
-          }`}
-          onClick={toggleFlagQuestion}
-        >
-          🚩 {flaggedQuestions[String(currentQ.id)] ? "Unflag" : "Flag"}
-        </button>
+    {!isReview && (
+      <button
+        className={`flag-btn ${
+          flaggedQuestions[String(currentQ.id)] ? "flagged" : ""
+        }`}
+        onClick={toggleFlagQuestion}
+      >
+        🚩 {flaggedQuestions[String(currentQ.id)] ? "Unflag" : "Flag"}
+      </button>
+    )}
 
-        {currentIndex < questions.length - 1 ? (
-          <button
-            className="nav-btn next"
-            onClick={() => goToQuestion(currentIndex + 1)}
-          >
-            Next
-          </button>
-        ) : (
-          <button
-            className="nav-btn finish"
-            disabled={mode === "submitting"}
-            onClick={() => setShowConfirmFinish(true)}
-          >
-            Finish Exam
-          </button>
-        )}
-      </div>
-    </div>
-  ) : (
-    <div className="exam-header-right-placeholder" />
-  )}
+    {isReview ? (
+      <button
+        className="nav-btn next"
+        disabled={currentIndex === questions.length - 1}
+        onClick={() => goToQuestion(currentIndex + 1)}
+      >
+        Next
+      </button>
+    ) : currentIndex < questions.length - 1 ? (
+      <button
+        className="nav-btn next"
+        onClick={() => goToQuestion(currentIndex + 1)}
+      >
+        Next
+      </button>
+    ) : (
+      <button
+        className="nav-btn finish"
+        disabled={mode === "submitting"}
+        onClick={() => setShowConfirmFinish(true)}
+      >
+        Finish Exam
+      </button>
+    )}
+  </div>
+</div>
 </div>
 
         {/* QUESTION INDEX (same as Thinking Skills) */}

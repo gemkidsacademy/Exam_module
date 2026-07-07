@@ -180,7 +180,6 @@ export default function ReadingReviewOC({
     <div className="exam-container review-mode">
       {/* HEADER */}
       <div className="exam-header">
-
   <div>OC Reading Review</div>
 
   <div
@@ -197,9 +196,7 @@ export default function ReadingReviewOC({
 
     <button
       className="question-grid-toggle"
-      onClick={() =>
-        setShowQuestionNavigator(prev => !prev)
-      }
+      onClick={() => setShowQuestionNavigator(prev => !prev)}
     >
       ▦
     </button>
@@ -218,7 +215,6 @@ export default function ReadingReviewOC({
       value={selectedSessionId || ""}
       onChange={(e) => {
         const sessionId = e.target.value;
-
         setSelectedSessionId(sessionId);
         onSessionChange(sessionId);
       }}
@@ -228,16 +224,31 @@ export default function ReadingReviewOC({
           key={a.session_id}
           value={a.session_id}
         >
-          {new Date(
-            a.created_at
-          ).toLocaleString()}
+          {new Date(a.created_at).toLocaleString()}
         </option>
       ))}
     </select>
-
   </div>
 
-</div>  
+  {/* REVIEW NAV BUTTONS */}
+  <div className="top-nav-buttons">
+    <button
+      className="nav-btn prev"
+      disabled={index === 0}
+      onClick={() => setIndex(index - 1)}
+    >
+      Previous
+    </button>
+
+    <button
+      className="nav-btn next"
+      disabled={index === questions.length - 1}
+      onClick={() => setIndex(index + 1)}
+    >
+      Next
+    </button>
+  </div>
+</div>
       
       {/* QUESTION INDEX */}
       {showQuestionNavigator && (
@@ -590,22 +601,7 @@ export default function ReadingReviewOC({
             </div>
           )}
 
-          {/* NAV */}
-          <div className="nav-buttons">
-            <button
-              disabled={index === 0}
-              onClick={() => setIndex(index - 1)}
-            >
-              Previous
-            </button>
-
-            <button
-              disabled={index === questions.length - 1}
-              onClick={() => setIndex(index + 1)}
-            >
-              Next
-            </button>
-          </div>
+          
         </div>
       </div>
     </div>

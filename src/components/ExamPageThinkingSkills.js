@@ -725,42 +725,57 @@ return (
   </div>
 
   {/* 🔥 TOP NAV BUTTONS */}
+  {/* TOP NAV BUTTONS */}
+<div className="top-nav-buttons">
+  <button
+    className="nav-btn prev"
+    onClick={() => goToQuestion(currentIndex - 1)}
+    disabled={currentIndex === 0}
+  >
+    Previous
+  </button>
+
+  {/* Flag button should only exist during live exam */}
   {!isReview && (
-    <div className="top-nav-buttons">
-      <button
-        className="nav-btn prev"
-        onClick={() => goToQuestion(currentIndex - 1)}
-        disabled={currentIndex === 0}
-      >
-        Previous
-      </button>
-
-      <button
-        className={`flag-btn ${
-          flaggedQuestions[String(currentQ.q_id)] ? "flagged" : ""
-        }`}
-        onClick={toggleFlagQuestion}
-      >
-        🚩 {flaggedQuestions[String(currentQ.q_id)] ? "Unflag" : "Flag"}
-      </button>
-
-      {currentIndex < activeQuestions.length - 1 ? (
-        <button
-          className="nav-btn next"
-          onClick={() => goToQuestion(currentIndex + 1)}
-        >
-          Next
-        </button>
-      ) : (
-        <button
-          className="nav-btn finish"
-          onClick={() => setShowConfirmFinish(true)}
-        >
-          Finish Exam
-        </button>
-      )}
-    </div>
+    <button
+      className={`flag-btn ${
+        flaggedQuestions[String(currentQ.q_id)] ? "flagged" : ""
+      }`}
+      onClick={toggleFlagQuestion}
+    >
+      🚩 {flaggedQuestions[String(currentQ.q_id)] ? "Unflag" : "Flag"}
+    </button>
   )}
+
+  {currentIndex < activeQuestions.length - 1 ? (
+    <button
+      className="nav-btn next"
+      onClick={() => goToQuestion(currentIndex + 1)}
+    >
+      Next
+    </button>
+  ) : isReview ? (
+    <button
+      className="nav-btn finish"
+      onClick={() => {
+        setQuestions([]);
+        setCurrentIndex(0);
+        setVisited({});
+        setAnswers({});
+        setMode("report");
+      }}
+    >
+      Exit Review
+    </button>
+  ) : (
+    <button
+      className="nav-btn finish"
+      onClick={() => setShowConfirmFinish(true)}
+    >
+      Finish Exam
+    </button>
+  )}
+</div>
 </div>
 
     {/* QUESTION INDEX */}

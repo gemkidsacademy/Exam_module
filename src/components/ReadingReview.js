@@ -40,7 +40,6 @@
 
 
     const currentQuestion = questions[index];
-    const qid = String(currentQuestion.question_id);
     const [explanations, setExplanations] = useState({});
     const [showQuestionNavigator, setShowQuestionNavigator] =
     useState(false);
@@ -106,6 +105,7 @@
     if (!currentQuestion) {
       return <div>No review data available.</div>;
     }
+    const qid = String(currentQuestion.question_id);  
 
     /* =============================
       QUESTION TYPE
@@ -162,71 +162,81 @@
           HEADER
         ============================= */}
         <div className="exam-header">
+  <div>Reading Exam Review</div>
 
-    <div>Reading Exam Review</div>
+  <div
+    className="question-counter-inline"
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "10px"
+    }}
+  >
+    <span className="question-counter-text">
+      Question {index + 1} of {questions.length}
+    </span>
 
-      <div
-        className="question-counter-inline"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "10px"
-        }}
+    <button
+      className="question-grid-toggle"
+      onClick={() => setShowQuestionNavigator(prev => !prev)}
+    >
+      ▦
+    </button>
+
+    {onExit && (
+      <button
+        className="exit-review-btn"
+        onClick={onExit}
       >
+        Exit Review
+      </button>
+    )}
 
-        <span className="question-counter-text">
-          Question {index + 1} of {questions.length}
-        </span>
-        <button
-          className="question-grid-toggle"
-          onClick={() =>
-            setShowQuestionNavigator(prev => !prev)
-          }
+    <select
+      className="review-exam-dropdown"
+      value={selectedExamId || ""}
+      onChange={(e) => {
+        const examId = Number(e.target.value);
+        onDateChange?.(examId);
+      }}
+    >
+      {examDates.map((d) => (
+        <option
+          key={d.exam_id}
+          value={d.exam_id}
         >
-          ▦
-        </button>
+          {new Date(d.date).toLocaleString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+          })}
+        </option>
+      ))}
+    </select>
+  </div>
 
+  {/* REVIEW NAV BUTTONS */}
+  <div className="top-nav-buttons">
+    <button
+      className="nav-btn prev"
+      disabled={index === 0}
+      onClick={() => setIndex(index - 1)}
+    >
+      Previous
+    </button>
 
-        {onExit && (
-          <button
-            className="exit-review-btn"
-            onClick={onExit}
-          >
-            Exit Review
-          </button>
-        )}
-
-        <select
-          className="review-exam-dropdown"
-          value={selectedExamId || ""}
-          onChange={(e) => {
-            const examId = Number(e.target.value);
-            onDateChange?.(examId);
-          }}
-        >
-          {examDates.map((d) => (
-            <option
-              key={d.exam_id}
-              value={d.exam_id}
-            >
-              {new Date(d.date).toLocaleString(
-                "en-US",
-                {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: true
-                }
-              )}
-            </option>
-          ))}
-        </select>
-
-      </div>
-
-    </div>
+    <button
+      className="nav-btn next"
+      disabled={index === questions.length - 1}
+      onClick={() => setIndex(index + 1)}
+    >
+      Next
+    </button>
+  </div>
+</div>
 
         {/* =============================
           QUESTION INDEX
@@ -533,22 +543,7 @@
               </div>
             )}
 
-            {/* ✅ NAV LAST */}
-            <div className="nav-buttons">
-              <button
-                disabled={index === 0}
-                onClick={() => setIndex(index - 1)}
-              >
-                Previous
-              </button>
-
-              <button
-                disabled={index === questions.length - 1}
-                onClick={() => setIndex(index + 1)}
-              >
-                Next
-              </button>
-            </div>
+            
 
           </div>
         </div>

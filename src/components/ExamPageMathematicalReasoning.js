@@ -694,47 +694,49 @@ return (
   </div>
 
   {/* 🔥 TOP RIGHT NAVIGATION */}
+  {/* TOP RIGHT NAVIGATION */}
+<div className="top-nav-buttons">
+  <button
+    className="nav-btn prev"
+    onClick={() => goToQuestion(currentIndex - 1)}
+    disabled={currentIndex === 0}
+  >
+    Previous
+  </button>
+
   {!isReview && (
-    <div className="top-nav-buttons">
-      <button
-        className="nav-btn prev"
-        onClick={() => goToQuestion(currentIndex - 1)}
-        disabled={currentIndex === 0}
-      >
-        Previous
-      </button>
-
-      <button
-        className={`flag-btn ${
-          flaggedQuestions[activeQuestions[currentIndex]?.q_id]
-            ? "flagged"
-            : ""
-        }`}
-        onClick={toggleFlagQuestion}
-      >
-        🚩{" "}
-        {flaggedQuestions[activeQuestions[currentIndex]?.q_id]
-          ? "Unflag"
-          : "Flag"}
-      </button>
-
-      {currentIndex < activeQuestions.length - 1 ? (
-        <button
-          className="nav-btn next"
-          onClick={() => goToQuestion(currentIndex + 1)}
-        >
-          Next
-        </button>
-      ) : (
-        <button
-          className="nav-btn finish"
-          onClick={() => setShowConfirmFinish(true)}
-        >
-          Finish Exam
-        </button>
-      )}
-    </div>
+    <button
+      className={`flag-btn ${
+        flaggedQuestions[activeQuestions[currentIndex]?.q_id]
+          ? "flagged"
+          : ""
+      }`}
+      onClick={toggleFlagQuestion}
+    >
+      🚩{" "}
+      {flaggedQuestions[activeQuestions[currentIndex]?.q_id]
+        ? "Unflag"
+        : "Flag"}
+    </button>
   )}
+
+  <button
+    className="nav-btn next"
+    onClick={() => goToQuestion(currentIndex + 1)}
+    disabled={currentIndex === activeQuestions.length - 1}
+  >
+    Next
+  </button>
+
+  {!isReview && currentIndex === activeQuestions.length - 1 && (
+    <button
+      className="nav-btn finish"
+      onClick={() => setShowConfirmFinish(true)}
+    >
+      Finish Exam
+    </button>
+  )}
+</div>
 </div>
     {/* QUESTION INDEX */}
     {showQuestionNavigator && (
