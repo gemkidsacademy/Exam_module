@@ -645,60 +645,97 @@ return (
     {/* HEADER */}
     <div className="exam-header">
 
-      {
-        mode === "exam" && (
-          <div className="timer">
-            ⏳ {formatTime(timeLeft)}
-          </div>
-        )
+  {mode === "exam" && (
+    <div className="timer">
+      ⏳ {formatTime(timeLeft)}
+    </div>
+  )}
+
+  <div className="question-counter-inline">
+
+    <span className="question-counter-text">
+      Question {currentIndex + 1} of {activeQuestions.length}
+    </span>
+
+    <button
+      className="question-grid-toggle"
+      onClick={() =>
+        setShowQuestionNavigator(prev => !prev)
       }
+    >
+      ▦
+    </button>
 
-      <div className="question-counter-inline">
-
-        <span className="question-counter-text">
-          Question {currentIndex + 1} of {activeQuestions.length}
-        </span>
-
+    {isReview && (
+      <>
         <button
-          className="question-grid-toggle"
-          onClick={() =>
-            setShowQuestionNavigator(prev => !prev)
-          }
+          className="exit-review-btn"
+          onClick={handleExitReview}
         >
-          ▦
+          Exit Review
         </button>
 
-        {isReview && (
-          <>
-            <button
-              className="exit-review-btn"
-              onClick={handleExitReview}
+        <select
+          className="review-exam-dropdown"
+          value={selectedExamId || ""}
+          onChange={handleDateChange}
+        >
+          {examDates.map((d) => (
+            <option
+              key={d.exam_id}
+              value={d.exam_id}
             >
-              Exit Review
-            </button>
+              {new Date(d.date).toLocaleString()}
+            </option>
+          ))}
+        </select>
+      </>
+    )}
+  </div>
 
-            <select
-              className="review-exam-dropdown"
-              value={selectedExamId || ""}
-              onChange={handleDateChange}
-            >
-              {examDates.map((d) => (
-                <option
-                  key={d.exam_id}
-                  value={d.exam_id}
-                >
-                  {new Date(d.date).toLocaleString()}
-                </option>
-              ))}
-            </select>
-          </>
-        )}
+  {/* 🔥 TOP RIGHT NAVIGATION */}
+  {!isReview && (
+    <div className="top-nav-buttons">
+      <button
+        className="nav-btn prev"
+        onClick={() => goToQuestion(currentIndex - 1)}
+        disabled={currentIndex === 0}
+      >
+        Previous
+      </button>
 
-      </div>
+      <button
+        className={`flag-btn ${
+          flaggedQuestions[activeQuestions[currentIndex]?.q_id]
+            ? "flagged"
+            : ""
+        }`}
+        onClick={toggleFlagQuestion}
+      >
+        🚩{" "}
+        {flaggedQuestions[activeQuestions[currentIndex]?.q_id]
+          ? "Unflag"
+          : "Flag"}
+      </button>
 
-      
-
+      {currentIndex < activeQuestions.length - 1 ? (
+        <button
+          className="nav-btn next"
+          onClick={() => goToQuestion(currentIndex + 1)}
+        >
+          Next
+        </button>
+      ) : (
+        <button
+          className="nav-btn finish"
+          onClick={() => setShowConfirmFinish(true)}
+        >
+          Finish Exam
+        </button>
+      )}
     </div>
+  )}
+</div>
     {/* QUESTION INDEX */}
     {showQuestionNavigator && (
       
@@ -1011,99 +1048,7 @@ return (
     </div>
 
 
-    {/* NAVIGATION */}
-    <div className="nav-buttons">
-
-      <button
-        className="nav-btn prev"
-
-        onClick={() =>
-          goToQuestion(
-            currentIndex - 1
-          )
-        }
-
-        disabled={
-          currentIndex === 0
-        }
-      >
-        Previous
-      </button>
-
-      {
-        mode !== "review" && (
-
-          <button
-            className={`flag-btn ${
-              flaggedQuestions[
-                activeQuestions[
-                  currentIndex
-                ]?.q_id
-              ]
-                ? "flagged"
-                : ""
-            }`}
-
-            onClick={
-              toggleFlagQuestion
-            }
-          >
-            🚩
-
-            {
-              flaggedQuestions[
-                activeQuestions[
-                  currentIndex
-                ]?.q_id
-              ]
-                ? "Unflag"
-                : "Flag"
-            }
-
-          </button>
-
-        )
-      }
-
-      {
-        currentIndex <
-        activeQuestions.length - 1 && (
-
-          <button
-            className="nav-btn next"
-
-            onClick={() =>
-              goToQuestion(
-                currentIndex + 1
-              )
-            }
-          >
-            Next
-          </button>
-        )
-      }
-
-      {
-        mode !== "review" &&
-
-        currentIndex ===
-        activeQuestions.length - 1 && (
-
-          <button
-            className="nav-btn finish"
-
-            onClick={() =>
-              setShowConfirmFinish(
-                true
-              )
-            }
-          >
-            Finish Exam
-          </button>
-        )
-      }
-
-    </div>
+    
   </div> 
   {showConfirmFinish && (
   <div className="confirm-overlay">

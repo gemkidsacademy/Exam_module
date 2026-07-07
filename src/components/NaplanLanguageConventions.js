@@ -1057,17 +1057,32 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
           <div key={idx} className="word-selection-panel">
             <div className="sentence-container">
               {sentenceWords.map((word, i) => {
-                const cleanWord = word.replace(/[.,!?]/g, "");
+                const cleanWord = word.replace(/[.,!?]/g, "").trim();
                 const isSelectable = block.selectable_words.includes(cleanWord);
+
                 const isSelected =
-                  answers[String(currentQ.id)] === cleanWord;
+                  normalizedStudentAnswer === cleanWord;
+
+                const isCorrectWord =
+                  normalizedCorrectAnswer === cleanWord;
+
+                let reviewClass = "";
+
+                if (isReview) {
+                  if (isCorrectWord) {
+                    reviewClass = "review-correct";
+                  } else if (isSelected && !isCorrectWord) {
+                    reviewClass = "review-wrong";
+                  }
+                }
 
                 return (
                   <span
                     key={i}
                     className={`sentence-word
                       ${isSelectable ? "selectable" : "non-selectable"}
-                      ${isSelected ? "selected" : ""}
+                      ${!isReview && isSelected ? "selected" : ""}
+                      ${reviewClass}
                     `}
                     onClick={() => {
                       if (!isReview && isSelectable) {
@@ -1267,53 +1282,62 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
           })}
       </div>
     )}
-    {currentQ.question_type === 2 && !hasImageMultiSelect && (
-      <div className="text-multi-select-grid">
-        {Object.values(currentQ.options || {}).map((value, idx) => {
-          const key = String.fromCharCode(65 + idx); // internal key only
-          const selected = answers[qid] || [];
-          const isSelected = selected.includes(key);
+  {currentQ.question_type === 2 && !hasImageMultiSelect && (
+  <div className="text-multi-select-grid">
+    {Object.values(currentQ.options || {}).map((value, idx) => {
+      const key = String.fromCharCode(65 + idx);
+      const selected = Array.isArray(answers[qid]) ? answers[qid] : [];
+      const correctAnswers = Array.isArray(normalizedCorrectAnswer)
+        ? normalizedCorrectAnswer
+        : [];
 
-          const correctAnswers = normalizedCorrectAnswer || [];
-          const isCorrectOption = correctAnswers.includes(key);
-          const isWrongSelected = isReview && isSelected && !isCorrectOption;
-          const isCorrectHighlight = isReview && isCorrectOption;
+      const isSelected = selected.includes(key);
+      const isCorrectOption = correctAnswers.includes(key);
 
-          return (
-            <label
-              key={key}
-              className={`text-option-card
-                ${isSelected ? "selected" : ""}
-                ${isCorrectHighlight ? "review-correct" : ""}
-                ${isWrongSelected ? "review-wrong" : ""}
-              `}
-            >
-              <input
-                type="checkbox"
-                checked={isSelected}
-                disabled={isReview}
-                onChange={() => {
-                  let updated;
+      let optionClass = "text-option-card";
 
-                  if (isSelected) {
-                    updated = selected.filter(v => v !== key);
-                  } else {
-                    if (selected.length >= TYPE_2_MAX_SELECTIONS) return;
-                    updated = [...selected, key];
-                  }
+      if (isReview) {
+        if (isCorrectOption) {
+          optionClass += " review-correct";
+        } else if (isSelected && !isCorrectOption) {
+          optionClass += " review-wrong";
+        }
+      } else {
+        if (isSelected) {
+          optionClass += " selected";
+        }
+      }
 
-                  handleAnswer(updated);
-                }}
-              />
+      return (
+        <label key={key} className={optionClass}>
+          <input
+            type="checkbox"
+            checked={isSelected}
+            disabled={isReview}
+            onChange={() => {
+              if (isReview) return;
 
-              <div className="text-option-content">
-                <span className="option-text">{value}</span>
-              </div>
-            </label>
-          );
-        })}
-      </div>
-    )}
+              let updated;
+
+              if (isSelected) {
+                updated = selected.filter(v => v !== key);
+              } else {
+                if (selected.length >= TYPE_2_MAX_SELECTIONS) return;
+                updated = [...selected, key];
+              }
+
+              handleAnswer(updated);
+            }}
+          />
+
+          <div className="text-option-content">
+            <span className="option-text">{value}</span>
+          </div>
+        </label>
+      );
+    })}
+  </div>
+)}
   {/* ================= AI EXPLANATION ================= */}
 {isReview && (
   <div style={{ marginTop: "16px" }}>

@@ -1316,7 +1316,7 @@ return (
                           className={[
                             "sentence-word",
                             isSelectable ? "selectable" : "non-selectable",
-                            isSelected ? "selected" : "",
+                            !isReview && isSelected ? "selected" : "",
                             reviewClass
                           ].join(" ")}
                           onClick={() => {
@@ -1343,48 +1343,43 @@ return (
               if (block.type === "image-multi-select") {
                 const qid = String(currentQ.id);
                 const selectedAnswers = Array.isArray(answers[qid])
-                  ? answers[qid]
+                  ? answers[qid].map(String)
                   : [];
 
-                const correctAnswers = normalizeCorrectAnswer(
+                const correctAnswersRaw = normalizeCorrectAnswer(
                   currentQ.correct_answer,
                   currentQ.question_type
                 );
 
+                const correctAnswers = Array.isArray(correctAnswersRaw)
+                  ? correctAnswersRaw.map(String)
+                  : [];
+
                 return (
                   <div key={idx} className="image-multi-select-grid">
                     {block.options.map((opt) => {
-                      console.log("QUESTION ID:", qid);
-                      console.log("Correct Answers:", correctAnswers);
-                      console.log("Student Answers:", selectedAnswers);
-                      console.log("Current option id:", opt.id);
-                      const isSelected = selectedAnswers.map(String).includes(String(opt.id));
+                      const optionId = String(opt.id);
+                      const isSelected = selectedAnswers.includes(optionId);
+                      const isCorrectOption = correctAnswers.includes(optionId);
 
-                      const isCorrectOption =
-                        Array.isArray(correctAnswers) &&
-                        correctAnswers.map(String).includes(String(opt.id));
+                      let optionClass = "image-option-card";
 
-                      let reviewClass = "";
+                      // ✅ blue only during exam
+                      if (!isReview && isSelected) {
+                        optionClass += " selected";
+                      }
 
-                      if (mode === "review") {
-                        if (isCorrectOption && isSelected) {
-                          reviewClass = "review-correct";
-                        } 
-                        else if (isCorrectOption && !isSelected) {
-                          reviewClass = "review-wrong"; // missed correct
-                        } 
-                        else if (!isCorrectOption && isSelected) {
-                          reviewClass = "review-wrong"; // wrongly selected
+                      // ✅ review colors only during review
+                      if (isReview) {
+                        if (isCorrectOption) {
+                          optionClass += " review-correct";
+                        } else if (isSelected && !isCorrectOption) {
+                          optionClass += " review-wrong";
                         }
                       }
 
                       return (
-                        <label
-                          key={opt.id}
-                          className={`image-option-card ${
-                            isSelected ? "selected" : ""
-                          } ${reviewClass}`}
-                        >
+                        <label key={opt.id} className={optionClass}>
                           <input
                             type="checkbox"
                             checked={isSelected}
@@ -1397,8 +1392,8 @@ return (
                               if (isReview) return;
 
                               const updated = isSelected
-                                ? selectedAnswers.filter((v) => v !== opt.id)
-                                : [...selectedAnswers, opt.id];
+                                ? selectedAnswers.filter(v => v !== optionId)
+                                : [...selectedAnswers, optionId];
 
                               handleAnswer(updated);
                             }}
@@ -1410,9 +1405,7 @@ return (
                             className="image-option-image"
                           />
 
-                          <div className="image-option-label">
-                            {opt.label}
-                          </div>
+                          <div className="image-option-label">{opt.label}</div>
                         </label>
                       );
                     })}
@@ -1493,77 +1486,156 @@ return (
           )}
 
             {currentQ.question_type === 6 && (
-              <div
-                className="image-mcq-grid"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(2, minmax(420px, 1fr))",
-                  gap: "24px",
-                  justifyItems: "center",
-                  marginTop: "20px"
-                }}
-              >
-                {Object.entries(currentQ.options || {}).map(
-                  ([key, imgUrl]) => {
-                    const qid = String(currentQ.id);
-                    const studentAnswer = answers[qid];
-            
-                    const correctAnswer = normalizeCorrectAnswer(
-                      currentQ.correct_answer,
-                      currentQ.question_type
-                    );
-            
-                    const isSelected = studentAnswer === key;
-                    const isCorrectOption = key === correctAnswer;
-            
-                    let reviewClass = "";
-            
-                    if (mode === "review") {
-                      if (isCorrectOption) {
-                        reviewClass = "review-correct";
-                      } else if (isSelected && studentAnswer !== correctAnswer) {
-                        reviewClass = "review-wrong";
-                      }
-                    }
-            
-                    return (
-                      <div
-                        key={key}
-                        className={`image-mcq-card ${
-                          isSelected ? "selected" : ""
-                        } ${reviewClass}`}
-                        style={{
-                          width: "420px",
-                          padding: "16px",
-                          border: "2px solid #d0d7de",
-                          borderRadius: "14px",
-                          background: "#fff",
-                          boxSizing: "border-box",
-                          overflow: "visible"
-                        }}
-                        onClick={() => {
-                          if (!isReview) {
-                            handleAnswerForQuestion(currentQ.id, key);
-                          }
-                        }}
-                      >
-                        <img
-                          src={imgUrl}
-                          alt={`Option ${key}`}
-                          style={{
-                            width: "100%",
-                            height: "auto",
-                            display: "block",
-                            objectFit: "contain"
-                          }}
-                        />
-                        <div className="image-mcq-label">{key}</div>
-                      </div>
-                    );
-                  }
-                )}
-              </div>
-            )}
+  <div
+    className="image-mcq-grid"
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(2, minmax(420px, 1fr))",
+      gap: "24px",
+      justifyItems: "center",
+      marginTop: "20px"
+    }}
+  >
+    {Object.entries(currentQ.options || {}).map(([key, imgUrl]) => {
+  const qid = String(currentQ.id);
+
+  const studentAnswerRaw = answers[qid];
+  const correctAnswerRaw = normalizeCorrectAnswer(
+    currentQ.correct_answer,
+    currentQ.question_type
+  );
+
+  const optionKey = String(key).trim();
+  const optionValue = String(imgUrl).trim();
+
+  // Normalize student answer to option key if backend stored image URL
+  let normalizedStudentAnswer = "";
+  if (studentAnswerRaw != null) {
+    const rawStudent = String(studentAnswerRaw).trim();
+
+    if (rawStudent === optionKey || rawStudent === optionValue) {
+      normalizedStudentAnswer = optionKey;
+    }
+  }
+
+  // Normalize correct answer to option key if backend stored image URL
+  let normalizedCorrectAnswer = "";
+  if (correctAnswerRaw != null) {
+    const rawCorrect = String(correctAnswerRaw).trim();
+
+    if (rawCorrect === optionKey || rawCorrect === optionValue) {
+      normalizedCorrectAnswer = optionKey;
+    }
+  }
+
+  const isSelected = normalizedStudentAnswer === optionKey;
+  const isCorrectOption = normalizedCorrectAnswer === optionKey;
+
+  console.log("===== NUMERACY TYPE 6 REVIEW DEBUG =====");
+  console.log("qid:", qid);
+  console.log("optionKey:", optionKey);
+  console.log("optionValue:", optionValue);
+  console.log("studentAnswerRaw:", studentAnswerRaw);
+  console.log("normalizedStudentAnswer:", normalizedStudentAnswer);
+  console.log("correctAnswerRaw:", correctAnswerRaw);
+  console.log("normalizedCorrectAnswer:", normalizedCorrectAnswer);
+  console.log("isSelected:", isSelected);
+  console.log("isCorrectOption:", isCorrectOption);
+
+      return (
+        <div
+          key={key}
+          className={`image-mcq-card ${
+            !isReview && isSelected ? "selected" : ""
+          }`}
+          style={{
+            width: "420px",
+            padding: "16px",
+            borderRadius: "14px",
+            boxSizing: "border-box",
+            overflow: "visible",
+
+            border: isReview
+              ? isCorrectOption
+                ? "3px solid #22c55e"
+                : isSelected
+                ? "3px solid #ef4444"
+                : "2px solid #d9e2f2"
+              : isSelected
+              ? "3px solid #3b82f6"
+              : "2px solid #d9e2f2",
+
+            backgroundColor: isReview
+              ? isCorrectOption
+                ? "#ecfdf5"
+                : isSelected
+                ? "#fef2f2"
+                : "#ffffff"
+              : "#ffffff",
+
+            boxShadow: isReview
+              ? isCorrectOption
+                ? "0 0 0 1px rgba(34,197,94,0.15)"
+                : isSelected
+                ? "0 0 0 1px rgba(239,68,68,0.15)"
+                : "none"
+              : "none"
+          }}
+          onClick={() => {
+            if (!isReview) {
+              handleAnswerForQuestion(currentQ.id, key);
+            }
+          }}
+        >
+          <div
+  style={{
+    width: "100%",
+    padding: "10px",
+    borderRadius: "12px",
+    backgroundColor: isReview
+      ? isCorrectOption
+        ? "#dcfce7"
+        : isSelected
+        ? "#fee2e2"
+        : "#f8fafc"
+      : "#f8fafc"
+  }}
+>
+  <img
+    src={imgUrl}
+    alt={`Option ${key}`}
+    style={{
+      width: "100%",
+      height: "auto",
+      display: "block",
+      objectFit: "contain",
+      borderRadius: "10px"
+    }}
+  />
+</div>
+
+          <div
+            className="image-mcq-label"
+            style={{
+              marginTop: "10px",
+              fontWeight: 700,
+              textAlign: "center",
+              color: isReview
+                ? isCorrectOption
+                  ? "#166534"
+                  : isSelected
+                  ? "#b91c1c"
+                  : "#111827"
+                : "#111827"
+            }}
+          >
+            {key}
+          </div>
+        </div>
+      );
+    })}
+  </div>
+)}
 
             {currentQ.question_type === 3 && (
             <>
@@ -1607,121 +1679,111 @@ return (
 
             
 {currentQ.question_type === 2 && !hasImageMultiSelect && (() => {
+  const qid = String(currentQ.id);
 
-const qid = String(currentQ.id);
+  const selectedAnswers = Array.isArray(answers[qid])
+    ? answers[qid].map(String)
+    : [];
 
-const selectedAnswers = Array.isArray(answers[qid])
-  ? answers[qid]
-  : [];
+  const correctAnswersRaw = normalizeCorrectAnswer(
+    currentQ.correct_answer,
+    currentQ.question_type
+  );
 
-const correctAnswers = normalizeCorrectAnswer(
-  currentQ.correct_answer,
-  currentQ.question_type
-);
+  const correctAnswers = Array.isArray(correctAnswersRaw)
+    ? correctAnswersRaw.map(String)
+    : [];
 
-const isFullyCorrect =
-  Array.isArray(correctAnswers) &&
-  selectedAnswers.length === correctAnswers.length &&
-  selectedAnswers.every(v => correctAnswers.includes(v));
+  const isFullyCorrect =
+    selectedAnswers.length === correctAnswers.length &&
+    selectedAnswers.every(v => correctAnswers.includes(v));
 
-return (
-  <div className="text-multi-select-grid">
+  return (
+    <div className="text-multi-select-grid">
+      {Object.entries(currentQ.options || {}).map(([key, value]) => {
+        const normalizedKey = String(key);
+        const isSelected = selectedAnswers.includes(normalizedKey);
+        const isCorrectOption = correctAnswers.includes(normalizedKey);
 
-    {Object.entries(currentQ.options || {}).map(([key, value]) => {
+        let optionClass = "text-option-card";
 
-      const isSelected = selectedAnswers.map(String).includes(String(key));
-
-      const isCorrectOption =
-        Array.isArray(correctAnswers) &&
-        correctAnswers.map(String).includes(String(key));
-
-      let reviewClass = "";
-
-      if (mode === "review") {
-        if (isCorrectOption) {
-          reviewClass = "review-correct";
-        } 
-        else if (isSelected && !isCorrectOption) {
-          reviewClass = "review-wrong";
+        // ✅ exam mode only
+        if (!isReview && isSelected) {
+          optionClass += " selected";
         }
-      }
 
-      return (
-        <label
-          key={key}
-          className={`text-option-card ${
-            isSelected ? "selected" : ""
-          } ${reviewClass}`}
-        >
-          <input
-            type="checkbox"
-            checked={isSelected}
-            disabled={
-              isReview ||
-              (!isSelected &&
-                selectedAnswers.length >= TYPE_2_MAX_SELECTIONS)
-            }
-            onChange={() => {
-              if (isReview) return;
+        // ✅ review mode only
+        if (isReview) {
+          if (isCorrectOption) {
+            optionClass += " review-correct";
+          } else if (isSelected && !isCorrectOption) {
+            optionClass += " review-wrong";
+          }
+        }
 
-              const updatedAnswers = isSelected
-                ? selectedAnswers.filter((v) => v !== key)
-                : [...selectedAnswers, key];
+        return (
+          <label key={key} className={optionClass}>
+            <input
+              type="checkbox"
+              checked={isSelected}
+              disabled={
+                isReview ||
+                (!isSelected &&
+                  selectedAnswers.length >= TYPE_2_MAX_SELECTIONS)
+              }
+              onChange={() => {
+                if (isReview) return;
 
-              handleAnswer(updatedAnswers);
-            }}
-          />
-          <span className="option-text">{value}</span>
-        </label>
-      );
-    })}
+                const updatedAnswers = isSelected
+                  ? selectedAnswers.filter(v => v !== normalizedKey)
+                  : [...selectedAnswers, normalizedKey];
 
-    {/* ✅ Explicit Correct Answer Display */}
-  {/* ✅ Explicit Correct Answer Display */}
-    {mode === "review" && (
-      <>
-        {/* Show correct answer only if not fully correct */}
-        {!isFullyCorrect && (
+                handleAnswer(updatedAnswers);
+              }}
+            />
+            <span className="option-text">{value}</span>
+          </label>
+        );
+      })}
+
+      {isReview && (
+        <>
+          {!isFullyCorrect && (
+            <div
+              className="correct-answer-text"
+              style={{ marginTop: "12px", gridColumn: "1 / -1" }}
+            >
+              <strong>Correct answer: </strong>
+              {correctAnswers
+                .map(key => currentQ.options?.[key])
+                .join(", ")}
+            </div>
+          )}
+
           <div
-            className="correct-answer-text"
-            style={{ marginTop: "12px", gridColumn: "1 / -1" }}
-          >
-            <strong>Correct answer: </strong>
-            {Array.isArray(correctAnswers)
-              ? correctAnswers
-                  .map(key => currentQ.options?.[key])
-                  .join(", ")
-              : ""}
-          </div>
-        )}
-    
-        {/* Always show what student selected */}
-        <div
-          style={{
-            marginTop: "8px",
-            gridColumn: "1 / -1"
-          }}
-        >
-          <strong>Your answer: </strong>
-          <span
             style={{
-              color: isFullyCorrect ? "#16a34a" : "#dc2626",
-              fontWeight: 600
+              marginTop: "8px",
+              gridColumn: "1 / -1"
             }}
           >
-            {selectedAnswers.length > 0
-              ? selectedAnswers
-                  .map(key => currentQ.options?.[key])
-                  .join(", ")
-              : "No answer selected"}
-          </span>
-        </div>
-      </>
-    )}
-    
-
-  </div>
-);
+            <strong>Your answer: </strong>
+            <span
+              style={{
+                color: isFullyCorrect ? "#16a34a" : "#dc2626",
+                fontWeight: 600
+              }}
+            >
+              {selectedAnswers.length > 0
+                ? selectedAnswers
+                    .map(key => currentQ.options?.[key])
+                    .join(", ")
+                : "No answer selected"}
+            </span>
+          </div>
+        </>
+      )}
+    </div>
+  );
 })()}
 
       {/* ================= AI EXPLANATION ================= */}

@@ -1405,10 +1405,6 @@ useEffect(() => {
                       <span className="extract-tab-badge">
                         Text {String.fromCharCode(65 + idx)}
                       </span>
-
-                      <span className="extract-tab-title">
-                        {ext.title || `Extract ${ext.extract_id}`}
-                      </span>
                     </button>
                   );
                 })}

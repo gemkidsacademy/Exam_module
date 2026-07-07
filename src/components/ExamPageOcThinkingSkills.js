@@ -670,74 +670,109 @@ return (
     {/* HEADER */}
     <div className="exam-header">
 
-      {!isReview && (
-        <div className="timer">
-          ⏳ {formatTime(timeLeft)}
-        </div>
-      )}
-
-      <div className="question-counter-inline">
-
-  <span className="question-counter-text">
-    Question {activeQuestions.length
-      ? currentIndex + 1
-      : 0}
-    {" "}of{" "}
-    {activeQuestions.length}
-  </span>
-
-  <button
-    className="question-grid-toggle"
-    onClick={() =>
-      setShowQuestionNavigator(prev => !prev)
-    }
-  >
-    ▦
-  </button>
-
-  {isReview && (
-    <>
-      <button
-        className="nav-btn finish"
-        onClick={() => {
-          setMode("report");
-          setExplanation(null);
-        }}
-      >
-        Exit Review
-      </button>
-
-      <select
-        className="review-exam-dropdown"
-        value={examAttemptId || ""}
-        onChange={(e) => {
-          const id = Number(e.target.value);
-
-          setExamAttemptId(id);
-          setQuestions([]);
-        }}
-      >
-        <option value="">
-          Select Attempt
-        </option>
-
-        {attempts.map((a) => (
-          <option
-            key={a.exam_attempt_id}
-            value={a.exam_attempt_id}
-          >
-            {new Date(
-              a.completed_at
-            ).toLocaleString()}
-          </option>
-        ))}
-      </select>
-    </>
+  {!isReview && (
+    <div className="timer">
+      ⏳ {formatTime(timeLeft)}
+    </div>
   )}
 
-</div>
+  <div className="question-header-center">
+    <div className="question-counter-inline">
 
+      <span className="question-counter-text">
+        Question {activeQuestions.length ? currentIndex + 1 : 0} of {activeQuestions.length}
+      </span>
+
+      <button
+        className="question-grid-toggle"
+        onClick={() => setShowQuestionNavigator(prev => !prev)}
+      >
+        ▦
+      </button>
+
+      {isReview && (
+        <>
+          <button
+            className="nav-btn finish"
+            onClick={() => {
+              setMode("report");
+              setExplanation(null);
+            }}
+          >
+            Exit Review
+          </button>
+
+          <select
+            className="review-exam-dropdown"
+            value={examAttemptId || ""}
+            onChange={(e) => {
+              const id = Number(e.target.value);
+              setExamAttemptId(id);
+              setQuestions([]);
+            }}
+          >
+            <option value="">
+              Select Attempt
+            </option>
+
+            {attempts.map((a) => (
+              <option
+                key={a.exam_attempt_id}
+                value={a.exam_attempt_id}
+              >
+                {new Date(a.completed_at).toLocaleString()}
+              </option>
+            ))}
+          </select>
+        </>
+      )}
     </div>
+  </div>
+
+  {!isReview && (
+    <div className="exam-header-actions">
+      <div className="header-nav-buttons">
+        <button
+          className="nav-btn prev"
+          onClick={() => goToQuestion(currentIndex - 1)}
+          disabled={currentIndex === 0}
+        >
+          Previous
+        </button>
+
+        <button
+          className={`flag-btn ${
+            flaggedQuestions[activeQuestions[currentIndex]?.q_id]
+              ? "flagged"
+              : ""
+          }`}
+          onClick={toggleFlagQuestion}
+        >
+          🚩{" "}
+          {flaggedQuestions[activeQuestions[currentIndex]?.q_id]
+            ? "Unflag"
+            : "Flag"}
+        </button>
+
+        {currentIndex < activeQuestions.length - 1 ? (
+          <button
+            className="nav-btn next"
+            onClick={() => goToQuestion(currentIndex + 1)}
+          >
+            Next
+          </button>
+        ) : (
+          <button
+            className="nav-btn finish"
+            onClick={() => setShowConfirmFinish(true)}
+          >
+            Finish Exam
+          </button>
+        )}
+      </div>
+    </div>
+  )}
+</div>
 
     {/* QUESTION INDEX */}
     {showQuestionNavigator && (
@@ -1083,102 +1118,7 @@ return (
 
 
 
-    {/* NAVIGATION */}
-    {/* NAVIGATION */}
-    <div className="nav-buttons">
-
-      
-
-      <button
-        className="nav-btn prev"
-
-        onClick={() =>
-          goToQuestion(
-            currentIndex - 1
-          )
-        }
-
-        disabled={
-          currentIndex === 0
-        }
-      >
-        Previous
-      </button>
-
-      {
-        !isReview && (
-
-          <button
-            className={`flag-btn ${
-              flaggedQuestions[
-                activeQuestions[
-                  currentIndex
-                ]?.q_id
-              ]
-                ? "flagged"
-                : ""
-            }`}
-
-            onClick={
-              toggleFlagQuestion
-            }
-          >
-            🚩
-
-            {
-              flaggedQuestions[
-                activeQuestions[
-                  currentIndex
-                ]?.q_id
-              ]
-                ? "Unflag"
-                : "Flag"
-            }
-
-          </button>
-
-        )
-      }
-
-      {
-        currentIndex <
-        activeQuestions.length - 1 && (
-
-          <button
-            className="nav-btn next"
-
-            onClick={() =>
-              goToQuestion(
-                currentIndex + 1
-              )
-            }
-          >
-            Next
-          </button>
-        )
-      }
-
-      {
-        currentIndex ===
-        activeQuestions.length - 1 &&
-
-        !isReview && (
-
-          <button
-            className="nav-btn finish"
-
-            onClick={() =>
-              setShowConfirmFinish(
-                true
-              )
-            }
-          >
-            Finish Exam
-          </button>
-        )
-      }
-
-    </div>
+    
 
   </div>
   {showConfirmFinish && (

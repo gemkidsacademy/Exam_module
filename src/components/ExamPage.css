@@ -1672,3 +1672,68 @@ progress::-moz-progress-bar {
   background: #fef2f2 !important;
   color: #b91c1c !important;
 }
+.exam-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.top-nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.top-nav-buttons .nav-btn,
+.top-nav-buttons .flag-btn {
+  min-width: 96px;
+  height: 42px;
+}
+/* ============================================================
+   TYPE 2 REVIEW FIX — force green/red in review
+   Put this at the VERY END of the CSS file
+============================================================ */
+
+/* CORRECT options in review */
+.text-option-card.review-correct,
+.text-option-card.review-correct .text-option-content,
+.text-option-card.review-correct .option-text,
+.text-option-card.review-correct input:checked + .text-option-content,
+.text-option-card.review-correct input:checked ~ .text-option-content {
+  background: #dcfce7 !important;
+  border-color: #16a34a !important;
+  color: #166534 !important;
+  box-shadow: none !important;
+}
+
+/* WRONG selected options in review */
+.text-option-card.review-wrong,
+.text-option-card.review-wrong .text-option-content,
+.text-option-card.review-wrong .option-text,
+.text-option-card.review-wrong input:checked + .text-option-content,
+.text-option-card.review-wrong input:checked ~ .text-option-content {
+  background: #fee2e2 !important;
+  border-color: #dc2626 !important;
+  color: #991b1b !important;
+  box-shadow: none !important;
+}
+
+/* Ensure the card shell itself also gets review border/background */
+.text-option-card.review-correct {
+  border: 2px solid #16a34a !important;
+  background: #dcfce7 !important;
+}
+
+.text-option-card.review-wrong {
+  border: 2px solid #dc2626 !important;
+  background: #fee2e2 !important;
+}
+
+/* Make review checkbox area stop inheriting exam blue */
+.text-option-card.review-correct input,
+.text-option-card.review-wrong input {
+  accent-color: inherit;
+}

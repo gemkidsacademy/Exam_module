@@ -1091,33 +1091,76 @@
     <div className="exam-container">
       <div className="exam-header">
 
-        <div className="timer">
-          ⏳ {formatTime(timeLeft)}
-        </div>
+  <div className="timer">
+    ⏳ {formatTime(timeLeft)}
+  </div>
 
-        <div className="question-counter-inline">
+  <div className="question-header-center">
+    <div className="question-counter-inline">
+      <span className="question-counter-text">
+        Question {index + 1} of {questions.length}
+      </span>
 
-          <span className="question-counter-text">
-            Question {index + 1} of {questions.length}
-          </span>
+      <button
+        className="question-grid-toggle"
+        onClick={() =>
+          setShowQuestionNavigator(prev => !prev)
+        }
+      >
+        ▦
+      </button>
+    </div>
+  </div>
 
-          <button
-            className="question-grid-toggle"
+  <div className="exam-header-actions">
+    
 
-            onClick={() =>
-              setShowQuestionNavigator(prev => !prev)
-            }
-          >
-            ▦
-          </button>
+    <div className="header-nav-buttons">
+      <button
+        className="nav-btn prev"
+        disabled={index === 0}
+        onClick={() => goTo(index - 1)}
+      >
+        Previous
+      </button>
 
-        </div>
+      <button
+        className={`flag-btn ${
+          flaggedQuestions[questions[index]?.question_id]
+            ? "flagged"
+            : ""
+        }`}
+        onClick={toggleFlagQuestion}
+      >
+        🚩{" "}
+        {flaggedQuestions[questions[index]?.question_id]
+          ? "Unflag"
+          : "Flag"}
+      </button>
 
-        <div>
-          Reading Comprehension Exam
-        </div>
+      {index < questions.length - 1 ? (
+        <button
+          className="nav-btn next"
+          onClick={() => goTo(index + 1)}
+        >
+          Next
+        </button>
+      ) : (
+        <button
+          className="nav-btn finish"
+          type="button"
+          onClick={() => {
+            console.log("Finish clicked");
+            setShowSubmitConfirm(true);
+          }}
+        >
+          Finish
+        </button>
+      )}
+    </div>
+  </div>
 
-      </div>
+</div>
 
       {
         showQuestionNavigator && (
@@ -1596,80 +1639,7 @@
             </div>
           )}
 
-          <div className="nav-buttons">
-
-            <button
-              disabled={index === 0}
-
-              onClick={() =>
-                goTo(index - 1)
-              }
-            >
-              Previous
-            </button>
-
-            <button
-              className={`flag-btn ${
-                flaggedQuestions[
-                  questions[index]
-                    ?.question_id
-                ]
-                  ? "flagged"
-                  : ""
-              }`}
-
-              onClick={
-                toggleFlagQuestion
-              }
-            >
-              🚩
-
-              {
-                flaggedQuestions[
-                  questions[index]
-                    ?.question_id
-                ]
-                  ? "Unflag"
-                  : "Flag"
-              }
-
-            </button>
-
-            {
-              index <
-              questions.length - 1 ? (
-
-                <button
-                  onClick={() =>
-                    goTo(index + 1)
-                  }
-                >
-                  Next
-                </button>
-
-              ) : (
-
-                <button
-                  type="button"
-
-                  onClick={() => {
-
-                    console.log(
-                      "Finish clicked"
-                    );
-
-                    setShowSubmitConfirm(
-                      true
-                    );
-                  }}
-                >
-                  Finish
-                </button>
-
-              )
-            }
-
-          </div>
+          
     
         </div>
       </div>
