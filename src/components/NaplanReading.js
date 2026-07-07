@@ -1711,17 +1711,22 @@ useEffect(() => {
 
                 if (block.type === "true_false") {
                   const qid = String(currentQ.question_id);
-                  const selectedAnswers = answers[qid] || [];
+
+                  const selectedAnswers = Array.isArray(answers[qid])
+                    ? answers[qid]
+                    : [];
+
+                  const correctAnswers = normalizeCorrectAnswer(
+                    currentQ.exam_bundle.correct_answer,
+                    currentQ.question_type
+                  );
 
                   return (
                     <div key={idx} className="tf-question">
-
-                      {/* ✅ Instruction text */}
                       <p className="tf-instruction">
                         Which of these statements are true and which are false?
                       </p>
 
-                      {/* Grid */}
                       <div className="tf-grid">
                         {/* Header */}
                         <div className="tf-grid-header">
@@ -1731,17 +1736,61 @@ useEffect(() => {
                         </div>
 
                         {block.statements.map((stmt, i) => {
-                          const currentValue = selectedAnswers[i] || null;
+                          const studentValue = selectedAnswers[i] || null;
+                          const correctValue = Array.isArray(correctAnswers)
+                            ? correctAnswers[i]
+                            : null;
+
+                          const isTrueSelected = studentValue === "True";
+                          const isFalseSelected = studentValue === "False";
+
+                          const trueIsCorrectOption = correctValue === "True";
+                          const falseIsCorrectOption = correctValue === "False";
+
+                          const trueIsWrongSelected =
+                            isReview &&
+                            isTrueSelected &&
+                            correctValue !== "True";
+
+                          const falseIsWrongSelected =
+                            isReview &&
+                            isFalseSelected &&
+                            correctValue !== "False";
 
                           return (
                             <div key={i} className="tf-grid-row">
                               <span className="tf-statement">{stmt}</span>
 
-                              <div className={`tf-cell ${currentValue === "False" ? "tf-dim" : ""}`}>
+                              {/* TRUE CELL */}
+                              <div
+                                className="tf-cell"
+                                style={{
+                                  backgroundColor: isReview
+                                    ? trueIsCorrectOption
+                                      ? "#dcfce7"   // green for correct option
+                                      : trueIsWrongSelected
+                                      ? "#fee2e2"   // red for wrong selected option
+                                      : "#fff"
+                                    : "#fff",
+                                  border: isReview
+                                    ? trueIsCorrectOption
+                                      ? "2px solid #22c55e"
+                                      : trueIsWrongSelected
+                                      ? "2px solid #ef4444"
+                                      : "1px solid #e5e7eb"
+                                    : "1px solid #e5e7eb",
+                                  borderRadius: "8px",
+                                  padding: "8px 10px",
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  minHeight: "42px"
+                                }}
+                              >
                                 <input
                                   type="radio"
                                   name={`tf-${qid}-${i}`}
-                                  checked={currentValue === "True"}
+                                  checked={isTrueSelected}
                                   disabled={isReview}
                                   onChange={() => {
                                     const updated = [...selectedAnswers];
@@ -1750,12 +1799,37 @@ useEffect(() => {
                                   }}
                                 />
                               </div>
-                              
-                              <div className={`tf-cell ${currentValue === "True" ? "tf-dim" : ""}`}>
+
+                              {/* FALSE CELL */}
+                              <div
+                                className="tf-cell"
+                                style={{
+                                  backgroundColor: isReview
+                                    ? falseIsCorrectOption
+                                      ? "#dcfce7"   // green for correct option
+                                      : falseIsWrongSelected
+                                      ? "#fee2e2"   // red for wrong selected option
+                                      : "#fff"
+                                    : "#fff",
+                                  border: isReview
+                                    ? falseIsCorrectOption
+                                      ? "2px solid #22c55e"
+                                      : falseIsWrongSelected
+                                      ? "2px solid #ef4444"
+                                      : "1px solid #e5e7eb"
+                                    : "1px solid #e5e7eb",
+                                  borderRadius: "8px",
+                                  padding: "8px 10px",
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  minHeight: "42px"
+                                }}
+                              >
                                 <input
                                   type="radio"
                                   name={`tf-${qid}-${i}`}
-                                  checked={currentValue === "False"}
+                                  checked={isFalseSelected}
                                   disabled={isReview}
                                   onChange={() => {
                                     const updated = [...selectedAnswers];

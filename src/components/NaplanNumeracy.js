@@ -1346,79 +1346,180 @@ return (
                   </div>
                 );
               }
-
               if (block.type === "image-multi-select") {
-                const qid = String(currentQ.id);
-                const selectedAnswers = Array.isArray(answers[qid])
-                  ? answers[qid].map(String)
-                  : [];
+  const qid = String(currentQ.id);
 
-                const correctAnswersRaw = normalizeCorrectAnswer(
-                  currentQ.correct_answer,
-                  currentQ.question_type
-                );
+  const selectedAnswers = Array.isArray(answers[qid])
+    ? answers[qid].map(v => String(v).trim().toUpperCase())
+    : [];
 
-                const correctAnswers = Array.isArray(correctAnswersRaw)
-                  ? correctAnswersRaw.map(String)
-                  : [];
+  const correctAnswersRaw = normalizeCorrectAnswer(
+    currentQ.correct_answer,
+    currentQ.question_type
+  );
 
-                return (
-                  <div key={idx} className="image-multi-select-grid">
-                    {block.options.map((opt) => {
-                      const optionId = String(opt.id);
-                      const isSelected = selectedAnswers.includes(optionId);
-                      const isCorrectOption = correctAnswers.includes(optionId);
+  const correctAnswers = Array.isArray(correctAnswersRaw)
+    ? correctAnswersRaw.map((ans) => {
+        const normalizedAns = String(ans).trim();
 
-                      let optionClass = "image-option-card";
+        // backend already gives A/B/C...
+        if (/^[A-Z]$/i.test(normalizedAns)) {
+          return normalizedAns.toUpperCase();
+        }
 
-                      // ✅ blue only during exam
-                      if (!isReview && isSelected) {
-                        optionClass += " selected";
-                      }
+        // backend gives 1,2,3...
+        if (/^\d+$/.test(normalizedAns)) {
+          const idx = Number(normalizedAns) - 1;
+          if (idx >= 0 && idx < block.options.length) {
+            return String.fromCharCode(65 + idx);
+          }
+        }
 
-                      // ✅ review colors only during review
-                      if (isReview) {
-                        if (isCorrectOption) {
-                          optionClass += " review-correct";
-                        } else if (isSelected && !isCorrectOption) {
-                          optionClass += " review-wrong";
-                        }
-                      }
+        // backend gives label text
+        const matchedIndex = block.options.findIndex(
+          (opt) =>
+            String(opt.label || "").trim().toLowerCase() ===
+            normalizedAns.toLowerCase()
+        );
+        if (matchedIndex !== -1) {
+          return String.fromCharCode(65 + matchedIndex);
+        }
 
-                      return (
-                        <label key={opt.id} className={optionClass}>
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            disabled={
-                              isReview ||
-                              (!isSelected &&
-                                selectedAnswers.length >= TYPE_2_MAX_SELECTIONS)
-                            }
-                            onChange={() => {
-                              if (isReview) return;
+        return normalizedAns.toUpperCase();
+      })
+    : [];
 
-                              const updated = isSelected
-                                ? selectedAnswers.filter(v => v !== optionId)
-                                : [...selectedAnswers, optionId];
+  return (
+    <div
+      key={idx}
+      className="image-multi-select-grid"
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+        gap: "16px",
+        marginTop: "20px"
+      }}
+    >
+      {block.options.map((opt, optIdx) => {
+        const optionKey = String.fromCharCode(65 + optIdx)
+          .trim()
+          .toUpperCase();
 
-                              handleAnswer(updated);
-                            }}
-                          />
+        const normalizedSelectedAnswers = Array.isArray(selectedAnswers)
+          ? selectedAnswers.map(v => String(v).trim().toUpperCase())
+          : [];
 
-                          <img
-                            src={opt.image}
-                            alt={opt.label}
-                            className="image-option-image"
-                          />
+        const normalizedCorrectAnswers = Array.isArray(correctAnswers)
+          ? correctAnswers.map(v => String(v).trim().toUpperCase())
+          : [];
 
-                          <div className="image-option-label">{opt.label}</div>
-                        </label>
-                      );
-                    })}
-                  </div>
-                );
+        const isSelected = normalizedSelectedAnswers.includes(optionKey);
+        const isCorrectOption = normalizedCorrectAnswers.includes(optionKey);
+
+        // ===== FORCE REVIEW COLORS INLINE =====
+        let cardBorder = "1px solid #d1d5db";
+        let cardBg = "#ffffff";
+        let labelColor = "#111827";
+        let imageWrapBg = "#ffffff";
+
+        if (isReview) {
+          if (isCorrectOption) {
+            cardBorder = "3px solid #22c55e";
+            cardBg = "#dcfce7";
+            labelColor = "#166534";
+            imageWrapBg = "#dcfce7";
+          } else if (isSelected && !isCorrectOption) {
+            cardBorder = "3px solid #ef4444";
+            cardBg = "#fee2e2";
+            labelColor = "#b91c1c";
+            imageWrapBg = "#fee2e2";
+          }
+        } else if (isSelected) {
+          cardBorder = "2px solid #3b82f6";
+          cardBg = "#eff6ff";
+          imageWrapBg = "#eff6ff";
+        }
+
+        return (
+          <label
+            key={optionKey}
+            style={{
+              borderRadius: "14px",
+              padding: "12px",
+              border: cardBorder,
+              backgroundColor: cardBg,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "10px",
+              cursor: isReview ? "default" : "pointer",
+              boxSizing: "border-box",
+              width: "100%",
+              minHeight: "220px"
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={isSelected}
+              disabled={
+                isReview ||
+                (!isSelected &&
+                  normalizedSelectedAnswers.length >= TYPE_2_MAX_SELECTIONS)
               }
+              onChange={() => {
+                if (isReview) return;
+
+                const updated = isSelected
+                  ? normalizedSelectedAnswers.filter(v => v !== optionKey)
+                  : [...normalizedSelectedAnswers, optionKey];
+
+                handleAnswer(updated);
+              }}
+            />
+
+            {/* image wrapper gets the same review color */}
+            <div
+              style={{
+                width: "100%",
+                flex: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: imageWrapBg,
+                borderRadius: "10px",
+                padding: "10px",
+                boxSizing: "border-box"
+              }}
+            >
+              <img
+                src={opt.image}
+                alt={opt.label || `Option ${optionKey}`}
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "160px",
+                  objectFit: "contain",
+                  display: "block"
+                }}
+              />
+            </div>
+
+            <div
+              style={{
+                fontWeight: 600,
+                color: labelColor,
+                textAlign: "center"
+              }}
+            >
+              {opt.label || `Shape ${optionKey}`}
+            </div>
+          </label>
+        );
+      })}
+    </div>
+  );
+}
+              
+    
 
               return null;
             })}
