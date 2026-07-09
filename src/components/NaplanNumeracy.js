@@ -9,9 +9,11 @@ import "./NaplanNumeracyExam.css";
 //import "./ExamPage.css";
 import styles from "./ExamPageThinkingSkills.module.css";
 import NaplanCalculator from "./NaplanCalculator";
-
+import DraggableCalculator from "./DraggableCalculator";
 import NaplanNumeracyReview from "./NaplanNumeracyReview";
 import NaplanNumeracyReport from "./NaplanNumeracyReport";
+import NaplanRuler from "./NaplanRuler";
+import NaplanProtractor from "./NaplanProtractor";
 
 /* ============================================================
   MAIN COMPONENT
@@ -23,15 +25,18 @@ mode: parentMode // 🔥 THIS
 }) {
   const studentId = sessionStorage.getItem("student_id");
   const API_BASE = process.env.REACT_APP_API_URL;
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [showRuler, setShowRuler] = useState(false);
+  const [showProtractor, setShowProtractor] = useState(false);
   
   const [examDates, setExamDates] = useState([]);
   const [selectedExamId, setSelectedExamId] = useState(null);
   const [showQuestionNavigator, setShowQuestionNavigator] =
     useState(false);
     const [classYear, setClassYear] = useState(null);
-    const canUseCalculator = Number(classYear) >= 7;
+    const canUseCalculator = Number(classYear) >= 6;
 
-  const [showCalculator, setShowCalculator] = useState(false);  
+  
   const [flaggedQuestions, setFlaggedQuestions] =
     useState({});
   const TYPE_2_MAX_SELECTIONS = 2;
@@ -321,13 +326,11 @@ return student === correct;
 useEffect(() => {
   if (!canUseCalculator) {
     setShowCalculator(false);
+    setShowRuler(false);
   }
 }, [canUseCalculator]);
-  useEffect(() => {
-  if (isReview) {
-    setShowCalculator(false);
-  }
-}, [isReview]);
+  
+
   useEffect(() => {
   if (isReview) {
     setShowQuestionNavigator(false);
@@ -810,12 +813,28 @@ return (
       </button>
 
       {!isReview && canUseCalculator && (
-        <button
-          className={`calculator-toggle-btn ${showCalculator ? "active" : ""}`}
-          onClick={() => setShowCalculator(prev => !prev)}
-        >
-          Calculator
-        </button>
+        <>
+          <button
+            className={`calculator-toggle-btn ${showCalculator ? "active" : ""}`}
+            onClick={() => setShowCalculator(prev => !prev)}
+          >
+            Calculator
+          </button>
+
+          <button
+            className={`calculator-toggle-btn ${showRuler ? "active" : ""}`}
+            onClick={() => setShowRuler(prev => !prev)}
+          >
+            Ruler
+          </button>
+
+          <button
+            className={`calculator-toggle-btn ${showProtractor ? "active" : ""}`}
+            onClick={() => setShowProtractor(prev => !prev)}
+          >
+            Protractor
+          </button>
+        </>
       )}
 
       {isReview && (
@@ -1153,14 +1172,10 @@ return (
         }
 
         {/* QUESTION + CALCULATOR LAYOUT */}
-        <div
-        className={`question-layout ${
-          canUseCalculator && showCalculator ? "calculator-open" : ""
-        }`}
-      >
+        <div className="question-layout">
           
           <div className="question-card">
-            <div className="question-content-centered">
+            <div className="question-content-centered"> 
             {!currentQ.question_blocks?.some(b => b.type === "text") &&
               currentQ.question_text && (
                 <p className="question-text">
@@ -1927,13 +1942,47 @@ return (
 )}
             </div> {/* closes question-content-centered */}
           </div> {/* closes question-card */}
-
+          </div> {/* closes question-layout */}
           {!isReview && canUseCalculator && showCalculator && (
-            <div className="calculator-panel">
+            <DraggableCalculator
+              initialX={window.innerWidth - 380}
+              initialY={140}
+              title="Calculator"
+              width="340px"
+            >
               <NaplanCalculator />
-            </div>
+            </DraggableCalculator>
           )}
-      </div> {/* closes question-layout */}
+
+          {!isReview && canUseCalculator && showRuler && (
+            <DraggableCalculator
+              initialX={window.innerWidth - 520}
+              initialY={220}
+              title="Ruler"
+              width="500px"
+              transparentBody={true}
+              hideBodyPadding={true}
+              rotatable={true}
+              initialRotation={0}
+            >
+              <NaplanRuler />
+            </DraggableCalculator>
+          )}
+          {!isReview && canUseCalculator && showProtractor && (
+            <DraggableCalculator
+              initialX={window.innerWidth - 520}
+              initialY={120}
+              title="Protractor"
+              width="520px"
+              transparentBody={true}
+              hideBodyPadding={true}
+              rotatable={true}
+              initialRotation={0}
+            >
+              <NaplanProtractor />
+            </DraggableCalculator>
+          )}
+      
       
 
       {showConfirmFinish && (
