@@ -1538,3 +1538,135 @@
 .timer {
   white-space: nowrap;
 }
+.header-nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.gadget-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 8px;
+}
+
+.gadget-btn {
+  width: 42px;
+  height: 42px;
+  border: 1px solid #cfd8e3;
+  background: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.gadget-btn:hover {
+  background: #f4f8ff;
+  border-color: #7aa7ff;
+}
+
+.gadget-btn.active {
+  background: #1e63ff;
+  color: #fff;
+  border-color: #1e63ff;
+  box-shadow: 0 0 0 2px rgba(30, 99, 255, 0.15);
+}
+.gadget-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 10px;
+}
+
+.gadget-btn {
+  width: 44px;
+  height: 44px;
+  border: 1px solid #cfd8e3;
+  border-radius: 10px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.gadget-btn.active {
+  border-color: #1e63ff;
+  box-shadow: 0 0 0 2px rgba(30, 99, 255, 0.15);
+  background: #eef4ff;
+}
+
+.gadget-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  display: block;
+}
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.28);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px 16px 0;
+  z-index: 9999;
+  box-sizing: border-box;
+}
+
+.confirm-modal {
+  width: 100%;
+  max-width: 520px;
+  background: #fff;
+  border-radius: 18px;
+  padding: 24px 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.confirm-modal h3 {
+  margin: 0 0 10px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.confirm-modal p {
+  margin: 0;
+  font-size: 18px;
+  color: #6b7280;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.confirm-actions .btn {
+  flex: 1;
+  height: 52px;
+  border: none;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.confirm-actions .cancel {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.confirm-actions .confirm {
+  background: #2563eb;
+  color: #fff;
+}

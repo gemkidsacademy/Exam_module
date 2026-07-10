@@ -1481,7 +1481,7 @@ useEffect(() => {
 
                 if (
                   block.content &&
-                  !["gap_fill", "single_gap"].includes(block.type)
+                  !["gap_fill", "single_gap", "word_select", "true_false"].includes(block.type)
                 ) {
                   return <p key={idx}>{block.content}</p>;
                 }
@@ -1633,81 +1633,93 @@ useEffect(() => {
   );
 }
                 if (block.type === "word_select") {
-  const qid = String(currentQ.question_id);
-  const selected = answers[qid] || null;
+                  const qid = String(currentQ.question_id);
+                  const selected = answers[qid] || null;
 
-  const correct = normalizeCorrectAnswer(
-    currentQ.exam_bundle.correct_answer,
-    currentQ.question_type
-  );
+                  const correct = normalizeCorrectAnswer(
+                    currentQ.exam_bundle.correct_answer,
+                    currentQ.question_type
+                  );
 
-  // Clean up text issues from backend
-  const text = block.text
-    .replace("/n", "\n")
-    .replace("eat pies,plums", "eats pies, plums")
-    .replace("off bug", "odd bug");
+                  const text = (block.text || block.content || "")
+                    .replace("/n", "\n")
+                    .replace("eat pies,plums", "eats pies, plums")
+                    .replace("off bug", "odd bug");
 
-  const tokens = text.split(/(\s+)/); // keep spaces
+                  const optionWords = Array.isArray(block.options)
+                    ? block.options.map(w => String(w).trim())
+                    : [];
 
-  return (
-    <p key={idx} className="word-select-text">
-      {tokens.map((token, i) => {
-        const clean = token.replace(/[.,]/g, "").trim();
-        const isOption = block.options.includes(clean);
-        const isSelected = selected === clean;
+                  const tokens = text.split(/(\s+)/); // keep spaces
 
-        const isCorrectOption =
-          isReview && String(clean).trim() === String(correct).trim();
+                  return (
+                    <p key={idx} className="word-select-text">
+                      {tokens.map((token, i) => {
+                        const clean = token.replace(/[.,!?;:]/g, "").trim();
 
-        const isWrongSelection =
-          isReview &&
-          isSelected &&
-          String(clean).trim() !== String(correct).trim();
+                        const isOption = optionWords.includes(clean);
+                        const isSelected = String(selected || "").trim() === clean;
+                        const isCorrectOption =
+                          isReview && String(clean).trim() === String(correct || "").trim();
+                        const isWrongSelection =
+                          isReview &&
+                          isSelected &&
+                          String(clean).trim() !== String(correct || "").trim();
 
-        if (!isOption) {
-          return <span key={i}>{token}</span>;
-        }
+                        if (!isOption) {
+                          return <span key={i}>{token}</span>;
+                        }
 
-        return (
-          <span
-            key={i}
-            onClick={() => {
-              if (!isReview) {
-                handleAnswer(clean);
-              }
-            }}
-            style={{
-              display: "inline-block",
-              padding: "2px 8px",
-              margin: "0 2px",
-              borderRadius: "6px",
-              cursor: isReview ? "default" : "pointer",
-              fontWeight:
-                isCorrectOption || isWrongSelection || isSelected ? "600" : "400",
-              backgroundColor: isCorrectOption
-                ? "#dcfce7"   // green
-                : isWrongSelection
-                ? "#fee2e2"   // red
-                : isSelected
-                ? "#dbeafe"   // blue during normal selection
-                : "transparent",
-              border: isCorrectOption
-                ? "1px solid #22c55e"
-                : isWrongSelection
-                ? "1px solid #ef4444"
-                : isSelected
-                ? "1px solid #3b82f6"
-                : "1px solid transparent",
-              color: "#111827"
-            }}
-          >
-            {token}
-          </span>
-        );
-      })}
-    </p>
-  );
-}
+                        let backgroundColor = "#f3f4f6"; // default visible selectable word bg
+                        let border = "1px solid #d1d5db";
+                        let fontWeight = "500";
+
+                        if (!isReview && isSelected) {
+                          backgroundColor = "#dbeafe";
+                          border = "1px solid #3b82f6";
+                          fontWeight = "600";
+                        }
+
+                        if (isReview && isCorrectOption) {
+                          backgroundColor = "#dcfce7";
+                          border = "1px solid #22c55e";
+                          fontWeight = "600";
+                        }
+
+                        if (isReview && isWrongSelection) {
+                          backgroundColor = "#fee2e2";
+                          border = "1px solid #ef4444";
+                          fontWeight = "600";
+                        }
+
+                        return (
+                          <span
+                            key={i}
+                            onClick={() => {
+                              if (!isReview) {
+                                handleAnswer(clean);
+                              }
+                            }}
+                            style={{
+                              display: "inline-block",
+                              padding: "4px 10px",
+                              margin: "2px 3px",
+                              borderRadius: "8px",
+                              cursor: isReview ? "default" : "pointer",
+                              backgroundColor,
+                              border,
+                              fontWeight,
+                              color: "#111827",
+                              lineHeight: "1.6"
+                            }}
+                          >
+                            {clean}
+                          </span>
+                        );
+                      })}
+                    </p>
+                  );
+                }
 
                 if (block.type === "true_false") {
                   const qid = String(currentQ.question_id);
@@ -1767,24 +1779,32 @@ useEffect(() => {
                                 style={{
                                   backgroundColor: isReview
                                     ? trueIsCorrectOption
-                                      ? "#dcfce7"   // green for correct option
+                                      ? "#dcfce7"
                                       : trueIsWrongSelected
-                                      ? "#fee2e2"   // red for wrong selected option
+                                      ? "#fee2e2"
                                       : "#fff"
+                                    : isFalseSelected
+                                    ? "#f3f4f6"
                                     : "#fff",
+
                                   border: isReview
                                     ? trueIsCorrectOption
                                       ? "2px solid #22c55e"
                                       : trueIsWrongSelected
                                       ? "2px solid #ef4444"
                                       : "1px solid #e5e7eb"
+                                    : isFalseSelected
+                                    ? "1px solid #d1d5db"
                                     : "1px solid #e5e7eb",
+
+                                  opacity: !isReview && isFalseSelected ? 0.65 : 1,
                                   borderRadius: "8px",
                                   padding: "8px 10px",
                                   display: "flex",
                                   justifyContent: "center",
                                   alignItems: "center",
-                                  minHeight: "42px"
+                                  minHeight: "42px",
+                                  transition: "all 0.2s ease"
                                 }}
                               >
                                 <input
@@ -1806,24 +1826,32 @@ useEffect(() => {
                                 style={{
                                   backgroundColor: isReview
                                     ? falseIsCorrectOption
-                                      ? "#dcfce7"   // green for correct option
+                                      ? "#dcfce7"
                                       : falseIsWrongSelected
-                                      ? "#fee2e2"   // red for wrong selected option
+                                      ? "#fee2e2"
                                       : "#fff"
+                                    : isTrueSelected
+                                    ? "#f3f4f6"
                                     : "#fff",
+
                                   border: isReview
                                     ? falseIsCorrectOption
                                       ? "2px solid #22c55e"
                                       : falseIsWrongSelected
                                       ? "2px solid #ef4444"
                                       : "1px solid #e5e7eb"
+                                    : isTrueSelected
+                                    ? "1px solid #d1d5db"
                                     : "1px solid #e5e7eb",
+
+                                  opacity: !isReview && isTrueSelected ? 0.65 : 1,
                                   borderRadius: "8px",
                                   padding: "8px 10px",
                                   display: "flex",
                                   justifyContent: "center",
                                   alignItems: "center",
-                                  minHeight: "42px"
+                                  minHeight: "42px",
+                                  transition: "all 0.2s ease"
                                 }}
                               >
                                 <input

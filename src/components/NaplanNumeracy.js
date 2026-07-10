@@ -327,6 +327,7 @@ useEffect(() => {
   if (!canUseCalculator) {
     setShowCalculator(false);
     setShowRuler(false);
+    setShowProtractor(false);
   }
 }, [canUseCalculator]);
   
@@ -782,104 +783,81 @@ return (
           overflowX: "hidden"
         }}
       >
+          {/* HEADER */}
+          {/* HEADER */}
         {/* HEADER */}
         {/* HEADER */}
-{/* HEADER */}
-{/* HEADER */}
-<div className="exam-header">
-  {/* LEFT: TIMER */}
-  {!isReview ? (
-    <div className="exam-header-left">
-      <div className="timer">
-        ⏳ {formatTime(timeLeft)}
-      </div>
-    </div>
-  ) : (
-    <div className="exam-header-left" />
-  )}
+        <div className="exam-header">
+          {/* LEFT: TIMER */}
+        {!isReview ? (
+          <div className="exam-header-left">
+            <div className="timer">
+              ⏳ {formatTime(timeLeft)}
+            </div>
+          </div>
+        ) : (
+          <div className="exam-header-left" />
+        )}
 
-  {/* CENTER: QUESTION + PROGRESS */}
-  <div className="question-header-center">
-    <div className="question-counter-inline">
-      <span className="question-counter-text">
-        Question {currentIndex + 1} of {questions.length}
-      </span>
+        {/* CENTER: QUESTION + PROGRESS */}
+        <div className="question-header-center">
+          <div className="question-counter-inline">
+            <span className="question-counter-text">
+              Question {currentIndex + 1} of {questions.length}
+            </span>
 
-      <button
-        className="question-grid-toggle"
-        onClick={() => setShowQuestionNavigator(prev => !prev)}
-      >
-        ▦
-      </button>
-
-      {!isReview && canUseCalculator && (
-        <>
-          <button
-            className={`calculator-toggle-btn ${showCalculator ? "active" : ""}`}
-            onClick={() => setShowCalculator(prev => !prev)}
-          >
-            Calculator
-          </button>
-
-          <button
-            className={`calculator-toggle-btn ${showRuler ? "active" : ""}`}
-            onClick={() => setShowRuler(prev => !prev)}
-          >
-            Ruler
-          </button>
-
-          <button
-            className={`calculator-toggle-btn ${showProtractor ? "active" : ""}`}
-            onClick={() => setShowProtractor(prev => !prev)}
-          >
-            Protractor
-          </button>
-        </>
-      )}
-
-      {isReview && (
-        <>
-          <button
-            className="exit-review-btn-small"
-            onClick={() => {
-              setQuestions([]);
-              setAnswers({});
-              setVisited({});
-              setCurrentIndex(0);
-              setMode("report");
-            }}
-          >
-            Exit Review
-          </button>
-
-          {examDates?.length > 0 && (
-            <select
-              className="review-exam-dropdown"
-              value={selectedExamId || ""}
-              onChange={(e) => {
-                setQuestions([]);
-                setAnswers({});
-                setVisited({});
-                setCurrentIndex(0);
-                setSelectedExamId(Number(e.target.value));
-              }}
+            <button
+              className="question-grid-toggle"
+              onClick={() => setShowQuestionNavigator(prev => !prev)}
             >
-              {examDates.map((d) => (
-                <option key={d.exam_id} value={d.exam_id}>
-                  {new Date(d.date).toLocaleString("en-AU", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true
-                  })}
-                </option>
-              ))}
-            </select>
-          )}
-        </>
-      )}
+              ▦
+            </button>
+
+            
+
+            {isReview && (
+              <>
+                <button
+                  className="exit-review-btn-small"
+                  onClick={() => {
+                    setQuestions([]);
+                    setAnswers({});
+                    setVisited({});
+                    setCurrentIndex(0);
+                    setMode("report");
+                  }}
+                >
+                  Exit Review
+                </button>
+
+                {examDates?.length > 0 && (
+                  <select
+                    className="review-exam-dropdown"
+                    value={selectedExamId || ""}
+                    onChange={(e) => {
+                      setQuestions([]);
+                      setAnswers({});
+                      setVisited({});
+                      setCurrentIndex(0);
+                      setSelectedExamId(Number(e.target.value));
+                    }}
+                  >
+                    {examDates.map((d) => (
+                      <option key={d.exam_id} value={d.exam_id}>
+                        {new Date(d.date).toLocaleString("en-AU", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true
+                        })}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </>
+            )}
     </div>
 
     <div className="exam-progress">
@@ -892,53 +870,93 @@ return (
     </div>
   </div>
 
-  {/* RIGHT: NAV BUTTONS */}
-  {/* RIGHT: NAV BUTTONS */}
-<div className="exam-header-actions">
-  <div className="header-nav-buttons">
-    <button
-      className="nav-btn prev"
-      disabled={currentIndex === 0}
-      onClick={() => goToQuestion(currentIndex - 1)}
-    >
-      Previous
-    </button>
+      {/* RIGHT: NAV BUTTONS */}
+      {/* RIGHT: NAV BUTTONS */}
+    <div className="exam-header-actions">
+      <div className="header-nav-buttons">
+        {!isReview && canUseCalculator && (
+          <div className="gadget-toolbar">
+            <button
+              className={`gadget-btn ${showCalculator ? "active" : ""}`}
+              onClick={() => setShowCalculator(prev => !prev)}
+              title="Calculator"
+              aria-label="Calculator"
+              type="button"
+            >
+              🧮
+            </button>
 
-    {!isReview && (
-      <button
-        className={`flag-btn ${
-          flaggedQuestions[String(currentQ.id)] ? "flagged" : ""
-        }`}
-        onClick={toggleFlagQuestion}
-      >
-        🚩 {flaggedQuestions[String(currentQ.id)] ? "Unflag" : "Flag"}
-      </button>
-    )}
+            <button
+              className={`gadget-btn ${showProtractor ? "active" : ""}`}
+              onClick={() => setShowProtractor(prev => !prev)}
+              title="Protractor"
+              aria-label="Protractor"
+              type="button"
+            >
+              <img
+                src="/icons/protractor.png"
+                alt="Protractor"
+                className="gadget-icon"
+              />
+            </button>
 
-    {isReview ? (
-      <button
-        className="nav-btn next"
-        disabled={currentIndex === questions.length - 1}
-        onClick={() => goToQuestion(currentIndex + 1)}
-      >
-        Next
-      </button>
-    ) : currentIndex < questions.length - 1 ? (
-      <button
-        className="nav-btn next"
-        onClick={() => goToQuestion(currentIndex + 1)}
-      >
-        Next
-      </button>
-    ) : (
-      <button
-        className="nav-btn finish"
-        onClick={() => setShowConfirmFinish(true)}
-      >
-        Finish Exam
-      </button>
-    )}
-  </div>
+            <button
+              className={`gadget-btn ${showRuler ? "active" : ""}`}
+              onClick={() => setShowRuler(prev => !prev)}
+              title="Ruler"
+              aria-label="Ruler"
+              type="button"
+            >
+              📏
+            </button>
+          </div>
+        )}
+        
+
+        <button
+          className="nav-btn prev"
+          disabled={currentIndex === 0}
+          onClick={() => goToQuestion(currentIndex - 1)}
+        >
+          Previous
+        </button>
+
+        {!isReview && (
+          <button
+            className={`flag-btn ${
+              flaggedQuestions[String(currentQ.id)] ? "flagged" : ""
+            }`}
+            onClick={toggleFlagQuestion}
+          >
+            🚩 {flaggedQuestions[String(currentQ.id)] ? "Unflag" : "Flag"}
+          </button>
+        )}
+
+        {isReview ? (
+          <button
+            className="nav-btn next"
+            disabled={currentIndex === questions.length - 1}
+            onClick={() => goToQuestion(currentIndex + 1)}
+          >
+            Next
+          </button>
+        ) : currentIndex < questions.length - 1 ? (
+          <button
+            className="nav-btn next"
+            onClick={() => goToQuestion(currentIndex + 1)}
+          >
+            Next
+          </button>
+        ) : (
+          <button
+            className="nav-btn finish"
+            onClick={() => setShowConfirmFinish(true)}
+          >
+            Finish Exam
+          </button>
+        )}
+   </div>
+
 </div>
 </div> 
 
@@ -1711,31 +1729,38 @@ return (
           }}
         >
           <div
-  style={{
-    width: "100%",
-    padding: "10px",
-    borderRadius: "12px",
-    backgroundColor: isReview
-      ? isCorrectOption
-        ? "#dcfce7"
-        : isSelected
-        ? "#fee2e2"
-        : "#f8fafc"
-      : "#f8fafc"
-  }}
->
-  <img
-    src={imgUrl}
-    alt={`Option ${key}`}
-    style={{
-      width: "100%",
-      height: "auto",
-      display: "block",
-      objectFit: "contain",
-      borderRadius: "10px"
-    }}
-  />
-</div>
+            style={{
+              width: "100%",
+              minHeight: "220px",
+              padding: "16px",
+              borderRadius: "12px",
+              backgroundColor: isReview
+                ? isCorrectOption
+                  ? "#dcfce7"
+                  : isSelected
+                  ? "#fee2e2"
+                  : "#f8fafc"
+                : "#f8fafc",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxSizing: "border-box"
+            }}
+          >
+            <img
+              src={imgUrl}
+              alt={`Option ${key}`}
+              style={{
+                width: "auto",
+                height: "auto",
+                maxWidth: "100%",
+                maxHeight: "260px",
+                display: "block",
+                objectFit: "contain",
+                borderRadius: "10px"
+              }}
+            />
+          </div>
 
           <div
             className="image-mcq-label"
@@ -1985,38 +2010,40 @@ return (
       
       
 
-      {showConfirmFinish && (
-        <div className="confirm-overlay">
-          <div className="confirm-modal">
-            <h3>Finish Exam?</h3>
-            <p>You won’t be able to change answers.</p>
-
-            <div className="confirm-actions">
-              <button
-                className="btn cancel"
-                onClick={() => setShowConfirmFinish(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="btn confirm"
-                onClick={() => {
-                  setShowConfirmFinish(false);
-                  finishExam();
-                }}
-              >
-                Submit
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      
 
         
     </div>
   )}
+  {showConfirmFinish && (
+    <div className="confirm-overlay">
+      <div className="confirm-modal">
+        <h3>Finish Exam?</h3>
+        <p>You won’t be able to change answers.</p>
+
+        <div className="confirm-actions">
+          <button
+            className="btn cancel"
+            onClick={() => setShowConfirmFinish(false)}
+          >
+            Cancel
+          </button>
+          <button
+            className="btn confirm"
+            onClick={() => {
+              setShowConfirmFinish(false);
+              finishExam();
+            }}
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
 
 </div>
+
 )
 };
 }

@@ -1,0 +1,87 @@
+.naplan-protractor {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  user-select: none;
+}
+
+.naplan-protractor-svg {
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  display: block;
+
+  /* sharper SVG rendering */
+  shape-rendering: geometricPrecision;
+  text-rendering: geometricPrecision;
+}
+
+/* blue plastic body */
+.protractor-fill {
+  fill: rgba(66, 170, 255, 0.18);
+  stroke: none;
+}
+
+.protractor-outer-arc,
+.protractor-inner-arc,
+.protractor-base,
+.protractor-hole {
+  fill: none;
+  stroke: #1f2937;
+  stroke-width: 2;
+}
+
+.protractor-center-line {
+  stroke: #1f2937;
+  stroke-width: 2;
+}
+
+.protractor-center-dot {
+  fill: #111827;
+}
+
+.protractor-radial {
+  stroke: rgba(31, 41, 55, 0.32);
+  stroke-width: 1;
+}
+
+.protractor-tick-major {
+  stroke: #111827;
+  stroke-width: 2;
+}
+
+.protractor-tick-minor {
+  stroke: #374151;
+  stroke-width: 1;
+}
+
+.protractor-label {
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  fill: #111827;
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+}
+
+.protractor-label.outer {
+  font-size: 14px;
+}
+
+.protractor-label.inner {
+  font-size: 13px;
+  fill: #1f2937;
+}
+
+.protractor-top-label {
+  font-family: Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  fill: #111827;
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 1.5px;
+}
