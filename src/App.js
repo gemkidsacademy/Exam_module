@@ -201,7 +201,8 @@ const handleLogin = async (e) => {
     // =========================
 
     if (
-      data.user_type === "CENTER_ADMIN"
+      data.user_type === "CENTER_ADMIN" ||
+      data.user_type === "CENTER_TEACHER"
     ) {
 
       sessionStorage.setItem(

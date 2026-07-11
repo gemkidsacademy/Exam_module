@@ -98,6 +98,8 @@
 
       userType === "SUPER_ADMIN"
         ? "center-management"
+        : userType === "CENTER_TEACHER"
+        ? "student-exam-reports"
         : "database"
 
     );
@@ -240,6 +242,20 @@ const tabs = allTabs.filter((tab) => {
       "add-quiz",
 
       "generate-exam",
+
+      "student-exam-reports",
+
+      "topic-report-limited-2",
+
+      "selective-readiness-overall",
+
+    ].includes(tab.id);
+
+  }
+   // CENTER TEACHER
+  if (userType === "CENTER_TEACHER") {
+
+    return [
 
       "student-exam-reports",
 

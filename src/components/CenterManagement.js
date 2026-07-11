@@ -4,13 +4,12 @@ import { useState } from "react";
 
 import AddCenter from "./AddCenter";
 import AddCenterAdmin from "./AddCenterAdmin";
+import AddCenterTeacher from "./AddCenterTeacher";
 
 export default function CenterManagement() {
-
-  const [selectedAction, setSelectedAction] = useState("");
+  const [selectedAction, setSelectedAction] = useState("add-center");
 
   return (
-
     <div className="p-6">
 
       {/* Top Buttons */}
@@ -30,7 +29,12 @@ export default function CenterManagement() {
           Manage Center Admin
         </button>
 
-        
+        <button
+          onClick={() => setSelectedAction("add-center-teacher")}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg"
+        >
+          Manage Center Teacher
+        </button>
 
       </div>
 
@@ -41,6 +45,10 @@ export default function CenterManagement() {
 
       {selectedAction === "add-center-admin" && (
         <AddCenterAdmin />
+      )}
+
+      {selectedAction === "add-center-teacher" && (
+        <AddCenterTeacher />
       )}
 
     </div>
