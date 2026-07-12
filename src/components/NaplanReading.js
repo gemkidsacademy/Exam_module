@@ -17,7 +17,8 @@ import NaplanReadingReview from "./NaplanReadingReview";
 export default function NaplanReading({
   onExamStart,
   onExamFinish,
-  mode: parentMode // 🔥 ADD THIS
+  mode: parentMode,
+  onBackToDashboard
 }) {
   const studentId = sessionStorage.getItem("student_id");
   const isHomeworkMode =
@@ -889,13 +890,23 @@ useEffect(() => {
       }}
     >
       {examDates.length > 0 && (
-        <div className="report-filter-row">
+        <div
+          className="report-filter-row"
+          style={{
+            width: "320px",
+            maxWidth: "320px"
+          }}
+        >
           <label className="report-label">
             Select Date:
           </label>
 
           <select
-            className="report-select"
+             className="report-select"
+            style={{
+              width: "180px",
+              minWidth: "180px"
+            }}
             value={selectedExamId || ""}
             onChange={(e) => {
               const newId = Number(e.target.value);
@@ -932,6 +943,11 @@ useEffect(() => {
 
       <NaplanReadingReport
         report={report}
+        examDates={examDates}
+        selectedExamId={selectedExamId}
+        onExamChange={(id) => {
+          setSelectedExamId(id);
+        }}
         onViewExamDetails={() => {
           setQuestions([]);
           setAnswers({});
@@ -939,6 +955,7 @@ useEffect(() => {
           setCurrentIndex(0);
           setMode("review");
         }}
+        onBackToDashboard={onBackToDashboard}
       />
     </div>
   );
@@ -951,45 +968,50 @@ useEffect(() => {
   return (
     <>
       {examDates.length > 0 && (
-        <div className="report-filter-row">
-          <label className="report-label">
-            Select Date:
-          </label>
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: "20px"
+    }}
+  >
+    <div className="report-filter-row">
+      <label className="report-label">
+        Select Date:
+      </label>
 
-          <select
-            className="report-select"
-            value={selectedExamId || ""}
-            onChange={(e) => {
-              setQuestions([]);
-              setAnswers({});
-              setVisited({});
-              setCurrentIndex(0);
+      <select
+        className="report-select"
+        value={selectedExamId || ""}
+        onChange={(e) => {
+          setQuestions([]);
+          setAnswers({});
+          setVisited({});
+          setCurrentIndex(0);
 
-              setSelectedExamId(
-                Number(
-                  e.target.value
-                )
-              );
-            }}
+          setSelectedExamId(Number(e.target.value));
+        }}
+      >
+        {examDates.map((item) => (
+          <option
+            key={item.exam_id}
+            value={item.exam_id}
           >
-            {examDates.map((item) => (
-              <option
-                key={item.exam_id}
-                value={item.exam_id}
-              >
-                {new Date(item.date).toLocaleString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: true
-                })}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+            {new Date(item.date).toLocaleString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true
+            })}
+          </option>
+        ))}
+      </select>
+    </div>
+  </div>
+)}
 
       <NaplanReadingReview
         studentId={studentId}

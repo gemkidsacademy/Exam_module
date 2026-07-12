@@ -1,7 +1,10 @@
 import React from "react";
 import "./WelcomeScreen.css";
 
-const WelcomeScreen = ({ onNext }) => {
+const WelcomeScreen = ({
+    onNext,
+    onBack
+}) => {
   // This can later come from backend/session
   const accessCode = ["X", "M", "M", "K", "B", "W", "L", "X"];
 
@@ -16,6 +19,12 @@ const WelcomeScreen = ({ onNext }) => {
     />
 
     <div className="welcome-card">
+      <div
+          className="back-link"
+          onClick={onBack}
+      >
+          ← Back
+      </div>
       <h1 className="welcome-title">Welcome</h1>
 
       <p className="welcome-text">

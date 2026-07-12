@@ -1,12 +1,13 @@
 import React from "react";
 import "./ExamPage.css";
 
-export default function NaplanLanguageConventionsReport({
+function NaplanLanguageConventionsReport({
   report,
-  onViewExamDetails,
-  examDates = [],
+  examDates,
   selectedExamId,
-  onExamChange
+  onExamChange,
+  onViewExamDetails,
+  onBackToDashboard
 }) {
   if (!report?.overall) {
     return (
@@ -24,6 +25,12 @@ export default function NaplanLanguageConventionsReport({
 
   return (
     <div className="report-page">
+       <button
+        className="back-dashboard-btn"
+        onClick={onBackToDashboard}
+      >
+        ← Back to Dashboard
+      </button>
 
       {/* ===============================
           HEADER
@@ -268,3 +275,4 @@ export default function NaplanLanguageConventionsReport({
     </div>
   );
 }
+export default NaplanLanguageConventionsReport

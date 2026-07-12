@@ -52,6 +52,15 @@ const NaplanDashboard = () => {
   const [examPhase, setExamPhase] = useState("modeSelection"); 
   const [reportVariant, setReportVariant] = useState(null);
   const [subjectAvailability, setSubjectAvailability] = useState({});
+  const handleBackToDashboard = () => {
+  setActiveSubject(null);
+  setExamInProgress(false);
+  setExamMode(null);
+  setReportVariant(null);
+  setSubjectAvailability({});
+  setIsLoadingAvailability(true);
+  setExamPhase("modeSelection");
+};
   const [isLoadingAvailability, setIsLoadingAvailability] = useState(true);
   const [examMode, setExamMode] = useState(null); // 🔥 NEW
   // phases: selection → welcome → instructions → exam
@@ -163,6 +172,19 @@ const NaplanDashboard = () => {
   <div className="subject-selection-wrapper">
 
     <div className="subject-selection-card">
+
+      <div
+        className="back-link"
+        onClick={() => {
+          setExamMode(null);
+          setReportVariant(null);
+          setSubjectAvailability({});
+          setExamPhase("modeSelection");
+        }}
+      >
+        ← Back
+      </div>
+
       <h1 className="dashboard-title">
         Select Report Type
       </h1>
@@ -204,6 +226,23 @@ const NaplanDashboard = () => {
           />
 
           <div className="subject-selection-card">
+
+            <div
+              className="back-link"
+              onClick={() => {
+                if (examMode === "report") {
+                  setExamPhase("report_type_selection");
+                } else {
+                  setExamMode(null);
+                  setReportVariant(null);
+                  setSubjectAvailability({});
+                  setExamPhase("modeSelection");
+                }
+              }}
+            >
+              ← Back
+            </div>
+
             <h1 className="dashboard-title">
               NAPLAN Practice Test
             </h1>
@@ -258,6 +297,7 @@ const NaplanDashboard = () => {
       {examPhase === "welcome" && (
         <WelcomeScreen
           onNext={() => setExamPhase("instructions")}
+          onBack={() => setExamPhase("selection")}
         />
       )}
 
@@ -266,6 +306,7 @@ const NaplanDashboard = () => {
         <InstructionsScreen_naplan
           subject={activeSubject.key}
           onNext={() => setExamPhase("exam")}
+          onBack={() => setExamPhase("welcome")}
         />
       )}
 
@@ -284,6 +325,7 @@ const NaplanDashboard = () => {
             }
             onExamStart={() => setExamInProgress(true)}
             onExamFinish={() => setExamInProgress(false)}
+            onBackToDashboard={handleBackToDashboard}
           />
         </div>
       )}

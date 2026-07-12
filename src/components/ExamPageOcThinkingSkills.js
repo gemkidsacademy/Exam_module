@@ -15,12 +15,14 @@ import OcThinkingSkillsReview from "./OcThinkingSkillsReview";
 export default function ExamPageOcThinkingSkills({
   mode: parentMode,   // 🔥 ADD THIS
   onExamStart,
-  onExamFinish
+  onExamFinish,
+  onBackToDashboard
 }) {
 const studentId = sessionStorage.getItem("student_id");
 const [reviewLoading, setReviewLoading] = useState(false);
 console.log("🔥 parentMode (child):", parentMode);
 const [attempts, setAttempts] = useState([]);
+
 const loadAttempts = useCallback(async () => {
   try {
     const isHomework = parentMode?.includes("homework");
@@ -628,8 +630,9 @@ if (mode === "report") {
       onViewExamDetails={handleViewExamDetails}
       onSelectAttempt={(id) => {
         console.log("📅 selected attempt:", id);
-        loadReport(id);   // 🔥 THIS IS YOUR “3rd INSTANCE”
+        loadReport(id);
       }}
+      onBackToDashboard={onBackToDashboard}
     />
 
   );
@@ -1174,7 +1177,13 @@ return (
 /* ============================================================
  REPORT COMPONENT
 ============================================================ */
-function ThinkingSkillsReport({ report, attempts, onViewExamDetails, onSelectAttempt }) {
+function ThinkingSkillsReport({
+  report,
+  attempts,
+  onViewExamDetails,
+  onSelectAttempt,
+  onBackToDashboard
+}) {
 const [selectedAttempt, setSelectedAttempt] = useState("");
 if (!report?.overall) {
   return <p className="loading">Generating your report…</p>;
@@ -1204,6 +1213,28 @@ return (
        HEADER (Overall Result – B)
     =============================== */}
     <div style={{ marginBottom: "20px" }}>
+      <div
+  style={{
+    display: "flex",
+    justifyContent: "flex-end",
+    marginBottom: "20px"
+  }}
+>
+  <button
+    onClick={onBackToDashboard}
+    style={{
+      padding: "10px 18px",
+      background: "#0d8ecf",
+      color: "#fff",
+      border: "none",
+      borderRadius: "6px",
+      cursor: "pointer",
+      fontWeight: "600"
+    }}
+  >
+    ← Back to Dashboard
+  </button>
+</div>
 
   <h2 className="report-title">
     You scored {overall.correct} out of {overall.total_questions} in 

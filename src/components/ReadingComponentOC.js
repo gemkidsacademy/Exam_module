@@ -6,7 +6,8 @@ export default function ReadingComponentOC({
   studentId,
   mode: parentMode,
   onExamStart,
-  onExamFinish
+  onExamFinish,
+  onBackToDashboard
 }) {
   const API_BASE =
   process.env.REACT_APP_API_URL || "http://localhost:3000";
@@ -787,6 +788,28 @@ useEffect(() => {
         zIndex: 1
       }}
     >
+      <div
+  style={{
+    display: "flex",
+    justifyContent: "flex-end",
+    marginBottom: "20px"
+  }}
+>
+  <button
+    onClick={onBackToDashboard}
+    style={{
+      padding: "10px 18px",
+      background: "#0d8ecf",
+      color: "#fff",
+      border: "none",
+      borderRadius: "6px",
+      cursor: "pointer",
+      fontWeight: "600"
+    }}
+  >
+    ← Back to Dashboard
+  </button>
+</div>
       <h1>
         You scored {normalizedReport.correct} out of {normalizedReport.total}
       </h1>

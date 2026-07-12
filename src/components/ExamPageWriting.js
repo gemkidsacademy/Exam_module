@@ -52,10 +52,11 @@
 
   export default function WritingComponent({
   studentId,
-  mode: parentMode, 
+  mode: parentMode,
   variant: parentVariant,
   onExamStart,
-  onExamFinish
+  onExamFinish,
+  onBackToDashboard
 }) {
   
     /* -----------------------------------------------------------
@@ -615,6 +616,28 @@
     background: "#f9fafb"
   }}
 >
+  <div
+  style={{
+    display: "flex",
+    justifyContent: "flex-end",
+    padding: "24px 24px 0 24px"
+  }}
+>
+  <button
+    onClick={onBackToDashboard}
+    style={{
+      padding: "10px 18px",
+      background: "#0d8ecf",
+      color: "#fff",
+      border: "none",
+      borderRadius: "6px",
+      cursor: "pointer",
+      fontWeight: "600"
+    }}
+  >
+    ← Back to Dashboard
+  </button>
+</div>
   <div
     style={{
       maxWidth: "900px",

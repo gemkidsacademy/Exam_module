@@ -14,10 +14,11 @@ import "./ExamOptionStates_mr.css";
 ============================================================ */
 export default function ExamPageMathematicalReasoning({
   mode: parentMode,
-  variant,  
+  variant,
   studentId,
   onExamStart,
-  onExamFinish
+  onExamFinish,
+  onBackToDashboard
 }) {
 
 
@@ -589,6 +590,7 @@ return (
    selectedExamId={selectedExamId}
    onDateChange={handleDateChange}
    onViewExamDetails={() => setMode("review")}
+   onBackToDashboard={onBackToDashboard}
  />
 
 );
@@ -1098,7 +1100,8 @@ function MathematicalReasoningReport({
   examDates,
   selectedExamId,
   onDateChange,
-  onViewExamDetails
+  onViewExamDetails,
+  onBackToDashboard
 }) {
   // 🔴 NO REPORT CASE
   if (!report) {
@@ -1142,6 +1145,28 @@ function MathematicalReasoningReport({
        }}
      > 
       <div style={{ display: "flex", flexDirection: "column" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "20px"
+          }}
+        >
+          <button
+            onClick={onBackToDashboard}
+            style={{
+              padding: "10px 18px",
+              background: "#0d8ecf",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontWeight: "600"
+            }}
+          >
+            ← Back to Dashboard
+          </button>
+        </div>
   
         {/* Row 1: Heading */}
         <h2

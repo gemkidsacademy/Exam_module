@@ -15,12 +15,13 @@ import ThinkingSkillsReview from "./ThinkingSkillsReview";
 ============================================================ */
 export default function ExamPageThinkingSkills({
   mode: parentMode,
-  variant,   // 👈 ADD THIS
+  variant,
   studentId,
   subject,
   difficulty,
   onExamStart,
   onExamFinish,
+  onBackToDashboard
 }) {
    
  console.log("PARENT MODE RECEIVED:", parentMode);  
@@ -589,6 +590,7 @@ if (mode === "report") {
       onViewExamDetails={handleViewExamDetails}
       attempts={attempts}
       onAttemptChange={(id) => loadReport(id)}
+      onBackToDashboard={onBackToDashboard}
     />
 
   );
@@ -1167,7 +1169,13 @@ return (
 /* ============================================================
  REPORT COMPONENT
 ============================================================ */
-function ThinkingSkillsReport({ report, onViewExamDetails, attempts, onAttemptChange }) {
+function ThinkingSkillsReport({
+  report,
+  onViewExamDetails,
+  attempts,
+  onAttemptChange,
+  onBackToDashboard
+}) {
   // 🔴 NO REPORT EXISTS (never attempted)
   if (!report) {
     return (
@@ -1213,7 +1221,15 @@ return (
     <h2 className="report-title">
       You scored {overall.correct} out of {overall.total_questions} in NSW
       Selective Thinking Skills Test 
-    </h2>
+    </h2> 
+    <div className="report-top-right">
+      <button
+        className="back-dashboard-button"
+        onClick={onBackToDashboard}
+      >
+        ← Back to Dashboard
+      </button>
+    </div>
     <select
       className="attempt-dropdown"
       value={report.exam_attempt_id}

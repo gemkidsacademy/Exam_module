@@ -19,9 +19,10 @@ import NaplanProtractor from "./NaplanProtractor";
   MAIN COMPONENT
 ============================================================ */
 export default function NaplanNumeracy({
-onExamStart,
-onExamFinish,
-mode: parentMode // 🔥 THIS
+  onExamStart,
+  onExamFinish,
+  mode: parentMode,
+  onBackToDashboard
 }) {
   const studentId = sessionStorage.getItem("student_id");
   const API_BASE = process.env.REACT_APP_API_URL;
@@ -715,6 +716,7 @@ const toggleFlagQuestion = () => {
           setAnswers({});
           setMode("review");
         }}
+        onBackToDashboard={onBackToDashboard}
       />
     );
   }

@@ -43,6 +43,14 @@ const OCDashboard = () => {
   const [availabilityLoading, setAvailabilityLoading] = useState(true);
   const API_BASE = process.env.REACT_APP_API_URL;
   const [subjectAvailability, setSubjectAvailability] = useState({});
+  const handleBackToDashboard = () => {
+    setActiveSubject(null);
+    setExamInProgress(false);
+    setExamMode(null);
+    setSubjectAvailability({});
+    setAvailabilityLoading(true);
+    setExamPhase("mode_selection");
+  };
   const ActiveComponent = activeSubject?.component;
 
   const handleSubjectSelect = (subject) => {
@@ -160,6 +168,12 @@ useEffect(() => {
     />
 
     <div className="subject-selection-card">
+      <div
+        className="back-link"
+        onClick={() => setExamPhase("mode_selection")}
+      >
+        ← Back
+      </div>
       <h1 className="dashboard-title">
         Select Report Type
       </h1>
@@ -204,6 +218,20 @@ useEffect(() => {
           />
 
           <div className="subject-selection-card">
+            <div
+              className="back-link"
+              onClick={() => {
+                if (examMode?.startsWith("report")) {
+                  setExamPhase("report_mode_selection");
+                } else {
+                  setExamMode(null);
+                  setSubjectAvailability({});
+                  setExamPhase("mode_selection");
+                }
+              }}
+            >
+              ← Back
+            </div>
             <h1 className="dashboard-title">
               OC Placement Practice Test
             </h1>
@@ -244,15 +272,17 @@ useEffect(() => {
       {/* 2️⃣ WELCOME */}
       {examPhase === "welcome" && (
         <WelcomeScreenOC
-          onNext={() => setExamPhase("instructions")}
+            onNext={() => setExamPhase("instructions")}
+            onBack={() => setExamPhase("selection")}
         />
       )}
 
       {/* 3️⃣ INSTRUCTIONS */}
       {examPhase === "instructions" && (
         <InstructionsScreenOC
-          subject={activeSubject.key}
-          onNext={() => setExamPhase("exam")}
+            subject={activeSubject.key}
+            onNext={() => setExamPhase("exam")}
+            onBack={() => setExamPhase("welcome")}
         />
       )}
 
@@ -261,14 +291,15 @@ useEffect(() => {
         <main className="content-area">
           <div className="exam-root">
             <ActiveComponent
-              key={`exam-${activeSubject.key}-${examMode}`}// 🔑 important
+              key={`exam-${activeSubject.key}-${examMode}`}
               studentId={studentId}
-              mode={examMode} 
+              mode={examMode}
               subject={activeSubject.key}
               difficulty="advanced"
               onExamStart={() => setExamInProgress(true)}
               onExamFinish={() => setExamInProgress(false)}
-            />
+              onBackToDashboard={handleBackToDashboard}
+          />
           </div>
         </main>
       )}

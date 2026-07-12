@@ -54,7 +54,12 @@ const DEFAULT_INSTRUCTIONS = [
   "Read each question carefully before answering.",
 ];
 
-const InstructionsScreen = ({ subject, onNext }) => {
+const InstructionsScreen = ({
+    subject,
+    onNext,
+    onViewResults,
+    onBack
+}) => {
   const subjectLabel = subject
     .replace("_", " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
@@ -73,6 +78,12 @@ const InstructionsScreen = ({ subject, onNext }) => {
     />
 
     <div className="instructions-card">
+      <div
+          className="back-link"
+          onClick={onBack}
+      >
+          ← Back
+      </div>
       <h1 className="instructions-title">
         Selective High School Placement Practice Test
       </h1>

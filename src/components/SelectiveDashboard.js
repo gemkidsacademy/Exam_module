@@ -49,6 +49,14 @@ const SelectiveDashboard = () => {
   const [subjectAvailability, setSubjectAvailability] = useState({});
   const location = useLocation();
   const [reportVariant, setReportVariant] = useState(null);
+  const handleBackToDashboard = () => {
+    setActiveSubject(null);
+    setExamInProgress(false);
+    setExamMode(null);
+    setReportVariant(null);
+    setSubjectAvailability({});
+    setExamPhase("mode_selection");
+  };
   
   // phases: selection → welcome → instructions → exam
 
@@ -126,6 +134,7 @@ useEffect(() => {
     />
 
     <div className="subject-selection-card">
+      
       <h1 className="dashboard-title">
         Selective High School Practice Test
       </h1>
@@ -174,6 +183,12 @@ useEffect(() => {
   <div className="subject-selection-wrapper">
     
     <div className="subject-selection-card">
+      <div
+        className="back-link"
+        onClick={() => setExamPhase("mode_selection")}
+      >
+        ← Back
+      </div>
       <h1 className="dashboard-title">
         Select Report Type
       </h1>
@@ -217,6 +232,17 @@ useEffect(() => {
           />
       
           <div className="subject-selection-card">
+            <div
+              className="back-link"
+              onClick={() => {
+                setExamMode(null);
+                setReportVariant(null);
+                setSubjectAvailability({});
+                setExamPhase("mode_selection");
+              }}
+            >
+              ← Back
+            </div>
             <h1 className="dashboard-title">
               Selective High School Placement Practice Test
             </h1>
@@ -262,16 +288,18 @@ useEffect(() => {
       {/* 2️⃣ WELCOME SCREEN */}
       {examPhase === "welcome" && (
         <WelcomeScreen
-          onNext={() => setExamPhase("instructions")}
+            onNext={() => setExamPhase("instructions")}
+            onBack={() => setExamPhase("selection")}
         />
       )}
 
       {/* 3️⃣ INSTRUCTIONS SCREEN */}
       {examPhase === "instructions" && (
         <InstructionsScreen
-          subject={activeSubject.key}
-          onNext={handleStartExam}          // ✅ updated
-          onViewResults={handleViewResults} // ✅ NEW
+            subject={activeSubject.key}
+            onNext={handleStartExam}
+            onViewResults={handleViewResults}
+            onBack={() => setExamPhase("welcome")}
         />
       )}
 
@@ -289,6 +317,7 @@ useEffect(() => {
             variant={reportVariant}
             onExamStart={() => setExamInProgress(true)}
             onExamFinish={() => setExamInProgress(false)}
+            onBackToDashboard={handleBackToDashboard}
           />
           </div>
         </main>

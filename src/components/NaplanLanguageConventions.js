@@ -15,10 +15,12 @@ import NaplanLanguageConventionsReport from "./NaplanLanguageConventionsReport";
 /* ============================================================
    MAIN COMPONENT
 ============================================================ */
+
 export default function NaplanLanguageConventions({
   onExamStart,
   onExamFinish,
-  mode: parentMode // 🔥 ADD THIS
+  mode: parentMode,
+  onBackToDashboard
 }) {
   const studentId = sessionStorage.getItem("student_id");
   const API_BASE = process.env.REACT_APP_API_URL;
@@ -625,6 +627,7 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
           setAnswers({});
           setMode("review");
         }}
+        onBackToDashboard={onBackToDashboard}
       />
     );
   }

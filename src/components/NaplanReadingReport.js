@@ -1,9 +1,13 @@
 import React from "react";
 import "./NaplanReadingReport.css";
 
-export default function NaplanReadingReport({
+function NaplanReadingReport({
   report,
-  onViewExamDetails
+  examDates,
+  selectedExamId,
+  onExamChange,
+  onViewExamDetails,
+  onBackToDashboard
 }) {
   if (!report) {
     return <p className="loading">Generating your report…</p>;
@@ -17,16 +21,39 @@ export default function NaplanReadingReport({
 
   return (
     <div className="report-dashboard">
-
+      
       {/* =====================================================
          HEADER / ACTION
       ====================================================== */}
-      <div className="report-header">
+      <div
+        className="report-header"
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "24px"
+        }}
+      >
         <button
           className="btn-primary"
           onClick={onViewExamDetails}
         >
           View Exam Details
+        </button>
+
+        <button
+          onClick={onBackToDashboard}
+          style={{
+            padding: "10px 18px",
+            background: "#0d8ecf",
+            color: "#fff",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontWeight: "600"
+          }}
+        >
+          ← Back to Dashboard
         </button>
       </div>
 
@@ -243,3 +270,4 @@ export default function NaplanReadingReport({
     </div>
   );
 }
+export default NaplanReadingReport

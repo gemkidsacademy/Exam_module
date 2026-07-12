@@ -1,12 +1,13 @@
 import React from "react";
 import "./ExamPage.css";
 
-export default function NaplanNumeracyReport({
+function NaplanNumeracyReport({
   report,
   examDates,
   selectedExamId,
   onExamChange,
-  onViewExamDetails
+  onViewExamDetails,
+  onBackToDashboard
 }) {
   // 🔥 1. Loading state
 if (report === undefined) {
@@ -60,6 +61,28 @@ console.log(
       {/* ===============================
           HEADER
       =============================== */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: "20px"
+        }}
+      >
+        <button
+          onClick={onBackToDashboard}
+          style={{
+            padding: "10px 18px",
+            background: "#0d8ecf",
+            color: "#fff",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontWeight: "600"
+          }}
+        >
+          ← Back to Dashboard
+        </button>
+      </div>
       <h2 className="report-title">
         You scored {overall.correct} out of {overall.total_questions} in NAPLAN Numeracy
       </h2>
@@ -217,3 +240,4 @@ console.log(
     </div>
   );
 }
+export default NaplanNumeracyReport;

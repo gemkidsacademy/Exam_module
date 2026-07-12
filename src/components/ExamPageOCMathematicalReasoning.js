@@ -15,10 +15,11 @@
   MAIN COMPONENT
   ============================================================ */
   export default function ExamPageOCMathematicalReasoning({
-    mode: parentMode,
-    onExamStart,    
-    onExamFinish
-  }) {
+  mode: parentMode,
+  onExamStart,
+  onExamFinish,
+  onBackToDashboard
+}) {
   const studentId = sessionStorage.getItem("student_id");
   const isPopNavigationRef = useRef(false);
 
@@ -569,12 +570,13 @@ useEffect(() => {
   if (mode === "report") {
   return (
     <MathematicalReasoningReport
-    report={report}
-    attempts={attempts}
-    selectedAttemptId={selectedAttemptId}
-    onChangeAttempt={(id) => setSelectedAttemptId(id)}
-    onViewExamDetails={() => setMode("review")}
-  />
+  report={report}
+  attempts={attempts}
+  selectedAttemptId={selectedAttemptId}
+  onChangeAttempt={(id) => setSelectedAttemptId(id)}
+  onViewExamDetails={() => setMode("review")}
+  onBackToDashboard={onBackToDashboard}
+/>
 
   );
   }
@@ -1072,12 +1074,13 @@ if (!currentQ) {
   ============================================================ */
 
   function MathematicalReasoningReport({
-    report,
-    attempts,
-    selectedAttemptId,
-    onChangeAttempt,
-    onViewExamDetails
-  }) {
+  report,
+  attempts,
+  selectedAttemptId,
+  onChangeAttempt,
+  onViewExamDetails,
+  onBackToDashboard
+}) {
     if (!report?.overall) {
       return <p className="loading">Generating your report…</p>;
     }
@@ -1106,6 +1109,28 @@ if (!currentQ) {
           zIndex: 1
         }}
       >
+        <div
+  style={{
+    display: "flex",
+    justifyContent: "flex-end",
+    marginBottom: "20px"
+  }}
+>
+  <button
+    onClick={onBackToDashboard}
+    style={{
+      padding: "10px 18px",
+      background: "#0d8ecf",
+      color: "#fff",
+      border: "none",
+      borderRadius: "6px",
+      cursor: "pointer",
+      fontWeight: "600"
+    }}
+  >
+    ← Back to Dashboard
+  </button>
+</div>
 
         {/* HEADER */}
         <h2
