@@ -1470,35 +1470,96 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
       </div>
 
       {showConfirmFinish && (
-        <div className="confirm-overlay">
-          <div className="confirm-modal">
-            <h3>Finish Exam?</h3>
-            <p>You won’t be able to change answers.</p>
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.55)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 999999
+    }}
+  >
+    <div
+      style={{
+        width: "420px",
+        maxWidth: "90vw",
+        background: "#fff",
+        borderRadius: "16px",
+        padding: "32px",
+        textAlign: "center",
+        boxShadow: "0 20px 50px rgba(0,0,0,.25)"
+      }}
+    >
+      <h3
+        style={{
+          margin: "0 0 16px",
+          fontSize: "34px",
+          fontWeight: 700,
+          color: "#0f172a"
+        }}
+      >
+        Finish Exam?
+      </h3>
 
-            <div className="confirm-actions">
-              <button
-                className="btn cancel"
-                onClick={() => setShowConfirmFinish(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="btn confirm"
-                onClick={() => {
-                  setShowConfirmFinish(false);
-              
-                  // 🔑 BLANK SCREEN STARTS HERE
-                  setMode("submitting");
-              
-                  finishExam();
-                }}
-              >
-                Submit
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <p
+        style={{
+          margin: "0 0 28px",
+          fontSize: "20px",
+          lineHeight: 1.5,
+          color: "#4b5563"
+        }}
+      >
+        You won't be able to change your answers after submission.
+      </p>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "14px"
+        }}
+      >
+        <button
+          onClick={() => setShowConfirmFinish(false)}
+          style={{
+            padding: "12px 28px",
+            border: "none",
+            borderRadius: "8px",
+            background: "#e5e7eb",
+            color: "#374151",
+            fontSize: "16px",
+            fontWeight: 600,
+            cursor: "pointer"
+          }}
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={() => {
+            setShowConfirmFinish(false);
+            setMode("submitting");
+            finishExam();
+          }}
+          style={{
+            padding: "12px 28px",
+            border: "none",
+            borderRadius: "8px",
+            background: "#2563eb",
+            color: "#fff",
+            fontSize: "16px",
+            fontWeight: 600,
+            cursor: "pointer"
+          }}
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

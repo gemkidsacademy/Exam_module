@@ -141,6 +141,7 @@ export default function EditUserForm() {
           required
         >
           <option value="">-- Select Year --</option>
+          <option value="Kindergarten">Kindergarten</option>
           <option value="Year 2">Year 2</option>
           <option value="Year 3">Year 3</option>
           <option value="Year 4">Year 4</option>
@@ -149,6 +150,8 @@ export default function EditUserForm() {
           <option value="Year 7">Year 7</option>
           <option value="Year 8">Year 8</option>
           <option value="Year 9">Year 9</option>
+          <option value="Year 10">Year 10</option>
+          
         </select>
 
         <label>Class Day</label>
@@ -178,8 +181,8 @@ export default function EditUserForm() {
           <option value="Male">Male</option>
 
           <option value="Female">Female</option>
-
         </select>
+
 
         <button type="submit">Update Student</button>
       </form>

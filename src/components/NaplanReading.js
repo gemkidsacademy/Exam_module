@@ -1100,7 +1100,9 @@ useEffect(() => {
   console.log("🧠 ACTUAL RENDER answers:", answers);
 
   return (
+     <>
     <div className={`exam-shell ${mode === "review" ? "review-mode" : ""}`}>
+      
 
       
       <div className="exam-container">
@@ -2226,16 +2228,24 @@ useEffect(() => {
         
       </div>
 
-      {showConfirmFinish && (
-        <div className="confirm-overlay">
-          <div className="confirm-modal">
-            <h3>Finish Exam?</h3>
-            <p>You won’t be able to change answers.</p>
-            <button onClick={() => setShowConfirmFinish(false)}>Cancel</button>
+      
+    </div>
+    {showConfirmFinish && (
+      <div className="confirm-overlay">
+        <div className="confirm-modal">
+          <h3>Finish Exam?</h3>
+
+          <p>You won’t be able to change answers.</p>
+
+          <div className="confirm-actions">
+            <button onClick={() => setShowConfirmFinish(false)}>
+              Cancel
+            </button>
+
             <button
               onClick={() => {
                 setShowConfirmFinish(false);
-                setMode("submitting");   // 🔑 UI LOCK
+                setMode("submitting");
                 finishExam();
               }}
             >
@@ -2243,8 +2253,11 @@ useEffect(() => {
             </button>
           </div>
         </div>
-      )}
-    </div>
+      </div>
+    )}
+  </>
+    
+    
   );
 }
 

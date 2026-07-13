@@ -23,14 +23,15 @@ export default function AddStudentForm() {
       : rawCenterCode;
   const [studentYear, setStudentYear] = useState("");
   const STUDENT_YEAR_OPTIONS = [
+        "Kindergarten",
+        "Year 2",
+        "Year 3",    
         "Year 4",
-        "Year 2",    
-        "Year 3",
         "Year 5",
         "Year 6",       
         "Year 7",
         "Year 9",
-        "N/A",  
+        "Year 10",  
       ];
   const CLASS_NAME_OPTIONS = [
   "NAPLAN",
@@ -45,6 +46,8 @@ const CLASS_DAY_OPTIONS = [
   "Wednesday",
   "Thursday",
   "Friday",
+  "Saturday",
+  "Sunday",
 ];
 const GENDER_OPTIONS = [
   "Male",

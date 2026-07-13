@@ -885,7 +885,11 @@ return (
               aria-label="Calculator"
               type="button"
             >
-              🧮
+              <img
+                src="/icons/calculator.png"
+                alt="Calculator"
+                className="gadget-icon"
+              />
             </button>
 
             <button
@@ -1426,12 +1430,12 @@ return (
 
   return (
     <div
-      key={idx}
       className="image-multi-select-grid"
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-        gap: "16px",
+        gridTemplateColumns: "repeat(auto-fit, max-content)",
+        justifyContent: "center",
+        gap: "20px",
         marginTop: "20px"
       }}
     >
@@ -1489,8 +1493,8 @@ return (
               gap: "10px",
               cursor: isReview ? "default" : "pointer",
               boxSizing: "border-box",
-              width: "100%",
-              minHeight: "220px"
+              width: "fit-content",
+              height: "fit-content"
             }}
           >
             <input
@@ -1515,8 +1519,6 @@ return (
             {/* image wrapper gets the same review color */}
             <div
               style={{
-                width: "100%",
-                flex: 1,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -1528,12 +1530,11 @@ return (
             >
               <img
                 src={opt.image}
-                alt={opt.label || `Option ${optionKey}`}
                 style={{
-                  maxWidth: "100%",
+                  border: "2px solid red",
+                  maxWidth: "160px",
                   maxHeight: "160px",
-                  objectFit: "contain",
-                  display: "block"
+                  objectFit: "contain"
                 }}
               />
             </div>
@@ -1633,9 +1634,9 @@ return (
     className="image-mcq-grid"
     style={{
       display: "grid",
-      gridTemplateColumns: "repeat(2, minmax(420px, 1fr))",
+      gridTemplateColumns: "repeat(auto-fit, max-content)",
+      justifyContent: "center",
       gap: "24px",
-      justifyItems: "center",
       marginTop: "20px"
     }}
   >
@@ -1692,7 +1693,7 @@ return (
             !isReview && isSelected ? "selected" : ""
           }`}
           style={{
-            width: "420px",
+            width: "fit-content",
             padding: "16px",
             borderRadius: "14px",
             boxSizing: "border-box",
@@ -1750,17 +1751,14 @@ return (
             }}
           >
             <img
-              src={imgUrl}
-              alt={`Option ${key}`}
-              style={{
-                width: "auto",
-                height: "auto",
-                maxWidth: "100%",
-                maxHeight: "260px",
-                display: "block",
-                objectFit: "contain",
-                borderRadius: "10px"
-              }}
+                src={imgUrl}
+                alt={`Option ${key}`}
+                style={{
+                    display: "block",
+                    maxWidth: "320px",
+                    height: "auto",
+                    objectFit: "contain"
+                }}
             />
           </div>
 
@@ -2018,31 +2016,93 @@ return (
     </div>
   )}
   {showConfirmFinish && (
-    <div className="confirm-overlay">
-      <div className="confirm-modal">
-        <h3>Finish Exam?</h3>
-        <p>You won’t be able to change answers.</p>
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.55)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 999999
+    }}
+  >
+    <div
+      style={{
+        width: "420px",
+        maxWidth: "90vw",
+        background: "#ffffff",
+        borderRadius: "16px",
+        padding: "32px",
+        textAlign: "center",
+        boxShadow: "0 20px 50px rgba(0,0,0,0.25)"
+      }}
+    >
+      <h3
+        style={{
+          margin: "0 0 16px",
+          fontSize: "34px",
+          fontWeight: "700",
+          color: "#0f172a"
+        }}
+      >
+        Finish Exam?
+      </h3>
 
-        <div className="confirm-actions">
-          <button
-            className="btn cancel"
-            onClick={() => setShowConfirmFinish(false)}
-          >
-            Cancel
-          </button>
-          <button
-            className="btn confirm"
-            onClick={() => {
-              setShowConfirmFinish(false);
-              finishExam();
-            }}
-          >
-            Submit
-          </button>
-        </div>
+      <p
+        style={{
+          margin: "0 0 28px",
+          fontSize: "20px",
+          color: "#4b5563",
+          lineHeight: 1.5
+        }}
+      >
+        You won't be able to change your answers after submission.
+      </p>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "14px"
+        }}
+      >
+        <button
+          onClick={() => setShowConfirmFinish(false)}
+          style={{
+            padding: "12px 28px",
+            border: "none",
+            borderRadius: "8px",
+            background: "#e5e7eb",
+            color: "#374151",
+            fontWeight: 600,
+            cursor: "pointer"
+          }}
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={() => {
+            setShowConfirmFinish(false);
+            finishExam();
+          }}
+          style={{
+            padding: "12px 28px",
+            border: "none",
+            borderRadius: "8px",
+            background: "#2563eb",
+            color: "#fff",
+            fontWeight: 600,
+            cursor: "pointer"
+          }}
+        >
+          Submit
+        </button>
       </div>
     </div>
-  )}
+  </div>
+)}
 
 </div>
 
