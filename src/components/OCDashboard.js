@@ -6,7 +6,7 @@ import ExamPageOcThinkingSkills from "./ExamPageOcThinkingSkills";
 import ExamPageOCMathematicalReasoning from "./ExamPageOCMathematicalReasoning";
 import ReadingComponentOC from "./ReadingComponentOC";
 
-
+import ExamPageOCwriting from "./ExamPageOCwriting";
 //import ReadingComponent from "./ReadingComponent";
 
 import WelcomeScreenOC from "./WelcomeScreenOC";
@@ -31,7 +31,11 @@ const SUBJECTS = [
     key: "reading",
     component: ReadingComponentOC,
   },
-  
+  {
+    label: "Writing",
+    key: "writing",
+    component: ExamPageOCwriting,
+  },
 ];
 
 const OCDashboard = () => {

@@ -38,6 +38,7 @@ export default function QuizSetup_writing({
 
     const params = new URLSearchParams({
       center_code: centerCode,
+      class_name: form.className,
     });
 
     const res = await fetch(

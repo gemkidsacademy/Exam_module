@@ -27,7 +27,9 @@
   import GenerateExam_oc_reading from "./GenerateExam_oc_reading";
   import GenerateExam_naplan_writing from "./GenerateExam_naplan_writing";
   import CenterManagement from "./CenterManagement";
-     
+  import QuizSetup_oc_writing from "./QuizSetup_oc_writing";
+  import GenerateExam_oc_writing from "./GenerateExam_oc_writing";
+  
   
   
   
@@ -119,6 +121,8 @@
     const [generateExamType, setGenerateExamType] = useState(null);
     const [centerId, setCenterId] = useState("");
     const [centerName, setCenterName] = useState("");
+    console.log("createExamCategory:", createExamCategory);
+    console.log("createExamType:", createExamType);
   
     /* ============================
       Exam Flow State
@@ -291,7 +295,7 @@ const tabs = allTabs.filter((tab) => {
     ============================ */
     return (
     <div className="dashboard-container">
-      <h1 className="dashboard-title">Admin Dashboard</h1>
+      <h1 className="dashboard-title">Admin Dashboard hello thre </h1>
   
       {/* ---------- Tabs ---------- */}
       <div className="tab-nav">
@@ -523,6 +527,12 @@ const tabs = allTabs.filter((tab) => {
                 >
                   Reading
                 </button>
+                <button
+                  className="dashboard-button"
+                  onClick={() => setCreateExamType("oc_writing")}
+                >
+                  Writing
+                </button>
                 </div>
               )}
               
@@ -590,6 +600,12 @@ const tabs = allTabs.filter((tab) => {
               )}
               {createExamType === "oc_reading" && (
                 <QuizSetup_oc_reading
+                  userType={userType}
+                  centerCode={centerCode}
+                />
+              )}
+              {createExamType === "oc_writing" && (
+                <QuizSetup_oc_writing
                   userType={userType}
                   centerCode={centerCode}
                 />
@@ -771,6 +787,15 @@ const tabs = allTabs.filter((tab) => {
                           >
                             Reading
                           </button>
+                          <button
+                            className="dashboard-button"
+                            onClick={() => {
+                              setGenerateExamType("oc_writing");
+                              setGenerateExamStep("mode");
+                            }}
+                          >
+                            Writing
+                          </button>
                         </div>
                       )}
                     {generateExamStep === "type" &&
@@ -903,6 +928,13 @@ const tabs = allTabs.filter((tab) => {
                            mode={generateMode}
                            centerCode={centerCode}                           
                            />
+                        )}
+                        {generateExamCategory === "oc" &&
+                          generateExamType === "oc_writing" && (
+                            <GenerateExam_oc_writing
+                              mode={generateMode}
+                              centerCode={centerCode}
+                            />
                         )}
 
                         {generateExamCategory === "foundational" && (
