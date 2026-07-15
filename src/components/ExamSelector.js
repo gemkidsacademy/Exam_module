@@ -5,6 +5,8 @@ import ExamTypeSelector_naplan from "./ExamTypeSelector_naplan";
 
 const ExamSelector = ({ examType, onSelect }) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
+  console.log("selectedCategory:", selectedCategory);
+  console.log("examType:", examType);
 
   return (
     <div className="exam-selector-container">

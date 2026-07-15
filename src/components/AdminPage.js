@@ -14,6 +14,8 @@
   
   import QuizSetup_naplan from "./QuizSetup_naplan";
   import GenerateExam_naplan_numeracy from "./GenerateExam_naplan_numeracy";
+  import QuizSetup_naplan_writing from "./QuizSetup_naplan_writing";
+
   import GenerateExam_oc_mathematical_reasoning from "./GenerateExam_oc_mathematical_reasoning";
   
   import GenerateExam_naplan_language_conventions from "./GenerateExam_naplan_language_conventions";
@@ -28,6 +30,8 @@
   import GenerateExam_naplan_writing from "./GenerateExam_naplan_writing";
   import CenterManagement from "./CenterManagement";
   import QuizSetup_oc_writing from "./QuizSetup_oc_writing";
+  
+  
   import GenerateExam_oc_writing from "./GenerateExam_oc_writing";
   
   
@@ -40,7 +44,7 @@
   
   
   import "./AdminPanel.css";
-  
+  import UploadWord_writing from "./UploadWord_writing";
   /* ============================
     User Management
   ============================ */
@@ -295,7 +299,7 @@ const tabs = allTabs.filter((tab) => {
     ============================ */
     return (
     <div className="dashboard-container">
-      <h1 className="dashboard-title">Admin Dashboard hello thre </h1>
+      <h1 className="dashboard-title">Admin Dashboard </h1>
   
       {/* ---------- Tabs ---------- */}
       <div className="tab-nav">
@@ -419,6 +423,9 @@ const tabs = allTabs.filter((tab) => {
             )}
             {createExamType === "naplan_reading" && (
               <UploadWordNaplanReading />
+            )}
+            {createExamType === "naplan_writing" && (
+              <UploadWord_writing />
             )}
           </div>
         )}
@@ -656,6 +663,13 @@ const tabs = allTabs.filter((tab) => {
                   centerCode={centerCode}
                  />
               )}
+              {createExamCategory === "naplan" &&
+                createExamType === "naplan_writing" && (
+                    <QuizSetup_naplan_writing
+                        userType={userType}
+                        centerCode={centerCode}
+                    />
+                )}
               
               
           
@@ -965,8 +979,11 @@ const tabs = allTabs.filter((tab) => {
                            />
                         )}
                         {generateExamCategory === "naplan" &&
-                        generateExamType === "naplan_writing" && (
-                          <GenerateExam_naplan_writing mode={generateMode} />
+                          generateExamType === "naplan_writing" && (
+                            <GenerateExam_naplan_writing
+                              mode={generateMode}
+                              centerCode={centerCode}
+                            />
                         )}
                       </>
                     )}

@@ -2,7 +2,10 @@ import React from "react";
 import "./ExamTypeSelector_naplan.css";
 
 const ExamTypeSelector_naplan = ({ examType, onSelect }) => {
-  // If an exam type is already selected, hide buttons
+  console.log("ExamTypeSelector_naplan rendered");
+  console.log("examType:", examType);
+
+  // If an exam type has already been selected, don't show the buttons
   if (examType) {
     return null;
   }
@@ -22,6 +25,7 @@ const ExamTypeSelector_naplan = ({ examType, onSelect }) => {
       >
         Language Conventions
       </button>
+
       <button
         className="dashboard-button"
         onClick={() => onSelect("naplan_reading")}
@@ -29,6 +33,12 @@ const ExamTypeSelector_naplan = ({ examType, onSelect }) => {
         Reading
       </button>
 
+      <button
+        className="dashboard-button"
+        onClick={() => onSelect("naplan_writing")}
+      >
+        Writing
+      </button>
     </div>
   );
 };

@@ -6,7 +6,7 @@ import "./NaplanDashboard.css";
 import NaplanNumeracy from "./NaplanNumeracy";
 import NaplanLanguageConventions from "./NaplanLanguageConventions";
 import NaplanReading from "./NaplanReading";
-//import NaplanWriting from "./NaplanWriting";
+import NaplanWriting from "./NaplanWriting";
 
 // SHARED SCREENS
 import WelcomeScreen from "./WelcomeScreen";
@@ -31,19 +31,16 @@ const SUBJECTS = [
     key: "language_conventions",
     component: NaplanLanguageConventions,
   },
-
-  
-   {
-     label: "Reading",
-     key: "reading",
-     component: NaplanReading,
-   },
-  // Temporarily disabled
-  // {
-  //   label: "Writing",
-  //   key: "writing",
-  //   component: NaplanWriting,
-  // },
+  {
+    label: "Reading",
+    key: "reading",
+    component: NaplanReading,
+  },
+  {
+    label: "Writing",
+    key: "writing",
+    component: NaplanWriting,
+  },
 ];
 
 const NaplanDashboard = () => {
