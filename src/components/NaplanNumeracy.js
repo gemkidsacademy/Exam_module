@@ -14,6 +14,7 @@ import NaplanNumeracyReview from "./NaplanNumeracyReview";
 import NaplanNumeracyReport from "./NaplanNumeracyReport";
 import NaplanRuler from "./NaplanRuler";
 import NaplanProtractor from "./NaplanProtractor";
+import MatchingQuestion from "./MatchingQuestion";
 
 /* ============================================================
   MAIN COMPONENT
@@ -26,6 +27,7 @@ export default function NaplanNumeracy({
 }) {
   const studentId = sessionStorage.getItem("student_id");
   const API_BASE = process.env.REACT_APP_API_URL;
+  
   const [showCalculator, setShowCalculator] = useState(false);
   const [showRuler, setShowRuler] = useState(false);
   const [showProtractor, setShowProtractor] = useState(false);
@@ -648,12 +650,14 @@ const toggleFlagQuestion = () => {
     ANSWERS
   ============================================================ */
   const handleAnswer = (value) => {
+    console.log("📤 handleAnswer:", value);
+
     const qid = String(questions[currentIndex]?.id);
     if (!qid) return;
 
     setAnswers(prev => ({ ...prev, [qid]: value }));
     setVisited(prev => ({ ...prev, [qid]: true }));
-  };
+};
 
   const handleAnswerForQuestion = (questionId, value) => {
     const qid = String(questionId);
@@ -1384,6 +1388,18 @@ return (
                     )}
                   </div>
                 );
+              }
+              if (block.type === "matching") {
+                  return (
+                      <MatchingQuestion
+                          key={idx}
+                          block={block}
+                          answer={answers[String(currentQ.id)]}
+                          onAnswer={handleAnswer}
+                          review={isReview}
+                          correctAnswer={currentQ.correct_answer}
+                      />
+                  );
               }
               if (block.type === "image-multi-select") {
   const qid = String(currentQ.id);
