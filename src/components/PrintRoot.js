@@ -3,7 +3,10 @@ import { forwardRef } from "react";
 import "./SelectiveReadinessOverall.css";
 
 const PrintRoot = forwardRef(function PrintRoot(props, ref) {
-  const { overall } = props;
+  const {
+    overall,
+    reportType = "selective"
+  } = props;
   const thinkingDiag =
   overall?.section_diagnostics?.thinking_skills || null;
   const mathsDiag =
@@ -333,8 +336,10 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
       <header className="pdf-report-header">
         <div className="pdf-brand">GEM KIDS ACADEMY</div>
         <div className="pdf-main-title">
-          SELECTIVE DIAGNOSTIC PERFORMANCE REPORT
-        </div>
+        {reportType === "oc"
+          ? "OC DIAGNOSTIC PERFORMANCE REPORT"
+          : "SELECTIVE DIAGNOSTIC PERFORMANCE REPORT"}
+      </div>
       </header>
 
       {/* STUDENT INFO */}
@@ -344,7 +349,12 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
         <div><strong>Student ID:</strong> {studentId}</div>
         <div><strong>Year Level:</strong> {yearLevel}</div>
         <div><strong>Test Date:</strong> {examDate}</div>
-        <div><strong>Assessment:</strong> Selective Full-Length Practice Test</div>
+        <div>
+          <strong>Assessment:</strong>{" "}
+          {reportType === "oc"
+            ? "OC Full-Length Practice Test"
+            : "Selective Full-Length Practice Test"}
+        </div>
         <div><strong>Mode:</strong> Online (Gem Exam Portal)</div>
       </section>
 
@@ -429,11 +439,10 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
       <section className="pdf-intro-box">
         <h3 className="pdf-section-heading">Test Overview</h3>
         <p>
-          This assessment is designed to closely reflect the NSW Selective High
-          School Placement Test in structure, difficulty, and time pressure.
-          Results are analysed using Gem Kids Academy benchmarking standards to
-          provide a clear view of current performance, strengths, and next steps.
-        </p>
+        {reportType === "oc"
+          ? "This assessment is designed to closely reflect the NSW Opportunity Class (OC) Placement Test in structure, difficulty, and time pressure. Results are analysed using Gem Kids Academy benchmarking standards to provide a clear view of current performance, strengths, and next steps."
+          : "This assessment is designed to closely reflect the NSW Selective High School Placement Test in structure, difficulty, and time pressure. Results are analysed using Gem Kids Academy benchmarking standards to provide a clear view of current performance, strengths, and next steps."}
+      </p>
       </section>
 
       {/* SUBJECTS */}
@@ -497,7 +506,11 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
   <p><strong>Overall Score:</strong> {overall.overall_percent}%</p>
 
   <p>
-    <strong>Selective Readiness:</strong>{" "}
+    <strong>
+      {reportType === "oc"
+        ? "OC Readiness"
+        : "Selective Readiness"}:
+    </strong>{" "}
     {overall.readiness_band}
   </p>
 
@@ -589,9 +602,9 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
 </section>
       {/* FOOTER */}
       <footer className="pdf-footer-note">
-        This report provides indicative guidance based on Gem Kids Academy
-        internal assessment standards. Final placement outcomes are determined
-        by official statewide ranking, scaling, and moderation processes.
+        {reportType === "oc"
+          ? "This report provides indicative guidance based on Gem Kids Academy internal assessment standards for Opportunity Class preparation. Final placement outcomes are determined by official statewide ranking, scaling, and moderation processes."
+          : "This report provides indicative guidance based on Gem Kids Academy internal assessment standards. Final placement outcomes are determined by official statewide ranking, scaling, and moderation processes."}
       </footer>
     </div>
   );

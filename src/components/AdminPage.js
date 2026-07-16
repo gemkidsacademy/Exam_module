@@ -4,6 +4,7 @@
   
   import StudentExamReports from "./StudentExamReports";
   import SelectiveReadinessOverall from "./SelectiveReadinessOverall";
+  import OCReadinessOverall from "./OCReadinessOverall";
   import StudentReportShell from "./StudentReportShell";
   import BulkUserUpload from "./BulkUserUpload";
   import StudentReportShell_backend from "./StudentReportShell_backend";
@@ -208,6 +209,10 @@ const allTabs = [
     id: "selective-readiness-overall",
     label: "Selective Readiness (Overall)",
   },
+  {
+  id: "oc-readiness-overall",
+    label: "OC Readiness (Overall)",
+  },
 
 ];
 
@@ -256,6 +261,7 @@ const tabs = allTabs.filter((tab) => {
       "topic-report-limited-2",
 
       "selective-readiness-overall",
+      "oc-readiness-overall",
 
     ].includes(tab.id);
 
@@ -270,6 +276,7 @@ const tabs = allTabs.filter((tab) => {
       "topic-report-limited-2",
 
       "selective-readiness-overall",
+      "oc-readiness-overall",
 
     ].includes(tab.id);
 
@@ -1006,6 +1013,14 @@ const tabs = allTabs.filter((tab) => {
                     <SelectiveReadinessOverall
                       centerCode={centerCode}
                     
+                    />
+                  </div>
+                )}
+
+                {activeTab === "oc-readiness-overall" && (
+                  <div className="tab-panel">
+                    <OCReadinessOverall
+                      centerCode={centerCode}
                     />
                   </div>
                 )}
