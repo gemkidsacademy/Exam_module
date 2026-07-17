@@ -15,6 +15,8 @@ import NaplanNumeracyReport from "./NaplanNumeracyReport";
 import NaplanRuler from "./NaplanRuler";
 import NaplanProtractor from "./NaplanProtractor";
 import MatchingQuestion from "./MatchingQuestion";
+import OrderingQuestion from "./OrderingQuestion";
+import CalendarQuestion from "./CalendarQuestion";
 
 /* ============================================================
   MAIN COMPONENT
@@ -1392,6 +1394,30 @@ return (
               if (block.type === "matching") {
                   return (
                       <MatchingQuestion
+                          key={idx}
+                          block={block}
+                          answer={answers[String(currentQ.id)]}
+                          onAnswer={handleAnswer}
+                          review={isReview}
+                          correctAnswer={currentQ.correct_answer}
+                      />
+                  );
+              }
+              if (block.type === "ordering") {
+                  return (
+                      <OrderingQuestion
+                          key={idx}
+                          block={block}
+                          answer={answers[String(currentQ.id)]}
+                          onAnswer={handleAnswer}
+                          review={isReview}
+                          correctAnswer={currentQ.correct_answer}
+                      />
+                  );
+              }
+              if (block.type === "calendar") {
+                  return (
+                      <CalendarQuestion
                           key={idx}
                           block={block}
                           answer={answers[String(currentQ.id)]}

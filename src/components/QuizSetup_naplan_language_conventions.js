@@ -25,7 +25,7 @@ export default function QuizSetup_naplan_language_conventions({
     const y = Number(year);
 
     if (y >= 2 && y <= 9) {
-      return { min: 45, max: 60 };
+      return { min: 1, max: 60 };
     }
 
     return null;

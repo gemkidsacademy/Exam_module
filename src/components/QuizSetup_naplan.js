@@ -104,7 +104,7 @@ export default function QuizSetup_naplan({
     const yearNum = Number(year);
 
     if (yearNum >= 2 && yearNum <= 9) {
-      return { min: 35, max: 45 };
+      return { min: 1, max: 45 };
     }
 
     return null;

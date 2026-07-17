@@ -1,0 +1,82 @@
+.calendar-question{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin-top:20px;
+}
+
+.calendar-title{
+    font-size:34px;
+    font-weight:700;
+    margin-bottom:20px;
+}
+
+.calendar-grid{
+    display:grid;
+    grid-template-columns:repeat(7,80px);
+    gap:2px;
+}
+
+.calendar-header{
+    background:#d8eefc;
+    font-weight:bold;
+    padding:14px;
+    text-align:center;
+    border:1px solid #9bb8cc;
+}
+
+.calendar-empty{
+    width:80px;
+    height:70px;
+    border:1px solid transparent;
+}
+
+.calendar-cell{
+    width:80px;
+    height:70px;
+
+    background:white;
+
+    border:2px solid #d4dff4;
+
+    cursor:pointer;
+
+    font-size:22px;
+
+    color:#1f2937;
+
+    font-weight:600;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    transition:.15s;
+
+    padding:0;
+}
+
+.calendar-cell:hover{
+    background:#eef5ff;
+}
+
+.calendar-cell.selected{
+    border:3px solid #2563eb;
+    background:#dbeafe;
+}
+
+.calendar-cell.review-correct{
+    background:#dcfce7;
+    border:3px solid #22c55e;
+}
+
+.calendar-cell.review-wrong{
+    background:#fee2e2;
+    border:3px solid #ef4444;
+}
+
+.calendar-correct-answer{
+    margin-top:18px;
+    font-weight:600;
+    color:#15803d;
+}

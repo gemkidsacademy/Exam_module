@@ -7,6 +7,7 @@ import React, {
 import "./NaplanNumeracyExam.css";
 
 import "./ExamPage.css";
+import MatchingQuestion from "./MatchingQuestion";
 import styles from "./ExamPageThinkingSkills.module.css";
 
 import NaplanLanguageConventionsReview from "./NaplanLanguageConventionsReview";
@@ -989,9 +990,27 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
       }}
     >
   <div className="question-content-centered">
+    {!currentQ.question_blocks?.some(b => b.type === "text") &&
+      currentQ.question_text && (
+        <p className="question-text">
+          {currentQ.question_text}
+        </p>
+    )}
     {currentQ.question_blocks?.map((block, idx) => {
 
-      if (block.type === "text") {
+        if (block.type === "matching") {
+            return (
+                <MatchingQuestion
+                    key={idx}
+                    block={block}
+                    answer={answers[String(currentQ.id)]}
+                    onAnswer={handleAnswer}
+                    review={isReview}
+                    correctAnswer={currentQ.correct_answer}
+                />
+            );
+        }
+        if (block.type === "text") {
         return (
           <p key={idx} className="question-text">
             {renderHighlightedText(block.content)}
