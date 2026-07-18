@@ -1,0 +1,4 @@
+student_id,password,name,gender,class_name,student_year,class_day,parent_email
+Gem_bulk_user_004,123,bulk_test,Male,Selective,Year 7 ,Monday,any3@hotmail.com
+Gem_bulk_user_005,123,Gem_bulk_user_002,Female,OC,Year 6,Tuesday,any4@htmail.com
+Gem_bulk_user_006,123,Gem_bulk_user_003,Male,Naplan,Year 5,Wednesday,any5@hotmail.com
