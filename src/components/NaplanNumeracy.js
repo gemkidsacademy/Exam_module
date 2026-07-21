@@ -109,6 +109,7 @@ export default function NaplanNumeracy({
   }
 
   // Multi-select
+  // Multi-select
   if (questionType === 2) {
     if (Array.isArray(correctAnswer)) return correctAnswer;
 
@@ -123,29 +124,40 @@ export default function NaplanNumeracy({
     return [];
   }
 
+  // Interactive question types
+  if ([8, 9, 10].includes(questionType)) {
+    return correctAnswer;
+  }
+
   return String(correctAnswer).trim();
 };
   const normalizeStudentAnswer = (answer, questionType) => {
     if (answer == null) return null;
 
+    // Multi-select
     if (questionType === 2) {
-      if (Array.isArray(answer)) {
-        return [...answer].sort();
-      }
-
-      if (typeof answer === "string") {
-        try {
-          return JSON.parse(answer.replace(/'/g, '"')).sort();
-        } catch {
-          return [];
+        if (Array.isArray(answer)) {
+            return [...answer].sort();
         }
-      }
 
-      return [];
+        if (typeof answer === "string") {
+            try {
+                return JSON.parse(answer.replace(/'/g, '"')).sort();
+            } catch {
+                return [];
+            }
+        }
+
+        return [];
+    }
+
+    // Interactive question types
+    if ([8, 9, 10].includes(questionType)) {
+        return answer;
     }
 
     return String(answer).trim();
-  };
+};
 
   // ---------------- REPORT ----------------
   const [report, setReport] = useState(null);
@@ -1114,11 +1126,58 @@ return (
                             q.correct_answer
                           );
 
-                      } else {
+                      } else if (q.question_type === 8) {
+
+                          isCorrect =
+                            Array.isArray(normalizedStudentAnswer) &&
+                            Array.isArray(correctAnswer) &&
+                            normalizedStudentAnswer.length === correctAnswer.length &&
+                            normalizedStudentAnswer.every(studentPair =>
+                                correctAnswer.some(correctPair =>
+                                    (
+                                        studentPair.left === correctPair.left &&
+                                        studentPair.right === correctPair.right
+                                    ) ||
+                                    (
+                                        studentPair.left === correctPair.right &&
+                                        studentPair.right === correctPair.left
+                                    )
+                                )
+                            );
+
+                      } else if (q.question_type === 9) {
+
+                          isCorrect =
+                              Array.isArray(normalizedStudentAnswer) &&
+                              Array.isArray(correctAnswer) &&
+                              normalizedStudentAnswer.length === correctAnswer.length &&
+                              normalizedStudentAnswer.every(
+                                  (value, index) => value === correctAnswer[index]
+                              );
+
+                      } else if (q.question_type === 10) {
+
+                          isCorrect =
+                              normalizedStudentAnswer === correctAnswer;
+
+                      }
+                       else {
 
                         isCorrect =
                           normalizedStudentAnswer ===
                           correctAnswer;
+                      }
+                      if (isReview && q.question_type === 8) {
+                          console.log("Student:", normalizedStudentAnswer);
+                          console.log("Correct:", correctAnswer);
+
+                          normalizedStudentAnswer.forEach((pair, i) => {
+                              console.log("Student Pair", i, pair);
+                          });
+
+                          correctAnswer.forEach((pair, i) => {
+                              console.log("Correct Pair", i, pair);
+                          });
                       }
 
                       cls += isCorrect
@@ -1399,7 +1458,10 @@ return (
                           answer={answers[String(currentQ.id)]}
                           onAnswer={handleAnswer}
                           review={isReview}
-                          correctAnswer={currentQ.correct_answer}
+                          correctAnswer={normalizeCorrectAnswer(
+                              currentQ.correct_answer,
+                              currentQ.question_type
+                          )}
                       />
                   );
               }

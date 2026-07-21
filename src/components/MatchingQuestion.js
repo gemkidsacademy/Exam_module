@@ -42,7 +42,10 @@ function DropZone({
     );
 }
 
-function DraggableCard({ item }) {
+function DraggableCard({
+    item,
+    review = false,
+}) {
   const {
     attributes,
     listeners,
@@ -62,7 +65,7 @@ function DraggableCard({ item }) {
     color: "#ffffff",
     textAlign: "center",
     fontWeight: 600,
-    cursor: "grab",
+    cursor: review ? "default" : "grab",
     userSelect: "none",
     boxShadow: "0 2px 5px rgba(0,0,0,0.15)",
     transform: transform
@@ -70,16 +73,22 @@ function DraggableCard({ item }) {
       : undefined,
   };
 
-  return (
+  const dragProps = review
+    ? {}
+    : {
+        ...listeners,
+        ...attributes,
+    };
+
+return (
     <div
-      ref={setNodeRef}
-      style={style}
-      {...listeners}
-      {...attributes}
+        ref={setNodeRef}
+        style={style}
+        {...dragProps}
     >
-      {item.text}
+        {item.text}
     </div>
-  );
+);
 }
 
 export default function MatchingQuestion({
@@ -89,14 +98,15 @@ export default function MatchingQuestion({
   review,
   correctAnswer
 }) {
-  console.log("=================================");
-  console.log("MATCHING BLOCK");
-  console.log(block);
-  console.log("match_mode:", block.match_mode);
-  console.log("left_items:", block.left_items);
-  console.log("right_items:", block.right_items);
-  console.log("items:", block.items);
-  console.log("=================================");
+  console.log("========== MATCHING REVIEW ==========");
+  console.log("review:", review);
+  console.log("answer:", answer);
+  console.log("correctAnswer:", correctAnswer);
+  console.log("typeof correctAnswer:", typeof correctAnswer);
+  console.log("Array.isArray:", Array.isArray(correctAnswer));
+  console.log("block:", block);
+  console.log("====================================");
+  
   
 
   // All draggable cards
@@ -119,9 +129,7 @@ const draggableItems =
         ? rightItems
         : block.items || [];
 const [assignments, setAssignments] = React.useState(answer || {});
-console.log("🔥 MatchingQuestion render");
-  console.log("answer prop:", answer);
-  console.log("assignments:", assignments);
+console.log("assignments state:", assignments);
   
 // Student answer
 
@@ -140,6 +148,9 @@ const availableItems = draggableItems.filter(
 
 React.useEffect(() => {
 
+    console.log("useEffect fired");
+    console.log("Incoming answer:", answer);
+
     if (
         layout === "fixed-left" &&
         Array.isArray(answer)
@@ -151,9 +162,13 @@ React.useEffect(() => {
             map[pair.left] = pair.right;
         });
 
+        console.log("Mapped assignments:", map);
+
         setAssignments(map);
 
     } else {
+
+        console.log("Using answer directly");
 
         setAssignments(answer || {});
 
@@ -161,11 +176,17 @@ React.useEffect(() => {
 
 }, [answer, layout]);
 
+
 function isCorrect(leftId, rightId) {
-    return (correctAnswer || []).some(
-        pair =>
+    return (correctAnswer || []).some(pair =>
+        (
             pair.left === leftId &&
             pair.right === rightId
+        ) ||
+        (
+            pair.left === rightId &&
+            pair.right === leftId
+        )
     );
 }
 function handleDragEnd(event) {
@@ -179,10 +200,24 @@ function handleDragEnd(event) {
 
     setAssignments(prev => {
 
-        const updated = {
-            ...prev,
-            [over.id]: active.id,
-        };
+        const updated = { ...prev };
+
+        // Remove the card from whichever slot currently contains it
+        const previousSlot = Object.keys(updated).find(
+            key => updated[key] === active.id
+        );
+
+        if (previousSlot) {
+            delete updated[previousSlot];
+        }
+
+        // If destination already contains another card,
+        // send that card back to Available Cards
+        if (updated[over.id]) {
+            delete updated[over.id];
+        }
+
+        updated[over.id] = active.id;
 
         console.log("Updated assignments:", updated);
 
@@ -215,7 +250,205 @@ console.log(
         i => i.id === assignments["mass"]
     )
 );
-  return (
+console.log("Final assignments:", assignments);
+
+if (review && layout === "free-pair") {
+    const pairsToDisplay =
+    Array.isArray(answer) && answer.length > 0
+        ? answer
+        : (correctAnswer || []);
+
+    return (
+
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "24px",
+                marginTop: "30px",
+                maxWidth: "900px",
+                marginInline: "auto"
+            }}
+        >
+
+            {pairsToDisplay.map((studentPair, index) => {
+
+                const correct = isCorrect(
+                    studentPair.left,
+                    studentPair.right
+                );
+
+                const expectedPair = (correctAnswer || []).find(
+                    pair =>
+                        pair.left === studentPair.left ||
+                        pair.right === studentPair.left ||
+                        pair.left === studentPair.right ||
+                        pair.right === studentPair.right
+                );
+
+                const studentLeft = block.items.find(
+                    item => item.id === studentPair.left
+                );
+
+                const studentRight = block.items.find(
+                    item => item.id === studentPair.right
+                );
+
+                const correctLeft = expectedPair
+                    ? block.items.find(
+                        item => item.id === expectedPair.left
+                    )
+                    : null;
+
+                const correctRight = expectedPair
+                    ? block.items.find(
+                        item => item.id === expectedPair.right
+                    )
+                    : null;
+
+                return (
+
+                    <div
+                        key={index}
+                        style={{
+                            border: `2px solid ${
+                                correct
+                                    ? "#2e7d32"
+                                    : "#d32f2f"
+                            }`,
+                            borderRadius: "8px",
+                            padding: "20px"
+                        }}
+                    >
+
+                        <div
+                            style={{
+                                fontWeight: 700,
+                                color: correct
+                                    ? "#2e7d32"
+                                    : "#d32f2f",
+                                marginBottom: "15px"
+                            }}
+                        >
+                            {correct
+                                ? "Correct Match"
+                                : "Student Match"}
+                        </div>
+
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                gap: "18px",
+                                flexWrap: "wrap"
+                            }}
+                        >
+
+                            <DraggableCard
+                                item={studentLeft}
+                                review
+                            />
+
+                            <span
+                                style={{
+                                    fontSize: "28px",
+                                    fontWeight: 700
+                                }}
+                            >
+                                ↔
+                            </span>
+
+                            <DraggableCard
+                                item={studentRight}
+                                review
+                            />
+
+                            <span
+                                style={{
+                                    fontSize: "28px",
+                                    color: correct
+                                        ? "#2e7d32"
+                                        : "#d32f2f"
+                                }}
+                            >
+                                {correct ? "✓" : "✕"}
+                            </span>
+
+                        </div>
+
+                        {!correct && expectedPair && (
+
+                            <>
+
+                                <div
+                                    style={{
+                                        marginTop: "24px",
+                                        marginBottom: "12px",
+                                        color: "#2e7d32",
+                                        fontWeight: 700
+                                    }}
+                                >
+                                    Correct Pair
+                                </div>
+
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        gap: "18px",
+                                        flexWrap: "wrap"
+                                    }}
+                                >
+
+                                    <DraggableCard
+                                        item={correctLeft}
+                                        review
+                                    />
+
+                                    <span
+                                        style={{
+                                            fontSize: "28px",
+                                            fontWeight: 700
+                                        }}
+                                    >
+                                        ↔
+                                    </span>
+
+                                    <DraggableCard
+                                        item={correctRight}
+                                        review
+                                    />
+
+                                    <span
+                                        style={{
+                                            fontSize: "28px",
+                                            color: "#2e7d32"
+                                        }}
+                                    >
+                                        ✓
+                                    </span>
+
+                                </div>
+
+                            </>
+
+                        )}
+
+                    </div>
+
+                );
+
+            })}
+
+        </div>
+
+    );
+
+}
+
+return (
     <DndContext
         collisionDetection={pointerWithin}
         onDragEnd={handleDragEnd}
@@ -246,8 +479,9 @@ console.log(
         >
           {availableItems.map(item => (
             <DraggableCard
-              key={item.id}
-              item={item}
+                key={item.id}
+                item={item}
+                review={review}
             />
           ))}
         </div>
@@ -269,8 +503,9 @@ console.log(
             >
               {availableItems.map(item => (
                 <DraggableCard
-                  key={item.id}
-                  item={item}
+                    key={item.id}
+                    item={item}
+                    review={review}
                 />
               ))}
             </div>
@@ -359,12 +594,25 @@ console.log(
     </div>
 
     <DropZone id={left.id}>
-        {
-            draggableItems.find(
-                i=>i.id===assignments[left.id]
-            )?.text
-        }
-    </DropZone>
+
+      {(() => {
+
+          const assignedItem = draggableItems.find(
+              item => item.id === assignments[left.id]
+          );
+
+          return assignedItem ? (
+
+              <DraggableCard
+                  item={assignedItem}
+                  review={review}
+              />
+
+          ) : null;
+
+      })()}
+
+  </DropZone>
 
     </div>
 
@@ -395,22 +643,50 @@ console.log(
       >
 
         <DropZone id={`pair-${pair}-left`}>
-            {
-                draggableItems.find(
-                    item => item.id === assignments[`pair-${pair}-left`]
-                )?.text
-            }
-        </DropZone>
+
+        {(() => {
+
+            const assignedItem = draggableItems.find(
+                item =>
+                    item.id === assignments[`pair-${pair}-left`]
+            );
+
+            return assignedItem ? (
+
+                <DraggableCard
+                    item={assignedItem}
+                    review={review}
+                />
+
+            ) : null;
+
+        })()}
+
+    </DropZone>
 
         ↔
 
         <DropZone id={`pair-${pair}-right`}>
-            {
-                draggableItems.find(
-                    item => item.id === assignments[`pair-${pair}-right`]
-                )?.text
-            }
-        </DropZone>
+
+          {(() => {
+
+              const assignedItem = draggableItems.find(
+                  item =>
+                      item.id === assignments[`pair-${pair}-right`]
+              );
+
+              return assignedItem ? (
+
+                  <DraggableCard
+                      item={assignedItem}
+                      review={review}
+                  />
+
+              ) : null;
+
+          })()}
+
+      </DropZone>
 
       </div>
 

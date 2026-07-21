@@ -6,8 +6,11 @@ import React, {
 } from "react";
 import "./NaplanNumeracyExam.css";
 
+
 import "./ExamPage.css";
 import MatchingQuestion from "./MatchingQuestion";
+import OrderingQuestion from "./OrderingQuestion";
+import CalendarQuestion from "./CalendarQuestion";
 import styles from "./ExamPageThinkingSkills.module.css";
 
 import NaplanLanguageConventionsReview from "./NaplanLanguageConventionsReview";
@@ -112,6 +115,7 @@ export default function NaplanLanguageConventions({
     if (correctAnswer == null) return null;
 
     // handle stringified objects like "{'value':'brilliantly'}"
+    
     if (
       typeof correctAnswer === "string" &&
       correctAnswer.includes("value")
@@ -144,7 +148,9 @@ export default function NaplanLanguageConventions({
 
       return [];
     }
-
+    if ([8, 9, 10].includes(questionType)) {
+        return correctAnswer;
+    }
     return String(correctAnswer);
   };
 
@@ -166,6 +172,9 @@ export default function NaplanLanguageConventions({
       }
 
       return [];
+    }
+    if ([8, 9, 10].includes(questionType)) {
+        return answer;
     }
 
     // All single-answer types (1, 3, 4, 5, 6, 7)
@@ -653,7 +662,13 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
   /* ============================================================
      EXAM UI
   ============================================================ */
+  
   const currentQ = questions[currentIndex];
+  console.log("CURRENT QUESTION", currentQ);
+  console.log("QUESTION TYPE", currentQ?.question_type);
+  console.log("BLOCKS", currentQ?.question_blocks);
+  console.log("CORRECT ANSWER", currentQ?.correct_answer);
+  console.log("STUDENT ANSWER", answers[String(currentQ?.id)]);
   const hasImageMultiSelect =
     currentQ?.question_blocks?.some(
       (b) =>
@@ -677,6 +692,20 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
   const normalizedStudentAnswer = normalizeStudentAnswer(
     answers[String(currentQ.id)],
     currentQ.question_type
+  );
+  console.log(
+      "QUESTION TYPE:",
+      currentQ.question_type
+  );
+
+  console.log(
+      "normalizedStudentAnswer:",
+      normalizedStudentAnswer
+  );
+
+  console.log(
+      "normalizedCorrectAnswer:",
+      normalizedCorrectAnswer
   );
 
   return (
@@ -1010,6 +1039,32 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
                 />
             );
         }
+        if (block.type === "ordering") {
+            return (
+                <OrderingQuestion
+                    key={idx}
+                    block={block}
+                    answer={answers[String(currentQ.id)]}
+                    onAnswer={handleAnswer}
+                    review={isReview}
+                    correctAnswer={currentQ.correct_answer}
+                />
+            );
+        }
+
+        if (block.type === "calendar") {
+            return (
+                <CalendarQuestion
+                    key={idx}
+                    block={block}
+                    answer={answers[String(currentQ.id)]}
+                    onAnswer={handleAnswer}
+                    review={isReview}
+                    correctAnswer={currentQ.correct_answer}
+                />
+            );
+        }
+
         if (block.type === "text") {
         return (
           <p key={idx} className="question-text">
@@ -1334,34 +1389,10 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
         })}
       </div>
     )}
-    {isReview && (
-      <div className={`your-answer-text ${isCorrect ? "correct" : "wrong"}`}>
-        <strong>Your answer:</strong>{" "}
-        {normalizedStudentAnswer || "No answer"}
-      </div>
-    )}
+    
+      
 
-    {isReview && !isCorrect && (
-      <div className="correct-answer-text">
-        <strong>Correct answer:</strong>{" "}
-        {(() => {
-          let answer = normalizedCorrectAnswer;
-
-          // case: "{'value': 'brilliantly'}"
-          if (typeof answer === "string" && answer.includes("value")) {
-            try {
-              const parsed = JSON.parse(answer.replace(/'/g, '"'));
-              return parsed.value;
-            } catch {
-              return answer;
-            }
-          }
-
-          // case: MCQ keys (A,B,C,D)
-          return currentQ.options?.[answer] || answer;
-        })()}
-      </div>
-    )}
+    
     
     {/* =========================
    TYPE 6 — IMAGE MCQ

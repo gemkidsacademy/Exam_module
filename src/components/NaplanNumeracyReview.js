@@ -6,6 +6,7 @@ export default function NaplanNumeracyReview({
   onLoaded, 
   mode
 }) {
+  
   const API_BASE = process.env.REACT_APP_API_URL;
   //const API_BASE = "http://127.0.0.1:8000";
   useEffect(() => {
@@ -25,7 +26,7 @@ export default function NaplanNumeracyReview({
         console.log("📘 Loading review for examId:", examId);
         console.log("📘 Review mode:", mode);
         console.log("🌐 Request URL:", reviewUrl);
-
+        
         const response = await fetch(reviewUrl, {
           signal: abortController.signal
         });
