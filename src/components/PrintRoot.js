@@ -3,10 +3,22 @@ import { forwardRef } from "react";
 import "./SelectiveReadinessOverall.css";
 
 const PrintRoot = forwardRef(function PrintRoot(props, ref) {
+  
   const {
     overall,
     reportType = "selective"
   } = props;
+  if (!overall) {
+  return (
+    <div ref={ref} className="pdf-report-page">
+      Preparing report...
+    </div>
+  );
+}
+  const schools =
+    overall.recommended_schools ||
+    overall.school_recommendation ||
+    [];
   const thinkingDiag =
   overall?.section_diagnostics?.thinking_skills || null;
   const mathsDiag =
@@ -108,13 +120,7 @@ const PrintRoot = forwardRef(function PrintRoot(props, ref) {
 
   );
 }
-  if (!overall) {
-  return (
-    <div ref={ref} className="pdf-report-page">
-      Preparing report...
-    </div>
-  );
-}
+  
 
 console.log("BENCHMARK DATA:", overall.benchmark_bands);
 
@@ -554,33 +560,40 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
   )}
 </section>
 
-{/* SCHOOL GUIDANCE */}
-<section className="pdf-section-card">
-  <h3 className="pdf-section-heading">
-    Target School Guidance (Indicative Only)
-  </h3>
+  {/* SCHOOL GUIDANCE */}
+  <section className="pdf-section-card">
+    <h3 className="pdf-section-heading">
+      Target School Guidance (Indicative Only)
+    </h3>
 
-  <p><strong>Based on current performance:</strong></p>
+    <p><strong>Based on current performance:</strong></p>
 
-  <p><strong>Competitive Range:</strong></p>
-  <ul className="pdf-list">
-    {(overall.school_recommendation || []).slice(0,3).map((item, index) => (
-      <li key={index}>{item}</li>
-    ))}
-  </ul>
+    {schools.length > 0 ? (
+      <>
+        <p><strong>Competitive Range:</strong></p>
 
-  {(overall.school_recommendation || []).length > 3 && (
-    <>
-      <p><strong>With Further Improvement:</strong></p>
+        <ul className="pdf-list">
+          {schools.slice(0, 3).map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
 
-      <ul className="pdf-list">
-        {(overall.school_recommendation || []).slice(3).map((item, index) => (
-          <li key={index}>{item}</li>
-        ))}
-      </ul>
-    </>
-  )}
-</section>
+        {schools.length > 3 && (
+          <>
+            <p><strong>With Further Improvement:</strong></p>
+
+            <ul className="pdf-list">
+              {schools.slice(3).map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </>
+        )}
+      </>
+    ) : (
+      <p><em>No recommended schools available.</em></p>
+    )}
+  </section>
 
 {/* NEXT STEPS */}
 <section className="pdf-section-card">

@@ -9,6 +9,10 @@ export default function ReportContent({
   SUBJECT_LABELS,
   SubjectFocusCard
 }) {
+  const schools =
+  overall.recommended_schools ||
+  overall.school_recommendation ||
+  [];
   return (
     <>
       {/* SCORE CARDS */}
@@ -92,11 +96,23 @@ export default function ReportContent({
         <div className="chart-title">Recommended Schools</div>
       
         <div className="schools-list">
-          {overall.school_recommendation?.map((school, index) => (
-            <div key={index} className="school-pill">
-              {school}
+          {schools.length > 0 ? (
+            schools.map((school, index) => (
+              <div key={index} className="school-pill">
+                {school}
+              </div>
+            ))
+          ) : (
+            <div
+              style={{
+                color: "#6b7280",
+                fontStyle: "italic",
+                padding: "10px 0"
+              }}
+            >
+              No recommended schools available.
             </div>
-          ))}
+          )}
         </div>
       </div>
 

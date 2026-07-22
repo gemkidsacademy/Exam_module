@@ -12,6 +12,9 @@
   import UploadWordNaplanLanguageConventions from "./UploadWordNaplanLanguageConventions";
   import UploadWordNaplanNumeracy from "./UploadWordNaplanNumeracy";
   import UploadWordNaplanReading from "./UploadWordNaplanReading";
+  import Leaderboard from "./Leaderboard";
+  import ExamCleaner from "./ExamCleaner";
+  
   
   import QuizSetup_naplan from "./QuizSetup_naplan";
   import GenerateExam_naplan_numeracy from "./GenerateExam_naplan_numeracy";
@@ -213,6 +216,14 @@ const allTabs = [
   id: "oc-readiness-overall",
     label: "OC Readiness (Overall)",
   },
+  {
+  id: "leaderboard",
+  label: "Leaderboard",
+  },
+  {
+    id: "exam-cleaner",
+    label: "Exam Cleaner",
+  },
 
 ];
 
@@ -237,6 +248,8 @@ const tabs = allTabs.filter((tab) => {
       "upload-image-folder",
 
       "add-quiz",
+      
+      "exam-cleaner",
 
     ].includes(tab.id);
 
@@ -255,6 +268,8 @@ const tabs = allTabs.filter((tab) => {
       "add-quiz",
 
       "generate-exam",
+      
+      "exam-cleaner",
 
       "student-exam-reports",
 
@@ -270,14 +285,12 @@ const tabs = allTabs.filter((tab) => {
   if (userType === "CENTER_TEACHER") {
 
     return [
-
       "student-exam-reports",
-
+      "leaderboard",
       "topic-report-limited-2",
-
       "selective-readiness-overall",
+      "exam-cleaner",
       "oc-readiness-overall",
-
     ].includes(tab.id);
 
   }
@@ -999,6 +1012,7 @@ const tabs = allTabs.filter((tab) => {
                 
                   </div>
                 )}
+
                 {/* ===== STUDENT EXAM REPORTS ===== */}
                 {activeTab === "student-exam-reports" && (
                   <div className="tab-panel">
@@ -1034,6 +1048,20 @@ const tabs = allTabs.filter((tab) => {
 
                   </div>
                 )}
+                {/* ===== LEADERBOARD ===== */}
+                {activeTab === "leaderboard" && (
+                  <div className="tab-panel">
+                    <Leaderboard
+                      centerCode={centerCode}
+                    />
+                  </div>
+                )}
+                {/* ===== EXAM CLEANER ===== */}
+                  {activeTab === "exam-cleaner" && (
+                    <div className="tab-panel">
+                      <ExamCleaner />
+                    </div>
+                  )}
   
   
   
