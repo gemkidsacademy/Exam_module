@@ -8,6 +8,7 @@ export default function EditUserForm() {
   const [name, setName] = useState("");
   const [className, setClassName] = useState("");
   const [classYear, setClassYear] = useState("");
+  const [classOptions, setClassOptions] = useState([]);
   const centerCode = sessionStorage.getItem(
     "center_code"
   );
@@ -15,6 +16,15 @@ export default function EditUserForm() {
   const [gender, setGender] = useState("");
   const [parentEmail, setParentEmail] = useState("");
   const BACKEND_URL = process.env.REACT_APP_API_URL;
+  const CLASS_DAY_OPTIONS = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
 
   // Fetch all students for dropdown
   useEffect(() => {
@@ -40,6 +50,29 @@ export default function EditUserForm() {
   };
 
   fetchStudents();
+}, []);
+
+  useEffect(() => {
+  const fetchClasses = async () => {
+    try {
+      const response = await fetch(
+        `${BACKEND_URL}/classes/${centerCode}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch classes");
+      }
+
+      const data = await response.json();
+
+      setClassOptions(data);
+    } catch (err) {
+      console.error(err);
+      alert("Unable to load classes");
+    }
+  };
+
+  fetchClasses();
 }, []);
 
 
@@ -128,12 +161,25 @@ export default function EditUserForm() {
         />
 
         <label>Class Name</label>
-        <input
-          type="text"
+
+        <select
           value={className}
           onChange={(e) => setClassName(e.target.value)}
           required
-        />
+        >
+          <option value="">
+            -- Select Class --
+          </option>
+
+          {classOptions.map((cls) => (
+            <option
+              key={cls.id}
+              value={cls.class_name}
+            >
+              {cls.class_name}
+            </option>
+          ))}
+        </select>
         <label>Class Year</label>
         <select
           value={classYear}
@@ -155,12 +201,20 @@ export default function EditUserForm() {
         </select>
 
         <label>Class Day</label>
-        <input
-          type="text"
+
+        <select
           value={classDay}
           onChange={(e) => setClassDay(e.target.value)}
           required
-        />
+        >
+          <option value="">-- Select Day --</option>
+
+          {CLASS_DAY_OPTIONS.map((day) => (
+            <option key={day} value={day}>
+              {day}
+            </option>
+          ))}
+        </select>
 
         <label>Parent Email</label>
         <input

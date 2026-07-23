@@ -10,6 +10,7 @@ export default function AddStudentForm() {
   const [className, setClassName] = useState("");
   const [classDay, setClassDay] = useState("");
   const [parentEmail, setParentEmail] = useState("");
+  const [classOptions, setClassOptions] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const rawCenterCode =
     sessionStorage.getItem("center_code") || "";
@@ -37,12 +38,7 @@ export default function AddStudentForm() {
         "Year 11",
         "Year 12",  
       ];
-  const CLASS_NAME_OPTIONS = [
-  "NAPLAN",
-  "Selective",
-  "OC",
-  "Foundational",
-];
+  
 
 const CLASS_DAY_OPTIONS = [
   "Monday",
@@ -58,6 +54,30 @@ const GENDER_OPTIONS = [
   "Female",
   "Other",
 ];
+useEffect(() => {
+  const fetchClasses = async () => {
+    try {
+      const response = await fetch(
+        `${BACKEND_URL}/classes/${centerCode}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to load classes");
+      }
+
+      const data = await response.json();
+
+      setClassOptions(data);
+    } catch (err) {
+      console.error("Error fetching classes:", err);
+      alert("Unable to load classes.");
+    }
+  };
+
+  if (centerCode) {
+    fetchClasses();
+  }
+}, [centerCode]);
 
   useEffect(() => {
   const fetchNextId = async () => {
@@ -185,10 +205,16 @@ const GENDER_OPTIONS = [
             onChange={(e) => setClassName(e.target.value)}
             required
           >
-            <option value="">Select class</option>
-            {CLASS_NAME_OPTIONS.map((cls) => (
-              <option key={cls} value={cls}>
-                {cls}
+            <option value="">
+              Select class
+            </option>
+
+            {classOptions.map((cls) => (
+              <option
+                key={cls.id}
+                value={cls.class_name}
+              >
+                {cls.class_name}
               </option>
             ))}
           </select>

@@ -12,7 +12,30 @@ export default function AddCenter() {
   const [allCenters, setAllCenters] = useState([]);
   const [mode, setMode] = useState("");
   const [selectedCenterCode, setSelectedCenterCode] = useState("");
+  const [timeZone, setTimeZone] = useState("Australia/Sydney");
   const BACKEND_URL = process.env.REACT_APP_API_URL;
+  const fetchNextCenterCode = async () => {
+
+        try {
+
+          const response = await fetch(
+            `${BACKEND_URL}/centers/get-next-center-code`
+          );
+
+          const data = await response.json();
+
+          setCenterCode(data.center_code);
+
+        } catch (error) {
+
+          console.error(
+            "Error fetching center code:",
+            error
+          );
+
+        }
+
+      };
 
     const [status, setStatus] = useState("ACTIVE");
     const fetchAllCenters = async () => {
@@ -40,36 +63,28 @@ export default function AddCenter() {
       }
 
     };
+
     useEffect(() => {
 
-      const fetchNextCenterCode = async () => {
-
-        try {
-
-          const response = await fetch(
-            `${BACKEND_URL}/centers/get-next-center-code`
-          );
-
-          const data = await response.json();
-
-          setCenterCode(data.center_code);
-
-        } catch (error) {
-
-          console.error(
-            "Error fetching center code:",
-            error
-          );
-
-        }
-
-      };
+      
 
       fetchNextCenterCode();
 
     }, [BACKEND_URL]);
 
   const handleAddCenter = async () => {
+    if (
+      !centerCode.trim() ||
+      !centerName.trim() ||
+      !address.trim() ||
+      !phoneNumber.trim() ||
+      !email.trim() ||
+      !timeZone.trim() ||
+      !status.trim()
+    ) {
+      alert("Please fill in all fields before saving the center.");
+      return;
+    }
 
   try {
 
@@ -79,6 +94,7 @@ export default function AddCenter() {
       address: address,
       phone_number: phoneNumber,
       email: email,
+      time_zone: timeZone,
       status: status,
     };
 
@@ -116,6 +132,17 @@ export default function AddCenter() {
       "Center saved:",
       data
     );
+
+    // Clear form
+    setCenterName("");
+    setAddress("");
+    setPhoneNumber("");
+    setEmail("");
+    setStatus("ACTIVE");
+    setTimeZone("Australia/Sydney");
+
+    // Get next center code
+    await fetchNextCenterCode();
 
   } catch (error) {
 
@@ -169,6 +196,7 @@ export default function AddCenter() {
       setPhoneNumber("");
       setEmail("");
       setStatus("ACTIVE");
+      setTimeZone("Australia/Sydney");
 
       setSelectedCenterCode("");
 
@@ -198,6 +226,7 @@ export default function AddCenter() {
       address: address,
       phone_number: phoneNumber,
       email: email,
+      time_zone: timeZone,
       status: status,
     };
 
@@ -292,6 +321,10 @@ export default function AddCenter() {
               );
 
               setEmail(selectedCenter.email || "");
+
+              setTimeZone(
+                selectedCenter.time_zone || "Australia/Sydney"
+              );
 
               setStatus(selectedCenter.status || "ACTIVE");
 
@@ -409,21 +442,45 @@ export default function AddCenter() {
 
       </div>
 
-      {/* Status */}
-      <div className="mt-6">
+  
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
 
-        <label className="block text-sm font-medium mb-2">
-          Status
-        </label>
+        {/* Status */}
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Status
+          </label>
 
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="w-full border rounded-lg px-4 py-3"
-        >
-          <option value="ACTIVE">ACTIVE</option>
-          <option value="INACTIVE">INACTIVE</option>
-        </select>
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="w-full border rounded-lg px-4 py-3"
+          >
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="INACTIVE">INACTIVE</option>
+          </select>
+        </div>
+
+        {/* Time Zone */}
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Time Zone
+          </label>
+
+          <select
+            value={timeZone}
+            onChange={(e) => setTimeZone(e.target.value)}
+            className="w-full border rounded-lg px-4 py-3"
+          >
+            <option value="Australia/Sydney">Australia/Sydney</option>
+            <option value="Australia/Melbourne">Australia/Melbourne</option>
+            <option value="Australia/Brisbane">Australia/Brisbane</option>
+            <option value="Australia/Perth">Australia/Perth</option>
+            <option value="Australia/Adelaide">Australia/Adelaide</option>
+            <option value="Australia/Darwin">Australia/Darwin</option>
+            <option value="UTC">UTC</option>
+          </select>
+        </div>
 
       </div>
 
@@ -432,7 +489,7 @@ export default function AddCenter() {
 
         {/* Add Mode Button */}
         <button
-          onClick={() => {
+          onClick={async () => {
 
             setMode("ADD");
 
@@ -446,6 +503,9 @@ export default function AddCenter() {
             setEmail("");
 
             setStatus("ACTIVE");
+            setTimeZone("Australia/Sydney");
+
+            await fetchNextCenterCode();
 
           }}
           className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg"

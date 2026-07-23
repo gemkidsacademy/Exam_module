@@ -14,6 +14,7 @@
   import UploadWordNaplanReading from "./UploadWordNaplanReading";
   import Leaderboard from "./Leaderboard";
   import ExamCleaner from "./ExamCleaner";
+  import ManageClasses from "./ManageClasses";
   
   
   import QuizSetup_naplan from "./QuizSetup_naplan";
@@ -172,6 +173,10 @@ const allTabs = [
     id: "database",
     label: "Exam Module User Management",
   },
+  {
+    id: "manage-classes",
+    label: "Manage Classes",
+  },
 
   {
     id: "center-management",
@@ -264,6 +269,8 @@ const tabs = allTabs.filter((tab) => {
     return [
 
       "database",
+
+      "manage-classes",
 
       "add-quiz",
 
@@ -409,6 +416,13 @@ const tabs = allTabs.filter((tab) => {
               />
             )}
         
+          </div>
+        )}
+        {activeTab === "manage-classes" && (
+          <div className="tab-panel">
+            <ManageClasses
+              centerCode={centerCode}
+            />
           </div>
         )}
         {activeTab === "center-management" && (
