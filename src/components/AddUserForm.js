@@ -11,6 +11,26 @@ export default function AddStudentForm() {
   const [classDay, setClassDay] = useState("");
   const [parentEmail, setParentEmail] = useState("");
   const [classOptions, setClassOptions] = useState([]);
+  const [studentYearOptions, setStudentYearOptions] = useState([]);
+  const fetchClassYears = async () => {
+  try {
+    const response = await fetch(
+      `${BACKEND_URL}/class-years-exam-module?center_code=${centerCode}`
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to load class years");
+    }
+
+    const data = await response.json();
+
+    setStudentYearOptions(data);
+
+  } catch (err) {
+    console.error("Error fetching class years:", err);
+    alert("Unable to load class years.");
+  }
+};
   const [isSubmitting, setIsSubmitting] = useState(false);
   const rawCenterCode =
     sessionStorage.getItem("center_code") || "";
@@ -23,21 +43,7 @@ export default function AddStudentForm() {
       ? rawCenterCode.split("|")[1].trim()
       : rawCenterCode;
   const [studentYear, setStudentYear] = useState("");
-  const STUDENT_YEAR_OPTIONS = [
-        "Kindergarten",
-        "Year 1",
-        "Year 2",
-        "Year 3",    
-        "Year 4",
-        "Year 5",
-        "Year 6",       
-        "Year 7",
-        "Year 8",
-        "Year 9",
-        "Year 10",
-        "Year 11",
-        "Year 12",  
-      ];
+  
   
 
 const CLASS_DAY_OPTIONS = [
@@ -76,8 +82,10 @@ useEffect(() => {
 
   if (centerCode) {
     fetchClasses();
+    fetchClassYears();
   }
 }, [centerCode]);
+
 
   useEffect(() => {
   const fetchNextId = async () => {
@@ -225,9 +233,12 @@ useEffect(() => {
             required
           >
             <option value="">Select year</option>
-            {STUDENT_YEAR_OPTIONS.map((year) => (
-              <option key={year} value={year}>
-                {year}
+            {studentYearOptions.map((year) => (
+              <option
+                key={year.id}
+                value={year.year_name}
+              >
+                {year.year_name}
               </option>
             ))}
           </select>

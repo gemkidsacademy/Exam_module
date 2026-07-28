@@ -8,6 +8,7 @@ export default function AddCenter() {
   const [centerName, setCenterName] = useState("");
   const [address, setAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const timeZones = Intl.supportedValuesOf("timeZone");
   const [email, setEmail] = useState("");
   const [allCenters, setAllCenters] = useState([]);
   const [mode, setMode] = useState("");
@@ -472,13 +473,11 @@ export default function AddCenter() {
             onChange={(e) => setTimeZone(e.target.value)}
             className="w-full border rounded-lg px-4 py-3"
           >
-            <option value="Australia/Sydney">Australia/Sydney</option>
-            <option value="Australia/Melbourne">Australia/Melbourne</option>
-            <option value="Australia/Brisbane">Australia/Brisbane</option>
-            <option value="Australia/Perth">Australia/Perth</option>
-            <option value="Australia/Adelaide">Australia/Adelaide</option>
-            <option value="Australia/Darwin">Australia/Darwin</option>
-            <option value="UTC">UTC</option>
+            {timeZones.map((tz) => (
+              <option key={tz} value={tz}>
+                {tz}
+              </option>
+            ))}
           </select>
         </div>
 

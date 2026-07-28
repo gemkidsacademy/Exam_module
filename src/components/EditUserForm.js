@@ -8,10 +8,30 @@ export default function EditUserForm() {
   const [name, setName] = useState("");
   const [className, setClassName] = useState("");
   const [classYear, setClassYear] = useState("");
+  const [classYearOptions, setClassYearOptions] = useState([]);
   const [classOptions, setClassOptions] = useState([]);
   const centerCode = sessionStorage.getItem(
     "center_code"
   );
+  const fetchClassYears = async () => {
+  try {
+    const response = await fetch(
+      `${BACKEND_URL}/class-years-exam-module?center_code=${centerCode}`
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch class years");
+    }
+
+    const data = await response.json();
+
+    setClassYearOptions(data);
+
+  } catch (err) {
+    console.error(err);
+    alert("Unable to load class years");
+  }
+};
   const [classDay, setClassDay] = useState("");
   const [gender, setGender] = useState("");
   const [parentEmail, setParentEmail] = useState("");
@@ -52,28 +72,6 @@ export default function EditUserForm() {
   fetchStudents();
 }, []);
 
-  useEffect(() => {
-  const fetchClasses = async () => {
-    try {
-      const response = await fetch(
-        `${BACKEND_URL}/classes/${centerCode}`
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch classes");
-      }
-
-      const data = await response.json();
-
-      setClassOptions(data);
-    } catch (err) {
-      console.error(err);
-      alert("Unable to load classes");
-    }
-  };
-
-  fetchClasses();
-}, []);
 
 
   // When a student is selected from dropdown, populate the form
@@ -98,6 +96,33 @@ export default function EditUserForm() {
 
     }
   }, [selectedStudentId, studentOptions]);
+  useEffect(() => {
+
+  const fetchClasses = async () => {
+    try {
+
+      const response = await fetch(
+        `${BACKEND_URL}/classes/${centerCode}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch classes");
+      }
+
+      const data = await response.json();
+
+      setClassOptions(data);
+
+    } catch (err) {
+      console.error(err);
+      alert("Unable to load classes");
+    }
+  };
+
+  fetchClasses();
+  fetchClassYears();
+
+}, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -164,7 +189,10 @@ export default function EditUserForm() {
 
         <select
           value={className}
-          onChange={(e) => setClassName(e.target.value)}
+          onChange={(e) => {
+            setClassName(e.target.value);
+            setClassYear("");
+          }}
           required
         >
           <option value="">
@@ -187,16 +215,17 @@ export default function EditUserForm() {
           required
         >
           <option value="">-- Select Year --</option>
-          <option value="Kindergarten">Kindergarten</option>
-          <option value="Year 2">Year 2</option>
-          <option value="Year 3">Year 3</option>
-          <option value="Year 4">Year 4</option>
-          <option value="Year 5">Year 5</option>
-          <option value="Year 6">Year 6</option>
-          <option value="Year 7">Year 7</option>
-          <option value="Year 8">Year 8</option>
-          <option value="Year 9">Year 9</option>
-          <option value="Year 10">Year 10</option>
+
+            {classYearOptions
+              .filter((year) => year.class_name === className)
+              .map((year) => (
+                <option
+                  key={year.id}
+                  value={year.year_name}
+                >
+                  {year.year_name}
+                </option>
+            ))}
           
         </select>
 

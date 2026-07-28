@@ -1,6 +1,8 @@
   import React, { useState, useEffect } from "react";
   import { useNavigate } from "react-router-dom";
   import DeleteUserExamAttempt from "./DeleteUserExamAttempt"; 
+  import ManageClassYears from "./ManageClassYears";
+
   
   import StudentExamReports from "./StudentExamReports";
   import SelectiveReadinessOverall from "./SelectiveReadinessOverall";
@@ -177,6 +179,10 @@ const allTabs = [
     id: "manage-classes",
     label: "Manage Classes",
   },
+  {
+    id: "manage-class-years",
+    label: "Manage Class Years",
+  },
 
   {
     id: "center-management",
@@ -271,6 +277,8 @@ const tabs = allTabs.filter((tab) => {
       "database",
 
       "manage-classes",
+
+      "manage-class-years",
 
       "add-quiz",
 
@@ -421,6 +429,13 @@ const tabs = allTabs.filter((tab) => {
         {activeTab === "manage-classes" && (
           <div className="tab-panel">
             <ManageClasses
+              centerCode={centerCode}
+            />
+          </div>
+        )}
+        {activeTab === "manage-class-years" && (
+          <div className="tab-panel">
+            <ManageClassYears
               centerCode={centerCode}
             />
           </div>
