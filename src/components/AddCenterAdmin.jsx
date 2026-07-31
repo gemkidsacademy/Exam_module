@@ -1,20 +1,21 @@
-// AddCenterTeacher.jsx
+// AddCenterAdmin.jsx
 
 import { useEffect, useState } from "react";
 
 const API_BASE = process.env.REACT_APP_API_URL;
 
-export default function AddCenterTeacher() {
+export default function AddCenterAdmin() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [centers, setCenters] = useState([]);
 
   const [formData, setFormData] = useState({
     centerCode: "",
-    teacherName: "",
-    username: "",
-    password: "",
+    adminName: "",
     email: "",
     phoneNumber: "",
+    username: "",
+    password: "",
+    status: "ACTIVE",
   });
 
   useEffect(() => {
@@ -52,12 +53,13 @@ export default function AddCenterTeacher() {
   const resetForm = () => {
     setFormData({
       centerCode: "",
-      teacherName: "",
-      username: "",
-      password: "",
+      adminName: "",
       email: "",
       phoneNumber: "",
-    });
+      username: "",
+      password: "",
+      status: "ACTIVE",
+    });;
   };
 
   const handleSubmit = async (e) => {
@@ -69,7 +71,7 @@ export default function AddCenterTeacher() {
       setIsSubmitting(true);
 
       const response = await fetch(
-        `${API_BASE}/center-teacher/add-center-teacher`,
+        `${API_BASE}/center-admin/add-center-admin`,
         {
           method: "POST",
           headers: {
@@ -77,23 +79,21 @@ export default function AddCenterTeacher() {
           },
           body: JSON.stringify({
             center_code: formData.centerCode,
-            full_name: formData.teacherName,
-            username: formData.username,
-            password: formData.password,
+            admin_name: formData.adminName,
             email: formData.email,
             phone_number: formData.phoneNumber,
+            username: formData.username,
+            password: formData.password,
           }),
         }
       );
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(
-          error.detail || "Failed to create Center Teacher"
-        );
+        throw new Error(error.detail || "Failed to create Center Admin");
       }
 
-      alert("Center Teacher created successfully.");
+      alert("Center Admin created successfully.");
 
       resetForm();
     } catch (err) {
@@ -108,7 +108,7 @@ export default function AddCenterTeacher() {
     <div className="bg-white rounded-xl shadow-md p-8">
 
       <h2 className="text-3xl font-semibold mb-8">
-        Add Center Teacher
+        Add Center Admin
       </h2>
 
       <form onSubmit={handleSubmit}>
@@ -144,16 +144,47 @@ export default function AddCenterTeacher() {
 
           <div>
             <label className="block mb-2 font-medium">
-              Teacher Name
+              Admin Name
             </label>
 
             <input
               type="text"
-              name="teacherName"
-              value={formData.teacherName}
+              name="adminName"
+              value={formData.adminName}
               onChange={handleChange}
               className="w-full border rounded-lg px-4 py-3"
               required
+            />
+          </div>
+
+          
+
+          <div>
+            <label className="block mb-2 font-medium">
+              Email
+            </label>
+
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full border rounded-lg px-4 py-3"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block mb-2 font-medium">
+              Phone Number
+            </label>
+
+            <input
+              type="text"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              className="w-full border rounded-lg px-4 py-3"
             />
           </div>
 
@@ -189,31 +220,23 @@ export default function AddCenterTeacher() {
 
           <div>
             <label className="block mb-2 font-medium">
-              Email
+              Status
             </label>
 
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
+            <select
+              name="status"
+              value={formData.status}
               onChange={handleChange}
               className="w-full border rounded-lg px-4 py-3"
-              required
-            />
-          </div>
+            >
+              <option value="ACTIVE">
+                ACTIVE
+              </option>
 
-          <div>
-            <label className="block mb-2 font-medium">
-              Phone Number
-            </label>
-
-            <input
-              type="text"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-3"
-            />
+              <option value="INACTIVE">
+                INACTIVE
+              </option>
+            </select>
           </div>
 
         </div>
@@ -226,8 +249,8 @@ export default function AddCenterTeacher() {
             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg disabled:opacity-50"
           >
             {isSubmitting
-              ? "Creating Center Teacher..."
-              : "Add Center Teacher"}
+              ? "Creating Center Admin..."
+              : "Add Center Admin"}
           </button>
 
           <button

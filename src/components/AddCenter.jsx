@@ -1,42 +1,45 @@
-// AddCenterTeacher.jsx
+// AddCenter.jsx
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
 const API_BASE = process.env.REACT_APP_API_URL;
 
-export default function AddCenterTeacher() {
+export default function AddCenter() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [centers, setCenters] = useState([]);
 
   const [formData, setFormData] = useState({
     centerCode: "",
-    teacherName: "",
-    username: "",
-    password: "",
-    email: "",
+    centerName: "",
     phoneNumber: "",
+    email: "",
+    address: "",
+    status: "ACTIVE",
+    timeZone: "Australia/Sydney",
   });
 
   useEffect(() => {
-    loadCenters();
+    fetchNextCenterCode();
   }, []);
 
-  const loadCenters = async () => {
+  const fetchNextCenterCode = async () => {
     try {
       const response = await fetch(
-        `${API_BASE}/centers/get-all-centers`
+        `${API_BASE}/centers/get-next-center-code`
       );
 
       if (!response.ok) {
-        throw new Error("Failed to load centers");
+        throw new Error("Failed to load next center code");
       }
 
       const data = await response.json();
 
-      setCenters(data.centers);
+      setFormData((prev) => ({
+      ...prev,
+      centerCode: data.center_code,
+    }));
     } catch (err) {
       console.error(err);
-      alert("Unable to load centers.");
+      alert("Unable to fetch next center code.");
     }
   };
 
@@ -49,15 +52,18 @@ export default function AddCenterTeacher() {
     }));
   };
 
-  const resetForm = () => {
+  const resetForm = async () => {
     setFormData({
       centerCode: "",
-      teacherName: "",
-      username: "",
-      password: "",
-      email: "",
+      centerName: "",
       phoneNumber: "",
+      email: "",
+      address: "",
+      status: "ACTIVE",
+      timeZone: "Australia/Sydney",
     });
+
+    await fetchNextCenterCode();
   };
 
   const handleSubmit = async (e) => {
@@ -69,7 +75,7 @@ export default function AddCenterTeacher() {
       setIsSubmitting(true);
 
       const response = await fetch(
-        `${API_BASE}/center-teacher/add-center-teacher`,
+        `${API_BASE}/centers/add-center`,
         {
           method: "POST",
           headers: {
@@ -77,28 +83,26 @@ export default function AddCenterTeacher() {
           },
           body: JSON.stringify({
             center_code: formData.centerCode,
-            full_name: formData.teacherName,
-            username: formData.username,
-            password: formData.password,
-            email: formData.email,
+            center_name: formData.centerName,
             phone_number: formData.phoneNumber,
+            email: formData.email,
+            address: formData.address,
+            time_zone: formData.timeZone,
+            status: formData.status,
           }),
         }
       );
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(
-          error.detail || "Failed to create Center Teacher"
-        );
+        throw new Error("Failed to add center");
       }
 
-      alert("Center Teacher created successfully.");
+      alert("Center added successfully.");
 
-      resetForm();
+      await resetForm();
     } catch (err) {
       console.error(err);
-      alert(err.message);
+      alert("Unable to add center.");
     } finally {
       setIsSubmitting(false);
     }
@@ -108,7 +112,7 @@ export default function AddCenterTeacher() {
     <div className="bg-white rounded-xl shadow-md p-8">
 
       <h2 className="text-3xl font-semibold mb-8">
-        Add Center Teacher
+        Add Center
       </h2>
 
       <form onSubmit={handleSubmit}>
@@ -117,85 +121,27 @@ export default function AddCenterTeacher() {
 
           <div>
             <label className="block mb-2 font-medium">
-              Center
+              Center Code
             </label>
 
-            <select
+            <input
+              type="text"
               name="centerCode"
               value={formData.centerCode}
-              onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-3"
-              required
-            >
-              <option value="">
-                Select Center
-              </option>
-
-              {centers.map((center) => (
-                <option
-                  key={center.center_code}
-                  value={center.center_code}
-                >
-                  {center.center_code} - {center.center_name}
-                </option>
-              ))}
-            </select>
+              readOnly
+              className="w-full border rounded-lg px-4 py-3 bg-gray-100"
+            />
           </div>
 
           <div>
             <label className="block mb-2 font-medium">
-              Teacher Name
+              Center Name
             </label>
 
             <input
               type="text"
-              name="teacherName"
-              value={formData.teacherName}
-              onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-3"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 font-medium">
-              Username
-            </label>
-
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-3"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 font-medium">
-              Password
-            </label>
-
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-3"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 font-medium">
-              Email
-            </label>
-
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
+              name="centerName"
+              value={formData.centerName}
               onChange={handleChange}
               className="w-full border rounded-lg px-4 py-3"
               required
@@ -216,6 +162,94 @@ export default function AddCenterTeacher() {
             />
           </div>
 
+          <div>
+            <label className="block mb-2 font-medium">
+              Email
+            </label>
+
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full border rounded-lg px-4 py-3"
+            />
+          </div>
+
+        </div>
+
+        <div className="mt-6">
+
+          <label className="block mb-2 font-medium">
+            Address
+          </label>
+
+          <textarea
+            rows={4}
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+            className="w-full border rounded-lg px-4 py-3"
+          />
+
+        </div>
+
+        <div className="grid grid-cols-2 gap-6 mt-6">
+
+          <div>
+
+            <label className="block mb-2 font-medium">
+              Status
+            </label>
+
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full border rounded-lg px-4 py-3"
+            >
+              <option value="ACTIVE">ACTIVE</option>
+              <option value="INACTIVE">INACTIVE</option>
+            </select>
+
+          </div>
+
+          <div>
+
+            <label className="block mb-2 font-medium">
+              Time Zone
+            </label>
+
+            <select
+              name="timeZone"
+              value={formData.timeZone}
+              onChange={handleChange}
+              className="w-full border rounded-lg px-4 py-3"
+            >
+              <option value="Australia/Sydney">
+                Australia/Sydney
+              </option>
+
+              <option value="Australia/Melbourne">
+                Australia/Melbourne
+              </option>
+
+              <option value="Australia/Brisbane">
+                Australia/Brisbane
+              </option>
+
+              <option value="Australia/Perth">
+                Australia/Perth
+              </option>
+
+              <option value="UTC">
+                UTC
+              </option>
+
+            </select>
+
+          </div>
+
         </div>
 
         <div className="flex gap-4 mt-8">
@@ -225,9 +259,7 @@ export default function AddCenterTeacher() {
             disabled={isSubmitting}
             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg disabled:opacity-50"
           >
-            {isSubmitting
-              ? "Creating Center Teacher..."
-              : "Add Center Teacher"}
+            {isSubmitting ? "Adding Center..." : "Add Center"}
           </button>
 
           <button

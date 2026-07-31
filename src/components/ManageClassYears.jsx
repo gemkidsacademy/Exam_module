@@ -168,7 +168,13 @@ const handleSave = async () => {
 
           
 
-          <button onClick={handleSave}>
+          <button
+            onClick={handleSave}
+            disabled={
+              !form.class_name ||
+              !form.year_name.trim()
+            }
+          >
             {editingId ? "Update" : "Add"}
           </button>
 
