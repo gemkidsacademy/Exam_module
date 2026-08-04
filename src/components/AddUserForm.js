@@ -12,10 +12,10 @@ export default function AddStudentForm() {
   const [parentEmail, setParentEmail] = useState("");
   const [classOptions, setClassOptions] = useState([]);
   const [studentYearOptions, setStudentYearOptions] = useState([]);
-  const fetchClassYears = async () => {
+  const fetchClassYears = async (selectedClassName) => {
   try {
     const response = await fetch(
-      `${BACKEND_URL}/class-years-exam-module?center_code=${centerCode}`
+      `${BACKEND_URL}/class-years-exam-module?center_code=${centerCode}&class_name=${encodeURIComponent(selectedClassName)}`
     );
 
     if (!response.ok) {
@@ -60,7 +60,9 @@ const GENDER_OPTIONS = [
   "Female",
   "Other",
 ];
-useEffect(() => {
+
+
+  useEffect(() => {
   const fetchClasses = async () => {
     try {
       const response = await fetch(
@@ -72,7 +74,6 @@ useEffect(() => {
       }
 
       const data = await response.json();
-
       setClassOptions(data);
     } catch (err) {
       console.error("Error fetching classes:", err);
@@ -82,7 +83,6 @@ useEffect(() => {
 
   if (centerCode) {
     fetchClasses();
-    fetchClassYears();
   }
 }, [centerCode]);
 
@@ -210,7 +210,12 @@ useEffect(() => {
         <label>Class Name</label>
           <select
             value={className}
-            onChange={(e) => setClassName(e.target.value)}
+            onChange={(e) => {
+              const selectedClass = e.target.value;
+              setClassName(selectedClass);
+              setStudentYear(""); // reset previous selection
+              fetchClassYears(selectedClass);
+            }}
             required
           >
             <option value="">

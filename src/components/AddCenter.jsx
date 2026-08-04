@@ -1,11 +1,18 @@
 // AddCenter.jsx
 
 import { useState, useEffect } from "react";
+import TimezoneSelect from "react-timezone-select";
 
 const API_BASE = process.env.REACT_APP_API_URL;
 
 export default function AddCenter() {
+
+  const [timeZones, setTimeZones] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedTimezone, setSelectedTimezone] = useState({
+    value: "Australia/Sydney",
+    label: "(GMT+10:00) Australia/Sydney",
+  });
 
   const [formData, setFormData] = useState({
     centerCode: "",
@@ -16,6 +23,9 @@ export default function AddCenter() {
     status: "ACTIVE",
     timeZone: "Australia/Sydney",
   });
+  useEffect(() => {
+    setTimeZones(Intl.supportedValuesOf("timeZone"));
+  }, []);
 
   useEffect(() => {
     fetchNextCenterCode();
@@ -215,39 +225,23 @@ export default function AddCenter() {
           </div>
 
           <div>
-
             <label className="block mb-2 font-medium">
               Time Zone
             </label>
 
-            <select
-              name="timeZone"
-              value={formData.timeZone}
-              onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-3"
-            >
-              <option value="Australia/Sydney">
-                Australia/Sydney
-              </option>
+            <TimezoneSelect
+              value={selectedTimezone}
+              onChange={(tz) => {
+                setSelectedTimezone(tz);
 
-              <option value="Australia/Melbourne">
-                Australia/Melbourne
-              </option>
-
-              <option value="Australia/Brisbane">
-                Australia/Brisbane
-              </option>
-
-              <option value="Australia/Perth">
-                Australia/Perth
-              </option>
-
-              <option value="UTC">
-                UTC
-              </option>
-
-            </select>
-
+                setFormData((prev) => ({
+                  ...prev,
+                  timeZone: tz.value,
+                }));
+              }}
+              displayValue="GMT"
+              labelStyle="original"
+            />
           </div>
 
         </div>

@@ -34,21 +34,33 @@ export default function CenterManagement() {
 
         <button
           onClick={() => handleModuleSelect("center")}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg"
+          className={`px-6 py-3 rounded-lg text-white font-medium transition-all duration-200 ${
+            selectedModule === "center"
+              ? "bg-purple-600 shadow-lg ring-2 ring-purple-300 scale-105"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
         >
           Manage Center
         </button>
 
         <button
           onClick={() => handleModuleSelect("admin")}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg"
+          className={`px-6 py-3 rounded-lg text-white font-medium transition-all duration-200 ${
+            selectedModule === "admin"
+              ? "bg-purple-600 shadow-lg ring-2 ring-purple-300 scale-105"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
         >
           Manage Center Admin
         </button>
 
         <button
           onClick={() => handleModuleSelect("teacher")}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg"
+          className={`px-6 py-3 rounded-lg text-white font-medium transition-all duration-200 ${
+            selectedModule === "teacher"
+              ? "bg-purple-600 shadow-lg ring-2 ring-purple-300 scale-105"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
         >
           Manage Center Teacher
         </button>
@@ -61,27 +73,44 @@ export default function CenterManagement() {
 
           <button
             onClick={() => setSelectedOperation("add")}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg"
+            className={`px-6 py-3 rounded-lg text-white font-medium transition-all duration-200 ${
+              selectedOperation === "add"
+                ? "bg-purple-600 shadow-lg ring-2 ring-purple-300 scale-105"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
             Add
           </button>
-           <button
+
+          <button
             onClick={() => setSelectedOperation("view")}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg"
+            className={`px-6 py-3 rounded-lg text-white font-medium transition-all duration-200 ${
+              selectedOperation === "view"
+                ? "bg-purple-600 shadow-lg ring-2 ring-purple-300 scale-105"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
             View
           </button>
 
           <button
             onClick={() => setSelectedOperation("edit")}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg"
+            className={`px-6 py-3 rounded-lg text-white font-medium transition-all duration-200 ${
+              selectedOperation === "edit"
+                ? "bg-purple-600 shadow-lg ring-2 ring-purple-300 scale-105"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
             Edit
           </button>
 
           <button
             onClick={() => setSelectedOperation("delete")}
-            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg"
+            className={`px-6 py-3 rounded-lg text-white font-medium transition-all duration-200 ${
+              selectedOperation === "delete"
+                ? "bg-purple-600 shadow-lg ring-2 ring-purple-300 scale-105"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
             Delete
           </button>
