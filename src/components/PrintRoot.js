@@ -580,7 +580,7 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
 
         {schools.length > 3 && (
           <>
-            <p><strong>With Further Improvement:</strong></p>
+            
 
             <ul className="pdf-list">
               {schools.slice(3).map((item, index) => (
