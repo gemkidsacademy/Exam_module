@@ -400,11 +400,15 @@ useEffect(() => {
     prevIndexRef.current = currentIndex;
   }, [currentIndex, activeQuestions, answers]);
   
-  useEffect(() => {
-    if (questions.length > 0) {
-      console.log("🧠 SAMPLE QUESTION OBJECT:", questions[0]);
-    }
-  }, [questions]);
+ useEffect(() => {
+  if (questions.length > 0) {
+    console.log("========== QUESTION DEBUG ==========");
+    console.log("ALL QUESTIONS:", questions);
+    console.log("FIRST QUESTION:", questions[0]);
+    console.log("FIRST QUESTION BLOCKS:", questions[0]?.blocks);
+    console.log("====================================");
+  }
+}, [questions]);
 
 
   /* ============================================================
@@ -596,7 +600,8 @@ const reviewLoader = isReview && (
 );
 
 const currentQ = activeQuestions[currentIndex];
-
+console.log("🔍 CURRENT QUESTION:", currentQ);
+console.log("🔍 CURRENT QUESTION BLOCKS:", currentQ?.blocks);
 if (!currentQ) {
   return (
     <div className="exam-shell">

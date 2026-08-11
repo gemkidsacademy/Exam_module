@@ -304,7 +304,7 @@ const tabs = allTabs.filter((tab) => {
       "leaderboard",
       "topic-report-limited-2",
       "selective-readiness-overall",
-      "exam-cleaner",
+      
       "oc-readiness-overall",
     ].includes(tab.id);
 

@@ -1142,8 +1142,6 @@ return (
       <h3>Finish Exam?</h3>
       <p>
         Are you sure you want to submit your exam?
-        <br />
-        You won’t be able to change your answers after this.
       </p>
 
       <div className="confirm-actions">
@@ -1161,7 +1159,7 @@ return (
             finishExam("manual_submit");
           }}
         >
-          Yes, Submit Exam
+          Submit Exam
         </button>
       </div>
     </div>

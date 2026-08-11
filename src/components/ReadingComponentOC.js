@@ -303,6 +303,8 @@ useEffect(() => {
     }
 
     const data = await res.json();
+    console.log("🔍 OC READING REPORT FROM BACKEND:");
+    console.log(JSON.stringify(data, null, 2));
     setReport(data);
 
   } catch (err) {
