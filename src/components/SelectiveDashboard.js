@@ -125,6 +125,7 @@ useEffect(() => {
 
   return (
     <div className="selective-dashboard">
+      
     {/* 0️⃣ MODE SELECTION */}
 {examPhase === "mode_selection" && (
   <div className="subject-selection-wrapper">
@@ -136,8 +137,17 @@ useEffect(() => {
     />
 
     <div className="subject-selection-card">
-      
-      <h1 className="dashboard-title">
+      <button
+        className="logout-button"
+        onClick={handleLogout}
+      >
+        Logout
+      </button>
+
+      <h1
+        className="dashboard-title"
+        style={{ marginTop: "45px" }}
+      >
         Selective High School Practice Test
       </h1>
       <div className="title-divider" />

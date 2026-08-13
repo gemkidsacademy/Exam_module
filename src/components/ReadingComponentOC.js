@@ -856,9 +856,9 @@ useEffect(() => {
           <div className="overall-content">
             <div
               className="accuracy-circle"
-              style={{ "--p": normalizedReport.accuracy }}
+              style={{ "--p": normalizedReport.score }}
             >
-              <span>{normalizedReport.accuracy}%</span>
+              <span>{normalizedReport.score}%</span>
             </div>
 
             <div className="overall-stats">

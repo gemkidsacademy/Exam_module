@@ -14,11 +14,47 @@ body,
 ============================================================ */
 
 .selective-dashboard {
+  position: relative;
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
   background: #eef1f4;
+}
+.oc-dashboard-title {
+  position: relative;
+  left: -35px;
+  margin-top: 45px;
+}
+
+/* ============================================================
+   LOGOUT BUTTON
+   TOP-RIGHT CORNER
+============================================================ */
+
+.logout-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 10;
+
+  width: 85px;
+  padding: 8px 10px;
+
+  border: none;
+  border-radius: 6px;
+
+  background: #dc3545;
+  color: #ffffff;
+
+  font-weight: 600;
+  font-size: 13px;
+
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background: #b02a37;
 }
 
 /* ============================================================
@@ -40,6 +76,7 @@ body,
 }
 
 .subject-selection-card {
+  position: relative;
   background: #ffffff;
   padding: 36px 40px 32px;
   width: 420px;
@@ -57,7 +94,7 @@ body,
   font-size: 28px;
   font-weight: 700;
   color: #0b3c6d;
-  margin-bottom: 16px;
+  margin-bottom: 36px;   /* increased from 16px */
 }
 
 .title-divider {
@@ -91,6 +128,13 @@ body,
 
 .subject-button:hover {
   background: #001f4f;
+}
+
+.subject-button:disabled {
+  background-color: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 /* ============================================================
@@ -130,22 +174,25 @@ body,
   width: 100%;
   box-sizing: border-box;
 
-  overflow-y: auto;   /* allow vertical scrolling */
+  overflow-y: auto;
   padding: 0;
 }
+
 /* Intermediate wrapper must also allow shrinking */
 .exam-root {
   flex: 1;
   display: flex;
   flex-direction: column;
 
-  min-height: 0;          /* 🔑 CRITICAL */
+  min-height: 0;
   width: 100%;
   box-sizing: border-box;
 }
 
+/* ============================================================
+   WIDTH SAFETY
+============================================================ */
 
-/* Safety: prevent width clamping */
 .content-area,
 .exam-root,
 .exam-shell,
@@ -155,7 +202,7 @@ body,
 }
 
 /* ============================================================
-   MISC UI
+   DASHBOARD LOGO
 ============================================================ */
 
 .dashboard-logo {
@@ -163,59 +210,39 @@ body,
   margin-bottom: 24px;
 }
 
+/* ============================================================
+   EXAM HEADER
+============================================================ */
+
 /* Header should never clip horizontally */
 .exam-header {
   width: 100%;
   max-width: 100%;
   overflow-x: visible;
 }
-.subject-button:disabled {
-  background-color: #cccccc;
-  color: #666666;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
+
+/* ============================================================
+   BACK LINK
+============================================================ */
+
 .back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 
-    color: #0d8ecf;
-    font-size: 15px;
-    font-weight: 600;
+  color: #0d8ecf;
+  font-size: 15px;
+  font-weight: 600;
 
-    cursor: pointer;
-    user-select: none;
+  cursor: pointer;
+  user-select: none;
 
-    transition: all 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .back-link:hover {
-    color: #086ca6;
-    text-decoration: underline;
-}
-.logout-button {
-  grid-column: 1 / -1;
-  justify-self: end;
-
-  width: 85px;
-  padding: 7px 10px;
-  margin-top: 4px;
-
-  border: none;
-  border-radius: 6px;
-
-  background: #dc3545;
-  color: white;
-
-  font-weight: 600;
-  font-size: 13px;
-
-  cursor: pointer;
-}
-
-.logout-button:hover {
-  background: #b02a37;
+  color: #086ca6;
+  text-decoration: underline;
 }

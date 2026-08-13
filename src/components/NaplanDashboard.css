@@ -51,6 +51,8 @@
    SELECTION CARD
 =============================== */
 .subject-selection-card {
+  position: relative;
+
   background: #ffffff;
   padding: 40px 50px;
   border-radius: 10px;
@@ -68,6 +70,9 @@
   font-weight: 600;
   margin-bottom: 10px;
   color: #1f2937;
+}
+.naplan-dashboard-title {
+  margin-top: 45px;
 }
 
 .title-divider {
@@ -160,12 +165,13 @@
   width: 100%;
 }
 .logout-button {
-  grid-column: 1 / -1;
-  justify-self: end;
+  position: absolute;
+  top: 20px;
+  right: 15px;
+  z-index: 10;
 
   width: 85px;
-  padding: 7px 10px;
-  margin-top: 4px;
+  padding: 8px 10px;
 
   border: none;
   border-radius: 6px;

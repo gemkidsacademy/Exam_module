@@ -129,7 +129,7 @@ useEffect(() => {
         />
 
         <div className="subject-selection-card">
-          <h1 className="dashboard-title">
+          <h1 className="dashboard-title oc-dashboard-title">
             OC Placement Practice Test
           </h1>
 
@@ -189,14 +189,19 @@ useEffect(() => {
     />
 
     <div className="subject-selection-card">
-      <div
-        className="back-link"
-        onClick={() => setExamPhase("mode_selection")}
+
+      <button
+        className="logout-button"
+        onClick={handleLogout}
       >
-        ← Back
-      </div>
-      <h1 className="dashboard-title">
-        Select Report Type
+        Logout
+      </button>
+
+      <h1 
+        className="dashboard-title oc-dashboard-title"
+        style={{ marginTop: "45px" }}
+      >
+        OC Placement Practice Test
       </h1>
 
       <div className="title-divider" />
@@ -206,17 +211,30 @@ useEffect(() => {
         <button
           className="subject-button"
           onClick={() => {
-            setExamMode("report_actual");
+            setExamMode("exam");
+            setSubjectAvailability({});
             setExamPhase("selection");
           }}
         >
-          Actual exams
+          Active exams
         </button>
 
         <button
           className="subject-button"
           onClick={() => {
-            setExamMode("report_homework");
+            setExamMode("report");
+            setSubjectAvailability({});
+            setExamPhase("report_mode_selection");
+          }}
+        >
+          Historical reports
+        </button>
+
+        <button
+          className="subject-button"
+          onClick={() => {
+            setExamMode("homework");
+            setSubjectAvailability({});
             setExamPhase("selection");
           }}
         >

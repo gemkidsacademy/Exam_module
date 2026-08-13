@@ -129,9 +129,18 @@ const NaplanDashboard = () => {
         />
 
         <div className="subject-selection-card">
-          <h1 className="dashboard-title">
+
+          <button
+            className="logout-button"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+
+          <h1 className="dashboard-title naplan-dashboard-title">
             NAPLAN Practice Test
           </h1>
+
           <div className="title-divider" />
 
           <div className="subject-buttons">
@@ -146,7 +155,6 @@ const NaplanDashboard = () => {
               Active exams
             </button>
 
-
             <button
               className="subject-button"
               onClick={() => {
@@ -156,6 +164,7 @@ const NaplanDashboard = () => {
             >
               Historical reports
             </button>
+
             <button
               className="subject-button"
               onClick={() => {
@@ -164,12 +173,6 @@ const NaplanDashboard = () => {
               }}
             >
               Homework Exams
-            </button>
-            <button
-              className="logout-button"
-              onClick={handleLogout}
-            >
-              Logout
             </button>
 
           </div>
