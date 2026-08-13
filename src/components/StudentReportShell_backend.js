@@ -22,6 +22,9 @@
     const [availableClassDates, setAvailableClassDates] = useState([]);
     const [examOptions, setExamOptions] = useState([]);
     const [loadingExams, setLoadingExams] = useState(false);
+    const [cumulativeOptions, setCumulativeOptions] = useState([]);
+    const [loadingCumulativeOptions, setLoadingCumulativeOptions] = useState(false);
+    const [cumulativeOptionsError, setCumulativeOptionsError] = useState(null);
     const API_BASE = process.env.REACT_APP_API_URL;
     
 
@@ -537,51 +540,102 @@ useEffect(() => {
     
     
     useEffect(() => {
-      console.log("🟦 TOPICS EFFECT CHECK", {
-        reportType,
-        exam
-      });
-    
-      // Only relevant for cumulative reports
-      if (reportType !== "cumulative") {
-        console.log("⛔ Skipping topics fetch (not cumulative)");
-        return;
+  if (
+    reportType !== "cumulative" &&
+    reportType !== "topic"
+  ) {
+    setCumulativeOptions([]);
+    return;
+  }
+
+  if (!studentId) {
+    setCumulativeOptions([]);
+    return;
+  }
+
+  console.log(
+    "📋 Fetching cumulative options for:",
+    studentId
+  );
+
+  setLoadingCumulativeOptions(true);
+  setCumulativeOptionsError(null);
+
+  fetch(
+    `${API_BASE}/api/reports/student/cumulative/options?student_id=${encodeURIComponent(
+      studentId
+    )}`
+  )
+    .then(async (res) => {
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(
+          data.detail ||
+          "Failed to load cumulative report options"
+        );
       }
-    
-      if (!exam) {
-        console.log("⛔ Skipping topics fetch (no exam)");
-        setAvailableTopics([]);
-        return;
-      }
-    
-      console.log("📘 FETCHING TOPICS FOR EXAM:", exam);
-    
-      setLoadingTopics(true);
-      setTopicsError(null);
-    
-      fetch(
-        `${API_BASE}/api/exams/${exam}/topics`
-      )
-        .then(res => {
-          if (!res.ok) {
-            throw new Error("Failed to load topics");
-          }
-          return res.json();
-        })
-        .then(data => {
-          console.log("✅ TOPICS RECEIVED", data.topics);
-          setAvailableTopics(data.topics || []);
-          // ⚠️ DO NOT reset topic here
-        })
-        .catch(err => {
-          console.error("❌ Topics load error:", err);
-          setAvailableTopics([]);
-          setTopicsError(err.message);
-        })
-        .finally(() => {
-          setLoadingTopics(false);
-        });
-    }, [exam, reportType]);
+
+      return data;
+    })
+    .then((data) => {
+      console.log(
+        "✅ CUMULATIVE OPTIONS RECEIVED:",
+        JSON.stringify(data, null, 2)
+      );
+
+      setCumulativeOptions(data.exams || []);
+    })
+    .catch((err) => {
+      console.error(
+        "❌ Cumulative options error:",
+        err
+      );
+
+      setCumulativeOptions([]);
+      setCumulativeOptionsError(
+        err.message
+      );
+    })
+    .finally(() => {
+      setLoadingCumulativeOptions(false);
+    });
+
+}, [studentId, reportType]);
+
+
+const selectedCumulativeExam = cumulativeOptions.find(
+  item => item.key === exam
+);
+
+
+// ------------------------------------
+// OLD CUMULATIVE PROGRESS
+// Exam → Topic → Dates
+// ------------------------------------
+
+const cumulativeTopics =
+  (selectedCumulativeExam?.topics || []).filter(
+    item => (item.attempt_dates || []).length >= 2
+  );
+
+const selectedCumulativeTopic = cumulativeTopics.find(
+  item => item.key === topic
+);
+
+const cumulativeTopicAttemptDates =
+  selectedCumulativeTopic?.attempt_dates || [];
+
+
+// ------------------------------------
+// NEW CUMULATIVE PROGRESS
+// Exam → Dates
+// ------------------------------------
+
+const datesForCurrentReport =
+  reportType === "cumulative"
+    ? cumulativeTopicAttemptDates
+    : availableAttemptDates;
 
   
     useEffect(() => {
@@ -755,19 +809,25 @@ useEffect(() => {
           {(reportType === "cumulative" || reportType === "topic") && (
             <div className="attempt-group">
               <div className="attempt-selector">
+
                 <select
                   value={pendingAttemptDate}
-                  disabled={!studentId}
+                  disabled={datesForCurrentReport.length === 0}
                   onChange={e => setPendingAttemptDate(e.target.value)}
                 >
-                  <option value="">Select attempt date</option>
-                  {availableAttemptDates.map(date => (
+                  <option value="">
+                    {datesForCurrentReport.length === 0
+                      ? "No attempts available"
+                      : "Select attempt date"}
+                  </option>
+
+                  {datesForCurrentReport.map(date => (
                     <option key={date} value={date}>
                       {new Date(date).toLocaleDateString()}
                     </option>
                   ))}
                 </select>
-  
+
                 <button
                   type="button"
                   disabled={!pendingAttemptDate}
@@ -778,11 +838,13 @@ useEffect(() => {
                         pendingAttemptDate
                       ]);
                     }
+
                     setPendingAttemptDate("");
                   }}
                 >
                   Add
                 </button>
+
               </div>
   
               {selectedAttemptDates.length > 0 && (
@@ -872,12 +934,19 @@ useEffect(() => {
           <label>Exam</label>
             <select
               value={exam}
-              onChange={e => {
-                const selectedExam = e.target.value;   // ✅ define it first
+               onChange={e => {
+                const selectedExam = e.target.value;
 
                 console.log("Selected exam:", selectedExam);
-                
-                setExam(e.target.value);
+
+                setExam(selectedExam);
+
+                // Clear cumulative selections
+                setTopic("");
+                setPendingAttemptDate("");
+                setSelectedAttemptDates([]);
+
+                // Clear normal report date
                 setDate("");
                 setDateWarning("");
               }}
@@ -891,11 +960,18 @@ useEffect(() => {
                 {loadingExams ? "Loading exams..." : "Select exam"}
               </option>
             
-              {examOptions.map(e => (
-                <option key={e.key} value={e.key}>
-                  {e.label}
-                </option>
-              ))}
+              {(reportType === "cumulative" || reportType === "topic")
+                ? cumulativeOptions.map(e => (
+                    <option key={e.key} value={e.key}>
+                      {e.label}
+                    </option>
+                  ))
+                : examOptions.map(e => (
+                    <option key={e.key} value={e.key}>
+                      {e.label}
+                    </option>
+                  ))
+              }
             </select>
         </div>
   
@@ -943,35 +1019,45 @@ useEffect(() => {
   
       {/* Topics (cumulative only) */}
       {reportType === "cumulative" && (
-        <div className="field">
-          <label>Topics</label>
-      
-          <select
-            value={topic}
-            disabled={loadingTopics || availableTopics.length === 0}
-            onChange={e => {
-              const selected = e.target.value;
-              console.log("🟣 TOPIC SELECTED (UI):", selected);
-              setTopic(selected);
-            }}
-          >
+  <div className="field">
+    <label>Topics</label>
 
-            <option value="">
-              {loadingTopics ? "Loading topics..." : "Select topic"}
-            </option>
-      
-            {availableTopics.map(t => (
-              <option key={t.key} value={t.key}>
-                {t.label}
-              </option>
-            ))}
-          </select>
-      
-          {topicsError && (
-            <p className="error">{topicsError}</p>
-          )}
-        </div>
-      )}
+    <select
+      value={topic}
+      disabled={cumulativeTopics.length === 0}
+      onChange={e => {
+        const selected = e.target.value;
+
+        console.log(
+          "🟣 CUMULATIVE TOPIC SELECTED:",
+          selected
+        );
+
+        setTopic(selected);
+        setPendingAttemptDate("");
+        setSelectedAttemptDates([]);
+      }}
+    >
+      <option value="">
+        {cumulativeTopics.length === 0
+          ? "No topics available"
+          : "Select topic"}
+      </option>
+
+      {cumulativeTopics.map(t => (
+        <option key={t.key} value={t.key}>
+          {t.label}
+        </option>
+      ))}
+    </select>
+
+    {cumulativeOptionsError && (
+      <p className="error">
+        {cumulativeOptionsError}
+      </p>
+    )}
+  </div>
+)}
   
     </div>
   
@@ -982,6 +1068,7 @@ useEffect(() => {
           className="secondary-btn"
           disabled={
             (reportType === "student" && !studentId) ||
+
             (reportType === "class" &&
               (
                 !className ||
@@ -989,26 +1076,41 @@ useEffect(() => {
                 !exam ||
                 !date
               )) ||
+
+            // OLD CUMULATIVE
             (reportType === "cumulative" &&
-              (!studentId || selectedAttemptDates.length === 0))
+              (
+                !studentId ||
+                !exam ||
+                !topic ||
+                selectedAttemptDates.length === 0
+              ))
           }
           onClick={() => {
-      
+
+            // ------------------------------
+            // OLD CUMULATIVE
+            // ------------------------------
             if (reportType === "cumulative") {
 
-                if (!topic) {
-                  return;
-                }
-
-                setShouldGenerate(true);
+              if (!topic) {
                 return;
               }
-      
-            if (reportType === "student" && !date) {
-              setDateWarning("Please select a date before generating the report.");
+
+              setShouldGenerate(true);
               return;
             }
-      
+
+            // ------------------------------
+            // NORMAL STUDENT REPORT
+            // ------------------------------
+            if (reportType === "student" && !date) {
+              setDateWarning(
+                "Please select a date before generating the report."
+              );
+              return;
+            }
+
             setDateWarning("");
             setShouldGenerate(true);
           }}

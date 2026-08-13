@@ -63,7 +63,9 @@ const SelectiveDashboard = () => {
   const studentId = sessionStorage.getItem("student_id");
   
   const ActiveComponent = activeSubject?.component;
-
+  const handleLogout = () => {
+    window.location.reload();
+  };
   const handleSubjectSelect = (subject) => {
   if (examInProgress) {
     alert("Please submit your current exam before switching subjects.");
@@ -172,6 +174,12 @@ useEffect(() => {
           }}
         >
           Homework
+        </button>
+        <button
+          className="logout-button"
+          onClick={handleLogout}
+        >
+          Logout
         </button>
 
       </div>

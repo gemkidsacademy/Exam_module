@@ -60,10 +60,14 @@ const NaplanDashboard = () => {
 };
   const [isLoadingAvailability, setIsLoadingAvailability] = useState(true);
   const [examMode, setExamMode] = useState(null); // 🔥 NEW
+  
   // phases: selection → welcome → instructions → exam
 
   const studentId = sessionStorage.getItem("student_id");
   const ActiveComponent = activeSubject?.component;
+  const handleLogout = () => {
+    window.location.reload();
+  };
   
   useEffect(() => {
   if (examPhase !== "selection") return;
@@ -71,6 +75,7 @@ const NaplanDashboard = () => {
 
   setSubjectAvailability({}); // reset stale data
 
+  
   const fetchAvailabilityNaplan = async () => {
   try {
     setIsLoadingAvailability(true);
@@ -159,6 +164,12 @@ const NaplanDashboard = () => {
               }}
             >
               Homework Exams
+            </button>
+            <button
+              className="logout-button"
+              onClick={handleLogout}
+            >
+              Logout
             </button>
 
           </div>

@@ -1,254 +1,715 @@
-/* ===============================
-   WRAPPER
-================================ */
+/* =========================================================
+   MAIN REPORT
+========================================================= */
 
 .class-report {
+  width: 100%;
+  box-sizing: border-box;
+  color: #172033;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* =========================================================
+   SUMMARY CARDS
+========================================================= */
+
+.report-summary-card {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  width: 100%;
+
   background: #ffffff;
-  border-radius: 10px;
-  padding: 20px 24px;
-  margin-top: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-/* ===============================
-   HEADER
-================================ */
-
-.report-header {
-  margin-bottom: 20px;
-}
-
-.report-header h2 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: #111827;
-}
-
-.report-subtitle {
-  margin-top: 4px;
-  font-size: 14px;
-  color: #6b7280;
-}
-
-/* ===============================
-   SUMMARY
-================================ */
-
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 16px;
-  margin-bottom: 28px;
-}
-
-.summary-card {
-  background: #f9fafb;
+  border: 1px solid #edf0f5;
   border-radius: 8px;
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
 
-.summary-card .label {
-  font-size: 12px;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
+  margin-bottom: 16px;
 
-.summary-card .value {
-  font-size: 22px;
-  font-weight: 600;
-  color: #111827;
-}
-
-/* ===============================
-   SCORE DISTRIBUTION
-================================ */
-
-.score-distribution {
-  margin-bottom: 30px;
-}
-
-.score-distribution h3 {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: #111827;
-}
-
-.distribution-bars {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.distribution-row {
-  display: grid;
-  grid-template-columns: 60px 1fr 30px;
-  align-items: center;
-  gap: 10px;
-}
-
-.distribution-row .range {
-  font-size: 13px;
-  color: #374151;
-}
-
-.distribution-row .bar {
-  background: #e5e7eb;
-  height: 10px;
-  border-radius: 999px;
   overflow: hidden;
 }
 
-.distribution-row .fill {
-  height: 100%;
-  background: #3b82f6;
-  border-radius: 999px;
+
+.summary-item {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  padding: 18px;
+
+  min-height: 85px;
+
+  border-right: 1px solid #edf0f5;
 }
 
-.distribution-row .count {
-  font-size: 13px;
-  text-align: right;
-  color: #374151;
+
+.summary-item:last-child {
+  border-right: none;
 }
 
-/* ===============================
-   LEADERBOARD
-================================ */
 
-.leaderboard-section h3 {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: #111827;
+.summary-icon {
+  width: 42px;
+  height: 42px;
+
+  min-width: 42px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 19px;
+
+  margin-right: 12px;
 }
 
-.leaderboard {
+
+.summary-icon.purple {
+  background: #efedff;
+}
+
+
+.summary-icon.green {
+  background: #e7f8ec;
+}
+
+
+.summary-icon.blue {
+  background: #e7f1ff;
+}
+
+
+.summary-icon.orange {
+  background: #fff1df;
+}
+
+
+.summary-content {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+
+.summary-label {
+  display: block;
+
+  font-size: 8px;
+  font-weight: 500;
+
+  color: #657083;
+
+  margin-bottom: 6px;
+
+  white-space: nowrap;
+}
+
+
+.summary-value {
+  display: block;
+
+  font-size: 22px;
+  line-height: 1;
+
+  font-weight: 700;
+
+  color: #172033;
+
+  white-space: nowrap;
+}
+
+
+.summary-subtext {
+  display: block;
+
+  font-size: 8px;
+
+  color: #697386;
+
+  margin-top: 6px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   REPORT SECTIONS
+========================================================= */
+
+.report-section {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 1px solid #edf0f5;
+  border-radius: 8px;
+
+  padding: 16px;
+
+  margin-bottom: 16px;
 }
 
-.leaderboard th {
-  text-align: left;
-  padding: 10px 12px;
-  background: #f3f4f6;
+
+.section-heading {
+  margin-bottom: 16px;
+}
+
+
+.section-heading h3 {
+  margin: 0;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  color: #172033;
+}
+
+
+.section-heading p {
+  margin: 7px 0 0;
+
+  font-size: 9px;
+
+  color: #687386;
+}
+
+
+/* =========================================================
+   SCORE DISTRIBUTION
+========================================================= */
+
+.distribution-table {
+  width: 100%;
+}
+
+
+.distribution-header {
+  display: grid;
+
+  grid-template-columns:
+    1.5fr
+    0.9fr
+    1fr
+    0.7fr
+    1.4fr;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 0 6px 9px;
+
+  border-bottom: 1px solid #e9edf3;
+
+  font-size: 7px;
   font-weight: 600;
-  color: #374151;
+
+  color: #697386;
 }
 
-.leaderboard td {
-  padding: 10px 12px;
-  border-bottom: 1px solid #e5e7eb;
-  color: #111827;
+
+.distribution-row {
+  display: grid;
+
+  grid-template-columns:
+    1.5fr
+    0.9fr
+    1fr
+    0.7fr
+    1.4fr;
+
+  align-items: center;
+
+  gap: 10px;
+
+  min-height: 42px;
+
+  padding: 0 6px;
+
+  border-bottom: 1px solid #edf0f5;
+
+  font-size: 10px;
+
+  color: #172033;
 }
 
-.leaderboard tr:last-child td {
+
+.distribution-row:last-child {
   border-bottom: none;
 }
 
-/* ===============================
-   EMPTY STATES
-================================ */
 
-.muted {
-  font-size: 14px;
-  color: #6b7280;
-  font-style: italic;
+.performance-name {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
 }
 
-/* ===============================
-   PRINT / PDF FRIENDLY
-================================ */
+
+.performance-dot {
+  width: 8px;
+  height: 8px;
+
+  min-width: 8px;
+
+  border-radius: 50%;
+}
+
+
+.performance-dot.needs-support {
+  background: #ef4444;
+}
+
+
+.performance-dot.developing {
+  background: #f59e0b;
+}
+
+
+.performance-dot.good {
+  background: #22c55e;
+}
+
+
+.performance-dot.excellent {
+  background: #2563eb;
+}
+
+
+/* =========================================================
+   DISTRIBUTION BARS
+========================================================= */
+
+.distribution-bar-wrapper {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  min-width: 0;
+}
+
+
+.distribution-bar-background {
+  flex: 1;
+
+  height: 7px;
+
+  background: #e9edf1;
+
+  border-radius: 999px;
+
+  overflow: hidden;
+}
+
+
+.distribution-bar {
+  height: 100%;
+
+  border-radius: 999px;
+
+  transition: width 0.3s ease;
+}
+
+
+.distribution-bar.needs-support {
+  background: #ef4444;
+}
+
+
+.distribution-bar.developing {
+  background: #f59e0b;
+}
+
+
+.distribution-bar.good {
+  background: #22c55e;
+}
+
+
+.distribution-bar.excellent {
+  background: #2563eb;
+}
+
+
+.distribution-percentage {
+  min-width: 25px;
+
+  text-align: right;
+
+  font-size: 9px;
+
+  color: #536071;
+}
+
+
+/* =========================================================
+   DISTRIBUTION INSIGHT
+========================================================= */
+
+.distribution-insight {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-top: 12px;
+
+  padding: 9px 10px;
+
+  border-radius: 6px;
+
+  background: #eef4ff;
+
+  color: #405273;
+
+  font-size: 9px;
+
+  line-height: 1.5;
+}
+
+
+.insight-icon {
+  color: #2563eb;
+
+  font-size: 13px;
+
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   LEADERBOARD
+========================================================= */
+
+.leaderboard-wrapper {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+
+.leaderboard-table {
+  width: 100%;
+
+  border-collapse: separate;
+  border-spacing: 0;
+
+  font-size: 10px;
+
+  border-radius: 6px;
+
+  overflow: hidden;
+}
+
+
+.leaderboard-table thead th {
+  background: #f5f7fa;
+
+  padding: 9px 10px;
+
+  text-align: left;
+
+  font-size: 7px;
+  font-weight: 600;
+
+  color: #566174;
+}
+
+
+.leaderboard-table tbody td {
+  padding: 9px 10px;
+
+  border-bottom: 1px solid #edf0f5;
+
+  color: #263247;
+}
+
+
+.leaderboard-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+.leaderboard-rank-1 {
+  background: #fff7d6;
+}
+
+
+.leaderboard-rank-2 {
+  background: #f1f2f4;
+}
+
+
+.leaderboard-rank-3 {
+  background: #ffe9a8;
+}
+
+
+.rank-display {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+}
+
+
+/* =========================================================
+   PERFORMANCE BADGES
+========================================================= */
+
+.performance-badge {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 4px 8px;
+
+  border-radius: 5px;
+
+  font-size: 8px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+
+.performance-badge.needs-support {
+  background: #ffe3e3;
+  color: #dc2626;
+}
+
+
+.performance-badge.developing {
+  background: #fff0d6;
+  color: #ea8500;
+}
+
+
+.performance-badge.good {
+  background: #dcf7e4;
+  color: #159447;
+}
+
+
+.performance-badge.excellent {
+  background: #dff0ff;
+  color: #2563eb;
+}
+
+
+/* =========================================================
+   CLASS INSIGHT
+========================================================= */
+
+.class-insight-section {
+  margin-bottom: 0;
+}
+
+
+.class-insight-box {
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 14px;
+
+  border: 1px solid #cbdcff;
+
+  background: #f3f7ff;
+
+  border-radius: 6px;
+}
+
+
+.class-insight-icon {
+  width: 40px;
+  height: 40px;
+
+  min-width: 40px;
+
+  border-radius: 50%;
+
+  background: #e3ecff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #2563eb;
+
+  font-size: 18px;
+}
+
+
+.class-insight-content {
+  font-size: 9px;
+
+  color: #263247;
+
+  line-height: 1.6;
+}
+
+
+.class-insight-content p {
+  margin: 0 0 5px;
+}
+
+
+.class-insight-content p strong {
+  color: #2563eb;
+
+  font-size: 11px;
+}
+
+
+.class-insight-content ul {
+  margin: 0;
+
+  padding-left: 15px;
+}
+
+
+.class-insight-content li {
+  margin-bottom: 2px;
+}
+
+
+.insight-performance.needs-support {
+  color: #dc2626;
+}
+
+
+.insight-performance.developing {
+  color: #ea8500;
+}
+
+
+.insight-performance.good {
+  color: #159447;
+}
+
+
+.insight-performance.excellent {
+  color: #2563eb;
+}
+
+
+.insight-footer {
+  margin: 7px 0 0;
+
+  font-size: 7px;
+
+  color: #788396;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.muted {
+  color: #7a8494;
+
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   CLASS DAY
+========================================================= */
+
+.class-day-section {
+  margin-bottom: 32px;
+
+  padding-bottom: 24px;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+
+.class-day-section:last-child {
+  border-bottom: none;
+
+  margin-bottom: 0;
+
+  padding-bottom: 0;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .report-summary-card {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .summary-item:nth-child(2) {
+    border-right: none;
+  }
+
+  .summary-item:nth-child(1),
+  .summary-item:nth-child(2) {
+    border-bottom: 1px solid #edf0f5;
+  }
+
+}
+
+
+@media (max-width: 500px) {
+
+  .report-summary-card {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-item {
+    border-right: none;
+    border-bottom: 1px solid #edf0f5;
+  }
+
+  .summary-item:last-child {
+    border-bottom: none;
+  }
+
+  .distribution-table {
+    overflow-x: auto;
+  }
+
+  .distribution-header,
+  .distribution-row {
+    min-width: 650px;
+  }
+
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
 
 @media print {
+
   .class-report {
     box-shadow: none;
     padding: 0;
   }
 
-  .summary-card {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
+  .report-section,
+  .report-summary-card {
+    break-inside: avoid;
   }
 
-  .distribution-row .fill {
-    background: #111827;
-  }
-}
-/* ===============================
-   LEADERBOARD RANK HIGHLIGHTS
-================================ */
-
-.leaderboard tr.rank-1 {
-  background: #fef3c7; /* gold */
-  font-weight: 600;
-}
-
-.leaderboard tr.rank-2 {
-  background: #e5e7eb; /* silver */
-}
-
-.leaderboard tr.rank-3 {
-  background: #fde68a; /* bronze */
-}
-/* ===============================
-   SCORE DISTRIBUTION BAR CHART
-================================ */
-
-.score-distribution {
-  margin-top: 24px;
-}
-
-.score-distribution h3 {
-  margin-bottom: 12px;
-  font-size: 16px;
-}
-
-.score-row {
-  display: grid;
-  grid-template-columns: 80px 1fr 40px;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-
-.score-label {
-  font-size: 13px;
-  color: #374151;
-}
-
-.score-bar-wrapper {
-  background: #e5e7eb;
-  height: 10px;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.score-bar {
-  height: 100%;
-  background: #2563eb;
-  border-radius: 6px;
-}
-
-.score-count {
-  font-size: 13px;
-  text-align: right;
-}
-.class-day-section {
-  margin-bottom: 32px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid #e5e7eb; /* light gray divider */
-}
-
-/* Remove divider from last section */
-.class-day-section:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./SelectiveDashboard.css"; // you can reuse same CSS
 
 // EXAM COMPONENTS
@@ -39,6 +40,8 @@ const SUBJECTS = [
 ];
 
 const OCDashboard = () => {
+  const navigate = useNavigate();
+
   const [activeSubject, setActiveSubject] = useState(null);
   const [examInProgress, setExamInProgress] = useState(false);
   const [examPhase, setExamPhase] = useState("mode_selection");
@@ -56,6 +59,13 @@ const OCDashboard = () => {
     setExamPhase("mode_selection");
   };
   const ActiveComponent = activeSubject?.component;
+  const handleLogout = () => {
+  // Clear student session data
+    sessionStorage.clear();
+
+    // Return to login page
+    navigate("/");
+  };
 
   const handleSubjectSelect = (subject) => {
   if (examInProgress) {
@@ -110,6 +120,7 @@ useEffect(() => {
        {/* 0️⃣ MODE SELECTION (ADD HERE) */}
     {examPhase === "mode_selection" && (
       <div className="subject-selection-wrapper">
+        
 
         <img
           src="https://gemkidsacademy.com.au/wp-content/uploads/2024/10/cropped-logo-4-1.png"
@@ -156,6 +167,12 @@ useEffect(() => {
               }}
             >
               Homework exams
+            </button>
+            <button
+              className="logout-button"
+              onClick={() => window.location.reload()}
+            >
+              Logout
             </button>
 
           </div>

@@ -728,7 +728,7 @@ if (!currentQ) {
     )}
   </div>
 </div>
-  )}
+  
 </div>      
       {/* QUESTION INDEX */}
       {showQuestionNavigator && (

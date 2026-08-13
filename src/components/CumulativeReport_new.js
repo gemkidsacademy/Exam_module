@@ -10,38 +10,17 @@ export default function CumulativeReport_new({
 }) {
 
   const [reports, setReports] = useState([]);
-  const [showTopics, setShowTopics] = useState(false);
-  const [topicList, setTopicList] = useState([]);
+  
+
+  useEffect(() => {
+    setReports([]);
+  }, [studentId, exam, attemptDates]);
 
 
   /* ================= RESET WHEN INPUTS CHANGE ================= */
 
-  useEffect(() => {
-    setReports([]);
-    setShowTopics(false);
-  }, [studentId, exam, attemptDates]);
- useEffect(() => {
 
-  if (!exam) return;
-
-  const fetchTopics = async () => {
-  
-  const res = await fetch(`${API_BASE}/api/exams/${exam}/topics`);
-  const data = await res.json();
-  console.log("TOPICS API RESPONSE:", data);
-  const topicsArray =
-    Array.isArray(data)
-      ? data
-      : Array.isArray(data?.topics)
-      ? data.topics
-      : [];
-
-  setTopicList(topicsArray);
-};
-
-  fetchTopics();
-
-}, [exam, API_BASE]);
+ 
 
 
   /* ================= GENERATE OVERALL REPORT ================= */
@@ -61,18 +40,7 @@ export default function CumulativeReport_new({
 
   /* ================= ADD TOPIC REPORT ================= */
 
-  const handleTopicSelect = (e) => {
-
-    const topic = String(e.target.value);
-    if (!topic) return;
-
-    const exists = reports.some(r => r.topic === topic);
-    if (exists) return;
-
-    setReports(prev => [...prev, { topic }]);
-
-    e.target.value = "";
-  };
+  
 
 
 
@@ -104,19 +72,18 @@ export default function CumulativeReport_new({
         });
         console.log("DATES SENT TO BACKEND:", attemptDates);
 
-        if (topic) {
-          params.append("topic", topic);
-        }
-
         let endpoint;
 
-          if (exam === "writing") {
-            endpoint = "/api/reports/student/writing/cumulative";
-          } else {
-            endpoint = topic
-              ? "/api/reports/student/cumulative"
-              : "/api/reports/student/cumulative-overall";
-          }
+        if (exam === "writing") {
+          endpoint = "/api/reports/student/writing/cumulative";
+        } else {
+          endpoint = "/api/reports/student/cumulative-overall";
+        }
+
+
+
+
+
         try {
           console.log(
             "FETCHING:",
@@ -132,9 +99,7 @@ export default function CumulativeReport_new({
           setData(result);
 
           // Only after overall report loads do we show topic dropdown
-          if (!topic) {
-            setShowTopics(true);
-          }
+          
 
         } catch (err) {
           console.error(err);
@@ -146,7 +111,7 @@ export default function CumulativeReport_new({
 
       fetchData();
 
-    }, [topic, studentId, exam, attemptDates, API_BASE]);
+    }, [studentId, exam, attemptDates, API_BASE]);
 
 
     if (loading) {
@@ -241,36 +206,7 @@ export default function CumulativeReport_new({
 
       {/* Topic selector appears AFTER overall report loads */}
 
-      {showTopics && (
-  <div className="topic-bar">
-
-    <div className="topic-label">
-      Add Topic Report
-    </div>
-
-    <select
-      className="topic-dropdown"
-      onChange={handleTopicSelect}
-    >
-      <option value="">Choose a topic...</option>
-
-      {Array.isArray(topicList) &&
-  topicList.map((t, i) => {
-  const key = typeof t === "object" ? t.key : t;
-  const label = typeof t === "object" ? t.label : t;
-
-  return (
-    <option key={i} value={key}>
-      {label}
-    </option>
-  );
-})
-  }
-
-    </select>
-
-  </div>
-)}
+  
 
 
       {/* Reports */}
