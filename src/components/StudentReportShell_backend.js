@@ -20,8 +20,7 @@
     const [reportError, setReportError] = useState(null);
     const [selectedClassDay, setSelectedClassDay] = useState("");
     const [availableClassDates, setAvailableClassDates] = useState([]);
-    const [examOptions, setExamOptions] = useState([]);
-    const [loadingExams, setLoadingExams] = useState(false);
+    
     const [cumulativeOptions, setCumulativeOptions] = useState([]);
     const [loadingCumulativeOptions, setLoadingCumulativeOptions] = useState(false);
     const [cumulativeOptionsError, setCumulativeOptionsError] = useState(null);
@@ -79,6 +78,12 @@
   
   
     const [shouldGenerate, setShouldGenerate] = useState(false);
+
+    const [loadingExams, setLoadingExams] = useState(false);
+    const [examOptions, setExamOptions] = useState([]);
+
+  
+    
     useEffect(() => {
   // Only run for class report
   if (reportType !== "class" || !className) {
@@ -639,53 +644,201 @@ const datesForCurrentReport =
 
   
     useEffect(() => {
-      console.log("CUMULATIVE SESSION DATES EFFECT FIRED", {
-        reportType,
-        studentId,
-        exam
-      });
-    
-      if (
-        (reportType !== "cumulative" && reportType !== "topic") ||
-        !studentId ||
-        !exam
-      ) {
-        setAvailableAttemptDates([]);
-        return;
-      }
-    
-      const examKey = exam?.toLowerCase().trim();
+  console.log("CUMULATIVE SESSION DATES EFFECT FIRED", {
+    reportType,
+    studentId,
+    exam
+  });
 
-      const isNaplanExam = examKey?.startsWith("naplan");
-      const isOCExam = examKey?.startsWith("oc");
-      
-      let url = "";
-      
-      if (isNaplanExam) {
-        url = `${API_BASE}/api/exams/dates/naplan?exam=${examKey}&student_id=${studentId}`;
-      } else if (isOCExam) {
-        url = `${API_BASE}/api/exams/dates/oc?exam=${examKey}&student_id=${studentId}`;
-      } else {
-        url = `${API_BASE}/api/exams/dates?exam=${examKey}&student_id=${studentId}`;
+  if (
+    (reportType !== "cumulative" && reportType !== "topic") ||
+    !studentId ||
+    !exam
+  ) {
+    setAvailableAttemptDates([]);
+    return;
+  }
+
+  const examKey = exam.toLowerCase().trim();
+
+  // --------------------------------------------------
+  // Determine the actual exam key used by the backend
+  // --------------------------------------------------
+
+  let resolvedExamKey = examKey;
+
+  // OC exams from cumulative options may come as:
+  // reading
+  // mathematical_reasoning
+  // thinking_skills
+  //
+  // But the OC dates endpoint expects:
+  // oc_reading
+  // oc_mathematical_reasoning
+  // oc_thinking_skills
+
+  if (
+    examKey === "reading" ||
+    examKey === "mathematical_reasoning" ||
+    examKey === "thinking_skills"
+  ) {
+    // We need to know whether this student is OC.
+    // Since this component already receives studentId,
+    // ask the backend for the student's class.
+
+    fetch(
+      `${API_BASE}/api/students/class?student_id=${encodeURIComponent(
+        studentId
+      )}`
+    )
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Failed to resolve student class");
+        }
+
+        return res.json();
+      })
+      .then(studentData => {
+        const className = (
+          studentData.class_name || ""
+        ).toLowerCase().trim();
+
+        console.log("🎓 Student class:", className);
+
+        if (className === "oc") {
+          resolvedExamKey = `oc_${examKey}`;
+
+          console.log(
+            "🟣 OC student detected"
+          );
+
+          console.log(
+            "🔄 Resolved exam:",
+            examKey,
+            "→",
+            resolvedExamKey
+          );
+        }
+
+        // --------------------------------------------------
+        // Build correct dates endpoint
+        // --------------------------------------------------
+
+        let url = "";
+
+        if (resolvedExamKey.startsWith("naplan")) {
+          url =
+            `${API_BASE}/api/exams/dates/naplan` +
+            `?exam=${encodeURIComponent(resolvedExamKey)}` +
+            `&student_id=${encodeURIComponent(studentId)}`;
+        } else if (resolvedExamKey.startsWith("oc_")) {
+          url =
+            `${API_BASE}/api/exams/dates/oc` +
+            `?exam=${encodeURIComponent(resolvedExamKey)}` +
+            `&student_id=${encodeURIComponent(studentId)}`;
+        } else {
+          url =
+            `${API_BASE}/api/exams/dates` +
+            `?exam=${encodeURIComponent(resolvedExamKey)}` +
+            `&student_id=${encodeURIComponent(studentId)}`;
+        }
+
+        console.log(
+          "🚀 FINAL CUMULATIVE DATES URL:",
+          url
+        );
+
+        return fetch(url);
+      })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(
+            "Failed to fetch cumulative exam dates"
+          );
+        }
+
+        return res.json();
+      })
+      .then(data => {
+        console.log(
+          "📅 CUMULATIVE DATES RECEIVED:",
+          data.dates
+        );
+
+        setAvailableAttemptDates(
+          data.dates || []
+        );
+      })
+      .catch(err => {
+        console.error(
+          "❌ Error loading cumulative session dates:",
+          err
+        );
+
+        setAvailableAttemptDates([]);
+      });
+
+    return;
+  }
+
+  // --------------------------------------------------
+  // NAPLAN / already-prefixed OC / normal exams
+  // --------------------------------------------------
+
+  let url = "";
+
+  if (resolvedExamKey.startsWith("naplan")) {
+    url =
+      `${API_BASE}/api/exams/dates/naplan` +
+      `?exam=${encodeURIComponent(resolvedExamKey)}` +
+      `&student_id=${encodeURIComponent(studentId)}`;
+  } else if (resolvedExamKey.startsWith("oc_")) {
+    url =
+      `${API_BASE}/api/exams/dates/oc` +
+      `?exam=${encodeURIComponent(resolvedExamKey)}` +
+      `&student_id=${encodeURIComponent(studentId)}`;
+  } else {
+    url =
+      `${API_BASE}/api/exams/dates` +
+      `?exam=${encodeURIComponent(resolvedExamKey)}` +
+      `&student_id=${encodeURIComponent(studentId)}`;
+  }
+
+  console.log(
+    "🚀 FINAL CUMULATIVE DATES URL:",
+    url
+  );
+
+  fetch(url)
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(
+          "Failed to fetch exam dates"
+        );
       }
-      
-      console.log("🚀 FINAL URL (student):", url); 
-      fetch(url)
-        .then(res => {
-          if (!res.ok) {
-            throw new Error("Failed to fetch exam dates");
-          }
-          return res.json();
-        })
-        .then(data => {
-          setAvailableAttemptDates(data.dates || []);
-        })
-        .catch(err => {
-          console.error("Error loading cumulative session dates:", err);
-          setAvailableAttemptDates([]);
-        });
-    }, [studentId, exam, reportType]);
-  
+
+      return res.json();
+    })
+    .then(data => {
+      console.log(
+        "📅 CUMULATIVE DATES RECEIVED:",
+        data.dates
+      );
+
+      setAvailableAttemptDates(
+        data.dates || []
+      );
+    })
+    .catch(err => {
+      console.error(
+        "❌ Error loading cumulative session dates:",
+        err
+      );
+
+      setAvailableAttemptDates([]);
+    });
+
+}, [studentId, exam, reportType]);
     useEffect(() => {
 
   if (!centerCode) {
@@ -932,47 +1085,64 @@ const datesForCurrentReport =
         {/* Exam */}
         <div className="field">
           <label>Exam</label>
-            <select
-              value={exam}
-               onChange={e => {
-                const selectedExam = e.target.value;
 
-                console.log("Selected exam:", selectedExam);
+          <select
+            value={exam}
+            onChange={e => {
+              const selectedExam = e.target.value;
 
-                setExam(selectedExam);
+              console.log("Selected exam:", selectedExam);
 
-                // Clear cumulative selections
-                setTopic("");
-                setPendingAttemptDate("");
-                setSelectedAttemptDates([]);
+              setExam(selectedExam);
 
-                // Clear normal report date
-                setDate("");
-                setDateWarning("");
-              }}
-              disabled={
-                loadingExams ||
-                (reportType === "student" && !studentId) ||
-                (reportType === "class" && !className)
-              }
-            >
-              <option value="">
-                {loadingExams ? "Loading exams..." : "Select exam"}
-              </option>
-            
-              {(reportType === "cumulative" || reportType === "topic")
-                ? cumulativeOptions.map(e => (
-                    <option key={e.key} value={e.key}>
-                      {e.label}
-                    </option>
-                  ))
-                : examOptions.map(e => (
-                    <option key={e.key} value={e.key}>
-                      {e.label}
-                    </option>
-                  ))
-              }
-            </select>
+              // Clear cumulative selections
+              setTopic("");
+              setPendingAttemptDate("");
+              setSelectedAttemptDates([]);
+
+              // Clear normal report date
+              setDate("");
+              setDateWarning("");
+            }}
+            disabled={
+              loadingExams ||
+              loadingCumulativeOptions ||
+              (reportType === "student" && !studentId) ||
+              (reportType === "class" && !className)
+            }
+          >
+            <option value="">
+              {loadingExams || loadingCumulativeOptions
+                ? "Loading exams..."
+                : "Select exam"}
+            </option>
+
+            {(reportType === "cumulative" || reportType === "topic")
+              ? cumulativeOptions.map(e => (
+                  <option key={e.key} value={e.key}>
+                    {e.label}
+                  </option>
+                ))
+              : examOptions.map(e => (
+                  <option key={e.key} value={e.key}>
+                    {e.label}
+                  </option>
+                ))
+            }
+          </select>
+
+          {/* NAPLAN / cumulative options loading message */}
+          {loadingCumulativeOptions && (
+            <p className="loading-message">
+              Loading exam history...
+            </p>
+          )}
+
+          {cumulativeOptionsError && (
+            <p className="error">
+              {cumulativeOptionsError}
+            </p>
+          )}
         </div>
   
         {/* Date (non-cumulative only) */}
