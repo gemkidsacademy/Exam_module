@@ -219,25 +219,7 @@ export default function ClassCurrentExamReport({ data }) {
         </div>
 
 
-        <div className="summary-item">
-          <div className="summary-icon orange">
-            📄
-          </div>
-
-          <div className="summary-content">
-            <span className="summary-label">
-              TOTAL MARKS
-            </span>
-
-            <strong className="summary-value">
-              {totalMarks}
-            </strong>
-
-            <span className="summary-subtext">
-              Per Student
-            </span>
-          </div>
-        </div>
+        
 
       </section>
 

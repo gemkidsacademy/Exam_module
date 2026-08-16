@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./generate_exam.css";
 
 const BACKEND_URL = process.env.REACT_APP_API_URL;
@@ -11,7 +11,9 @@ export default function GenerateExam_naplan_writing({
   const [generatedExam, setGeneratedExam] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const [selectedClassYear, setSelectedClassYear] = useState("5");
+  const [classYears, setClassYears] = useState([]);
+  const [selectedClassYear, setSelectedClassYear] = useState("");
+  const [classesLoading, setClassesLoading] = useState(true);
 
   /* ===========================
      Generate Actual Exam
@@ -59,6 +61,48 @@ const handleGenerateNaplanWritingExam = async () => {
     setLoading(false);
   }
 };
+useEffect(() => {
+  const fetchClassYears = async () => {
+    if (!centerCode) {
+      setClassesLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${BACKEND_URL}/class-years-exam-module?center_code=${encodeURIComponent(centerCode)}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to load class years");
+      }
+
+      const data = await response.json();
+
+      console.log("CLASS YEARS FROM BACKEND:", data);
+
+      setClassYears(data);
+
+      // Automatically select the first available year
+      if (data.length > 0) {
+        setSelectedClassYear(
+          data[0].year_name.replace(/^Year\s+/i, "")
+        );
+      }
+
+    } catch (error) {
+      console.error("Failed to load class years:", error);
+
+      setErrorMessage(
+        error.message || "Unable to load class years."
+      );
+    } finally {
+      setClassesLoading(false);
+    }
+  };
+
+  fetchClassYears();
+}, [centerCode]);
   /* ===========================
      Generate Homework Exam
   =========================== */
@@ -126,11 +170,26 @@ const handleGenerateNaplanWritingExam = async () => {
         <select
           value={selectedClassYear}
           onChange={(e) => setSelectedClassYear(e.target.value)}
+          disabled={classesLoading}
         >
-          <option value="3">Year 3</option>
-          <option value="5">Year 5</option>
-          <option value="7">Year 7</option>
-          <option value="9">Year 9</option>
+          <option value="">
+            {classesLoading
+              ? "Loading class years..."
+              : "Select class year"}
+          </option>
+
+          {classYears.map((row) => {
+            const yearValue = row.year_name.replace(/^Year\s+/i, "");
+
+            return (
+              <option
+                key={row.id}
+                value={yearValue}
+              >
+                {row.year_name}
+              </option>
+            );
+          })}
         </select>
       </div>
 
@@ -144,7 +203,7 @@ const handleGenerateNaplanWritingExam = async () => {
       <button
         className="generate-btn blue-btn"
         onClick={handleGenerateNaplanWritingExam}
-        disabled={loading}
+        disabled={loading || !selectedClassYear}
       >
         {loading
           ? "Generating..."
@@ -155,7 +214,7 @@ const handleGenerateNaplanWritingExam = async () => {
       <button
         className="generate-btn blue-btn"
         onClick={handleGenerateNaplanWritingHomework}
-        disabled={loading}
+        disabled={loading || !selectedClassYear}
         style={{ marginTop: "15px" }}
       >
         {loading

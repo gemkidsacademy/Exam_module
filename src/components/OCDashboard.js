@@ -207,40 +207,19 @@ useEffect(() => {
       <div className="title-divider" />
 
       <div className="subject-buttons">
-
-        <button
-          className="subject-button"
-          onClick={() => {
-            setExamMode("exam");
-            setSubjectAvailability({});
-            setExamPhase("selection");
-          }}
-        >
-          Active exams
-        </button>
-
-        <button
-          className="subject-button"
-          onClick={() => {
-            setExamMode("report");
-            setSubjectAvailability({});
-            setExamPhase("report_mode_selection");
-          }}
-        >
-          Historical reports
-        </button>
-
-        <button
-          className="subject-button"
-          onClick={() => {
-            setExamMode("homework");
-            setSubjectAvailability({});
-            setExamPhase("selection");
-          }}
-        >
-          Homework exams
-        </button>
-
+        {SUBJECTS.map((subject) => (
+          <button
+            key={subject.key}
+            className="subject-button"
+            onClick={() => {
+              setActiveSubject(subject);
+              setExamMode("report");
+              setExamPhase("exam");
+            }}
+          >
+            {subject.label}
+          </button>
+        ))}
       </div>
     </div>
   </div>

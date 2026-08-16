@@ -16,9 +16,10 @@
 
 .report-summary-card {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 
   width: 100%;
+  box-sizing: border-box;
 
   background: #ffffff;
   border: 1px solid #edf0f5;
