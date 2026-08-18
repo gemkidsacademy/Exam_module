@@ -13,7 +13,7 @@ export default function ViewUserModal({ onClose }) {
     const fetchStudents = async () => {
       try {
         const res = await fetch(
-          `${BACKEND_URL}/students/by-center/${centerCode}`
+          `${BACKEND_URL}/students/active/by-center/${centerCode}`
         );
 
         if (!res.ok) {
