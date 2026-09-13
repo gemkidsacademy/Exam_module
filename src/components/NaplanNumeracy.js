@@ -1537,10 +1537,12 @@ return (
       className="image-multi-select-grid"
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, max-content)",
+        gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
         justifyContent: "center",
         gap: "20px",
-        marginTop: "20px"
+        marginTop: "20px",
+        width: "100%",
+        boxSizing: "border-box"
       }}
     >
       {block.options.map((opt, optIdx) => {
@@ -1597,7 +1599,7 @@ return (
               gap: "10px",
               cursor: isReview ? "default" : "pointer",
               boxSizing: "border-box",
-              width: "fit-content",
+              width: "100%",
               height: "fit-content"
             }}
           >
