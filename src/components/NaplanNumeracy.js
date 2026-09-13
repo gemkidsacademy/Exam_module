@@ -1635,7 +1635,6 @@ return (
               <img
                 src={opt.image}
                 style={{
-                  border: "2px solid red",
                   maxWidth: "160px",
                   maxHeight: "160px",
                   objectFit: "contain"

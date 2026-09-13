@@ -10,6 +10,7 @@
   import StudentReportShell from "./StudentReportShell";
   import BulkUserUpload from "./BulkUserUpload";
   import StudentReportShell_backend from "./StudentReportShell_backend";
+  import HomeworkTopicReports from "./HomeworkTopicReports";
   import ExamSelector from "./ExamSelector";
   import UploadWordNaplanLanguageConventions from "./UploadWordNaplanLanguageConventions";
   import UploadWordNaplanNumeracy from "./UploadWordNaplanNumeracy";
@@ -220,6 +221,11 @@ const allTabs = [
   },
 
   {
+    id: "homework-topic-reports",
+    label: "Homework Topic Reports",
+  },
+
+  {
     id: "selective-readiness-overall",
     label: "Selective Readiness (Overall)",
   },
@@ -290,6 +296,8 @@ const tabs = allTabs.filter((tab) => {
 
       "topic-report-limited-2",
 
+      "homework-topic-reports",
+
       "selective-readiness-overall",
       "oc-readiness-overall",
 
@@ -303,6 +311,7 @@ const tabs = allTabs.filter((tab) => {
       "student-exam-reports",
       "leaderboard",
       "topic-report-limited-2",
+      "homework-topic-reports",
       "selective-readiness-overall",
       
       "oc-readiness-overall",
@@ -1075,6 +1084,14 @@ const tabs = allTabs.filter((tab) => {
                       centerCode={centerCode}
                     />
 
+                  </div>
+                )}
+                {/* ===== HOMEWORK TOPIC REPORTS ===== */}
+                {activeTab === "homework-topic-reports" && (
+                  <div className="tab-panel">
+                    <HomeworkTopicReports
+                      centerCode={centerCode}
+                    />
                   </div>
                 )}
                 {/* ===== LEADERBOARD ===== */}

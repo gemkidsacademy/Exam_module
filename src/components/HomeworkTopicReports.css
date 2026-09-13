@@ -1,0 +1,82 @@
+.homework-topic-report {
+  width: 100%;
+  padding: 0 14px 20px;
+  box-sizing: border-box;
+}
+
+.homework-topic-report-filters {
+  display: grid;
+  grid-template-columns: 145px 130px 145px;
+  column-gap: 14px;
+  row-gap: 28px;
+  align-items: start;
+  padding: 0 10px 28px;
+  border-bottom: 1px solid #e1e1e1;
+  max-width: 476px;
+  box-sizing: border-box;
+}
+
+.homework-topic-report-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.homework-topic-report-field label {
+  font-size: 9px;
+  line-height: 1.2;
+  color: #333;
+}
+
+.homework-topic-report-field select {
+  width: 100%;
+  height: 27px;
+  padding: 0 8px;
+  border: 1px solid #ccd3dc;
+  border-radius: 5px;
+  background: #fff;
+  color: #333;
+  font-size: 10px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.homework-topic-report-field select:focus {
+  border-color: #9aa6b5;
+}
+
+.homework-topic-report-row-break {
+  grid-column: 1;
+}
+
+.homework-topic-report-actions {
+  grid-column: 1;
+  margin-top: 3px;
+}
+
+.homework-topic-report-actions button {
+  width: 106px;
+  height: 29px;
+  border: none;
+  border-radius: 6px;
+  background: #d9d9d9;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 500;
+  cursor: not-allowed;
+}
+
+.homework-topic-report-actions button:not(:disabled) {
+  background: #9ca6b5;
+  cursor: pointer;
+}
+
+@media (max-width: 700px) {
+  .homework-topic-report-filters {
+    grid-template-columns: 145px 130px;
+  }
+
+  .homework-topic-report-row-break {
+    grid-column: 1;
+  }
+}
