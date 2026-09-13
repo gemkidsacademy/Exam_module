@@ -1537,7 +1537,7 @@ return (
       className="image-multi-select-grid"
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
+        gridTemplateColumns: "repeat(6, minmax(140px, 1fr))",
         justifyContent: "center",
         gap: "20px",
         marginTop: "20px",
@@ -1637,8 +1637,9 @@ return (
               <img
                 src={opt.image}
                 style={{
-                  maxWidth: "160px",
-                  maxHeight: "160px",
+                  width: "100%",
+                  maxWidth: "120px",
+                  maxHeight: "120px",
                   objectFit: "contain"
                 }}
               />
