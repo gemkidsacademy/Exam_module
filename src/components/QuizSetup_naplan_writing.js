@@ -247,6 +247,8 @@ export default function QuizSetup_naplan_writing({ userType, centerCode }) {
         >
           <option value="">Select Year</option>
           <option value="3">Year 3</option>
+          <option value="4">Year 4</option>
+
           <option value="5">Year 5</option>
           <option value="7">Year 7</option>
           <option value="9">Year 9</option>

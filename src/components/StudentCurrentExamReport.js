@@ -29,7 +29,7 @@ export default function StudentCurrentExamReport({
     evaluation
   } = data;
 
-  const isWriting = exam === "writing";
+  const isWriting = String(exam).toLowerCase() === "writing";
 
   const accuracyPie = summary
     ? [
@@ -59,14 +59,24 @@ export default function StudentCurrentExamReport({
 
           <div className="summary-grid">
             <div>
-              <p><strong>Total Questions:</strong> {summary.total_questions}</p>
-              <p><strong>Attempted:</strong> {summary.attempted}</p>
-              <p><strong>Correct:</strong> {summary.correct}</p>
-              <p><strong>Incorrect:</strong> {summary.incorrect}</p>
-              <p><strong>Not Attempted:</strong> {summary.not_attempted}</p>
-              <p><strong>Accuracy:</strong> {summary.accuracy}%</p>
-              <p><strong>Score:</strong> {summary.score}%</p>
-              <p><strong>Result:</strong> {summary.result}</p>
+              {isWriting ? (
+                <>
+                  <p><strong>Writing Score:</strong> {summary.score}/25</p>
+                  <p><strong>Score Percentage:</strong> {summary.accuracy}%</p>
+                  <p><strong>Result:</strong> {summary.result}</p>
+                </>
+              ) : (
+                <>
+                  <p><strong>Total Questions:</strong> {summary.total_questions}</p>
+                  <p><strong>Attempted:</strong> {summary.attempted}</p>
+                  <p><strong>Correct:</strong> {summary.correct}</p>
+                  <p><strong>Incorrect:</strong> {summary.incorrect}</p>
+                  <p><strong>Not Attempted:</strong> {summary.not_attempted}</p>
+                  <p><strong>Accuracy:</strong> {summary.accuracy}%</p>
+                  <p><strong>Score:</strong> {summary.score}%</p>
+                  <p><strong>Result:</strong> {summary.result}</p>
+                </>
+              )}
             </div>
 
             {!isWriting && (
@@ -99,7 +109,7 @@ export default function StudentCurrentExamReport({
               >
                 <div
                   style={{
-                    width: `${summary.score}%`,
+                    width: `${summary.accuracy}%`,
                     height: "100%",
                     backgroundColor:
                       summary.score >= 85
@@ -113,7 +123,7 @@ export default function StudentCurrentExamReport({
               </div>
           
               <div style={{ marginTop: "6px", fontWeight: "600" }}>
-                Writing score: {summary.score}%
+                Writing score: {summary.score}/25 ({summary.accuracy}%)
               </div>
             </div>
           )}

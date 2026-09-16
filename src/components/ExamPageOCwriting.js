@@ -501,7 +501,7 @@
     
       try {
         const endpoint =
-          variant === "homework"
+          parentMode === "homework"
             ? "/api/student/submit-homework-writing"
             : "/api/exams/writing/submit";
 
