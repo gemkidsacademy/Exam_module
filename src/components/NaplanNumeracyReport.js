@@ -18,6 +18,29 @@ if (report === undefined) {
 if (!report || report.status === "no_data" || !report.overall) {
   return (
     <div className="empty-state">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: "20px"
+        }}
+      >
+        <button
+          onClick={onBackToDashboard}
+          style={{
+            padding: "10px 18px",
+            background: "#0d8ecf",
+            color: "#fff",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontWeight: "600"
+          }}
+        >
+          ← Back to Dashboard
+        </button>
+      </div>
+
       <h3>📭 No reports available</h3>
       <p>This student has not completed this exam yet.</p>
 

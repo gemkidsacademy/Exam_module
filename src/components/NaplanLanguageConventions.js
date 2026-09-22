@@ -615,6 +615,29 @@ if (mode === "report" && isLoadingDates) {
 if (mode === "report" && !isLoadingDates && examDates.length === 0) {
   return (
     <div className="no-report">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: "20px"
+        }}
+      >
+        <button
+          onClick={onBackToDashboard}
+          style={{
+            padding: "10px 18px",
+            background: "#0d8ecf",
+            color: "#fff",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontWeight: "600"
+          }}
+        >
+          ← Back to Dashboard
+        </button>
+      </div>
+
       <h3>No reports available yet</h3>
       <p>Please complete an exam first.</p>
     </div>

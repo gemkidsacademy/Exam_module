@@ -583,6 +583,23 @@
     if (completed && !result) {
       return (
         <div className="empty-report-card">
+
+          <button
+            onClick={onBackToDashboard}
+            style={{
+              padding: "10px 18px",
+              background: "#0d8ecf",
+              color: "#fff",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontWeight: "600",
+              marginBottom: "24px"
+            }}
+          >
+            ← Back to Dashboard
+          </button>
+
           <div className="empty-icon">✍️</div>
 
           <h1>Writing Reports</h1>
@@ -594,7 +611,6 @@
             detailed feedback, scores, and progress tracking.
           </p>
 
-          
         </div>
       );
     }

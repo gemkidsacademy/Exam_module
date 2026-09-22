@@ -170,6 +170,8 @@
 
     if (!res.ok) {
       console.warn(`⚠️ ${parentMode} report not available yet`);
+      setReport(null);
+      setMode("report");
       return;
     }
 
@@ -1087,7 +1089,61 @@ if (!currentQ) {
   onBackToDashboard
 }) {
     if (!report?.overall) {
-      return <p className="loading">Generating your report…</p>;
+      return (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            overflowY: "auto",
+            background: "#f3f4f6",
+            padding: "32px",
+            boxSizing: "border-box",
+            zIndex: 1
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginBottom: "20px"
+            }}
+          >
+            <button
+              onClick={onBackToDashboard}
+              style={{
+                padding: "10px 18px",
+                background: "#0d8ecf",
+                color: "#fff",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontWeight: "600"
+              }}
+            >
+              ← Back to Dashboard
+            </button>
+          </div>
+
+          <div
+            style={{
+              minHeight: "70vh",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center"
+            }}
+          >
+            <h3>No reports available yet</h3>
+
+            <p>
+              You haven’t attempted any exams yet.
+              <br />
+              Complete an exam to see your performance here.
+            </p>
+          </div>
+        </div>
+      );
     }
 
     const {
