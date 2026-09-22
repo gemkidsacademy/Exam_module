@@ -6,7 +6,10 @@
   
   import StudentExamReports from "./StudentExamReports";
   import SelectiveReadinessOverall from "./SelectiveReadinessOverall";
+  import HomeworkSelectiveReadinessOverall from "./HomeworkSelectiveReadinessOverall";
   import OCReadinessOverall from "./OCReadinessOverall";
+  import HomeworkOCReadinessOverall from "./HomeworkOCReadinessOverall";
+  
   import StudentReportShell from "./StudentReportShell";
   import BulkUserUpload from "./BulkUserUpload";
   import StudentReportShell_backend from "./StudentReportShell_backend";
@@ -117,6 +120,8 @@
         : "database"
 
     );
+    const [topicReportType, setTopicReportType] = useState(null);
+    const [selectiveReadinessType, setSelectiveReadinessType] = useState(null);
   
     /* ============================
       User Modals
@@ -135,6 +140,7 @@
     const [centerName, setCenterName] = useState("");
     console.log("createExamCategory:", createExamCategory);
     console.log("createExamType:", createExamType);
+    const [ocReadinessType, setOcReadinessType] = useState(null);
   
     /* ============================
       Exam Flow State
@@ -145,6 +151,18 @@
     ============================ */
     
     useEffect(() => {
+      if (activeTab !== "topic-reports") {
+        setTopicReportType(null);
+      }
+
+      if (activeTab !== "selective-readiness-overall") {
+        setSelectiveReadinessType(null);
+      }
+
+      if (activeTab !== "oc-readiness-overall") {
+        setOcReadinessType(null);
+      }
+
       if (activeTab !== "database") {
         setUserMode("menu");
       }
@@ -216,13 +234,8 @@ const allTabs = [
   },
 
   {
-    id: "topic-report-limited-2",
+    id: "topic-reports",
     label: "Topic Report",
-  },
-
-  {
-    id: "homework-topic-reports",
-    label: "Homework Topic Reports",
   },
 
   {
@@ -294,9 +307,7 @@ const tabs = allTabs.filter((tab) => {
 
       "student-exam-reports",
 
-      "topic-report-limited-2",
-
-      "homework-topic-reports",
+      "topic-reports",
 
       "selective-readiness-overall",
       "oc-readiness-overall",
@@ -310,8 +321,7 @@ const tabs = allTabs.filter((tab) => {
     return [
       "student-exam-reports",
       "leaderboard",
-      "topic-report-limited-2",
-      "homework-topic-reports",
+      "topic-reports",
       "selective-readiness-overall",
       
       "oc-readiness-overall",
@@ -1062,36 +1072,123 @@ const tabs = allTabs.filter((tab) => {
                 {/* ===== SELECTIVE READINESS (OVERALL) ===== */}
                 {activeTab === "selective-readiness-overall" && (
                   <div className="tab-panel">
-                    <SelectiveReadinessOverall
-                      centerCode={centerCode}
-                    
-                    />
+
+                    {!selectiveReadinessType && (
+                      <div className="user-actions-grid">
+
+                        <div
+                          className="action-card"
+                          onClick={() => setSelectiveReadinessType("homework")}
+                        >
+                          <h3>Home Work</h3>
+                          <p>View homework selective readiness</p>
+                        </div>
+
+                        <div
+                          className="action-card"
+                          onClick={() => setSelectiveReadinessType("actual-exam")}
+                        >
+                          <h3>Actual Exam</h3>
+                          <p>View actual exam selective readiness</p>
+                        </div>
+
+                      </div>
+                    )}
+
+                    {selectiveReadinessType === "homework" && (
+                      <HomeworkSelectiveReadinessOverall
+                        centerCode={centerCode}
+                      />
+                    )}
+
+                    {selectiveReadinessType === "actual-exam" && (
+                      <SelectiveReadinessOverall
+                        centerCode={centerCode}
+                      />
+                    )}
+
                   </div>
                 )}
 
                 {activeTab === "oc-readiness-overall" && (
                   <div className="tab-panel">
-                    <OCReadinessOverall
-                      centerCode={centerCode}
-                    />
+
+                    {!ocReadinessType && (
+                      <div className="user-actions-grid">
+
+                        <div
+                          className="action-card"
+                          onClick={() => setOcReadinessType("homework")}
+                        >
+                          <h3>Home Work</h3>
+                          <p>View homework OC readiness</p>
+                        </div>
+
+                        <div
+                          className="action-card"
+                          onClick={() => setOcReadinessType("actual-exam")}
+                        >
+                          <h3>Actual Exam</h3>
+                          <p>View actual exam OC readiness</p>
+                        </div>
+
+                      </div>
+                    )}
+
+                    {ocReadinessType === "homework" && (
+                      <div>
+                        <HomeworkOCReadinessOverall
+                          centerCode={centerCode}
+                      />
+                      </div>
+                    )}
+
+                    {ocReadinessType === "actual-exam" && (
+                      <OCReadinessOverall
+                        centerCode={centerCode}
+                      />
+                    )}
+
                   </div>
                 )}
                 
-                {activeTab === "topic-report-limited-2" && (
+                {activeTab === "topic-reports" && (
                   <div className="tab-panel">
 
-                    <StudentReportShell_backend
-                      centerCode={centerCode}
-                    />
+                    {!topicReportType && (
+                      <div className="user-actions-grid">
 
-                  </div>
-                )}
-                {/* ===== HOMEWORK TOPIC REPORTS ===== */}
-                {activeTab === "homework-topic-reports" && (
-                  <div className="tab-panel">
-                    <HomeworkTopicReports
-                      centerCode={centerCode}
-                    />
+                        <div
+                          className="action-card"
+                          onClick={() => setTopicReportType("homework")}
+                        >
+                          <h3>Home Work</h3>
+                          <p>View homework topic reports</p>
+                        </div>
+
+                        <div
+                          className="action-card"
+                          onClick={() => setTopicReportType("actual-exam")}
+                        >
+                          <h3>Actual Exam</h3>
+                          <p>View actual exam topic reports</p>
+                        </div>
+
+                      </div>
+                    )}
+
+                    {topicReportType === "homework" && (
+                      <HomeworkTopicReports
+                        centerCode={centerCode}
+                      />
+                    )}
+
+                    {topicReportType === "actual-exam" && (
+                      <StudentReportShell_backend
+                        centerCode={centerCode}
+                      />
+                    )}
+
                   </div>
                 )}
                 {/* ===== LEADERBOARD ===== */}

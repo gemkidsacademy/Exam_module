@@ -22,6 +22,7 @@ export default function CumulativeReport({ data }) {
   } = data;
 
   const topicLabel = topic?.label ?? "Unknown topic";
+  const isWriting = exam?.toLowerCase() === "writing";
 
   if (attempts.length === 0) {
     return (
@@ -76,30 +77,48 @@ export default function CumulativeReport({ data }) {
           <KpiCard
             type="latest"
             label="Latest Score"
-            value={`${summary.latest_attempt_score}%`}
-            secondary={`${latestAttempt?.correct_answers ?? 0} / ${
-              latestAttempt?.questions_attempted ?? 0
-            } correct`}
+            value={
+              isWriting
+                ? `${summary.latest_attempt_score} / 25`
+                : `${summary.latest_attempt_score}%`
+            }
+            secondary={
+              isWriting
+                ? `${summary.latest_attempt_accuracy}%`
+                : `${latestAttempt?.correct_answers ?? 0} / ${
+                    latestAttempt?.questions_attempted ?? 0
+                  } correct`
+            }
             date={formatDate(latestAttempt?.date)}
           />
 
           <KpiCard
             type="starting"
             label="Starting Score"
-            value={`${summary.first_attempt_score}%`}
-            secondary={`${attempts[0]?.correct_answers ?? 0} / ${
-              attempts[0]?.questions_attempted ?? 0
-            } correct`}
+            value={
+              isWriting
+                ? `${summary.first_attempt_score} / 25`
+                : `${summary.first_attempt_score}%`
+            }
+            secondary={
+              isWriting
+                ? `${summary.first_attempt_accuracy}%`
+                : `${attempts[0]?.correct_answers ?? 0} / ${
+                    attempts[0]?.questions_attempted ?? 0
+                  } correct`
+            }
             date={formatDate(attempts[0]?.date)}
           />
 
           <KpiCard
             type="improvement"
             label="Improvement"
-            value={`${summary.score_change > 0 ? "+" : ""}${
-              summary.score_change
-            }%`}
-            secondary="Percentage Points"
+            value={
+              isWriting
+                ? `${summary.score_change > 0 ? "+" : ""}${summary.score_change}`
+                : `${summary.score_change > 0 ? "+" : ""}${summary.score_change}%`
+            }
+            secondary={isWriting ? "Points" : "Percentage Points"}
             badge={capitalize(summary.trend)}
           />
 
@@ -140,7 +159,10 @@ export default function CumulativeReport({ data }) {
           </div>
         </div>
 
-        <ProgressChart attempts={attempts} />
+        <ProgressChart
+          attempts={attempts}
+          isWriting={isWriting}
+        />
 
       </section>
 
@@ -178,46 +200,66 @@ export default function CumulativeReport({ data }) {
 
             <Metric
               label="Start Score"
-              value={`${summary.first_attempt_score}%`}
-              secondary={`${
-                attempts[0]?.correct_answers ?? 0
-              } / ${attempts[0]?.questions_attempted ?? 0}`}
+              value={
+                isWriting
+                  ? `${summary.first_attempt_score} / 25`
+                  : `${summary.first_attempt_score}%`
+              }
+              secondary={
+                isWriting
+                  ? `${summary.first_attempt_accuracy}%`
+                  : `${attempts[0]?.correct_answers ?? 0} / ${
+                      attempts[0]?.questions_attempted ?? 0
+                    }`
+              }
             />
 
             <Metric
               label="Latest Score"
-              value={`${summary.latest_attempt_score}%`}
-              secondary={`${
-                latestAttempt?.correct_answers ?? 0
-              } / ${latestAttempt?.questions_attempted ?? 0}`}
+              value={
+                isWriting
+                  ? `${summary.latest_attempt_score} / 25`
+                  : `${summary.latest_attempt_score}%`
+              }
+              secondary={
+                isWriting
+                  ? `${summary.latest_attempt_accuracy}%`
+                  : `${latestAttempt?.correct_answers ?? 0} / ${
+                      latestAttempt?.questions_attempted ?? 0
+                    }`
+              }
             />
 
             <Metric
               label="Score Change"
               value={`${summary.score_change > 0 ? "+" : ""}${
                 summary.score_change
-              }%`}
+              }${isWriting ? "" : "%"}`}
               secondary="points"
               positive={summary.score_change > 0}
             />
 
             <Metric
               label="Best Score"
-              value={`${bestScore}%`}
+              value={
+                isWriting
+                  ? `${bestScore} / 25`
+                  : `${bestScore}%`
+              }
             />
 
             <Metric
-              label="Start Accuracy"
+              label={isWriting ? "Start Percentage" : "Start Accuracy"}
               value={`${summary.first_attempt_accuracy}%`}
             />
 
             <Metric
-              label="Latest Accuracy"
+              label={isWriting ? "Latest Percentage" : "Latest Accuracy"}
               value={`${summary.latest_attempt_accuracy}%`}
             />
 
             <Metric
-              label="Accuracy Change"
+              label={isWriting ? "Percentage Change" : "Accuracy Change"}
               value={`${summary.accuracy_change > 0 ? "+" : ""}${
                 summary.accuracy_change
               }%`}
@@ -272,9 +314,11 @@ export default function CumulativeReport({ data }) {
               <tr>
                 <th>#</th>
                 <th>Date</th>
-                <th>Score (%)</th>
-                <th>Score (Correct / Total)</th>
-                <th>Accuracy (%)</th>
+                <th>{isWriting ? "Writing Score" : "Score (%)"}</th>
+                <th>
+                  {isWriting ? "Score (%)" : "Score (Correct / Total)"}
+                </th>
+                <th>{isWriting ? "Percentage (%)" : "Accuracy (%)"}</th>
                 <th>Performance</th>
               </tr>
             </thead>
@@ -298,16 +342,26 @@ export default function CumulativeReport({ data }) {
 
                     <td>
                       <div className="score-cell">
-                        <span>{attempt.score}%</span>
+                        <span>
+                          {isWriting
+                            ? `${attempt.score} / 25`
+                            : `${attempt.score}%`}
+                        </span>
 
                         <div className="mini-progress">
                           <div
                             className="mini-progress-fill"
                             style={{
-                              width: `${Math.min(
-                                Number(attempt.score) || 0,
-                                100
-                              )}%`,
+                              width: `${
+                                Math.min(
+                                  Number(
+                                    isWriting
+                                      ? attempt.accuracy
+                                      : attempt.score
+                                  ) || 0,
+                                  100
+                                )
+                              }%`,
                             }}
                           />
                         </div>
@@ -315,8 +369,9 @@ export default function CumulativeReport({ data }) {
                     </td>
 
                     <td>
-                      {attempt.correct_answers} /{" "}
-                      {attempt.questions_attempted}
+                      {isWriting
+                        ? `${attempt.accuracy}%`
+                        : `${attempt.correct_answers} / ${attempt.questions_attempted}`}
                     </td>
 
                     <td>
@@ -546,7 +601,7 @@ function Metric({
    PROGRESS CHART
 ============================================================ */
 
-function ProgressChart({ attempts }) {
+function ProgressChart({ attempts, isWriting }) {
 
   const width = 900;
   const height = 320;
@@ -601,7 +656,9 @@ function ProgressChart({ attempts }) {
       .join(" ");
   };
 
-  const scorePoints = createPoints("score");
+  const scorePoints = createPoints(
+    isWriting ? "accuracy" : "score"
+  );
   const accuracyPoints = createPoints("accuracy");
 
   return (
@@ -668,7 +725,11 @@ function ProgressChart({ attempts }) {
         {attempts.map((attempt, index) => {
 
           const x = getX(index);
-          const scoreY = getY(attempt.score);
+          const chartScore = isWriting
+            ? attempt.accuracy
+            : attempt.score;
+
+          const scoreY = getY(chartScore);
 
           return (
             <g key={`score-${index}`}>
@@ -686,7 +747,7 @@ function ProgressChart({ attempts }) {
                 textAnchor="middle"
                 className="chart-value-label"
               >
-                {attempt.score}%
+                {chartScore}%
               </text>
 
               <text
@@ -695,8 +756,9 @@ function ProgressChart({ attempts }) {
                 textAnchor="middle"
                 className="chart-correct-label"
               >
-                ({attempt.correct_answers} /{" "}
-                {attempt.questions_attempted})
+                {isWriting
+                  ? `(${attempt.score} / 25)`
+                  : `(${attempt.correct_answers} / ${attempt.questions_attempted})`}
               </text>
 
             </g>

@@ -6,7 +6,7 @@ import "./SelectiveReadinessOverall.css";
 
 const BACKEND_URL = process.env.REACT_APP_API_URL;
 
-export default function OCReadinessOverall({ centerCode }) {
+export default function HomeworkOCReadinessOverall({ centerCode }) {
 
   /* =====================================
     State
@@ -26,78 +26,80 @@ export default function OCReadinessOverall({ centerCode }) {
   const [sendingEmail, setSendingEmail] = useState(false);
 
   const handleSendEmail = async () => {
-  if (!selectedStudent || !selectedDate || !printRef.current) return;
+    if (!selectedStudent || !selectedDate || !printRef.current) return;
 
-  setSendingEmail(true);
+    setSendingEmail(true);
 
-  try {
-    // install first:
-    // npm install html2pdf.js
+    try {
+      // install first:
+      // npm install html2pdf.js
 
-    const html2pdf = (await import("html2pdf.js")).default;
+      const html2pdf = (await import("html2pdf.js")).default;
 
-    const element = printRef.current;
+      const element = printRef.current;
 
-    const pdfBlob = await html2pdf()
-      .from(element)
-      .set({
-        margin: 8,
-        filename: "OC_Report.pdf",
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true
-        },
-        jsPDF: {
-          unit: "mm",
-          format: "a4",
-          orientation: "portrait"
+      const pdfBlob = await html2pdf()
+        .from(element)
+        .set({
+          margin: 8,
+          filename: "Homework_OC_Report.pdf",
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true
+          },
+          jsPDF: {
+            unit: "mm",
+            format: "a4",
+            orientation: "portrait"
+          }
+        })
+        .outputPdf("blob");
+
+      const formData = new FormData();
+
+      formData.append("student_id", selectedStudent);
+      formData.append("exam_date", selectedDate);
+
+      const pdfFile = new File(
+        [pdfBlob],
+        `Homework_OC_Report_${selectedStudent}.pdf`,
+        { type: "application/pdf" }
+      );
+
+      formData.append("file", pdfFile);
+
+      const res = await fetch(
+        `${BACKEND_URL}/api/admin/send-homework-oc-report-email`,
+        {
+          method: "POST",
+          body: formData
         }
-      })
-      .outputPdf("blob");
+      );
 
-    const formData = new FormData();
+      const data = await res.json();
 
-    formData.append("student_id", selectedStudent);
-    formData.append("exam_date", selectedDate);
-    const pdfFile = new File(
-      [pdfBlob],
-      `OC_Report_${selectedStudent}.pdf`,
-      { type: "application/pdf" }
-    );
-
-    formData.append("file", pdfFile);
-
-    const res = await fetch(
-      `${BACKEND_URL}/api/admin/send-oc-report-email`,
-      {
-        method: "POST",
-        body: formData
+      if (!res.ok) {
+        alert(data.message || "Failed to send email");
+        return;
       }
-    );
 
-    const data = await res.json();
+      alert("Email sent successfully ✅");
 
-    if (!res.ok) {
-      alert(data.message || "Failed to send email");
-      return;
+    } catch (error) {
+      console.error("SEND EMAIL ERROR:", error);
+      alert(error?.message || "Failed to generate/send PDF");
+    } finally {
+      setSendingEmail(false);
     }
-
-    alert("Email sent successfully ✅");
-  } catch (error) {
-  console.error("SEND EMAIL ERROR:", error);
-  alert(error?.message || "Failed to generate/send PDF");
-} finally {
-    setSendingEmail(false);
-  }
-};
+  };
 
   const printRef = useRef(null);
 
   // Placeholder (used later)
   const handlePrint = useReactToPrint({
     contentRef: printRef,
-    documentTitle: "OC_Readiness_Report",
+    documentTitle: "Homework_OC_Readiness_Report",
   });
 
   /* =====================================
@@ -187,34 +189,36 @@ export default function OCReadinessOverall({ centerCode }) {
     Load Students
   ===================================== */
 
-  useEffect(() => {
-
-    fetch(
-      `${BACKEND_URL}/api/admin/oc-students?center_code=${centerCode}`
-    )
-      .then(res => res.json())
-      .then(data =>
-        setStudents(
-          Array.isArray(data)
-            ? data
-            : []
-        )
+   useEffect(() => {
+  
+      fetch(
+        `${BACKEND_URL}/api/admin/oc-students?center_code=${centerCode}`
       )
-      .catch(err => {
-
-        console.error(err);
-
-        setStudents([]);
-
-      });
-
-  }, [centerCode]);
+        .then(res => res.json())
+        .then(data =>
+          setStudents(
+            Array.isArray(data)
+              ? data
+              : []
+          )
+        )
+        .catch(err => {
+  
+          console.error(err);
+  
+          setStudents([]);
+  
+        });
+  
+    }, [centerCode]);
+  
 
   /* =====================================
     Load Report Dates
   ===================================== */
 
   useEffect(() => {
+
     if (!selectedStudent) return;
 
     setLoading(true);
@@ -224,6 +228,7 @@ export default function OCReadinessOverall({ centerCode }) {
     )
       .then(res => res.json())
       .then(data => {
+
         setAvailableDates(
           Array.isArray(data)
             ? data
@@ -232,10 +237,12 @@ export default function OCReadinessOverall({ centerCode }) {
 
         setSelectedDate("");
         setOverall(null);
+
       })
       .finally(() => setLoading(false));
 
   }, [selectedStudent]);
+
   /* =====================================
     Generate Report
   ===================================== */
@@ -399,7 +406,7 @@ export default function OCReadinessOverall({ centerCode }) {
 
       <h2 className="overall-title">
 
-        Overall OC Readiness
+        Overall Homework OC Readiness
 
       </h2>
 
@@ -455,7 +462,7 @@ export default function OCReadinessOverall({ centerCode }) {
 
           <label>
 
-            Exam Date
+            Homework Exam Date
 
           </label>
 
@@ -508,13 +515,16 @@ export default function OCReadinessOverall({ centerCode }) {
             disabled={loading}
             onClick={generateReport}
           >
+
             {loading
               ? "Generating..."
-              : "Generate OC Readiness"}
+              : "Generate Homework OC Readiness"}
+
           </button>
 
           {overall && (
             <>
+
               <button
                 className="generate-button secondary"
                 onClick={() => setShowPreview(true)}
@@ -527,10 +537,13 @@ export default function OCReadinessOverall({ centerCode }) {
                 onClick={handleSendEmail}
                 disabled={sendingEmail}
               >
+
                 {sendingEmail
                   ? "Sending..."
                   : "Send Email"}
+
               </button>
+
             </>
           )}
 
@@ -581,17 +594,24 @@ export default function OCReadinessOverall({ centerCode }) {
         </div>
 
       )}
+
       {showPreview && overall && (
+
         <div className="pdf-modal-overlay">
+
           <div className="pdf-modal">
 
             <div className="pdf-toolbar">
 
               <button onClick={handlePrint}>
+
                 Save / Print PDF
+
               </button>
 
-              <button onClick={() => setShowPreview(false)}>
+              <button
+                onClick={() => setShowPreview(false)}
+              >
                 Close
               </button>
 
@@ -600,20 +620,23 @@ export default function OCReadinessOverall({ centerCode }) {
             <div className="pdf-preview-body">
 
               <PrintRoot
-                  reportType="oc"
-                  overall={overall}
-                  balanceIndex={balanceIndex}
-                  strengths={strengths}
-                  improvements={improvements}
-                  subjectChartData={subjectChartData}
-                  SUBJECT_LABELS={SUBJECT_LABELS}
+                reportType="oc"
+                overall={overall}
+                balanceIndex={balanceIndex}
+                strengths={strengths}
+                improvements={improvements}
+                subjectChartData={subjectChartData}
+                SUBJECT_LABELS={SUBJECT_LABELS}
               />
 
             </div>
 
           </div>
+
         </div>
+
       )}
+
       <div className="print-only">
 
         <PrintRoot
