@@ -46,6 +46,7 @@ const OCDashboard = () => {
   const [examInProgress, setExamInProgress] = useState(false);
   const [examPhase, setExamPhase] = useState("mode_selection");
   const [examMode, setExamMode] = useState(null);
+  const [reportVariant, setReportVariant] = useState(null);
   const studentId = sessionStorage.getItem("student_id");
   const [availabilityLoading, setAvailabilityLoading] = useState(true);
   const API_BASE = process.env.REACT_APP_API_URL;
@@ -54,6 +55,7 @@ const OCDashboard = () => {
     setActiveSubject(null);
     setExamInProgress(false);
     setExamMode(null);
+    setReportVariant(null);
     setSubjectAvailability({});
     setAvailabilityLoading(true);
     setExamPhase("mode_selection");
@@ -127,7 +129,7 @@ useEffect(() => {
           alt="Gem Kids Academy"
           className="dashboard-logo"
         />
-
+      {/* HERE 1000 */}
         <div className="subject-selection-card">
           <h1 className="dashboard-title oc-dashboard-title">
             OC Placement Practice Test
@@ -181,45 +183,44 @@ useEffect(() => {
     )}
     {examPhase === "report_mode_selection" && (
   <div className="subject-selection-wrapper">
-
-    <img
-      src="https://gemkidsacademy.com.au/wp-content/uploads/2024/10/cropped-logo-4-1.png"
-      alt="Gem Kids Academy"
-      className="dashboard-logo"
-    />
-
     <div className="subject-selection-card">
-
-      <button
-        className="logout-button"
-        onClick={handleLogout}
+      <div
+        className="back-link"
+        onClick={() => setExamPhase("mode_selection")}
       >
-        Logout
-      </button>
+        ← Back
+      </div>
 
-      <h1 
-        className="dashboard-title oc-dashboard-title"
-        style={{ marginTop: "45px" }}
-      >
-        OC Placement Practice Test
+      <h1 className="dashboard-title">
+        Select Report Type
       </h1>
 
       <div className="title-divider" />
 
       <div className="subject-buttons">
-        {SUBJECTS.map((subject) => (
-          <button
-            key={subject.key}
-            className="subject-button"
-            onClick={() => {
-              setActiveSubject(subject);
-              setExamMode("report");
-              setExamPhase("exam");
-            }}
-          >
-            {subject.label}
-          </button>
-        ))}
+        <button
+          className="subject-button"
+          onClick={() => {
+            setReportVariant("actual");
+            setExamMode("report");
+            setSubjectAvailability({});
+            setExamPhase("selection");
+          }}
+        >
+          Actual Exam
+        </button>
+
+        <button
+          className="subject-button"
+          onClick={() => {
+            setReportVariant("homework");
+            setExamMode("report_homework");
+            setSubjectAvailability({});
+            setExamPhase("selection");
+          }}
+        >
+          Homework
+        </button>
       </div>
     </div>
   </div>
@@ -234,7 +235,7 @@ useEffect(() => {
             alt="Gem Kids Academy"
             className="dashboard-logo"
           />
-
+          {/* HERE 2000 */}
           <div className="subject-selection-card">
             <div
               className="back-link"
@@ -309,9 +310,10 @@ useEffect(() => {
         <main className="content-area">
           <div className="exam-root">
             <ActiveComponent
-              key={`exam-${activeSubject.key}-${examMode}`}
+              key={`exam-${activeSubject.key}-${examMode}-${reportVariant}`}
               studentId={studentId}
               mode={examMode}
+              variant={reportVariant}
               subject={activeSubject.key}
               difficulty="advanced"
               onExamStart={() => setExamInProgress(true)}
