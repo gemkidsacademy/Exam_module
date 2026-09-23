@@ -15,54 +15,24 @@ if (report === undefined) {
 }
 
 // 🔥 2. No data state
+// 🔥 2. No data state
 if (!report || report.status === "no_data" || !report.overall) {
   return (
     <div className="empty-state">
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: "20px"
-        }}
+      <button
+        className="back-dashboard-button"
+        onClick={onBackToDashboard}
       >
-        <button
-          onClick={onBackToDashboard}
-          style={{
-            padding: "10px 18px",
-            background: "#0d8ecf",
-            color: "#fff",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: "600"
-          }}
-        >
-          ← Back to Dashboard
-        </button>
-      </div>
+        ← Back
+      </button>
 
-      <h3>📭 No reports available</h3>
-      <p>This student has not completed this exam yet.</p>
+      <h3>No reports available yet</h3>
 
-      {examDates?.length > 0 && (
-        <select
-          className="exam-dropdown"
-          value={selectedExamId || ""}
-          onChange={(e) => onExamChange(Number(e.target.value))}
-        >
-          {examDates.map((d) => (
-            <option key={d.exam_id} value={d.exam_id}>
-              {new Date(d.date).toLocaleString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-              })}
-            </option>
-          ))}
-        </select>
-      )}
+      <p>
+        You haven’t attempted any exams yet.
+        <br />
+        Complete an exam to see your performance here.
+      </p>
     </div>
   );
 }

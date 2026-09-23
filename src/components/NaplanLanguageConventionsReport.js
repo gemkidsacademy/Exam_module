@@ -11,9 +11,22 @@ function NaplanLanguageConventionsReport({
 }) {
   if (!report?.overall) {
     return (
-      <p className="loading">
-        Generating your report…
-      </p>
+      <div className="empty-state">
+        <button
+          className="back-dashboard-button"
+          onClick={onBackToDashboard}
+        >
+          ← Back
+        </button>
+
+        <h3>No reports available yet</h3>
+
+        <p>
+          You haven’t attempted any exams yet.
+          <br />
+          Complete an exam to see your performance here.
+        </p>
+      </div>
     );
   }
 

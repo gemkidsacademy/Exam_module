@@ -582,35 +582,21 @@
     ----------------------------------------------------------- */
     if (completed && !result) {
       return (
-        <div className="empty-report-card">
-
+        <div className="empty-state">
           <button
+            className="back-dashboard-button"
             onClick={onBackToDashboard}
-            style={{
-              padding: "10px 18px",
-              background: "#0d8ecf",
-              color: "#fff",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              fontWeight: "600",
-              marginBottom: "24px"
-            }}
           >
-            ← Back to Dashboard
+            ← Back
           </button>
 
-          <div className="empty-icon">✍️</div>
-
-          <h1>Writing Reports</h1>
-
-          <h3>No reports yet</h3>
+          <h3>No reports available yet</h3>
 
           <p>
-            Complete your first writing exam to unlock
-            detailed feedback, scores, and progress tracking.
+            You haven’t attempted any exams yet.
+            <br />
+            Complete an exam to see your performance here.
           </p>
-
         </div>
       );
     }
