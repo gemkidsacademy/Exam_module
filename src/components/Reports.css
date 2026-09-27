@@ -187,6 +187,69 @@
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 
+.attempt-selector button {
+  background-color: #0d8ecf;
+  color: white;
+  border: 1px solid #0d8ecf;
+  cursor: pointer;
+}
+
+.attempt-selector button:not(:disabled):hover {
+  background-color: #0b7db8;
+  border-color: #0b7db8;
+}
+
+.attempt-selector button:disabled {
+  background-color: #9ca3af;
+  color: white;
+  border-color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.student-search input {
+  width: 100%;
+  height: 40px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  font-size: 14px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #101828;
+}
+
+.student-search-results {
+  max-height: 240px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #d0d5dd;
+}
+
+.student-search-result {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #101828;
+  font-size: 14px;
+  font-weight: 400;
+  text-align: left;
+  cursor: pointer;
+}
+
+.student-search-result:last-child {
+  border-bottom: 0;
+}
+
+.student-search-result:hover {
+  background: #f3f4f6;
+}
+
+.student-search-no-results {
+  padding: 10px 12px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
 /* Attempts */
 
 .attempt-group {
@@ -276,13 +339,23 @@
 /* Secondary */
 
 .secondary-btn {
-  background: #ffffff;
-  border: 1px solid #d0d7e2;
-  color: #111827;
+  background-color: #0d8ecf;
+  border: 1px solid #0d8ecf;
+  color: white;
+  cursor: pointer;
 }
 
-.secondary-btn:hover {
-  background: #f9fafb;
+.secondary-btn:not(:disabled):hover {
+  background-color: #0b7db8;
+  border-color: #0b7db8;
+}
+
+.secondary-btn:disabled {
+  background-color: #9ca3af;
+  color: white;
+  border-color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 1;
 }
 
 /* Primary */

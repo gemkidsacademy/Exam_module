@@ -7,6 +7,7 @@ const HomeworkTopicReports = ({ centerCode }) => {
   const [reportType, setReportType] = useState("");
   const [students, setStudents] = useState([]);
   const [studentId, setStudentId] = useState("");
+  const [studentSearch, setStudentSearch] = useState("");
   const [exam, setExam] = useState("");
   const [examOptions, setExamOptions] = useState([]);
   const [loadingExams, setLoadingExams] = useState(false);
@@ -657,6 +658,22 @@ const handleGenerate = async () => {
     setLoadingReport(false);
   }
 };
+  const filteredStudents = students.filter(student => {
+    const searchValue = studentSearch.toLowerCase();
+
+    return (
+      String(student.id).toLowerCase().includes(searchValue) ||
+      String(student.label).toLowerCase().includes(searchValue)
+    );
+  });
+
+  const selectedStudentOption = students.find(
+    student => String(student.id) === String(studentId)
+  );
+
+  const showStudentSearchResults =
+    !selectedStudentOption || studentSearch !== selectedStudentOption.label;
+
   return (
     <div className="homework-topic-report">
       <div className="homework-topic-report-filters">
@@ -665,7 +682,11 @@ const handleGenerate = async () => {
           <label>Report Type</label>
           <select
             value={reportType}
-            onChange={(e) => setReportType(e.target.value)}
+            onChange={(e) => {
+              setReportType(e.target.value);
+              setStudentSearch("");
+              setReportData(null);
+            }}
           >
             <option value="">Select report type</option>
             <option value="Per Student Report">Per Student Report</option>
@@ -677,44 +698,80 @@ const handleGenerate = async () => {
 
         {reportType === "Per Student Report" && (
           <div className="homework-topic-report-field">
-            <label>Student</label>
-            <select
-              value={studentId}
-              onChange={(e) => {  
-                setStudentId(e.target.value);  
-                setExam("");  
-                setHomeworkAttemptId(""); 
-              }}
-            >
-              <option value="">Select student</option>
-              {students.map(student => ( 
-                <option key={student.id} value={student.id}> 
-                  {student.label} 
-                </option> 
-              ))}
-            </select>
+            <label>Student ID</label>
+            <div className="homework-topic-report-student-search">
+              <input
+                type="text"
+                placeholder="Search student by ID or name..."
+                value={studentSearch}
+                onChange={(e) => setStudentSearch(e.target.value)}
+              />
+
+              {showStudentSearchResults && (
+                <div className="homework-topic-report-student-results">
+                  {filteredStudents.map(student => (
+                    <div
+                      className="homework-topic-report-student-result"
+                      key={student.id}
+                      onClick={() => {
+                        setStudentId(student.id);
+                        setStudentSearch(student.label);
+                        setExam("");
+                        setHomeworkAttemptId("");
+                      }}
+                    >
+                      {student.label}
+                    </div>
+                  ))}
+
+                  {filteredStudents.length === 0 && (
+                    <div className="homework-topic-report-student-no-results">
+                      No students found
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
         {reportType === "Cumulative Progress" && (
           <div className="homework-topic-report-cumulative-student">
             <div className="homework-topic-report-field">
-              <label>Student</label>
-              <select
-                value={studentId}
-                onChange={(e) => {
-                  setStudentId(e.target.value);
-                  setExam("");
-                  setHomeworkAttemptId("");
-                }}
-              >
-                <option value="">Select student</option>
-                {students.map(student => (
-                  <option key={student.id} value={student.id}>
-                    {student.label}
-                  </option>
-                ))}
-              </select>
+              <label>Student ID</label>
+              <div className="homework-topic-report-student-search">
+                <input
+                  type="text"
+                  placeholder="Search student by ID or name..."
+                  value={studentSearch}
+                  onChange={(e) => setStudentSearch(e.target.value)}
+                />
+
+                {showStudentSearchResults && (
+                  <div className="homework-topic-report-student-results">
+                    {filteredStudents.map(student => (
+                      <div
+                        className="homework-topic-report-student-result"
+                        key={student.id}
+                        onClick={() => {
+                          setStudentId(student.id);
+                          setStudentSearch(student.label);
+                          setExam("");
+                          setHomeworkAttemptId("");
+                        }}
+                      >
+                        {student.label}
+                      </div>
+                    ))}
+
+                    {filteredStudents.length === 0 && (
+                      <div className="homework-topic-report-student-no-results">
+                        No students found
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="homework-topic-report-attempt-selector">
@@ -912,7 +969,12 @@ const handleGenerate = async () => {
         />
       )}
       {reportData && reportType === "Cumulative Progress" && (
-        <CumulativeReport data={reportData} />
+        <CumulativeReport
+          data={{
+            ...reportData,
+            exam: selectedExamSubject || reportData.exam,
+          }}
+        />
       )}
       {reportData && reportType === "Per Class Report" && (
   <div

@@ -45,6 +45,50 @@
   border-color: #9aa6b5;
 }
 
+.homework-topic-report-student-search input {
+  width: 100%;
+  height: 27px;
+  padding: 0 8px;
+  border: 1px solid #ccd3dc;
+  border-radius: 5px;
+  background: #fff;
+  color: #333;
+  font-size: 10px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.homework-topic-report-student-results {
+  max-height: 180px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ccd3dc;
+}
+
+.homework-topic-report-student-result {
+  padding: 8px;
+  border-bottom: 1px solid #e1e5ea;
+  color: #333;
+  font-size: 10px;
+  font-weight: 400;
+  text-align: left;
+  cursor: pointer;
+}
+
+.homework-topic-report-student-result:last-child {
+  border-bottom: 0;
+}
+
+.homework-topic-report-student-result:hover {
+  background: #f3f4f6;
+}
+
+.homework-topic-report-student-no-results {
+  padding: 8px;
+  color: #6b7280;
+  font-size: 10px;
+}
+
 .homework-topic-report-cumulative-student {
   display: flex;
   flex-direction: column;
@@ -72,11 +116,24 @@
 .homework-topic-report-attempt-selector button {
   height: 27px;
   padding: 0 10px;
-  border: none;
+  border: 1px solid #2563eb;
   border-radius: 5px;
-  background: #d9d9d9;
+  background: #2563eb;
   color: #fff;
   font-size: 10px;
+  cursor: pointer;
+}
+
+.homework-topic-report-attempt-selector button:not(:disabled):hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.homework-topic-report-attempt-selector button:disabled {
+  border-color: #d1d5db;
+  background: #d9d9d9;
+  color: #6b7280;
+  cursor: not-allowed;
 }
 
 .homework-topic-report-selected-attempts {
@@ -164,8 +221,20 @@
 }
 
 .homework-topic-report-actions button:not(:disabled) {
-  background: #9ca6b5;
+  border: 1px solid #2563eb;
+  background: #2563eb;
+  color: #fff;
   cursor: pointer;
+}
+
+.homework-topic-report-actions button:not(:disabled):hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.homework-topic-report-actions button:disabled {
+  background: #d9d9d9;
+  color: #6b7280;
 }
 
 @media (max-width: 700px) {

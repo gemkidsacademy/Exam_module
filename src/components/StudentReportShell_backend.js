@@ -45,6 +45,7 @@
   
   
     const [studentId, setStudentId] = useState("");
+    const [studentSearch, setStudentSearch] = useState("");
     const [className, setClassName] = useState("");
     const [classYear, setClassYear] = useState("");
     const [availableYears, setAvailableYears] = useState([]);
@@ -894,6 +895,22 @@ const datesForCurrentReport =
     });
 
 }, [centerCode]);
+
+    const filteredStudents = students.filter(student => {
+      const searchValue = studentSearch.toLowerCase();
+
+      return (
+        String(student.id).toLowerCase().includes(searchValue) ||
+        String(student.label).toLowerCase().includes(searchValue)
+      );
+    });
+
+    const selectedStudentOption = students.find(
+      student => String(student.id) === String(studentId)
+    );
+
+    const showStudentSearchResults =
+      !selectedStudentOption || studentSearch !== selectedStudentOption.label;
   
     
   
@@ -912,6 +929,7 @@ const datesForCurrentReport =
             setReportType(next);
           
             setStudentId("");
+            setStudentSearch("");
             setClassName("");
           
             setAvailableAttemptDates([]);
@@ -939,24 +957,41 @@ const datesForCurrentReport =
   
       {(reportType === "student" || reportType === "cumulative" || reportType === "topic") && (
         <div className="filter-group wide">
-          <label>Student</label>
-          <select
-              value={studentId}
-              onChange={e => {
-                const student = e.target.value;
-                setStudentId(student);
-                setPendingAttemptDate("");
-                setSelectedAttemptDates([]);
-                setShouldGenerate(false);
-              }}
-            >
-              <option value="">Select student</option>
-              {students.map(s => (
-                <option key={s.id} value={s.id}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
+          <label>Student ID</label>
+          <div className="student-search">
+            <input
+              type="text"
+              placeholder="Search student by ID or name..."
+              value={studentSearch}
+              onChange={e => setStudentSearch(e.target.value)}
+            />
+
+            {showStudentSearchResults && (
+              <div className="student-search-results">
+                {filteredStudents.map(student => (
+                  <div
+                    className="student-search-result"
+                    key={student.id}
+                    onClick={() => {
+                      setStudentId(student.id);
+                      setStudentSearch(student.label);
+                      setPendingAttemptDate("");
+                      setSelectedAttemptDates([]);
+                      setShouldGenerate(false);
+                    }}
+                  >
+                    {student.label}
+                  </div>
+                ))}
+
+                {filteredStudents.length === 0 && (
+                  <div className="student-search-no-results">
+                    No students found
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
   
   
           {(reportType === "cumulative" || reportType === "topic") && (
