@@ -4,6 +4,7 @@ import "./AddStudentForm.css";
 function DeleteUserModal({ onClose, onUserDeleted }) {
   const [studentOptions, setStudentOptions] = useState([]);
   const [selectedStudentId, setSelectedStudentId] = useState("");
+  const [studentSearch, setStudentSearch] = useState("");
 
   // Read-only fields
   const [id, setId] = useState("");
@@ -11,12 +12,11 @@ function DeleteUserModal({ onClose, onUserDeleted }) {
   const [parentEmail, setParentEmail] = useState("");
   const [className, setClassName] = useState("");
   const [classDay, setClassDay] = useState("");
-  const centerCode = sessionStorage.getItem(
-    "center_code"
-  );
+
+  const centerCode = sessionStorage.getItem("center_code");
   const BACKEND_URL = process.env.REACT_APP_API_URL;
 
-  // 1️⃣ Fetch all students once (same as Edit)
+  // Fetch all students once
   useEffect(() => {
     const fetchStudents = async () => {
       try {
@@ -39,7 +39,7 @@ function DeleteUserModal({ onClose, onUserDeleted }) {
     fetchStudents();
   }, []);
 
-  // 2️⃣ Populate fields from local list (NO API CALL)
+  // Populate fields from local list
   useEffect(() => {
     if (!selectedStudentId) {
       setId("");
@@ -63,7 +63,7 @@ function DeleteUserModal({ onClose, onUserDeleted }) {
     }
   }, [selectedStudentId, studentOptions]);
 
-  // 3️⃣ Delete handler
+  // Delete handler
   const handleDelete = async () => {
     if (!id) {
       alert("Please select a student to delete");
@@ -79,7 +79,9 @@ function DeleteUserModal({ onClose, onUserDeleted }) {
     try {
       const res = await fetch(
         `${BACKEND_URL}/delete_student_exam_module/${id}`,
-        { method: "DELETE" }
+        {
+          method: "DELETE",
+        }
       );
 
       if (!res.ok) {
@@ -96,52 +98,96 @@ function DeleteUserModal({ onClose, onUserDeleted }) {
   };
 
   return (
-  <div className="add-student-container">
-    <h2>Delete Student</h2>
+    <div className="add-student-container">
+      <h2>Delete Student</h2>
 
-    {/* Dropdown */}
-    <label>Select Student</label>
-    <select
-      value={selectedStudentId}
-      onChange={(e) => setSelectedStudentId(e.target.value)}
-    >
-      <option value="">-- Select Student --</option>
-      {studentOptions.map((s) => (
-        <option key={s.id} value={s.id}>
-          {s.student_id} - {s.name}
-        </option>
-      ))}
-    </select>
+      <label>Search Student</label>
 
-    {/* Read-only details */}
-    <label>ID</label>
-    <input type="text" value={id} readOnly />
+      <input
+        type="text"
+        placeholder="Search student by ID or name..."
+        value={studentSearch}
+        onChange={(e) => {
+          setStudentSearch(e.target.value);
+          setSelectedStudentId("");
+        }}
+      />
 
-    <label>Name</label>
-    <input type="text" value={name} readOnly />
+      {/* Student search results */}
+      {studentSearch && !selectedStudentId && (
+        <div
+          style={{
+            width: "100%",
+            border: "1px solid #ccc",
+            borderTop: "none",
+            backgroundColor: "#fff",
+          }}
+        >
+          {studentOptions
+            .filter((s) => {
+              const searchValue = studentSearch.toLowerCase();
 
-    <label>Class</label>
-    <input type="text" value={className} readOnly />
+              return (
+                String(s.student_id)
+                  .toLowerCase()
+                  .includes(searchValue) ||
+                String(s.name).toLowerCase().includes(searchValue)
+              );
+            })
+            .map((s) => (
+              <div
+                key={s.id}
+                onClick={() => {
+                  setSelectedStudentId(String(s.id));
+                  setStudentSearch(`${s.student_id} - ${s.name}`);
+                }}
+                style={{
+                  padding: "10px",
+                  borderBottom: "1px solid #ccc",
+                  backgroundColor: "#fff",
+                  color: "#222",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f5f5f5";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#fff";
+                }}
+              >
+                {s.student_id} - {s.name}
+              </div>
+            ))}
+        </div>
+      )}
 
-    <label>Day</label>
-    <input type="text" value={classDay} readOnly />
+      {/* Read-only details */}
+      <label>ID</label>
+      <input type="text" value={id} readOnly />
 
-    <label>Parent Email</label>
-    <input type="email" value={parentEmail} readOnly />
+      <label>Name</label>
+      <input type="text" value={name} readOnly />
 
-    <button
-      className="danger-btn"
-      type="button"
-      onClick={handleDelete}
-      disabled={!id}
-    >
-      Delete Student
-    </button>
+      <label>Class</label>
+      <input type="text" value={className} readOnly />
 
-    
-  </div>
-);
+      <label>Day</label>
+      <input type="text" value={classDay} readOnly />
 
+      <label>Parent Email</label>
+      <input type="email" value={parentEmail} readOnly />
+
+      <button
+        className="danger-btn"
+        type="button"
+        onClick={handleDelete}
+        disabled={!id}
+      >
+        Delete Student
+      </button>
+    </div>
+  );
 }
 
 export default DeleteUserModal;

@@ -8,6 +8,7 @@ const DeleteUserExamAttempt = ({
   const [studentsList, setStudentsList] = useState([]);
 
   const [selectedStudentId, setSelectedStudentId] = useState("");
+  const [studentSearch, setStudentSearch] = useState("");
   const BACKEND_URL = process.env.REACT_APP_API_URL;
   
 
@@ -172,18 +173,70 @@ const DeleteUserExamAttempt = ({
     <div className="modal">
       <h2>Delete User Exam Attempt</h2>
 
-      {/* ============================
-          STUDENT DROPDOWN
-      ============================ */}
-      <label>Student</label>
-      <select value={selectedStudentId} onChange={handleStudentChange}>
-        <option value="">Select Student</option>
-        {studentsList.map((studentItem) => (
-          <option key={studentItem.id} value={studentItem.student_id}>
-            {studentItem.name}
-          </option>
-        ))}
-      </select>
+      <label>Search Student</label>
+      <input
+        type="text"
+        placeholder="Search student by ID or name..."
+        value={studentSearch}
+        onChange={(e) => {
+          setStudentSearch(e.target.value);
+          setSelectedStudentId("");
+          setSelectedClassType("");
+          setSelectedExamType("");
+          setExamOptionsList([]);
+        }}
+      />
+
+      {studentSearch && !selectedStudentId && (
+        <div role="listbox" style={{ width: "100%" }}>
+          {studentsList
+            .filter((studentItem) => {
+              const searchValue = studentSearch.toLowerCase();
+
+              return (
+                String(studentItem.student_id)
+                  .toLowerCase()
+                  .includes(searchValue) ||
+                String(studentItem.name).toLowerCase().includes(searchValue)
+              );
+            })
+            .map((studentItem) => (
+              <div
+                key={studentItem.id}
+                role="option"
+                aria-selected="false"
+                onClick={() => {
+                  setSelectedStudentId(String(studentItem.student_id));
+                  setStudentSearch(
+                    `${studentItem.student_id} - ${studentItem.name}`
+                  );
+                  setSelectedClassType(studentItem.class_name || "");
+                  setSelectedExamType("");
+                  updateExamOptionsBasedOnClass(studentItem.class_name);
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f5f5f5";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#ffffff";
+                }}
+                style={{
+                  width: "100%",
+                  boxSizing: "border-box",
+                  padding: "8px 10px",
+                  backgroundColor: "#ffffff",
+                  color: "#222222",
+                  border: "1px solid #d9d9d9",
+                  textAlign: "left",
+                  fontWeight: "normal",
+                  cursor: "pointer",
+                }}
+              >
+                {studentItem.student_id} - {studentItem.name}
+              </div>
+            ))}
+        </div>
+      )}
 
       {/* ============================
           STUDENT ID FIELD (AUTO FILLED)

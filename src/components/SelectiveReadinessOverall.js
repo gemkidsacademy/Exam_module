@@ -26,6 +26,8 @@ export default function SelectiveReadinessOverall({
   const [students, setStudents] = useState([]);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState("");
+  const [studentSearch, setStudentSearch] = useState("");
+  const [showStudentResults, setShowStudentResults] = useState(false);
   const [availableDates, setAvailableDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [overall, setOverall] = useState(null);
@@ -312,17 +314,76 @@ const MAX_SCORES = {
     {/* ================= STUDENT SELECTOR ================= */}
     <div className="selector-row">
       <label>Student ID</label>
-      <select
-        value={selectedStudent}
-        onChange={(e) => setSelectedStudent(e.target.value)}
-      >
-        <option value="">Select student</option>
-        {students.map((s) => (
-          <option key={s.student_id} value={s.student_id}>
-            {s.student_id}
-          </option>
-        ))}
-      </select>
+
+      <div style={{ width: "100%" }}>
+        <input
+          type="text"
+          placeholder="Search student by ID or name..."
+          value={studentSearch}
+          onChange={(e) => {
+            setStudentSearch(e.target.value);
+            setShowStudentResults(true);
+          }}
+          style={{ width: "100%", boxSizing: "border-box" }}
+        />
+
+        {showStudentResults && studentSearch && (
+          <div
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              backgroundColor: "#ffffff",
+              border: "1px solid #d1d5db"
+            }}
+          >
+            {students
+              .filter((student) => {
+                const searchValue = studentSearch.toLowerCase();
+
+                return (
+                  String(student.student_id)
+                    .toLowerCase()
+                    .includes(searchValue) ||
+                  String(student.name)
+                    .toLowerCase()
+                    .includes(searchValue)
+                );
+              })
+              .map((student, index, matchingStudents) => (
+                <div
+                  key={student.student_id}
+                  onClick={() => {
+                    setSelectedStudent(student.student_id);
+                    setStudentSearch(
+                      `${student.student_id} - ${student.name}`
+                    );
+                    setShowStudentResults(false);
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#f3f4f6";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#ffffff";
+                  }}
+                  style={{
+                    padding: "8px 10px",
+                    backgroundColor: "#ffffff",
+                    color: "#1f2937",
+                    borderBottom:
+                      index < matchingStudents.length - 1
+                        ? "1px solid #d1d5db"
+                        : "none",
+                    textAlign: "left",
+                    fontWeight: "normal",
+                    cursor: "pointer"
+                  }}
+                >
+                  {student.student_id} - {student.name}
+                </div>
+              ))}
+          </div>
+        )}
+      </div>
     </div>
 
     {/* ================= DATE SELECTOR ================= */}

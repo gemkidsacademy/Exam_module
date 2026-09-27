@@ -4,6 +4,9 @@ import "./AddStudentForm.css";
 export default function EditUserForm() {
   const [studentOptions, setStudentOptions] = useState([]);
   const [selectedStudentId, setSelectedStudentId] = useState("");
+  const [studentSearch, setStudentSearch] = useState("");
+  const [showStudentResults, setShowStudentResults] = useState(false);
+
   const [id, setId] = useState("");
   const [name, setName] = useState("");
   const [className, setClassName] = useState("");
@@ -17,7 +20,6 @@ export default function EditUserForm() {
   const [gender, setGender] = useState("");
   const [parentEmail, setParentEmail] = useState("");
 
-  // NEW: Student active/inactive status
   const [isActive, setIsActive] = useState(true);
 
   const BACKEND_URL = process.env.REACT_APP_API_URL;
@@ -51,7 +53,7 @@ export default function EditUserForm() {
     }
   };
 
-  // Fetch all students for dropdown
+  // Fetch all students
   useEffect(() => {
     const fetchStudents = async () => {
       try {
@@ -75,8 +77,7 @@ export default function EditUserForm() {
     fetchStudents();
   }, []);
 
-  // When a student is selected from dropdown,
-  // populate the form
+  // Populate form when a student is selected
   useEffect(() => {
     if (!selectedStudentId) return;
 
@@ -86,20 +87,12 @@ export default function EditUserForm() {
 
     if (student) {
       setId(student.id);
-
       setName(student.name);
-
       setClassName(student.class_name);
-
       setClassDay(student.class_day);
-
       setParentEmail(student.parent_email);
-
       setGender(student.gender || "");
-
       setClassYear(student.student_year || "");
-
-      // NEW: Load student's current active status
       setIsActive(student.is_active ?? true);
     }
   }, [selectedStudentId, studentOptions]);
@@ -140,8 +133,6 @@ export default function EditUserForm() {
       class_day: classDay,
       parent_email: parentEmail,
       gender,
-
-      // NEW
       is_active: isActive,
     };
 
@@ -175,22 +166,68 @@ export default function EditUserForm() {
       <h2>Edit Student</h2>
 
       <form onSubmit={handleSubmit}>
-        {/* Dropdown to select student by student_id */}
-        <label>Select Student ID</label>
+        <label>Search Student</label>
 
-        <select
-          value={selectedStudentId}
-          onChange={(e) => setSelectedStudentId(e.target.value)}
+        <input
+          type="text"
+          placeholder="Search student by ID or name..."
+          value={studentSearch}
+          onChange={(e) => {
+            setStudentSearch(e.target.value);
+            setShowStudentResults(true);
+          }}
           required
-        >
-          <option value="">-- Select Student --</option>
+        />
 
-          {studentOptions.map((s) => (
-            <option key={s.id} value={s.student_id}>
-              {s.student_id} - {s.name}
-            </option>
-          ))}
-        </select>
+        {/* Student search results */}
+        {showStudentResults && studentSearch && (
+          <div
+            style={{
+              width: "100%",
+              border: "1px solid #ccc",
+              borderTop: "none",
+              backgroundColor: "#fff",
+            }}
+          >
+            {studentOptions
+              .filter((s) => {
+                const searchValue = studentSearch.toLowerCase();
+
+                return (
+                  String(s.student_id)
+                    .toLowerCase()
+                    .includes(searchValue) ||
+                  String(s.name).toLowerCase().includes(searchValue)
+                );
+              })
+              .map((s) => (
+                <div
+                  key={s.id}
+                  onClick={() => {
+                    setSelectedStudentId(s.student_id);
+                    setStudentSearch(`${s.student_id} - ${s.name}`);
+                    setShowStudentResults(false);
+                  }}
+                  style={{
+                    padding: "10px",
+                    borderBottom: "1px solid #ccc",
+                    backgroundColor: "#fff",
+                    color: "#222",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#f5f5f5";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#fff";
+                  }}
+                >
+                  {s.student_id} - {s.name}
+                </div>
+              ))}
+          </div>
+        )}
 
         {/* Non-editable ID from backend */}
         <label>ID</label>
@@ -241,7 +278,9 @@ export default function EditUserForm() {
           onChange={(e) => setClassYear(e.target.value)}
           required
         >
-          <option value="">-- Select Year --</option>
+          <option value="">
+            -- Select Year --
+          </option>
 
           {classYearOptions
             .filter((year) => year.class_name === className)
@@ -262,7 +301,9 @@ export default function EditUserForm() {
           onChange={(e) => setClassDay(e.target.value)}
           required
         >
-          <option value="">-- Select Day --</option>
+          <option value="">
+            -- Select Day --
+          </option>
 
           {CLASS_DAY_OPTIONS.map((day) => (
             <option key={day} value={day}>
@@ -287,7 +328,9 @@ export default function EditUserForm() {
           onChange={(e) => setGender(e.target.value)}
           required
         >
-          <option value="">-- Select Gender --</option>
+          <option value="">
+            -- Select Gender --
+          </option>
 
           <option value="Male">
             Male
@@ -298,12 +341,13 @@ export default function EditUserForm() {
           </option>
         </select>
 
-        {/* NEW: Active / Inactive */}
         <label>Student Status</label>
 
         <select
           value={isActive ? "true" : "false"}
-          onChange={(e) => setIsActive(e.target.value === "true")}
+          onChange={(e) =>
+            setIsActive(e.target.value === "true")
+          }
           required
         >
           <option value="true">

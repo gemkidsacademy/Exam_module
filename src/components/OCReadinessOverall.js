@@ -14,6 +14,8 @@ export default function OCReadinessOverall({ centerCode }) {
 
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState("");
+  const [studentSearch, setStudentSearch] = useState("");
+  const [showStudentResults, setShowStudentResults] = useState(false);
   const [availableDates, setAvailableDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
 
@@ -411,41 +413,85 @@ export default function OCReadinessOverall({ centerCode }) {
 
         </label>
 
-        <select
+        <div style={{ width: "100%" }}>
 
-          value={selectedStudent}
+          <input
+            type="text"
+            placeholder="Search student by ID or name..."
+            value={studentSearch}
+            onChange={(e) => {
+              setStudentSearch(e.target.value);
+              setShowStudentResults(true);
+            }}
+            style={{ width: "100%", boxSizing: "border-box" }}
+          />
 
-          onChange={(e) =>
-            setSelectedStudent(
-              e.target.value
-            )
-          }
+          {showStudentResults && studentSearch && (
 
-        >
-
-          <option value="">
-
-            Select student
-
-          </option>
-
-          {students.map(student => (
-
-            <option
-
-              key={student.student_id}
-
-              value={student.student_id}
-
+            <div
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+                backgroundColor: "#ffffff",
+                border: "1px solid #d1d5db"
+              }}
             >
 
-              {student.student_id}
+              {students
+                .filter((student) => {
+                  const searchValue = studentSearch.toLowerCase();
 
-            </option>
+                  return (
+                    String(student.student_id)
+                      .toLowerCase()
+                      .includes(searchValue) ||
+                    String(student.name)
+                      .toLowerCase()
+                      .includes(searchValue)
+                  );
+                })
+                .map((student, index, matchingStudents) => (
 
-          ))}
+                  <div
+                    key={student.student_id}
+                    onClick={() => {
+                      setSelectedStudent(student.student_id);
+                      setStudentSearch(
+                        `${student.student_id} - ${student.name}`
+                      );
+                      setShowStudentResults(false);
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "#f3f4f6";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "#ffffff";
+                    }}
+                    style={{
+                      padding: "8px 10px",
+                      backgroundColor: "#ffffff",
+                      color: "#1f2937",
+                      borderBottom:
+                        index < matchingStudents.length - 1
+                          ? "1px solid #d1d5db"
+                          : "none",
+                      textAlign: "left",
+                      fontWeight: "normal",
+                      cursor: "pointer"
+                    }}
+                  >
 
-        </select>
+                    {student.student_id} - {student.name}
+
+                  </div>
+
+                ))}
+
+            </div>
+
+          )}
+
+        </div>
 
       </div>
 

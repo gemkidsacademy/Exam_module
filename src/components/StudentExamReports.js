@@ -33,6 +33,7 @@ const READINESS_SCORE_MAP = {
   "Competitive": 75,
   "Needs Improvement": 45
 };
+
 const SECTION_GRADE_MAP = {
   A: 90,
   B: 75,
@@ -47,11 +48,16 @@ const SECTION_GRADE_MAP = {
 export default function StudentExamReports({
   centerCode
 }) {
-
   console.log(centerCode);
+
   const [students, setStudents] = useState([]);
   const [selectedStudentId, setSelectedStudentId] = useState("");
   const [studentDetails, setStudentDetails] = useState(null);
+
+  // NEW: Student search state
+  const [studentSearch, setStudentSearch] = useState("");
+  const [showStudentResults, setShowStudentResults] = useState(false);
+
   const [availableDates, setAvailableDates] = useState([]);
   const [reports, setReports] = useState([]);
   const [reportsLoading, setReportsLoading] = useState(false);
@@ -60,47 +66,54 @@ export default function StudentExamReports({
   /* ============================
      Helpers
   ============================ */
+
   const parseSummaryNotes = (notes) => {
     if (!notes) return {};
+
     const result = {};
-    notes.split(",").forEach(part => {
-      const [key, value] = part.split(":").map(s => s.trim());
+
+    notes.split(",").forEach((part) => {
+      const [key, value] = part.split(":").map((s) => s.trim());
+
       if (key && value) {
         result[key.toLowerCase()] = value.replace("%", "");
       }
     });
+
     return result;
   };
 
   const formatExamName = (type) =>
-    type ? type.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase()) : "Unknown Exam";
+    type
+      ? type
+          .replace("_", " ")
+          .replace(/\b\w/g, (c) => c.toUpperCase())
+      : "Unknown Exam";
 
   /* ============================
      Data Fetching
   ============================ */
 
   useEffect(() => {
-
     fetch(
       `${BACKEND_URL}/api/admin/students_center_specific?center_code=${centerCode}`
     )
-      .then(res => res.json())
-      .then(data =>
+      .then((res) => res.json())
+      .then((data) =>
         setStudents(
           Array.isArray(data)
             ? data
             : []
         )
       );
-
   }, [centerCode]);
 
   useEffect(() => {
     if (!selectedStudentId) return;
 
     fetch(`${BACKEND_URL}/api/admin/students/${selectedStudentId}`)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setStudentDetails(data);
         setReports([]);
         setSelectedDate("");
@@ -113,8 +126,12 @@ export default function StudentExamReports({
     fetch(
       `${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-report-dates`
     )
-      .then(res => res.json())
-      .then(data => setAvailableDates(Array.isArray(data) ? data : []));
+      .then((res) => res.json())
+      .then((data) =>
+        setAvailableDates(
+          Array.isArray(data) ? data : []
+        )
+      );
   }, [selectedStudentId]);
 
   useEffect(() => {
@@ -125,8 +142,12 @@ export default function StudentExamReports({
     fetch(
       `${BACKEND_URL}/api/admin/students/${selectedStudentId}/selective-reports?exam_date=${selectedDate}`
     )
-      .then(res => res.json())
-      .then(data => setReports(Array.isArray(data) ? data : []))
+      .then((res) => res.json())
+      .then((data) =>
+        setReports(
+          Array.isArray(data) ? data : []
+        )
+      )
       .finally(() => setReportsLoading(false));
   }, [selectedStudentId, selectedDate]);
 
@@ -139,27 +160,94 @@ export default function StudentExamReports({
       <h2>Student Exam Reports</h2>
 
       {!studentDetails && (
-        <select
-          value={selectedStudentId}
-          onChange={e => setSelectedStudentId(e.target.value)}
-        >
-          <option value="">-- Select Student --</option>
-          {students.map(s => (
-            <option key={s.student_id} value={s.student_id}>
-              {s.student_id} – {s.name}
-            </option>
-          ))}
-        </select>
+        <>
+          <label>Search Student</label>
+
+          <input
+            type="text"
+            placeholder="Search student by ID or name..."
+            value={studentSearch}
+            onChange={(e) => {
+              setStudentSearch(e.target.value);
+              setShowStudentResults(true);
+            }}
+          />
+
+          {/* Student search results */}
+          {showStudentResults && studentSearch && (
+            <div
+              style={{
+                width: "100%",
+                border: "1px solid #ccc",
+                borderTop: "none",
+                backgroundColor: "#fff"
+              }}
+            >
+              {students
+                .filter((student) => {
+                  const searchValue =
+                    studentSearch.toLowerCase();
+
+                  return (
+                    String(student.student_id)
+                      .toLowerCase()
+                      .includes(searchValue) ||
+                    String(student.name)
+                      .toLowerCase()
+                      .includes(searchValue)
+                  );
+                })
+                .map((student) => (
+                  <div
+                    key={student.student_id}
+                    onClick={() => {
+                      setSelectedStudentId(
+                        student.student_id
+                      );
+
+                      setStudentSearch(
+                        `${student.student_id} - ${student.name}`
+                      );
+
+                      setShowStudentResults(false);
+                    }}
+                    style={{
+                      padding: "10px",
+                      borderBottom: "1px solid #ccc",
+                      backgroundColor: "#fff",
+                      color: "#222",
+                      cursor: "pointer",
+                      fontSize: "14px"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        "#f5f5f5";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        "#fff";
+                    }}
+                  >
+                    {student.student_id} – {student.name}
+                  </div>
+                ))}
+            </div>
+          )}
+        </>
       )}
 
       {studentDetails && (
         <>
-          <button onClick={() => {
-            setSelectedStudentId("");
-            setStudentDetails(null);
-            setReports([]);
-            setSelectedDate("");
-          }}>
+          <button
+            onClick={() => {
+              setSelectedStudentId("");
+              setStudentDetails(null);
+              setReports([]);
+              setSelectedDate("");
+              setStudentSearch("");
+              setShowStudentResults(false);
+            }}
+          >
             ← Back
           </button>
 
@@ -167,121 +255,191 @@ export default function StudentExamReports({
 
           <select
             value={selectedDate}
-            onChange={e => setSelectedDate(e.target.value)}
+            onChange={(e) =>
+              setSelectedDate(e.target.value)
+            }
           >
-            <option value="">-- Select Attempt Date --</option>
-            {availableDates.map(date => (
+            <option value="">
+              -- Select Attempt Date --
+            </option>
+
+            {availableDates.map((date) => (
               <option key={date} value={date}>
                 Week Starting - {date}
               </option>
             ))}
           </select>
-
         </>
       )}
 
       {reportsLoading && <p>Loading reports…</p>}
 
-      {reports.map(report => {
+      {reports.map((report) => {
         console.log("REPORT OBJECT:", report);
-        const sectionChartData = report.sections.map(s => ({
-          section: s.section_name,
-          score: SECTION_GRADE_MAP[s.performance_band] || 0
-        }));
 
-        const summary = parseSummaryNotes(report.summary_notes);
+        const sectionChartData =
+          report.sections.map((s) => ({
+            section: s.section_name,
+            score:
+              SECTION_GRADE_MAP[
+                s.performance_band
+              ] || 0
+          }));
+
+        const summary =
+          parseSummaryNotes(
+            report.summary_notes
+          );
 
         return (
-          <div key={report.id} className="exam-report-card">
-
-            <h4>{formatExamName(report.exam_type)}</h4>
+          <div
+            key={report.id}
+            className="exam-report-card"
+          >
+            <h4>
+              {formatExamName(
+                report.exam_type
+              )}
+            </h4>
 
             {/* Overall Readiness */}
             <div className="summary-box">
-              <strong>{report.readiness_band}</strong>
+              <strong>
+                {report.readiness_band}
+              </strong>
+
               <div className="readiness-bar">
                 <div
                   className="readiness-fill"
                   style={{
-                    width: `${READINESS_SCORE_MAP[report.readiness_band] || 0}%`
+                    width: `${
+                      READINESS_SCORE_MAP[
+                        report.readiness_band
+                      ] || 0
+                    }%`
                   }}
                 />
               </div>
-              {/* ✅ Writing score appears here */}
-                {report.exam_type === "writing" && (
-                  <p className="writing-score">
-                    <strong>Writing Score:</strong> {report.overall_score} / 25
-                  </p>
-                )}
 
-              {/* Reading (extra features)
-              {report.exam_type === "reading" && (
-                <div className="reading-score">
-                  <p>
-                    <strong>Overall Reading Score:</strong> {summary.score || report.overall_score}%
-                  </p>
-                  <p>
-                    <strong>Exam Coverage:</strong> {summary.coverage}%
-                  </p>
-                  <p>
-                    <strong>Accuracy (attempted questions):</strong> {summary.accuracy}%
-                  </p>
-                </div>
+              {/* Writing score */}
+              {report.exam_type ===
+                "writing" && (
+                <p className="writing-score">
+                  <strong>
+                    Writing Score:
+                  </strong>{" "}
+                  {report.overall_score} / 25
+                </p>
               )}
-              */}
 
-            {report.exam_type === "reading" && (
-              <p className="reading-score">
-                <strong>Overall Reading Score:</strong> {report.overall_score}%
-                {report.obtained_marks !== undefined && report.total_marks !== undefined && (
-                  <> ({report.obtained_marks} / {report.total_marks})</>
-                )}
+              {report.exam_type ===
+                "reading" && (
+                <p className="reading-score">
+                  <strong>
+                    Overall Reading Score:
+                  </strong>{" "}
+                  {report.overall_score}%
+
+                  {report.obtained_marks !==
+                    undefined &&
+                    report.total_marks !==
+                      undefined && (
+                      <>
+                        {" "}
+                        ({report.obtained_marks} /{" "}
+                        {report.total_marks})
+                      </>
+                    )}
+                </p>
+              )}
+            </div>
+
+            {/* Mathematical Reasoning */}
+            {report.exam_type ===
+              "mathematical_reasoning" && (
+              <p className="math-score">
+                <strong>
+                  Overall Mathematical Reasoning
+                  Accuracy:
+                </strong>{" "}
+                {report.overall_score}%
+
+                {report.obtained_marks !==
+                  undefined &&
+                  report.total_marks !==
+                    undefined && (
+                    <>
+                      {" "}
+                      ({report.obtained_marks} /{" "}
+                      {report.total_marks})
+                    </>
+                  )}
               </p>
             )}
 
-            </div>
-             {/* Mathematical Reasoning */}
-              {report.exam_type === "mathematical_reasoning" && (
-                <p className="math-score">
-                  <strong>Overall Mathematical Reasoning Accuracy:</strong> {report.overall_score}%
-                  {report.obtained_marks !== undefined && report.total_marks !== undefined && (
-                    <> ({report.obtained_marks} / {report.total_marks})</>
+            {/* Thinking Skills */}
+            {report.exam_type ===
+              "thinking_skills" && (
+              <p className="thinking-score">
+                <strong>
+                  Overall Thinking Skills
+                  Accuracy:
+                </strong>{" "}
+                {report.overall_score}%
+
+                {report.obtained_marks !==
+                  undefined &&
+                  report.total_marks !==
+                    undefined && (
+                    <>
+                      {" "}
+                      ({report.obtained_marks} /{" "}
+                      {report.total_marks})
+                    </>
                   )}
-                </p>
-              )}
-              {/* Thinking Skills */}
-              {report.exam_type === "thinking_skills" && (
-                <p className="thinking-score">
-                  <strong>Overall Thinking Skills Accuracy:</strong> {report.overall_score}%
-                  {report.obtained_marks !== undefined && report.total_marks !== undefined && (
-                    <> ({report.obtained_marks} / {report.total_marks})</>
-                  )}
-                </p>
-              )}
-            
-            {report.exam_type === "reading" && report.sections?.length > 0 && (
-                 <>
-                <h5>Section Performance</h5>
-                <div style={{ width: "100%", height: 220 }}>
-                  <ResponsiveContainer>
-                    <BarChart data={sectionChartData}>
-                      <XAxis dataKey="section" />
-                      <YAxis domain={[0, 100]} />
-                      <Tooltip />
-                      <Bar dataKey="score" fill="#2563eb" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </>
+              </p>
             )}
 
-            
-            <p className="report-disclaimer">{report.disclaimer}</p>
+            {/* Reading Section Performance */}
+            {report.exam_type ===
+              "reading" &&
+              report.sections?.length > 0 && (
+                <>
+                  <h5>
+                    Section Performance
+                  </h5>
+
+                  <div
+                    style={{
+                      width: "100%",
+                      height: 220
+                    }}
+                  >
+                    <ResponsiveContainer>
+                      <BarChart
+                        data={sectionChartData}
+                      >
+                        <XAxis dataKey="section" />
+                        <YAxis
+                          domain={[0, 100]}
+                        />
+                        <Tooltip />
+                        <Bar
+                          dataKey="score"
+                          fill="#2563eb"
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </>
+              )}
+
+            <p className="report-disclaimer">
+              {report.disclaimer}
+            </p>
           </div>
         );
       })}
-
-      
     </div>
   );
 }
