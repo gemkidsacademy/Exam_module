@@ -14,27 +14,128 @@ export default function GenerateExam_naplan_writing({
   const [classYears, setClassYears] = useState([]);
   const [selectedClassYear, setSelectedClassYear] = useState("");
   const [classesLoading, setClassesLoading] = useState(true);
+  const [availableDates, setAvailableDates] = useState([]);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [availableBatches, setAvailableBatches] = useState([]);
+  const [selectedBatchId, setSelectedBatchId] = useState("");
+
+  useEffect(() => {
+    if (!selectedClassYear || mode !== "latest") {
+      return;
+    }
+
+    setAvailableDates([]);
+    setSelectedDate("");
+    setAvailableBatches([]);
+    setSelectedBatchId("");
+
+    const fetchAvailableDates = async () => {
+      try {
+        const response = await fetch(
+          `${BACKEND_URL}/api/writing/upload-dates/${selectedClassYear}`
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.detail || "Failed to fetch upload dates"
+          );
+        }
+
+        setAvailableDates(data.dates || []);
+
+        if (data.dates?.length > 0) {
+          setSelectedDate(data.dates[0]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch upload dates:", error);
+        setErrorMessage(
+          error.message || "Failed to fetch upload dates"
+        );
+      }
+    };
+
+    fetchAvailableDates();
+  }, [selectedClassYear, mode]);
+
+  useEffect(() => {
+    if (!selectedClassYear || !selectedDate || mode !== "latest") {
+      return;
+    }
+
+    setAvailableBatches([]);
+    setSelectedBatchId("");
+
+    const fetchAvailableBatches = async () => {
+      try {
+        const response = await fetch(
+          `${BACKEND_URL}/api/writing/available-batches?class_year=${selectedClassYear}&date=${selectedDate}&class_name=Naplan`
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.detail || "Failed to fetch batches");
+        }
+
+        setAvailableBatches(data.batches || []);
+
+        if (data.batches?.length > 0) {
+          setSelectedBatchId(data.batches[0]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch batches:", error);
+        setErrorMessage(error.message || "Failed to fetch batches");
+      }
+    };
+
+    fetchAvailableBatches();
+  }, [selectedClassYear, selectedDate, mode]);
 
   /* ===========================
      Generate Actual Exam
   =========================== */
 const handleGenerateNaplanWritingExam = async () => {
+  if (mode === "latest" && !selectedDate) {
+    setErrorMessage("Please select an upload date");
+    return;
+  }
+
+  if (mode === "latest" && !selectedBatchId) {
+    setErrorMessage("Please select a batch");
+    return;
+  }
+
   setLoading(true);
   setErrorMessage("");
   setGeneratedExam(null);
 
   try {
+    const endpoint =
+      mode === "latest"
+        ? "/api/exams/generate-naplan-writing-latest"
+        : "/api/exams/generate-naplan-writing";
+
+    const payload =
+      mode === "latest"
+        ? {
+            class_year: selectedClassYear,
+            selected_date: selectedDate,
+            batch_id: Number(selectedBatchId),
+            center_code: centerCode,
+          }
+        : {
+            class_year: selectedClassYear,
+            center_code: centerCode,
+          };
+
     const response = await fetch(
-      `${BACKEND_URL}/api/exams/generate-naplan-writing`,
+      `${BACKEND_URL}${endpoint}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          class_year: selectedClassYear,
-          center_code: centerCode,
-        }),
+        body: JSON.stringify(payload),
       }
     );
 
@@ -107,22 +208,47 @@ useEffect(() => {
      Generate Homework Exam
   =========================== */
   const handleGenerateNaplanWritingHomework = async () => {
+  if (mode === "latest" && !selectedDate) {
+    setErrorMessage("Please select an upload date");
+    return;
+  }
+
+  if (mode === "latest" && !selectedBatchId) {
+    setErrorMessage("Please select a batch");
+    return;
+  }
+
   setLoading(true);
   setErrorMessage("");
   setGeneratedExam(null);
 
   try {
+    const endpoint =
+      mode === "latest"
+        ? "/api/exams/generate-naplan-writing-homework-latest"
+        : "/api/exams/generate-naplan-writing-homework";
+
+    const payload =
+      mode === "latest"
+        ? {
+            class_year: selectedClassYear,
+            selected_date: selectedDate,
+            batch_id: Number(selectedBatchId),
+            center_code: centerCode,
+          }
+        : {
+            class_year: selectedClassYear,
+            center_code: centerCode,
+          };
+
     const response = await fetch(
-      `${BACKEND_URL}/api/exams/generate-naplan-writing-homework`,
+      `${BACKEND_URL}${endpoint}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          class_year: selectedClassYear,
-          center_code: centerCode,
-        }),
+        body: JSON.stringify(payload),
       }
     );
 
@@ -193,6 +319,44 @@ useEffect(() => {
         </select>
       </div>
 
+      {mode === "latest" && (
+        <>
+          <div className="form-group">
+            <label>Select Upload Date:</label>
+
+            <select
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+            >
+              <option value="">Select upload date</option>
+
+              {availableDates.map((date) => (
+                <option key={date} value={date}>
+                  {date}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Select Upload Batch:</label>
+
+            <select
+              value={selectedBatchId}
+              onChange={(e) => setSelectedBatchId(e.target.value)}
+            >
+              <option value="">Select upload batch</option>
+
+              {availableBatches.map((batchId) => (
+                <option key={batchId} value={batchId}>
+                  Batch {batchId}
+                </option>
+              ))}
+            </select>
+          </div>
+        </>
+      )}
+
       {errorMessage && (
         <p className="error-text">
           {errorMessage}
@@ -203,7 +367,11 @@ useEffect(() => {
       <button
         className="generate-btn blue-btn"
         onClick={handleGenerateNaplanWritingExam}
-        disabled={loading || !selectedClassYear}
+        disabled={
+          loading ||
+          !selectedClassYear ||
+          (mode === "latest" && (!selectedDate || !selectedBatchId))
+        }
       >
         {loading
           ? "Generating..."
@@ -214,7 +382,11 @@ useEffect(() => {
       <button
         className="generate-btn blue-btn"
         onClick={handleGenerateNaplanWritingHomework}
-        disabled={loading || !selectedClassYear}
+        disabled={
+          loading ||
+          !selectedClassYear ||
+          (mode === "latest" && (!selectedDate || !selectedBatchId))
+        }
         style={{ marginTop: "15px" }}
       >
         {loading

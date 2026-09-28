@@ -60,7 +60,8 @@ export default function GenerateExam_writing({
       const response = await fetch(
         `${BACKEND_URL}/api/writing/available-batches` +
         `?class_year=${encodeURIComponent(selectedClassYear)}` +
-        `&date=${selectedDate}`
+        `&date=${selectedDate}` +
+        `&class_name=${encodeURIComponent(selectedClass)}`
       );
 
       const data = await response.json();

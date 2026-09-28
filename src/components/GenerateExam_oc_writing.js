@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./GenerateExam.css";
 
 export default function GenerateExam_oc_writing({
@@ -12,6 +12,74 @@ export default function GenerateExam_oc_writing({
   
   const [homeworkSetup, setHomeworkSetup] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [availableBatches, setAvailableBatches] = useState([]);
+  const [selectedBatchId, setSelectedBatchId] = useState("");
+  const [availableDates, setAvailableDates] = useState([]);
+  const [selectedDate, setSelectedDate] = useState("");
+
+  useEffect(() => {
+    if (!classYear || mode !== "latest") {
+      return;
+    }
+
+    const fetchAvailableDates = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE}/api/writing/upload-dates/${classYear}`
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.detail || "Failed to fetch upload dates");
+        }
+
+        setAvailableDates(data.dates || []);
+
+        if (data.dates?.length > 0) {
+          setSelectedDate(data.dates[0]);
+        }
+      } catch (err) {
+        console.error("Error fetching upload dates:", err);
+      }
+    };
+
+    fetchAvailableDates();
+  }, [classYear, mode, API_BASE]);
+
+  useEffect(() => {
+    if (!classYear || !selectedDate || mode !== "latest") {
+      return;
+    }
+
+    const fetchAvailableBatches = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE}/api/writing/available-batches` +
+          `?class_year=${encodeURIComponent(classYear)}` +
+          `&date=${selectedDate}` +
+          `&class_name=OC`
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.detail || "Failed to fetch batches");
+        }
+
+        setAvailableBatches(data.batches || []);
+
+        if (data.batches?.length > 0) {
+          setSelectedBatchId(data.batches[0]);
+        } else {
+          setSelectedBatchId("");
+        }
+      } catch (err) {
+        console.error("Error fetching batches:", err);
+      }
+    };
+
+    fetchAvailableBatches();
+  }, [classYear, selectedDate, mode, API_BASE]);
+
   const fetchHomeworkQuizSetup = async (selectedYear) => {
   try {
     const response = await fetch(
@@ -75,18 +143,41 @@ export default function GenerateExam_oc_writing({
       return;
     }
 
+    if (mode === "latest" && !selectedDate) {
+      alert("Please select an upload date");
+      return;
+    }
+
+    if (mode === "latest" && !selectedBatchId) {
+      alert("Please select a batch");
+      return;
+    }
+
     try {
       setLoading(true);
 
-      const payload = {
-        class_name: "OC",
-        class_year: classYear,
-        center_code: centerCode,
-        mode: mode,
-      };
+      const endpoint =
+        mode === "latest"
+          ? "/api/exams/generate-oc-writing-latest"
+          : "/api/exams/generate-oc-writing";
+
+      const payload =
+        mode === "latest"
+          ? {
+              class_year: classYear,
+              selected_date: selectedDate,
+              batch_id: Number(selectedBatchId),
+              center_code: centerCode,
+            }
+          : {
+              class_name: "OC",
+              class_year: classYear,
+              center_code: centerCode,
+              mode: mode,
+            };
 
       const response = await fetch(
-        `${API_BASE}/api/exams/generate-oc-writing`,
+        `${API_BASE}${endpoint}`,
         {
           method: "POST",
           headers: {
@@ -118,18 +209,41 @@ export default function GenerateExam_oc_writing({
       return;
     }
 
+    if (mode === "latest" && !selectedDate) {
+      alert("Please select an upload date");
+      return;
+    }
+
+    if (mode === "latest" && !selectedBatchId) {
+      alert("Please select a batch");
+      return;
+    }
+
     try {
       setLoading(true);
 
-      const payload = {
-        class_name: "OC",
-        class_year: classYear,
-        center_code: centerCode,
-        mode: mode,
-      };
+      const endpoint =
+        mode === "latest"
+          ? "/api/exams/generate-oc-writing-homework-latest"
+          : "/api/exams/generate-oc-writing-homework";
+
+      const payload =
+        mode === "latest"
+          ? {
+              class_year: classYear,
+              selected_date: selectedDate,
+              batch_id: Number(selectedBatchId),
+              center_code: centerCode,
+            }
+          : {
+              class_name: "OC",
+              class_year: classYear,
+              center_code: centerCode,
+              mode: mode,
+            };
 
       const response = await fetch(
-        `${API_BASE}/api/exams/generate-oc-writing-homework`,
+        `${API_BASE}${endpoint}`,
         {
           method: "POST",
           headers: {
@@ -184,6 +298,62 @@ export default function GenerateExam_oc_writing({
           <option value="9">Year 9</option>
         </select>
       </div>
+
+      {mode === "latest" && (
+        <>
+          <label>Select Upload Date:</label>
+
+          <select
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            style={{
+              width: "100%",
+              marginBottom: "12px"
+            }}
+          >
+            <option value="">Select Upload Date</option>
+
+            {availableDates.map((date) => (
+              <option key={date} value={date}>
+                {date}
+              </option>
+            ))}
+          </select>
+
+          {availableBatches.length > 0 && (
+            <>
+              <label>Select Upload Batch:</label>
+
+              <select
+                value={selectedBatchId}
+                onChange={(e) => setSelectedBatchId(e.target.value)}
+                style={{
+                  width: "100%",
+                  marginBottom: "12px"
+                }}
+              >
+                <option value="">Select Batch</option>
+
+                {availableBatches.map((batchId) => (
+                  <option key={batchId} value={batchId}>
+                    Batch {batchId}
+                  </option>
+                ))}
+              </select>
+
+              <p
+                style={{
+                  color: "red",
+                  marginTop: "8px",
+                  fontWeight: "500",
+                }}
+              >
+                Make sure none of the questions are part of previously generated exams
+              </p>
+            </>
+          )}
+        </>
+      )}
 
       <h2 style={{ marginTop: "35px", marginBottom: "30px" }}>
         Generate Writing Exam
