@@ -39,8 +39,28 @@ export default function NaplanLanguageConventionsReview({
           );
         }
 
-        const data =
-          await response.json();
+
+        const data = await response.json();
+
+        const rawQ15 = data.questions?.[14];
+
+        console.log("========== RAW QUESTION 15 ==========");
+        console.log("EXAM ID:", examId);
+        console.log("STUDENT ID:", studentId);
+        console.log("QUESTION ID:", rawQ15?.id);
+        console.log("QUESTION TYPE:", rawQ15?.question_type);
+        console.log("QUESTION TEXT:", rawQ15?.question_text);
+        console.log("CORRECT ANSWER:", rawQ15?.correct_answer);
+        console.log(
+          "STUDENT ANSWER:",
+          data.student_answers?.[String(rawQ15?.id)]
+        );
+        console.log("IS CORRECT:", rawQ15?.is_correct);
+        console.log(
+          "IS CORRECT TYPE:",
+          typeof rawQ15?.is_correct
+        );
+        console.log("=====================================");
 
         const questions =
           Array.isArray(

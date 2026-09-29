@@ -148,7 +148,7 @@
       if (!result?.attempt_id) return;
 
       const endpoint =
-        variant === "homework"
+        parentMode === "homework"
           ? `/api/student/homework-writing-history-by-attempt?attempt_id=${result.attempt_id}`
           : `/api/exams/writing/history-by-attempt?attempt_id=${result.attempt_id}`;
 
@@ -215,7 +215,7 @@
     setCompleted(true);
 
     const endpoint =
-      variant === "homework"
+      parentMode === "homework"
         ? `/api/student/homework-writing-report?student_id=${studentId}`
         : `/api/exams/writing/result?student_id=${studentId}`;
 

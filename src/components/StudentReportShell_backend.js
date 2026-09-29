@@ -449,6 +449,7 @@ useEffect(() => {
     `&date=${encodeURIComponent(date)}`;
 
   console.log("CLASS REPORT URL:", url);
+  
   fetch(url)
     .then(res => {
       if (!res.ok) {
@@ -457,6 +458,8 @@ useEffect(() => {
       return res.json();
     })
     .then(data => {
+      console.log("CLASS REPORT RESPONSE OBJECT:", data);
+      console.log("CLASS REPORT RESPONSE JSON:", JSON.stringify(data, null, 2));
       setClassReportData(data);
     })
     .catch(err => {
@@ -467,6 +470,7 @@ useEffect(() => {
       setLoadingClassReport(false);
       setShouldGenerate(false);
     });
+    
 
 }, [
   shouldGenerate,
@@ -502,8 +506,8 @@ useEffect(() => {
 
     const url =
       examKey === "writing"
-        ? `${API_BASE}/api/reports/student/writing?student_id=${studentId}&date=${date}&class_name=${className}`
-        : `${API_BASE}/api/reports/student?student_id=${studentId}&exam=${examKey}&date=${date}&class_name=${className}`; 
+        ? `${API_BASE}/api/reports/student/writing?student_id=${studentId}&date=${date.split("T")[0]}&class_name=${className}`
+        : `${API_BASE}/api/reports/student?student_id=${studentId}&exam=${examKey}&date=${date.split("T")[0]}&class_name=${className}`; 
     fetch(url)
       .then(res => {
         if (!res.ok) {
@@ -512,6 +516,8 @@ useEffect(() => {
         return res.json();
       })
       .then(data => {
+        console.log("PER STUDENT REPORT RESPONSE:", data);
+        console.log("PER STUDENT REPORT DATE:", data?.date);
         setReportData(data);
       })
       .catch(err => {

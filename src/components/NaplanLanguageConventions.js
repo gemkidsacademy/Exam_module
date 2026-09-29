@@ -1208,22 +1208,46 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
           <div key={idx} className="word-selection-panel">
             <div className="sentence-container">
               {sentenceWords.map((word, i) => {
-                const cleanWord = word.replace(/[.,!?]/g, "").trim();
-                const isSelectable = block.selectable_words.includes(cleanWord);
+                const cleanWord = word
+                  .replace(/[.,!?]/g, "")
+                  .trim();
+
+                const isSelectable =
+                  block.selectable_words.includes(cleanWord);
+
+                const normalizedSelectedAnswer =
+                  String(normalizedStudentAnswer ?? "")
+                    .trim()
+                    .toLowerCase()
+                    .replace(/[.,!?;:]/g, "");
+
+                const normalizedWord =
+                  String(cleanWord ?? "")
+                    .trim()
+                    .toLowerCase()
+                    .replace(/[.,!?;:]/g, "");
 
                 const isSelected =
-                  normalizedStudentAnswer === cleanWord;
+                  normalizedSelectedAnswer === normalizedWord;
 
                 const isCorrectWord =
-                  normalizedCorrectAnswer === cleanWord;
+                  String(normalizedCorrectAnswer ?? "")
+                    .trim()
+                    .toLowerCase()
+                    .replace(/[.,!?;:]/g, "") === normalizedWord;
 
                 let reviewClass = "";
 
                 if (isReview) {
-                  if (isCorrectWord) {
+                  if (currentQ.is_correct && isSelected) {
+                    // Backend says the student's selected answer is correct
                     reviewClass = "review-correct";
-                  } else if (isSelected && !isCorrectWord) {
+                  } else if (!currentQ.is_correct && isSelected) {
+                    // Backend says the student's selected answer is incorrect
                     reviewClass = "review-wrong";
+                  } else if (!currentQ.is_correct && isCorrectWord) {
+                    // Student was wrong/unanswered: show the correct answer
+                    reviewClass = "review-correct";
                   }
                 }
 
@@ -1382,36 +1406,58 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
     {/* =========================
       TYPE 1 — SINGLE CHOICE (MCQ)
     ========================= */}
-    {currentQ.question_type === 1 && currentQ.options && (
-      <div className="mcq-options">
-        {Object.entries(currentQ.options).map(([key, value]) => {
-          const isSelected = normalizedStudentAnswer === value;
-          const isCorrectOption = normalizedCorrectAnswer === value;
-          const isWrongSelected = isReview && isSelected && !isCorrectOption;
-          const isCorrectHighlight = isReview && isCorrectOption;
-        
-          return (
-            <label
-              key={key}
-              className={`mcq-option-card
-                ${isSelected ? "selected" : ""}
-                ${isCorrectHighlight ? "review-correct" : ""}
-                ${isWrongSelected ? "review-wrong" : ""}
-              `}
-            >
-              <input
-                type="radio"
-                name={`q-${qid}`}
-                checked={isSelected}
-                disabled={isReview}
-                onChange={() => handleAnswer(value)}
-              />
-              <span>{key}. {value}</span>
-            </label>
-          );
-        })}
-      </div>
-    )}
+  {currentQ.question_type === 1 && currentQ.options && (
+  <div className="mcq-options">
+    {Object.entries(currentQ.options).map(([key, value]) => {
+      const isSelected =
+        String(normalizedStudentAnswer ?? "").trim() ===
+        String(value ?? "").trim();
+
+      const isCorrectHighlight =
+        isReview &&
+        currentQ.is_correct &&
+        isSelected;
+
+      const isWrongSelected =
+        isReview &&
+        !currentQ.is_correct &&
+        isSelected;
+
+      const isCorrectAnswer =
+        isReview &&
+        !currentQ.is_correct &&
+        String(normalizedCorrectAnswer ?? "").trim() ===
+        String(value ?? "").trim();
+
+      return (
+        <label
+          key={key}
+          className={`mcq-option-card
+            ${isSelected && !isReview ? "selected" : ""}
+            ${
+              isCorrectHighlight || isCorrectAnswer
+                ? "review-correct"
+                : ""
+            }
+            ${isWrongSelected ? "review-wrong" : ""}
+          `}
+        >
+          <input
+            type="radio"
+            name={`q-${qid}`}
+            checked={isSelected}
+            disabled={isReview}
+            onChange={() => handleAnswer(value)}
+          />
+
+          <span>
+            {key}. {value}
+          </span>
+        </label>
+      );
+    })}
+  </div>
+)}
     
       
 

@@ -12,6 +12,7 @@ const HomeworkTopicReports = ({ centerCode }) => {
   const [examOptions, setExamOptions] = useState([]);
   const [loadingExams, setLoadingExams] = useState(false);
   const [homeworkAttemptId, setHomeworkAttemptId] = useState("");
+  const [selectedClassHomeworkExamId, setSelectedClassHomeworkExamId] = useState("");
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const [classOptions, setClassOptions] = useState([]);
@@ -181,7 +182,10 @@ const HomeworkTopicReports = ({ centerCode }) => {
       item => `${item.subject}:${item.id}` === String(exam)
     );
 
-    const selectedExamId = selectedExamOption?.id || "";
+    const selectedExamId =
+      reportType === "Per Class Report"
+        ? selectedClassHomeworkExamId
+        : selectedExamOption?.id || "";
 
     const selectedExamSubject = selectedExamOption?.subject || "";
     
@@ -445,11 +449,10 @@ const HomeworkTopicReports = ({ centerCode }) => {
 
     if (reportType === "Per Class Report") {
       url =
-        `${process.env.REACT_APP_API_URL}/api/reports/homework/class/dates` +
+        `${process.env.REACT_APP_API_URL}/api/reports/homework/class/available-dates` +
         `?center_code=${encodeURIComponent(centerCode)}` +
         `&class_name=${encodeURIComponent(selectedClass)}` +
         `&class_year=${encodeURIComponent(selectedYear)}` +
-        `&homework_exam_id=${encodeURIComponent(selectedExamId)}` +
         `&subject=${encodeURIComponent(selectedExamSubject)}`;
     } else {
       url =
@@ -523,7 +526,15 @@ const handleAddCumulativeAttempt = () => {
 };
 
 const handleGenerate = async () => {
-  if (!centerCode || !exam || !studentId) {
+  console.log("HANDLE GENERATE ENTERED", {
+    centerCode,
+    exam,
+    studentId,
+    reportType,
+    selectedDate,
+  });
+
+  if (!centerCode || !exam) {
     return;
   }
 
@@ -920,14 +931,36 @@ const handleGenerate = async () => {
             <label>Date</label>
             <select
               value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
+              onChange={(e) => {
+                if (reportType === "Per Class Report") {
+                  const selectedItem = dateOptions.find(
+                    item => String(item.date) === String(e.target.value)
+                  );
+
+                  setSelectedDate(selectedItem?.date || "");
+                  setSelectedClassHomeworkExamId(
+                    selectedItem?.homework_exam_id || ""
+                  );
+                  return;
+                }
+
+                setSelectedDate(e.target.value);
+              }}
             >
               <option value="">Select date</option>
 
               {dateOptions.map(item => (
                 <option
-                  key={item.homework_attempt_id}
-                  value={item.homework_attempt_id}
+                  key={
+                    reportType === "Per Class Report"
+                      ? `${item.homework_exam_id}:${item.date}`
+                      : item.homework_attempt_id
+                  }
+                  value={
+                    reportType === "Per Class Report"
+                      ? item.date
+                      : item.homework_attempt_id
+                  }
                 >
                   {new Date(item.date).toLocaleDateString()}
                 </option>
@@ -939,7 +972,10 @@ const handleGenerate = async () => {
         <div className="homework-topic-report-actions">
           <button
             type="button"
-            onClick={handleGenerate}
+            onClick={() => {
+              console.log("GENERATE BUTTON CLICKED");
+              handleGenerate();
+            }}
             disabled={
               loadingReport ||
               (reportType === "Cumulative Progress"
