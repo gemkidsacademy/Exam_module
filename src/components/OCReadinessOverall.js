@@ -222,7 +222,7 @@ export default function OCReadinessOverall({ centerCode }) {
     setLoading(true);
 
     fetch(
-      `${BACKEND_URL}/api/admin/students/${selectedStudent}/homework-oc-report-dates`
+      `${BACKEND_URL}/api/admin/students/${selectedStudent}/oc-report-dates`
     )
       .then(res => res.json())
       .then(data => {
@@ -257,7 +257,7 @@ export default function OCReadinessOverall({ centerCode }) {
 
       const res = await fetch(
 
-        `${BACKEND_URL}/api/admin/students/${selectedStudent}/overall-oc-homework-report?exam_date=${selectedDate}`,
+        `${BACKEND_URL}/api/admin/students/${selectedStudent}/overall-oc-report?exam_date=${selectedDate}`,
 
         {
           method: "POST"

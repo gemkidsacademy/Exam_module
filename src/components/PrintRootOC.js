@@ -2,7 +2,7 @@
 import { forwardRef } from "react";
 import "./SelectiveReadinessOverall.css";
 
-const PrintRoot = forwardRef(function PrintRoot(props, ref) {
+const PrintRootOC = forwardRef(function PrintRoot(props, ref) {
   
   const {
     overall,
@@ -138,7 +138,7 @@ console.log("BENCHMARK DATA:", overall.benchmark_bands);
   const thinking = components.thinking_skills || {};
   const writing = components.writing || {};
   function getPercent(subjectData) {
-  return Number(subjectData?.percent || 0);
+  return Number(subjectData?.score_percent || 0);
 }
 
 const subjectScores = {
@@ -283,19 +283,13 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
     focus,
     isWriting = false
   ) {
-    const scoreText = isWriting
-      ? `Score: ${data.percent || 0} / 25`
-      : `Score: ${data.obtained || 0} / ${data.total || 0}`;
+    const scoreText = `Score: ${data.score_percent || 0}%`;
 
-    const accuracyText = isWriting ? null : `Accuracy: ${data.percent || 0}%`;
+    const accuracyText = `Accuracy: ${data.score_percent || 0}%`;
 
     return (
       <section className="pdf-section-card">
         <h3 className="pdf-section-heading">{title}</h3>
-
-        {(isWriting ? data.percent : data.obtained) > 0 && (
-          <p className="pdf-line"><strong>{scoreText}</strong></p>
-        )}
 
         {accuracyText && (
           <p className="pdf-line">{accuracyText}</p>
@@ -303,7 +297,7 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
 
         <p className="pdf-line">
           Performance Level:{" "}
-          <strong>{getPerformanceLevel(data.percent)}</strong>
+          <strong>{getPerformanceLevel(data.score_percent)}</strong>
         </p>
 
         <div className="pdf-sub-block">
@@ -314,7 +308,7 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
         <div className="pdf-sub-block">
           <div className="pdf-mini-title">Strengths</div>
           <p>
-            {getSmartStrengthComment(title, data.percent)}
+            {getSmartStrengthComment(title, data.score_percent)}
             {" "}
             {strengths}
           </p>
@@ -323,7 +317,7 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
         <div className="pdf-sub-block">
           <div className="pdf-mini-title">Area to Improve</div>
           <p>
-            {Number(data.percent || 0) < 65
+            {Number(data.score_percent || 0) < 65
               ? `${title} should be prioritised in the next study cycle. `
               : ""}
             {improve}
@@ -491,20 +485,6 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
         "Thinking Skills",
         thinkingDiag
       )}
-
-      {renderAcademicSection(
-        "Writing",
-        writing,
-        `${studentName}'s writing is structured and relevant, with room to improve depth and sophistication.`,
-        "Clear structure and stays on topic.",
-        "Idea expansion and stronger vocabulary.",
-        "Planning techniques and deeper paragraph development.",
-        true
-      )}
-      {renderTopicBreakdown(
-        "Writing",
-        writingDiag
-      )}
       {/* OVERALL PERFORMANCE SUMMARY */}
 <section className="pdf-summary-box">
   <h3 className="pdf-section-heading">
@@ -625,4 +605,4 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
   );
 });
 
-export default PrintRoot;
+export default PrintRootOC;

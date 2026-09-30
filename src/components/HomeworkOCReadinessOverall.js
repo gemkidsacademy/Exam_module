@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import PrintRoot from "./PrintRoot";
-import ReportContent from "./ReportContent";
+import PrintRootOC from "./PrintRootOC";
+import ReportContentOC from "./ReportContentOC";
 import { useReactToPrint } from "react-to-print";
 import "./SelectiveReadinessOverall.css";
 
@@ -131,7 +131,7 @@ export default function HomeworkOCReadinessOverall({ centerCode }) {
 
     const actualValue =
       typeof value === "object" && value !== null
-        ? value.percent
+        ? value.score_percent
         : value;
 
     if (actualValue == null) return 0;
@@ -619,22 +619,13 @@ export default function HomeworkOCReadinessOverall({ centerCode }) {
 
         <div className="overall-summary">
 
-          <ReportContent
-
+          <ReportContentOC
             overall={overall}
-
             balanceIndex={balanceIndex}
-
             strengths={strengths}
-
             improvements={improvements}
-
             subjectChartData={subjectChartData}
-
             SUBJECT_LABELS={SUBJECT_LABELS}
-
-            SubjectFocusCard={SubjectFocusCard}
-
           />
 
         </div>
@@ -665,7 +656,7 @@ export default function HomeworkOCReadinessOverall({ centerCode }) {
 
             <div className="pdf-preview-body">
 
-              <PrintRoot
+              <PrintRootOC
                 reportType="oc"
                 overall={overall}
                 balanceIndex={balanceIndex}
@@ -685,7 +676,7 @@ export default function HomeworkOCReadinessOverall({ centerCode }) {
 
       <div className="print-only">
 
-        <PrintRoot
+        <PrintRootOC
           ref={printRef}
           reportType="oc"
           overall={overall}
