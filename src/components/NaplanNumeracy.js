@@ -763,20 +763,43 @@ return (
 
       Object.entries(studentAnswers || {}).forEach(
         ([key, value]) => {
-          if (typeof value === "string") {
+          let answerValue = value;
+
+          // API may return:
+          // { answer: "A", is_correct: true }
+          // instead of simply "A"
+          if (
+            value &&
+            typeof value === "object" &&
+            !Array.isArray(value)
+          ) {
+            answerValue =
+              value.answer ??
+              value.student_answer ??
+              value.selected_answer ??
+              value.value ??
+              "";
+          }
+
+          // Handle stringified arrays/objects
+          if (typeof answerValue === "string") {
             try {
               const parsed = JSON.parse(
-                value.replace(/'/g, '"')
+                answerValue.replace(/'/g, '"')
               );
               normalizedAnswers[String(key)] = parsed;
             } catch {
-              normalizedAnswers[String(key)] = value;
+              normalizedAnswers[String(key)] = answerValue;
             }
           } else {
-            normalizedAnswers[String(key)] = value;
+            normalizedAnswers[String(key)] = answerValue;
           }
         }
       );
+
+      console.log("🔎 NAPLAN NUMERACY QUESTIONS:", qs);
+      console.log("🔎 NAPLAN NUMERACY RAW STUDENT ANSWERS:", studentAnswers);
+      console.log("🔎 NAPLAN NUMERACY NORMALIZED ANSWERS:", normalizedAnswers);
 
       setQuestions(qs || []);
       setAnswers(normalizedAnswers);
@@ -2039,6 +2062,44 @@ return (
     </div>
   );
 })()}
+
+      {isReview && (() => {
+        const qid = String(currentQ.id);
+        const studentAnswer = answers[qid];
+        const correctAnswer = normalizeCorrectAnswer(
+          currentQ.correct_answer,
+          currentQ.question_type
+        );
+
+        const formatReviewAnswer = (answer, emptyValue) => {
+          if (
+            answer == null ||
+            answer === "" ||
+            (Array.isArray(answer) && answer.length === 0)
+          ) {
+            return emptyValue;
+          }
+
+          if (typeof answer === "object") {
+            return JSON.stringify(answer);
+          }
+
+          return String(answer);
+        };
+
+        return (
+          <div className="numeric-review-feedback">
+            <div>
+              <strong>Your answer: </strong>
+              {formatReviewAnswer(studentAnswer, "No answer")}
+            </div>
+            <div className="correct-answer-text">
+              <strong>Correct answer: </strong>
+              {formatReviewAnswer(correctAnswer, "No correct answer")}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ================= AI EXPLANATION ================= */}
 {isReview && (

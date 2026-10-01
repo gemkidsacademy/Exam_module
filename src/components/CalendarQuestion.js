@@ -17,6 +17,7 @@ export default function CalendarQuestion({
     onAnswer,
     review = false,
     correctAnswer,
+    showCorrectAnswer = true,
 }) {
     const {
         month,
@@ -121,7 +122,7 @@ export default function CalendarQuestion({
                 })}
             </div>
 
-            {review &&
+            {review && showCorrectAnswer &&
                 studentAnswer !== correct && (
                     <div className="calendar-correct-answer">
                         Correct answer: {correct}

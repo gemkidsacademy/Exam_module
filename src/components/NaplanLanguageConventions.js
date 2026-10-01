@@ -180,6 +180,21 @@ export default function NaplanLanguageConventions({
     // All single-answer types (1, 3, 4, 5, 6, 7)
     return String(answer).trim();
   };
+  const formatReviewAnswer = (answer, emptyValue = "No answer") => {
+    if (
+      answer == null ||
+      answer === "" ||
+      (Array.isArray(answer) && answer.length === 0)
+    ) {
+      return emptyValue;
+    }
+
+    if (typeof answer === "object") {
+      return JSON.stringify(answer);
+    }
+
+    return String(answer);
+  };
   function renderHighlightedText(content) {
     if (!content) return content;
   
@@ -672,10 +687,43 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
         studentId={studentId}
         examId={selectedExamId}
         onLoaded={(qs, studentAnswers) => {
-          setQuestions(qs);
+          const normalizedAnswers = {};
+
+          Object.entries(studentAnswers || {}).forEach(([key, value]) => {
+            let answerValue = value;
+
+            if (
+              value &&
+              typeof value === "object" &&
+              !Array.isArray(value)
+            ) {
+              answerValue =
+                value.answer ??
+                value.student_answer ??
+                value.selected_answer ??
+                value.value ??
+                "";
+            }
+
+            if (typeof answerValue === "string") {
+              try {
+                normalizedAnswers[String(key)] = JSON.parse(
+                  answerValue.replace(/'/g, '"')
+                );
+              } catch {
+                normalizedAnswers[String(key)] = answerValue;
+              }
+            } else {
+              normalizedAnswers[String(key)] = answerValue;
+            }
+          });
+
+          console.log("LANGUAGE NORMALIZED STUDENT ANSWERS:", normalizedAnswers);
+
+          setQuestions(qs || []);
           setCurrentIndex(0);
           setVisited({});
-          setAnswers(studentAnswers || {});
+          setAnswers(normalizedAnswers);
           setExplanations({});
         }}
       />
@@ -715,6 +763,9 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
   const normalizedStudentAnswer = normalizeStudentAnswer(
     answers[String(currentQ.id)],
     currentQ.question_type
+  );
+  const hasClozeDropdownBlock = currentQ.question_blocks?.some(
+    block => block.type === "cloze-dropdown"
   );
   console.log(
       "QUESTION TYPE:",
@@ -1080,10 +1131,17 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
                 <CalendarQuestion
                     key={idx}
                     block={block}
-                    answer={answers[String(currentQ.id)]}
+                    answer={normalizeStudentAnswer(
+                      answers[String(currentQ.id)],
+                      currentQ.question_type
+                    )}
                     onAnswer={handleAnswer}
                     review={isReview}
-                    correctAnswer={currentQ.correct_answer}
+                    correctAnswer={normalizeCorrectAnswer(
+                      currentQ.correct_answer,
+                      currentQ.question_type
+                    )}
+                    showCorrectAnswer={false}
                 />
             );
         }
@@ -1182,19 +1240,16 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
 
       {parts[1]}
 
-      {isReview && !isClozeCorrect && (
-        <div
-          style={{
-            marginTop: "10px",
-            padding: "10px 12px",
-            borderRadius: "8px",
-            background: "#f0fdf4",
-            border: "1px solid #22c55e",
-            color: "#166534",
-            fontWeight: 500
-          }}
-        >
-          <strong>Correct answer:</strong> {correctAnswer}
+      {isReview && (
+        <div className="numeric-review-feedback">
+          <div>
+            <strong>Your answer: </strong>
+            {formatReviewAnswer(studentAnswer)}
+          </div>
+          <div className="correct-answer-text">
+            <strong>Correct answer: </strong>
+            {formatReviewAnswer(correctAnswer, "No correct answer")}
+          </div>
         </div>
       )}
     </div>
@@ -1385,19 +1440,16 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
         }}
       />
 
-      {isReview && !isTextCorrect && (
-        <div
-          style={{
-            marginTop: "10px",
-            padding: "10px 12px",
-            borderRadius: "8px",
-            background: "#f0fdf4",
-            border: "1px solid #22c55e",
-            color: "#166534",
-            fontWeight: 500
-          }}
-        >
-          <strong>Correct answer:</strong> {correctAnswer}
+      {isReview && (
+        <div className="numeric-review-feedback">
+          <div>
+            <strong>Your answer: </strong>
+            {formatReviewAnswer(studentAnswer)}
+          </div>
+          <div className="correct-answer-text">
+            <strong>Correct answer: </strong>
+            {formatReviewAnswer(correctAnswer, "No correct answer")}
+          </div>
         </div>
       )}
     </>
@@ -1554,6 +1606,18 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
     })}
   </div>
 )}
+  {isReview && currentQ.question_type !== 4 && !hasClozeDropdownBlock && (
+    <div className="numeric-review-feedback">
+      <div>
+        <strong>Your answer: </strong>
+        {formatReviewAnswer(normalizedStudentAnswer)}
+      </div>
+      <div className="correct-answer-text">
+        <strong>Correct answer: </strong>
+        {formatReviewAnswer(normalizedCorrectAnswer, "No correct answer")}
+      </div>
+    </div>
+  )}
   {/* ================= AI EXPLANATION ================= */}
 {isReview && (
   <div style={{ marginTop: "16px" }}>
