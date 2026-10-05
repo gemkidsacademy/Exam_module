@@ -917,6 +917,19 @@ const datesForCurrentReport =
 
     const showStudentSearchResults =
       !selectedStudentOption || studentSearch !== selectedStudentOption.label;
+    const canGenerate =
+      reportType === "student"
+        ? !!studentId && !!exam && !!date
+        : reportType === "class"
+          ? !!className && !!classYear && !!exam && !!date
+          : reportType === "cumulative"
+            ? !!studentId &&
+              !!exam &&
+              !!topic &&
+              selectedAttemptDates.length > 0
+            : false;
+
+    
   
     
   
@@ -1276,27 +1289,8 @@ const datesForCurrentReport =
     <div className="actions-group">
       {reportType !== "topic" && (
         <button
-          className="secondary-btn"
-          disabled={
-            (reportType === "student" && !studentId) ||
-
-            (reportType === "class" &&
-              (
-                !className ||
-                !classYear ||
-                !exam ||
-                !date
-              )) ||
-
-            // OLD CUMULATIVE
-            (reportType === "cumulative" &&
-              (
-                !studentId ||
-                !exam ||
-                !topic ||
-                selectedAttemptDates.length === 0
-              ))
-          }
+          className={canGenerate ? "primary-btn" : "secondary-btn"}
+          disabled={!canGenerate}
           onClick={() => {
 
             // ------------------------------
