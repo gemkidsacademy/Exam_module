@@ -48,6 +48,7 @@ const NaplanDashboard = () => {
   const [examInProgress, setExamInProgress] = useState(false);
   const [examPhase, setExamPhase] = useState("modeSelection"); 
   const [reportVariant, setReportVariant] = useState(null);
+  const [examAccess, setExamAccess] = useState(null);
   const [subjectAvailability, setSubjectAvailability] = useState({});
   const handleBackToDashboard = () => {
   setActiveSubject(null);
@@ -64,6 +65,31 @@ const NaplanDashboard = () => {
   // phases: selection → welcome → instructions → exam
 
   const studentId = sessionStorage.getItem("student_id");
+  useEffect(() => {
+    if (!studentId) {
+      return;
+    }
+
+    fetch(
+      `${API_BASE}/api/student/exam-access?student_id=${encodeURIComponent(studentId)}`
+    )
+      .then(async (res) => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch exam access.");
+        }
+
+        return res.json();
+      })
+      .then((data) => {
+        console.log("✅ NAPLAN Student exam access:", data);
+        setExamAccess(data);
+      })
+      .catch((err) => {
+        console.error("❌ Failed to fetch NAPLAN exam access:", err);
+        setExamAccess(null);
+      });
+  }, [studentId]);
+
   const ActiveComponent = activeSubject?.component;
   const handleLogout = () => {
     window.location.reload();
@@ -146,7 +172,10 @@ const NaplanDashboard = () => {
           <div className="subject-buttons">
 
             <button
-              className="subject-button"
+              className={`subject-button ${
+                examAccess && !examAccess.active_exam ? "disabled" : ""
+              }`}
+              disabled={examAccess === null || !examAccess.active_exam}
               onClick={() => {
                 setExamMode("exam");
                 setExamPhase("selection");
@@ -166,7 +195,10 @@ const NaplanDashboard = () => {
             </button>
 
             <button
-              className="subject-button"
+              className={`subject-button ${
+                examAccess && !examAccess.homework_exam ? "disabled" : ""
+              }`}
+              disabled={examAccess === null || !examAccess.homework_exam}
               onClick={() => {
                 setExamMode("homework");
                 setExamPhase("selection");

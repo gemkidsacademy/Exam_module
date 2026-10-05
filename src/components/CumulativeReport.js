@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./CumulativeReport.css";
 
 /**
@@ -10,6 +10,8 @@ import "./CumulativeReport.css";
  * Backend data structure remains unchanged.
  */
 export default function CumulativeReport({ data }) {
+  const [chartMetric, setChartMetric] = useState("percentage");
+
   if (!data) return null;
 
   const {
@@ -146,22 +148,31 @@ export default function CumulativeReport({ data }) {
             </p>
           </div>
 
-          <div className="chart-legend">
-            <span>
-              <span className="legend-dot score-dot" />
-              Score (%)
-            </span>
+          <div className="chart-metric-toggle">
+            <button
+              type="button"
+              className={chartMetric === "percentage" ? "active" : ""}
+              onClick={() => setChartMetric("percentage")}
+              aria-pressed={chartMetric === "percentage"}
+            >
+              Percentage
+            </button>
 
-            <span>
-              <span className="legend-dot accuracy-dot" />
-              Accuracy (%)
-            </span>
+            <button
+              type="button"
+              className={chartMetric === "accuracy" ? "active" : ""}
+              onClick={() => setChartMetric("accuracy")}
+              aria-pressed={chartMetric === "accuracy"}
+            >
+              Accuracy
+            </button>
           </div>
         </div>
 
         <ProgressChart
           attempts={attempts}
           isWriting={isWriting}
+          chartMetric={chartMetric}
         />
 
       </section>
@@ -601,7 +612,7 @@ function Metric({
    PROGRESS CHART
 ============================================================ */
 
-function ProgressChart({ attempts, isWriting }) {
+function ProgressChart({ attempts, isWriting, chartMetric }) {
 
   const width = 900;
   const height = 320;
@@ -643,23 +654,20 @@ function ProgressChart({ attempts, isWriting }) {
     );
   };
 
-  const createPoints = (field) => {
+  const getMetricValue = (attempt) => {
+    if (chartMetric === "accuracy") {
+      return Number(attempt.accuracy) || 0;
+    }
 
-    return attempts
-      .map((attempt, index) => {
-
-        return `${getX(index)},${getY(
-          attempt[field]
-        )}`;
-
-      })
-      .join(" ");
+    const score = Number(attempt.score) || 0;
+    return isWriting ? (score / 25) * 100 : score;
   };
 
-  const scorePoints = createPoints(
-    isWriting ? "accuracy" : "score"
-  );
-  const accuracyPoints = createPoints("accuracy");
+  const metricPoints = attempts
+    .map((attempt, index) => {
+      return `${getX(index)},${getY(getMetricValue(attempt))}`;
+    })
+    .join(" ");
 
   return (
     <div className="progress-chart-wrapper">
@@ -702,21 +710,16 @@ function ProgressChart({ attempts, isWriting }) {
           }
         )}
 
-        {/* SCORE LINE */}
+        {/* SELECTED METRIC LINE */}
 
         {attempts.length > 1 && (
           <polyline
-            points={scorePoints}
-            className="score-line"
-          />
-        )}
-
-        {/* ACCURACY LINE */}
-
-        {attempts.length > 1 && (
-          <polyline
-            points={accuracyPoints}
-            className="accuracy-line"
+            points={metricPoints}
+            className={
+              chartMetric === "accuracy"
+                ? "accuracy-line"
+                : "score-line"
+            }
           />
         )}
 
@@ -725,34 +728,35 @@ function ProgressChart({ attempts, isWriting }) {
         {attempts.map((attempt, index) => {
 
           const x = getX(index);
-          const chartScore = isWriting
-            ? attempt.accuracy
-            : attempt.score;
-
-          const scoreY = getY(chartScore);
+          const metricValue = getMetricValue(attempt);
+          const metricY = getY(metricValue);
 
           return (
-            <g key={`score-${index}`}>
+            <g key={`metric-${index}`}>
 
               <circle
                 cx={x}
-                cy={scoreY}
+                cy={metricY}
                 r="5"
-                className="score-point"
+                className={
+                  chartMetric === "accuracy"
+                    ? "accuracy-point"
+                    : "score-point"
+                }
               />
 
               <text
                 x={x}
-                y={scoreY - 16}
+                y={metricY - 16}
                 textAnchor="middle"
                 className="chart-value-label"
               >
-                {chartScore}%
+                {metricValue}%
               </text>
 
               <text
                 x={x}
-                y={scoreY - 3}
+                y={metricY - 3}
                 textAnchor="middle"
                 className="chart-correct-label"
               >

@@ -47,6 +47,7 @@ const SelectiveDashboard = () => {
   const [examPhase, setExamPhase] = useState("mode_selection");
   const [examMode, setExamMode] = useState(null);
   const [subjectAvailability, setSubjectAvailability] = useState({});
+  const [examAccess, setExamAccess] = useState(null);
   const location = useLocation();
   const [reportVariant, setReportVariant] = useState(null);
   const handleBackToDashboard = () => {
@@ -61,6 +62,30 @@ const SelectiveDashboard = () => {
   // phases: selection → welcome → instructions → exam
 
   const studentId = sessionStorage.getItem("student_id");
+  useEffect(() => {
+  if (!studentId) {
+    return;
+  }
+
+  fetch(
+    `${BACKEND_URL}/api/student/exam-access?student_id=${encodeURIComponent(studentId)}`
+  )
+    .then(async (res) => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch exam access.");
+      }
+
+      return res.json();
+    })
+    .then((data) => {
+      console.log("✅ Student exam access:", data);
+      setExamAccess(data);
+    })
+    .catch((err) => {
+      console.error("❌ Failed to fetch exam access:", err);
+      setExamAccess(null);
+    });
+}, [studentId]);
   
   const ActiveComponent = activeSubject?.component;
   const handleLogout = () => {
@@ -155,10 +180,13 @@ useEffect(() => {
       <div className="subject-buttons">
         
         <button
-          className="subject-button"
+          className={`subject-button ${
+            examAccess && !examAccess.active_exam ? "disabled" : ""
+          }`}
+          disabled={examAccess === null || !examAccess.active_exam}
           onClick={() => {
             setExamMode("exam");
-            setReportVariant("actual");   // ✅ ADD THIS
+            setReportVariant("actual");
             setSubjectAvailability({});
             setExamPhase("selection");
           }}
@@ -176,7 +204,10 @@ useEffect(() => {
           Historical reports
         </button>
         <button
-          className="subject-button"
+          className={`subject-button ${
+            examAccess && !examAccess.homework_exam ? "disabled" : ""
+          }`}
+          disabled={examAccess === null || !examAccess.homework_exam}
           onClick={() => {
             setExamMode("exam");
             setReportVariant("homework");

@@ -334,6 +334,12 @@
   stroke-width: 2;
 }
 
+.accuracy-point {
+  fill: #6257e8;
+  stroke: #ffffff;
+  stroke-width: 2;
+}
+
 .chart-value-label {
   font-size: 10px;
   font-weight: 700;
@@ -350,33 +356,31 @@
   fill: #697386;
 }
 
-.chart-legend {
+.chart-metric-toggle {
   display: flex;
-  gap: 16px;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid #e5e8ef;
+  border-radius: 7px;
+  background: #f7f8fa;
+}
 
-  font-size: 9px;
+.chart-metric-toggle button {
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
   color: #667085;
+  font: inherit;
+  font-size: 9px;
+  cursor: pointer;
 }
 
-.chart-legend span {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.legend-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.score-dot {
-  background: #35a85a;
-}
-
-.accuracy-dot {
-  background: #6257e8;
+.chart-metric-toggle button.active {
+  background: #ffffff;
+  color: #30394a;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.12);
 }
 
 /* ============================================================

@@ -49,6 +49,7 @@ const OCDashboard = () => {
   const [reportVariant, setReportVariant] = useState(null);
   const studentId = sessionStorage.getItem("student_id");
   const [availabilityLoading, setAvailabilityLoading] = useState(true);
+  const [examAccess, setExamAccess] = useState(null);
   const API_BASE = process.env.REACT_APP_API_URL;
   const [subjectAvailability, setSubjectAvailability] = useState({});
   const handleBackToDashboard = () => {
@@ -83,6 +84,30 @@ const OCDashboard = () => {
     setExamPhase("welcome");
   }
 };
+useEffect(() => {
+  if (!studentId) {
+    return;
+  }
+
+  fetch(
+    `${API_BASE}/api/student/exam-access?student_id=${encodeURIComponent(studentId)}`
+  )
+    .then(async (res) => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch exam access.");
+      }
+
+      return res.json();
+    })
+    .then((data) => {
+      console.log("✅ OC Student exam access:", data);
+      setExamAccess(data);
+    })
+    .catch((err) => {
+      console.error("❌ Failed to fetch OC exam access:", err);
+      setExamAccess(null);
+    });
+}, [studentId]);
 useEffect(() => {
   if (examPhase === "selection" && studentId && examMode) {
     const normalizedMode =
@@ -140,7 +165,10 @@ useEffect(() => {
           <div className="subject-buttons">
 
             <button
-              className="subject-button"
+              className={`subject-button ${
+                examAccess && !examAccess.active_exam ? "disabled" : ""
+              }`}
+              disabled={examAccess === null || !examAccess.active_exam}
               onClick={() => {
                 setExamMode("exam");
                 setSubjectAvailability({});
@@ -161,9 +189,12 @@ useEffect(() => {
               Historical reports
             </button>
             <button
-              className="subject-button"
+              className={`subject-button ${
+                examAccess && !examAccess.homework_exam ? "disabled" : ""
+              }`}
+              disabled={examAccess === null || !examAccess.homework_exam}
               onClick={() => {
-                setExamMode("homework");   // ✅ NEW MODE
+                setExamMode("homework");
                 setSubjectAvailability({});
                 setExamPhase("selection");
               }}

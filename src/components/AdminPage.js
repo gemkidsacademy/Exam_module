@@ -4,6 +4,7 @@
   import ManageClassYears from "./ManageClassYears";
 
   
+  import ManageExams from "./ManageExams";
   import StudentExamReports from "./StudentExamReports";
   import SelectiveReadinessOverall from "./SelectiveReadinessOverall";
   import HomeworkSelectiveReadinessOverall from "./HomeworkSelectiveReadinessOverall";
@@ -229,6 +230,11 @@ const allTabs = [
   },
 
   {
+    id: "manage-exams",
+    label: "Manage Exams",
+  },
+
+  {
     id: "student-exam-reports",
     label: "Student Exam Reports",
   },
@@ -302,6 +308,8 @@ const tabs = allTabs.filter((tab) => {
       "add-quiz",
 
       "generate-exam",
+
+      "manage-exams",
       
       "exam-cleaner",
 
@@ -1058,6 +1066,16 @@ const tabs = allTabs.filter((tab) => {
                       
   
                 
+                  </div>
+                )}
+
+                {/* ===== MANAGE EXAMS ===== */}
+                {activeTab === "manage-exams" && (
+                  <div className="tab-panel">
+                    <ManageExams
+                      centerCode={centerCode}
+                      onBack={() => setActiveTab("generate-exam")}
+                    />
                   </div>
                 )}
 
