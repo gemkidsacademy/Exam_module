@@ -1093,12 +1093,13 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
       }}
     >
   <div className="question-content-centered">
-    {!currentQ.question_blocks?.some(b => b.type === "text") &&
+    {currentQ.question_type !== 5 &&
+      !currentQ.question_blocks?.some(b => b.type === "text") &&
       currentQ.question_text && (
         <p className="question-text">
           {currentQ.question_text}
         </p>
-    )}
+      )}
     {currentQ.question_blocks?.map((block, idx) => {
 
         if (block.type === "matching") {
@@ -1191,8 +1192,18 @@ if (mode === "report" && !isLoadingDates && examDates.length === 0) {
   const studentAnswer =
     normalizeStudentAnswer(answers[qid], currentQ.question_type) || "";
 
+  const rawCorrectAnswer =
+    normalizeCorrectAnswer(
+      currentQ.correct_answer,
+      currentQ.question_type
+    ) || "";
+
   const correctAnswer =
-    normalizeCorrectAnswer(currentQ.correct_answer, currentQ.question_type) || "";
+    /^[A-D]$/i.test(String(rawCorrectAnswer).trim())
+      ? block.options[
+          String(rawCorrectAnswer).trim().toUpperCase().charCodeAt(0) - 65
+        ]
+      : rawCorrectAnswer;
 
   const isClozeCorrect =
     String(studentAnswer).trim().toLowerCase() ===
