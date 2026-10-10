@@ -37,6 +37,25 @@ export default function NaplanNumeracyReview({
 
         const data = await response.json();
 
+        console.log("========== REVIEW API DIAGNOSTICS ==========");
+        console.log("Review mode:", mode);
+        console.log("Request URL:", reviewUrl);
+        console.log("HTTP status:", response.status);
+        console.log("Full API response:", data);
+
+        const q7276 = Array.isArray(data.questions)
+          ? data.questions.find((q) => String(q.id) === "7276")
+          : undefined;
+
+        console.log("Question 7276 from API:", q7276);
+        console.log("Correct answer from API:", q7276?.correct_answer);
+        console.log(
+          "Question keys:",
+          q7276 ? Object.keys(q7276) : "Question not found"
+        );
+        console.log("============================================");
+
+
         const safeQuestions = Array.isArray(data.questions)
           ? data.questions
           : [];

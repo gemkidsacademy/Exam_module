@@ -798,8 +798,23 @@ return (
       );
 
       console.log("🔎 NAPLAN NUMERACY QUESTIONS:", qs);
-      console.log("🔎 NAPLAN NUMERACY RAW STUDENT ANSWERS:", studentAnswers);
-      console.log("🔎 NAPLAN NUMERACY NORMALIZED ANSWERS:", normalizedAnswers);
+      const question9 = (qs || []).find(
+        (q, index) => index === 8
+      );
+
+      const q7276 = (qs || []).find(
+        (q) => String(q.id) === "7276"
+      );
+
+      console.log(
+        "[REVIEW STATE] Question 7276 before setQuestions:",
+        q7276
+      );
+
+      console.log(
+        "[REVIEW STATE] correct_answer:",
+        q7276?.correct_answer
+      );
 
       setQuestions(qs || []);
       setAnswers(normalizedAnswers);
