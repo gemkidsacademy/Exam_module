@@ -1478,20 +1478,10 @@ console.log("EXTRACTS:", currentQuestion?.reading_material?.extracts);
                     )}
 
                     {rm?.paragraphs ? (
-
                       rm.paragraphs.map((p, idx) => (
-                        <p key={idx}>
-                          {p}
-                        </p>
+                        <p key={idx}>{p}</p>
                       ))
-
-                    ) : (
-
-                      <p>
-                        {rm?.content || ""}
-                      </p>
-
-                    )}
+                    ) : null}
 
                   </>
 
