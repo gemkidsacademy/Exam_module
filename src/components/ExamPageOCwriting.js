@@ -217,7 +217,7 @@
     const endpoint =
       variant === "homework"
         ? `/api/student/homework-writing-report?student_id=${studentId}`
-        : `/api/exams/writing/result?student_id=${studentId}`;
+        : `/api/exams/oc-writing/result?student_id=${studentId}`;
 
     const res = await fetch(`${API_BASE}${endpoint}`);
 
