@@ -774,7 +774,40 @@ useEffect(() => {
     />
   );
 }
-    
+
+const handleNext = () => {
+  const current = questions[index];
+
+  if (!current) return;
+
+  const isCloze =
+    current.section_ref?.question_type ===
+    "dropdown_cloze";
+
+  if (isCloze) {
+    const currentSectionId =
+      current.section_ref?.section_id;
+
+    // Find the first question outside this cloze section
+    const nextSectionIndex = questions.findIndex(
+      (q, i) =>
+        i > index &&
+        q.section_ref?.section_id !== currentSectionId
+    );
+
+    if (nextSectionIndex !== -1) {
+      goTo(nextSectionIndex);
+    }
+
+    return;
+  }
+
+  // Keep existing behavior for ordinary questions
+  if (index < questions.length - 1) {
+    goTo(index + 1);
+  }
+};
+
   /* =============================
      FINISHED VIEW
   ============================= */
@@ -1124,7 +1157,7 @@ console.log("EXTRACTS:", currentQuestion?.reading_material?.extracts);
       {index < questions.length - 1 ? (
         <button
           className="nav-btn next"
-          onClick={() => goTo(index + 1)}
+          onClick={handleNext}
         >
           Next
         </button>
@@ -1326,7 +1359,13 @@ console.log("EXTRACTS:", currentQuestion?.reading_material?.extracts);
       )
     }
 
-    <div className="exam-body">
+    
+      <div className={`exam-body ${
+        isDropdownCloze && mode === "exam"
+          ? "dropdown-cloze-exam-body"
+          : ""
+      }`}>
+
       <div
        className={`passage-pane ${passageStyle}`}
        onContextMenu={(e) => e.preventDefault()}
@@ -1488,7 +1527,17 @@ console.log("EXTRACTS:", currentQuestion?.reading_material?.extracts);
                 )}
 
               {rm.content && (
-                <div className="reading-content">
+               
+              <div
+                className={`reading-content ${
+                  isDropdownCloze
+                    ? mode === "exam"
+                      ? "dropdown-cloze-exam-layout"
+                      : "dropdown-cloze-layout"
+                    : ""
+                }`}
+              >
+
 
                   {/* -------------------------------- */}
                   {/* DROPDOWN CLOZE RENDERING */}
@@ -1548,13 +1597,26 @@ console.log("EXTRACTS:", currentQuestion?.reading_material?.extracts);
                               value={
                                 answers[gapQuestion.question_id] || ""
                               }
-                              onChange={(e) =>
+                              
+                              onChange={(e) => {
+                                const selectedValue = e.target.value;
+
+                                // Preserve the existing answer-saving behavior
                                 setAnswers((prev) => ({
                                   ...prev,
-                                  [gapQuestion.question_id]:
-                                    e.target.value
-                                }))
-                              }
+                                  [gapQuestion.question_id]: selectedValue
+                                }));
+
+                                // Update the header to the blank being answered
+                                const gapIndex = questions.findIndex(
+                                  (q) => q.question_id === gapQuestion.question_id
+                                );
+
+                                if (gapIndex !== -1) {
+                                  setIndex(gapIndex);
+                                }
+                              }}
+
                             >
                               <option value="">
                                 Select
