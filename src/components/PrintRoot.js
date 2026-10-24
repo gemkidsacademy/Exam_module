@@ -132,14 +132,21 @@ console.log("BENCHMARK DATA:", overall.benchmark_bands);
   const examDate = overall.exam_date;
 
   const components = overall.components || {};
+  console.log("PDF COMPONENT SCORES:", components);
 
   const reading = components.reading || {};
   const maths = components.mathematical_reasoning || {};
   const thinking = components.thinking_skills || {};
   const writing = components.writing || {};
+  
   function getPercent(subjectData) {
-  return Number(subjectData?.percent || 0);
-}
+    return Number(
+      subjectData?.score_percent ??
+      subjectData?.percent ??
+      0
+    );
+  }
+
 
 const subjectScores = {
   Reading: getPercent(reading),
@@ -273,70 +280,81 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
     </section>
   );
 }
+  
+console.log("PDF NORMALIZED SCORES:", {
+  reading: getPercent(reading),
+  maths: getPercent(maths),
+  thinking: getPercent(thinking),
+  writing: getPercent(writing)
+});
 
-  function renderAcademicSection(
-    title,
-    data,
-    meaning,
-    strengths,
-    improve,
-    focus,
-    isWriting = false
-  ) {
-    const scoreText = isWriting
-      ? `Score: ${data.percent || 0} / 25`
-      : `Score: ${data.obtained || 0} / ${data.total || 0}`;
 
-    const accuracyText = isWriting ? null : `Accuracy: ${data.percent || 0}%`;
+  
+function renderAcademicSection(
+  title,
+  data,
+  meaning,
+  strengths,
+  improve,
+  focus,
+  isWriting = false
+) {
+  const percent = getPercent(data);
 
-    return (
-      <section className="pdf-section-card">
-        <h3 className="pdf-section-heading">{title}</h3>
+  const scoreText = isWriting
+    ? `Score: ${percent}%`
+    : `Accuracy: ${percent}%`;
 
-        {(isWriting ? data.percent : data.obtained) > 0 && (
-          <p className="pdf-line"><strong>{scoreText}</strong></p>
-        )}
+  return (
+    <section className="pdf-section-card">
+      <h3 className="pdf-section-heading">{title}</h3>
 
-        {accuracyText && (
-          <p className="pdf-line">{accuracyText}</p>
-        )}
+      <p className="pdf-line">
+        <strong>{scoreText}</strong>
+      </p>
 
-        <p className="pdf-line">
-          Performance Level:{" "}
-          <strong>{getPerformanceLevel(data.percent)}</strong>
+      <p className="pdf-line">
+        Performance Level:{" "}
+        <strong>{getPerformanceLevel(percent)}</strong>
+      </p>
+
+      <div className="pdf-sub-block">
+        <div className="pdf-mini-title">What this means</div>
+        <p>{meaning}</p>
+      </div>
+
+      <div className="pdf-sub-block">
+        <div className="pdf-mini-title">Strengths</div>
+        <p>
+          {getSmartStrengthComment(title, percent)} {strengths}
         </p>
+      </div>
 
-        <div className="pdf-sub-block">
-          <div className="pdf-mini-title">What this means</div>
-          <p>{meaning}</p>
-        </div>
+      <div className="pdf-sub-block">
+        <div className="pdf-mini-title">Area to Improve</div>
+        <p>
+          {percent < 65
+            ? `${title} should be prioritised in the next study cycle. `
+            : ""}
+          {improve}
+        </p>
+      </div>
 
-        <div className="pdf-sub-block">
-          <div className="pdf-mini-title">Strengths</div>
-          <p>
-            {getSmartStrengthComment(title, data.percent)}
-            {" "}
-            {strengths}
-          </p>
-        </div>
-
-        <div className="pdf-sub-block">
-          <div className="pdf-mini-title">Area to Improve</div>
-          <p>
-            {Number(data.percent || 0) < 65
-              ? `${title} should be prioritised in the next study cycle. `
-              : ""}
-            {improve}
-          </p>
-        </div>
-
-        <div className="pdf-sub-block">
-          <div className="pdf-mini-title">Recommended Focus</div>
-          <p>{focus}</p>
-        </div>
-      </section>
-    );
-  }
+      <div className="pdf-sub-block">
+        <div className="pdf-mini-title">Recommended Focus</div>
+        <p>{focus}</p>
+      </div>
+    </section>
+  );
+}
+  console.log("PROFILE AND RANK DATA:", {
+  profile_score: overall.profile_score,
+  gender_rank: overall.gender_rank,
+  total_gender_students: overall.total_gender_students,
+  overall_rank: overall.overall_rank,
+  total_students: overall.total_students,
+  overall
+});
 
   return (
     <div ref={ref} className="pdf-report-page">
@@ -372,7 +390,7 @@ const weakestSubject = Object.keys(subjectScores).reduce((a, b) =>
         <div className="pdf-metric-card">
           <div className="pdf-metric-label">Your Profile Score</div>
           <div className="pdf-metric-value">
-            {overall.profile_score || 0}
+            {overall.profile_score ?? overall.overall_percent ?? 0}
           </div>
           <div className="pdf-metric-sub">
             out of 100

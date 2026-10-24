@@ -128,17 +128,15 @@ export default function HomeworkSelectiveReadinessOverall({
   ============================ */
 
   const normalizeScore = (subject, value) => {
-    const max = MAX_SCORES[subject];
+  const actualValue =
+    typeof value === "object" && value !== null
+      ? value.score_percent
+      : value;
 
-    const actualValue =
-      typeof value === "object" && value !== null
-        ? value.percent
-        : value;
+  if (actualValue == null) return 0;
 
-    if (actualValue == null) return 0;
-
-    return Math.round((actualValue / max) * 100);
-  };
+  return Math.round(actualValue);
+};
 
   /* ============================
      Load students
@@ -197,6 +195,20 @@ export default function HomeworkSelectiveReadinessOverall({
       );
 
       const data = await res.json();
+      console.log(
+        "FULL RESPONSE JSON:",
+        JSON.stringify(data, null, 2)
+      );
+
+      console.log(
+        "READING SCORE OBJECT:",
+        JSON.stringify(data.components?.reading, null, 2)
+      );
+
+      console.log(
+        "NORMALIZED READING SCORE:",
+        normalizeScore("reading", data.components?.reading)
+      );
 
       if (!res.ok) {
         // Backend-controlled error handling
@@ -258,6 +270,11 @@ export default function HomeworkSelectiveReadinessOverall({
 
   function SubjectFocusCard({ subjectKey, label, rawScore }) {
     const percent = normalizeScore(subjectKey, rawScore);
+    console.log("SUBJECT CARD:", {
+      subjectKey,
+      rawScore,
+      percent
+    });
 
     // Extract safely from new backend format
     const obtained =

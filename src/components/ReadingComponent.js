@@ -766,6 +766,43 @@
       setVisited((v) => ({ ...v, [i]: true }));
       setIndex(i);
     };
+    
+const goToNextQuestion = () => {
+  const currentQuestion = questions[index];
+
+  if (!currentQuestion) return;
+
+  let nextIndex = index + 1;
+
+  // Dropdown Cloze displays multiple gaps together.
+  // Skip the remaining questions in the same section.
+  if (
+    currentQuestion.section_ref?.question_type === "dropdown_cloze"
+  ) {
+    const currentSectionId = currentQuestion.section_ref?.section_id;
+
+    while (nextIndex < questions.length) {
+      const nextQuestion = questions[nextIndex];
+
+      const isSameSection =
+        currentSectionId != null
+          ? nextQuestion.section_ref?.section_id === currentSectionId
+          : nextQuestion.section_ref === currentQuestion.section_ref;
+
+      if (!isSameSection) break;
+
+      nextIndex++;
+    }
+  }
+
+  // Move directly to the next question or question type.
+  if (nextIndex < questions.length) {
+    goTo(nextIndex);
+  } else {
+    setShowSubmitConfirm(true);
+  }
+};
+
     if (mode === "loading") {
     return <div>Loading...</div>;
   }  
@@ -1170,12 +1207,14 @@
       </button>
 
       {index < questions.length - 1 ? (
+        
         <button
           className="nav-btn next"
-          onClick={() => goTo(index + 1)}
+          onClick={goToNextQuestion}
         >
           Next
         </button>
+
       ) : (
         <button
           className="nav-btn finish"
@@ -1636,6 +1675,7 @@
           )}
         </div>
 
+        {!isDropdownCloze && (
         <div className="question-pane">
           {!isDropdownCloze && (
             <p className="question-text">
@@ -1673,6 +1713,7 @@
           
     
         </div>
+        )}
       </div>
       {showSubmitConfirm && (
     <div className="submit-modal-overlay">

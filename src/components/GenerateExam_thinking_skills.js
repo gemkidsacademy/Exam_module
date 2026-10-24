@@ -82,7 +82,7 @@ useEffect(() => {
         class_year: `Year ${selectedClassYear}`,
       });
 
-      const url = `${BACKEND_URL}/api/available-thinking-dates?${params.toString()}`;
+      const url = `${BACKEND_URL}/api/available-thinking-dates-new?${params.toString()}`;
 
       console.log("📅 FETCH THINKING DATES:", url);
 
