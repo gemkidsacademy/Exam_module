@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import styles from "./ThinkingSkillsReview.module.css";
 
@@ -10,37 +11,74 @@ export default function OcThinkingSkillsReview({
   const API_BASE = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
+    console.log(
+      "========== OC THINKING SKILLS REVIEW DEBUG =========="
+    );
+
+    console.log("👤 studentId:", studentId);
+    console.log("📝 examAttemptId:", examAttemptId);
+    console.log("🔍 parentMode:", parentMode);
+    console.log("🔍 parentMode type:", typeof parentMode);
+    console.log("🌐 API_BASE:", API_BASE);
+
     if (!studentId) {
-      console.log("⚠️ No studentId provided for review");
+      console.log("⚠️ No studentId provided. Request cancelled.");
       return;
     }
 
     const loadReviewQuestions = async () => {
       try {
-        console.log("🚀 Loading OC Thinking Skills review");
+        console.log("🚀 Starting OC Thinking Skills review request");
 
-        const endpoint =
-          parentMode === "homework"
-            ? "/api/student/homework-review/oc-thinking-skills"
-            : "/api/student/exam-review/oc-thinking-skills";
+        // Determine which review endpoint to use.
+        const isHomework =
+          parentMode === "homework" ||
+          parentMode === "report_homework";
 
-        let url = `${API_BASE}${endpoint}?student_id=${studentId}`;
+        console.log("🏠 Is homework mode:", isHomework);
+
+        const endpoint = isHomework
+          ? "/api/student/homework-review/oc-thinking-skills"
+          : "/api/student/exam-review/oc-thinking-skills";
+
+        console.log("🎯 Selected endpoint:", endpoint);
+
+        // Construct the request URL.
+        const params = new URLSearchParams({
+          student_id: studentId
+        });
 
         if (
           examAttemptId !== null &&
           examAttemptId !== undefined &&
           examAttemptId !== ""
         ) {
-          url += `&exam_attempt_id=${examAttemptId}`;
+          params.append("exam_attempt_id", examAttemptId);
         }
 
-        console.log("🌐 REVIEW URL:", url);
+        const url = `${API_BASE}${endpoint}?${params.toString()}`;
+
+        console.log("🌐 FINAL REVIEW URL:", url);
+        console.log("📤 Sending review API request...");
 
         const response = await fetch(url);
 
         console.log("📡 RESPONSE STATUS:", response.status);
+        console.log("📡 RESPONSE URL:", response.url);
 
         if (!response.ok) {
+          const errorBody = await response.text();
+
+          console.error("❌ REVIEW API ERROR:", {
+            status: response.status,
+            statusText: response.statusText,
+            url: response.url,
+            responseBody: errorBody,
+            parentMode,
+            isHomework,
+            selectedEndpoint: endpoint
+          });
+
           throw new Error(
             `Review fetch failed with status ${response.status}`
           );
@@ -51,12 +89,11 @@ export default function OcThinkingSkillsReview({
         console.log("===== OC REVIEW API RAW RESPONSE =====");
         console.log(data);
 
-        const questions =
-          Array.isArray(data.questions)
-            ? data.questions
-            : Array.isArray(data.review_questions)
-            ? data.review_questions
-            : [];
+        const questions = Array.isArray(data.questions)
+          ? data.questions
+          : Array.isArray(data.review_questions)
+          ? data.review_questions
+          : [];
 
         console.log("📚 QUESTIONS RECEIVED:", questions.length);
 
@@ -84,6 +121,10 @@ export default function OcThinkingSkillsReview({
         );
 
         onLoaded?.([]);
+      } finally {
+        console.log(
+          "========== END REVIEW DEBUG =========="
+        );
       }
     };
 
