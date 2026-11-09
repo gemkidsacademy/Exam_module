@@ -948,18 +948,19 @@ if (!currentQ) {
     })}
 
   {/* OPTIONS */}
+<div className="options-grid">
   {optionEntries.map(([key, opt], i) => {
     const optionKey = key.toUpperCase();
     const student = currentQ.student_answer?.trim().toUpperCase();
     const correct = currentQ.correct_answer?.trim().toUpperCase();
-    
+
     let statusClass = "";
-    
+
     if (isReview) {
       if (optionKey === correct) {
-        statusClass = "option-correct";     // green
+        statusClass = "option-correct";
       } else if (optionKey === student) {
-        statusClass = "option-wrong";       // red
+        statusClass = "option-wrong";
       }
     } else {
       if (answers[currentQ.q_id] === optionKey) {
@@ -975,20 +976,21 @@ if (!currentQ) {
         onClick={() => !isReview && handleAnswer(optionKey)}
       >
         {opt?.type === "image" ? (
-        <img
-          src={opt.src}
-          alt={`Option ${optionKey}`}
-          className="option-image"
-        />
-      ) : (
-        <div className="option-row">
-          <span className="option-label">{optionKey}.</span>
-          <span>{opt?.content}</span>
-        </div>
-      )}
+          <img
+            src={opt.src}
+            alt={`Option ${optionKey}`}
+            className="option-image"
+          />
+        ) : (
+          <div className="option-row">
+            <span className="option-label">{optionKey}.</span>
+            <span>{opt?.content}</span>
+          </div>
+        )}
       </button>
     );
   })}
+</div>
   {/* AI EXPLANATION SECTION */}
   {isReview && (
     <div style={{ marginTop: "20px" }}>

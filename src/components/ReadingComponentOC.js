@@ -1509,21 +1509,13 @@ console.log("EXTRACTS:", currentQuestion?.reading_material?.extracts);
                 /* ===================================== */
 
                 (
-
                   <>
-
-                    {rm?.title && (
-                      <h3>{rm.title}</h3>
-                    )}
-
                     {rm?.paragraphs ? (
                       rm.paragraphs.map((p, idx) => (
                         <p key={idx}>{p}</p>
                       ))
                     ) : null}
-
                   </>
-
                 )}
 
               {rm.content && (

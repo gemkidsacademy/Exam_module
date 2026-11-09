@@ -1085,3 +1085,125 @@ body {
     justify-content: center;
   }
 }
+/* ============================================
+   OPTION IMAGE DISPLAY FIX
+============================================ */
+
+.option-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  height: auto;
+  min-height: 0;
+
+  overflow: visible;
+  white-space: normal;
+}
+
+.option-btn .option-image {
+  display: block;
+
+  width: auto;
+  height: auto;
+
+  max-width: 100%;
+  max-height: none;
+
+  object-fit: contain;
+
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+/* Fix image option button height and prevent overlap */
+
+.option-btn:has(.option-image) {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+
+    width: 100% !important;
+    align-self: stretch;
+
+    height: auto !important;
+    min-height: 125px !important;
+
+    box-sizing: border-box;
+    padding: 12px !important;
+    margin-bottom: 12px;
+
+    overflow: visible !important;
+    position: relative;
+}
+
+.option-btn .option-image {
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    object-fit: contain;
+    margin: 0 auto;
+}
+/* ============================================
+   TWO-COLUMN OPTION GRID
+============================================ */
+
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+    align-items: stretch;
+}
+
+/* Individual option */
+.options-grid .option-btn {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+
+    margin: 0;
+    padding: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+/* Complete image without cropping */
+.options-grid .option-image {
+    display: block;
+
+    width: auto;
+    height: auto;
+
+    max-width: 100%;
+    max-height: 180px;
+
+    object-fit: contain;
+    object-position: center;
+
+    flex-shrink: 0;
+    margin: auto;
+}
+
+/* Responsive layout */
+@media (max-width: 600px) {
+    .options-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .options-grid .option-btn {
+        padding: 8px;
+    }
+
+    .options-grid .option-image {
+        max-height: 140px;
+    }
+}
