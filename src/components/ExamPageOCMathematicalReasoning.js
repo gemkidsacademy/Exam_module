@@ -615,7 +615,15 @@ if (!currentQ) {
 
   
   const optionEntries = Object.entries(currentQ.options || {});
+  console.log("========== OPTION DEBUG ==========");
+  console.log("Parent Mode:", parentMode);
+  console.log("Question ID:", currentQ.q_id);
+  console.log("Raw Options:", currentQ.options);
+  console.log("Option Entries:", optionEntries);
 
+  optionEntries.forEach(([key, opt]) => {
+    console.log(`Option ${key}:`, opt);
+  });
   
   
   return (
@@ -948,11 +956,17 @@ if (!currentQ) {
     })}
 
   {/* OPTIONS */}
+
+{/* OPTIONS */}
 <div className="options-grid">
   {optionEntries.map(([key, opt], i) => {
     const optionKey = key.toUpperCase();
-    const student = currentQ.student_answer?.trim().toUpperCase();
-    const correct = currentQ.correct_answer?.trim().toUpperCase();
+
+    const student =
+      currentQ.student_answer?.trim().toUpperCase();
+
+    const correct =
+      currentQ.correct_answer?.trim().toUpperCase();
 
     let statusClass = "";
 
@@ -968,22 +982,37 @@ if (!currentQ) {
       }
     }
 
+    // Support both actual exam and homework structures
+    const optionSrc =
+      opt?.type === "image"
+        ? opt.src
+        : (
+            typeof opt?.content === "string" &&
+            /^https?:\/\/.+\.(png|jpg|jpeg|webp|gif)(\?.*)?$/i.test(opt.content)
+          )
+          ? opt.content
+          : null;
+
     return (
       <button
         key={i}
         disabled={isReview}
         className={`option-btn ${statusClass}`}
-        onClick={() => !isReview && handleAnswer(optionKey)}
+        onClick={() =>
+          !isReview && handleAnswer(optionKey)
+        }
       >
-        {opt?.type === "image" ? (
+        {optionSrc ? (
           <img
-            src={opt.src}
+            src={optionSrc}
             alt={`Option ${optionKey}`}
             className="option-image"
           />
         ) : (
           <div className="option-row">
-            <span className="option-label">{optionKey}.</span>
+            <span className="option-label">
+              {optionKey}.
+            </span>
             <span>{opt?.content}</span>
           </div>
         )}
@@ -991,6 +1020,7 @@ if (!currentQ) {
     );
   })}
 </div>
+
   {/* AI EXPLANATION SECTION */}
   {isReview && (
     <div style={{ marginTop: "20px" }}>
